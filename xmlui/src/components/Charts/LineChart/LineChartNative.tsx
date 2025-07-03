@@ -112,35 +112,44 @@ export function LineChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width="100%" height="100%">
-        <RLineChart
-          accessibilityLayer
-          data={data}
-          margin={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
-        >
-          <XAxis
-            interval="preserveEnd"
-            dataKey={nameKey}
-            tickLine={false}
-            hide={hideX}
-            axisLine={false}
-            tick={{ fill: "currentColor" }}
-            tickFormatter={tickFormatter}
-            minTickGap={5}
-          />
-          {!hideTooltip && <Tooltip content={<TooltipContent />} />}
-          {Object.keys(config).map((key, index) => (
-            <Line
-              key={index}
-              dataKey={key}
-              type="monotone"
-              stroke={config[key].color}
-              dot={false}
+      <div
+        style={{
+          flexGrow: 1,
+          minHeight: 0,
+          width: style.width || "100%",
+          height: style.height || "100%",
+        }}
+      >
+        <ResponsiveContainer style={style} width="100%" height="100%">
+          <RLineChart
+            accessibilityLayer
+            data={data}
+            margin={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
+          >
+            <XAxis
+              interval="preserveEnd"
+              dataKey={nameKey}
+              tickLine={false}
+              hide={hideX}
+              axisLine={false}
+              tick={{ fill: "currentColor" }}
+              tickFormatter={tickFormatter}
+              minTickGap={5}
             />
-          ))}
-          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
-        </RLineChart>
-      </ResponsiveContainer>
+            {!hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {Object.keys(config).map((key, index) => (
+              <Line
+                key={index}
+                dataKey={key}
+                type="monotone"
+                stroke={config[key].color}
+                dot={false}
+              />
+            ))}
+            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+          </RLineChart>
+        </ResponsiveContainer>
+      </div>
     </ChartProvider>
   );
 }
