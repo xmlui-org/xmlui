@@ -52,6 +52,8 @@
                 <NavLink label="Forms" to="/forms"/>
                 <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
+                <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
+                <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavGroup label="Reference">
                 <RecursiveNavTree
@@ -70,8 +72,6 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
-                <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
-                <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
             <NavLink label="MCP" to="/mcp"/>
@@ -143,7 +143,7 @@
                 <DocumentPage url="/pages/working-with-text.md"/>
             </Page>
             <Page url="/working-with-markdown">
-                <DocumentPage hideToc="true" url="/pages/working-with-markdown.md"/>
+                <DocumentPage url="/pages/working-with-markdown.md"/>
             </Page>
             <Page url="/routing-and-links">
                 <DocumentPage url="/pages/routing-and-links.md"/>
