@@ -5,7 +5,7 @@
 - **Text overflow control**: Automatic ellipses and line limiting for long headings
 - **Anchor generation**: Optional hover anchors for deep linking to specific sections
 
-For the shorthand versions see: [H1](/components/H1), [H2](/components/H2), [H3](/components/H3), [H4](/components/H4), [H5](/components/H5), [H6](/components/H6).
+For the shorthand versions see: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
 ```xmlui-pg copy display name="Example: Headings with levels"
 <App>

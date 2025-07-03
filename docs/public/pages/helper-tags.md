@@ -122,3 +122,19 @@ The `<event>` is necessary when using `<APICall>` as an event handler.
 </Button>
 ```
 
+## script
+
+The `<script>` tag declares inline JavaScript code.
+
+```xlmlui
+<Component name="ImportProducts">
+  <script>
+    var parsedCsv = null;
+
+    function isDuplicate(name) {
+      return existingProducts.value.some(p => p.name === name);
+    }
+  </script>
+...
+```
+

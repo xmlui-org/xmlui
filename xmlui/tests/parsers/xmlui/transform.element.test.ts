@@ -1,8 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import type { ExpressionStatement, Identifier, Statement} from "../../../src/abstractions/scripting/ScriptingSourceTree";
-import { T_EXPRESSION_STATEMENT, T_IDENTIFIER } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import type { ExpressionStatement, Identifier, Statement} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { T_EXPRESSION_STATEMENT, T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Xmlui transform - child elements", () => {
   it("Comments ignored, whitespace collapsed", () => {

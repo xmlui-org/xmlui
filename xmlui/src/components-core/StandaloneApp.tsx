@@ -8,7 +8,6 @@ import type {
   ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
-import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
 
 import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
@@ -51,6 +50,7 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
+import { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;

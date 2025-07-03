@@ -1,10 +1,9 @@
 import styles from "./AppHeader.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
 import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
 

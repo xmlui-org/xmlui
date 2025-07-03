@@ -13,11 +13,13 @@ export function ApiInterceptorProvider({
   children,
   apiWorker,
   useHashBasedRouting,
+  waitForApiInterceptor = false
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
   apiWorker?: SetupWorker;
   useHashBasedRouting?: boolean;
+  waitForApiInterceptor?: boolean;
 }) {
   const [initialized, setInitialized] = useState(!interceptor);
   const [interceptorWorker, setInterceptorWorker] = useState<SetupWorker | null>(null);
@@ -72,7 +74,7 @@ export function ApiInterceptorProvider({
 
   return (
     <ApiInterceptorContext.Provider value={contextValue}>
-      {children}
+      {waitForApiInterceptor && !initialized ? null : children}
     </ApiInterceptorContext.Provider>
   );
 }

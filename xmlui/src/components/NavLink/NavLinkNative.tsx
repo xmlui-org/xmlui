@@ -16,7 +16,7 @@ import { NavGroupContext } from "../NavGroup/NavGroupContext";
 // Default props for NavLink component
 export const defaultProps = {
   active: false,
-  displayActive: true
+  displayActive: true,
 };
 
 type Props = {
@@ -52,12 +52,16 @@ export const NavLink = forwardRef(function NavLink(
   ref: Ref<any>,
 ) {
   const appLayoutContext = useAppLayoutContext();
+  const layoutIsVertical =
+    !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
   const navPanelContext = useContext(NavPanelContext);
-  const {level} = useContext(NavGroupContext);
+  const inDrawer = navPanelContext?.inDrawer;
+  
+  const { level } = useContext(NavGroupContext);
   let safeVertical = vertical;
-  if (appLayoutContext && safeVertical === undefined) {
-    safeVertical =
-      getAppLayoutOrientation(appLayoutContext.layout) === "vertical" || navPanelContext?.inDrawer;
+
+  if (safeVertical === undefined) {
+    safeVertical = layoutIsVertical || inDrawer;
   }
   const smartTo = useMemo(() => {
     if (to) {
@@ -65,13 +69,12 @@ export const NavLink = forwardRef(function NavLink(
     }
   }, [to]) as To;
 
-  const styleObj = useMemo(()=>{
+  const styleObj = useMemo(() => {
     return {
-      "--nav-link-level": level + 1,
+      "--nav-link-level": layoutIsVertical ? level + 1 : 0,
       ...style,
-    }
-  }, [level, style]);
-
+    };
+  }, [level, style, layoutIsVertical]);
 
   const baseClasses = classnames(styles.content, styles.base, {
     [styles.disabled]: disabled,
@@ -80,12 +83,13 @@ export const NavLink = forwardRef(function NavLink(
     [styles.navItemActive]: displayActive && forceActive,
   });
 
-  let innerContent =
+  let innerContent = (
     <div className={styles.innerContent}>
-    {icon}
-    {children}
+      {icon}
+      {children}
     </div>
-  let content;
+  );
+  let content: React.ReactNode = null;
   if (disabled || !smartTo) {
     content = (
       <button
@@ -112,7 +116,7 @@ export const NavLink = forwardRef(function NavLink(
           classnames(baseClasses, {
             [styles.displayActive]: displayActive,
             [styles.navItemActive]: displayActive && (isActive || forceActive),
-            'xmlui-navlink-active': isActive || forceActive
+            "xmlui-navlink-active": isActive || forceActive,
           })
         }
       >

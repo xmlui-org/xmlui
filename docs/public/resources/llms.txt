@@ -65,7 +65,7 @@ app/
     </NavGroup>
   </NavPanel>
 
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Dashboard />
     </Page>

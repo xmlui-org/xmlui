@@ -6,7 +6,7 @@ import {
   Literal,
   T_CONST_STATEMENT,
   T_LITERAL,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - regex literals", () => {
   it("null", () => {

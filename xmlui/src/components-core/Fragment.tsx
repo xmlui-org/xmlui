@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { createMetadata } from "../abstractions/ComponentDefs";
 import { createComponentRenderer } from "./renderers";
+import { createMetadata } from "../components/metadata-helpers";
 
 const COMP = "Fragment";
 export const FragmentMd = createMetadata({
@@ -8,6 +8,9 @@ export const FragmentMd = createMetadata({
     "`Fragment` provides conditional rendering. You can use `when=` on any " +
     "component to render it conditionally, use `Fragment` to apply `when` to a group of components.",
   opaque: true,
+  props: {
+    // Note: 'when' is a universal property defined in ComponentDefCore, no need to redefine it here
+  },
 });
 
 export const fragmentComponentRenderer = createComponentRenderer(

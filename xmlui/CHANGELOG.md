@@ -1,5 +1,43 @@
 # xmlui
 
+## 0.9.63
+
+### Patch Changes
+
+- b9c0881: Fix: add a workaround to ListNative to avoid issues coming from undefined row values
+
+## 0.9.62
+
+### Patch Changes
+
+- 832f31d: fix: nestedApp fills the available space in AppWithCode component
+- 4f9ff06: Fix the build issue with FormSection
+
+## 0.9.61
+
+### Patch Changes
+
+- 4ef5f3f: This version does not contain any real changes; it's just for bumping the version number.
+
+## 0.9.60
+
+### Patch Changes
+
+- f37ed8c: Fine tune AppWithCodeView header
+- 736dbc8: improve: AppWithCode - center the XML/UI buttons
+- e2a6e1a: Add a popOutUrl="<url>" option to xmlui-pg to allow pop out to a custom playground location
+
+## 0.9.59
+
+### Patch Changes
+
+- 2a07157: Rename Pages property 'defaultRoute' to 'fallbackPath'
+- 97b3241: improve: expanding the styles of the components responsible for code display with new theme variables.
+- c4abb20: Fixed RadioGroup disabled and validation indicator states. Also fixed an issue where the checked indicator was not aligned to center if the RadioGroup Option was resized in some way.
+- f19720c: Added 0 min width to PieChart, Fixed focus error when one checkbox's state change depended on another
+- 66c2288: Fixed NavLink indentation in horizontal App layout, if in a nested NavGroup in the NavPanel
+- 2d27204: Fixed a number of color & visual state representations of the components: DatePicker, Switch, Select, TextBox, TextArea, NumberBox, AutoComplete
+
 ## 0.9.58
 
 ### Patch Changes

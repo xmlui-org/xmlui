@@ -1,10 +1,10 @@
 import styles from "./TableOfContents.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";

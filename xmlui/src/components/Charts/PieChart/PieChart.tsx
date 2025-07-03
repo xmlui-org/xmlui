@@ -1,10 +1,10 @@
 import { defaultProps, PieChart } from "./PieChartNative";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
-import { createMetadata, d } from "../../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import type { LabelPosition } from "recharts/types/component/Label";
+import { createMetadata, d } from "../../metadata-helpers";
 
 const COMP = "PieChart";
 

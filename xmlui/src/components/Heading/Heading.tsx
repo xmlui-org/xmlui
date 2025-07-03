@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 import styles from "./Heading.module.scss";
 
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
@@ -10,6 +10,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
+import { d, createMetadata } from "../metadata-helpers";
 
 const COMP = "Heading";
 

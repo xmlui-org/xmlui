@@ -1,8 +1,8 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "ToneChangerButton";
 const LIGHT_TO_DARK_ICON = "lightToDark:ToneChangerButton";

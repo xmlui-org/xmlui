@@ -59,10 +59,5 @@
       <PaletteItem width="33.3%" color="backgroundColor--disabled"/>
       <PaletteItem width="33.3%" color="backgroundColor--selected"/>
     </FlowLayout>
-    <DocumentLinks 
-      prevLink="/globals" 
-      prevTitle="Globals" 
-      nextLink="/icons" 
-      nextTitle="Icons"/>
   </DocumentPage>
 </Component>

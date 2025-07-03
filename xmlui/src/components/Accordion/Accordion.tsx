@@ -1,9 +1,9 @@
 import styles from "./Accordion.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dCollapse,
   dDidChange,
   dExpand,
@@ -65,7 +65,9 @@ export const AccordionMd = createMetadata({
     expanded: dExpanded(COMP),
     expand: dExpand(COMP),
     collapse: dCollapse(COMP),
-    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
+    toggle: {
+      description: `This method toggles the state of the ${COMP} between expanded and collapsed.`
+    },
     focus: dFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),

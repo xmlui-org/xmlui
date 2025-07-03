@@ -183,7 +183,7 @@ export function PieChart({
           height: style.height || "100%",
         }}
       >
-        <ResponsiveContainer style={style} width="100%" height="100%">
+        <ResponsiveContainer style={style} width="100%" height="100%" minWidth={0}>
           <RPieChart>
             <Tooltip content={<TooltipContent />} />
             <Pie

@@ -1,9 +1,9 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -63,14 +63,19 @@ export const SwitchMd = createMetadata({
     [`backgroundColor-checked-${COMP}-warning`]: `$borderColor-${COMP}-warning`,
     [`borderColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
     [`backgroundColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
-    [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-${COMP}`]: "$color-surface-0",
     [`borderColor-${COMP}`]: "$color-surface-200",
     [`borderWidth-${COMP}`]: "1px",
-    [`backgroundColor-indicator-${COMP}`]: "$color-surface-200",
+    [`backgroundColor-indicator-${COMP}`]: "$color-surface-400",
+    [`backgroundColor-${COMP}-indicator--disabled`]: "$backgroundColor-primary",
     [`backgroundColor-indicator-checked-${COMP}`]: "$backgroundColor-primary",
     [`borderColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
+
+    dark: {
+      [`backgroundColor-indicator-${COMP}`]: "$color-surface-500",
+    }
   },
 });
 

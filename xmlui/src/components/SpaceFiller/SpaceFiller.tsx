@@ -1,9 +1,9 @@
 import styles from "./SpaceFiller.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { SpaceFiller } from "./SpaceFillerNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "SpaceFiller";
 

@@ -1,10 +1,9 @@
 import styles from "./ExpandableItem.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
 import { defaultExpandableItemProps, ExpandableItem } from "./ExpandableItemNative";
 
 const COMP = "ExpandableItem";

@@ -38,7 +38,6 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 
 **Layout**: [FlowLayout](/components/FlowLayout), [HStack](/components/HStack), [VStack](/components/VStack) ...
 
-
 **Navigation**: [DropdownMenu](/components/DropdownMenu),
 [MenuItem](/components/MenuItem),
 [NavLink](/components/NavLink),
@@ -69,7 +68,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
   </HStack>
 ```
-]]>
+      ]]>
     </Markdown>
     <FlowLayout>
       <Stack width="*">
@@ -92,7 +91,6 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
     <FlowLayout>
       <Markdown width="*">
         <![CDATA[
-
 ```xmlui
 <Component name="TubeStops">
 
@@ -121,12 +119,12 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 </Component>
 ```
-    ]]>
+        ]]>
       </Markdown>
 
       <ExpandableItem summary="view the transformStops function">
-      <Markdown width="*">
-        <![CDATA[
+        <Markdown width="*">
+          <![CDATA[
 ```
 window.transformStops = function(stops) {
   return stops.map(function(stop) {
@@ -149,9 +147,9 @@ window.transformStops = function(stops) {
   });
 }
 ```
-]]>
-      </Markdown>
-    </ExpandableItem>
+          ]]>
+        </Markdown>
+      </ExpandableItem>
     </FlowLayout>
     <Markdown>
       <![CDATA[
@@ -166,13 +164,7 @@ The `TubeStops` component:
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
 Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
-
-]]>
+      ]]>
     </Markdown>
-    <DocumentLinks
-      prevLink="/reactive-intro"
-      prevTitle="Reactive Data"
-      nextLink="/themes-intro"
-      nextTitle="Themes"/>
   </DocumentPage>
 </Component>

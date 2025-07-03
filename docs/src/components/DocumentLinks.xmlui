@@ -1,6 +1,4 @@
 <Component name="DocumentLinks">
-  <!-- 
-    We tempoprarily removed document links.
   <Theme 
     textDecorationLine-Link="none" 
     textColor-Link="$textColor-DocumentLinks" 
@@ -8,22 +6,21 @@
     backgroundColor-ContentSeparator="$backgroundColor-separator-DocumentLinks">
     <ContentSeparator 
       marginVertical="$space-6" 
-      when="{$props.prevLink || $props.nextLink}"/>
+      when="{$linkInfo.prevLink || $linkInfo.nextLink}"/>
     <HStack verticalAlignment="center" gap="$space-2">
-      <Link when="{$props.prevLink}" to="{$props.prevLink}">
+      <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
         <Icon name="chevronleft"/>
         <Text variant="subtitle">
-          {$props.prevTitle}
+          {$linkInfo.prevLink.label}
         </Text>
       </Link>
       <SpaceFiller/>
-      <Link when="{$props.nextLink}" to="{$props.nextLink}">
+      <Link when="{$linkInfo.nextLink}" to="{$linkInfo.nextLink.to}">
         <Text variant="subtitle">
-          {$props.nextTitle}
+          {$linkInfo.nextLink.label}
         </Text>
         <Icon name="chevronright"/>
       </Link>
     </HStack>
   </Theme>
-  -->
 </Component>

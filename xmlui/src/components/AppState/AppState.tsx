@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../metadata-helpers";
 import { AppState, defaultProps } from "./AppStateNative";
 
 const COMP = "AppState";

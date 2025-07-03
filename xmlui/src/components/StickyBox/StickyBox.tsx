@@ -1,9 +1,9 @@
 import styles from "./StickyBox.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { StickyBox, defaultProps } from "./StickyBoxNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "StickyBox";
 

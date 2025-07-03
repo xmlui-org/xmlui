@@ -12,14 +12,14 @@ import {
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
-import { useParams, useSearchParams } from "@remix-run/react";
+import { useLocation, useParams, useSearchParams } from "@remix-run/react";
 
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "../abstractions/containers";
-import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { ContainerActionKind } from "./containers";
+import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
@@ -40,6 +40,7 @@ import {
   ComponentApi,
   StatePartChangedFn,
 } from "./ContainerWrapper";
+import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -253,6 +254,8 @@ export const StateContainer = memo(
 const useRoutingParams = () => {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
+  const location = useLocation();
+  const appLayoutContext = useAppLayoutContext();
   const queryParamsMap = useMemo(() => {
     const result: Record<string, any> = {};
     for (const [key, value] of Array.from(queryParams.entries())) {
@@ -263,8 +266,10 @@ const useRoutingParams = () => {
 
   return useMemo(() => {
     return {
+      $pathname: location.pathname,
       $routeParams: routeParams,
       $queryParams: queryParamsMap,
+      $linkInfo: appLayoutContext?.linkMap?.get(location.pathname) || {},
     };
   }, [queryParamsMap, routeParams]);
 };

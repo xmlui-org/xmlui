@@ -1,6 +1,6 @@
 import { BarChart, defaultProps } from "./BarChartNative";
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "BarChart";
 

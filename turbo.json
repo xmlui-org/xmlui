@@ -44,7 +44,7 @@
       "outputs": ["dist/**"]
     },
     "gen:releases": {
-      "env": ["GITHUB_TOKEN"],
+      "env": ["GITHUB_TOKEN", "DOCS_XMLUI_MAX_RELEASES_LENGTH"],
       "outputs": ["public/resources/files/releases.json"]
     },
     "build:ext-meta": {},

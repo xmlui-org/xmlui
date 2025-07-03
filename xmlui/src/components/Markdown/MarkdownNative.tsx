@@ -118,7 +118,6 @@ export const Markdown = memo(function Markdown({
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
-            console.log("details", children);
             return (
               <details className={htmlTagStyles.htmlDetails} {...props}>
                 {children}
@@ -338,7 +337,6 @@ export const Markdown = memo(function Markdown({
             return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
           },
           samp({ ...props }) {
-            const nestedProps = props as any;
             const markdownContentBase64 = props?.["data-pg-markdown"];
             const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
             const dataContentBase64 = props?.["data-pg-content"];
@@ -357,7 +355,9 @@ export const Markdown = memo(function Markdown({
                 height={appProps.height}
                 allowPlaygroundPopup={!appProps.noPopup}
                 withFrame={appProps.noFrame ? false : true}
-                sideBySide={appProps.sideBySide ?? false}
+                splitView={appProps.splitView ?? false}
+                initiallyShowCode={appProps.initiallyShowCode ?? false}
+                popOutUrl={appProps.popOutUrl}
               />
             );
           },

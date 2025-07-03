@@ -1,13 +1,14 @@
 import styles from "./App.module.scss";
 import drawerStyles from "./Sheet.module.scss";
 
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App, defaultProps } from "./AppNative";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
@@ -92,7 +93,9 @@ export const AppMd = createMetadata({
     },
   },
   events: {
-    ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
+    ready: {
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -389,13 +392,18 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
   );
 }
 
-const HIDDEN_STYLE = {
+const HIDDEN_STYLE: CSSProperties = {
+  position: "absolute",
+  top: "-9999px",
   display: "none",
+};
+
+const indexerContextValue = {
+  indexing: true,
 };
 
 function SearchIndexCollector({ Pages, renderChild }) {
   const appContext = useAppContext();
-  const indexerContextValue = useMemo(() => ({ indexing: true }), []);
   const setIndexing = useSearchContextSetIndexing();
 
   const [isClient, setIsClient] = useState(false);

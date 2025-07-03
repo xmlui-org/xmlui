@@ -1,10 +1,10 @@
 import styles from "./AppWithCodeView.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
 import { defaultProps } from "./defaultProps";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "AppWithCodeView";
 
@@ -17,7 +17,7 @@ It supports both side-by-side and stacked layouts.`,
       description: "The markdown content to be displayed alongside the app",
       valueType: "string",
     },
-    sideBySide: {
+    splitView: {
       description: "Whether to render the markdown and app side by side or stacked vertically",
       valueType: "boolean",
     },
@@ -71,11 +71,34 @@ It supports both side-by-side and stacked layouts.`,
 export const appWithCodeViewComponentRenderer = createComponentRenderer(
   COMP,
   AppWithCodeViewMd,
-  ({ node, extractValue }) => {
+  ({ node, extractValue, renderChild }) => {
+    let renderedChildren = "";
+
+    // 1. Static content prop fallback
+    if (!renderedChildren) {
+      renderedChildren = extractValue.asString(node.props.markdown);
+    }
+
+    // 2. "data" property fallback
+    if (!renderedChildren && typeof (node.props as any).data === "string") {
+      renderedChildren = extractValue.asString((node.props as any).data);
+    }
+
+    // 3. Children fallback
+    if (!renderedChildren) {
+      (node.children ?? []).forEach((child) => {
+        const renderedChild = renderChild(child);
+        console.log("renderedChild", renderedChild);
+        if (typeof renderedChild === "string") {
+          renderedChildren += renderedChild;
+        }
+      });
+    }
+
     return (
       <AppWithCodeViewNative
-        markdown={extractValue(node.props?.markdown)}
-        sideBySide={extractValue.asOptionalBoolean(node.props?.sideBySide)}
+        markdown={renderedChildren}
+        splitView={extractValue.asOptionalBoolean(node.props?.splitView)}
         app={node.props?.app}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}

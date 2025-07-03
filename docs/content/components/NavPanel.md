@@ -3,6 +3,7 @@
 `NavPanel` defines the navigation structure within an App, serving as a container for NavLink and NavGroup components that create your application's primary navigation menu. Its appearance and behavior automatically adapt based on the App's layout configuration.
 
 **Key features:**
+
 - **Layout adaptation**: Automatically positions navigation horizontally or vertically based on App layout
 - **Navigation organization**: Contains NavLink and NavGroup components to build structured menus
 - **Logo integration**: Supports custom logo templates in vertical layouts via logoTemplate property
@@ -31,7 +32,7 @@ This property defines the logo template to display in the navigation panel with 
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>

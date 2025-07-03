@@ -1,7 +1,6 @@
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
-import { dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent } from "./TreeNative";
 
 const COMP = "Tree";

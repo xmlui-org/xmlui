@@ -2,6 +2,12 @@ name: Deploy docs
 
 on:
   workflow_dispatch:
+    inputs:
+      max_releases:
+        description: "Maximum number of releases to include in docs"
+        type: number
+        required: false
+        default: 10
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,6 +35,7 @@ jobs:
       - run: npm run build-docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
 
       - name: "Run Azure webapp deploy action using publish profile credentials"
         uses: azure/webapps-deploy@v2

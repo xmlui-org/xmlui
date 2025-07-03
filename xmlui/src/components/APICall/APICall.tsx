@@ -1,7 +1,7 @@
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
-import { dInternal } from "../../components/metadata-helpers";
+import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
 import { APICallNative, defaultProps } from "./APICallNative";
 
@@ -117,33 +117,40 @@ export const APICallMd = createMetadata({
     getOptimisticValue: dInternal(),
   },
   events: {
-    beforeRequest: d(
-      "This event fires before the request is sent. Returning an explicit boolean" +
-        "\`false\` value will prevent the request from being sent.",
-    ),
-    success: d("This event fires when a request results in a success."),
-    /**
-     * This event fires when a request results in an error.
-     * @descriptionRef
-     */
-    error: d("This event fires when a request results in an error."),
+    beforeRequest: {
+      description: "This event fires before the request is sent. Returning an explicit boolean" +
+        "\`false\` value will prevent the request from being sent."
+    },
+    success: {
+      description: "This event fires when a request results in a success."
+    },
+    // This event fires when a request results in an error.
+    error: {
+      description: "This event fires when a request results in an error."
+    },
     progress: dInternal(),
   },
   contextVars: {
-    $param: d("The first parameter passed to `execute()` method"),
-    $params: d(
-      "Array of all parameters passed to `execute()` method (access with " +
-        "`$params[0]`, `$params[1]`, etc.)",
-    ),
-    $result: d("Response data (available in `completedNotificationMessage` and `success` event)"),
-    $error: d("Error details (available in `errorNotificationMessage` and `error` event)"),
+    $param: {
+      description: "The first parameter passed to `execute()` method"
+    },
+    $params: {
+      description: "Array of all parameters passed to `execute()` method (access with " +
+        "`$params[0]`, `$params[1]`, etc.)"
+    },
+    $result: {
+      description: "Response data (available in `completedNotificationMessage` and `success` event)"
+    },
+    $error: {
+      description: "Error details (available in `errorNotificationMessage` and `error` event)"
+    },
   },
   apis: {
-    execute: d(
-      "This method triggers the invocation of the API. You can pass an arbitrary " +
+    execute: {
+      description: "This method triggers the invocation of the API. You can pass an arbitrary " +
         "number of parameters to the method. In the \`APICall\` instance, you can " +
-        "access those with the \`$param\` and \`$params\` context values.",
-    ),
+        "access those with the \`$param\` and \`$params\` context values."
+    },
   },
 });
 

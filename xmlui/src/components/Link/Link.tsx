@@ -1,9 +1,8 @@
 import styles from "./Link.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
 

@@ -273,6 +273,10 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-warning | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-warning | *none* | *none* |
 | [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
 | [outlineColor](../styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |

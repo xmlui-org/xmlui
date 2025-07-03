@@ -12,9 +12,12 @@
             <SpaceFiller/>
             <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
+            <Link to="https://github.com/xmlui-org/xmlui">
+                <Button variant="ghost" icon="github" />
+            </Link>
         </AppHeader>
 
-        <NavPanel>
+        <NavPanel when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
             <Stack paddingHorizontal="$space-4" paddingBottom="$space-4" when="{mediaSize.sizeIndex <= 2}">
                 <Search data="{appGlobals.plainTextContent}" />
             </Stack>
@@ -53,8 +56,6 @@
             <NavGroup label="Reference">
                 <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
-                <RecursiveNavTree
-                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
@@ -64,6 +65,7 @@
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
                 <NavLink label="Helper Tags" to="/helper-tags"/>
+                <NavLink label="Universal Properties" to="/universal-properties"/>
                 <NavLink label="Template Properties" to="/template-properties"/>
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
@@ -75,7 +77,7 @@
 
         </NavPanel>
 
-        <Pages>
+        <Pages fallbackPath="/404">
             <Page url="/">
                 <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>
@@ -178,6 +180,9 @@
             <Page url="/helper-tags">
                 <DocumentPage url="pages/helper-tags.md" />
             </Page>
+            <Page url="/universal-properties">
+                <DocumentPage url="pages/universal-properties.md" />
+            </Page>
             <Page url="/template-properties">
                 <DocumentPage url="pages/template-properties.md" />
             </Page>
@@ -199,8 +204,16 @@
             <Page url="/mcp">
                 <DocumentPage hideToc="true" url="/pages/mcp.md" />
             </Page>
-            <Page url="/*">
-                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
+            <Page url="/components/*">
+                <script>
+                  var contentKey = 'components/' + $routeParams['*'];
+                  var content = appGlobals.content[contentKey];
+                </script>
+                <DocumentPage when="{content}" content="{content}" />
+                <PageNotFound when="{!content}" />
+            </Page>
+            <Page url="/404">
+                <PageNotFound />
             </Page>
         </Pages>
     </App>

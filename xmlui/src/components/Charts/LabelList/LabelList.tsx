@@ -1,9 +1,9 @@
 import styles from "./LabelListNative.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "LabelList";
 

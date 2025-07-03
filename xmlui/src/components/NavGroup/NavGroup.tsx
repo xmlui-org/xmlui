@@ -1,11 +1,10 @@
 import styles from "./NavGroup.module.scss";
 import navLinkStyles from "../NavLink/NavLink.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Icon } from "../Icon/IconNative";
-import { dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { defaultProps, NavGroup } from "./NavGroupNative";
 
 const COMP = "NavGroup";

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   generateBaseFontSizes,
   generateBaseSpacings,
@@ -25,16 +25,15 @@ import {
   XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
 } from "../theming/themes/xmlui";
-import { SolidThemeDefinition } from "../theming/themes/solid";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
-import {
+import type {
   AppThemes,
   FontDef,
   ThemeDefinition,
   ThemeScope,
   ThemeTone,
-  ThemeToneKeys,
 } from "../../abstractions/ThemingDefs";
+import { ThemeToneKeys } from "./utils";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,

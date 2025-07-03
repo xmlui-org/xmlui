@@ -1,9 +1,9 @@
 import styles from "./Footer.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Footer, defaultProps } from "./FooterNative";
+import { Footer } from "./FooterNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Footer";
 
@@ -23,6 +23,7 @@ export const FooterMd = createMetadata({
     [`borderTop-${COMP}`]: `1px solid $borderColor`,
     [`padding-${COMP}`]: "$space-2 $space-4",
     [`gap-${COMP}`]: "$space-normal",
+    [`margin-${COMP}`]: `0 auto`,
     light: {
       // --- No light-specific theme vars
     },

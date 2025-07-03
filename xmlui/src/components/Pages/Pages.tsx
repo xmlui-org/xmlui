@@ -1,7 +1,6 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
-import { dInternal } from "../metadata-helpers";
+import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
 
 const PAGE = "Page";
@@ -51,9 +50,9 @@ export const PagesMd = createMetadata({
     "`Pages` serves as the routing coordinator within an [App](/components/App), " +
     "managing which [Page](/components/Page)  displays based on the current URL.",
   props: {
-    defaultRoute: {
-      description: `The default route when displaying the app`,
-      defaultValue: defaultProps.defaultRoute,
+    fallbackPath: {
+      description: `The fallback path when the current URL does not match any of the paths of the pages.`,
+      defaultValue: defaultProps.fallbackPath,
     },
   },
 });
@@ -64,7 +63,7 @@ export const pagesRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild }) => {
     return (
       <Pages
-        defaultRoute={extractValue(node.props.defaultRoute)}
+        fallbackPath={extractValue(node.props.fallbackPath)}
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}

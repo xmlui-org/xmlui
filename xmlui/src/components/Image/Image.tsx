@@ -1,9 +1,8 @@
 import styles from "./Image.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dClick, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dClick, dInternal } from "../metadata-helpers";
 import { Image, defaultProps } from "./ImageNative";
 
 const COMP = "Image";

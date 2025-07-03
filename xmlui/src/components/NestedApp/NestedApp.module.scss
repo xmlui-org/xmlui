@@ -16,6 +16,25 @@ $gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
 $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
+$backgroundColor-viewControls-NestedApp: createThemeVar(
+                "backgroundColor-viewControls-#{$component}"
+);
+$bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
+$padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
+$paddingVertical-viewControls-button-NestedApp: createThemeVar(
+                "paddingVertical-viewControls-button-#{$component}"
+);
+$paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
+                "paddingHorizontal-viewControls-button-#{$component}"
+);
+$padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
+$width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
+$bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
+$borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
+$height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
+$width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
+$width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
+
 // --- End of theme variables collection
 
 .nestedAppContainer {
@@ -34,37 +53,76 @@ $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
   width: 100%;
   height: fit-content;
   display: flex;
+  border-radius: $bordRadius-NestedApp;
   flex-direction: column;
   gap: $gap-frame-NestedApp;
   background-color: $backgroundColor-frame-NestedApp;
   align-content: center;
   box-shadow: $boxShadow-NestedApp;
+  overflow: hidden;
 
-  .header {
+  .contentContainer {
     width: 100%;
-    height: 20px;
+    height: 100%;
+    overflow: auto;
     display: flex;
-    align-content: center;
-
-    .headerText {
-      @include t.textVars($themeVars, "header-#{$component}");
-    }
-
-    .headerButton {
-      padding: 0.5rem 1rem;
-    }
-
-    .spacer {
-      flex: 1 1 0 !important;
-      place-self: stretch;
-    }
+    align-items: center;
   }
 }
 
-:is(html[class~=dark]) {
+:is(html[class~="dark"]) {
   .preview {
-    border: 1px solid #33404F;
+    border: 1px solid #33404f;
   }
+}
+
+.preview {
+  overflow: hidden;
+}
+
+.viewControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $padding-viewControls-NestedApp;
+  background-color: $backgroundColor-viewControls-NestedApp;
+  border-radius: $bordRadius-viewControls-NestedApp;
+}
+
+.logo {
+  width: $width-logo-splitView-NestedApp;
+  height: $height-logo-splitView-NestedApp;
+}
+
+.splitViewButton {
+  padding: $padding-button-splitView-NestedApp !important;
+  width: $width-button-splitView-NestedApp !important;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-content: center;
+  padding: t.$space-2;
+  border-bottom: $borderBottom-header-NestedApp;
+  justify-content: space-between;
+
+  .headerText {
+    @include t.textVars($themeVars, "header-#{$component}");
+  }
+
+  .headerButton {
+    padding: t.$space-2 t.$space-3;
+  }
+
+  .spacer {
+    flex: 1 1 0 !important;
+    place-self: stretch;
+  }
+}
+
+.wrapper {
+  width: $width-controls-NestedApp;
 }
 
 // --- We export the theme variables to add them to the component renderer

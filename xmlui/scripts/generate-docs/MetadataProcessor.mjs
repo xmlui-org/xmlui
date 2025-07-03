@@ -481,7 +481,7 @@ function findParent(metadata, component) {
 function addParentLinkLine(parentName, componentDocsFolder) {
   // TODO: Insert component link
   const result = parentName
-    ? `This component is inherited from [${parentName}](${componentDocsFolder}/${parentName})`
+    ? `This component is inherited from [${parentName}](/${componentDocsFolder}/${parentName})`
     : "";
   return result ? `${result}\n\n` : "";
 }
@@ -499,7 +499,7 @@ function addSiblingLinkLine(siblings = [], componentDocsFolder) {
     siblings?.length > 0
       ? `See also: ${siblings
           .map((sibling) => {
-            return `[${sibling.displayName}](${componentDocsFolder}/${sibling.displayName})`;
+            return `[${sibling.displayName}](/${componentDocsFolder}/${sibling.displayName})`;
           })
           .join(", ")}`
       : "";

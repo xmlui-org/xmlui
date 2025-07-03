@@ -1,7 +1,7 @@
 import type { Dispatch } from "react";
 import { createContext, useContext, useContextSelector } from "use-context-selector";
 
-import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type { ContainerAction } from "../../components-core/rendering/containers";
 import type { FormAction } from "../Form/formActions";
 import type { LabelPosition } from "../abstractions";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";

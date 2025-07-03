@@ -1,9 +1,9 @@
 import styles from "./FileUploadDropZone.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";
 

@@ -1,4 +1,13 @@
-import { CSSProperties, startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  CSSProperties,
+  startTransition,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -31,8 +40,11 @@ type NestedAppProps = {
   title?: string;
   height?: string | number;
   allowPlaygroundPopup?: boolean;
+  popOutUrl?: string;
   withFrame?: boolean;
-  style?: CSSProperties
+  style?: CSSProperties;
+  splitView?: boolean;
+  refVersion?: number;
 };
 
 export function LazyNestedApp(props) {
@@ -66,24 +78,31 @@ export function NestedApp({
   title,
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
+  popOutUrl,
   withFrame = defaultProps.withFrame,
-  style
+  style,
+  refVersion = 0,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
   const contentRootRef = useRef<Root | null>(null);
   const nestedAppId = useId();
-  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [refreshVersion, setRefreshVersion] = useState(refVersion);
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
   const { interceptorWorker } = useApiInterceptorContext();
+
+  useEffect(() => {
+    setRefreshVersion(refVersion);
+  }, [refVersion]);
+
   //TODO illesg: we should come up with something to make sure that nestedApps doesn't overwrite each other's mocked api endpoints
   //   disabled for now, as it messes up the paths of not mocked APIs (e.g. resources/{staticJsonfiles})
   //const safeId = playgroundId || nestedAppId;
   //const apiUrl = api ? `/${safeId.replaceAll(":", "")}` : '';
-  const apiUrl = '';
+  const apiUrl = "";
 
   const mock = useMemo(() => {
     if (!api) {
@@ -130,7 +149,9 @@ export function NestedApp({
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
     window.open(
-      useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`,
+      useHashBasedRouting
+        ? `${popOutUrl ?? ""}/#/playground#${appQueryString}`
+        : `${popOutUrl ?? ""}/playground#${appQueryString}`,
       "_blank",
     );
   }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting]);
@@ -182,8 +203,9 @@ export function NestedApp({
 
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
-        <div style={{ height, ...style, ...themeVarReset }} >
+        <div style={{ height, ...style, ...themeVarReset }}>
           <AppRoot
+            isNested={true}
             key={`app-${nestedAppId}-${refreshVersion}`}
             previewMode={true}
             standalone={true}

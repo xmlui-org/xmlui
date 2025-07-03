@@ -23,22 +23,25 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
 
-  &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
-  }
+  &:not(:disabled) {
+    &:hover {
+      border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
+      box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
+      color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
+    }
 
-  &:focus {
-    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+    &:focus {
+      outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
+      outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
+      outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
+      outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+    }
   }
 
   &::placeholder {
     color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
   }
 }
 
@@ -108,6 +111,7 @@ button.selectTrigger {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
 }
 

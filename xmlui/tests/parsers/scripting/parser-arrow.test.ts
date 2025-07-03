@@ -13,7 +13,7 @@ import {
   T_EXPRESSION_STATEMENT,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_LET_STATEMENT,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - arrow expressions", () => {
   it("No param", () => {

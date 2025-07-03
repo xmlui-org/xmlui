@@ -1,9 +1,9 @@
 import styles from "./Spinner.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Spinner, defaultProps } from "./SpinnerNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Spinner";
 

@@ -4,7 +4,7 @@ import {
   isModuleErrors,
   parseScriptModule,
 } from "../../../src/parsers/scripting/modules";
-import { ScriptModule } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { ScriptModule } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 const ROOT_MODULE = "test";
 

@@ -3,6 +3,7 @@
 The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly.
 
 **Essential features:**
+
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/components/Pages) component
 
@@ -49,7 +50,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <List data="https://api.spacexdata.com/v3/history">
         <property name="itemTemplate">
@@ -82,7 +83,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -115,7 +116,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -146,7 +147,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -177,7 +178,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -208,7 +209,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -239,7 +240,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -272,7 +273,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -305,7 +306,7 @@ Currently, there is no restriction on what the user data must look like.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="User name: {loggedInUser.name}" />
       <Text value="User token: {loggedInUser.token}" />
@@ -350,7 +351,7 @@ The default value is `true`.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
