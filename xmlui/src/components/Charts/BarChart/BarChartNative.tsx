@@ -129,61 +129,75 @@ export function BarChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width="100%" height="100%">
-        <RBarChart
-          accessibilityLayer
-          data={data}
-          layout={layout}
-          margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
-        >
-          <CartesianGrid vertical={true} strokeDasharray="3 3" />
-          {layout === "vertical" ? (
-            <>
-              <XAxis type="number" axisLine={false} hide={hideX} tick={{ fill: "currentColor" }} />
-              <YAxis
-                hide={hideY}
-                dataKey={nameKey}
-                type="category"
-                interval={"equidistantPreserveStart"}
-                tickLine={false}
-                tickFormatter={tickFormatter}
-                tick={{ fill: "currentColor" }}
+      <div
+        style={{
+          flexGrow: 1,
+          minHeight: 0,
+          width: style.width || "100%",
+          height: style.height || "100%",
+        }}
+      >
+        <ResponsiveContainer style={style} width="100%" height="100%">
+          <RBarChart
+            accessibilityLayer
+            data={data}
+            layout={layout}
+            margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
+          >
+            <CartesianGrid vertical={true} strokeDasharray="3 3" />
+            {layout === "vertical" ? (
+              <>
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  hide={hideX}
+                  tick={{ fill: "currentColor" }}
+                />
+                <YAxis
+                  hide={hideY}
+                  dataKey={nameKey}
+                  type="category"
+                  interval={"equidistantPreserveStart"}
+                  tickLine={false}
+                  tickFormatter={tickFormatter}
+                  tick={{ fill: "currentColor" }}
+                />
+              </>
+            ) : (
+              <>
+                <XAxis
+                  dataKey={nameKey}
+                  type="category"
+                  interval={"equidistantPreserveStart"}
+                  tickLine={false}
+                  tickFormatter={tickFormatter}
+                  height={hideX ? 0 : 30}
+                  hide={hideX}
+                  tick={!hideTickX && { fill: "currentColor" }}
+                />
+                <YAxis
+                  type="number"
+                  axisLine={false}
+                  tick={!hideTickY && { fill: "currentColor" }}
+                  hide={hideY}
+                  width={hideY ? 0 : 60}
+                />
+              </>
+            )}
+            <Tooltip content={<TooltipContent />} />
+            {Object.keys(config).map((key, index) => (
+              <Bar
+                key={index}
+                dataKey={key}
+                fill={config[key].color}
+                radius={stacked ? 0 : 8}
+                stackId={stacked ? "stacked" : undefined}
               />
-            </>
-          ) : (
-            <>
-              <XAxis
-                dataKey={nameKey}
-                type="category"
-                interval={"equidistantPreserveStart"}
-                tickLine={false}
-                tickFormatter={tickFormatter}
-                height={hideX ? 0 : 30}
-                hide={hideX}
-                tick={!hideTickX && { fill: "currentColor" }}
-              />
-              <YAxis
-                type="number"
-                axisLine={false}
-                tick={!hideTickY && { fill: "currentColor" }}
-                hide={hideY}
-                width={hideY ? 0 : 60}
-              />
-            </>
-          )}
-          <Tooltip content={<TooltipContent />} />
-          {Object.keys(config).map((key, index) => (
-            <Bar
-              key={index}
-              dataKey={key}
-              fill={config[key].color}
-              radius={stacked ? 0 : 8}
-              stackId={stacked ? "stacked" : undefined}
-            />
-          ))}
-          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
-        </RBarChart>
-      </ResponsiveContainer>
+            ))}
+            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+          </RBarChart>
+        </ResponsiveContainer>
+      </div>
     </ChartProvider>
   );
 }
