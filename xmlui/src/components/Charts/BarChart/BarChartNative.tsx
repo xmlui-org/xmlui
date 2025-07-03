@@ -131,6 +131,7 @@ export function BarChart({
   const [interval, setIntervalState] = useState(0);
   const [rotate, setRotate] = useState(0);
   const [xAxisHeight, setXAxisHeight] = useState(50);
+  const [yTickCount, setYTickCount] = useState(5);
   const fontSize = 12; // fixed label font size
 
   useEffect(() => {
@@ -139,13 +140,14 @@ export function BarChart({
       const spans = labelsRef.current?.querySelectorAll('span') || [];
       let maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
 
-
-
-
-
       const maxTicks = Math.max(1, Math.floor(width / (maxWidth + 4)));
       const skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
       setIntervalState(skip);
+
+      // y-axis tick count based on container height
+      const chartHeight = containerRef.current?.offsetHeight || 300;
+      const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
+      setYTickCount(maxYTicks);
 
       setRotate(0);
 
@@ -217,6 +219,7 @@ export function BarChart({
                 axisLine={false}
                 tick={!hideTickY && { fill: "currentColor", fontSize }}
                 hide={hideY}
+                tickCount={yTickCount}
                 width={hideY || hideTickY ? 0 : 40}
               />
             </>
