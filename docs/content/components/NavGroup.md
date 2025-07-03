@@ -149,7 +149,7 @@ This property defines whether the group is initially expanded or collapsed. If n
 
 ### `label` [#label]
 
-This property sets the label of the component. If not set, the component will not display a label.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 This property sets the text displayed as the name of the `NavGroup`.
 
@@ -171,8 +171,8 @@ This component does not expose any methods.
 
 ### Theme Variables [#theme-variables]
 
-| Variable                                                                             | Default Value (Light)    | Default Value (Dark)     |
-| ------------------------------------------------------------------------------------ | ------------------------ | ------------------------ |
-| [backgroundColor](../styles-and-themes/common-units/#color)-dropdown-NavGroup        | $backgroundColor-primary | $backgroundColor-primary |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-dropdown-NavGroup | $borderRadius            | $borderRadius            |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-dropdown-NavGroup          | $boxShadow-spread        | $boxShadow-spread        |
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-dropdown-NavGroup | $backgroundColor-primary | $backgroundColor-primary |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-dropdown-NavGroup | $borderRadius | $borderRadius |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-dropdown-NavGroup | $boxShadow-spread | $boxShadow-spread |

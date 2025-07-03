@@ -410,7 +410,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
-| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-default--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-error | *none* | *none* |
@@ -445,6 +446,10 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning--hover | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
@@ -452,7 +457,6 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
-| [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | *none* | *none* |

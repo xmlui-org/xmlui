@@ -356,7 +356,15 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-warning--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-warning | *none* | *none* |
 | [minHeight](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-default--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-error--focus | *none* | *none* |
@@ -378,10 +386,6 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default--hover | *none* | *none* |
