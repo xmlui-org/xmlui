@@ -74,7 +74,7 @@
                 <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
-            <NavLink label="MCP (experimental)" to="/mcp"/>
+            <NavLink label="MCP" to="/mcp"/>
 
         </NavPanel>
 
@@ -220,6 +220,7 @@
                 <PageNotFound />
             </Page>
         </Pages>
+        <Footer>This site is an XMLUI app. We use what we ship.</Footer>
     </App>
 
     <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
