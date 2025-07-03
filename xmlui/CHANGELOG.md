@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.63
+
+### Patch Changes
+
+- b9c0881: Fix: add a workaround to ListNative to avoid issues coming from undefined row values
+
 ## 0.9.62
 
 ### Patch Changes
