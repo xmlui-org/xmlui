@@ -73,8 +73,8 @@
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
             </NavGroup>
+            <NavLink label="Model Context Protocol" to="/mcp"/>
             <NavLink label="Change Log" to="/change-log"/>
-            <NavLink label="MCP" to="/mcp"/>
 
         </NavPanel>
 
