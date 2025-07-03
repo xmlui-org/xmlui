@@ -16,7 +16,7 @@ export const FormSectionMd = createMetadata({
 const componentSource = `
 <Component name="FormSection">
   <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0" width="100%">
-    <Heading 
+    <Heading
       when="{!!$props.heading}"
       marginBottom="$space-tight"
       level="{$props.headingLevel ?? 'h3'}"
@@ -27,7 +27,7 @@ const componentSource = `
       fontSize="{$props.infoFontSize ?? '0.8rem'}"
       paddingBottom="$space-normal"
       value="{$props.info}" />
-    <FlowLayout 
+    <FlowLayout
       width="100%"
       paddingTop="{$props.paddingTop ?? '$space-normal'}"
       columnGap="{$props.columnGap ?? '3rem'}"
