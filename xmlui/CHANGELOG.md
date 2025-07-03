@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.62
+
+### Patch Changes
+
+- 832f31d: fix: nestedApp fills the available space in AppWithCode component
+- 4f9ff06: Fix the build issue with FormSection
+
 ## 0.9.61
 
 ### Patch Changes
