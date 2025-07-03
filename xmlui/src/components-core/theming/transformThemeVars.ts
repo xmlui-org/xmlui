@@ -1,6 +1,6 @@
 import Color from "color";
 
-import { HVar, parseHVar } from "../theming/hvar";
+import { type HVar, parseHVar } from "../theming/hvar";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
 import { toCssVar } from "./layout-resolver";
 

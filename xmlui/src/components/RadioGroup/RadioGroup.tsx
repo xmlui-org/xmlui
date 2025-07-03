@@ -73,17 +73,13 @@ export const RadioGroupMd = createMetadata({
     [`borderColor-checked-${RGOption}`]: "$color-primary-500",
     [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
     [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
+    [`borderColor-${RGOption}-error`]: `$borderColor-Input-default--error`,
+    [`borderColor-${RGOption}-warning`]: `$borderColor-Input-default--warning`,
+    [`borderColor-${RGOption}-success`]: `$borderColor-Input-default--success`,
 
     [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
-
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
-    [`backgroundColor-${RGOption}-checked--disabled`]: `$textColor--disabled`,
-    [`backgroundColor-checked-indicator-${RGOption}`]: `transparent`,
-    [`backgroundColor-${RGOption}-checked-indicator--disabled`]: `transparent`,
-
-    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-error`,
-    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-warning`,
-    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-success`,
+    [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
     
     [`fontSize-${RGOption}`]: "$fontSize-small",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
