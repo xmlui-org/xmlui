@@ -131,7 +131,7 @@ export function BarChart({
   const [interval, setIntervalState] = useState(0);
   const [rotate, setRotate] = useState(0);
   const [xAxisHeight, setXAxisHeight] = useState(50);
-  const [fontSize, setFontSize] = useState(12);
+  const fontSize = 12; // fixed label font size
 
   useEffect(() => {
     const calc = () => {
@@ -139,35 +139,17 @@ export function BarChart({
       const spans = labelsRef.current?.querySelectorAll('span') || [];
       let maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
 
-      let newFontSize = 12;
-      if (data.length * maxWidth > width * 2.5) newFontSize = 9;
-      else if (data.length * maxWidth > width * 2.0) newFontSize = 10;
-      else if (data.length * maxWidth > width * 1.5) newFontSize = 11;
-      setFontSize(newFontSize);
 
-      maxWidth = maxWidth * (newFontSize / 12);
 
-      const maxTicks = Math.floor(width / maxWidth) || 1;
-      const inter = Math.max(1, Math.round(data.length / maxTicks));
-      setIntervalState(inter);
 
-      const allWidthNoRotate = data.length * maxWidth;
-      const allWidth45 = data.length * (maxWidth * Math.cos(45 * Math.PI / 180));
 
-      let angle = 0;
-      if (allWidthNoRotate <= width) {
-        angle = 0;
-      } else if (allWidth45 <= width) {
-        angle = -45;
-      } else {
-        angle = -60;
-      }
-      setRotate(angle);
+      const maxTicks = Math.max(1, Math.floor(width / (maxWidth + 4)));
+      const skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+      setIntervalState(skip);
 
-      let height: number;
-      if (angle === 0) height = newFontSize * 2.5;
-      else if (angle === -45) height = newFontSize * 4.5;
-      else height = newFontSize * 6.5;
+      setRotate(0);
+
+      const height = fontSize * 2.5;
       setXAxisHeight(Math.ceil(height));
     };
 
@@ -194,12 +176,13 @@ export function BarChart({
           </span>
         ))}
       </div>
-      <ResponsiveContainer style={style} width="100%" height="100%" ref={containerRef}>
+      <ResponsiveContainer ref={containerRef} width="100%" height="100%" debounce={100}>
         <RBarChart
+          style={style}
           accessibilityLayer
           data={data}
           layout={layout}
-          margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
+          margin={{ left: (hideY || hideTickY) ? 4 : 40, top: 0, bottom: 0, right: 10 }}
         >
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
           {layout === "vertical" ? (
@@ -234,7 +217,7 @@ export function BarChart({
                 axisLine={false}
                 tick={!hideTickY && { fill: "currentColor", fontSize }}
                 hide={hideY}
-                width={hideY ? 0 : 60}
+                width={hideY || hideTickY ? 0 : 40}
               />
             </>
           )}
