@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
@@ -8,7 +8,6 @@ import type {
   ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
-import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
@@ -51,6 +50,7 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
+import { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -74,8 +74,6 @@ type StandaloneAppProps = {
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
-
-  waitForApiInterceptor?: boolean;
 };
 
 /**
@@ -91,7 +89,6 @@ function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
   debugEnabled = false,
-  waitForApiInterceptor = false,
   runtime,
   extensionManager,
 }: StandaloneAppProps) {
@@ -104,7 +101,7 @@ function StandaloneApp({
 
   if (!standaloneApp) {
     // --- Problems found, the standalone app cannot run
-    throw new Error("no app definition found");
+    return null;
   }
 
   const {
@@ -137,21 +134,8 @@ function StandaloneApp({
   // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
-  const globalProps = useMemo(()=>{
-    return {
-      name: name,
-      ...(appGlobals || {}),
-    }
-  }, [appGlobals, name]);
-
-  let contributes = useMemo(()=>{
-    return {
-      compoundComponents: components,
-      themes,
-    }
-  }, [components, themes]);
   return (
-    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting} waitForApiInterceptor={waitForApiInterceptor}>
+    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
       <AppRoot
         projectCompilation={projectCompilation}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
@@ -160,14 +144,20 @@ function StandaloneApp({
         debugEnabled={debugEnabled}
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-        globalProps={globalProps}
+        globalProps={{
+          name: name,
+          ...(appGlobals || {}),
+        }}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
         resourceMap={resourceMap}
         sources={sources}
         extensionManager={extensionManager}
-        contributes={contributes}
+        contributes={{
+          compoundComponents: components,
+          themes,
+        }}
       />
     </ApiInterceptorProvider>
   );
