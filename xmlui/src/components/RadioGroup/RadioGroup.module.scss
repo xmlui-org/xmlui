@@ -38,14 +38,8 @@ $backgroundColor-RadioGroupOption-default: createThemeVar(
 $backgroundColor-checked-RadioGroupOption: createThemeVar(
   "Input:backgroundColor-checked-RadioGroupOption"
 );
-$backgroundColor-checked-indicator-RadioGroupOption: createThemeVar(
-  "Input:backgroundColor-checked-indicator-RadioGroupOption"
-);
-$backgroundColor-RadioGroupOption-checked--disabled: createThemeVar(
-  "backgroundColor-RadioGroupOption-checked--disabled"
-);
-$backgroundColor-RadioGroupOption-checked-indicator--disabled: createThemeVar(
-  "Input:backgroundColor-RadioGroupOption-indicator--disabled"
+$backgroundColor-checked-RadioGroupOption--disabled: createThemeVar(
+  "Input:backgroundColor-checked-RadioGroupOption--disabled"
 );
 
 // --- Foreground
@@ -105,7 +99,7 @@ $textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupO
     color: $color-RadioGroupOption--disabled;
   }
   &:not(:disabled) {
-    &:has(span[class*="indicator"]):not(.error):not(.warning):not(.valid) {
+    &:not(.error):not(.warning):not(.valid) {
       border-color: $borderColor-checked-RadioGroupOption;
     }
     &.error {
@@ -133,15 +127,15 @@ $textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupO
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    $backgroundColor-checked-indicator-RadioGroupOption 28%,
+    transparent 28%,
     $backgroundColor-checked-RadioGroupOption 34%
   );
 
   &.disabled {
     background: radial-gradient(
       circle,
-      $backgroundColor-RadioGroupOption-checked-indicator--disabled 28%,
-      $backgroundColor-RadioGroupOption-checked--disabled 34%
+      transparent 28%,
+      $backgroundColor-checked-RadioGroupOption--disabled 34%
     );
   }
 }

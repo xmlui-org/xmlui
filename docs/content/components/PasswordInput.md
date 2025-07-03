@@ -186,11 +186,6 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-error | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-success | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-warning | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Input | $textColor-subtitle | $textColor-subtitle |
-| [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-default | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-error | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-success | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-success | *none* | *none* |
@@ -229,6 +224,11 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [padding](../styles-and-themes/common-units/#size)-TextBox-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Input | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-Input--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Input | $textColor-subtitle | $textColor-subtitle |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-TextBox-default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-TextBox-error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-TextBox-success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-TextBox-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TextBox--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TextBox-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TextBox-default--focus | *none* | *none* |

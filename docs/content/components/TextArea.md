@@ -349,10 +349,6 @@ In the example below, typing in the `TextArea` will also display the length of t
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning--focus | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning--hover | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-default | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-error | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-success | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-success | *none* | *none* |
@@ -381,6 +377,10 @@ In the example below, typing in the `TextArea` will also display the length of t
 | [padding](../styles-and-themes/common-units/#size)-Textarea-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Textarea-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Textarea-warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea-default--focus | *none* | *none* |

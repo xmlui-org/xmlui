@@ -195,11 +195,12 @@ You can query this read-only API property to query the component's current value
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
 | [backgroundColor](../styles-and-themes/common-units/#color)-indicator-checked-Switch | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-indicator-Switch | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-indicator-Switch | $color-surface-400 | $color-surface-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-0 | $color-surface-0 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-0 | $color-surface-0 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch-indicator--disabled | $backgroundColor-primary | $backgroundColor-primary |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |
