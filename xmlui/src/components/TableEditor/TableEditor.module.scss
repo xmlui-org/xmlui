@@ -1,0 +1,69 @@
+@use "../../components-core/theming/themes" as t;
+$componentName: "TableEditor";
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Reuse Table theme variables
+$backgroundColorHeadingTable: createThemeVar("backgroundColor-heading-Table");
+$borderCellTable: createThemeVar("border-cell-Table");
+$fontSizeHeadingTable: createThemeVar("fontSize-heading-Table");
+$fontWeightHeadingTable: createThemeVar("fontWeight-heading-Table");
+$fontSizeRowTable: createThemeVar("fontSize-row-Table");
+$fontWeightRowTable: createThemeVar("fontWeight-row-Table");
+$paddingCellTable: createThemeVar("padding-cell-Table");
+$paddingHeadingTable: createThemeVar("padding-heading-Table");
+$textColorHeadingTable: createThemeVar("textColor-heading-Table");
+$textColorPaginationTable: createThemeVar("textColor-pagination-Table");
+$buttonStackSpacing: createThemeVar("spacing-buttonStack-Table");
+$textTransformHeadingTable: createThemeVar("textTransform-heading-Table");
+$tableMarginTop: t.$space-4;
+$paddingHtmlTd: createThemeVar("padding-HtmlTd");
+$paddingHtmlTh: createThemeVar("padding-HtmlTh");
+
+.editor {
+  :global(.ProseMirror) {
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 100px;
+    table {
+      border-collapse: collapse;
+      margin-top: $tableMarginTop;
+    }
+    th {
+      background-color: $backgroundColorHeadingTable;
+      font-size: $fontSizeHeadingTable;
+      font-weight: $fontWeightHeadingTable;
+      padding: $paddingHtmlTh;
+      color: $textColorHeadingTable;
+      text-transform: $textTransformHeadingTable;
+    }
+    td {
+      font-size: $fontSizeRowTable;
+      font-weight: $fontWeightRowTable;
+      padding: $paddingHtmlTd;
+      border: $borderCellTable;
+    }
+  }
+}
+
+.button-stack {
+  margin-bottom: $buttonStackSpacing;
+}
+
+.table-editor-root {
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.pagination {
+  color: $textColorPaginationTable;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

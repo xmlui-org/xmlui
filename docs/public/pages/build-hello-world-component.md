@@ -1,6 +1,5 @@
 # Build a Hello World Component
 
-
 This guide will walk you through creating a complete React-based component for XMLUI, from initial setup to registration and testing. We'll build a functional HelloWorld component that demonstrates the core patterns for XMLUI component development.
 
 

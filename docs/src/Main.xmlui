@@ -70,10 +70,11 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
-                <NavLink label="Build HelloWorld Component" to="/build-hello-world-component"/>
+                <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
+                <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
-            <NavLink label="MCP (experimental)" to="/mcp"/>
+            <NavLink label="MCP" to="/mcp"/>
 
         </NavPanel>
 
@@ -198,6 +199,9 @@
             <Page url="/build-hello-world-component">
                 <DocumentPage url="/pages/build-hello-world-component.md" />
             </Page>
+            <Page url="/build-editor-component">
+                <DocumentPage url="/pages/build-editor-component.md" />
+            </Page>
             <Page url="/change-log">
                 <ChangeLog />
             </Page>
@@ -216,6 +220,7 @@
                 <PageNotFound />
             </Page>
         </Pages>
+        <Footer>This site is an XMLUI app. We use what we ship.</Footer>
     </App>
 
     <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
