@@ -32,6 +32,7 @@ type AppWithCodeViewNativeProps = {
   height?: string | number;
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
+  noHeader?: boolean;
 };
 
 /**
@@ -40,6 +41,8 @@ type AppWithCodeViewNativeProps = {
 export function AppWithCodeViewNative({
   markdown,
   splitView,
+  withFrame = true,
+  noHeader = false,
   initiallyShowCode = false,
   popOutUrl,
   app,
@@ -164,6 +167,7 @@ export function AppWithCodeViewNative({
               title={title}
               allowPlaygroundPopup={allowPlaygroundPopup}
               withFrame={false}
+              noHeader={false}
               popOutUrl={popOutUrl}
             />
           )}
@@ -187,7 +191,8 @@ export function AppWithCodeViewNative({
           title={title}
           height={height}
           allowPlaygroundPopup={allowPlaygroundPopup}
-          withFrame={true}
+          withFrame={withFrame}
+          noHeader={noHeader}
           popOutUrl={popOutUrl}
         />
       </div>
