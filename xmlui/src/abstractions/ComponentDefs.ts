@@ -14,11 +14,6 @@ export interface ComponentDefCore {
   // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
   testId?: string;
 
-  // A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" />
-  // syntax. These are used later to resolve the `type` of the componentDef.
-  // <KEY:Button/> will have type `VALUE.Button` (joined with a "." (dot)).
-  namespaces?: Record<string, string>;
-
   // Though components manage their state internally, the app logic may require user
   // state management. Components may have user *variables*, which the UI logic uses to
   // manage the application state. This property holds the variables (name and value
@@ -31,7 +26,7 @@ export interface ComponentDefCore {
 
   // Components may have slots that can be filled with other components. This property
   // holds the contents of the slots.
-  
+
   slots?: Record<string, ComponentDef[]>;
 
   // This property is evaluated to a Boolean value during run time. When this value is
@@ -55,7 +50,7 @@ export interface ComponentDefCore {
   // working with this hierarchy, parent components may flow state values (key and value
   // pairs) to their child containers. This property holds the name of state values to
   // flow down to the direct child containers.
-  
+
   uses?: string[];
 
   // Arbitrary debug information that can be attached to a component definition.
@@ -81,7 +76,7 @@ export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
 
   // Components may provide context variables that can be used to in expressions and
   // event handlers within the component.
-  
+
   contextVars?: Record<keyof TMd["contextVars"], string>;
 }
 
@@ -104,7 +99,7 @@ export interface CompoundComponentDef extends Scriptable {
 
   // This property holds the variables (name and value pairs) associated with this
   // compound component definition.
-  
+
   vars?: Record<string, any>;
 
   // A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" />
@@ -157,7 +152,10 @@ export type PropertyValueType = "boolean" | "string" | "number" | "any" | "Compo
 
 // A generic validation function that retrieves either a hint (the validation argument
 // has issues) or undefined (the argument is valid).
-export type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+export type IsValidFunction<T> = (
+  propKey: string,
+  propValue: T,
+) => string | string[] | undefined | null;
 
 // This type represents the description of a property value, which can be a string, a
 // number, or an object with a value and a description. This type is used in the
@@ -257,7 +255,7 @@ export type ComponentMetadata<
   // Theme variable defaults for a particular tone-specific theme
   toneSpecificThemeVars?: Record<string, Record<string, string>>;
 
-  // Indicates that the documentation should include only the theme variables 
+  // Indicates that the documentation should include only the theme variables
   // including the component name
   limitThemeVarsToComponent?: boolean;
 

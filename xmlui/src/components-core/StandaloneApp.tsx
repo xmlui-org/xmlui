@@ -1066,7 +1066,6 @@ function processAppLinting(
 ): null | ComponentDef {
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
-  console.log("linting process");
   if (lintSeverity !== LintSeverity.Skip) {
     const allComponentLints = lintApp({
       appDef,
