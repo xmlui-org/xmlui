@@ -4,5 +4,6 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 export const defaultProps = {
   allowPlaygroundPopup: true,
   withFrame: true,
+  noHeader: false,
   components: EMPTY_ARRAY
 };
