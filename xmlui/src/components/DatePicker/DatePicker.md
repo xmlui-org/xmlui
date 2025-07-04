@@ -16,7 +16,7 @@
     id="picker"
     readOnly="true"
   />
-  <HStack">
+  <HStack>
     <Button
       label="Add Text"
       onClick="picker.setValue('05/25/2024')" />
