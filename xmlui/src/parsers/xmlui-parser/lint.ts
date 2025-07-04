@@ -182,12 +182,7 @@ function lintHelp(
     : component.type;
   const componentMdProvider = metadataProvider.getComponent(componentName);
 
-  if (
-    componentName !== "FormItem" &&
-    componentName !== "FormSection" &&
-    componentMdProvider !== null &&
-    !componentMdProvider.allowArbitraryProps
-  ) {
+  if (componentMdProvider !== null && !componentMdProvider.allowArbitraryProps) {
     lintAttrs(component, componentMdProvider, acc);
   }
 
