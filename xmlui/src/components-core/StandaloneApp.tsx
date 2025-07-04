@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
+import yaml from "js-yaml";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
 import type {
@@ -481,6 +482,59 @@ function resolvePath(basePath: string, relativePath: string) {
 }
 
 /**
+ * Helper function to load theme files with support for both JSON and YAML formats.
+ * First tries to load as JSON, if that fails, attempts to load as YAML.
+ * @param url The URL to fetch the theme from
+ * @returns A Promise resolving to the parsed theme definition
+ */
+async function loadThemeFile(url: string): Promise<ThemeDefinition> {
+  // First try to load as JSON
+  try {
+    const response = await fetchWithoutCache(url);
+    if (!response.ok) {
+      // If the JSON file doesn't exist, try YAML immediately
+      throw new Error(`Failed to fetch ${url}`);
+    }
+
+    // Get the content as text first
+    const text = await response.text();
+
+    // Try to parse as JSON
+    try {
+      return JSON.parse(text);
+    } catch (jsonParseError) {
+      // If JSON parsing fails, it might be a YAML file with a .json extension
+      // or we need to try the .yml version
+      console.warn(`Failed to parse ${url} as JSON, attempting YAML parsing.`);
+      try {
+        return yaml.load(text) as ThemeDefinition;
+      } catch (yamlParseError) {
+        // If both JSON and YAML parsing fail for this file, try the .yml version
+        throw jsonParseError;
+      }
+    }
+  } catch (jsonError) {
+    // If JSON file loading fails, try YAML
+    const yamlUrl = url.replace(/\.json$/, ".yml");
+    try {
+      const response = await fetchWithoutCache(yamlUrl);
+      if (!response.ok) throw new Error(`Failed to fetch ${yamlUrl}`);
+      const text = await response.text();
+      return yaml.load(text) as ThemeDefinition;
+    } catch (yamlError) {
+      console.error(
+        `Failed to load theme file: ${url} (JSON error:`,
+        jsonError,
+        "YAML error:",
+        yamlError,
+        ")",
+      );
+      throw new Error(`Failed to load theme file ${url} in either JSON or YAML format`);
+    }
+  }
+}
+
+/**
  * Fetch the up-to-date state of the source file
  * @param url The URL to fetch the source file from
  * @returns The source file contents response
@@ -569,7 +623,7 @@ function useStandalone(
 
         const themePromises: Promise<ThemeDefinition>[] = [];
         config.themes?.forEach((theme) => {
-          themePromises.push(fetchWithoutCache(theme).then((value) => value.json()));
+          themePromises.push(loadThemeFile(theme));
         });
         const themes = await Promise.all(themePromises);
 
@@ -625,16 +679,12 @@ function useStandalone(
       let themePromises: Promise<ThemeDefinition>[];
       if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
         // --- Special case, we have only a single "defaultTheme" in the configuration
-        const fetchDefaultTheme = fetchWithoutCache(`themes/${config?.defaultTheme}.json`).then(
-          (value) => value.json(),
-        ) as Promise<ThemeDefinition>;
+        const fetchDefaultTheme = loadThemeFile(`themes/${config?.defaultTheme}.json`);
         themePromises = [fetchDefaultTheme];
       } else {
         // --- In any other case, we fetch all themes defined in the configuration
         themePromises = config?.themes?.map((themePath) => {
-          return fetchWithoutCache(themePath).then((value) =>
-            value.json(),
-          ) as Promise<ThemeDefinition>;
+          return loadThemeFile(themePath);
         });
       }
       // --- Fetch component files according to the configuration
@@ -743,9 +793,7 @@ function useStandalone(
           !builtInThemes.find((theme) => theme.id === defaultTheme) &&
           !themes.find((theme) => theme.id === defaultTheme)
         ) {
-          themes.push(
-            await fetchWithoutCache(`themes/${defaultTheme}.json`).then((value) => value.json()),
-          );
+          themes.push(await loadThemeFile(`themes/${defaultTheme}.json`));
         }
       }
 
