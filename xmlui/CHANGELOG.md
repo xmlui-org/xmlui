@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.65
+
+### Patch Changes
+
+- c17fc0d: fix the NestedAppNative.tsx issue introduced in #1547
+
 ## 0.9.64
 
 ### Patch Changes
