@@ -160,18 +160,15 @@ export function NestedApp({
 
   useEffect(() => {
     if (!shadowRef.current && rootRef.current) {
-      // TEMP: Disable Shadow DOM for debugging theming issues
-      // shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
-      shadowRef.current = rootRef.current; // Use the normal DOM instead of shadow root
-
-      // Optionally, skip cloning styles since they're already in the main document
-      // const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
-      // styleSheets.forEach((el) => {
-      //   if (el.hasAttribute("data-theme-root")) {
-      //     return;
-      //   }
-      //   shadowRef.current.appendChild(el.cloneNode(true));
-      // });
+      // Clone existing style and link tags
+      shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
+      const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styleSheets.forEach((el) => {
+        if (el.hasAttribute("data-theme-root")) {
+          return;
+        }
+        shadowRef.current.appendChild(el.cloneNode(true));
+      });
     }
     if (!contentRootRef.current && shadowRef.current) {
       contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
