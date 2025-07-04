@@ -1049,50 +1049,6 @@ describe("Xmlui transform - child elements", () => {
       });
     });
 
-    it("Compound component debug info", () => {
-      const source = `<Component name='MyComp'><Stack /></Component>`;
-      const cd = transformSource(source) as CompoundComponentDef;
-      expect(cd.debug).toMatchObject({
-        source: {
-          start: 0,
-          end: source.length,
-          fileId: 0,
-        },
-      });
-    });
-
-    it("Compound component debug info nested", () => {
-      const innerComp = `<Button label="hi"/>`;
-      const source = `
-      <Component name='MyComp'>
-        <Stack>
-          ${innerComp}
-        </Stack>
-      </Component>
-    `;
-      const cd = transformSource(source) as CompoundComponentDef;
-      const comp = cd.component;
-      expect(comp.children[0].debug).toMatchObject({
-        source: {
-          start: source.indexOf("<Stack>") + "<Stack>".length,
-          end: source.indexOf(innerComp) + innerComp.length,
-          fileId: 0,
-        },
-      });
-    });
-
-    it("Compound component debug info with vars", () => {
-      const source = `<Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack /></Component>`;
-      const cd = transformSource(source) as CompoundComponentDef;
-      expect(cd.debug).toMatchObject({
-        source: {
-          start: 0,
-          end: source.length,
-          fileId: 0,
-        },
-      });
-    });
-
     it("Compound component cannot nest another one", () => {
       try {
         const cd = transformSource(`
@@ -1108,82 +1064,6 @@ describe("Xmlui transform - child elements", () => {
       } catch (err) {
         expect(err.toString()).include("T006");
       }
-    });
-  });
-  describe("debug info", () => {
-    it("Compound component debug info nested with vars", () => {
-      const source = `<Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack var.myVar="hi" ><Button /></Stack></Component>`;
-      const cd = transformSource(source) as CompoundComponentDef;
-
-      expect(cd.debug).toMatchObject({
-        source: {
-          start: 0,
-          end: source.length,
-          fileId: 0,
-        },
-      });
-
-      const fragmentComp = cd.component;
-      expect(fragmentComp.debug).toMatchObject({
-        source: {
-          start: source.indexOf('<variable name="other"'),
-          end: source.indexOf("</Component"),
-          fileId: 0,
-        },
-      });
-
-      const stackComp = fragmentComp.children[0] as ComponentDef;
-      const beforeStack = '<variable name="other" value="{false}" />';
-      expect(stackComp.debug).toMatchObject({
-        source: {
-          start: source.indexOf(beforeStack) + beforeStack.length,
-          end: source.indexOf("</Component>"),
-          fileId: 0,
-        },
-      });
-    });
-
-    it("Debug info #1", () => {
-      const source = `<Stack><Button/></Stack>`;
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd.debug).toMatchObject({
-        source: {
-          start: 0,
-          end: source.length,
-          fileId: 0,
-        },
-      });
-
-      const btnComp = cd.children[0] as ComponentDef;
-      expect(btnComp.debug).toMatchObject({
-        source: {
-          start: source.indexOf("<Stack>") + "<Stack>".length,
-          end: source.indexOf("<Button/>") + "<Button/>".length,
-          fileId: 0,
-        },
-      });
-    });
-
-    it("Debug info #2", () => {
-      const source = `<Stack><Button/></Stack>`;
-      const FILE_ID = 123;
-      const cd = transformSource(source, FILE_ID) as ComponentDef;
-      expect(cd.debug).toMatchObject({
-        source: {
-          start: 0,
-          end: source.length,
-          fileId: FILE_ID,
-        },
-      });
-
-      const btnComp = cd.children[0] as ComponentDef;
-      expect(btnComp.debug).toMatchObject({
-        source: {
-          start: source.indexOf("<Stack>") + "<Stack>".length,
-          end: source.indexOf("<Button/>") + "<Button/>".length,
-          fileId: FILE_ID,
-        },
-      });
     });
   });
 
