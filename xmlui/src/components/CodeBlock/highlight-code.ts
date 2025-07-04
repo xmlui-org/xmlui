@@ -145,7 +145,7 @@ function extractMetaFromChildren(
         meta[CodeHighlighterMetaKeys.rowNumbers.data],
       ), */
       [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
-        code.split("\n").length,
+        code,
         meta[CodeHighlighterMetaKeys.highlightRows.data],
       ),
       [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
@@ -168,9 +168,10 @@ function parseBoolean(str?: string) {
   return false;
 }
 
-function parseRowHighlights(codeLines: number, str?: string): ItemRowDecoration[] {
+function parseRowHighlights(code: string, str?: string): DecorationItem[] {
   if (!str) return [];
   if (str === "") return [];
+  const codeLines = code.split("\n");
   return str
     .split(",")
     .map((item) => {
@@ -180,28 +181,50 @@ function parseRowHighlights(codeLines: number, str?: string): ItemRowDecoration[
       let end = 0;
 
       if (split.length === 0) return { start, end, properties: { class: highlightRowsClass } };
-      const val = parseAndRemoveIfInvalid(split[0]);
-      start = val - 1;
 
-      if (split.length === 1) {
-        end = val;
-      } else {
-        end = parseAndRemoveIfInvalid(split[1]);
+      // Start Index
+      const startIdx = parseAndValidate(split[0]) - 1;
+      if (startIdx > 0) {
+        start = getLineStartIndex(startIdx);
       }
+      // End Index
+      const endIdx = split.length === 1 ? startIdx : parseAndValidate(split[1]) - 1;
+      let endLineLength = 0;
+      if (endIdx >= 0 && codeLines[endIdx] !== undefined) {
+        endLineLength = codeLines[endIdx].length;
+      }
+      end = getLineStartIndex(endIdx) + endLineLength;
+
       return { start, end, properties: { class: highlightRowsClass } };
     })
     .filter((item) => {
-      if (item.start === -1 || item.end === -1) return false;
-      if (item.start > codeLines || item.end > codeLines) return false;
+      if (item.start <= -1 || item.end <= -1) return false;
+      if (item.start > code.length || item.end > code.length) return false;
       return true;
     });
 
-  function parseAndRemoveIfInvalid(value: string): number {
+  function parseAndValidate(value: string): number {
     const parsed = parseInt(value, 10);
     if (Number.isNaN(parsed)) return -1;
-    if (parsed < 0) return -1;
-    if (parsed > codeLines) return -1;
+    if (parsed <= 0) return -1;
+    if (parsed > codeLines.length) return -1;
     return parsed;
+  }
+
+  function getLineStartIndex(lineNumber: number) {
+    if (lineNumber < 0) return -1;
+    if (lineNumber === 0) return 0;
+
+    let count = 0;
+    let index = 0;
+    while (count < lineNumber && index !== -1) {
+      index = code.indexOf('\n', index);
+      if (index !== -1) {
+        index++; // Move past the '\n'
+        count++;
+      }
+    }
+    return (index !== -1) ? index : -1;
   }
 }
 
@@ -209,7 +232,7 @@ function parseSubstringHighlights(
   code: string,
   str?: string,
   emphasized = false,
-): ItemRowDecoration[] {
+): DecorationItem[] {
   if (!str) return [];
   if (!code) return [];
   return str
@@ -219,7 +242,7 @@ function parseSubstringHighlights(
     .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
 
   function findAllNonOverlappingSubstrings(str: string, code: string) {
-    const result: ItemRowDecoration[] = [];
+    const result: DecorationItem[] = [];
     let startIndex = 0;
     const searchLength = code.length;
 
@@ -268,11 +291,11 @@ export type CodeHighlighterMeta = {
   copy?: boolean;
   filename?: string;
   rowNumbers?: boolean;
-  highlightRows?: ItemRowDecoration[];
-  highlightSubstrings?: number[];
+  highlightRows?: DecorationItem[];
+  highlightSubstrings?: DecorationItem[];
 };
 
-type ItemRowDecoration = {
+type DecorationItem = {
   start: number;
   end: number;
   properties: { class?: string; style?: string };
