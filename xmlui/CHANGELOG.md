@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.64
+
+### Patch Changes
+
+- 5ad3ffc: Refactored the usage of theme variables in RadioGroup
+- da3c8bc: Add a "noHeader" option to the xmlui-pg codefence
+- 301cb39: Allow YAML (.yml) theme files in standalone apps
+- d5d3f4d: Fixed Bar- & LineChart sizing in the Table component
+
 ## 0.9.63
 
 ### Patch Changes
