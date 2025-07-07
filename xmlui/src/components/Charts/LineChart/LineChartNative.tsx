@@ -114,7 +114,7 @@ export function LineChart({
       let minTickSpacing = maxWidth + 8;
       let leftMargin = Math.max(8, Math.ceil(maxWidth / 3));
       let rightMargin = Math.max(8, Math.ceil(maxWidth / 3));
-      let xAxisH = Math.ceil(fontSize * 1.2);
+      // Tick interval és margin számítás
       let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
       let skip = Math.max(0, Math.ceil(safeData.length / maxTicks) - 1);
       if (skip > 0) {
@@ -126,13 +126,27 @@ export function LineChart({
         skip = Math.max(0, Math.ceil(safeData.length / maxTicks) - 1);
         leftMargin = Math.max(8, Math.ceil(maxWidth * Math.cos(rad) / 1.8));
         rightMargin = Math.max(8, Math.ceil(maxWidth * Math.cos(rad) / 1.8));
-        xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
       }
       setIntervalState(skip);
       setTickAngle(angle);
       setTickAnchor(anchor);
-      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: xAxisH });
-      setXAxisHeight(Math.ceil(fontSize));
+      // XAxis tickek magassága DOM-ból
+      const xTicks = Array.from(document.querySelectorAll('.recharts-x-axis .recharts-layer tspan')) as SVGGraphicsElement[];
+      const maxXTickHeight = xTicks.length > 0 ? Math.max(...xTicks.map(t => t.getBBox().height)) : fontSize;
+      setXAxisHeight(maxXTickHeight);
+
+      let legendHeight = 0;
+      const legendEl = document.querySelector('.recharts-default-legend');
+      if (showLegend && legendEl) {
+        legendHeight = (legendEl as HTMLElement).offsetHeight || 32;
+      } else if (showLegend) {
+        legendHeight = 32;
+      }
+
+      setIntervalState(skip);
+      setTickAngle(angle);
+      setTickAnchor(anchor);
+      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: maxXTickHeight + legendHeight });
       const containerHeight = containerRef.current?.offsetHeight || 0;
       const neededHeight = 10 + xAxisHeight + 10 + 32;
       setMiniMode(neededHeight > containerHeight);
