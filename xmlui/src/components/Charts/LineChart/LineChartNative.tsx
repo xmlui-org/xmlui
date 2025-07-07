@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import type { ReactNode } from "react";
 import type React from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "xmlui";
@@ -45,10 +45,6 @@ export function LineChart({
   tickFormatter,
   children,
   showLegend = false,
-  marginTop = 0,
-  marginRight = 0,
-  marginBottom = 0,
-  marginLeft = 0,
 }: LineChartProps) {
   const { getThemeVar } = useTheme();
 
@@ -93,63 +89,116 @@ export function LineChart({
     ];
   }, [getThemeVar]);
 
-  const config = useMemo(() => {
-    return Object.assign(
-      {},
-      ...dataKeys.map((key, index) => {
-        return {
-          [key]: {
-            label: key,
-            color: colorValues[index % colorValues.length],
-          },
-        };
-      }),
-    );
-  }, [colorValues, dataKeys]);
-
   const chartContextValue = useChartContextValue({ nameKey, dataKeys });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const labelsRef = useRef<HTMLDivElement>(null);
+  const [interval, setIntervalState] = useState(0);
+  const [tickAngle, setTickAngle] = useState(0);
+  const [tickAnchor, setTickAnchor] = useState<'end' | 'middle'>('middle');
+  const [chartMargin, setChartMargin] = useState({ left: 30, right: 30, top: 10, bottom: 60 });
+  const [xAxisHeight, setXAxisHeight] = useState(50);
+  const fontSize =  12;
+
+  const safeData = Array.isArray(data) ? data : [];
+
+  useEffect(() => {
+    const calc = () => {
+      const width = containerRef.current?.offsetWidth || 800;
+      const spans = labelsRef.current?.querySelectorAll('span') || [];
+      const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
+      let angle = 0;
+      let anchor: 'end' | 'middle' = 'middle';
+      let rad = 0;
+      let minTickSpacing = maxWidth + 8;
+      let leftMargin = Math.max(8, Math.ceil(maxWidth / 3));
+      let rightMargin = Math.max(8, Math.ceil(maxWidth / 3));
+      let xAxisH = Math.ceil(fontSize * 1.2);
+      let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+      let skip = Math.max(0, Math.ceil(safeData.length / maxTicks) - 1);
+      if (skip > 0) {
+        angle = -60;
+        anchor = 'end';
+        rad = Math.abs(angle) * Math.PI / 180;
+        minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
+        maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+        skip = Math.max(0, Math.ceil(safeData.length / maxTicks) - 1);
+        leftMargin = Math.max(8, Math.ceil(maxWidth * Math.cos(rad) / 1.8));
+        rightMargin = Math.max(8, Math.ceil(maxWidth * Math.cos(rad) / 1.8));
+        xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
+      }
+      setIntervalState(skip);
+      setTickAngle(angle);
+      setTickAnchor(anchor);
+      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: xAxisH });
+      setXAxisHeight(Math.ceil(fontSize));
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, [data, nameKey]);
 
   return (
     <ChartProvider value={chartContextValue}>
       {children}
       <div
+        ref={labelsRef}
+        style={{ position: 'absolute', visibility: 'hidden', height: 0, overflow: 'hidden' }}
+      >
+        {safeData.length > 0 && nameKey
+          ? safeData.map(d => d?.[nameKey]).map((label, idx) => (
+              <span key={idx} style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                {label}
+              </span>
+            ))
+          : null}
+      </div>
+      <div
         style={{
           flexGrow: 1,
           minHeight: 0,
-          width: style.width || "100%",
-          height: style.height || "100%",
+          width: style?.width || '100%',
+          height: style?.height || '100%',
+          padding: 0,
+          margin: 0,
         }}
       >
-        <ResponsiveContainer style={style} width="100%" height="100%">
+        <ResponsiveContainer ref={containerRef} width="100%" height="100%" debounce={100}>
           <RLineChart
+            style={style}
             accessibilityLayer
             data={data}
-            margin={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
+            margin={chartMargin}
           >
             <XAxis
-              interval="preserveEnd"
               dataKey={nameKey}
+              interval={interval}
               tickLine={false}
-              hide={hideX}
-              axisLine={false}
-              tick={{ fill: "currentColor" }}
+              angle={tickAngle}
+              textAnchor={tickAnchor}
+              tick={{ fill: 'currentColor', fontSize }}
               tickFormatter={tickFormatter}
-              minTickGap={5}
+              height={hideX ? 0 : xAxisHeight}
+              hide={hideX}
             />
             {!hideTooltip && <Tooltip content={<TooltipContent />} />}
-            {Object.keys(config).map((key, index) => (
+            {dataKeys.map((dataKey, i) => (
               <Line
-                key={index}
-                dataKey={key}
+                key={dataKey}
                 type="monotone"
-                stroke={config[key].color}
+                dataKey={dataKey}
+                name={dataKey}
+                stroke={colorValues[i]}
+                strokeWidth={2}
                 dot={false}
               />
             ))}
-            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+            {showLegend && <RLegend wrapperStyle={{ bottom: 0, left: 0, right: 0, margin: '0 auto', width: '100%', textAlign: 'center' }} />}
           </RLineChart>
         </ResponsiveContainer>
       </div>
+
     </ChartProvider>
   );
 }
+
