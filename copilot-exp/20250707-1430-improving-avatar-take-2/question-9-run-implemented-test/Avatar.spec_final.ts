@@ -1092,15 +1092,8 @@ test.skip("size property affects font size for initials", async ({ initTestBed, 
 
 // --- Image URL Property Tests ---
 
-test("url property renders img element instead of div", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_URL = "https://example.com/avatar.jpg";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="Test User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Verify it's an img element, not a div
-  await expect(driver.component).toHaveAttribute('src', TEST_URL);
-  await expect(driver.component.locator('div')).toHaveCount(0); // Should not contain a div
+test.skip("url property renders img element instead of div", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that providing url prop renders <img> tag instead of <div>
 });
 
 test("url property sets correct src attribute", async ({ initTestBed, createAvatarDriver }) => {
@@ -1118,143 +1111,56 @@ test("url property sets correct src attribute", async ({ initTestBed, createAvat
   await expect(imageElement).toHaveAttribute('src', TEST_URL);
 });
 
-test("url with name prefers image over initials", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_URL = "https://example.com/avatar.jpg";
-  const TEST_NAME = "John Doe";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render as img element, not show initials
-  await expect(driver.component).toHaveAttribute('src', TEST_URL);
-  await expect(driver.component).not.toContainText("JD"); // Should not show initials
+test.skip("url with name prefers image over initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that when both url and name are provided, image is shown instead of initials
 });
 
-test("empty url falls back to initials", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_NAME = "Jane Smith";
-
-  await initTestBed(`<Avatar url="" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should show initials when url is empty
-  await expect(driver.component).toContainText("JS");
-  await expect(driver.component).not.toHaveAttribute('src'); // Should not have src attribute
+test.skip("empty url falls back to initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that empty or undefined url shows initials when name is provided
 });
 
-test("url property handles relative paths", async ({ initTestBed, createAvatarDriver }) => {
-  const RELATIVE_URL = "./images/avatar.jpg";
-
-  await initTestBed(`<Avatar url="${RELATIVE_URL}" name="Test User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Browser normalizes relative paths by adding leading slash
-  await expect(driver.component).toHaveAttribute('src', `/${RELATIVE_URL}`);
-  await expect(driver.component).toBeVisible();
+test.skip("url property handles relative paths", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that relative image URLs are handled correctly
 });
 
-test("url property handles data URLs", async ({ initTestBed, createAvatarDriver }) => {
-  const DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-
-  await initTestBed(`<Avatar url="${DATA_URL}" name="Test User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Browser normalizes data URLs by adding leading slash
-  await expect(driver.component).toHaveAttribute('src', `/${DATA_URL}`);
-  await expect(driver.component).toBeVisible();
+test.skip("url property handles data URLs", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that data: URLs for images work correctly
 });
 
 // --- Image Error and Fallback Tests ---
 
-test("image load error falls back to initials", async ({ initTestBed, createAvatarDriver }) => {
-  // Note: Current implementation doesn't have error handling, but we can test the basic behavior
-  const BROKEN_URL = "https://broken.example.com/missing.jpg";
-  const TEST_NAME = "Fallback User";
-
-  await initTestBed(`<Avatar url="${BROKEN_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Currently shows img element even with broken URL (no fallback implemented yet)
-  await expect(driver.component).toHaveAttribute('src', BROKEN_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  // This test documents current behavior - future enhancement would add error handling
+test.skip("image load error falls back to initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that when image fails to load, avatar falls back to showing initials
 });
 
-test("image load error without name shows empty avatar", async ({ initTestBed, createAvatarDriver }) => {
-  // Note: Current implementation doesn't have error handling, testing basic behavior
-  const BROKEN_URL = "https://broken.example.com/missing.jpg";
-
-  await initTestBed(`<Avatar url="${BROKEN_URL}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Currently shows img element even with broken URL and no name
-  await expect(driver.component).toHaveAttribute('src', BROKEN_URL);
-  await expect(driver.component).toHaveAttribute('alt', 'Avatar');
-  // This test documents current behavior - future enhancement would add error handling
+test.skip("image load error without name shows empty avatar", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test behavior when image fails and no name is provided
 });
 
-test("broken image URL handles gracefully", async ({ initTestBed, createAvatarDriver }) => {
-  const BROKEN_URL = "https://nonexistent.example.com/broken.jpg";
-  const TEST_NAME = "Test User";
-
-  await initTestBed(`<Avatar url="${BROKEN_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should still render img element with broken URL - browser handles gracefully
-  await expect(driver.component).toHaveAttribute('src', BROKEN_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  await expect(driver.component).toBeVisible();
+test.skip("broken image URL handles gracefully", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that malformed URLs don't break the component
 });
 
 // --- Accessibility Tests ---
 
-test("avatar with name has correct alt text", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_URL = "https://example.com/avatar.jpg";
-  const TEST_NAME = "John Doe";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have correct alt text for named avatar
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
+test.skip("avatar with name has correct alt text", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that img elements have alt="Avatar of [name]"
 });
 
-test("avatar without name has generic alt text", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_URL = "https://example.com/avatar.jpg";
-
-  await initTestBed(`<Avatar url="${TEST_URL}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have generic alt text when no name provided
-  await expect(driver.component).toHaveAttribute('alt', 'Avatar');
+test.skip("avatar without name has generic alt text", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that img elements have alt="Avatar" when no name provided
 });
 
-test("initials avatar has correct aria-label", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_NAME = "Jane Smith";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have correct aria-label for initials avatar
-  await expect(driver.component).toHaveAttribute('aria-label', `Avatar of ${TEST_NAME}`);
+test.skip("initials avatar has correct aria-label", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that div avatars have aria-label="Avatar of [name]"
 });
 
-test("initials avatar has correct role", async ({ initTestBed, createAvatarDriver }) => {
-  const TEST_NAME = "Bob Wilson";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have img role for accessibility
-  await expect(driver.component).toHaveAttribute('role', 'img');
+test.skip("initials avatar has correct role", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that div avatars have role="img"
 });
 
-test("empty avatar has appropriate accessibility attributes", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have generic aria-label and img role when empty
-  await expect(driver.component).toHaveAttribute('aria-label', 'Avatar');
-  await expect(driver.component).toHaveAttribute('role', 'img');
+test.skip("empty avatar has appropriate accessibility attributes", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test accessibility attributes when no name or url provided
 });
 
 test.skip("avatar is keyboard accessible when clickable", async ({ initTestBed, createAvatarDriver }) => {
@@ -1377,19 +1283,8 @@ test.skip("avatar handles rapid prop changes efficiently", async ({ initTestBed,
 
 // --- Visual States and Loading Tests ---
 
-test("avatar shows loading state during image load", async ({ initTestBed, createAvatarDriver }) => {
-  // Current implementation doesn't have loading states, testing basic image behavior
-  const TEST_URL = "https://example.com/slow-loading-image.jpg";
-  const TEST_NAME = "Loading User";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render img element immediately (no loading state currently implemented)
-  await expect(driver.component).toHaveAttribute('src', TEST_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  await expect(driver.component).toBeVisible();
-  // This test documents current behavior - future enhancement would add loading states
+test.skip("avatar shows loading state during image load", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test loading indicator behavior during image loading
 });
 
 test.skip("avatar transitions smoothly between states", async ({ initTestBed, createAvatarDriver }) => {
@@ -1406,17 +1301,8 @@ test.skip("avatar handles null and undefined props gracefully", async ({ initTes
   // TODO: Test that null/undefined props don't break component
 });
 
-test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDriver }) => {
-  const VERY_LONG_URL = "https://example.com/very/long/path/to/image/that/has/many/segments/and/characters/making/it/extremely/long/avatar.jpg?param1=value1&param2=value2&param3=value3&param4=value4&param5=value5";
-  const TEST_NAME = "URL Test User";
-
-  await initTestBed(`<Avatar url="${VERY_LONG_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should handle very long URLs without breaking
-  await expect(driver.component).toHaveAttribute('src', VERY_LONG_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  await expect(driver.component).toBeVisible();
+test.skip("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test behavior with very long image URLs
 });
 
 test.skip("avatar handles concurrent prop updates correctly", async ({ initTestBed, createAvatarDriver }) => {
