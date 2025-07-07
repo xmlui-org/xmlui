@@ -6,7 +6,7 @@ I'd like to experiment with quality assurance and performance optimizations with
 I want you to record my questions and the answers you provide, as well as any code snippets you generate. Follow this structured approach:
 
 ## Session Setup
-1. When I start a new chat, ask me a title for the chat session and create a new folder in the `copilot-exp` directory with the title as the filename, prefixed with the start time in YYYYMMDD-HHMM format for proper chronological sorting.
+1. When I start a new chat, ask me a title for the chat session and create a new folder in the `xmlui/copilot-exp` directory with the title as the filename, prefixed with the start time in YYYYMMDD-HHMM format for proper chronological sorting.
 2. Create a log.md file in that folder to record the questions and answers.
 3. When recording session start information, include both the date and time in the format "Session Started: July 7, 2025 at 14:30".
 
@@ -24,5 +24,3 @@ I want you to record my questions and the answers you provide, as well as any co
 ## Summary and Logging
 11. Log the event when you summarize the conversation.
 12. When you make a summary, make it as concise as possible. Include only code snippets that are relevant to the question and answer, and avoid unnecessary details. Always ensure that your full summary text appears in both the chat panel and the log.md file.
-
-

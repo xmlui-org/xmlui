@@ -20,7 +20,7 @@ export const Avatar = memo(forwardRef(function Avatar(
   ref: Ref<any>,
 ) {
   // Memoize the abbreviated name calculation to avoid recalculation on every render
-  const abbreviatedName = useMemo(() => abbrevName(name ?? null), [name]);
+  const abbreviatedName = useMemo(() => abbrevName(name), [name]);
 
   // Simplified className generation by directly mapping size to styles
   const commonClassNames = classnames(
