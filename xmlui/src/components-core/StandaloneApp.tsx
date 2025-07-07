@@ -75,6 +75,9 @@ type StandaloneAppProps = {
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
+
+  // --- If true, the app waits for the API interceptor to be ready
+  waitForApiInterceptor?: boolean;
 };
 
 /**
