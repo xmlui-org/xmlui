@@ -98,6 +98,7 @@ export function LineChart({
   const [tickAnchor, setTickAnchor] = useState<'end' | 'middle'>('middle');
   const [chartMargin, setChartMargin] = useState({ left: 30, right: 30, top: 10, bottom: 60 });
   const [xAxisHeight, setXAxisHeight] = useState(50);
+  const [miniMode, setMiniMode] = useState(false);
   const fontSize =  12;
 
   const safeData = Array.isArray(data) ? data : [];
@@ -132,11 +133,14 @@ export function LineChart({
       setTickAnchor(anchor);
       setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: xAxisH });
       setXAxisHeight(Math.ceil(fontSize));
+      const containerHeight = containerRef.current?.offsetHeight || 0;
+      const neededHeight = 10 + xAxisHeight + 10 + 32;
+      setMiniMode(neededHeight > containerHeight);
     };
     calc();
     window.addEventListener('resize', calc);
     return () => window.removeEventListener('resize', calc);
-  }, [data, nameKey]);
+  }, [data, nameKey, xAxisHeight]);
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -168,7 +172,7 @@ export function LineChart({
             style={style}
             accessibilityLayer
             data={data}
-            margin={chartMargin}
+            margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <XAxis
               dataKey={nameKey}
@@ -176,12 +180,12 @@ export function LineChart({
               tickLine={false}
               angle={tickAngle}
               textAnchor={tickAnchor}
-              tick={{ fill: 'currentColor', fontSize }}
-              tickFormatter={tickFormatter}
-              height={hideX ? 0 : xAxisHeight}
-              hide={hideX}
+              tick={miniMode ? false : { fill: 'currentColor', fontSize }}
+              tickFormatter={miniMode ? undefined : tickFormatter}
+              height={miniMode || hideX ? 0 : xAxisHeight}
+              hide={miniMode || hideX}
             />
-            {!hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
             {dataKeys.map((dataKey, i) => (
               <Line
                 key={dataKey}
@@ -189,7 +193,7 @@ export function LineChart({
                 dataKey={dataKey}
                 name={dataKey}
                 stroke={colorValues[i]}
-                strokeWidth={2}
+                strokeWidth={1}
                 dot={false}
               />
             ))}
