@@ -88,7 +88,12 @@ type PagesProps = {
   children?: ReactNode;
 };
 
-export function Pages({ node, renderChild, extractValue, fallbackPath }: PagesProps) {
+export function Pages({
+  node,
+  renderChild,
+  extractValue,
+  fallbackPath = defaultProps.fallbackPath,
+}: PagesProps) {
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
   node.children?.forEach((child) => {
@@ -106,7 +111,7 @@ export function Pages({ node, renderChild, extractValue, fallbackPath }: PagesPr
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        {!!fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace />} />}
+        <Route path="*" element={<Navigate to={fallbackPath} replace />} />
       </Routes>
       {renderChild(restChildren)}
     </>
