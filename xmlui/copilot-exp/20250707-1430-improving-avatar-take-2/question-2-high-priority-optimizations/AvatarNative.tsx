@@ -1,5 +1,5 @@
 import type { CSSProperties, Ref } from "react";
-import { forwardRef, memo, useMemo } from "react";
+import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
@@ -15,19 +15,17 @@ export const defaultProps: Pick<Props, "size"> = {
   size: "sm",
 };
 
-export const Avatar = memo(forwardRef(function Avatar(
+export const Avatar = forwardRef(function Avatar(
   { size = defaultProps.size, url, name, style, onClick, ...rest }: Props,
   ref: Ref<any>,
 ) {
-  // Memoize the abbreviated name calculation to avoid recalculation on every render
-  const abbreviatedName = useMemo(() => abbrevName(name ?? null), [name]);
-
-  // Simplified className generation by directly mapping size to styles
-  const commonClassNames = classnames(
-    styles.container,
-    styles[size as keyof typeof styles] || styles.sm, // Fallback to sm if size not found
-    { [styles.clickable]: !!onClick }
-  );
+  const commonClassNames = classnames(styles.container, {
+    [styles.xs]: size === "xs",
+    [styles.sm]: size === "sm",
+    [styles.md]: size === "md",
+    [styles.lg]: size === "lg",
+    [styles.clickable]: !!onClick,
+  });
   const altTxt = !!name ? `Avatar of ${name}` : "Avatar";
 
   if (url) {
@@ -53,11 +51,11 @@ export const Avatar = memo(forwardRef(function Avatar(
         role="img"
         aria-label={altTxt}
       >
-        {abbreviatedName || <span aria-hidden="true"></span>}
+        {abbrevName(name) || <span aria-hidden="true"></span>}
         {/* Display initials or an empty decorative span */}
       </div>
     );
-}));
+});
 
 function abbrevName(name: string | null): string | null {
   if (!!name) {
