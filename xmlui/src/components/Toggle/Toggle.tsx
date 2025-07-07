@@ -198,6 +198,7 @@ export const Toggle = forwardRef(function Toggle(
           <div className={styles.inputContainer}>{input}</div>
           {inputRenderer({
             $checked: value,
+            $setChecked: setValue,
           })}
         </label>
       ) : (

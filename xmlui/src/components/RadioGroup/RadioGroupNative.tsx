@@ -20,6 +20,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { UnwrappedRadioItem } from "./RadioItemNative";
 
 export const defaultProps = {
   value: "",
@@ -31,6 +32,7 @@ export const defaultProps = {
 
 const RadioGroupStatusContext = createContext<{
   value?: string;
+  setValue?: (value: string) => void;
   status: ValidationStatus;
   enabled?: boolean;
 }>({
@@ -127,8 +129,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
   }, [/* focus, */ registerComponentApi, setValue]);
 
   const contextValue = useMemo(() => {
-    return { value, status: validationStatus, enabled };
-  }, [value, validationStatus, enabled]);
+    return { value, setValue: updateValue, status: validationStatus, enabled };
+  }, [value, updateValue, validationStatus, enabled]);
 
   return (
     <ItemWithLabel
@@ -188,29 +190,29 @@ export const RadioGroupOption = ({
   const item = useMemo(
     () => (
       <>
-        <InnerRadioGroup.Item
-          className={classnames(styles.radioOption, statusStyles)}
-          value={value}
-          disabled={!enabled}
+        <UnwrappedRadioItem
           id={id}
-        >
-          <InnerRadioGroup.Indicator className={classnames(styles.indicator, statusStyles)} />
-        </InnerRadioGroup.Item>
+          value={value}
+          checked={value === radioGroupContext.value}
+          disabled={!enabled}
+          statusStyles={statusStyles}
+        />
         <label htmlFor={id} className={classnames(styles.label, statusStyles)}>
           {label ?? value}
         </label>
       </>
     ),
-    [enabled, id, label, statusStyles, value],
+    [enabled, id, label, statusStyles, value, radioGroupContext],
   );
 
   return (
     <div key={id} className={styles.radioOptionContainer} style={style}>
-      {optionRenderer ? (
+      {!!optionRenderer ? (
         <label className={styles.optionLabel}>
           <div className={styles.itemContainer}>{item}</div>
           {optionRenderer({
             $checked: value === radioGroupContext.value,
+            $setChecked: radioGroupContext.setValue,
           })}
         </label>
       ) : (
