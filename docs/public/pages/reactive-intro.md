@@ -2,7 +2,7 @@
 
 Let's load that same London tube data into a [Select](/components/Select) component.
 
-```xmlui-pg copy display height="280px"
+```xmlui-pg display height="280px" noHeader
 <App>
   <Select id="lines" initialValue="bakerloo" dropdownHeight="200px">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
@@ -16,8 +16,8 @@ The `Select` uses the same API as the `List`. It contains an <a href="/component
 
 Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/components/Table">Table</a>.
 
-```xmlui-pg
----app copy display
+```xmlui-pg noHeader
+---app
 <App>
   <Select id="lines" initialValue="bakerloo">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">

@@ -3,7 +3,7 @@ The `Dashboard` page continues with a chart of daily revenue that uses a [Slider
 
 Here is a simplified version of that mechanism. Try using both slider handles to adjust the date range and corresponding total revenue.
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app display
 <App>
   <SliderDemo />
