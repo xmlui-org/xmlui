@@ -2,69 +2,85 @@ import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import type { DefaultThemeVars } from "./ThemingDefs";
 
-// This interface represents the core properties of a component definition
-// (independent of component metadata).
+/**
+ * This interface represents the core properties of a component definition
+ * (independent of component metadata).
+ */
 export interface ComponentDefCore {
-  // The type discriminator field of the component; it defines the unique ID of the component type.
+  /**
+   * The type discriminator field of the component; it defines the unique ID of the component type.
+   */
   type: string;
 
-  // Unique identifier of a component-like object
+  /**
+   * Unique identifier of a component-like object
+   */
   uid?: string;
 
-  // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
+  /**
+   * An optional identifier we use for e2e tests; it does not influence the rendering of a component.
+   */
   testId?: string;
 
-  // A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" />
-  // syntax. These are used later to resolve the `type` of the componentDef.
-  // <KEY:Button/> will have type `VALUE.Button` (joined with a "." (dot)).
-  namespaces?: Record<string, string>;
-
-  // Though components manage their state internally, the app logic may require user
-  // state management. Components may have user *variables*, which the UI logic uses to
-  // manage the application state. This property holds the variables (name and value
-  // pairs) associated with this component definition.
+  /**
+   * Though components manage their state internally, the app logic may require user
+   * state management. Components may have user *variables*, which the UI logic uses to
+   * manage the application state. This property holds the variables (name and value
+   * pairs) associated with this component definition.
+   */
   vars?: Record<string, any>;
 
-  // Each component may have child components to constitute a hierarchy of components.
-  // This property holds the definition of these nested children.
+  /**
+   * Each component may have child components to constitute a hierarchy of components.
+   * This property holds the definition of these nested children.
+   */
   children?: ComponentDef[];
 
-  // Components may have slots that can be filled with other components. This property
-  // holds the contents of the slots.
-  
+  /**
+   * Components may have slots that can be filled with other components. This property
+   * holds the contents of the slots.
+   */
   slots?: Record<string, ComponentDef[]>;
 
-  // This property is evaluated to a Boolean value during run time. When this value is
-  // `true`, the component with its children chain is rendered; otherwise, the entire
-  // component hierarchy is omitted from the rendered tree.
+  /**
+   * This property is evaluated to a Boolean value during run time. When this value is
+   * `true`, the component with its children chain is rendered; otherwise, the entire
+   * component hierarchy is omitted from the rendered tree.
+   */
   when?: string | boolean;
 
-  // Some components work with data obtained asynchronously. Fetching this data requires
-  // some state management handling the complexity (including error handling) of data
-  // access. A *loader* is responsible for managing this logic. This property holds the
-  // loaders associated with this component definition.
+  /**
+   * Some components work with data obtained asynchronously. Fetching this data requires
+   * some state management handling the complexity (including error handling) of data
+   * access. A *loader* is responsible for managing this logic. This property holds the
+   * loaders associated with this component definition.
+   */
   loaders?: ComponentDef[];
 
-  // Components may have functions that are used to perform some logic. This property
-  // holds the functions (name and function body) associated with this component
-  // definition.
+  /**
+   * Components may have functions that are used to perform some logic. This property
+   * holds the functions (name and function body) associated with this component
+   * definition.
+   */
   functions?: Record<string, any>;
 
-  // Components managing state through variables or loaders are wrapped with containers
-  // responsible for this job. Just as components, containers form a hierarchy. While
-  // working with this hierarchy, parent components may flow state values (key and value
-  // pairs) to their child containers. This property holds the name of state values to
-  // flow down to the direct child containers.
-  
+  /**
+   * Components managing state through variables or loaders are wrapped with containers
+   * responsible for this job. Just as components, containers form a hierarchy. While
+   * working with this hierarchy, parent components may flow state values (key and value
+   * pairs) to their child containers. This property holds the name of state values to
+   * flow down to the direct child containers.
+   */
   uses?: string[];
 
-  // Arbitrary debug information that can be attached to a component definition.
-  // Current usage:
-  // - `debug: { source: { start: number, end: number } }` The start and end
-  //   positions of the source belonging to the particular component definition.
+  /**
+   * Arbitrary debug information that can be attached to a component definition.
+   * Current usage:
+   * - `debug: { source: { start: number, end: number } }` The start and end
+   *   positions of the source belonging to the particular component definition.
+   */
   debug?: Record<string, any>;
 }
-
 // This interface represents the properties of a component definition.
 export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
   extends ComponentDefCore,
@@ -81,7 +97,7 @@ export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
 
   // Components may provide context variables that can be used to in expressions and
   // event handlers within the component.
-  
+
   contextVars?: Record<keyof TMd["contextVars"], string>;
 }
 
@@ -104,7 +120,7 @@ export interface CompoundComponentDef extends Scriptable {
 
   // This property holds the variables (name and value pairs) associated with this
   // compound component definition.
-  
+
   vars?: Record<string, any>;
 
   // A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" />
@@ -157,7 +173,10 @@ export type PropertyValueType = "boolean" | "string" | "number" | "any" | "Compo
 
 // A generic validation function that retrieves either a hint (the validation argument
 // has issues) or undefined (the argument is valid).
-export type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+export type IsValidFunction<T> = (
+  propKey: string,
+  propValue: T,
+) => string | string[] | undefined | null;
 
 // This type represents the description of a property value, which can be a string, a
 // number, or an object with a value and a description. This type is used in the
@@ -257,7 +276,7 @@ export type ComponentMetadata<
   // Theme variable defaults for a particular tone-specific theme
   toneSpecificThemeVars?: Record<string, Record<string, string>>;
 
-  // Indicates that the documentation should include only the theme variables 
+  // Indicates that the documentation should include only the theme variables
   // including the component name
   limitThemeVarsToComponent?: boolean;
 

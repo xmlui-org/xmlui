@@ -128,9 +128,8 @@ function highlight(
   const highlightedRows: DecorationItem[] =
     meta?.highlightRows?.map((row: DecorationItem) => {
       return {
-        // line and character are 0-indexed
-        start: { line: row.start, character: 0 },
-        end: { line: row.end, character: 0 },
+        start: row.start,
+        end: row.end,
         properties: row.properties,
       };
     }) ?? [];
@@ -139,7 +138,6 @@ function highlight(
     [...(meta?.highlightSubstringsEmphasized ?? []), ...(meta?.highlightSubstrings ?? [])]?.map(
       (str: DecorationItem) => {
         return {
-          // line and character are 0-indexed
           start: str.start,
           end: str.end,
           properties: str.properties,

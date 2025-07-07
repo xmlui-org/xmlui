@@ -33,6 +33,7 @@ const filteredValidationSeverityValues = validationSeverityValues.filter(
 
 export const FormItemMd = createMetadata({
   status: "stable",
+  allowArbitraryProps: true,
   description:
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +

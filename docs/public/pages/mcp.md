@@ -1,4 +1,4 @@
-# xmlui-mcp: Model Context Protocol server for XMLUI (experimental)
+# xmlui-mcp: Model Context Protocol server for XMLUI
 
 The Model Context Procotol (MCP) enables AI agents to use third-party tools. If you are using an agent like Claude or Cursor, you can equip them with a set of XMLUI-specific tools so they can:
 
@@ -8,7 +8,7 @@ The Model Context Procotol (MCP) enables AI agents to use third-party tools. If 
 - search XMLUI apps
 - help you build your own XMLUI app
 
-An experimental xmlui-mcp tookit is available [here](https://github.com/xmlui-org/xmlui-mcp). To use it, clone that repo and also the [XMLUI repo](https://github.com/xmlui-org/xmlui) to create this layout.
+The xmlui-mcp tookit is available [here](https://github.com/xmlui-org/xmlui-mcp). To use it, clone that repo and also the [XMLUI repo](https://github.com/xmlui-org/xmlui) to create this layout.
 
 ```xmlui-tree
 <root>

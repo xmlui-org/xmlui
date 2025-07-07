@@ -3,6 +3,7 @@ export type SegmentProps = {
   copy?: boolean;
   noPopup?: boolean;
   noFrame?: boolean;
+  noHeader?: boolean;
   splitView?: boolean;
   initiallyShowCode?: boolean;
   highlights?: (number | [number, number])[];
@@ -81,6 +82,11 @@ export function parseSegmentProps(input: string): SegmentProps {
   // --- Match the "noFrame" flag
   if (/\bnoFrame\b/.test(input)) {
     segment.noFrame = true;
+  }
+  
+  // --- Match the "noHeader" flag
+  if (/\bnoHeader\b/.test(input)) {
+    segment.noHeader = true;
   }
 
   // --- Match the "splitView" flag
@@ -275,6 +281,7 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
   const pgContent: any = {
     noPopup: pattern.default?.noPopup,
     noFrame: pattern.default?.noFrame,
+    noHeader: pattern.default?.noHeader,
     splitView: pattern.default?.splitView,
     initiallyShowCode: pattern.default?.initiallyShowCode,
     popOutUrl: pattern.default?.popOutUrl,

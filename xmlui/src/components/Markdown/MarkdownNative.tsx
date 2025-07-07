@@ -88,12 +88,12 @@ export const Markdown = memo(function Markdown({
   codeHighlighter,
   showHeadingAnchors,
 }: MarkdownProps) {
+  const imageInfo = useRef(new Map<string, boolean>());
   if (typeof children !== "string") {
     return null;
   }
   children = removeIndents ? removeTextIndents(children) : children;
 
-  const imageInfo = useRef(new Map<string, boolean>());
   const getImageKey = (node: any) =>
     `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
 
@@ -355,6 +355,7 @@ export const Markdown = memo(function Markdown({
                 height={appProps.height}
                 allowPlaygroundPopup={!appProps.noPopup}
                 withFrame={appProps.noFrame ? false : true}
+                noHeader={appProps.noHeader ?? false}
                 splitView={appProps.splitView ?? false}
                 initiallyShowCode={appProps.initiallyShowCode ?? false}
                 popOutUrl={appProps.popOutUrl}

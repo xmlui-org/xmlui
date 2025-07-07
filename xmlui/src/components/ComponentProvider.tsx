@@ -251,6 +251,9 @@ import { legendComponentRenderer } from "./Charts/Legend/Legend";
 import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
+import { editorComponentRenderer } from "./TableEditor/TableEditor";
+
+
 /**
  * The framework has a specialized component concept, the "property holder
  * component." These components only hold property values but do not render
@@ -394,6 +397,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
       this.registerCoreComponent(helloWorldComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
+      this.registerCoreComponent(editorComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
       this.registerCoreComponent(checkboxComponentRenderer);

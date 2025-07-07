@@ -42,6 +42,7 @@ type NestedAppProps = {
   allowPlaygroundPopup?: boolean;
   popOutUrl?: string;
   withFrame?: boolean;
+  noHeader?: boolean;
   style?: CSSProperties;
   splitView?: boolean;
   refVersion?: number;
@@ -80,6 +81,7 @@ export function NestedApp({
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
   popOutUrl,
   withFrame = defaultProps.withFrame,
+  noHeader = defaultProps.noHeader,
   style,
   refVersion = 0,
 }: NestedAppProps) {
@@ -229,38 +231,40 @@ export function NestedApp({
       <ErrorBoundary node={component}>
         {withFrame ? (
           <div className={styles.nestedAppContainer}>
-            <div className={styles.header}>
-              <span className={styles.headerText}>{title}</span>
-              <div className={styles.spacer} />
-              {allowPlaygroundPopup && (
+            {!noHeader && (
+              <div className={styles.header}>
+                <span className={styles.headerText}>{title}</span>
+                <div className={styles.spacer} />
+                {allowPlaygroundPopup && (
+                  <Tooltip
+                    trigger={
+                      <button
+                        className={styles.headerButton}
+                        onClick={() => {
+                          openPlayground();
+                        }}
+                      >
+                        <RxOpenInNewWindow />
+                      </button>
+                    }
+                    label="View and edit in new full-width window"
+                  />
+                )}
                 <Tooltip
                   trigger={
                     <button
                       className={styles.headerButton}
                       onClick={() => {
-                        openPlayground();
+                        setRefreshVersion(refreshVersion + 1);
                       }}
                     >
-                      <RxOpenInNewWindow />
+                      <LiaUndoAltSolid />
                     </button>
                   }
-                  label="View and edit in new full-width window"
+                  label="Reset the app"
                 />
-              )}
-              <Tooltip
-                trigger={
-                  <button
-                    className={styles.headerButton}
-                    onClick={() => {
-                      setRefreshVersion(refreshVersion + 1);
-                    }}
-                  >
-                    <LiaUndoAltSolid />
-                  </button>
-                }
-                label="Reset the app"
-              />
-            </div>
+              </div>
+            )}
             {nestedAppRoot}
           </div>
         ) : (
@@ -289,6 +293,7 @@ export function NestedApp({
     title,
     toneToApply,
     withFrame,
+    noHeader,
     apiUrl,
   ]);
 

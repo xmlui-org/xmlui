@@ -1254,9 +1254,6 @@ function addToNamespaces(
     return reportError("T025", nsKey);
   }
   compNamespaces.set(nsKey, nsValue);
-
-  comp.namespaces ??= {};
-  comp.namespaces[nsKey] = nsValue;
 }
 
 function getTopLvlElement(node: Node, getText: GetText): Node {
