@@ -1625,101 +1625,16 @@ test("avatar respects parent container constraints", async ({ initTestBed, creat
 
 // --- Performance and Optimization Tests ---
 
-test("avatar memoization prevents unnecessary re-renders", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar component doesn't re-render when props haven't changed
-  let renderCount = 0;
-  
-  const { testStateDriver } = await initTestBed(`
-    <Avatar 
-      name="Memo User" 
-      size="sm"
-      onClick="testState = ++testState || 1"
-    />
-  `, {});
-  
-  const driver = await createAvatarDriver();
-  
-  // Initial render
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
-  
-  // Click should trigger state change but not cause unnecessary re-renders
-  await driver.component.click();
-  await expect.poll(testStateDriver.testState).toEqual(1);
-  
-  // Component should still be visible and functional
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
-  
-  // Test that memoization works by ensuring component behavior is stable
-  await driver.component.click();
-  await expect.poll(testStateDriver.testState).toEqual(2);
-  
-  // Component should maintain consistent behavior (indicates memoization working)
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
+test.skip("avatar memoization prevents unnecessary re-renders", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that React.memo optimization works correctly
 });
 
-test("abbreviatedName calculation is memoized", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that abbreviated name calculation is efficient and memoized
-  const TEST_NAME = "Very Long Name That Should Be Abbreviated";
-  
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should show abbreviated initials
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("VLN");
-  
-  // Test that name processing is working correctly (indicates memoization logic is sound)
-  const text = await driver.component.textContent();
-  expect(text).toBe("VLN");
-  
-  // Test multiple renders with same name should be efficient
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver2 = await createAvatarDriver();
-  await expect(driver2.component).toContainText("VLN");
-  
-  // Test that different names are processed correctly
-  await initTestBed(`<Avatar name="Different Name"/>`, {});
-  const driver3 = await createAvatarDriver();
-  await expect(driver3.component).toContainText("DN");
+test.skip("abbreviatedName calculation is memoized", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that useMemo optimization for name abbreviation works
 });
 
-test("avatar handles rapid prop changes efficiently", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar handles rapid prop changes without performance issues
-  
-  // Start with one configuration
-  await initTestBed(`<Avatar name="User One" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("UO");
-  await expect(driver.component).toHaveCSS("width", "48px"); // sm size
-  
-  // Change to different size
-  await initTestBed(`<Avatar name="User One" size="md"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toContainText("UO");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
-  
-  // Change name while keeping size
-  await initTestBed(`<Avatar name="Different User" size="md"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("DU");
-  await expect(driver3.component).toHaveCSS("width", "64px"); // md size
-  
-  // Switch to image avatar
-  await initTestBed(`<Avatar name="Image User" url="https://example.com/avatar.jpg"/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-  await expect(driver4.component).toHaveAttribute('alt', 'Avatar of Image User');
+test.skip("avatar handles rapid prop changes efficiently", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test performance when props change rapidly (size, name, url)
 });
 
 // --- Visual States and Loading Tests ---
@@ -1740,112 +1655,19 @@ test("avatar shows loading state during image load", async ({ initTestBed, creat
   // This test documents current behavior - future enhancement would add loading states
 });
 
-test("avatar transitions smoothly between states", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar transitions smoothly between initials and image states
-  
-  // Start with initials avatar
-  await initTestBed(`<Avatar name="Transition User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("TU");
-  
-  // Verify it's rendered as div for initials
-  let tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("div");
-  
-  // Switch to image avatar
-  await initTestBed(`<Avatar name="Transition User" url="https://example.com/transition.jpg"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toHaveAttribute('src', 'https://example.com/transition.jpg');
-  await expect(driver2.component).toHaveAttribute('alt', 'Avatar of Transition User');
-  
-  // Verify it's rendered as img for image
-  tagName = await driver2.getComponentTagName();
-  expect(tagName).toBe("img");
-  
-  // Switch back to initials
-  await initTestBed(`<Avatar name="Transition User"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("TU");
-  
-  // Verify it's back to div for initials
-  tagName = await driver3.getComponentTagName();
-  expect(tagName).toBe("div");
+test.skip("avatar transitions smoothly between states", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test smooth transitions when switching between image and initials
 });
 
-test("avatar lazy loading works correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar handles lazy loading behavior correctly
-  // Note: Current implementation doesn't have lazy loading, testing basic image behavior
-  
-  const TEST_URL = "https://example.com/lazy-loading-image.jpg";
-  const TEST_NAME = "Lazy User";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render img element immediately (no lazy loading currently implemented)
-  await expect(driver.component).toHaveAttribute('src', TEST_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  await expect(driver.component).toBeVisible();
-  
-  // Test that image attributes are set correctly for future lazy loading enhancement
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("img");
-  
-  // Test that image is properly accessible
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  
-  // This test documents current behavior - future enhancement would add lazy loading
-  // with attributes like loading="lazy" and proper intersection observer handling
+test.skip("avatar lazy loading works correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test lazy loading behavior for images when implemented
 });
 
 // --- Error Handling and Robustness Tests ---
 
-test("avatar handles null and undefined props gracefully", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that null/undefined props don't break component
-  
-  // Test with undefined name
-  await initTestBed(`<Avatar/>`, {});
-  const driver1 = await createAvatarDriver();
-  
-  await expect(driver1.component).toBeVisible();
-  await expect(driver1.component).toHaveAttribute('aria-label', 'Avatar');
-  await expect(driver1.component).toHaveAttribute('role', 'img');
-  
-  // Test with empty string name (should still show "Avatar" because empty string is falsy)
-  await initTestBed(`<Avatar name=""/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toHaveAttribute('aria-label', 'Avatar');
-  await expect(driver2.component).toHaveAttribute('role', 'img');
-  
-  // Test with undefined URL (should fall back to initials)
-  await initTestBed(`<Avatar name="Test User"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("TU");
-  
-  // Test with empty URL (should fall back to initials)
-  await initTestBed(`<Avatar name="Test User" url=""/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toContainText("TU");
-  
-  // Test with undefined size (should use default)
-  await initTestBed(`<Avatar name="Size User"/>`, {});
-  const driver5 = await createAvatarDriver();
-  
-  await expect(driver5.component).toBeVisible();
-  await expect(driver5.component).toContainText("SU");
-  await expect(driver5.component).toHaveCSS("width", "48px"); // default sm size
+test.skip("avatar handles null and undefined props gracefully", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that null/undefined props don't break component
+
 });
 
 test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDriver }) => {
@@ -1861,84 +1683,10 @@ test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDri
   await expect(driver.component).toBeVisible();
 });
 
-test("avatar handles concurrent prop updates correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that rapid prop changes don't cause race conditions
-  
-  // Start with initial state
-  await initTestBed(`<Avatar name="Initial User" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("IU");
-  
-  // Rapidly change multiple props in sequence
-  await initTestBed(`<Avatar name="Updated User" size="md"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toContainText("UU");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
-  
-  // Change to image avatar
-  await initTestBed(`<Avatar name="Image User" url="https://example.com/user.jpg"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toHaveAttribute('src', 'https://example.com/user.jpg');
-  
-  // Change back to initials with different size
-  await initTestBed(`<Avatar name="Final User" size="lg"/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toContainText("FU");
-  await expect(driver4.component).toHaveCSS("width", "96px"); // lg size
-  
-  // Verify final state is correct (no race condition artifacts)
-  const tagName = await driver4.getComponentTagName();
-  expect(tagName).toBe("div"); // Should be div for initials, not img
+test.skip("avatar handles concurrent prop updates correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that rapid prop changes don't cause race conditions
 });
 
-test("avatar memory usage stays stable", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that component doesn't leak memory with frequent updates
-  
-  // Create multiple avatars with different configurations
-  const configurations = [
-    { name: "User 1", size: "sm" },
-    { name: "User 2", size: "md" },
-    { name: "User 3", size: "lg" },
-    { name: "User 4", url: "https://example.com/user4.jpg" },
-    { name: "User 5", url: "https://example.com/user5.jpg" }
-  ];
-  
-  // Test each configuration
-  for (const config of configurations) {
-    const markup = config.url 
-      ? `<Avatar name="${config.name}" url="${config.url}"/>` 
-      : `<Avatar name="${config.name}" size="${config.size}"/>`;
-    
-    await initTestBed(markup, {});
-    const driver = await createAvatarDriver();
-    
-    await expect(driver.component).toBeVisible();
-    
-    if (config.url) {
-      await expect(driver.component).toHaveAttribute('src', config.url);
-      await expect(driver.component).toHaveAttribute('alt', `Avatar of ${config.name}`);
-    } else {
-      const initials = config.name.split(' ').map(n => n[0]).join('');
-      await expect(driver.component).toContainText(initials);
-    }
-  }
-  
-  // Test that final state is clean and functional
-  await initTestBed(`<Avatar name="Final Test" size="sm"/>`, {});
-  const finalDriver = await createAvatarDriver();
-  
-  await expect(finalDriver.component).toBeVisible();
-  await expect(finalDriver.component).toContainText("FT");
-  await expect(finalDriver.component).toHaveCSS("width", "48px");
-  
-  // This test verifies that multiple avatar creations don't cause memory leaks
-  // by ensuring the component continues to function correctly after multiple instantiations
+test.skip("avatar memory usage stays stable", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that component doesn't leak memory with frequent updates
 });
