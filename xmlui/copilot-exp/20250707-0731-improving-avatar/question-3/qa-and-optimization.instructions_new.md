@@ -24,5 +24,3 @@ I want you to record my questions and the answers you provide, as well as any co
 ## Summary and Logging
 11. Log the event when you summarize the conversation.
 12. When you make a summary, make it as concise as possible. Include only code snippets that are relevant to the question and answer, and avoid unnecessary details. Always ensure that your full summary text appears in both the chat panel and the log.md file.
-
-

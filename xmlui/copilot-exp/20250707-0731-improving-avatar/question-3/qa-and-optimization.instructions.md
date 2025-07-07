@@ -19,10 +19,7 @@ I want you to record my questions and the answers you provide, as well as any co
 ## Agent Mode Operations
 8. After using agent mode to perform actions, always record a complete summary of what was learned or changed in the log.md file, ensuring this matches what is displayed in the chat panel.
 9. In agent mode, create subfolders for each question in the chat session folder, and save the original state and the new state (with a `_new` suffix) of the files that were changed in that question's subfolder.
-10. Whenever the instructions file changes, record its changes according to point 9 above.
 
 ## Summary and Logging
-11. Log the event when you summarize the conversation.
-12. When you make a summary, make it as concise as possible. Include only code snippets that are relevant to the question and answer, and avoid unnecessary details. Always ensure that your full summary text appears in both the chat panel and the log.md file.
-
-
+10. Log the event when you summarize the conversation.
+11. When you make a summary, make it as concise as possible. Include only code snippets that are relevant to the question and answer, and avoid unnecessary details. Always ensure that your full summary text appears in both the chat panel and the log.md file.
