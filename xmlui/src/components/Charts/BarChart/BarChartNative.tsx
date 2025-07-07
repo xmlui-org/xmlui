@@ -132,16 +132,23 @@ export function BarChart({
   const [rotate, setRotate] = useState(0);
   const [xAxisHeight, setXAxisHeight] = useState(50);
   const [yTickCount, setYTickCount] = useState(5);
+  const fontSize = 12; // fixed label font size
   const [chartMargin, setChartMargin] = useState({ left: 30, right: 30, top: 10, bottom: 60 });
   const [tickAngle, setTickAngle] = useState(0);
   const [tickAnchor, setTickAnchor] = useState<"end" | "middle">("middle");
   const [miniMode, setMiniMode] = useState(false);
-  const fontSize = 12; // fixed label font size
+  const [yAxisWidth, setYAxisWidth] = useState(40);
+  const [yAxisHeight, setYAxisHeight] = useState(fontSize);
 
   useEffect(() => {
     const calc = () => {
       const width = containerRef.current?.offsetWidth || 800;
       const spans = labelsRef.current?.querySelectorAll("span") || [];
+      const yTicks = Array.from(document.querySelectorAll('.recharts-y-axis .recharts-layer tspan')) as SVGGraphicsElement[];
+      const maxYTickWidth = yTicks.length > 0 ? Math.max(...yTicks.map(t => t.getBBox().width)) : 40;
+      const maxYTickHeight = yTicks.length > 0 ? Math.max(...yTicks.map(t => t.getBBox().height)) : fontSize;
+      setYAxisWidth(maxYTickWidth);
+      setYAxisHeight(maxYTickHeight);
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
       let anchor: "end" | "middle" = "middle";
@@ -166,7 +173,16 @@ export function BarChart({
       setIntervalState(skip);
       setTickAngle(angle);
       setTickAnchor(anchor);
-      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: xAxisH });
+      // XAxis tickek magassága (vertical layouthoz)
+      const xTicks = Array.from(document.querySelectorAll('.recharts-x-axis .recharts-layer tspan')) as SVGGraphicsElement[];
+      const maxXTickHeight = xTicks.length > 0 ? Math.max(...xTicks.map(t => t.getBBox().height)) : fontSize;
+      let bottomMargin = 10;
+      if (layout === "vertical") {
+        bottomMargin = maxXTickHeight;
+      } else {
+        bottomMargin = Math.max(xAxisH, maxXTickHeight);
+      }
+      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: bottomMargin });
 
       const chartHeight = containerRef.current?.offsetHeight || 300;
       const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
@@ -176,8 +192,13 @@ export function BarChart({
 
       setXAxisHeight(Math.ceil(fontSize));
       const containerHeight = containerRef.current?.offsetHeight || 0;
+      const containerWidth = containerRef.current?.offsetWidth || 0;
       const neededHeight = 10 + xAxisHeight + 10 + 32;
-      setMiniMode(neededHeight > containerHeight);
+      const neededWidth = chartMargin.left + chartMargin.right + yAxisWidth + 32;
+      setMiniMode(
+        neededHeight > containerHeight ||
+        neededWidth > containerWidth
+      );
     };
 
     calc();
