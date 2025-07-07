@@ -1,9 +1,3 @@
-%-DESC-START
-
-See [this guide](/forms) for details.
-
-%-DESC-END
-
 %-PROP-START columnGap
 
 ```xmlui-pg copy display name="Example: columnGap"

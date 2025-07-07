@@ -58,6 +58,10 @@ The markup displays the app's logo:
 
 Alternative text for the logo image for accessibility.
 
+### `inline (default: false)` [#inline-default-false]
+
+When set to true, the image will be displayed as an inline element instead of a block element.
+
 ## Events [#events]
 
 This component does not have any events.
