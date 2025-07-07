@@ -134,43 +134,40 @@ export function BarChart({
   const [yTickCount, setYTickCount] = useState(5);
   const [chartMargin, setChartMargin] = useState({ left: 30, right: 30, top: 10, bottom: 60 });
   const [tickAngle, setTickAngle] = useState(0);
-  const [tickAnchor, setTickAnchor] = useState<'end' | 'middle'>('middle');
+  const [tickAnchor, setTickAnchor] = useState<"end" | "middle">("middle");
+  const [miniMode, setMiniMode] = useState(false);
   const fontSize = 12; // fixed label font size
 
   useEffect(() => {
     const calc = () => {
       const width = containerRef.current?.offsetWidth || 800;
-      const spans = labelsRef.current?.querySelectorAll('span') || [];
+      const spans = labelsRef.current?.querySelectorAll("span") || [];
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
-      let anchor: 'end' | 'middle' = 'middle';
+      let anchor: "end" | "middle" = "middle";
       let rad = 0;
       let minTickSpacing = maxWidth + 8;
-      // Először próbáljuk forgatás nélkül, spacing = maxWidth + 8
       let leftMargin = Math.ceil(maxWidth / 3);
       let rightMargin = Math.ceil(maxWidth / 3);
       let xAxisH = Math.ceil(fontSize * 1.2);
       let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
       let skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
-      // Ha nem fér ki elég tick, próbáljuk meg -60°-os forgatással
       if (skip > 0) {
         angle = -60;
-        anchor = 'end';
-        rad = Math.abs(angle) * Math.PI / 180;
+        anchor = "end";
+        rad = (Math.abs(angle) * Math.PI) / 180;
         minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
         maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
         skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
-        leftMargin = Math.ceil(maxWidth * Math.cos(rad) / 1.8);
-        rightMargin = Math.ceil(maxWidth * Math.cos(rad) / 1.8);
+        leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
+        rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
-
       }
       setIntervalState(skip);
       setTickAngle(angle);
       setTickAnchor(anchor);
       setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: xAxisH });
 
-      // y-axis tick count based on container height
       const chartHeight = containerRef.current?.offsetHeight || 300;
       const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
       setYTickCount(maxYTicks);
@@ -178,25 +175,30 @@ export function BarChart({
       setRotate(0);
 
       setXAxisHeight(Math.ceil(fontSize));
+      const containerHeight = containerRef.current?.offsetHeight || 0;
+      const neededHeight = 10 + xAxisHeight + 10 + 32;
+      setMiniMode(neededHeight > containerHeight);
     };
 
     calc();
-    window.addEventListener('resize', calc);
-    return () => window.removeEventListener('resize', calc);
-  }, [data]);
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, [data, xAxisHeight]);
 
   return (
     <ChartProvider value={chartContextValue}>
       {children}
       <div
         ref={labelsRef}
-        style={{ position: 'absolute', visibility: 'hidden', height: 0, overflow: 'hidden' }}
+        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
       >
-        {data.map(d => d[nameKey]).map((label, idx) => (
-          <span key={idx} style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-            {label}
-          </span>
-        ))}
+        {data
+          .map((d) => d[nameKey])
+          .map((label, idx) => (
+            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {label}
+            </span>
+          ))}
       </div>
       <div
         style={{
@@ -208,13 +210,13 @@ export function BarChart({
           margin: 0,
         }}
       >
-        <ResponsiveContainer ref={containerRef}  width="100%" height="100%" debounce={100}>
+        <ResponsiveContainer ref={containerRef} width="100%" height="100%" debounce={100}>
           <RBarChart
             style={style}
             accessibilityLayer
             data={data}
             layout={layout}
-            margin={chartMargin}
+            margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <CartesianGrid vertical={true} strokeDasharray="3 3" />
             {layout === "vertical" ? (
@@ -222,17 +224,17 @@ export function BarChart({
                 <XAxis
                   type="number"
                   axisLine={false}
-                  hide={hideX}
-                  tick={{ fill: "currentColor", fontSize }}
+                  hide={miniMode || hideX}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
                 <YAxis
-                  hide={hideY}
+                  hide={miniMode || hideY}
                   dataKey={nameKey}
                   type="category"
                   interval={"equidistantPreserveStart"}
                   tickLine={false}
-                  tickFormatter={tickFormatter}
-                  tick={{ fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
               </>
             ) : (
@@ -244,22 +246,22 @@ export function BarChart({
                   tickLine={false}
                   angle={tickAngle}
                   textAnchor={tickAnchor}
-                  tick={{ fill: 'currentColor', fontSize }}
-                  tickFormatter={tickFormatter}
-                  height={hideX ? 0 : xAxisHeight}
-                  hide={hideX}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  height={miniMode || hideX ? 0 : xAxisHeight}
+                  hide={miniMode || hideX}
                 />
                 <YAxis
                   type="number"
                   axisLine={false}
-                  tick={!hideTickY && { fill: "currentColor", fontSize }}
-                  hide={hideY}
+                  tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+                  hide={miniMode || hideY}
                   tickCount={yTickCount}
-                  width={hideY || hideTickY ? 0 : 40}
+                  width={miniMode || hideY || hideTickY ? 0 : 40}
                 />
               </>
             )}
-            <Tooltip content={<TooltipContent />} />
+            {!miniMode && <Tooltip content={<TooltipContent />} />}
             {Object.keys(config).map((key, index) => (
               <Bar
                 key={index}
@@ -267,6 +269,7 @@ export function BarChart({
                 fill={config[key].color}
                 radius={stacked ? 0 : 8}
                 stackId={stacked ? "stacked" : undefined}
+                strokeWidth={1}
               />
             ))}
             {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
