@@ -403,7 +403,7 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 
 With the metadata and renderer complete, you can test custom props and nested content:
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <App>
   <VStack spacing="4">
     <!-- Custom message prop -->
@@ -449,7 +449,7 @@ window.handleHelloReset = function(event) {
 
 Now you can use the HelloWorld component with event handling:
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <App>
   <HelloWorld
     message="Event handling example"
@@ -570,7 +570,7 @@ This pattern allows XMLUI applications to:
 
 Test the Component API methods with this interactive example:
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <App>
 <VStack spacing="4">
 <HelloWorld id="demo" message="API Demo" />

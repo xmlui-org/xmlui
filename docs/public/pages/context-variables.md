@@ -166,3 +166,21 @@ These are the key context variables available in XMLUI components.
 </HStack>
 ```
 
+### `$pathname`
+
+Use `$pathname` to conditionally show content based on the current route path.
+
+```xmlui
+<App layout="horizontal-sticky">
+  <AppHeader>
+    <property name="logoTemplate">
+      <Text>My App</Text>
+    </property>
+    <property name="profileMenuTemplate">
+      <!-- Settings icon only shows on pages that have settings -->
+      <Icon name="cog" size="md" onClick="settingsDialog.open()"
+            when="{['/dashboard', '/profile', '/settings'].includes($pathname)}" />
+    </property>
+  </AppHeader>
+</App>
+```
