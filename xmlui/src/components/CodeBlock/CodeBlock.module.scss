@@ -20,6 +20,8 @@ $borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
 $border-CodeBlock: createThemeVar("border-CodeBlock");
 $boxShadow-CodeBlock: createThemeVar("boxShadow-CodeBlock");
 $height-CodeBlock: createThemeVar("height-CodeBlock");
+$paddingHorizontal-content-CodeBlock: createThemeVar("paddingHorizontal-content-CodeBlock");
+$paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-CodeBlock");
 
 .codeBlock {
   @include t.borderVars($themeVars, "CodeBlock");
@@ -35,8 +37,9 @@ $height-CodeBlock: createThemeVar("height-CodeBlock");
 }
 
 .copyButton {
-  opacity:  0.7;
-  &:hover{
+  opacity: 0.7;
+
+  &:hover {
     opacity: 1;
   }
 }
@@ -52,6 +55,7 @@ $height-CodeBlock: createThemeVar("height-CodeBlock");
 }
 
 .codeBlockContent {
+  padding: $paddingVertical-content-CodeBlock $paddingHorizontal-content-CodeBlock;
   position: relative;
   display: flex;
   align-items: center;
@@ -83,10 +87,12 @@ $height-CodeBlock: createThemeVar("height-CodeBlock");
   .codeBlockHighlightRow {
     background-color: $backgroundColor-CodeBlock-highlightRow;
   }
+
   .codeBlockHighlightString {
     background-color: $backgroundColor-CodeBlock-highlightString;
     padding: 1px;
   }
+
   .codeBlockHighlightStringEmphasis {
     border: 2px solid $borderColor-CodeBlock-highlightString-emphasis;
     border-radius: 2px;
