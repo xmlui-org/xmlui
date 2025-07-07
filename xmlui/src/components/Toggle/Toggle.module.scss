@@ -148,17 +148,61 @@ $themeVars: ();
 // --------------- Switch ---------------
 
 .switch {
-  border: 1px solid createThemeVar("Input:borderColor-Switch");
-  width: 32px;
-  height: 20px;
-  border-radius: 1rem;
-  position: relative;
+  --thumb-size: 1rem;
+  --thumb-position: 0%;
+  --track-size: calc(var(--thumb-size) * 3);
+  --padding-size: 4px;
+
   cursor: pointer;
   flex-shrink: 0;
-
+  display: grid;
+  align-items: center;
+  grid: [track] 1fr / [track] 1fr;
   background-color: createThemeVar("Input:backgroundColor-Switch");
 
+  width: var(--track-size);
+  min-height: var(--thumb-size);
+
+  padding: var(--padding-size);
+  border: 1px solid createThemeVar("Input:borderColor-Switch");
+  border-radius: 1rem;
+  
+  &::before {
+    content: "";
+    grid-area: track;
+    height: var(--thumb-size);
+    width: var(--thumb-size);
+    background: createThemeVar("backgroundColor-indicator-Switch");
+    border-radius: 50%;
+
+    transform: translateX(var(--thumb-position));
+    transition: 0.3s transform;
+  }
+
+  &:checked {
+    background: createThemeVar("backgroundColor-checked-Switch");
+
+    &::before {
+      background: createThemeVar("backgroundColor-indicator-checked-Switch");
+      --thumb-position: calc(var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 2px);
+    }
+  }
+
   @include hoverAndDisabledState("Switch");
+  @include checkedState("Switch");
+
+  &:focus-visible{
+    outline-width: createThemeVar('Input:outlineWidth-Switch--focus');
+    outline-color: createThemeVar('Input:outlineColor-Switch--focus');
+    outline-style: createThemeVar('Input:outlineStyle-Switch--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-Switch--focus');
+  }
+
+  &:disabled {
+    &::before {
+      background-color: createThemeVar("backgroundColor-Switch-indicator--disabled");
+    }
+  }
 
   &.error {
     border-color: createThemeVar("Input:borderColor-Switch-error");
@@ -170,39 +214,6 @@ $themeVars: ();
 
   &.valid {
     border-color: createThemeVar("Input:borderColor-Switch-success");
-  }
-
-  &:disabled {
-    &::before {
-      background-color: createThemeVar("backgroundColor-Switch-indicator--disabled");
-    }
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 1px;
-    width: 16px;
-    height: 16px;
-    background: createThemeVar("backgroundColor-indicator-Switch");
-    border-radius: 1rem;
-    transition: 0.3s transform;
-  }
-
-  @include checkedState("Switch");
-
-  &:focus-visible{
-    outline-width: createThemeVar('Input:outlineWidth-Switch--focus');
-    outline-color: createThemeVar('Input:outlineColor-Switch--focus');
-    outline-style: createThemeVar('Input:outlineStyle-Switch--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-Switch--focus');
-  }
-
-  &:checked::before {
-    background: createThemeVar("backgroundColor-indicator-checked-Switch");
-    transform: translateX(calc(100% - 4px)) translateY(-50%);
   }
 }
 
