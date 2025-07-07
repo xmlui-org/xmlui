@@ -173,7 +173,6 @@ export function BarChart({
       setIntervalState(skip);
       setTickAngle(angle);
       setTickAnchor(anchor);
-      // XAxis tickek magassága (vertical layouthoz)
       const xTicks = Array.from(document.querySelectorAll('.recharts-x-axis .recharts-layer tspan')) as SVGGraphicsElement[];
       const maxXTickHeight = xTicks.length > 0 ? Math.max(...xTicks.map(t => t.getBBox().height)) : fontSize;
       let bottomMargin = 10;
@@ -224,7 +223,8 @@ export function BarChart({
       <div
         style={{
           flexGrow: 1,
-          minHeight: 0,
+          minHeight: 40,
+          minWidth: 40,
           width: style.width || "100%",
           height: style.height || "100%",
           padding: 0,
@@ -293,7 +293,7 @@ export function BarChart({
                 strokeWidth={1}
               />
             ))}
-            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+            {showLegend && <RLegend wrapperStyle={{ bottom: 0, left: 0, right: 0, margin: '0 auto', width: '100%', textAlign: 'center' }} />}
           </RBarChart>
         </ResponsiveContainer>
       </div>
