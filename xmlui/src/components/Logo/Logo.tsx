@@ -17,6 +17,11 @@ export const LogoMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.alt,
     },
+    inline: {
+      description: `When set to true, the image will be displayed as an inline element instead of a block element.`,
+      type: "boolean",
+      defaultValue: defaultProps.inline,
+    },
   },
 });
 
@@ -24,6 +29,12 @@ export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
   ({ node, layoutCss, extractValue }) => {
-    return <Logo style={layoutCss} />;
+    return (
+      <Logo
+        style={layoutCss}
+        inline={extractValue.asOptionalBoolean(node.props.inline)}
+        alt={extractValue(node.props.alt)}
+      />
+    );
   },
 );

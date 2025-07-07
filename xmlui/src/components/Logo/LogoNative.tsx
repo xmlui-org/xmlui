@@ -6,14 +6,17 @@ import { useLogoUrl } from "../AppHeader/AppHeaderNative";
 // Default props for Logo component
 export const defaultProps = {
   alt: "Logo",
+  inline: false,
+};
+
+type LogoProps = {
+  alt?: string;
+  style?: CSSProperties;
+  inline?: boolean;
 };
 
 export const Logo = forwardRef(function Logo(
-  {
-    style,
-  }: {
-    style?: CSSProperties;
-  },
+  { style, alt = defaultProps.alt, inline = defaultProps.inline }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -25,7 +28,8 @@ export const Logo = forwardRef(function Logo(
     <Image
       ref={forwardedRef}
       src={logoUrl}
-      alt={defaultProps.alt}
+      alt={alt}
+      inline={inline}
       style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );
