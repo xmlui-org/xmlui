@@ -158,7 +158,7 @@
                 <DocumentPage url="/pages/modal-dialogs.md"/>
             </Page>
             <Page url="/user-defined-components">
-                <UserDefinedComponents />
+                <DocumentPage url="/pages/user-defined-components.md"/>
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
