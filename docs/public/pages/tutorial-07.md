@@ -3,7 +3,7 @@
 Here is the app's `Invoices` page, with a cached subset of data. To view the table full-width, and optionally make changes, use the <img src="/resources/pg-popout.svg" alt="" class="_htmlImage_1usjo_351" style="display: inline;"> icon to pop out to the full XMLUI playground.
 
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app display
 <App>
   <Invoices />

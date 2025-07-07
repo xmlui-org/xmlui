@@ -2,7 +2,7 @@
 
 The `Dashboard` page opens with a set of infocards. Here is a simplified version of two of them.
 
-```xmlui-pg display
+```xmlui-pg display  noHeader
 <App>
   <variable name="dashboardStats" value="{
     {
@@ -104,7 +104,7 @@ A [user-defined component](/components-intro) like `Dashboard` can define any se
 Here's a more complete version of the row of `InfoCard`s used in the Invoices app.
 
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app display
 <App>
   <Dashboard />
