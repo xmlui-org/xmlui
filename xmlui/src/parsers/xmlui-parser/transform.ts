@@ -68,6 +68,13 @@ export function nodeToComponentDef(
 
     let component: ComponentDef = {
       type: name,
+      debug: {
+        source: {
+          start: node.start,
+          end: node.end,
+          fileId,
+        },
+      },
     };
 
     // --- Done
@@ -87,6 +94,13 @@ export function nodeToComponentDef(
 
     let component: ComponentDef = {
       type: name,
+      debug: {
+        source: {
+          start: node.start,
+          end: node.end,
+          fileId,
+        },
+      },
     };
 
     // --- Done
@@ -173,6 +187,13 @@ export function nodeToComponentDef(
     const component: CompoundComponentDef = {
       name: compoundName.value,
       component: nestedComponent,
+      debug: {
+        source: {
+          start: node.start,
+          end: node.end,
+          fileId,
+        },
+      },
     };
 
     if (api) {
@@ -184,6 +205,14 @@ export function nodeToComponentDef(
     if (codeBehind) {
       component.codeBehind = codeBehind.value;
     }
+
+    nestedComponent.debug = {
+      source: {
+        start: element.start,
+        end: element.end,
+        fileId,
+      },
+    };
 
     const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);
     collectTraits(usesStack, component, nodeClone);
