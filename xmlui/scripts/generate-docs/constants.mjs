@@ -219,7 +219,9 @@ export const ERROR_HANDLING = {
 export const COMPONENT_NAVIGATION = {
   DELIMITERS: {
     START: "<!-- GENERATED CONTENT/Component references links -->",
-    END: "<!-- END GENERATED CONTENT/Component references links -->"
+    END: "<!-- END GENERATED CONTENT/Component references links -->",
+    START_REGEX: /<!--\s*GENERATED CONTENT.*?-->/,
+    END_REGEX: /<!--\s*END GENERATED CONTENT.*?-->/
   },
   OVERVIEW_LINK: {
     LABEL: "Components Overview",

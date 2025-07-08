@@ -91,27 +91,30 @@ async function findAndDisplayGeneratedContent() {
 
     const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
     
-    // Define the delimiter patterns
-    const startDelimiter = COMPONENT_NAVIGATION.DELIMITERS.START;
-    const endDelimiter = COMPONENT_NAVIGATION.DELIMITERS.END;
+    // Define the delimiter patterns using regex
+    const startDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.START_REGEX;
+    const endDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.END_REGEX;
     
-    const startIndex = fileContent.indexOf(startDelimiter);
-    const endIndex = fileContent.indexOf(endDelimiter);
+    const startMatch = fileContent.match(startDelimiterRegex);
+    const endMatch = fileContent.match(endDelimiterRegex);
     
-    if (startIndex === -1) {
+    if (!startMatch) {
       throw new Error(COMPONENT_NAV_ERRORS.START_DELIMITER_NOT_FOUND);
     }
     
-    if (endIndex === -1) {
+    if (!endMatch) {
       throw new Error(COMPONENT_NAV_ERRORS.END_DELIMITER_NOT_FOUND);
     }
+    
+    const startIndex = startMatch.index;
+    const endIndex = endMatch.index;
     
     if (startIndex >= endIndex) {
       throw new Error(COMPONENT_NAV_ERRORS.INVALID_DELIMITER_ORDER);
     }
     
     // Extract content between delimiters (excluding the delimiters themselves)
-    const generatedContentStart = startIndex + startDelimiter.length;
+    const generatedContentStart = startIndex + startMatch[0].length;
     const generatedContent = fileContent.substring(generatedContentStart, endIndex);
     
     // Calculate indentation depth
@@ -483,16 +486,19 @@ async function replaceGeneratedContentInMainXmlui(navLinksContent, indentationDe
     // Read the Main.xmlui file
     const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
     
-    // Define the delimiter patterns
-    const startDelimiter = COMPONENT_NAVIGATION.DELIMITERS.START;
-    const endDelimiter = COMPONENT_NAVIGATION.DELIMITERS.END;
+    // Define the delimiter patterns using regex
+    const startDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.START_REGEX;
+    const endDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.END_REGEX;
     
-    const startIndex = fileContent.indexOf(startDelimiter);
-    const endIndex = fileContent.indexOf(endDelimiter);
+    const startMatch = fileContent.match(startDelimiterRegex);
+    const endMatch = fileContent.match(endDelimiterRegex);
     
-    if (startIndex === -1 || endIndex === -1) {
+    if (!startMatch || !endMatch) {
       throw new Error(COMPONENT_NAV_ERRORS.DELIMITERS_NOT_FOUND);
     }
+    
+    const startIndex = startMatch.index;
+    const endIndex = endMatch.index;
     
     // Create indented content from the in-memory NavLinks content
     const indentString = ' '.repeat(indentationDepth);
@@ -505,7 +511,7 @@ async function replaceGeneratedContentInMainXmlui(navLinksContent, indentationDe
     const newGeneratedContent = TEXT_CONSTANTS.NEWLINE_SEPARATOR + indentedLines.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR) + TEXT_CONSTANTS.NEWLINE_SEPARATOR + indentString;
     
     // Replace the content between delimiters
-    const beforeDelimiter = fileContent.substring(0, startIndex + startDelimiter.length);
+    const beforeDelimiter = fileContent.substring(0, startIndex + startMatch[0].length);
     const afterDelimiter = fileContent.substring(endIndex);
     const newFileContent = beforeDelimiter + newGeneratedContent + afterDelimiter;
     
