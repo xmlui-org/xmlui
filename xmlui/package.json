@@ -9,7 +9,6 @@
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
-    "build:ext-meta": "node scripts/build-extension-packages/build-extension-packages.mjs",
     "test:unit": "vitest run",
     "test:e2e-non-smoke": "playwright test --project non-smoke",
     "test:e2e-smoke": "playwright test --project smoke",
@@ -251,7 +250,7 @@
     ]
   },
   "repository": {
-    "url": "https://github.com/xmlui-com/xmlui.git"
+    "url": "https://github.com/xmlui-org/xmlui.git"
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure/public"

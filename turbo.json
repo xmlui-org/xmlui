@@ -47,13 +47,14 @@
       "env": ["GITHUB_TOKEN", "DOCS_XMLUI_MAX_RELEASES_LENGTH"],
       "outputs": ["public/resources/files/releases.json"]
     },
-    "build:ext-meta": {},
     "generate-docs": {
       "outputs": ["scripts/generate-docs/metadata/**", "$TURBO_ROOT$/docs/content/**"],
-      "dependsOn": ["^build:xmlui-metadata", "build:ext-meta"]
+      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
+      "dependsOn": ["build:xmlui-metadata"]
     },
     "generate-docs-summaries": {
       "outputs": ["$TURBO_ROOT$/docs/content/**"],
+      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
       "dependsOn": ["generate-docs"]
     },
     "build:docs": {
