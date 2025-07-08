@@ -24,25 +24,15 @@ https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
 
 ## Getting started
 
-The fastest way to get started with XMLUI is to download our starter kit, which includes the XMLUI engine and `XMLUI Invoice` - a complete business application that demonstrates key features and common patterns.
-
-### Download the starter kit
-
-| Platform | Download
-|----------|----------
-| macOS Intel | [xmlui-invoice-macos-intel.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-intel.tar.gz)
-| macOS ARM64 | [xmlui-invoice-macos-arm64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-arm64.tar.gz)
-| Windows AMD64 | [xmlui-invoice-windows-amd64.zip](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-windows-amd64.zip)
-| Linux AMD64 | [xmlui-invoice-linux-amd64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-linux-amd64.tar.gz)
-
+The fastest way to get started with XMLUI is to [download our starter kit](https://github.com/xmlui-invoice/releases), which includes the XMLUI engine and `XMLUI Invoice` - a complete business application that demonstrates key features and common patterns.
 
 ### What's included
 
-**XMLUI Invoice**: A complete business application with client and product management, invoice creation and tracking, search, and charts.
+XMLUI Invoice: A complete business application with client and product management, invoice creation and tracking, search, and charts.
 
-**XMLUI engine**: The core framework file.
+XMLUI engine: The core framework file.
 
-**XMLUI test server**: A simple server to run the app.
+XMLUI test server: A simple server to run the app.
 
 ### Quick start
 
@@ -97,6 +87,3 @@ We based some of our essential components on [Radix UI](https://www.radix-ui.com
 
 We loved the simple and beautiful UI style used by the [Tabler.io](https://tabler.io/) project; it illuminated our component design and theming. Thanks to [Paweł Kuna](https://github.com/codecalm) for this inspiration.
 
-## Acknowledgements
-
-We would like to thank all contributors to **xmlui** who have helped make this project possible.
