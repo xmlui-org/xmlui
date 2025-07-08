@@ -28,6 +28,7 @@
     "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke",
     "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
     "build-extensions": "turbo run build:extension",
-    "build-docs": "turbo run build:docs"
+    "build-docs": "turbo run build:docs",
+    "watch-docs-content": "turbo watch generate-docs-summaries"
   }
 }

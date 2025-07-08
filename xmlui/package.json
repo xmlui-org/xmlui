@@ -250,7 +250,7 @@
     ]
   },
   "repository": {
-    "url": "https://github.com/xmlui-com/xmlui.git"
+    "url": "https://github.com/xmlui-org/xmlui.git"
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure/public"
