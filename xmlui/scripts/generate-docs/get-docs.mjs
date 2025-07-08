@@ -17,10 +17,15 @@ import {
   METADATA_PROPERTIES,
   TEMPLATE_STRINGS,
   ERROR_HANDLING,
-  URL_REFERENCES
+  URL_REFERENCES,
+  COMPONENT_NAVIGATION,
+  FILE_PATHS,
+  PATH_CONSTANTS,
+  TEXT_CONSTANTS,
+  ERROR_CONTEXTS,
+  COMPONENT_NAV_ERRORS
 } from "./constants.mjs";
 import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
-import { createScopedLogger } from "./logging-standards.mjs";
 
 // --- Main
 
@@ -37,16 +42,11 @@ await generateComponents(components);
 // const packagesMetadata = await dynamicallyLoadExtensionPackages();
 // await generateExtenionPackages(packagesMetadata);
 
-const mainLogger = createScopedLogger("DocsGenerator");
-
 /**
- * Generates a ComponentRefLinks.txt file with NavLink elements for components
+ * Generates NavLink elements for components and replaces the generated content in Main.xmlui
  * @param {Record<string, string>} componentsAndFileNames The components and their filenames
  */
 async function generateComponentRefLinks(componentsAndFileNames) {
-  const refLinksLogger = createScopedLogger("ComponentRefLinks");
-  refLinksLogger.operationStart("generating ComponentRefLinks.txt");
-
   try {
     // Get component names (excluding the summary file)
     const componentNames = Object.keys(componentsAndFileNames)
@@ -54,23 +54,27 @@ async function generateComponentRefLinks(componentsAndFileNames) {
       .sort();
 
     // Create NavLink elements for each component
-    const navLinks = componentNames.map(componentName => 
-      `<NavLink label="${componentName}" to="/components/${componentName}" />`
+    const componentNavLinks = componentNames.map(componentName => 
+      COMPONENT_NAVIGATION.TEMPLATES.NAVLINK(componentName)
     );
     
-    // Join with newlines
-    const content = navLinks.join('\n');
+    // Add the Components Overview link at the top
+    const overviewNavLink = COMPONENT_NAVIGATION.TEMPLATES.OVERVIEW_NAVLINK(
+      COMPONENT_NAVIGATION.OVERVIEW_LINK.LABEL,
+      COMPONENT_NAVIGATION.OVERVIEW_LINK.TO
+    );
+    const allNavLinks = [overviewNavLink, ...componentNavLinks];
     
-    // Write to docs folder
-    const outputPath = join(FOLDERS.docsRoot, 'ComponentRefLinks.txt');
-    await writeFile(outputPath, content);
+    // Join with newlines - store in memory instead of writing to file
+    const navLinksContent = allNavLinks.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR);
     
     // Find and display content between GENERATED CONTENT delimiters in Main.xmlui
-    await findAndDisplayGeneratedContent();
+    const { indentationDepth } = await findAndDisplayGeneratedContent();
     
-    refLinksLogger.operationComplete(`generated ComponentRefLinks.txt with ${componentNames.length} components`);
+    // Replace the generated content with the in-memory NavLinks content
+    await replaceGeneratedContentInMainXmlui(navLinksContent, indentationDepth);
   } catch (error) {
-    refLinksLogger.error("Failed to generate ComponentRefLinks.txt", error?.message || "unknown error");
+    throw new Error(COMPONENT_NAV_ERRORS.COMPONENT_NAV_FAILED);
   }
 }
 
@@ -78,57 +82,44 @@ async function generateComponentRefLinks(componentsAndFileNames) {
  * Finds and displays the content between GENERATED CONTENT delimiters in Main.xmlui
  */
 async function findAndDisplayGeneratedContent() {
-  const mainXmluiLogger = createScopedLogger("MainXMLUIParser");
-  mainXmluiLogger.operationStart("parsing Main.xmlui for generated content");
-
   try {
-    const mainXmluiPath = join(FOLDERS.docsRoot, 'src', 'Main.xmlui');
+    const mainXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.MAIN_XMLUI);
     
     if (!existsSync(mainXmluiPath)) {
-      mainXmluiLogger.error("Main.xmlui file not found at expected path", mainXmluiPath);
-      return;
+      throw new Error(COMPONENT_NAV_ERRORS.MAIN_XMLUI_NOT_FOUND(mainXmluiPath));
     }
 
-    const fileContent = await readFile(mainXmluiPath, 'utf8');
+    const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
     
     // Define the delimiter patterns
-    const startDelimiter = '<!-- GENERATED CONTENT/Component references links -->';
-    const endDelimiter = '<!-- END GENERATED CONTENT/Component references links -->';
+    const startDelimiter = COMPONENT_NAVIGATION.DELIMITERS.START;
+    const endDelimiter = COMPONENT_NAVIGATION.DELIMITERS.END;
     
     const startIndex = fileContent.indexOf(startDelimiter);
     const endIndex = fileContent.indexOf(endDelimiter);
     
     if (startIndex === -1) {
-      mainXmluiLogger.error("Start delimiter not found in Main.xmlui");
-      return;
+      throw new Error(COMPONENT_NAV_ERRORS.START_DELIMITER_NOT_FOUND);
     }
     
     if (endIndex === -1) {
-      mainXmluiLogger.error("End delimiter not found in Main.xmlui");
-      return;
+      throw new Error(COMPONENT_NAV_ERRORS.END_DELIMITER_NOT_FOUND);
     }
     
     if (startIndex >= endIndex) {
-      mainXmluiLogger.error("Invalid delimiter order in Main.xmlui");
-      return;
+      throw new Error(COMPONENT_NAV_ERRORS.INVALID_DELIMITER_ORDER);
     }
     
     // Extract content between delimiters (excluding the delimiters themselves)
     const generatedContentStart = startIndex + startDelimiter.length;
-    const generatedContent = fileContent.substring(generatedContentStart, endIndex).trim();
+    const generatedContent = fileContent.substring(generatedContentStart, endIndex);
     
-    // Display the content in console
-    console.log('\n' + '='.repeat(80));
-    console.log('GENERATED CONTENT SECTION FROM Main.xmlui:');
-    console.log('='.repeat(80));
-    console.log(generatedContent);
-    console.log('='.repeat(80));
-    console.log(`Content length: ${generatedContent.length} characters`);
-    console.log('='.repeat(80) + '\n');
+    // Calculate indentation depth
+    const indentationDepth = calculateIndentationDepth(generatedContent);
     
-    mainXmluiLogger.operationComplete("successfully parsed and displayed generated content");
+    return { indentationDepth };
   } catch (error) {
-    mainXmluiLogger.error("Failed to parse Main.xmlui", error?.message || "unknown error");
+    return { indentationDepth: 0 };
   }
 }
 
@@ -139,9 +130,6 @@ async function findAndDisplayGeneratedContent() {
  * @param {object} componentsAndFileNames - Object containing component metadata
  */
 async function generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames) {
-  const overviewLogger = createScopedLogger("ComponentsOverview");
-  overviewLogger.operationStart("generating components overview table");
-
   try {
     // Get component names (excluding the summary file)
     const componentNames = Object.keys(componentsAndFileNames)
@@ -158,29 +146,25 @@ async function generateComponentsOverview(overviewFile, summaryTitle, components
     const tableRows = componentNames.map(componentName => {
       // Get description from original metadata
       const originalMetadata = collectedComponentMetadata[componentName];
-      const description = originalMetadata?.description || 'No description available';
+      const description = originalMetadata?.description || TEXT_CONSTANTS.NO_DESCRIPTION_AVAILABLE;
       
       // Format the table row with correct relative path
       return `| [${componentName}](./${componentName}) | ${description} |`;
     });
 
     // Combine header and rows
-    const tableContent = [tableHeader, ...tableRows].join('\n');
+    const tableContent = [tableHeader, ...tableRows].join(TEXT_CONSTANTS.NEWLINE_SEPARATOR);
 
     // Write to file
     await writeFile(overviewFile, tableContent);
-    
-    overviewLogger.operationComplete(`generated overview table with ${componentNames.length} components`);
   } catch (error) {
-    overviewLogger.error("Failed to generate components overview", error?.message || "unknown error");
+    throw new Error(COMPONENT_NAV_ERRORS.OVERVIEW_GENERATION_FAILED);
   }
 }
 
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
-  mainLogger.operationStart("extension documentation generation");
-
   const extensionsConfig = await configManager.loadExtensionsConfig();
   const outputPaths = pathResolver.getOutputPaths();
   const outputFolder = outputPaths.extensions;
@@ -257,7 +241,7 @@ async function generateExtenionPackages(metadata) {
     // Do not include the summary file in the _meta.json
     deleteFileIfExists(extensionPackagesMetafile);
     await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
-  }, "extension packages metadata generation", ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
+  }, ERROR_CONTEXTS.EXTENSION_PACKAGES_METADATA, ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
 }
 
 async function generateComponents(metadata) {
@@ -268,11 +252,11 @@ async function generateComponents(metadata) {
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
-      sourceFolder: pathResolver.resolvePath("xmlui/src/components", "workspace"),
+      sourceFolder: pathResolver.resolvePath(PATH_CONSTANTS.XMLUI_SRC_COMPONENTS, PATH_CONSTANTS.WORKSPACE),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
       outFolder: outputFolder,
       // outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
-      examplesFolder: pathResolver.resolvePath("docs/component-samples", "workspace"),
+      examplesFolder: pathResolver.resolvePath(PATH_CONSTANTS.DOCS_COMPONENT_SAMPLES, PATH_CONSTANTS.WORKSPACE),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
@@ -321,9 +305,6 @@ async function generateHtmlTagComponents(metadata) {
 }
 
 async function cleanFolder(folderToClean) {
-  const cleanLogger = createScopedLogger("FolderCleaner");
-  cleanLogger.operationStart(`cleaning folder: ${basename(folderToClean)}`);
-
   if (!existsSync(folderToClean)) return;
 
   // NOTE: This is the important part: we only delete .mdx and .md files and the _meta.json
@@ -337,13 +318,10 @@ async function cleanFolder(folderToClean) {
       .map((file) => unlink(join(folderToClean, file)));
 
     await Promise.all(unlinkPromises)
-      .then(() => {
-        cleanLogger.operationComplete("file deletion");
-      })
       .catch((err) => {
         throw new ErrorWithSeverity(err.message, LOGGER_LEVELS.error);
       });
-  }, "folder cleanup", ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
+  }, ERROR_CONTEXTS.FOLDER_CLEANUP, ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
 }
 
 // TODO: We assume a lot here, need to make all the folders and filenames transparent
@@ -357,12 +335,9 @@ async function cleanFolder(folderToClean) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
-  const packageLogger = createScopedLogger("PackageLoader");
-  packageLogger.operationStart("loading extension packages");
-
   const defaultPackageState = COMPONENT_STATES.EXPERIMENTAL;
 
-  const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
+  const extendedPackagesFolder = join(FOLDERS.projectRoot, PATH_CONSTANTS.PACKAGES);
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
     return (
       entry.startsWith(PACKAGE_PATTERNS.XMLUI_PREFIX) && lstatSync(join(extendedPackagesFolder, entry)).isDirectory()
@@ -381,7 +356,6 @@ async function dynamicallyLoadExtensionPackages() {
     try {
       const packageFolderDist = join(dir, FOLDER_NAMES.DIST);
       if (!existsSync(packageFolderDist)) {
-        packageLogger.warn(`No dist folder found for package: ${dir}`);
         continue;
       }
       const distContents = await readdir(packageFolderDist);
@@ -391,11 +365,9 @@ async function dynamicallyLoadExtensionPackages() {
           filePath = winPathToPosix(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           if (!componentMetadata) {
-            packageLogger.warn(`No metadata object found for package: ${basename(dir)}`);
             continue;
           }
           if (!componentMetadata.metadata) {
-            packageLogger.warn(`No component metadata found for package: ${basename(dir)}`);
             continue;
           }
 
@@ -406,13 +378,11 @@ async function dynamicallyLoadExtensionPackages() {
       }
       // Ignore internal packages
       if (extensionPackage.state === COMPONENT_STATES.INTERNAL) {
-        packageLogger.packageSkipped(dir, "internal package");
         continue;
       }
-      packageLogger.packageLoaded(basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
-      handleNonFatalError(error, `loading extension package: ${basename(dir)}`);
+      handleNonFatalError(error, `${ERROR_CONTEXTS.LOADING_EXTENSION_PACKAGE}: ${basename(dir)}`);
     }
   }
   return importedMetadata;
@@ -462,4 +432,86 @@ function insertKeyAt(key, value, obj, pos) {
     ac[a] = obj[a];
     return ac;
   }, {});
+}
+
+/**
+ * Calculates the indentation depth of content by finding the minimum leading whitespace
+ * @param {string} content - The content to analyze
+ * @returns {number} The number of whitespace characters representing the indentation depth
+ */
+function calculateIndentationDepth(content) {
+  if (!content || content.trim().length === 0) {
+    return 0;
+  }
+
+  const lines = content.split('\n');
+  let minIndentation = Infinity;
+  
+  for (const line of lines) {
+    // Skip empty lines
+    if (line.trim().length === 0) {
+      continue;
+    }
+    
+    // Count leading whitespace characters
+    const leadingWhitespace = line.match(/^(\s*)/)[1];
+    const indentationCount = leadingWhitespace.length;
+    
+    // Track minimum indentation
+    if (indentationCount < minIndentation) {
+      minIndentation = indentationCount;
+    }
+  }
+  
+  // Return 0 if no lines had content or all lines were empty
+  return minIndentation === Infinity ? 0 : minIndentation;
+}
+
+/**
+ * Replaces the content between GENERATED CONTENT delimiters in Main.xmlui with NavLink content
+ * @param {string} navLinksContent - The NavLink content to insert
+ * @param {number} indentationDepth - Number of spaces to indent each line
+ */
+async function replaceGeneratedContentInMainXmlui(navLinksContent, indentationDepth) {
+  try {
+    const mainXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.MAIN_XMLUI);
+    
+    if (!existsSync(mainXmluiPath)) {
+      throw new Error(COMPONENT_NAV_ERRORS.MAIN_XMLUI_NOT_FOUND(mainXmluiPath));
+    }
+
+    // Read the Main.xmlui file
+    const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
+    
+    // Define the delimiter patterns
+    const startDelimiter = COMPONENT_NAVIGATION.DELIMITERS.START;
+    const endDelimiter = COMPONENT_NAVIGATION.DELIMITERS.END;
+    
+    const startIndex = fileContent.indexOf(startDelimiter);
+    const endIndex = fileContent.indexOf(endDelimiter);
+    
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error(COMPONENT_NAV_ERRORS.DELIMITERS_NOT_FOUND);
+    }
+    
+    // Create indented content from the in-memory NavLinks content
+    const indentString = ' '.repeat(indentationDepth);
+    const indentedLines = navLinksContent
+      .split(TEXT_CONSTANTS.NEWLINE_SEPARATOR)
+      .filter(line => line.trim().length > 0) // Remove empty lines
+      .map(line => indentString + line);
+    
+    // Build the new content with proper formatting
+    const newGeneratedContent = TEXT_CONSTANTS.NEWLINE_SEPARATOR + indentedLines.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR) + TEXT_CONSTANTS.NEWLINE_SEPARATOR + indentString;
+    
+    // Replace the content between delimiters
+    const beforeDelimiter = fileContent.substring(0, startIndex + startDelimiter.length);
+    const afterDelimiter = fileContent.substring(endIndex);
+    const newFileContent = beforeDelimiter + newGeneratedContent + afterDelimiter;
+    
+    // Write the updated content back to the file
+    await writeFile(mainXmluiPath, newFileContent, TEXT_CONSTANTS.UTF8_ENCODING);
+  } catch (error) {
+    throw new Error(COMPONENT_NAV_ERRORS.CONTENT_REPLACEMENT_FAILED);
+  }
 }
