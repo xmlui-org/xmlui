@@ -11,7 +11,7 @@ import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
-import { useTheme } from "xmlui";
+import { useTheme } from "../../../components-core/theming/ThemeContext";
 
 export type LineChartProps = {
   data: any[];

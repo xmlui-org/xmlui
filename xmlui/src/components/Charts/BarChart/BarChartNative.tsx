@@ -11,9 +11,9 @@ import {
 
 import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { useMemo } from "react";
-import { useTheme } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { useTheme } from "../../../components-core/theming/ThemeContext";
 
 export type BarChartProps = {
   data: any[];

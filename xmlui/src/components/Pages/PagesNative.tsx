@@ -32,9 +32,6 @@ export function RouteWrapper({
   uid,
 }: RouteWrapperProps) {
   const params = useParams();
-  const location = useLocation();
-  const appLayoutContext = useAppLayoutContext();
-  const linkInfo = appLayoutContext?.linkMap?.get(location.pathname) || {};
 
   //we need to wrap the child route in a container to make sure the route params are available.
   // we do this wrapping by providing an empty object to vars.

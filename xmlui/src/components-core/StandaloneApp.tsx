@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import yaml from "js-yaml";
@@ -95,6 +95,7 @@ function StandaloneApp({
   debugEnabled = false,
   runtime,
   extensionManager,
+  waitForApiInterceptor = false,
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
@@ -102,11 +103,6 @@ function StandaloneApp({
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
 
   usePrintVersionNumber(standaloneApp);
-
-  if (!standaloneApp) {
-    // --- Problems found, the standalone app cannot run
-    return null;
-  }
 
   const {
     apiInterceptor,
@@ -120,7 +116,26 @@ function StandaloneApp({
     components,
     themes,
     sources,
-  } = standaloneApp;
+  } = standaloneApp || {};
+
+  const globalProps = useMemo(()=>{
+    return {
+      name: name,
+      ...(appGlobals || {}),
+    }
+  }, [appGlobals, name]);
+
+  let contributes = useMemo(()=>{
+    return {
+      compoundComponents: components,
+      themes,
+    }
+  }, [components, themes]);
+
+  if (!standaloneApp) {
+    // --- Problems found, the standalone app cannot run
+    return null;
+  }
 
   // --- The app may use a mocked API already defined in `window.XMLUI_MOCK_API`
   // --- or within the standalone app's definition, in `apiInterceptor`.
@@ -139,7 +154,7 @@ function StandaloneApp({
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
-    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
+    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting} waitForApiInterceptor={waitForApiInterceptor}>
       <AppRoot
         projectCompilation={projectCompilation}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
@@ -148,20 +163,14 @@ function StandaloneApp({
         debugEnabled={debugEnabled}
         // @ts-ignore
         routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-        globalProps={{
-          name: name,
-          ...(appGlobals || {}),
-        }}
+        globalProps={globalProps}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
         resourceMap={resourceMap}
         sources={sources}
         extensionManager={extensionManager}
-        contributes={{
-          compoundComponents: components,
-          themes,
-        }}
+        contributes={contributes}
       />
     </ApiInterceptorProvider>
   );

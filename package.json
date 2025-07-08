@@ -29,11 +29,5 @@
     "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs"
-  },
-  "dependencies": {
-    "@tiptap/extension-table": "^2.23.0",
-    "@tiptap/extension-table-cell": "^2.23.0",
-    "@tiptap/extension-table-header": "^2.23.0",
-    "@tiptap/extension-table-row": "^2.23.0"
   }
 }
