@@ -1,5 +1,101 @@
 [
   {
+    "tag_name": "xmlui@0.9.65",
+    "published_at": "2025-07-04T13:51:13Z",
+    "changes": [
+      {
+        "description": "fix the NestedAppNative.tsx issue introduced in #1547",
+        "commit_sha": "c17fc0d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.65.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.65/xmlui-0.9.65.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.64",
+    "published_at": "2025-07-04T12:41:14Z",
+    "changes": [
+      {
+        "description": "Refactored the usage of theme variables in RadioGroup",
+        "commit_sha": "5ad3ffc"
+      },
+      {
+        "description": "Add a \"noHeader\" option to the xmlui-pg codefence",
+        "commit_sha": "da3c8bc"
+      },
+      {
+        "description": "Allow YAML (.yml) theme files in standalone apps",
+        "commit_sha": "301cb39"
+      },
+      {
+        "description": "Fixed Bar- & LineChart sizing in the Table component",
+        "commit_sha": "d5d3f4d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.64.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.64/xmlui-0.9.64.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.63",
+    "published_at": "2025-07-03T11:28:48Z",
+    "changes": [
+      {
+        "description": "Fix: add a workaround to ListNative to avoid issues coming from undefined row values",
+        "commit_sha": "b9c0881"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.63.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.63/xmlui-0.9.63.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.62",
+    "published_at": "2025-07-03T05:28:49Z",
+    "changes": [
+      {
+        "description": "fix: nestedApp fills the available space in AppWithCode component",
+        "commit_sha": "832f31d"
+      },
+      {
+        "description": "Fix the build issue with FormSection",
+        "commit_sha": "4f9ff06"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.62.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.62/xmlui-0.9.62.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.61",
+    "published_at": "2025-07-02T13:03:21Z",
+    "changes": [
+      {
+        "description": "This version does not contain any real changes; it's just for bumping the version number.",
+        "commit_sha": "4ef5f3f"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.61.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.61/xmlui-0.9.61.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.9.60",
     "published_at": "2025-06-24T06:16:48Z",
     "changes": [
@@ -12,6 +108,42 @@
       {
         "name": "xmlui-0.9.60.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.60/xmlui-0.9.60.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.59",
+    "published_at": "2025-07-01T15:53:48Z",
+    "changes": [
+      {
+        "description": "Rename Pages property 'defaultRoute' to 'fallbackPath'",
+        "commit_sha": "2a07157"
+      },
+      {
+        "description": "improve: expanding the styles of the components responsible for code display with new theme variables.",
+        "commit_sha": "97b3241"
+      },
+      {
+        "description": "Fixed RadioGroup disabled and validation indicator states. Also fixed an issue where the checked indicator was not aligned to center if the RadioGroup Option was resized in some way.",
+        "commit_sha": "c4abb20"
+      },
+      {
+        "description": "Added 0 min width to PieChart, Fixed focus error when one checkbox's state change depended on another",
+        "commit_sha": "f19720c"
+      },
+      {
+        "description": "Fixed NavLink indentation in horizontal App layout, if in a nested NavGroup in the NavPanel",
+        "commit_sha": "66c2288"
+      },
+      {
+        "description": "Fixed a number of color & visual state representations of the components: DatePicker, Switch, Select, TextBox, TextArea, NumberBox, AutoComplete",
+        "commit_sha": "2d27204"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.9.59.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.59/xmlui-0.9.59.js"
       }
     ]
   },
@@ -88,162 +220,6 @@
       {
         "name": "xmlui-0.9.56.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.56/xmlui-0.9.56.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.55",
-    "published_at": "2025-06-20T13:07:23Z",
-    "changes": [
-      {
-        "description": "Add AppWithCodeView component to display code and running app side-by-side",
-        "commit_sha": "d507ea8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.55.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.55/xmlui-0.9.55.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.54",
-    "published_at": "2025-06-20T08:55:52Z",
-    "changes": [
-      {
-        "description": "Change TreeDisplay theme variable defaults",
-        "commit_sha": "2688a95"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.54.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.54/xmlui-0.9.54.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.53",
-    "published_at": "2025-06-19T13:48:59Z",
-    "changes": [
-      {
-        "description": "Allow turning on/off heading anchors in appGlobals",
-        "commit_sha": "c64fa25"
-      },
-      {
-        "description": "wip: code inspector buttons - label change, devtools - animation update",
-        "commit_sha": "73c2c21"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.53.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.53/xmlui-0.9.53.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.52",
-    "published_at": "2025-06-18T15:58:14Z",
-    "changes": [
-      {
-        "description": "The Footer component no provides a themeable gap between its children.",
-        "commit_sha": "d079208"
-      },
-      {
-        "description": "feat: NestedApp works with ApiInterceptor",
-        "commit_sha": "2a461d8"
-      },
-      {
-        "description": "fix NestedApp apiUrl overwrite",
-        "commit_sha": "ad6d81e"
-      },
-      {
-        "description": "feat: xmlui-devtools - use it in a modal dialog",
-        "commit_sha": "f5b9f15"
-      },
-      {
-        "description": "fix: Table columns do not allow (and indicate) sorting when bindTo is not set",
-        "commit_sha": "88e4741"
-      },
-      {
-        "description": "change default borderColor",
-        "commit_sha": "7af4b4e"
-      },
-      {
-        "description": "fix table styling",
-        "commit_sha": "851ae21"
-      },
-      {
-        "description": "Default theme variables changed for App, NestedApp, TableOfContents, and Text",
-        "commit_sha": "7872ed0"
-      },
-      {
-        "description": "enhance xmlui parser error tolerance, recovering from unclosed tags",
-        "commit_sha": "bf00dce"
-      },
-      {
-        "description": "merge xmlui-charts into core",
-        "commit_sha": "38180ce"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.52.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.52/xmlui-0.9.52.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.51",
-    "published_at": "2025-06-12T20:12:02Z",
-    "changes": [
-      {
-        "description": "Added theme variable for setting the horizontal alignment of the logo in the NavPanel.",
-        "commit_sha": "ef7add9"
-      },
-      {
-        "description": "Moved Drawer logo position to left.",
-        "commit_sha": "ba2b5cd"
-      },
-      {
-        "description": "fix: Slider - min/max value validation",
-        "commit_sha": "96273bf"
-      },
-      {
-        "description": "fix: Markdown renders inline/block images correclty",
-        "commit_sha": "1a81bcf"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.51.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.51/xmlui-0.9.51.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.50",
-    "published_at": "2025-06-12T08:48:06Z",
-    "changes": [
-      {
-        "description": "standalone usage: explicit codeBehind reference",
-        "commit_sha": "e6c3b39"
-      },
-      {
-        "description": "Make the \"marked\" Text variant have lighter background color in dark mode.",
-        "commit_sha": "85031c8"
-      },
-      {
-        "description": "Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors",
-        "commit_sha": "d349036"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.50.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.50/xmlui-0.9.50.js"
       }
     ]
   }
