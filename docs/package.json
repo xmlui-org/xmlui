@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.3",
   "scripts": {
-    "start": "xmlui start",
+    "start": "echo '====================================================================\nRun \"npx turbo watch generate-docs-summaries\" in the xmlui directory\nif you want to get automatic metadata-docs generation!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
     "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip"
