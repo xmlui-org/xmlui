@@ -4,11 +4,28 @@ const highlightRowsClass = "codeBlockHighlightRow";
 const highlightSubstringsClass = "codeBlockHighlightString";
 const highlightSubstringsEmphasisClass = "codeBlockHighlightStringEmphasis";
 
-/*
- * Encode string, returns base64 value
- * @Params: string
+/**
+ * Encode string to ASCII base64 value
  */
-export function encodeValue(value) {
+export function encodeToBase64(value: string) {
+  if (!value) {
+    return null;
+  }
+
+  const valueToString = value.toString();
+
+  if (typeof window !== 'undefined') {
+    return window.btoa(valueToString);
+  }
+
+  const buff = Buffer.from(valueToString, 'ascii');
+  return buff.toString('base64');
+}
+
+/**
+ * Decode base64 value to string
+ */
+export function decodeFromBase64(value: string) {
   if (!value) {
     return null;
   }
@@ -36,8 +53,12 @@ export function parseMetaAndHighlightCode(
   codeHighlighter: CodeHighlighter,
   themeTone?: string,
 ): HighlighterResults | null {
-  const codeStr = mapTextContent(node);
-  const meta = extractMetaFromChildren(node, CodeHighlighterMetaKeysData, codeStr);
+  // parse
+  const rawCodeStr = getCodeStrFromNode(node);
+  const rawMeta = getCodeMetaFromNode(node, CodeHighlighterMetaKeysData);
+  // map
+  const codeStr = transformCodeLines(rawCodeStr);
+  const meta = extractMetaFromChildren(rawMeta, codeStr);
 
   const { language, ...restMeta } = meta;
   if (language && codeHighlighter.availableLangs.includes(language)) {
@@ -62,58 +83,21 @@ export function parseMetaAndHighlightCode(
   return null;
 }
 
-function mapTextContent(node: ReactNode): string {
+function getCodeStrFromNode(node: ReactNode) {
   if (typeof node === "string") {
-    return transformCodeLines(node);
+    return node;
   }
 
   if (isValidElement(node) && node.props && node.props.children) {
     if (Array.isArray(node.props.children)) {
-      return node.props.children.map(mapTextContent).join("");
+      return node.props.children.map(getCodeStrFromNode).join("");
     }
-    return mapTextContent(node.props.children);
+    return getCodeStrFromNode(node.props.children);
   }
   return "";
-
-  // ---
-
-  function transformCodeLines(node: string) {
-    const splitNode = node.split(/\r?\n/);
-    for (let i = 0; i < splitNode.length; i++) {
-      // Backslash before a codefence indicates an escaped codefence
-      // -> don't render the backslash
-      if (splitNode[i].startsWith("\\```")) {
-        splitNode[i] = splitNode[i].replace("\\```", "```");
-      }
-    }
-
-    // Remove empty lines from start and end
-    let startTrimIdx = 0;
-    let endTrimIdx = splitNode.length - 1;
-    for (let i = 0; i < splitNode.length; i++) {
-      if (splitNode[i].trim() !== "") {
-        startTrimIdx = i;
-        break;
-      }
-    }
-    for (let i = splitNode.length - 1; i >= 0; i--) {
-      if (splitNode[i].trim() !== "") {
-        endTrimIdx = i;
-        break;
-      }
-    }
-
-    splitNode.splice(0, startTrimIdx);
-    splitNode.splice(endTrimIdx + 1);
-    return splitNode.join("\n");
-  }
 }
 
-function extractMetaFromChildren(
-  node: ReactNode,
-  keys: string[],
-  code: string = "",
-): CodeHighlighterMeta {
+function getCodeMetaFromNode(node: ReactNode, keys: string[]) {
   if (!node) return {};
   if (typeof node === "string") return {};
   if (typeof node === "number") return {};
@@ -126,7 +110,7 @@ function extractMetaFromChildren(
     node.props.children &&
     typeof node.props.children === "string"
   ) {
-    const meta = Object.entries(node.props)
+    return Object.entries(node.props)
       .filter(([key, _]) => keys.includes(key))
       .reduce(
         (acc, [key, value]) => {
@@ -135,31 +119,69 @@ function extractMetaFromChildren(
         },
         {} as Record<string, any>,
       );
-
-    return {
-      [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
-      [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
-      [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
-      // NOTE: Row numbers are disabled for now, because applying the highlight class removes the "numbered" class
-      /* [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
-        meta[CodeHighlighterMetaKeys.rowNumbers.data],
-      ), */
-      [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
-        code,
-        meta[CodeHighlighterMetaKeys.highlightRows.data],
-      ),
-      [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
-        code,
-        meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
-      ),
-      [CodeHighlighterMetaKeys.highlightSubstringsEmphasized.prop]: parseSubstringHighlights(
-        code,
-        meta[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data],
-        true,
-      ),
-    };
   }
   return {};
+}
+
+export function transformCodeLines(node: string) {
+  const splitNode = node.split(/\r?\n/);
+  for (let i = 0; i < splitNode.length; i++) {
+    // Backslash before a codefence indicates an escaped codefence
+    // -> don't render the backslash
+    if (splitNode[i].startsWith("\\```")) {
+      splitNode[i] = splitNode[i].replace("\\```", "```");
+    }
+  }
+
+  // Remove empty lines from start and end
+  let startTrimIdx = 0;
+  let endTrimIdx = splitNode.length - 1;
+  for (let i = 0; i < splitNode.length; i++) {
+    if (splitNode[i].trim() !== "") {
+      startTrimIdx = i;
+      break;
+    }
+  }
+  for (let i = splitNode.length - 1; i >= 0; i--) {
+    if (splitNode[i].trim() !== "") {
+      endTrimIdx = i;
+      break;
+    }
+  }
+
+  splitNode.splice(0, startTrimIdx);
+  splitNode.splice(endTrimIdx + 1);
+  return splitNode.join("\n");
+}
+
+export function extractMetaFromChildren(
+  meta: Record<string, any>,
+  code: string = "",
+): CodeHighlighterMeta {
+  if (!meta) return {};
+
+  return {
+    // NOTE: Row numbers are disabled for now, because applying the highlight class removes the "numbered" class
+    /* [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
+      meta[CodeHighlighterMetaKeys.rowNumbers.data],
+    ), */
+    [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
+    [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
+    [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
+    [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightRows.data],
+    ),
+    [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
+    ),
+    [CodeHighlighterMetaKeys.highlightSubstringsEmphasized.prop]: parseSubstringHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data],
+      true,
+    ),
+  };
 }
 
 function parseBoolean(str?: string) {
@@ -177,23 +199,27 @@ function parseRowHighlights(code: string, str?: string): DecorationItem[] {
     .map((item) => {
       item = item.trim();
       const split = item.split("-");
-      let start = 0;
-      let end = 0;
+      let start = -1;
+      let end = -1;
 
       if (split.length === 0) return { start, end, properties: { class: highlightRowsClass } };
+      if (split.length > 2) return { start, end, properties: { class: highlightRowsClass } };
+      if (split[0] === "") return { start, end, properties: { class: highlightRowsClass } };
+      if (split[1] === "") return { start, end, properties: { class: highlightRowsClass } };
+      start = 0;
+      end = 0;
 
       // Start Index
-      const startIdx = parseAndValidate(split[0]) - 1;
-      if (startIdx > 0) {
-        start = getLineStartIndex(startIdx);
-      }
+      const startIdx = validate(parse(split[0]));
+      start = getLineLengthIndex(startIdx);
+
       // End Index
-      const endIdx = split.length === 1 ? startIdx : parseAndValidate(split[1]) - 1;
+      const endIdx = split.length === 1 ? startIdx : validate(parse(split[1]));
       let endLineLength = 0;
       if (endIdx >= 0 && codeLines[endIdx] !== undefined) {
         endLineLength = codeLines[endIdx].length;
       }
-      end = getLineStartIndex(endIdx) + endLineLength;
+      end = getLineLengthIndex(endIdx) + endLineLength;
 
       return { start, end, properties: { class: highlightRowsClass } };
     })
@@ -203,15 +229,21 @@ function parseRowHighlights(code: string, str?: string): DecorationItem[] {
       return true;
     });
 
-  function parseAndValidate(value: string): number {
+  function parse(value: string): number {
     const parsed = parseInt(value, 10);
     if (Number.isNaN(parsed)) return -1;
-    if (parsed <= 0) return -1;
-    if (parsed > codeLines.length) return -1;
     return parsed;
   }
 
-  function getLineStartIndex(lineNumber: number) {
+  function validate(parsed: number): number {
+    // correct for 0-indexed array
+    parsed -= 1;
+    // check bounds
+    if (parsed < 0 || parsed >= codeLines.length) return -1;
+    return parsed;
+  }
+
+  function getLineLengthIndex(lineNumber: number) {
     if (lineNumber < 0) return -1;
     if (lineNumber === 0) return 0;
 
@@ -237,7 +269,7 @@ function parseSubstringHighlights(
   if (!code) return [];
   return str
     .split(" ")
-    .map((item) => encodeValue(item))
+    .map((item) => decodeFromBase64(item))
     .filter((item) => item.trim() !== "")
     .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
 
