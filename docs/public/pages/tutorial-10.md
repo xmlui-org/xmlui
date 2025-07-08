@@ -2,7 +2,7 @@
 
 The `Search` component uses [Tabs](/components/Tabs) to enable switching between two different search experiences.
 
-```xmlui-pg display
+```xmlui-pg display  noHeader
 ---app display
 <App>
   <Search />
@@ -37,7 +37,7 @@ Try switching between the two tabs.
 Here is `SearchInvoicesAfter`. Try changing the date.
 
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app display
 <App>
   <SearchInvoicesAfter />
@@ -144,7 +144,7 @@ s `data` URL won't fire until its dependent variable is ready.
 
 Here is `SearchEverything`. Try typing `a`, then `c`, then `m`, and watch the results converge dynamically on `Acme`.
 
-```xmlui-pg height="400px"
+```xmlui-pg height="400px"  noHeader
 ---app
 <App>
   <SearchEverything />

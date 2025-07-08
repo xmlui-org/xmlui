@@ -1394,8 +1394,9 @@ $paddingHtmlTh: createThemeVar("padding-HtmlTh");
 
 Now the editor matches the look of XMLUI tables rendered directly using `Table` or indirectly when tables appear in a XMLUI `Markdown` context. Try it!
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <App var.markdown="">
+
 
   <Card>
     <TableEditor
@@ -1405,11 +1406,20 @@ Now the editor matches the look of XMLUI tables rendered directly using `Table` 
     />
   </Card>
 
-  <Card>
-    <Text variant="codefence" preserverLinebreaks="{true}">
+<Card>
+  <HStack>
+    <Text variant="codefence" preserveLinebreaks="{true}">
       { markdown }
     </Text>
-  </Card>
+    <SpaceFiller />
+    <Button
+      icon="copy"
+      variant="ghost"
+      size="xs"
+      onClick="navigator.clipboard.writeText(markdown)"
+    />
+  </HStack>
+</Card>
 
 </App>
 ```

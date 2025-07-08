@@ -42,7 +42,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 </Component>
 ```
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app
 <App>
   <Statuses />
@@ -79,7 +79,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 
 [PieChart](/components/PieChart) and [DonutChart](/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/components/BarChart) and [LineChart](/components/LineChart) can display multiple series denoted by `dataKeys`. We see that in the `MonthlyStatus` chart.
 
-```xmlui display /data/ /dataKeys/ /nameKey/
+```xmlui display  noHeader /data/ /dataKeys/ /nameKey/
 <Component name="MonthlyStatus"">
 
     <DataSource
@@ -107,7 +107,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 </Component>
 ```
 
-```xmlui-pg /data/
+```xmlui-pg /data/  noHeader
 ---app display /data/
 <App>
   <MonthlyStatus />

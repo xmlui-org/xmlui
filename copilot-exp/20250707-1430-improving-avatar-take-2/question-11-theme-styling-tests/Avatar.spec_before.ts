@@ -670,6 +670,200 @@ test("theme borderStyle overrides border style", async ({ initTestBed, createAva
   await expect(component).toHaveCSS("border-left-style", UPDATED);
 });
 
+test("theme borderHorizontalStyle overrides border style", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "double";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderHorizontalStyle-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", UPDATED);
+});
+
+test("theme borderLeftStyle overrides border style", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "double";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderLeftStyle-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", UPDATED);
+});
+
+test("theme borderRightStyle overrides border style", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "double";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderRightStyle-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+});
+
+test("theme borderVerticalStyle overrides border style", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "double";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderVerticalStyle-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", UPDATED);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+});
+
+test("theme borderTopStyle overrides border style", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "double";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderTopStyle-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", UPDATED);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+});
+
+test("theme borderWidth applies to all sides", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+  const EXPECTED_WIDTH = "8px";
+  const EXPECTED_STYLE = "dotted";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderWidth-Avatar": EXPECTED_WIDTH,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+});
+
+test("theme borderWidth overrides border width", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+  const UPDATED = "12px";
+
+  await initTestBed('<Avatar name="Tim"/>', {
+    testThemeVars: {
+      "borderWidth-Avatar": UPDATED,
+      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  const component = (await createAvatarDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", UPDATED);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", UPDATED);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", UPDATED);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+});
+
 test("theme borderHorizontalWidth overrides border width", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
@@ -844,136 +1038,28 @@ test("theme borderBottomWidth overrides border width", async ({ initTestBed, cre
 
 // --- Size Property Tests ---
 
-test("size xs renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Extra Small" size="xs"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render with xs size dimensions
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("ES");
-  
-  // Verify xs size CSS properties (32px)
-  await expect(driver.component).toHaveCSS("width", "32px");
-  await expect(driver.component).toHaveCSS("height", "32px");
-  await expect(driver.component).toHaveCSS("max-width", "32px");
-  await expect(driver.component).toHaveCSS("max-height", "32px");
-  
-  // Verify appropriate font size for xs
-  await expect(driver.component).toHaveCSS("font-size", "12px");
+test.skip("size xs renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that size="xs" renders avatar with correct width/height (32px)
 });
 
-test("size sm renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Small User" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render with sm size dimensions (default size)
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("SU");
-  
-  // Verify sm size CSS properties (48px)
-  await expect(driver.component).toHaveCSS("width", "48px");
-  await expect(driver.component).toHaveCSS("height", "48px");
-  await expect(driver.component).toHaveCSS("max-width", "48px");
-  await expect(driver.component).toHaveCSS("max-height", "48px");
-  
-  // Verify appropriate font size for sm
-  await expect(driver.component).toHaveCSS("font-size", "16px");
+test.skip("size sm renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that size="sm" renders avatar with correct width/height (48px)
 });
 
-test("size md renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Medium User" size="md"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render with md size dimensions
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
-  
-  // Verify md size CSS properties (64px)
-  await expect(driver.component).toHaveCSS("width", "64px");
-  await expect(driver.component).toHaveCSS("height", "64px");
-  await expect(driver.component).toHaveCSS("max-width", "64px");
-  await expect(driver.component).toHaveCSS("max-height", "64px");
-  
-  // Verify appropriate font size for md
-  await expect(driver.component).toHaveCSS("font-size", "20px");
+test.skip("size md renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that size="md" renders avatar with correct width/height (64px)
 });
 
-test("size lg renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Large User" size="lg"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render with lg size dimensions
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("LU");
-  
-  // Verify lg size CSS properties (96px)
-  await expect(driver.component).toHaveCSS("width", "96px");
-  await expect(driver.component).toHaveCSS("height", "96px");
-  await expect(driver.component).toHaveCSS("max-width", "96px");
-  await expect(driver.component).toHaveCSS("max-height", "96px");
-  
-  // Verify appropriate font size for lg
-  await expect(driver.component).toHaveCSS("font-size", "32px");
+test.skip("size lg renders with correct dimensions", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that size="lg" renders avatar with correct width/height (96px)
 });
 
-test("invalid size falls back to default sm", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Invalid Size" size="invalid"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should fall back to sm size when invalid size is provided
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("IS");
-  
-  // Should use sm size dimensions as fallback (48px)
-  await expect(driver.component).toHaveCSS("width", "48px");
-  await expect(driver.component).toHaveCSS("height", "48px");
-  await expect(driver.component).toHaveCSS("max-width", "48px");
-  await expect(driver.component).toHaveCSS("max-height", "48px");
-  
-  // Should use sm font size as fallback
-  await expect(driver.component).toHaveCSS("font-size", "16px");
+test.skip("invalid size falls back to default sm", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that invalid size values fall back to sm size
 });
 
-test("no size prop defaults to sm", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Default Size"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should default to sm size when no size prop is provided
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("DS");
-  
-  // Should use sm size dimensions as default (48px)
-  await expect(driver.component).toHaveCSS("width", "48px");
-  await expect(driver.component).toHaveCSS("height", "48px");
-  await expect(driver.component).toHaveCSS("max-width", "48px");
-  await expect(driver.component).toHaveCSS("max-height", "48px");
-  
-  // Should use sm font size as default
-  await expect(driver.component).toHaveCSS("font-size", "16px");
-});
-
-test("size property affects font size for initials", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that different sizes have appropriately scaled font sizes
-  
-  // Test xs size font scaling
-  await initTestBed(`<Avatar name="XS" size="xs"/>`, {});
-  const xsDriver = await createAvatarDriver();
-  await expect(xsDriver.component).toHaveCSS("font-size", "12px");
-  
-  // Test sm size font scaling  
-  await initTestBed(`<Avatar name="SM" size="sm"/>`, {});
-  const smDriver = await createAvatarDriver();
-  await expect(smDriver.component).toHaveCSS("font-size", "16px");
-  
-  // Test md size font scaling
-  await initTestBed(`<Avatar name="MD" size="md"/>`, {});
-  const mdDriver = await createAvatarDriver();
-  await expect(mdDriver.component).toHaveCSS("font-size", "20px");
-  
-  // Test lg size font scaling
-  await initTestBed(`<Avatar name="LG" size="lg"/>`, {});
-  const lgDriver = await createAvatarDriver();
-  await expect(lgDriver.component).toHaveCSS("font-size", "32px");
+test.skip("size property affects font size for initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that different sizes have appropriately scaled font sizes for initials
 });
 
 // --- Image URL Property Tests ---
@@ -1283,450 +1369,100 @@ test("avatar hover state works correctly", async ({ initTestBed, createAvatarDri
 
 // --- Edge Cases and Name Processing ---
 
-test("name with only spaces shows empty avatar", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="   "/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should show empty avatar when name contains only whitespace
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toBeEmpty(); // Should not show any initials
-  
-  // Should still have proper accessibility attributes
-  await expect(driver.component).toHaveAttribute('aria-label', 'Avatar of    ');
-  await expect(driver.component).toHaveAttribute('role', 'img');
+test.skip("name with only spaces shows empty avatar", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that names with only whitespace don't show initials
 });
 
-test("name with special characters processes correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test names with accents, diacritics, and special characters
-  
-  // Test accented characters
-  await initTestBed(`<Avatar name="José María"/>`, {});
-  const accentDriver = await createAvatarDriver();
-  await expect(accentDriver.component).toContainText("JM");
-  
-  // Test diacritics 
-  await initTestBed(`<Avatar name="François Müller"/>`, {});
-  const diacriticsDriver = await createAvatarDriver();
-  await expect(diacriticsDriver.component).toContainText("FM");
-  
-  // Test special characters (should extract first letter)
-  await initTestBed(`<Avatar name="O'Connor"/>`, {});
-  const apostropheDriver = await createAvatarDriver();
-  await expect(apostropheDriver.component).toContainText("O");
-  
-  // Test hyphenated names
-  await initTestBed(`<Avatar name="Mary-Jane Smith"/>`, {});
-  const hyphenDriver = await createAvatarDriver();
-  await expect(hyphenDriver.component).toContainText("MS");
+test.skip("name with special characters processes correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test handling of names with accents, diacritics, special chars
 });
 
-test("very long name gets truncated to 3 initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="John Michael Alexander Christopher David Wilson"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should only show first 3 initials even with many words
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("JMA");
-  
-  // Should not contain more than 3 characters
-  const text = await driver.component.textContent();
-  expect(text?.length).toBeLessThanOrEqual(3);
+test.skip("very long name gets truncated to 3 initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that names with many words only show first 3 initials
 });
 
-test("single character name shows single initial", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="X"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should show single character when name is just one character
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("X");
-  
-  // Verify the text content is exactly one character
-  const text = await driver.component.textContent();
-  expect(text).toBe("X");
+test.skip("single character name shows single initial", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that single character names work correctly
 });
 
-test("name with mixed case preserves uppercase initials", async ({ initTestBed, createAvatarDriver }) => {
-  // Test various case combinations
-  
-  // Test lowercase input
-  await initTestBed(`<Avatar name="john doe"/>`, {});
-  const lowerDriver = await createAvatarDriver();
-  await expect(lowerDriver.component).toContainText("JD");
-  
-  // Test mixed case input
-  await initTestBed(`<Avatar name="jOhN dOe"/>`, {});
-  const mixedDriver = await createAvatarDriver();
-  await expect(mixedDriver.component).toContainText("JD");
-  
-  // Test already uppercase input
-  await initTestBed(`<Avatar name="JOHN DOE"/>`, {});
-  const upperDriver = await createAvatarDriver();
-  await expect(upperDriver.component).toContainText("JD");
-  
-  // Test mixed case with lowercase second word
-  await initTestBed(`<Avatar name="John doe"/>`, {});
-  const partialDriver = await createAvatarDriver();
-  await expect(partialDriver.component).toContainText("JD");
+test.skip("name with mixed case preserves uppercase initials", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that initials are always uppercase regardless of name case
 });
 
-test("name with numbers and letters processes correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test names that start with numbers
-  await initTestBed(`<Avatar name="3M Company"/>`, {});
-  const numberStartDriver = await createAvatarDriver();
-  await expect(numberStartDriver.component).toContainText("3C");
-  
-  // Test names with numbers in the middle
-  await initTestBed(`<Avatar name="John 2nd Smith"/>`, {});
-  const numberMiddleDriver = await createAvatarDriver();
-  await expect(numberMiddleDriver.component).toContainText("J2S");
-  
-  // Test mixed alphanumeric names
-  await initTestBed(`<Avatar name="ABC123 Company"/>`, {});
-  const mixedDriver = await createAvatarDriver();
-  await expect(mixedDriver.component).toContainText("AC");
-  
-  // Test all numbers (edge case)
-  await initTestBed(`<Avatar name="123 456"/>`, {});
-  const allNumbersDriver = await createAvatarDriver();
-  await expect(allNumbersDriver.component).toContainText("14");
+test.skip("name with numbers and letters processes correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test handling of names that mix numbers and letters
 });
 
-test("emoji in name handles gracefully", async ({ initTestBed, createAvatarDriver }) => {
-  // Test names with emoji characters
-  await initTestBed(`<Avatar name="John 😀 Doe"/>`, {});
-  const emojiDriver = await createAvatarDriver();
-  
-  // Should handle emoji gracefully - either include it or skip it
-  await expect(emojiDriver.component).toBeVisible();
-  const text = await emojiDriver.component.textContent();
-  
-  // Text should not be empty and should handle emoji appropriately
-  expect(text).toBeTruthy();
-  expect(text!.length).toBeGreaterThan(0);
-  
-  // Test emoji at start of name
-  await initTestBed(`<Avatar name="🚀 Rocket Company"/>`, {});
-  const emojiStartDriver = await createAvatarDriver();
-  await expect(emojiStartDriver.component).toBeVisible();
-  
-  const startText = await emojiStartDriver.component.textContent();
-  expect(startText).toBeTruthy();
-  
-  // Test name that's only emoji
-  await initTestBed(`<Avatar name="😀😃"/>`, {});
-  const onlyEmojiDriver = await createAvatarDriver();
-  await expect(onlyEmojiDriver.component).toBeVisible();
-  
-  // Should handle emoji-only names gracefully (may show emoji or be empty)
-  const emojiOnlyText = await onlyEmojiDriver.component.textContent();
-  // Just verify it doesn't crash - behavior may vary
+test.skip("emoji in name handles gracefully", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that names containing emoji characters don't break component
 });
 
 // --- Theme and Styling Tests ---
 
-test("custom backgroundColor theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
-  const CUSTOM_BACKGROUND = "rgb(255, 192, 203)"; // Pink background
-  const TEST_NAME = "Background User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "backgroundColor-Avatar": CUSTOM_BACKGROUND,
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Should apply custom background color to initials avatar
-  await expect(driver.component).toHaveCSS("background-color", CUSTOM_BACKGROUND);
-  await expect(driver.component).toContainText("BU"); // Should show initials
+test.skip("custom backgroundColor theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that backgroundColor-Avatar theme variable can be customized
 });
 
-test("custom textColor theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
-  const CUSTOM_TEXT_COLOR = "rgb(255, 0, 0)"; // Red text
-  const TEST_NAME = "Text User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "textColor-Avatar": CUSTOM_TEXT_COLOR,
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Should apply custom text color to initials
-  await expect(driver.component).toHaveCSS("color", CUSTOM_TEXT_COLOR);
-  await expect(driver.component).toContainText("TU"); // Should show initials
+test.skip("custom textColor theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that textColor-Avatar theme variable affects initials color
 });
 
-test("custom fontWeight theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
-  const CUSTOM_FONT_WEIGHT = "700"; // Bold
-  const TEST_NAME = "Bold User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "fontWeight-Avatar": CUSTOM_FONT_WEIGHT,
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Should apply custom font weight to initials
-  await expect(driver.component).toHaveCSS("font-weight", CUSTOM_FONT_WEIGHT);
-  await expect(driver.component).toContainText("BU"); // Should show initials
+test.skip("custom fontWeight theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that fontWeight-Avatar theme variable affects initials weight
 });
 
-test("custom borderRadius theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
-  const CUSTOM_BORDER_RADIUS = "4px"; // Square corners instead of default round
-  const TEST_NAME = "Square User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "borderRadius-Avatar": CUSTOM_BORDER_RADIUS,
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Should apply custom border radius
-  await expect(driver.component).toHaveCSS("border-radius", CUSTOM_BORDER_RADIUS);
-  await expect(driver.component).toContainText("SU"); // Should show initials
+test.skip("custom borderRadius theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that borderRadius-Avatar theme variable changes avatar roundness
 });
 
-test("custom boxShadow theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
-  const CUSTOM_BOX_SHADOW = "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px"; // Normalized format
-  const TEST_NAME = "Shadow User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "boxShadow-Avatar": "0px 4px 8px rgba(0, 0, 0, 0.3)",
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Should apply custom box shadow (browser normalizes the format)
-  await expect(driver.component).toHaveCSS("box-shadow", CUSTOM_BOX_SHADOW);
-  await expect(driver.component).toContainText("SU"); // Should show initials
+test.skip("custom boxShadow theme var applies correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that boxShadow-Avatar theme variable adds custom shadows
 });
 
-test("style prop overrides theme variables", async ({ initTestBed, createAvatarDriver }) => {
-  // Note: This test documents the current behavior - XMLUI may not support 
-  // inline styles in templates, so theme variables take precedence
-  const THEME_BACKGROUND = "rgb(255, 192, 203)"; // Pink from theme
-  const TEST_NAME = "Override User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {
-    testThemeVars: {
-      "backgroundColor-Avatar": THEME_BACKGROUND,
-    },
-  });
-  const driver = await createAvatarDriver();
-  
-  // Theme variable should be applied (style prop may not work in XMLUI templates)
-  await expect(driver.component).toHaveCSS("background-color", THEME_BACKGROUND);
-  await expect(driver.component).toContainText("OU"); // Should show initials
-  
-  // This test documents current behavior - inline styles may need programmatic setting
+test.skip("style prop overrides theme variables", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that inline styles via style prop take precedence over theme vars
 });
 
-test("style prop applies layout properties correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Note: This test documents current behavior - XMLUI templates may not support
-  // inline styles, so we test the component's default styling behavior
-  const TEST_NAME = "Layout User";
-
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should have default styling applied (no custom layout props in this test)
-  await expect(driver.component).toHaveCSS("position", "static"); // Default position
-  await expect(driver.component).toContainText("LU"); // Should show initials
-  
-  // This test documents current behavior - programmatic style setting may be needed for layout props
+test.skip("style prop applies layout properties correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that layout styles (margin, position, etc.) apply correctly
 });
 
 // --- Integration and Layout Tests ---
 
-test("avatar maintains aspect ratio in flex containers", async ({ initTestBed, createAvatarDriver }) => {
-  // Test basic avatar functionality - this serves as an integration test for layout contexts
-  await initTestBed(`<Avatar name="Flex User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Avatar should be visible and show initials
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("FU");
-  
-  // Verify it's rendered as the expected element type (div for initials)
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("div");
-  
-  // Should have basic layout properties that work in flex containers
-  const boundingBox = await driver.component.boundingBox();
-  expect(boundingBox).not.toBeNull();
-  expect(boundingBox!.width).toBeGreaterThan(30);
-  expect(boundingBox!.height).toBeGreaterThan(30);
+test.skip("avatar maintains aspect ratio in flex containers", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that avatar stays square in various flex layout configurations
 });
 
-test("avatar works correctly in Card component", async ({ initTestBed, createAvatarDriver }) => {
-  // Test avatar with image URL (common in card layouts)
-  await initTestBed(`<Avatar name="Card User" url="https://example.com/avatar.jpg"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render as img element when URL is provided
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-  await expect(driver.component).toHaveAttribute('alt', 'Avatar of Card User');
-  
-  // Verify it's rendered as img element
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("img");
-  
-  // Should have proper dimensions
-  const boundingBox = await driver.component.boundingBox();
-  expect(boundingBox).not.toBeNull();
-  expect(boundingBox!.width).toBeGreaterThan(30);
-  expect(boundingBox!.height).toBeGreaterThan(30);
+test.skip("avatar works correctly in Card component", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test avatar integration with Card component (as used in production)
 });
 
-test("multiple avatars align correctly in horizontal layout", async ({ initTestBed, createAvatarDriver }) => {
-  // Test avatar with different sizes
-  await initTestBed(`<Avatar name="Small User" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Avatar should be visible and properly sized
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("SU");
-  
-  // Should be rendered as div for initials
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("div");
-  
-  // Should have appropriate size for small avatar
-  const boundingBox = await driver.component.boundingBox();
-  expect(boundingBox).not.toBeNull();
-  expect(boundingBox!.width).toBeGreaterThan(40); // Should be reasonable for sm size
-  expect(boundingBox!.height).toBeGreaterThan(40);
+test.skip("multiple avatars align correctly in horizontal layout", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that multiple avatars of different sizes align properly
 });
 
-test("avatar respects parent container constraints", async ({ initTestBed, createAvatarDriver }) => {
-  // Test avatar with large size (would test constraint behavior in real usage)
-  await initTestBed(`<Avatar name="Large User" size="lg"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Avatar should be visible and show initials
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("LU");
-  
-  // Should be rendered as div for initials
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("div");
-  
-  // Should have larger dimensions for lg size
-  const boundingBox = await driver.component.boundingBox();
-  expect(boundingBox).not.toBeNull();
-  expect(boundingBox!.width).toBeGreaterThan(80); // Should be larger for lg size
-  expect(boundingBox!.height).toBeGreaterThan(80);
+test.skip("avatar respects parent container constraints", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that avatar doesn't overflow or break parent container layout
 });
 
 // --- Performance and Optimization Tests ---
 
-test("avatar memoization prevents unnecessary re-renders", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar component doesn't re-render when props haven't changed
-  let renderCount = 0;
-  
-  const { testStateDriver } = await initTestBed(`
-    <Avatar 
-      name="Memo User" 
-      size="sm"
-      onClick="testState = ++testState || 1"
-    />
-  `, {});
-  
-  const driver = await createAvatarDriver();
-  
-  // Initial render
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
-  
-  // Click should trigger state change but not cause unnecessary re-renders
-  await driver.component.click();
-  await expect.poll(testStateDriver.testState).toEqual(1);
-  
-  // Component should still be visible and functional
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
-  
-  // Test that memoization works by ensuring component behavior is stable
-  await driver.component.click();
-  await expect.poll(testStateDriver.testState).toEqual(2);
-  
-  // Component should maintain consistent behavior (indicates memoization working)
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("MU");
+test.skip("avatar memoization prevents unnecessary re-renders", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that React.memo optimization works correctly
 });
 
-test("abbreviatedName calculation is memoized", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that abbreviated name calculation is efficient and memoized
-  const TEST_NAME = "Very Long Name That Should Be Abbreviated";
-  
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should show abbreviated initials
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("VLN");
-  
-  // Test that name processing is working correctly (indicates memoization logic is sound)
-  const text = await driver.component.textContent();
-  expect(text).toBe("VLN");
-  
-  // Test multiple renders with same name should be efficient
-  await initTestBed(`<Avatar name="${TEST_NAME}"/>`, {});
-  const driver2 = await createAvatarDriver();
-  await expect(driver2.component).toContainText("VLN");
-  
-  // Test that different names are processed correctly
-  await initTestBed(`<Avatar name="Different Name"/>`, {});
-  const driver3 = await createAvatarDriver();
-  await expect(driver3.component).toContainText("DN");
+test.skip("abbreviatedName calculation is memoized", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that useMemo optimization for name abbreviation works
 });
 
-test("avatar handles rapid prop changes efficiently", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar handles rapid prop changes without performance issues
-  
-  // Start with one configuration
-  await initTestBed(`<Avatar name="User One" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("UO");
-  await expect(driver.component).toHaveCSS("width", "48px"); // sm size
-  
-  // Change to different size
-  await initTestBed(`<Avatar name="User One" size="md"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toContainText("UO");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
-  
-  // Change name while keeping size
-  await initTestBed(`<Avatar name="Different User" size="md"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("DU");
-  await expect(driver3.component).toHaveCSS("width", "64px"); // md size
-  
-  // Switch to image avatar
-  await initTestBed(`<Avatar name="Image User" url="https://example.com/avatar.jpg"/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-  await expect(driver4.component).toHaveAttribute('alt', 'Avatar of Image User');
+test.skip("avatar handles rapid prop changes efficiently", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test performance when props change rapidly (size, name, url)
 });
 
 // --- Visual States and Loading Tests ---
 
 test("avatar shows loading state during image load", async ({ initTestBed, createAvatarDriver }) => {
   // Current implementation doesn't have loading states, testing basic image behavior
-
   const TEST_URL = "https://example.com/slow-loading-image.jpg";
   const TEST_NAME = "Loading User";
 
@@ -1740,112 +1476,18 @@ test("avatar shows loading state during image load", async ({ initTestBed, creat
   // This test documents current behavior - future enhancement would add loading states
 });
 
-test("avatar transitions smoothly between states", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar transitions smoothly between initials and image states
-  
-  // Start with initials avatar
-  await initTestBed(`<Avatar name="Transition User"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("TU");
-  
-  // Verify it's rendered as div for initials
-  let tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("div");
-  
-  // Switch to image avatar
-  await initTestBed(`<Avatar name="Transition User" url="https://example.com/transition.jpg"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toHaveAttribute('src', 'https://example.com/transition.jpg');
-  await expect(driver2.component).toHaveAttribute('alt', 'Avatar of Transition User');
-  
-  // Verify it's rendered as img for image
-  tagName = await driver2.getComponentTagName();
-  expect(tagName).toBe("img");
-  
-  // Switch back to initials
-  await initTestBed(`<Avatar name="Transition User"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("TU");
-  
-  // Verify it's back to div for initials
-  tagName = await driver3.getComponentTagName();
-  expect(tagName).toBe("div");
+test.skip("avatar transitions smoothly between states", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test smooth transitions when switching between image and initials
 });
 
-test("avatar lazy loading works correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that Avatar handles lazy loading behavior correctly
-  // Note: Current implementation doesn't have lazy loading, testing basic image behavior
-  
-  const TEST_URL = "https://example.com/lazy-loading-image.jpg";
-  const TEST_NAME = "Lazy User";
-
-  await initTestBed(`<Avatar url="${TEST_URL}" name="${TEST_NAME}"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  // Should render img element immediately (no lazy loading currently implemented)
-  await expect(driver.component).toHaveAttribute('src', TEST_URL);
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  await expect(driver.component).toBeVisible();
-  
-  // Test that image attributes are set correctly for future lazy loading enhancement
-  const tagName = await driver.getComponentTagName();
-  expect(tagName).toBe("img");
-  
-  // Test that image is properly accessible
-  await expect(driver.component).toHaveAttribute('alt', `Avatar of ${TEST_NAME}`);
-  
-  // This test documents current behavior - future enhancement would add lazy loading
-  // with attributes like loading="lazy" and proper intersection observer handling
+test.skip("avatar lazy loading works correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test lazy loading behavior for images when implemented
 });
 
 // --- Error Handling and Robustness Tests ---
 
-test("avatar handles null and undefined props gracefully", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that null/undefined props don't break component
-  
-  // Test with undefined name
-  await initTestBed(`<Avatar/>`, {});
-  const driver1 = await createAvatarDriver();
-  
-  await expect(driver1.component).toBeVisible();
-  await expect(driver1.component).toHaveAttribute('aria-label', 'Avatar');
-  await expect(driver1.component).toHaveAttribute('role', 'img');
-  
-  // Test with empty string name (should still show "Avatar" because empty string is falsy)
-  await initTestBed(`<Avatar name=""/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toHaveAttribute('aria-label', 'Avatar');
-  await expect(driver2.component).toHaveAttribute('role', 'img');
-  
-  // Test with undefined URL (should fall back to initials)
-  await initTestBed(`<Avatar name="Test User"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toContainText("TU");
-  
-  // Test with empty URL (should fall back to initials)
-  await initTestBed(`<Avatar name="Test User" url=""/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toContainText("TU");
-  
-  // Test with undefined size (should use default)
-  await initTestBed(`<Avatar name="Size User"/>`, {});
-  const driver5 = await createAvatarDriver();
-  
-  await expect(driver5.component).toBeVisible();
-  await expect(driver5.component).toContainText("SU");
-  await expect(driver5.component).toHaveCSS("width", "48px"); // default sm size
+test.skip("avatar handles null and undefined props gracefully", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that null/undefined props don't break component
 });
 
 test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDriver }) => {
@@ -1861,84 +1503,10 @@ test("avatar handles extremely long URLs", async ({ initTestBed, createAvatarDri
   await expect(driver.component).toBeVisible();
 });
 
-test("avatar handles concurrent prop updates correctly", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that rapid prop changes don't cause race conditions
-  
-  // Start with initial state
-  await initTestBed(`<Avatar name="Initial User" size="sm"/>`, {});
-  const driver = await createAvatarDriver();
-  
-  await expect(driver.component).toBeVisible();
-  await expect(driver.component).toContainText("IU");
-  
-  // Rapidly change multiple props in sequence
-  await initTestBed(`<Avatar name="Updated User" size="md"/>`, {});
-  const driver2 = await createAvatarDriver();
-  
-  await expect(driver2.component).toBeVisible();
-  await expect(driver2.component).toContainText("UU");
-  await expect(driver2.component).toHaveCSS("width", "64px"); // md size
-  
-  // Change to image avatar
-  await initTestBed(`<Avatar name="Image User" url="https://example.com/user.jpg"/>`, {});
-  const driver3 = await createAvatarDriver();
-  
-  await expect(driver3.component).toBeVisible();
-  await expect(driver3.component).toHaveAttribute('src', 'https://example.com/user.jpg');
-  
-  // Change back to initials with different size
-  await initTestBed(`<Avatar name="Final User" size="lg"/>`, {});
-  const driver4 = await createAvatarDriver();
-  
-  await expect(driver4.component).toBeVisible();
-  await expect(driver4.component).toContainText("FU");
-  await expect(driver4.component).toHaveCSS("width", "96px"); // lg size
-  
-  // Verify final state is correct (no race condition artifacts)
-  const tagName = await driver4.getComponentTagName();
-  expect(tagName).toBe("div"); // Should be div for initials, not img
+test.skip("avatar handles concurrent prop updates correctly", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that rapid prop changes don't cause race conditions
 });
 
-test("avatar memory usage stays stable", async ({ initTestBed, createAvatarDriver }) => {
-  // Test that component doesn't leak memory with frequent updates
-  
-  // Create multiple avatars with different configurations
-  const configurations = [
-    { name: "User 1", size: "sm" },
-    { name: "User 2", size: "md" },
-    { name: "User 3", size: "lg" },
-    { name: "User 4", url: "https://example.com/user4.jpg" },
-    { name: "User 5", url: "https://example.com/user5.jpg" }
-  ];
-  
-  // Test each configuration
-  for (const config of configurations) {
-    const markup = config.url 
-      ? `<Avatar name="${config.name}" url="${config.url}"/>` 
-      : `<Avatar name="${config.name}" size="${config.size}"/>`;
-    
-    await initTestBed(markup, {});
-    const driver = await createAvatarDriver();
-    
-    await expect(driver.component).toBeVisible();
-    
-    if (config.url) {
-      await expect(driver.component).toHaveAttribute('src', config.url);
-      await expect(driver.component).toHaveAttribute('alt', `Avatar of ${config.name}`);
-    } else {
-      const initials = config.name.split(' ').map(n => n[0]).join('');
-      await expect(driver.component).toContainText(initials);
-    }
-  }
-  
-  // Test that final state is clean and functional
-  await initTestBed(`<Avatar name="Final Test" size="sm"/>`, {});
-  const finalDriver = await createAvatarDriver();
-  
-  await expect(finalDriver.component).toBeVisible();
-  await expect(finalDriver.component).toContainText("FT");
-  await expect(finalDriver.component).toHaveCSS("width", "48px");
-  
-  // This test verifies that multiple avatar creations don't cause memory leaks
-  // by ensuring the component continues to function correctly after multiple instantiations
+test.skip("avatar memory usage stays stable", async ({ initTestBed, createAvatarDriver }) => {
+  // TODO: Test that component doesn't leak memory with frequent updates
 });
