@@ -70,11 +70,10 @@ See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
 ## Binding Expressions [#binding-expressions]
 
 Our `Markdown` component is capable of evaluating binding expressions just as other XMLUI components.
-Use the `&#64;{}` syntax to wrap expressions that need to be evaluated.
-
-Empty &#64;{} expressions are removed.
+Use the &#64;{} syntax to wrap expressions that need to be evaluated.
 
 Objects, functions and arrays will be stringified if you place them in `Markdown`.
+
 Function calls are executed and their return values inlined as strings into markdown.
 
 ```xmlui-pg copy {5-9} name="Example: binding expressions syntax"
@@ -99,20 +98,6 @@ Function calls are executed: @{x()}
 This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed.
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
-
-```xmlui-pg copy display name="Example: content property"
-<App>
-  <VStack>
-    <Items data="{[
-      {id: 123, name: 'Peter Parker'},
-      {id: 234, name: 'Clark Kent'},
-      {id: 345, name: 'Bruce Wayne'}
-    ]}">
-      <Markdown content="{'## ' + $item.id + '\n*' + $item.name + '*' }"/>
-    </Items>
-  </VStack>
-</App>
-```
 
 ### `removeIndents (default: true)` [#removeindents-default-true]
 
