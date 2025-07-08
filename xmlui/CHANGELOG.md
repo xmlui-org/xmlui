@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.66
+
+### Patch Changes
+
+- eae8145: Fixed Switch indicator positioning
+- b6c64de: improve: charts - improved tick rendering
+- 459bd3c: improve: Logo - add inline, alt props
+- 96be435: feat: CodeBlock - add new themeVariables
+
 ## 0.9.65
 
 ### Patch Changes

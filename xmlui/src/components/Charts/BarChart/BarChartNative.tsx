@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -126,23 +126,112 @@ export function BarChart({
 
   const chartContextValue = useChartContextValue({ dataKeys, nameKey });
 
+  const containerRef = useRef(null);
+  const labelsRef = useRef<HTMLDivElement>(null);
+  const [interval, setIntervalState] = useState(0);
+  const [xAxisHeight, setXAxisHeight] = useState(50);
+  const [yTickCount, setYTickCount] = useState(5);
+  const fontSize = 12;
+  const [chartMargin, setChartMargin] = useState({ left: 30, right: 30, top: 10, bottom: 60 });
+  const [tickAngle, setTickAngle] = useState(0);
+  const [tickAnchor, setTickAnchor] = useState<"end" | "middle">("middle");
+  const [miniMode, setMiniMode] = useState(false);
+  const [yAxisWidth, setYAxisWidth] = useState(40);
+
+  useEffect(() => {
+    const calc = () => {
+      const width = containerRef.current?.offsetWidth || 800;
+      const spans = labelsRef.current?.querySelectorAll("span") || [];
+      const yTicks = Array.from(
+        document.querySelectorAll(".recharts-y-axis .recharts-layer tspan"),
+      ) as SVGGraphicsElement[];
+      const maxYTickWidth =
+        yTicks.length > 0 ? Math.max(...yTicks.map((t) => t.getBBox().width)) : 40;
+      setYAxisWidth(maxYTickWidth);
+      const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
+      let angle = 0;
+      let anchor: "end" | "middle" = "middle";
+      let rad = 0;
+      let minTickSpacing = maxWidth + 8;
+      let leftMargin = Math.ceil(maxWidth / 3);
+      let rightMargin = Math.ceil(maxWidth / 3);
+      let xAxisH = Math.ceil(fontSize * 1.2);
+      let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+      let skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+      if (skip > 0) {
+        angle = -60;
+        anchor = "end";
+        rad = (Math.abs(angle) * Math.PI) / 180;
+        minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
+        maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+        skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+        leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
+        rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
+        xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
+      }
+      setIntervalState(skip);
+      setTickAngle(angle);
+      setTickAnchor(anchor);
+      const xTicks = Array.from(
+        document.querySelectorAll(".recharts-x-axis .recharts-layer tspan"),
+      ) as SVGGraphicsElement[];
+      const maxXTickHeight =
+        xTicks.length > 0 ? Math.max(...xTicks.map((t) => t.getBBox().height)) : fontSize;
+      let bottomMargin = 10;
+      if (layout === "vertical") {
+        bottomMargin = maxXTickHeight;
+      } else {
+        bottomMargin = Math.max(xAxisH, maxXTickHeight);
+      }
+      setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: bottomMargin });
+
+      const chartHeight = containerRef.current?.offsetHeight || 300;
+      const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
+      setYTickCount(maxYTicks);
+      setXAxisHeight(Math.ceil(fontSize));
+      const containerHeight = containerRef.current?.offsetHeight || 0;
+      const containerWidth = containerRef.current?.offsetWidth || 0;
+      const neededHeight = 10 + xAxisHeight + 10 + 32;
+      const neededWidth = chartMargin.left + chartMargin.right + yAxisWidth + 32;
+      setMiniMode(neededHeight > containerHeight || neededWidth > containerWidth);
+    };
+
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, [data, xAxisHeight]);
+
   return (
     <ChartProvider value={chartContextValue}>
       {children}
       <div
+        ref={labelsRef}
+        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
+      >
+        {data
+          .map((d) => d[nameKey])
+          .map((label, idx) => (
+            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {label}
+            </span>
+          ))}
+      </div>
+      <div
         style={{
           flexGrow: 1,
-          minHeight: 0,
           width: style.width || "100%",
           height: style.height || "100%",
+          padding: 0,
+          margin: 0,
         }}
       >
-        <ResponsiveContainer style={style} width="100%" height="100%">
+        <ResponsiveContainer ref={containerRef} width="100%" height="100%" debounce={100}>
           <RBarChart
+            style={style}
             accessibilityLayer
             data={data}
             layout={layout}
-            margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
+            margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <CartesianGrid vertical={true} strokeDasharray="3 3" />
             {layout === "vertical" ? (
@@ -150,17 +239,17 @@ export function BarChart({
                 <XAxis
                   type="number"
                   axisLine={false}
-                  hide={hideX}
-                  tick={{ fill: "currentColor" }}
+                  hide={miniMode || hideX}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
                 <YAxis
-                  hide={hideY}
+                  hide={miniMode || hideY}
                   dataKey={nameKey}
                   type="category"
                   interval={"equidistantPreserveStart"}
                   tickLine={false}
-                  tickFormatter={tickFormatter}
-                  tick={{ fill: "currentColor" }}
+                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
               </>
             ) : (
@@ -168,23 +257,26 @@ export function BarChart({
                 <XAxis
                   dataKey={nameKey}
                   type="category"
-                  interval={"equidistantPreserveStart"}
+                  interval={interval}
                   tickLine={false}
-                  tickFormatter={tickFormatter}
-                  height={hideX ? 0 : 30}
-                  hide={hideX}
-                  tick={!hideTickX && { fill: "currentColor" }}
+                  angle={tickAngle}
+                  textAnchor={tickAnchor}
+                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  height={miniMode || hideX ? 0 : xAxisHeight}
+                  hide={miniMode || hideX}
                 />
                 <YAxis
                   type="number"
                   axisLine={false}
-                  tick={!hideTickY && { fill: "currentColor" }}
-                  hide={hideY}
-                  width={hideY ? 0 : 60}
+                  tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+                  hide={miniMode || hideY}
+                  tickCount={yTickCount}
+                  width={miniMode || hideY || hideTickY ? 0 : 40}
                 />
               </>
             )}
-            <Tooltip content={<TooltipContent />} />
+            {!miniMode && <Tooltip content={<TooltipContent />} />}
             {Object.keys(config).map((key, index) => (
               <Bar
                 key={index}
@@ -192,9 +284,21 @@ export function BarChart({
                 fill={config[key].color}
                 radius={stacked ? 0 : 8}
                 stackId={stacked ? "stacked" : undefined}
+                strokeWidth={1}
               />
             ))}
-            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+            {showLegend && (
+              <RLegend
+                wrapperStyle={{
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  margin: "0 auto",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              />
+            )}
           </RBarChart>
         </ResponsiveContainer>
       </div>
