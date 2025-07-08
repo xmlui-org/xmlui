@@ -4,6 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
+import { useMemo } from "react";
 
 const COMP = "NavPanel";
 
@@ -39,22 +40,43 @@ export const NavPanelMd = createMetadata({
   },
 });
 
+function NavPanelWithBuiltNavHierarchy({
+  node,
+  renderChild,
+  layoutCss,
+  layoutContext,
+  extractValue,
+}) {
+  const navLinks = useMemo(() => {
+    return buildNavHierarchy(node.children, extractValue, undefined, []);
+  }, [extractValue, node.children]);
+
+  return (
+    <NavPanel
+      style={layoutCss}
+      logoContent={renderChild(node.props.logoTemplate)}
+      className={layoutContext?.themeClassName}
+      inDrawer={layoutContext?.inDrawer}
+      renderChild={renderChild}
+      navLinks={navLinks}
+    >
+      {renderChild(node.children)}
+    </NavPanel>
+  );
+}
+
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
-    const navLinks = buildNavHierarchy(node.children, extractValue, undefined, []);
     return (
-      <NavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate)}
-        className={layoutContext?.themeClassName}
-        inDrawer={layoutContext?.inDrawer}
+      <NavPanelWithBuiltNavHierarchy
+        node={node}
         renderChild={renderChild}
-        navLinks={navLinks}
-      >
-        {renderChild(node.children)}
-      </NavPanel>
+        layoutCss={layoutCss}
+        layoutContext={layoutContext}
+        extractValue={extractValue}
+      />
     );
   },
 );

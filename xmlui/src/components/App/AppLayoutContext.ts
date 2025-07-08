@@ -1,7 +1,6 @@
 import { createContext, useContext } from "react";
 
 import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
-import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 
 const appLayoutNames = [
   "vertical",
@@ -71,8 +70,6 @@ export interface IAppLayoutContext {
   scrollWholePage?: boolean;
   isFullVerticalWidth?: boolean;
   isNested?: boolean;
-  linkMap?: Map<string, NavHierarchyNode>;
-  registerLinkMap?: (linkMap: Map<string, NavHierarchyNode>) => void;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

@@ -28,6 +28,7 @@ import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
+import { LinkInfoContext } from "./LinkInfoContext";
 
 type Props = {
   children: ReactNode;
@@ -53,7 +54,10 @@ type Props = {
   defaultTheme?: string;
 };
 
-export const defaultProps: Pick<Props, "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady"> = {
+export const defaultProps: Pick<
+  Props,
+  "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady"
+> = {
   scrollWholePage: true,
   noScrollbarGutters: false,
   defaultTone: "light",
@@ -213,12 +217,12 @@ export function App({
   }, [forceRefreshAnchorScroll]);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
-  const [linkMap, setLinkMap] = useState<Map<string, NavHierarchyNode>>(new Map());
-  
+
   const registerSubNavPanelSlot = useCallback((element) => {
     setSubNavPanelSlot(element);
   }, []);
 
+  const [linkMap, setLinkMap] = useState<Map<string, NavHierarchyNode>>(new Map());
   const registerLinkMap = useCallback((newLinkMap: Map<string, NavHierarchyNode>) => {
     setLinkMap(newLinkMap);
   }, []);
@@ -245,8 +249,6 @@ export function App({
       registerSubNavPanelSlot,
       subNavPanelSlot,
       isNested: appGlobals?.isNested || false,
-      linkMap,
-      registerLinkMap,
     };
   }, [
     hasRegisteredNavPanel,
@@ -263,9 +265,14 @@ export function App({
     registerSubNavPanelSlot,
     subNavPanelSlot,
     appGlobals?.isNested,
-    linkMap,
-    registerLinkMap,
   ]);
+
+  const linkInfoContextValue = useMemo(()=>{
+    return {
+      linkMap,
+      registerLinkMap
+    }
+  }, [linkMap, registerLinkMap]);
 
   useEffect(() => {
     if (navPanelVisible) {
@@ -465,14 +472,15 @@ export function App({
 
   // Memoize the rendered nav panel in drawer to prevent unnecessary re-renders
   const memoizedNavPanelInDrawer = useMemo(
-    () => renderChild && navPanelDef ? renderChild(navPanelDef, { inDrawer: true }) : null,
-    [renderChild, navPanelDef]
+    () => (renderChild && navPanelDef ? renderChild(navPanelDef, { inDrawer: true }) : null),
+    [renderChild, navPanelDef],
   );
 
   // Memoize the helmet component
   const memoizedHelmet = useMemo(
-    () => name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
-    [name]
+    () =>
+      name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
+    [name],
   );
 
   // Memoize the onOpenChange callback
@@ -480,20 +488,18 @@ export function App({
     setDrawerVisible(open);
   }, []);
 
-
-  
   return (
     <>
       {memoizedHelmet}
       <AppLayoutContext.Provider value={layoutContextValue}>
-        <SearchContextProvider>
-          <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
-            <SheetContent side={"left"}>
-              {memoizedNavPanelInDrawer}
-            </SheetContent>
-          </Sheet>
-          {content}
-        </SearchContextProvider>
+        <LinkInfoContext.Provider value={linkInfoContextValue}>
+          <SearchContextProvider>
+            <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
+              <SheetContent side={"left"}>{memoizedNavPanelInDrawer}</SheetContent>
+            </Sheet>
+            {content}
+          </SearchContextProvider>
+        </LinkInfoContext.Provider>
       </AppLayoutContext.Provider>
     </>
   );

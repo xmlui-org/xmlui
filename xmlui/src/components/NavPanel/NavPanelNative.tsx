@@ -1,4 +1,4 @@
-import React, { forwardRef, type ReactNode, useRef, useEffect } from "react";
+import React, { forwardRef, type ReactNode, useEffect, useRef } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -9,6 +9,7 @@ import { ScrollContext } from "../../components-core/ScrollContext";
 import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
+import { useLinkInfoContext } from "../App/LinkInfoContext";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
@@ -55,65 +56,68 @@ export function buildNavHierarchy(
   const hierarchy: NavHierarchyNode[] = [];
 
   // Skip non-object children
-  children.filter(child => child && typeof child === 'object').forEach((child) => {
-    if (child.type === "NavLink") {
-      const label =
-        extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
-      const to = extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+  children
+    .filter((child) => child && typeof child === "object")
+    .forEach((child) => {
+      if (child.type === "NavLink") {
+        const label =
+          extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+        const to =
+          extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
 
-      // Handle case where label might not be in props but in children as text
-      let finalLabel = label;
-      if (!finalLabel && child.children?.length === 1 && child.children[0].type === "TextNode") {
-        finalLabel = extractValue(child.children[0].props?.value);
-      }
+        // Handle case where label might not be in props but in children as text
+        let finalLabel = label;
+        if (!finalLabel && child.children?.length === 1 && child.children[0].type === "TextNode") {
+          finalLabel = extractValue(child.children[0].props?.value);
+        }
 
-      // Only include NavLinks that have both label and to values
-      if (finalLabel && to) {
-        const node: NavHierarchyNode = {
-          type: "NavLink",
-          label: finalLabel,
-          to: to,
-          parent: parent,
-          pathSegments: [...pathSegments],
-        };
-        hierarchy.push(node);
-      }
-    } else if (child.type === "NavGroup") {
-      const label =
-        extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+        // Only include NavLinks that have both label and to values
+        if (finalLabel && to) {
+          const node: NavHierarchyNode = {
+            type: "NavLink",
+            label: finalLabel,
+            to: to,
+            parent: parent,
+            pathSegments: [...pathSegments],
+          };
+          hierarchy.push(node);
+        }
+      } else if (child.type === "NavGroup") {
+        const label =
+          extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
 
-      // NavGroups only need a label, no "to" value required
-      if (label) {
-        const groupNode: NavHierarchyNode = {
-          type: "NavGroup",
-          label: label,
-          parent: parent,
-          pathSegments: [...pathSegments],
-          children: [],
-        };
+        // NavGroups only need a label, no "to" value required
+        if (label) {
+          const groupNode: NavHierarchyNode = {
+            type: "NavGroup",
+            label: label,
+            parent: parent,
+            pathSegments: [...pathSegments],
+            children: [],
+          };
 
-        // Build children with this groupNode as parent and updated path
-        const newPathSegments = [...pathSegments, groupNode];
-        groupNode.children = buildNavHierarchy(
-          child.children,
-          extractValue,
-          groupNode,
-          newPathSegments,
-        );
-        hierarchy.push(groupNode);
+          // Build children with this groupNode as parent and updated path
+          const newPathSegments = [...pathSegments, groupNode];
+          groupNode.children = buildNavHierarchy(
+            child.children,
+            extractValue,
+            groupNode,
+            newPathSegments,
+          );
+          hierarchy.push(groupNode);
+        } else if (child.children && child.children.length > 0) {
+          // If no label but has children, process them at the current level with same parent and path
+          hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
+        }
       } else if (child.children && child.children.length > 0) {
-        // If no label but has children, process them at the current level with same parent and path
-        hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
+        //console.log("CN", child.children);
+        // Process any children that might contain NavGroup and NavLink components recursively
+        const nestedNodes = buildNavHierarchy(child.children, extractValue, parent, pathSegments);
+        if (nestedNodes.length > 0) {
+          hierarchy.push(...nestedNodes);
+        }
       }
-    } else if (child.children && child.children.length > 0) {
-      //console.log("CN", child.children);
-      // Process any children that might contain NavGroup and NavLink components recursively
-      const nestedNodes = buildNavHierarchy(child.children, extractValue, parent, pathSegments);
-      if (nestedNodes.length > 0) {
-        hierarchy.push(...nestedNodes);
-      }
-    }
-  });
+    });
 
   // Set navigation properties after building the hierarchy
   setNavigationProperties(hierarchy);
@@ -212,13 +216,11 @@ function DrawerNavPanel({
   children,
   className,
   style,
-  navLinks,
 }: {
   children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
-  navLinks?: NavHierarchyNode[];
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   return (
@@ -262,6 +264,7 @@ export const NavPanel = forwardRef(function NavPanel(
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const ref = forwardedRef ? composeRefs(scrollContainerRef, forwardedRef) : scrollContainerRef;
   const appLayoutContext = useAppLayoutContext();
+  const linkInfoContext = useLinkInfoContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const showLogo =
     appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
@@ -271,24 +274,15 @@ export const NavPanel = forwardRef(function NavPanel(
 
   // Register the linkMap when navLinks change
   useEffect(() => {
-    if (appLayoutContext?.registerLinkMap && navLinks) {
+    if (linkInfoContext?.registerLinkMap && navLinks) {
       const linkMap = buildLinkMap(navLinks);
-      appLayoutContext.registerLinkMap(linkMap);
+      linkInfoContext.registerLinkMap(linkMap);
     }
-  }, [navLinks, appLayoutContext?.registerLinkMap]);
-
-  if (appLayoutContext && !appLayoutContext?.isNested) {
-    //console.log(navLinks);
-  }
+  }, [navLinks, linkInfoContext?.registerLinkMap]);
 
   if (inDrawer) {
     return (
-      <DrawerNavPanel
-        style={style}
-        logoContent={safeLogoContent}
-        className={className}
-        navLinks={navLinks}
-      >
+      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className}>
         {children}
       </DrawerNavPanel>
     );

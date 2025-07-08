@@ -16,11 +16,10 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   useEffect(() => {
     register({
-      children,
       label,
       id,
     });
-  }, [id, children, label, register]);
+  }, [id, label, register]);
 
   useEffect(() => {
     return () => {
