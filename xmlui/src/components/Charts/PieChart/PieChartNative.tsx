@@ -9,13 +9,13 @@ import {
 } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
-import { useTheme } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { useTheme } from "../../../components-core/theming/ThemeContext";
 
 export type PieChartProps = {
   data: any[];
