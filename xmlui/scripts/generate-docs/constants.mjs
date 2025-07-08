@@ -214,3 +214,60 @@ export const ERROR_HANDLING = {
   },
   DEFAULT_EXIT_CODE: 1
 };
+
+// Component navigation generation constants
+export const COMPONENT_NAVIGATION = {
+  DELIMITERS: {
+    START: "<!-- GENERATED CONTENT/Component references links -->",
+    END: "<!-- END GENERATED CONTENT/Component references links -->",
+    START_REGEX: /<!--\s*GENERATED CONTENT.*?-->/,
+    END_REGEX: /<!--\s*END GENERATED CONTENT.*?-->/
+  },
+  OVERVIEW_LINK: {
+    LABEL: "Components Overview",
+    TO: "/components/_overview"
+  },
+  TEMPLATES: {
+    NAVLINK: (componentName) => `<NavLink label="${componentName}" to="/components/${componentName}" />`,
+    OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`
+  }
+};
+
+// File paths used in the documentation generation
+export const FILE_PATHS = {
+  MAIN_XMLUI: "src/Main.xmlui"
+};
+
+// Path constants for resolving workspace locations
+export const PATH_CONSTANTS = {
+  XMLUI_SRC_COMPONENTS: "xmlui/src/components",
+  DOCS_COMPONENT_SAMPLES: "docs/component-samples",
+  WORKSPACE: "workspace",
+  PACKAGES: "packages"
+};
+
+// Text constants and encoding
+export const TEXT_CONSTANTS = {
+  NO_DESCRIPTION_AVAILABLE: "No description available",
+  UTF8_ENCODING: "utf8",
+  NEWLINE_SEPARATOR: "\n"
+};
+
+// Error contexts for operation handling
+export const ERROR_CONTEXTS = {
+  EXTENSION_PACKAGES_METADATA: "extension packages metadata generation",
+  FOLDER_CLEANUP: "folder cleanup",
+  LOADING_EXTENSION_PACKAGE: "loading extension package"
+};
+
+// Error messages for component navigation
+export const COMPONENT_NAV_ERRORS = {
+  COMPONENT_NAV_FAILED: "Failed to generate component navigation links",
+  MAIN_XMLUI_NOT_FOUND: (path) => `Main.xmlui file not found at expected path: ${path}`,
+  START_DELIMITER_NOT_FOUND: "Start delimiter not found in Main.xmlui",
+  END_DELIMITER_NOT_FOUND: "End delimiter not found in Main.xmlui",
+  INVALID_DELIMITER_ORDER: "Invalid delimiter order in Main.xmlui",
+  DELIMITERS_NOT_FOUND: "Delimiters not found in Main.xmlui",
+  OVERVIEW_GENERATION_FAILED: "Failed to generate components overview",
+  CONTENT_REPLACEMENT_FAILED: "Failed to replace generated content"
+};

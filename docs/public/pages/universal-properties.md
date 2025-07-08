@@ -54,6 +54,8 @@ Set `when` to `false` to prevent rendering of a component.
 
 The `data` property makes external data available to a component. It's typically used with [List](/components/List), [Items](/components/Items), and [Table](/components/Table), but any component can receive data this way.
 
+When the property is a reference to a `DataSource`, its value is the data returned from that `DataSource`.
+
 ```xmlui
 <List data="{users}">
   <Text>{$item.name}</Text>
@@ -69,3 +71,10 @@ The `data` property makes external data available to a component. It's typically
 </Items>
 ```
 
+When the property is a string, the value is interpreted as an URL that returns JSON.
+
+```xmlui
+<List data="https://api.tfl.gov.uk/line/mode/tube/status">
+   <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
+</List>
+```
