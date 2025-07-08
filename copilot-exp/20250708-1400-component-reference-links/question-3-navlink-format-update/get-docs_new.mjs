@@ -1,6 +1,6 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { unlink, readdir, mkdir, writeFile, rm, readFile } from "fs/promises";
+import { unlink, readdir, mkdir, writeFile, rm } from "fs/promises";
 import { ErrorWithSeverity, LOGGER_LEVELS } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
@@ -65,114 +65,9 @@ async function generateComponentRefLinks(componentsAndFileNames) {
     const outputPath = join(FOLDERS.docsRoot, 'ComponentRefLinks.txt');
     await writeFile(outputPath, content);
     
-    // Find and display content between GENERATED CONTENT delimiters in Main.xmlui
-    await findAndDisplayGeneratedContent();
-    
     refLinksLogger.operationComplete(`generated ComponentRefLinks.txt with ${componentNames.length} components`);
   } catch (error) {
     refLinksLogger.error("Failed to generate ComponentRefLinks.txt", error?.message || "unknown error");
-  }
-}
-
-/**
- * Finds and displays the content between GENERATED CONTENT delimiters in Main.xmlui
- */
-async function findAndDisplayGeneratedContent() {
-  const mainXmluiLogger = createScopedLogger("MainXMLUIParser");
-  mainXmluiLogger.operationStart("parsing Main.xmlui for generated content");
-
-  try {
-    const mainXmluiPath = join(FOLDERS.docsRoot, 'src', 'Main.xmlui');
-    
-    if (!existsSync(mainXmluiPath)) {
-      mainXmluiLogger.error("Main.xmlui file not found at expected path", mainXmluiPath);
-      return;
-    }
-
-    const fileContent = await readFile(mainXmluiPath, 'utf8');
-    
-    // Define the delimiter patterns
-    const startDelimiter = '<!-- GENERATED CONTENT/Component references links -->';
-    const endDelimiter = '<!-- END GENERATED CONTENT/Component references links -->';
-    
-    const startIndex = fileContent.indexOf(startDelimiter);
-    const endIndex = fileContent.indexOf(endDelimiter);
-    
-    if (startIndex === -1) {
-      mainXmluiLogger.error("Start delimiter not found in Main.xmlui");
-      return;
-    }
-    
-    if (endIndex === -1) {
-      mainXmluiLogger.error("End delimiter not found in Main.xmlui");
-      return;
-    }
-    
-    if (startIndex >= endIndex) {
-      mainXmluiLogger.error("Invalid delimiter order in Main.xmlui");
-      return;
-    }
-    
-    // Extract content between delimiters (excluding the delimiters themselves)
-    const generatedContentStart = startIndex + startDelimiter.length;
-    const generatedContent = fileContent.substring(generatedContentStart, endIndex).trim();
-    
-    // Display the content in console
-    console.log('\n' + '='.repeat(80));
-    console.log('GENERATED CONTENT SECTION FROM Main.xmlui:');
-    console.log('='.repeat(80));
-    console.log(generatedContent);
-    console.log('='.repeat(80));
-    console.log(`Content length: ${generatedContent.length} characters`);
-    console.log('='.repeat(80) + '\n');
-    
-    mainXmluiLogger.operationComplete("successfully parsed and displayed generated content");
-  } catch (error) {
-    mainXmluiLogger.error("Failed to parse Main.xmlui", error?.message || "unknown error");
-  }
-}
-
-/**
- * Generates a comprehensive components overview file with a table of all components
- * @param {string} overviewFile - Path to the overview file to generate
- * @param {string} summaryTitle - Title for the overview section
- * @param {object} componentsAndFileNames - Object containing component metadata
- */
-async function generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames) {
-  const overviewLogger = createScopedLogger("ComponentsOverview");
-  overviewLogger.operationStart("generating components overview table");
-
-  try {
-    // Get component names (excluding the summary file)
-    const componentNames = Object.keys(componentsAndFileNames)
-      .filter(name => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
-      .sort();
-
-    // Create table header
-    const tableHeader = `# ${summaryTitle} [#components-overview]
-
-| Component | Description |
-| :---: | --- |`;
-
-    // Create table rows for each component from the original metadata
-    const tableRows = componentNames.map(componentName => {
-      // Get description from original metadata
-      const originalMetadata = collectedComponentMetadata[componentName];
-      const description = originalMetadata?.description || 'No description available';
-      
-      // Format the table row with correct relative path
-      return `| [${componentName}](./${componentName}) | ${description} |`;
-    });
-
-    // Combine header and rows
-    const tableContent = [tableHeader, ...tableRows].join('\n');
-
-    // Write to file
-    await writeFile(overviewFile, tableContent);
-    
-    overviewLogger.operationComplete(`generated overview table with ${componentNames.length} components`);
-  } catch (error) {
-    overviewLogger.error("Failed to generate components overview", error?.message || "unknown error");
   }
 }
 
@@ -292,10 +187,6 @@ async function generateComponents(metadata) {
   const summaryFileName = SUMMARY_CONFIG.COMPONENTS.fileName;
   await metadataGenerator.exportMetadataToJson(FOLDER_NAMES.COMPONENTS);
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
-
-  // Generate the overview file for components
-  const overviewFile = join(outputFolder, `${summaryFileName}.md`);
-  await generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 

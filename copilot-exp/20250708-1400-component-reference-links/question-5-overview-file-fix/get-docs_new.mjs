@@ -132,50 +132,6 @@ async function findAndDisplayGeneratedContent() {
   }
 }
 
-/**
- * Generates a comprehensive components overview file with a table of all components
- * @param {string} overviewFile - Path to the overview file to generate
- * @param {string} summaryTitle - Title for the overview section
- * @param {object} componentsAndFileNames - Object containing component metadata
- */
-async function generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames) {
-  const overviewLogger = createScopedLogger("ComponentsOverview");
-  overviewLogger.operationStart("generating components overview table");
-
-  try {
-    // Get component names (excluding the summary file)
-    const componentNames = Object.keys(componentsAndFileNames)
-      .filter(name => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
-      .sort();
-
-    // Create table header
-    const tableHeader = `# ${summaryTitle} [#components-overview]
-
-| Component | Description |
-| :---: | --- |`;
-
-    // Create table rows for each component from the original metadata
-    const tableRows = componentNames.map(componentName => {
-      // Get description from original metadata
-      const originalMetadata = collectedComponentMetadata[componentName];
-      const description = originalMetadata?.description || 'No description available';
-      
-      // Format the table row with correct relative path
-      return `| [${componentName}](./${componentName}) | ${description} |`;
-    });
-
-    // Combine header and rows
-    const tableContent = [tableHeader, ...tableRows].join('\n');
-
-    // Write to file
-    await writeFile(overviewFile, tableContent);
-    
-    overviewLogger.operationComplete(`generated overview table with ${componentNames.length} components`);
-  } catch (error) {
-    overviewLogger.error("Failed to generate components overview", error?.message || "unknown error");
-  }
-}
-
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
@@ -295,7 +251,11 @@ async function generateComponents(metadata) {
 
   // Generate the overview file for components
   const overviewFile = join(outputFolder, `${summaryFileName}.md`);
-  await generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames);
+  await metadataGenerator.generatePackageDescription(
+    "This section contains the documentation for all XMLUI components. Each component includes detailed information about its properties, events, and usage examples.",
+    `# ${summaryTitle}`,
+    overviewFile
+  );
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 

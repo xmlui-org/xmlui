@@ -56,8 +56,10 @@
                 <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavGroup label="Reference">
+                <!-- GENERATED CONTENT/Component references links -->
                 <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <!-- END GENERATED CONTENT/Component references links -->
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>

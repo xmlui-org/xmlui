@@ -1,6 +1,6 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { unlink, readdir, mkdir, writeFile, rm, readFile } from "fs/promises";
+import { unlink, readdir, mkdir, writeFile, rm } from "fs/promises";
 import { ErrorWithSeverity, LOGGER_LEVELS } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
@@ -38,143 +38,6 @@ await generateComponents(components);
 // await generateExtenionPackages(packagesMetadata);
 
 const mainLogger = createScopedLogger("DocsGenerator");
-
-/**
- * Generates a ComponentRefLinks.txt file with NavLink elements for components
- * @param {Record<string, string>} componentsAndFileNames The components and their filenames
- */
-async function generateComponentRefLinks(componentsAndFileNames) {
-  const refLinksLogger = createScopedLogger("ComponentRefLinks");
-  refLinksLogger.operationStart("generating ComponentRefLinks.txt");
-
-  try {
-    // Get component names (excluding the summary file)
-    const componentNames = Object.keys(componentsAndFileNames)
-      .filter(name => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
-      .sort();
-
-    // Create NavLink elements for each component
-    const navLinks = componentNames.map(componentName => 
-      `<NavLink label="${componentName}" to="/components/${componentName}" />`
-    );
-    
-    // Join with newlines
-    const content = navLinks.join('\n');
-    
-    // Write to docs folder
-    const outputPath = join(FOLDERS.docsRoot, 'ComponentRefLinks.txt');
-    await writeFile(outputPath, content);
-    
-    // Find and display content between GENERATED CONTENT delimiters in Main.xmlui
-    await findAndDisplayGeneratedContent();
-    
-    refLinksLogger.operationComplete(`generated ComponentRefLinks.txt with ${componentNames.length} components`);
-  } catch (error) {
-    refLinksLogger.error("Failed to generate ComponentRefLinks.txt", error?.message || "unknown error");
-  }
-}
-
-/**
- * Finds and displays the content between GENERATED CONTENT delimiters in Main.xmlui
- */
-async function findAndDisplayGeneratedContent() {
-  const mainXmluiLogger = createScopedLogger("MainXMLUIParser");
-  mainXmluiLogger.operationStart("parsing Main.xmlui for generated content");
-
-  try {
-    const mainXmluiPath = join(FOLDERS.docsRoot, 'src', 'Main.xmlui');
-    
-    if (!existsSync(mainXmluiPath)) {
-      mainXmluiLogger.error("Main.xmlui file not found at expected path", mainXmluiPath);
-      return;
-    }
-
-    const fileContent = await readFile(mainXmluiPath, 'utf8');
-    
-    // Define the delimiter patterns
-    const startDelimiter = '<!-- GENERATED CONTENT/Component references links -->';
-    const endDelimiter = '<!-- END GENERATED CONTENT/Component references links -->';
-    
-    const startIndex = fileContent.indexOf(startDelimiter);
-    const endIndex = fileContent.indexOf(endDelimiter);
-    
-    if (startIndex === -1) {
-      mainXmluiLogger.error("Start delimiter not found in Main.xmlui");
-      return;
-    }
-    
-    if (endIndex === -1) {
-      mainXmluiLogger.error("End delimiter not found in Main.xmlui");
-      return;
-    }
-    
-    if (startIndex >= endIndex) {
-      mainXmluiLogger.error("Invalid delimiter order in Main.xmlui");
-      return;
-    }
-    
-    // Extract content between delimiters (excluding the delimiters themselves)
-    const generatedContentStart = startIndex + startDelimiter.length;
-    const generatedContent = fileContent.substring(generatedContentStart, endIndex).trim();
-    
-    // Display the content in console
-    console.log('\n' + '='.repeat(80));
-    console.log('GENERATED CONTENT SECTION FROM Main.xmlui:');
-    console.log('='.repeat(80));
-    console.log(generatedContent);
-    console.log('='.repeat(80));
-    console.log(`Content length: ${generatedContent.length} characters`);
-    console.log('='.repeat(80) + '\n');
-    
-    mainXmluiLogger.operationComplete("successfully parsed and displayed generated content");
-  } catch (error) {
-    mainXmluiLogger.error("Failed to parse Main.xmlui", error?.message || "unknown error");
-  }
-}
-
-/**
- * Generates a comprehensive components overview file with a table of all components
- * @param {string} overviewFile - Path to the overview file to generate
- * @param {string} summaryTitle - Title for the overview section
- * @param {object} componentsAndFileNames - Object containing component metadata
- */
-async function generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames) {
-  const overviewLogger = createScopedLogger("ComponentsOverview");
-  overviewLogger.operationStart("generating components overview table");
-
-  try {
-    // Get component names (excluding the summary file)
-    const componentNames = Object.keys(componentsAndFileNames)
-      .filter(name => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
-      .sort();
-
-    // Create table header
-    const tableHeader = `# ${summaryTitle} [#components-overview]
-
-| Component | Description |
-| :---: | --- |`;
-
-    // Create table rows for each component from the original metadata
-    const tableRows = componentNames.map(componentName => {
-      // Get description from original metadata
-      const originalMetadata = collectedComponentMetadata[componentName];
-      const description = originalMetadata?.description || 'No description available';
-      
-      // Format the table row with correct relative path
-      return `| [${componentName}](./${componentName}) | ${description} |`;
-    });
-
-    // Combine header and rows
-    const tableContent = [tableHeader, ...tableRows].join('\n');
-
-    // Write to file
-    await writeFile(overviewFile, tableContent);
-    
-    overviewLogger.operationComplete(`generated overview table with ${componentNames.length} components`);
-  } catch (error) {
-    overviewLogger.error("Failed to generate components overview", error?.message || "unknown error");
-  }
-}
 
 // --- Helpers
 
@@ -284,18 +147,11 @@ async function generateComponents(metadata) {
   }
 
   let componentsAndFileNames = metadataGenerator.generateDocs();
-  
-  // Generate ComponentRefLinks.txt with component names
-  await generateComponentRefLinks(componentsAndFileNames);
 
   const summaryTitle = SUMMARY_CONFIG.COMPONENTS.title;
   const summaryFileName = SUMMARY_CONFIG.COMPONENTS.fileName;
   await metadataGenerator.exportMetadataToJson(FOLDER_NAMES.COMPONENTS);
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
-
-  // Generate the overview file for components
-  const overviewFile = join(outputFolder, `${summaryFileName}.md`);
-  await generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 
@@ -361,83 +217,58 @@ async function dynamicallyLoadExtensionPackages() {
   packageLogger.operationStart("loading extension packages");
 
   const defaultPackageState = COMPONENT_STATES.EXPERIMENTAL;
+  const packagesFolder = pathResolver.resolvePath("packages", "workspace");
+  const packagesMetadata = {};
 
-  const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
-  const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
-    return (
-      entry.startsWith(PACKAGE_PATTERNS.XMLUI_PREFIX) && lstatSync(join(extendedPackagesFolder, entry)).isDirectory()
-    );
-  });
+  if (!existsSync(packagesFolder)) {
+    packageLogger.operationComplete("no packages folder found");
+    return packagesMetadata;
+  }
 
-  const importedMetadata = {};
-  for (let dir of packageDirectories) {
-    const extensionPackage = {
-      sourceFolder: join(extendedPackagesFolder, dir),
-      description: "",
-      metadata: {},
-      state: defaultPackageState,
-    };
-    dir = join(extendedPackagesFolder, dir);
-    try {
-      const packageFolderDist = join(dir, FOLDER_NAMES.DIST);
-      if (!existsSync(packageFolderDist)) {
-        packageLogger.warn(`No dist folder found for package: ${dir}`);
-        continue;
-      }
-      const distContents = await readdir(packageFolderDist);
-      for (const file of distContents) {
-        let filePath = join(packageFolderDist, file);
-        if (filePath.endsWith(`${basename(dir)}${PACKAGE_PATTERNS.METADATA_SUFFIX}`) && existsSync(filePath)) {
-          filePath = winPathToPosix(relative(FOLDERS.script, filePath));
-          const { componentMetadata } = await import(filePath);
-          if (!componentMetadata) {
-            packageLogger.warn(`No metadata object found for package: ${basename(dir)}`);
-            continue;
+  const packageFolders = await readdir(packagesFolder);
+  const packagePromises = packageFolders.map(async (packageName) => {
+    const packagePath = join(packagesFolder, packageName);
+    const packageMeta = {};
+
+    if (lstatSync(packagePath).isDirectory()) {
+      const packageState = packageName === "xmlui" ? COMPONENT_STATES.INTERNAL : defaultPackageState;
+      const distFolder = join(packagePath, "dist");
+      const distMetadataFolder = join(distFolder, "metadata");
+
+      if (existsSync(distMetadataFolder)) {
+        // Try to load the metadata file
+        const expectedMetadataFileName = `${packageName}${PACKAGE_PATTERNS.METADATA_SUFFIX}`;
+        const metadataFile = join(distMetadataFolder, expectedMetadataFileName);
+
+        if (existsSync(metadataFile)) {
+          try {
+            const metadata = await import(metadataFile);
+            packageMeta.metadata = metadata.collectedComponentMetadata;
+            packageMeta.sourceFolder = join(packagePath, "src/components");
+            packageMeta.description = `Documentation for ${packageName}`;
+            packageMeta.state = packageState;
+          } catch (error) {
+            packageLogger.error(`Failed to load metadata from ${metadataFile}`, error?.message || "unknown error");
           }
-          if (!componentMetadata.metadata) {
-            packageLogger.warn(`No component metadata found for package: ${basename(dir)}`);
-            continue;
-          }
-
-          extensionPackage.metadata = componentMetadata.metadata ?? {};
-          extensionPackage.description = componentMetadata.description ?? "";
-          extensionPackage.state = componentMetadata.state ?? defaultPackageState;
         }
       }
-      // Ignore internal packages
-      if (extensionPackage.state === COMPONENT_STATES.INTERNAL) {
-        packageLogger.packageSkipped(dir, "internal package");
-        continue;
-      }
-      packageLogger.packageLoaded(basename(dir));
-      importedMetadata[basename(dir)] = extensionPackage;
-    } catch (error) {
-      handleNonFatalError(error, `loading extension package: ${basename(dir)}`);
     }
-  }
-  return importedMetadata;
-}
 
-function partitionMetadata(metadata, filterByProps) {
-  const [components, htmlTagComponents] = partitionObject(metadata, (compData, c) => {
-    if (!filterByProps || Object.keys(filterByProps).length === 0) {
-      return true;
-    }
-    for (const [propName, propValue] of Object.entries(filterByProps)) {
-      if (compData[propName] === undefined) {
-        return true;
-      }
-      if (compData[propName] === propValue) {
-        return false;
-      }
+    if (Object.keys(packageMeta).length > 0) {
+      packagesMetadata[packageName] = packageMeta;
     }
   });
 
-  return [components, htmlTagComponents];
+  await Promise.all(packagePromises);
+
+  packageLogger.operationComplete(`loaded ${Object.keys(packagesMetadata).length} extension packages`);
+  return packagesMetadata;
 }
 
+// --- Helpers
+
 /**
- * Partition an object into two objects based on a discriminator function.
+ * Partitions an object's entries into two objects based on a predicate function.
  * @template T
  * @param {Record<string, T>} obj Input object to partition
  * @param {(value: T, key: string) => boolean} discriminator Function to decide partitioning
@@ -462,4 +293,12 @@ function insertKeyAt(key, value, obj, pos) {
     ac[a] = obj[a];
     return ac;
   }, {});
+}
+
+function partitionMetadata(metadata, filterByProps) {
+  const discriminator = (componentData) => {
+    return Object.entries(filterByProps).every(([key, value]) => componentData[key] === value);
+  };
+
+  return partitionObject(metadata, discriminator);
 }
