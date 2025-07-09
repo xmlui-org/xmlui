@@ -1,9 +1,0 @@
-<Component name="RecursiveNavTree">
-  <Items items="{$props.items}">
-    <SectionHeader when="{$item.type === 'separator'}" title="{$item.title}" />
-    <NavLink when="{!$item.type && !$item.children}" to="/{$item.path}" label="{$item.title}" />
-    <NavGroup when="{!$item.type && !!$item.children}" label="{$item.title}">
-      <RecursiveNavTree items="{$item.children}" />
-    </NavGroup>
-  </Items>
-</Component>
