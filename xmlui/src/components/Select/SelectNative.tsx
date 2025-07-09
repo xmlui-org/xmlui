@@ -252,7 +252,6 @@ export const Select = forwardRef(function Select(
   const generatedId = useId();
   const inputId = id || generatedId;
 
-  console.log(JSON.stringify(Array.from(options)));
   // Set initial state based on the initialValue prop
   useEffect(() => {
     if (initialValue !== undefined) {
@@ -639,15 +638,14 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 
 SelectOption.displayName = "SelectOption";
 
-function renderOptionsOrDefault(options: Set<Option>, def: any) {
-  const filtered = Array.from(options).filter(({ label, value }) => label !== "" && value !== "");
-  if (filtered.length === 0) {
-    return def;
+function renderOptionsOrDefault(options: Set<Option>, default_: any) {
+  if (options.size === 0) {
+    return default_;
   }
 
-  return filtered.map((option, idx) => (
+  return Array.from(options).map((option) => (
     <SelectOption
-      key={`${option.value}-${idx}`}
+      key={option.value}
       value={option.value}
       label={option.label}
       enabled={option.enabled}

@@ -12,7 +12,7 @@ export function HiddenOption(option: Option) {
       label: label ?? node?.textContent ?? "",
       keywords: [label ?? node?.textContent ?? ""],
     };
-  }, [option, node]);
+  }, [option, node, label]);
 
   useEffect(() => {
     onOptionAdd(opt);

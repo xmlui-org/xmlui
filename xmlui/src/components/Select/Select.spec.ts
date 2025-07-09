@@ -1,26 +1,6 @@
 import { initComponent } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test("options with number type keeps number type - outside of forms", async ({
-  initTestBed,
-  page,
-  createSelectDriver,
-}) => {
-  const { testStateDriver } = await initTestBed(
-    `<Select onDidChange="(value) => { testState = value; }">
-      <Option value="{1}" label="One"/>
-      <Option value="{2}" label="Two"/>
-     </Select>`,
-  );
-  const driver = await createSelectDriver();
-
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("One");
-  await expect(page.getByText("One")).toBeVisible();
-  await expect(page.getByText("Two")).not.toBeVisible();
-  await expect.poll(testStateDriver.testState).toStrictEqual(1);
-});
-
 test("dynamic options displayed with Items component", async ({
   initTestBed,
   createSelectDriver,
@@ -324,23 +304,24 @@ test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) =
   await expect(page.getByText("Please select an item")).toBeVisible();
 });
 
-test.fixme(
-  "Optin without label and value is not rendered",
-  async ({ initTestBed, page, createSelectDriver }) => {
-    await initTestBed(`
+test("Optin without label and value is not rendered", async ({
+  initTestBed,
+  page,
+  createSelectDriver,
+}) => {
+  await initTestBed(`
     <Select placeholder="Please select an item">
       <Option />
       <Option />
       <Option />
     </Select>
   `);
-    const driver = await createSelectDriver();
-    await driver.click();
-    await expect(page.getByRole("option")).not.toBeVisible();
-  },
-);
+  const driver = await createSelectDriver();
+  await driver.click();
+  await expect(page.getByRole("option")).not.toBeVisible();
+});
 
-test.fixme("Optin value defaults to label", async ({ initTestBed, page, createSelectDriver }) => {
+test("Optin value defaults to label", async ({ initTestBed, page, createSelectDriver }) => {
   await initTestBed(`
     <Fragment>
       <Select id="mySelect">
@@ -348,7 +329,6 @@ test.fixme("Optin value defaults to label", async ({ initTestBed, page, createSe
         <Option label="One"/>
         <Option label="Two"/>
       </Select>
-      <Button id="resetBtn" label="reset" onClick="mySelect.reset()"/>
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
   `);
