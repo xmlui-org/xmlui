@@ -155,7 +155,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       const match = Array.from(options).find((o) => `${o.value}` === val);
       onValueChange(match?.value ?? val);
     },
-    [onValueChange, options],
+    [onValueChange, options, readOnly],
   );
 
   return (
@@ -252,6 +252,7 @@ export const Select = forwardRef(function Select(
   const generatedId = useId();
   const inputId = id || generatedId;
 
+  console.log(JSON.stringify(Array.from(options)));
   // Set initial state based on the initialValue prop
   useEffect(() => {
     if (initialValue !== undefined) {
@@ -529,16 +530,7 @@ export const Select = forwardRef(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
               >
-                {options.size > 0
-                  ? Array.from(options).map((option, idx) => (
-                      <SelectOption
-                        key={`${option.value}-${idx}`}
-                        value={option.value}
-                        label={option.label}
-                        enabled={option.enabled}
-                      />
-                    ))
-                  : emptyListNode}
+                {renderOptionsOrDefault(options, emptyListNode)}
               </SimpleSelect>
             )}
           </ItemWithLabel>
@@ -646,3 +638,19 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 );
 
 SelectOption.displayName = "SelectOption";
+
+function renderOptionsOrDefault(options: Set<Option>, def: any) {
+  const filtered = Array.from(options).filter(({ label, value }) => label !== "" && value !== "");
+  if (filtered.length === 0) {
+    return def;
+  }
+
+  return filtered.map((option, idx) => (
+    <SelectOption
+      key={`${option.value}-${idx}`}
+      value={option.value}
+      label={option.label}
+      enabled={option.enabled}
+    />
+  ));
+}
