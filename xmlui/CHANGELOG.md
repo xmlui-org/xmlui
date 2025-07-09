@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.67
+
+### Patch Changes
+
+- 51a5b05: Small changes in a few component's metadata representation
+- 9048af1: Remove the header logo and buttons from the AppWithCodeViewNative component
+- 94f0e66: Accounted for some bad inputs in code fences when highlighting rows & substrings
+- 3f0e6b0: fix memoization for tabs, pageInfo
+
 ## 0.9.66
 
 ### Patch Changes
