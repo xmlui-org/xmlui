@@ -32,12 +32,12 @@ import { SelectItemText } from "@radix-ui/react-select";
 const COMP = "Select";
 
 export const SelectMd = createMetadata({
+  status: "stable",
   description:
     "`Select` provides a dropdown interface for choosing from a list of options, " +
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
-  status: "stable",
   props: {
     placeholder: {
       ...dPlaceholder(),

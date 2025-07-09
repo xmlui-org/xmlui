@@ -7,10 +7,10 @@ import { HelloWorld, defaultProps } from "./HelloWorldNative";
 const COMP = "HelloWorld";
 
 export const HelloWorldMd = createMetadata({
+  status: "experimental",
   description:
     "`HelloWorld` is a demonstration component that shows basic XMLUI patterns. " +
     "It displays a customizable greeting message with an interactive click counter.",
-  status: "experimental",
   props: {
     id: {
       description: "The unique identifier for the component.",

@@ -27,6 +27,7 @@ import { defaultProps, Toggle } from "../Toggle/Toggle";
 const COMP = "Switch";
 
 export const SwitchMd = createMetadata({
+  status: "stable",
   description: "`Switch` enables users to toggle between two states: on and off.",
   props: {
     indeterminate: dIndeterminate(defaultProps.indeterminate),

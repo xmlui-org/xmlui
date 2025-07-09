@@ -10,6 +10,7 @@ import { LinkTargetMd } from "../abstractions";
 const COMP = "NavLink";
 
 export const NavLinkMd = createMetadata({
+  status: "stable",
   description:
     "`NavLink` creates interactive navigation items that connect users to different " +
     "destinations within an app or external URLs. It automatically indicates active " +

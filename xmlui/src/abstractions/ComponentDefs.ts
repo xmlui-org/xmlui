@@ -235,7 +235,7 @@ export type ComponentMetadata<
   TContextValues extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
-  // The current status of the component. By default, it is "stable".
+  // The current status of the component. This field is now mandatory.
   status?: "stable" | "experimental" | "deprecated" | "in progress";
 
   // Component description in markdown; it goes into the generated documentation

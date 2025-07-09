@@ -8,8 +8,8 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "CodeBlock";
 
 export const CodeBlockMd = createMetadata({
+  status: "stable",
   description: `The \`${COMP}\` component displays code with optional syntax highlighting and meta information.`,
-  status: "in progress",
   props: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

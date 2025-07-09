@@ -8,6 +8,7 @@ import { createMetadata, d } from "../metadata-helpers";
 const COMP = "FileUploadDropZone";
 
 export const FileUploadDropZoneMd = createMetadata({
+  status: "stable",
   description:
     "`FileUploadDropZone` enables users to upload files by dragging and dropping " +
     "files from their local file system onto a designated area within the UI.",

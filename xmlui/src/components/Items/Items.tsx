@@ -6,6 +6,7 @@ import { Items, defaultProps } from "./ItemsNative";
 const COMP = "Items";
 
 export const ItemsMd = createMetadata({
+  status: "stable",
   description:
     "`Items` renders data arrays without built-in layout or styling, providing " +
     "a lightweight alternative to `List`. Unlike `List`, it provides no " +

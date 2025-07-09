@@ -9,7 +9,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "AppWithCodeView";
 
 export const AppWithCodeViewMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description: `The ${COMP} component displays a combination of markdown content and a nested xmlui app. 
 It supports both side-by-side and stacked layouts.`,
   props: {

@@ -9,6 +9,7 @@ import { useMemo } from "react";
 const COMP = "NavPanel";
 
 export const NavPanelMd = createMetadata({
+  status: "stable",
   description:
     "`NavPanel` defines the navigation structure within an App, serving as a container " +
     "for NavLink and NavGroup components that create your application's primary " +

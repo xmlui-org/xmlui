@@ -9,6 +9,7 @@ import {
 const COMP = "AccordionItem";
 
 export const AccordionItemMd = createMetadata({
+  status: "in progress",
   description:
     `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
     `${COMP} instances from which the user can select.`,

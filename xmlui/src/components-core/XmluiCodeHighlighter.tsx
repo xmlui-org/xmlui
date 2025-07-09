@@ -76,7 +76,9 @@ export function XmluiCodeHighlighter({
 
 export const codeComponentRenderer = createComponentRenderer(
   "XmluiCodehighlighter",
-  {},
+  {
+    status: "stable",
+  },
   ({ node, renderChild, layoutCss }) => {
     return <XmluiCodeHighlighter value={renderChild(node.children) as string} style={layoutCss} />;
   },

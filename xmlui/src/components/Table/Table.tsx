@@ -20,6 +20,7 @@ import type { RendererContext } from "../../abstractions/RendererDefs";
 const COMP = "Table";
 
 export const TableMd = createMetadata({
+  status: "stable",
   description:
     "`Table` presents structured data for viewing, sorting, selection, and interaction.",
   props: {
@@ -330,7 +331,7 @@ export const tableComponentRenderer = createComponentRenderer(
       <TableWithColumns
         node={node}
         extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler}
+        lookupEventHandler={lookupEventHandler as any}
         lookupSyncCallback={lookupSyncCallback}
         layoutCss={layoutCss}
         renderChild={renderChild}

@@ -10,6 +10,7 @@ import { defaultProps, NavGroup } from "./NavGroupNative";
 const COMP = "NavGroup";
 
 export const NavGroupMd = createMetadata({
+  status: "stable",
   description:
     "`NavGroup` creates collapsible containers for organizing related navigation " +
     "items into hierarchical menu structures. It groups `NavLink` components and " +

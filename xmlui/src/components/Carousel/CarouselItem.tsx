@@ -4,7 +4,9 @@ import { CarouselItemComponent } from "./CarouselItemNative";
 
 const COMP = "CarouselItem";
 
-export const CarouselItemMd = createMetadata({});
+export const CarouselItemMd = createMetadata({
+  status: "in progress",
+});
 
 export const carouselItemComponentRenderer = createComponentRenderer(
   COMP,

@@ -5,6 +5,7 @@ import { Column, defaultProps } from "./ColumnNative";
 const COMP = "Column";
 
 export const ColumnMd = createMetadata({
+  status: "stable",
   description:
     "`Column` defines the structure and behavior of individual table columns " +
     "within a [`Table`](/components/Table) component. Each Column controls data " +

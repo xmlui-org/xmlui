@@ -6,6 +6,7 @@ import { OptionNative, defaultProps } from "./OptionNative";
 const COMP = "Option";
 
 export const OptionMd = createMetadata({
+  status: "stable",
   description:
     "`Option` defines selectable items for choice-based components, providing both " +
     "the underlying value and display text for selection interfaces. It serves as " +

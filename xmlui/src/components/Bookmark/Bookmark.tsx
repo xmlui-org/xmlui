@@ -5,6 +5,7 @@ import { Bookmark, defaultProps } from "./BookmarkNative";
 const COMP = "Bookmark";
 
 export const BookmarkMd = createMetadata({
+  status: "stable",
   description:
     "As its name suggests, this component places a bookmark into its parent component's view. The " +
     "component has an \`id\` that you can use in links to navigate (scroll to) the bookmark's location.",

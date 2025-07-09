@@ -5,6 +5,7 @@ import { createMetadata, dLabel } from "../metadata-helpers";
 const COMP = "TabItem";
 
 export const TabItemMd = createMetadata({
+  status: "stable",
   description:
     "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, " +
     "providing both the tab header label and the content that displays when the tab " +

@@ -10,6 +10,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "FlowLayout";
 
 export const FlowLayoutMd = createMetadata({
+  status: "stable",
   description:
     "`FlowLayout` positions content in rows with automatic wrapping. When items " +
     "exceed the available horizontal space, they automatically wrap to a new line.",

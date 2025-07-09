@@ -9,6 +9,7 @@ import { LinkNative, defaultProps } from "./LinkNative";
 const COMP = "Link";
 
 export const LinkMd = createMetadata({
+  status: "stable",
   description:
     "`Link` creates clickable navigation elements for internal app routes or " +
     "external URLs. You can use the `label` and `icon` properties for simple text " +

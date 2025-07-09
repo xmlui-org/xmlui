@@ -19,6 +19,7 @@ import { createMetadata, d } from "../metadata-helpers";
 const COMP = "Markdown";
 
 export const MarkdownMd = createMetadata({
+  status: "stable",
   description:
     "`Markdown` renders formatted text using markdown syntax. Use " +
     "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +

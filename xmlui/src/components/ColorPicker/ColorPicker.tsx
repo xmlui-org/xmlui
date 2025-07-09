@@ -25,6 +25,7 @@ import styles from "./ColorPicker.module.scss";
 const COMP = "ColorPicker";
 
 export const ColorPickerMd = createMetadata({
+  status: "stable",
   description:
     "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
   props: {

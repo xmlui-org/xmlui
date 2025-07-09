@@ -5,11 +5,11 @@ import { createMetadata } from "../../metadata-helpers";
 const COMP = "BarChart";
 
 export const BarChartMd = createMetadata({
+  status: "experimental",
   description:
     "`BarChart` displays data as horizontal or vertical bars, supporting both grouped " +
     "and stacked layouts. It's ideal for comparing values across categories, showing " +
     "revenue trends, or displaying any quantitative data over time or categories.",
-  status: "experimental",
   docFolder: "Charts/BarChart",
   props: {
     data: {

@@ -9,6 +9,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "ContentSeparator";
 
 export const ContentSeparatorMd = createMetadata({
+  status: "stable",
   description:
     "`ContentSeparator` creates visual dividers between content sections using " +
     "horizontal or vertical lines. It's essential for improving readability by " +

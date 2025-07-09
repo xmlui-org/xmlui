@@ -8,6 +8,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "Footer";
 
 export const FooterMd = createMetadata({
+  status: "stable",
   description:
     "`Footer` provides a designated area at the bottom of your application for " +
     "footer content such as branding, copyright notices, or utility controls like " +

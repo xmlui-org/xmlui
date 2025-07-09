@@ -10,6 +10,7 @@ import { createMetadata, d } from "../metadata-helpers";
 const COMP = "ModalDialog";
 
 export const ModalDialogMd = createMetadata({
+  status: "stable",
   description:
     "`ModalDialog` creates overlay dialogs that appear on top of the main interface, " +
     "ideal for forms, confirmations, detailed views, or any content that requires " +
