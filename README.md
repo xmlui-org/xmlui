@@ -20,7 +20,8 @@
 
 ## See it in action
 
-https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
+![Uploading xmlui.gif…]()
+
 
 ## Getting started
 
