@@ -102,13 +102,14 @@ $width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
 .header {
   width: 100%;
   display: flex;
-  align-content: center;
+  align-items: center;
   padding: t.$space-2;
   border-bottom: $borderBottom-header-NestedApp;
-  justify-content: space-between;
+  justify-content: center;
 
   .headerText {
     @include t.textVars($themeVars, "header-#{$component}");
+    padding-left: t.$space-2;
   }
 
   .headerButton {

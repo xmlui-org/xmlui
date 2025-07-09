@@ -11,6 +11,7 @@ import {
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
+import classnames from "classnames";
 
 import { AppRoot } from "../../components-core/rendering/AppRoot";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
@@ -232,7 +233,7 @@ export function NestedApp({
         {withFrame ? (
           <div className={styles.nestedAppContainer}>
             {!noHeader && (
-              <div className={styles.header}>
+              <div className={classnames(styles.header)}>
                 <span className={styles.headerText}>{title}</span>
                 <div className={styles.spacer} />
                 {allowPlaygroundPopup && (

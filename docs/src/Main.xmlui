@@ -314,8 +314,15 @@
                 <PageNotFound />
             </Page>
         </Pages>
-        <Footer>This site is an XMLUI app. We use what we ship.</Footer>
+        <Footer>
+            <CHStack width="100%" gap="0">
+                This site is an&nbsp;
+                <Logo inline="true" height="{mediaSize.phone ? '16px' : '20px'}"/>™
+                app. We use what we ship.
+            </CHStack>
+        </Footer>
     </App>
+
 
     <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
 </Fragment>
