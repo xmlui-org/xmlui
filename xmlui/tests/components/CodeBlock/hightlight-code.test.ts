@@ -470,4 +470,125 @@ describe("highlight-code", () => {
       }
     ]);
   });
+
+  it("highlightSubstrings empty", () => {
+    const code = "test\ntest";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64("")
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([]);
+  });
+
+  it("highlightSubstrings is number", () => {
+    const code = "test3";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64(3)
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([
+      {
+        start: 4,
+        end : 5,
+        properties: { class: "codeBlockHighlightString" }
+      }
+    ]);
+  });
+
+  it("highlightSubstrings is boolean", () => {
+    const code = "test true test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64(true)
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([
+      {
+        start: 5,
+        end : 9,
+        properties: { class: "codeBlockHighlightString" }
+      }
+    ]);
+  });
+
+  it("highlightSubstrings is object", () => {
+    const code = "test {\"a\":1} test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64({ a: 1 })
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([
+      {
+        start: 5,
+        end : 12,
+        properties: { class: "codeBlockHighlightString" }
+      }
+    ]);
+  });
+
+  it("highlightSubstrings single character", () => {
+    const code = "test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64("t")
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([
+      {
+        start: 0,
+        end : 1,
+        properties: { class: "codeBlockHighlightString" }
+      },
+      {
+        start: 3,
+        end : 4,
+        properties: { class: "codeBlockHighlightString" }
+      }
+    ]);
+  });
+
+  it("highlightSubstrings disregard not in code", () => {
+    const code = "test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64("a")
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([]);
+  });
+
+  it("highlightSubstrings disregard partially in code", () => {
+    const code = "test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64("esa")
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([]);
+  });
+
+  it("highlightSubstrings disregard unencoded", () => {
+    const code = "test";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: "test"
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([]);
+  });
+
+  it("highlightSubstrings multiple characters", () => {
+    const code = "test\ntest";
+    const meta = {
+      [CodeHighlighterMetaKeys.highlightSubstrings.data]: encodeToBase64("tes")
+    };
+    const result = extractMetaFromChildren(meta, code);
+    expect(result[CodeHighlighterMetaKeys.highlightSubstrings.prop]).toStrictEqual([
+      {
+        start: 0,
+        end : 3,
+        properties: { class: "codeBlockHighlightString" }
+      },
+      {
+        start: 5,
+        end : 8,
+        properties: { class: "codeBlockHighlightString" }
+      },
+    ]);
+  });
 });

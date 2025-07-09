@@ -7,12 +7,12 @@ const highlightSubstringsEmphasisClass = "codeBlockHighlightStringEmphasis";
 /**
  * Encode string to ASCII base64 value
  */
-export function encodeToBase64(value: string) {
+export function encodeToBase64(value: string | number | boolean | object | null) {
   if (!value) {
     return null;
   }
 
-  const valueToString = value.toString();
+  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
 
   if (typeof window !== 'undefined') {
     return window.btoa(valueToString);
@@ -25,12 +25,12 @@ export function encodeToBase64(value: string) {
 /**
  * Decode base64 value to string
  */
-export function decodeFromBase64(value: string) {
+export function decodeFromBase64(value: string | number | boolean | object | null) {
   if (!value) {
     return null;
   }
 
-  const valueToString = value.toString();
+  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
 
   if (typeof window !== "undefined") {
     return window.atob(valueToString);

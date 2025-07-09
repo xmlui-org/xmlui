@@ -34,8 +34,8 @@ This prop is commonly used if there are several other checkboxes linked to one c
 
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
-```xmlui-pg copy display {4} name="Example: indeterminate"
----app copy display
+```xmlui-pg copy display name="Example: indeterminate"
+---app copy display {4}
 <App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"

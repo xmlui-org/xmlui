@@ -68,8 +68,8 @@ For a visual example, see the component description.
 
 %-PROP-START preserveLinebreaks
 
-```xmlui-pg copy {5} display name="Example: preserveLinebreaks"
----app copy display
+```xmlui-pg copy display name="Example: preserveLinebreaks"
+---app copy display {5}
 <App>
   <HStack>
     <H3

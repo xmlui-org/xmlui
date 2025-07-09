@@ -61,7 +61,7 @@ If true, the value of the component cannot be modified.
 
 %-API-START setValue
 
-```xmlui-pg copy {9,12,14} display name="Example: value and setValue"
+```xmlui-pg copy {10,13,15} display name="Example: value and setValue"
 <App var.changes="">
   <Switch
     id="mySwitch"
