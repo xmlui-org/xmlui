@@ -1,4 +1,4 @@
-import { assert, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   convertPlaygroundPatternToMarkdown,
   observePlaygroundPattern,
@@ -321,7 +321,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result.app).toBeDefined();
-    expect(result.app.copy).toBeUndefined;
+    expect(result.app.copy).toBeUndefined();
     expect(result.app.display).toBe(true);
     expect(result.app.highlights).toBeUndefined();
     expect(result.app.filename).toBeUndefined();

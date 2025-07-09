@@ -30,8 +30,8 @@ The following sample demonstrates enabling a field according to another's curren
 
 The following example demonstrates using it:
 
-```xmlui-pg copy {10-19} display name="Example: buttonRowTemplate"
----app copy display
+```xmlui-pg copy display name="Example: buttonRowTemplate"
+---app copy display {10-19}
 <App>
   <Form id="searchForm" padding="0.5rem"
     data="{{ search: 'Seattle', caseSensitive: false }}"
