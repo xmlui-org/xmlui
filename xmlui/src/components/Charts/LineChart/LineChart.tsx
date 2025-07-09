@@ -5,12 +5,12 @@ import { createMetadata, d } from "../../metadata-helpers";
 const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
+  status: "experimental",
   description:
     "`LineChart` displays data as connected points over a continuous axis, ideal " +
     "for showing trends, changes over time, or relationships between variables. " +
     "Use it time series data, progress tracking, and comparing multiple data " +
     "series on the same scale.",
-  status: "experimental",
   props: {
     data: {
       description:

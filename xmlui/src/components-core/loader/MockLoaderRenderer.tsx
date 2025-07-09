@@ -57,6 +57,7 @@ function MockLoader({
 }
 
 export const MockLoaderMd = createMetadata({
+  status: "stable",
   description: "A loader that simulates a delay and returns a predefined response",
   props: {
     waitTime: d("The time to wait before returning the response"),

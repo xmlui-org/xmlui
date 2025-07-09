@@ -31,12 +31,12 @@ import { AutoComplete, defaultProps } from "./AutoCompleteNative";
 const COMP = "AutoComplete";
 
 export const AutoCompleteMd = createMetadata({
+  status: "experimental",
   description:
     "`AutoComplete` is a searchable dropdown input that allows users to type and " +
     "filter through options, with support for single or multiple selections. Unlike " +
     "a basic [`Select`](/components/Select), it provides type-ahead functionality " +
     "and can allow users to create new options.",
-  status: "experimental",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -83,7 +83,7 @@ export const AutoCompleteMd = createMetadata({
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
     ),
   },

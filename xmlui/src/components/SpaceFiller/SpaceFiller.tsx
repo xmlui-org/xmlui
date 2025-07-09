@@ -8,6 +8,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "SpaceFiller";
 
 export const SpaceFillerMd = createMetadata({
+  status: "stable",
   description:
     "`SpaceFiller` works well in layout containers to fill remaining (unused) " +
     "space. Its behavior depends on the layout container in which it is used.",

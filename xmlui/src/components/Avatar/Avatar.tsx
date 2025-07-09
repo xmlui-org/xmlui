@@ -9,6 +9,7 @@ import { createMetadata, d } from "../metadata-helpers";
 const COMP = "Avatar";
 
 export const AvatarMd = createMetadata({
+  status: "stable",
   description:
     "`Avatar` displays a user or entity's profile picture as a circular image, " +
     "with automatic fallback to initials when no image is provided. It's commonly " +

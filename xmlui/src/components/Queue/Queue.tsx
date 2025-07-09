@@ -6,6 +6,7 @@ import { Queue, defaultProps } from "./QueueNative";
 const COMP = "Queue";
 
 export const QueueMd = createMetadata({
+  status: "stable",
   description:
     "`Queue` manages sequential processing of items in FIFO (first-in, first-out) " +
     "order. It is a non-visual component but provides UI progress reporting and result display.",

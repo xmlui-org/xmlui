@@ -46,6 +46,7 @@ export const pageRenderer = createComponentRenderer(
 const COMP = "Pages";
 
 export const PagesMd = createMetadata({
+  status: "stable",
   description:
     "`Pages` serves as the routing coordinator within an [App](/components/App), " +
     "managing which [Page](/components/Page)  displays based on the current URL.",

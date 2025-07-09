@@ -5,6 +5,7 @@ import { AppState, defaultProps } from "./AppStateNative";
 const COMP = "AppState";
 
 export const AppStateMd = createMetadata({
+  status: "stable",
   description:
     "`AppState` is an invisible component that provides global state management " +
     "across your entire application. Unlike component variables that are scoped " +

@@ -8,6 +8,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "ProgressBar";
 
 export const ProgressBarMd = createMetadata({
+  status: "stable",
   description:
     "`ProgressBar` provides a visual indicator showing the completion percentage " +
     "of tasks, processes, or any measurable progress. It displays as a horizontal " +

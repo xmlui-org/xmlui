@@ -13,6 +13,7 @@ import {
   createMetadata,
   d,
   dAutoFocus,
+  dComponent,
   dEnabled,
   dInitialValue,
   dLabel,
@@ -178,9 +179,9 @@ export const FormItemMd = createMetadata({
       availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
-    inputTemplate: {
-      description: "This property is used to define a custom input template.",
-    },
+    inputTemplate: dComponent(
+      "This property is used to define a custom input template."
+    ),
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
       valueType: "string",

@@ -8,6 +8,7 @@ import { NoResult, defaultProps } from "./NoResultNative";
 const COMP = "NoResult";
 
 export const NoResultMd = createMetadata({
+  status: "stable",
   description: "`NoResult` displays a visual indication that a query or search returned nothing.",
   props: {
     label: dLabel(),

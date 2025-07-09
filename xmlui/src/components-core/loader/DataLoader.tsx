@@ -422,6 +422,7 @@ function DataLoader({
 }
 
 export const DataLoaderMd = createMetadata({
+  status: "stable",
   description: "This component manages data fetching from a web API",
   props: {
     method: d("The HTTP method to use"),

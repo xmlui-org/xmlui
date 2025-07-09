@@ -6,6 +6,7 @@ import { Theme, defaultProps } from "./ThemeNative";
 const COMP = "Theme";
 
 export const ThemeMd = createMetadata({
+  status: "stable",
   description:
     "`Theme` creates styling contexts to customize the appearance of nested " +
     "components without using CSS.",

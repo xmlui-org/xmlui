@@ -178,9 +178,9 @@ export default TableEditor;
 
 // Create metadata for TableEditor that defines allowed props
 export const TableEditorMd = createMetadata({
+  status: "stable",
   description:
     "`TableEditor` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
-  status: "stable",
   props: {
     themeColor: {
       description: "Sets the color scheme for all editor buttons.",

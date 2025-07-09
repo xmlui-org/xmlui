@@ -9,6 +9,7 @@ import { defaultExpandableItemProps, ExpandableItem } from "./ExpandableItemNati
 const COMP = "ExpandableItem";
 
 export const ExpandableItemMd = createMetadata({
+  status: "stable",
   description:
     "`ExpandableItem` creates expandable/collapsible section, similar to the HTML " +
     "details disclosure element. When the user clicks on the `summary` the content " +

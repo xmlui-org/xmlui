@@ -17,6 +17,7 @@ import {
 const DDMCOMP = "DropdownMenu";
 
 export const DropdownMenuMd = createMetadata({
+  status: "stable",
   description:
     "`DropdownMenu` provides a space-efficient way to present multiple options or " +
     "actions through a collapsible interface. When clicked, the trigger button reveals " +
@@ -110,6 +111,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
 const MICOMP = "MenuItem";
 
 export const MenuItemMd = createMetadata({
+  status: "stable",
   description:
     "`MenuItem` represents individual clickable items within dropdown menus and other " +
     "menu components. Each menu item can display text, icons, and respond to clicks " +
@@ -201,6 +203,7 @@ export const menuItemRenderer = createComponentRenderer(
 const SMCOMP = "SubMenuItem";
 
 export const SubMenuItemMd = createMetadata({
+  status: "stable",
   description:
     "`SubMenuItem` creates hierarchical menu structures by acting as both a menu " +
     "item and a container for nested menu items. When clicked or hovered, it reveals " +
@@ -233,6 +236,7 @@ export const subMenuItemRenderer = createComponentRenderer(
 const MSEP = "MenuSeparator";
 
 export const MenuSeparatorMd = createMetadata({
+  status: "stable",
   description:
     "`MenuSeparator` displays a separator line between menu items to group related " +
     "menu options within `DropdownMenu`.",

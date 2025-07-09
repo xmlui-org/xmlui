@@ -9,6 +9,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "NestedApp";
 
 export const NestedAppMd = createMetadata({
+  status: "stable",
   description: `The ${COMP} component allows you to nest an entire xmlui app into another one.
 `,
   props: {

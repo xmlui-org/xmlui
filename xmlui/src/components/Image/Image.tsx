@@ -8,6 +8,7 @@ import { Image, defaultProps } from "./ImageNative";
 const COMP = "Image";
 
 export const ImageMd = createMetadata({
+  status: "stable",
   description:
     "`Image` displays pictures from URLs or local sources with built-in responsive " +
     "sizing, aspect ratio control, and accessibility features. It handles different " +

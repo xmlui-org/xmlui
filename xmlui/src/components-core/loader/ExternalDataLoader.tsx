@@ -83,6 +83,7 @@ function ExternalDataLoader({
 }
 
 export const ExternalDataLoaderMd = createMetadata({
+  status: "stable",
   description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
     url: d("URL segment to use in the GET request"),

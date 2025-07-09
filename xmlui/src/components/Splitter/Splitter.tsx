@@ -16,6 +16,7 @@ import { Splitter, defaultProps } from "./SplitterNative";
 const COMP = "Splitter";
 
 const baseSplitterMd = createMetadata({
+  status: "stable",
   description:
     "`Splitter` component divides a container into two resizable sections. These " +
     "are are identified by their names: primary and secondary. They have a " +

@@ -29,6 +29,7 @@ export interface ApiActionComponent extends ComponentDef {
 }
 
 export const APICallMd = createMetadata({
+  status: "stable",
   description:
     "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
     "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
@@ -118,38 +119,42 @@ export const APICallMd = createMetadata({
   },
   events: {
     beforeRequest: {
-      description: "This event fires before the request is sent. Returning an explicit boolean" +
-        "\`false\` value will prevent the request from being sent."
+      description:
+        "This event fires before the request is sent. Returning an explicit boolean" +
+        "\`false\` value will prevent the request from being sent.",
     },
     success: {
-      description: "This event fires when a request results in a success."
+      description: "This event fires when a request results in a success.",
     },
     // This event fires when a request results in an error.
     error: {
-      description: "This event fires when a request results in an error."
+      description: "This event fires when a request results in an error.",
     },
     progress: dInternal(),
   },
   contextVars: {
     $param: {
-      description: "The first parameter passed to `execute()` method"
+      description: "The first parameter passed to `execute()` method",
     },
     $params: {
-      description: "Array of all parameters passed to `execute()` method (access with " +
-        "`$params[0]`, `$params[1]`, etc.)"
+      description:
+        "Array of all parameters passed to `execute()` method (access with " +
+        "`$params[0]`, `$params[1]`, etc.)",
     },
     $result: {
-      description: "Response data (available in `completedNotificationMessage` and `success` event)"
+      description:
+        "Response data (available in `completedNotificationMessage` and `success` event)",
     },
     $error: {
-      description: "Error details (available in `errorNotificationMessage` and `error` event)"
+      description: "Error details (available in `errorNotificationMessage` and `error` event)",
     },
   },
   apis: {
     execute: {
-      description: "This method triggers the invocation of the API. You can pass an arbitrary " +
+      description:
+        "This method triggers the invocation of the API. You can pass an arbitrary " +
         "number of parameters to the method. In the \`APICall\` instance, you can " +
-        "access those with the \`$param\` and \`$params\` context values."
+        "access those with the \`$param\` and \`$params\` context values.",
     },
   },
 });

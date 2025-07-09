@@ -46,6 +46,7 @@ const OMIT_FROM_TOC_DESC = {
 };
 
 export const HeadingMd = createMetadata({
+  status: "stable",
   description:
     "`Heading` displays hierarchical text headings with semantic importance levels " +
     "from H1 to H6, following HTML heading standards. It provides text overflow " +
@@ -91,6 +92,7 @@ export const HeadingMd = createMetadata({
 
 const H1 = "H1";
 export const H1Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(1),
   specializedFrom: COMP,
   props: {
@@ -117,6 +119,7 @@ export const H1Md = createMetadata({
 
 const H2 = "H2";
 export const H2Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(2),
   specializedFrom: COMP,
   props: {
@@ -142,6 +145,7 @@ export const H2Md = createMetadata({
 
 const H3 = "H3";
 export const H3Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(3),
   specializedFrom: COMP,
   props: {
@@ -167,6 +171,7 @@ export const H3Md = createMetadata({
 
 const H4 = "H4";
 export const H4Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(4),
   specializedFrom: COMP,
   props: {
@@ -192,6 +197,7 @@ export const H4Md = createMetadata({
 
 const H5 = "H5";
 export const H5Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(5),
   specializedFrom: COMP,
   props: {
@@ -217,6 +223,7 @@ export const H5Md = createMetadata({
 
 const H6 = "H6";
 export const H6Md = createMetadata({
+  status: "stable",
   description: LEVEL_DESC(6),
   specializedFrom: COMP,
   props: {

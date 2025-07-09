@@ -12,6 +12,7 @@ export const defaultProps = {
 };
 
 export const RedirectMd = createMetadata({
+  status: "stable",
   description:
     "`Redirect` immediately redirects the browser to the URL in its `to` property when " +
     "it gets visible (its `when` property gets `true`). It works only within " +

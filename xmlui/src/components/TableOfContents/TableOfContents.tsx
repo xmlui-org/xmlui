@@ -10,7 +10,7 @@ const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
 
 export const TableOfContentsMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     "`TableOfContents` component collects [Heading](/components/Heading) and " +
     "[Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",

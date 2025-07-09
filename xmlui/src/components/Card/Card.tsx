@@ -9,6 +9,7 @@ import { Card, defaultProps } from "./CardNative";
 const COMP = "Card";
 
 export const CardMd = createMetadata({
+  status: "stable",
   description:
     "`Card` is a versatile container that groups related content with a visual " +
     "boundary, typically featuring background color, padding, borders, and rounded " +

@@ -9,11 +9,11 @@ import { createMetadata, d } from "../../metadata-helpers";
 const COMP = "PieChart";
 
 export const PieChartMd = createMetadata({
+  status: "experimental",
   description:
     "`PieChart` visualizes proportional data as circular segments; each slice " +
     "represents a percentage of the whole. Note that the height of the component or " +
     "its parent needs to be set explicitly.",
-  status: "experimental",
   docFolder: "Charts/PieChart",
   props: {
     data: {

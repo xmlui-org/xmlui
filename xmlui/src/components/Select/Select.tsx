@@ -32,12 +32,12 @@ import { SelectItemText } from "@radix-ui/react-select";
 const COMP = "Select";
 
 export const SelectMd = createMetadata({
+  status: "stable",
   description:
     "`Select` provides a dropdown interface for choosing from a list of options, " +
     "supporting both single and multiple selection modes. It offers extensive " +
     "customization capabilities including search functionality, custom templates, " +
     "and comprehensive form integration.",
-  status: "stable",
   props: {
     placeholder: {
       ...dPlaceholder(),
@@ -84,7 +84,7 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),

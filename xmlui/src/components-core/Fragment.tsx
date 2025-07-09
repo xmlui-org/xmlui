@@ -4,6 +4,7 @@ import { createMetadata } from "../components/metadata-helpers";
 
 const COMP = "Fragment";
 export const FragmentMd = createMetadata({
+  status: "stable",
   description:
     "`Fragment` provides conditional rendering. You can use `when=` on any " +
     "component to render it conditionally, use `Fragment` to apply `when` to a group of components.",

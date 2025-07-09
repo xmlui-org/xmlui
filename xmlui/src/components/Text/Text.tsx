@@ -9,6 +9,7 @@ import { createMetadata, d } from "../metadata-helpers";
 const COMP = "Text";
 
 export const TextMd = createMetadata({
+  status: "stable",
   description:
     `The \`${COMP}\` component displays textual information in a number of optional ` +
     `styles and variants.`,

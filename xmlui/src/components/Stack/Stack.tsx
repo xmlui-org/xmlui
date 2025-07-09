@@ -30,6 +30,7 @@ const VERTICAL_ALIGNMENT: ComponentPropertyMetadata = {
 };
 
 const stackMd = createMetadata({
+  status: "stable",
   description:
     "`Stack` is the fundamental layout container that organizes child elements in " +
     "configurable horizontal or vertical arrangements. As the most versatile building " +

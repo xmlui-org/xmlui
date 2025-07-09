@@ -8,6 +8,7 @@ import { createMetadata } from "../metadata-helpers";
 const COMP = "Spinner";
 
 export const SpinnerMd = createMetadata({
+  status: "stable",
   description:
     "`Spinner` is an animated indicator that represents an action in progress " +
     "with no deterministic progress value.",
