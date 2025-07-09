@@ -84,7 +84,7 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),

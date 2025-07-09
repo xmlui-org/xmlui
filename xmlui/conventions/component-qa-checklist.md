@@ -500,13 +500,17 @@ export const ComponentMd = createMetadata({
 - [ ] State updates are batched when possible
 - [ ] State is synchronized with XMLUI when needed
 
-### ✅ API Registration
-- [ ] Component API methods registered with `registerComponentApi`
-- [ ] Common methods: `setValue`, `focus`, `reset`
+### ✅ API Registration (Only for Interactive Components)
+
+**Note**: Most UI components correctly have no APIs. Only apply this section to components that need programmatic control (form inputs, data tables, etc.).
+
+- [ ] Component API methods registered with `registerComponentApi` (if component needs APIs)
+- [ ] Common methods implemented where applicable: `setValue`, `focus`, `reset`
 - [ ] API methods are properly typed
+- [ ] API documentation explains when/why to use each method
 
 ```typescript
-// ✅ Good
+// ✅ Good - Only for components that need programmatic control
 useEffect(() => {
   registerComponentApi?.({
     setValue: (value: string) => {
@@ -699,28 +703,119 @@ export const ComponentMd = createMetadata({
 
 ### ✅ Template Property Patterns
 - [ ] Template properties follow `*Template` suffix naming convention
-- [ ] Template properties use `dComponent()` metadata helper
+- [ ] **Template properties use `dComponent()` metadata helper** (CRITICAL)
 - [ ] Template documentation includes expected data structure
+- [ ] Context variables are documented (e.g., `$item`, `$index`, `$itemContext`)
 - [ ] Template examples are provided in component documentation
 - [ ] Template fallbacks are properly handled in implementation
+
+### ✅ Template Import Requirements
+- [ ] `dComponent` imported from `../metadata-helpers` when templates are used
+- [ ] Import statement includes `dComponent` alongside other helpers
+
+```typescript
+// ✅ Good - Import dComponent when using templates
+import { 
+  createMetadata, 
+  d, 
+  dComponent,  // Required for template properties
+  dEnabled,
+  dLabel 
+} from "../metadata-helpers";
+```
+
+### ✅ Template Property Documentation Standards
+- [ ] **All template properties use `dComponent()` consistently** (avoid `d()` for templates)
+- [ ] Properties requiring additional flags use spread operator pattern
+- [ ] Context variables are explicitly documented in descriptions
+- [ ] Internal templates are marked appropriately
+
+**✅ Correct Template Property Patterns:**
+```typescript
+props: {
+  // Standard template property
+  optionTemplate: dComponent(
+    `Template for rendering dropdown options. Context: $item (option data).`
+  ),
+  
+  // Empty state template
+  emptyListTemplate: dComponent(
+    `Template shown when no options are available. No additional context.`
+  ),
+  
+  // Template with additional properties
+  tabTemplate: {
+    ...dComponent(
+      `Template for clickable tab area. Context: $tab (tab data).`
+    ),
+    isInternal: true,
+  },
+  
+  // Template with complex context
+  valueTemplate: dComponent(
+    `Template for selected values in multi-select. Context: $item (selected item), $itemContext ({ removeItem }).`
+  ),
+}
+```
+
+**❌ Incorrect Template Property Patterns:**
+```typescript
+props: {
+  // ❌ Wrong - using d() instead of dComponent()
+  emptyListTemplate: d(
+    "Template for empty state."
+  ),
+  
+  // ❌ Wrong - plain object instead of dComponent()
+  tabTemplate: {
+    description: "Template for tabs.",
+    valueType: "ComponentDef",
+    isInternal: true,
+  },
+  
+  // ❌ Wrong - missing context variable documentation
+  optionTemplate: dComponent(
+    `Template for options.`  // Missing $item context info
+  ),
+}
+```
 
 ### ✅ Template Implementation
 - [ ] Templates receive appropriate context data
 - [ ] Template rendering uses `MemoizedItem` for performance
 - [ ] Template components handle missing data gracefully
 - [ ] Custom templates maintain accessibility standards
+- [ ] Context variables are properly passed to templates
 
-**Example:**
+**Template Usage Pattern:**
 ```typescript
-props: {
-  itemTemplate: dComponent(
-    `Template for rendering individual items. Receives item data in context.`
-  ),
-  headerTemplate: dComponent(
-    `Template for custom header content. No additional context provided.`
-  ),
+// ✅ Good - Template rendering with context
+valueRenderer={
+  node.props.valueTemplate
+    ? (item, removeItem) => {
+        return (
+          <MemoizedItem
+            contextVars={{
+              $item: item,
+              $itemContext: { removeItem },
+            }}
+            node={node.props.valueTemplate}
+            item={item}
+            renderChild={renderChild}
+          />
+        );
+      }
+    : undefined
 }
 ```
+
+### ✅ Template Property Compliance Checklist
+- [ ] **No template properties use `d()` helper** (should be `dComponent()`)
+- [ ] **No template properties use plain objects** (should use `dComponent()`)
+- [ ] **All template imports include `dComponent`** from metadata-helpers
+- [ ] **Context variables documented** in all template descriptions
+- [ ] **Spread operator used** for templates with additional properties
+- [ ] **Template names end with `Template`** suffix consistently
 
 ---
 

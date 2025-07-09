@@ -5,6 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dAutoFocus,
+  dComponent,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -49,9 +50,9 @@ export const CheckboxMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-    inputTemplate: {
-      description: "This property is used to define a custom checkbox input template",
-    },
+    inputTemplate: dComponent(
+      "This property is used to define a custom checkbox input template"
+    ),
   },
   childrenAsTemplate: "inputTemplate",
   events: {

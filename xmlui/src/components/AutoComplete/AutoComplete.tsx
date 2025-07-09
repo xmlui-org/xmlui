@@ -83,7 +83,7 @@ export const AutoCompleteMd = createMetadata({
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
     ),
   },

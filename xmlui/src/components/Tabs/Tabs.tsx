@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dComponent } from "../metadata-helpers";
 
 const COMP = "Tabs";
 
@@ -31,8 +31,9 @@ export const TabsMd = createMetadata({
       valueType: "string",
     },
     tabTemplate: {
-      description: `This property declares the template for the clickable tab area.`,
-      valueType: "ComponentDef",
+      ...dComponent(
+        `This property declares the template for the clickable tab area.`
+      ),
       isInternal: true,
     },
   },
