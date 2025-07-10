@@ -1,6 +1,6 @@
 /* eslint react-hooks/rules-of-hooks: 0 */
 // The above exception is needed since it fires a false-positive
-// for the "use" function of the playwright test framework
+// for the "use" function coming from the playwright test framework
 import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
@@ -10,7 +10,6 @@ import type { StandaloneAppDescription } from "../components-core/abstractions/s
 import {
   type ComponentDriver,
   type ComponentDriverParams,
-  type HtmlTagDriver,
   AccordionDriver,
   AppFooterDriver,
   AppHeaderDriver,
@@ -22,6 +21,7 @@ import {
   FormItemDriver,
   HeadingDriver,
   HStackDriver,
+  HtmlTagDriver,
   IconDriver,
   ItemsDriver,
   LinkDriver,
@@ -46,7 +46,8 @@ import {
   ValidationDisplayDriver,
   ValidationSummaryDriver,
   VStackDriver,
-  DatePickerDriver, AutoCompleteDriver
+  DatePickerDriver, AutoCompleteDriver,
+  CodeBlockDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -374,7 +375,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
   createHtmlTagDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
-      return createDriver(OptionDriver, testIdOrLocator);
+      return createDriver(HtmlTagDriver, testIdOrLocator);
+    });
+  },
+  createCodeBlockDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(CodeBlockDriver, testIdOrLocator);
     });
   },
 });
@@ -438,4 +444,5 @@ type TestDriverExtenderProps = {
   createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
   createOptionDriver: ComponentDriverMethod<OptionDriver>;
   createHtmlTagDriver: ComponentDriverMethod<HtmlTagDriver>;
+  createCodeBlockDriver: ComponentDriverMethod<CodeBlockDriver>;
 };
