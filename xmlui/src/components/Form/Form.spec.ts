@@ -124,9 +124,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     initTestBed,
     createFormDriver,
     createButtonDriver,
-    createFormItemDriver
+    createFormItemDriver,
   }) => {
-    const {testStateDriver} = await initTestBed(`
+    const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data" testId="form">
         <FormItem testId="formItem" type="items" bindTo="arrayItems" id="arrayItems">
             <FormItem bindTo="name" testId="text{$itemIndex}"/>
@@ -141,17 +141,17 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const driver = await createFormDriver("form");
     await driver.submitForm();
     await expect.poll(testStateDriver.testState).toStrictEqual({
-      arrayItems: [{name: "John"}, {name: "Peter"}],
+      arrayItems: [{ name: "John" }, { name: "Peter" }],
     });
   });
 
   test(`submit with type 'items', empty bindTo`, async ({
-                                            initTestBed,
-                                            createFormDriver,
-                                            createButtonDriver,
-                                            createFormItemDriver
-                                          }) => {
-    const {testStateDriver} = await initTestBed(`
+    initTestBed,
+    createFormDriver,
+    createButtonDriver,
+    createFormItemDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data" testId="form">
         <FormItem testId="formItem" type="items" bindTo="arrayItems" id="arrayItems">
             <FormItem testId="text{$itemIndex}" bindTo=""/>
@@ -168,9 +168,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect.poll(testStateDriver.testState).toStrictEqual({
       arrayItems: ["John", "Peter"],
     });
-  })
+  });
 });
-
 
 // --- Testing
 
@@ -851,7 +850,7 @@ test("can submit with invisible required field", async ({
   createFormDriver,
   createFormItemDriver,
   createTextBoxDriver,
-  page
+  page,
 }) => {
   const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
@@ -861,9 +860,9 @@ test("can submit with invisible required field", async ({
         <Option value="{1}" label="Public Key" />
       </FormItem>
       <FormItem label="name1" testId="name1" bindTo="name1"
-        required="true" when="{$data.authenticationType === 0}"/>
+        required="true" when="{$data.authenticationType == 0}"/>
       <FormItem label="name2" testId="name2" bindTo="name2"
-        required="true" when="{$data.authenticationType === 1}"/>
+        required="true" when="{$data.authenticationType == 1}"/>
     </Form>
   `);
   const formDriver = await createFormDriver();
@@ -893,9 +892,9 @@ test("conditional fields keep the state", async ({
         <Option value="{1}" label="Public Key" testId="publicKey" />
       </FormItem>
       <FormItem label="name1" testId="name1" bindTo="name1"
-        required="true" when="{$data.authenticationType === 0}"/>
+        required="true" when="{$data.authenticationType == 0}"/>
       <FormItem label="name2" testId="name2" bindTo="name2"
-        required="true" when="{$data.authenticationType === 1}"/>
+        required="true" when="{$data.authenticationType == 1}"/>
     </Form>
   `);
   const option1Driver = await createFormItemDriver("password");

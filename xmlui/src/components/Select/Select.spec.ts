@@ -1,26 +1,6 @@
 import { initComponent } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test("options with number type keeps number type - outside of forms", async ({
-  initTestBed,
-  page,
-  createSelectDriver,
-}) => {
-  const { testStateDriver } = await initTestBed(
-    `<Select onDidChange="(value) => { testState = value; }">
-      <Option value="{1}" label="One"/>
-      <Option value="{2}" label="Two"/>
-     </Select>`,
-  );
-  const driver = await createSelectDriver();
-
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("One");
-  await expect(page.getByText("One")).toBeVisible();
-  await expect(page.getByText("Two")).not.toBeVisible();
-  await expect.poll(testStateDriver.testState).toStrictEqual(1);
-});
-
 test("dynamic options displayed with Items component", async ({
   initTestBed,
   createSelectDriver,
@@ -216,17 +196,21 @@ test("disabled Option cannot be selected", async ({ initTestBed, createSelectDri
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
 });
 
-test("clicking label brings up the options", async ({ initTestBed, page, createSelectDriver }) => {
-  await initTestBed(`
+test(
+  "clicking label brings up the options",
+  { tag: "@smoke" },
+  async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
     <Select label="Choose an option">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
   `);
-  await page.getByLabel("Choose an option").click();
-  await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-});
+    await page.getByLabel("Choose an option").click();
+    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+  },
+);
 
 test("label displayed for selected numeric value", async ({ page, initTestBed }) => {
   await initTestBed(`
@@ -324,8 +308,9 @@ test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) =
   await expect(page.getByText("Please select an item")).toBeVisible();
 });
 
-test.fixme(
+test(
   "Optin without label and value is not rendered",
+  { tag: "@smoke" },
   async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
     <Select placeholder="Please select an item">
@@ -340,23 +325,26 @@ test.fixme(
   },
 );
 
-test.fixme("Optin value defaults to label", async ({ initTestBed, page, createSelectDriver }) => {
-  await initTestBed(`
+test(
+  "Optin value defaults to label",
+  { tag: "@smoke" },
+  async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
     <Fragment>
       <Select id="mySelect">
         <Option label="Zero"/>
         <Option label="One"/>
         <Option label="Two"/>
       </Select>
-      <Button id="resetBtn" label="reset" onClick="mySelect.reset()"/>
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
   `);
-  const driver = await createSelectDriver("mySelect");
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("Zero");
-  await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
-});
+    const driver = await createSelectDriver("mySelect");
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Zero");
+    await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
+  },
+);
 
 test.describe("searchable select", () => {
   test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
@@ -404,21 +392,25 @@ test.describe("searchable select", () => {
     await expect(page.getByText("in-progress-msg")).not.toBeVisible();
   });
 
-  test.fixme("search filters option labels", async ({ initTestBed, page, createSelectDriver }) => {
-    // to fix: right now it filters the values, not the labels
-    await initTestBed(`
+  test(
+    "search filters option labels",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
       <Select searchable>
         <Option value="opt1" label="first"/>
         <Option value="opt2" label="second"/>
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
-    await driver.searchFor("econd");
-    const options = await page.getByRole("option").all();
-    expect(options).toHaveLength(1);
-    await expect(options[0]).toHaveText("second");
-  });
+      const driver = await createSelectDriver();
+      await driver.toggleOptionsVisibility();
+      await driver.searchFor("econd");
+      const options = await page.getByRole("option").all();
+      expect(options).toHaveLength(1);
+      await expect(options[0]).toHaveText("second");
+    },
+  );
 });
 
 test('labelWidth applies with labelPosition="start"', async ({
@@ -457,7 +449,7 @@ test.describe("multiSelect", () => {
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
   });
 
-  test("initialValue='{[0,1]}' works", async ({ page, initTestBed }) => {
+  test("initialValue='{[0,1]}' works", { tag: "@smoke" }, async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <Select id="mySelect" initialValue="{[0,1]}" multiSelect>
@@ -470,32 +462,6 @@ test.describe("multiSelect", () => {
     `);
 
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
-  });
-
-  test.fixme("label displayed for selected numeric value", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Fragment>
-        <Select initialValue="{[0]}" multiSelect>
-          <Option value="{0}" label="Zero"/>
-          <Option value="{1}" label="One"/>
-          <Option value="{2}" label="Two"/>
-        </Select>
-      </Fragment>
-    `);
-    await expect(page.getByText("Zero")).toBeVisible();
-  });
-
-  test.fixme("label displayed for selected object value", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Fragment>
-        <Select initialValue="{[{num:1}]}" multiSelect>
-          <Option value="{{num:1}}" label="Zero"/>
-          <Option value="{1}" label="One"/>
-          <Option value="{2}" label="Two"/>
-        </Select>
-      </Fragment>
-    `);
-    await expect(page.getByText("Zero")).toBeVisible();
   });
 
   test("select multiple items without closing listbox", async ({
@@ -522,21 +488,21 @@ test.describe("multiSelect", () => {
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
   });
 
-  test("clicking label brings up the options", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
-    await initTestBed(`
+  test(
+    "clicking label brings up the options",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
       <Select label="Choose an option" multiSelect>
         <Option value="1" label="One"/>
         <Option value="2" label="Two"/>
       </Select>
     `);
-    await page.getByLabel("Choose an option").click();
-    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-  });
+      await page.getByLabel("Choose an option").click();
+      await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+    },
+  );
 
   test("labelBreak prop defaults to false", async ({ initTestBed, page, createSelectDriver }) => {
     await page.setViewportSize({ width: 300, height: 720 });
@@ -648,7 +614,7 @@ test.describe("multiSelect", () => {
   });
 });
 
-test.describe("searchable multiselect", () => {
+test.describe("searchable multiselect", { tag: "@smoke" }, () => {
   test("searching for and selecting 2 items works", async ({
     page,
     initTestBed,

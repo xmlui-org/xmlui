@@ -155,7 +155,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       const match = Array.from(options).find((o) => `${o.value}` === val);
       onValueChange(match?.value ?? val);
     },
-    [onValueChange, options],
+    [onValueChange, options, readOnly],
   );
 
   return (
@@ -470,10 +470,11 @@ export const Select = forwardRef(function Select(
                         <Cmd
                           className={styles.command}
                           shouldFilter={searchable}
-                          filter={(value, search, keywords) => {
-                            const extendedValue = value + " " + keywords.join(" ");
-                            if (extendedValue.toLowerCase().includes(search.toLowerCase()))
-                              return 1;
+                          filter={(_, search, keywords) => {
+                            const lowSearch = search.toLowerCase();
+                            for (const kw of keywords) {
+                              if (kw.toLowerCase().includes(lowSearch)) return 1;
+                            }
                             return 0;
                           }}
                         >
@@ -529,16 +530,7 @@ export const Select = forwardRef(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
               >
-                {options.size > 0
-                  ? Array.from(options).map((option, idx) => (
-                      <SelectOption
-                        key={`${option.value}-${idx}`}
-                        value={option.value}
-                        label={option.label}
-                        enabled={option.enabled}
-                      />
-                    ))
-                  : emptyListNode}
+                {renderOptionsOrDefault(options, emptyListNode)}
               </SimpleSelect>
             )}
           </ItemWithLabel>
@@ -585,7 +577,7 @@ export const ComboboxOption = forwardRef(function Combobox(
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
-      keywords={keywords}
+      keywords={[...keywords, label]}
     >
       <div className={styles.multiComboboxOptionContent}>
         {optionRenderer ? (
@@ -646,3 +638,18 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 );
 
 SelectOption.displayName = "SelectOption";
+
+function renderOptionsOrDefault(options: Set<Option>, default_: any) {
+  if (options.size === 0) {
+    return default_;
+  }
+
+  return Array.from(options).map((option) => (
+    <SelectOption
+      key={option.value}
+      value={option.value}
+      label={option.label}
+      enabled={option.enabled}
+    />
+  ));
+}

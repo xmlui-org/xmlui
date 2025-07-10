@@ -1,4 +1,8 @@
 <Fragment>
+    <Select searchable>
+        <Option value="option1" label="A1"></Option>
+        <Option value="option2" label="B2"></Option>
+    </Select>
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"

@@ -39,6 +39,11 @@ export const optionComponentRenderer = createComponentRenderer(
   ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
     const optionTemplate = node.props.optionTemplate;
 
+    const label = extractValue.asOptionalString(node.props.label) || extractValue(node.props.value);
+    const value = extractValue.asOptionalString(node.props.value) || extractValue(node.props.label);
+    if (label === undefined) {
+      return null;
+    }
     return (
       <OptionNative
         optionRenderer={
@@ -53,8 +58,8 @@ export const optionComponentRenderer = createComponentRenderer(
               )
             : undefined
         }
-        value={extractValue(node.props.value)}
-        label={extractValue.asOptionalString(node.props.label) || extractValue(node.props.value)}
+        label={label}
+        value={value}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
       />
