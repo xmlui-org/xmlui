@@ -1,6 +1,6 @@
 /**
  * Constants and configuration values for the documentation generation scripts
- * 
+ *
  * This file contains all the magic strings, configuration objects, and constants
  * that were extracted from multiple files in the documentation generation system:
  * - get-docs.mjs
@@ -11,7 +11,7 @@
  * - build-pages-map.mjs
  * - build-downloads-map.mjs
  * - logger.mjs
- * 
+ *
  * These constants can be imported and used by other documentation generation scripts
  * to ensure consistency and improve maintainability.
  */
@@ -51,7 +51,7 @@ export const SUMMARY_CONFIG = {
     fileName: "_overview"
   },
   EXTENSIONS: {
-    title: "Extension Overview", 
+    title: "Extension Overview",
     fileName: "_overview"
   }
 };
@@ -151,7 +151,7 @@ export const SECTION_REFERENCE_KEYS = {
 export const TABLE_CONFIG = {
   STYLES: {
     LEFT: "left",
-    CENTER: "center", 
+    CENTER: "center",
     RIGHT: "right"
   },
   MARKDOWN_ALIGNMENTS: {
