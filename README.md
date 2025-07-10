@@ -14,7 +14,7 @@
 
 **Connected**. Read and write APIs with little or no scripting.
 
-**Modular**. Use a comprehensive suite of [components](/components/_overview) that you can extend with — again! — little or no scripting.
+**Modular**. Use a comprehensive suite of [components](https://docs.xmlui.com/components/_overview) that you can extend with — again! — little or no scripting.
 
 **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
 
 ## Getting started
 
-The fastest way to get started with XMLUI is to [download our starter kit](https://github.com/xmlui-invoice/releases), which includes the XMLUI engine and `XMLUI Invoice` - a complete business application that demonstrates key features and common patterns.
+The fastest way to get started with XMLUI is to [download our starter kit](https://github.com/xmlui-org/xmlui-invoice/releases), which includes the XMLUI engine and `XMLUI Invoice` - a complete business application that demonstrates key features and common patterns.
 
 ### What's included
 
@@ -57,13 +57,13 @@ Please read our [Contribution Guidelines](./CONTRIBUTING.md) before contributing
 
 Have a feature request? Here's how to submit it:
 
-If your feature request is not already listed in the [Issues](https://github.com/xmlui-com/xmlui/issues) section, please follow these steps:
+If your feature request is not already listed in the [Issues](https://github.com/xmlui-org/xmlui/issues) section, please follow these steps:
 
 1. Click on the link below to open the feature request template.
 2. Fill out the template with as much detail as possible.
 3. Submit the issue.
 
-[New feature request](https://github.com/xmlui-com/xmlui/issues/new?template=feature_request.md)
+[New feature request](https://github.com/xmlui-org/xmlui/issues/new?template=feature_request.md)
 
 ## Bug Reports
 
@@ -73,15 +73,17 @@ Have you found a bug? Here's how to report it:
 2. Fill out the template with as much detail as possible.
 3. Submit the issue.
 
-[New bug report](https://github.com/xmlui-com/xmlui/issues/new?template=bug_report.md)
+[New bug report](https://github.com/xmlui-org/xmlui/issues/new?template=bug_report.md)
 
 ## License
 
-**xmlui** is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more information.
+XMLUI is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more information.
 
 ## Attribution
 
-Our virtualized components and data management mechanisms would not be as simple, performant, and powerful without the help of a few [TanStack](https://github.com/TanStack) projects, such as [query](https://github.com/TanStack/query), [table](https://github.com/TanStack/table), and others. We appreciate the team's outstanding work!
+XMLUI is sponsored by [/n software](https://nsoftware.com).
+
+Our virtualized components and data management mechanisms would not be as simple, performant, and powerful without the help of a few [TanStack](https://github.com/TanStack) projects, such as [query](https://github.com/TanStack/query), [table](https://github.com/TanStack/table), and others. We appreciate their outstanding work!
 
 We based some of our essential components on [Radix UI](https://www.radix-ui.com/) components and involved some of the architectural approaches they used in their project. Thanks to all project contributors for their excellent work.
 
