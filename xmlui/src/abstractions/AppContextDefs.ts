@@ -261,6 +261,7 @@ export type LoggedInUserDto = {
 export interface IApiInterceptorContext {
   isMocked: (url: string) => boolean;
   initialized: boolean;
+  forceInitialize: ()=>void;
   interceptorWorker: SetupWorker | null;
 }
 

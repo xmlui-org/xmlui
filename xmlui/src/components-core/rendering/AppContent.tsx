@@ -234,6 +234,17 @@ export function AppContent({
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
 
+
+  // useEffect(()=>{
+  //   if(isWindowFocused){
+  //     if ("serviceWorker" in navigator) {
+  //       // Manually Activate the MSW again
+  //       // console.log("REACTIVATE MSW");
+  //       navigator.serviceWorker.controller?.postMessage("MOCK_ACTIVATE");
+  //     }
+  //   }
+  // }, [isWindowFocused]);
+
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
   // https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op

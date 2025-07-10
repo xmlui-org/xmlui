@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SetupWorker } from "msw/browser";
 
 import type { IApiInterceptorContext } from "../../abstractions/AppContextDefs";
@@ -13,7 +13,7 @@ export function ApiInterceptorProvider({
   children,
   apiWorker,
   useHashBasedRouting,
-  waitForApiInterceptor = false
+  waitForApiInterceptor = false,
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
@@ -21,12 +21,13 @@ export function ApiInterceptorProvider({
   useHashBasedRouting?: boolean;
   waitForApiInterceptor?: boolean;
 }) {
+  const [forceInitialize, setForceInitialize] = useState(false);
   const [initialized, setInitialized] = useState(!interceptor);
   const [interceptorWorker, setInterceptorWorker] = useState<SetupWorker | null>(null);
 
   // --- Whenever the interceptor changes, update the provider accordingly
   useEffect(() => {
-    if (interceptor) {
+    if (interceptor || forceInitialize) {
       setInitialized(false);
 
       // --- We use "msw" to manage the API interception
@@ -35,8 +36,8 @@ export function ApiInterceptorProvider({
         // --- Create the worker on the fly
         if (process.env.VITE_MOCK_ENABLED) {
           const { createApiInterceptorWorker } = await import("./apiInterceptorWorker");
-          if (interceptor) {
-            interceptorWorker = await createApiInterceptorWorker(interceptor, apiWorker);
+          if (interceptor || forceInitialize) {
+            interceptorWorker = await createApiInterceptorWorker(interceptor || {}, apiWorker);
             setInterceptorWorker(interceptorWorker);
             // if the apiWorker comes from the outside, we don't handle the lifecycle here
             if (!apiWorker) {
@@ -62,15 +63,25 @@ export function ApiInterceptorProvider({
         }
       };
     }
-  }, [apiWorker, interceptor, useHashBasedRouting]);
+  }, [apiWorker, forceInitialize, interceptor, useHashBasedRouting]);
+
+  const doForceInitialize = useCallback(() => {
+    setForceInitialize(true);
+  }, []);
+
+  const isMocked = useCallback(
+    (url) => interceptor !== undefined && !!process.env.VITE_MOCK_ENABLED,
+    [interceptor],
+  );
 
   const contextValue: IApiInterceptorContext = useMemo(() => {
     return {
       interceptorWorker,
       initialized: initialized,
-      isMocked: (url) => interceptor !== undefined && !!process.env.VITE_MOCK_ENABLED,
+      forceInitialize: doForceInitialize,
+      isMocked: isMocked,
     };
-  }, [interceptorWorker, initialized, interceptor]);
+  }, [interceptorWorker, initialized, doForceInitialize, isMocked]);
 
   return (
     <ApiInterceptorContext.Provider value={contextValue}>

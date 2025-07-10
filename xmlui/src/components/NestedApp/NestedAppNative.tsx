@@ -1,13 +1,5 @@
-import {
-  CSSProperties,
-  startTransition,
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import type { CSSProperties } from "react";
+import { startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -95,13 +87,13 @@ export function NestedApp({
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
-  const { interceptorWorker } = useApiInterceptorContext();
+  const { interceptorWorker, initialized, forceInitialize } = useApiInterceptorContext();
 
   useEffect(() => {
     setRefreshVersion(refVersion);
   }, [refVersion]);
 
-  //TODO illesg: we should come up with something to make sure that nestedApps doesn't overwrite each other's mocked api endpoints
+  //TODO illesg: we should come up with something to make sure that nestedApps don't overwrite each other's mocked api endpoints
   //   disabled for now, as it messes up the paths of not mocked APIs (e.g. resources/{staticJsonfiles})
   //const safeId = playgroundId || nestedAppId;
   //const apiUrl = api ? `/${safeId.replaceAll(":", "")}` : '';
@@ -157,7 +149,7 @@ export function NestedApp({
         : `${popOutUrl ?? ""}/playground#${appQueryString}`,
       "_blank",
     );
-  }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting]);
+  }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting, popOutUrl]);
 
   useEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -204,7 +196,12 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
-    let nestedAppRoot = (
+    let shouldForceInit = mock && initialized && !interceptorWorker;
+    if (shouldForceInit) {
+      forceInitialize();
+    }
+
+    let nestedAppRoot = mock && !interceptorWorker ? null : (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
         <div style={{ height, ...style, ...themeVarReset }}>
           <AppRoot
@@ -296,6 +293,9 @@ export function NestedApp({
     withFrame,
     noHeader,
     apiUrl,
+    initialized,
+    style,
+    forceInitialize,
   ]);
 
   const mountedRef = useRef(false);
