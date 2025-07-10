@@ -81,7 +81,7 @@ XMLUI is licensed under the MIT License. See the [LICENSE](./LICENSE) file for m
 
 ## Attribution
 
-XMLUI is sponsored by [/n software](https://nsoftware.com).
+XMLUI was stared as an internal project at [/n software](https://nsoftware.com) which is the primary sponsor and source of funding for this open source project.
 
 Our virtualized components and data management mechanisms would not be as simple, performant, and powerful without the help of a few [TanStack](https://github.com/TanStack) projects, such as [query](https://github.com/TanStack/query), [table](https://github.com/TanStack/table), and others. We appreciate their outstanding work!
 
