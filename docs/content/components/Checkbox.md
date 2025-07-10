@@ -79,6 +79,8 @@ The following sample binds the state of two checkboxes to one and updates the st
     <Checkbox label="Checkbox #2" id="cb2" initialValue="false" />
   </HStack>
 </App>
+---desc
+Try this sample by clicking the bottom group of checkboxes.
 ```
 
 ### `initialValue (default: false)` [#initialvalue-default-false]

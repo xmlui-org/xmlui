@@ -22,8 +22,8 @@ This property allows defining a custom component to display the buttons at the b
 
 The following example demonstrates using it:
 
-```xmlui-pg copy {10-19} display name="Example: buttonRowTemplate"
----app copy display
+```xmlui-pg copy display name="Example: buttonRowTemplate"
+---app copy display {10-19}
 <App>
   <Form id="searchForm" padding="0.5rem"
     data="{{ search: 'Seattle', caseSensitive: false }}"
