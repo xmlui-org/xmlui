@@ -109,6 +109,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
             : undefined
         }
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         style={layoutCss}
         initialValue={extractValue.asOptionalBoolean(
           node.props.initialValue,
