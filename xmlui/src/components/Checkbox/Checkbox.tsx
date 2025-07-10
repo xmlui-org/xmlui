@@ -1,4 +1,4 @@
-import styles from "../Toggle/Toggle.module.scss";
+import styles from "./Checkbox.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -50,9 +50,7 @@ export const CheckboxMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-    inputTemplate: dComponent(
-      "This property is used to define a custom checkbox input template"
-    ),
+    inputTemplate: dComponent("This property is used to define a custom checkbox input template"),
   },
   childrenAsTemplate: "inputTemplate",
   events: {
@@ -95,6 +93,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
     layoutContext,
   }) => {
     const inputTemplate = node.props.inputTemplate;
+    const validationStatus = extractValue(node.props.validationStatus);
     return (
       <Toggle
         inputRenderer={
@@ -115,9 +114,15 @@ export const checkboxComponentRenderer = createComponentRenderer(
           node.props.initialValue,
           defaultProps.initialValue,
         )}
+        variantClassName={styles.checkbox}
+        statusClasses={{
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        }}
         value={state?.value}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
+        validationStatus={validationStatus}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}

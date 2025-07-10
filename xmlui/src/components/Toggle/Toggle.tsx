@@ -17,6 +17,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { LabelPosition } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { stat } from "fs";
 
 type ToggleProps = {
   id?: string;
@@ -33,6 +34,8 @@ type ToggleProps = {
   variant?: "checkbox" | "switch";
   indeterminate?: boolean;
   className?: string;
+  variantClassName?: string;
+  statusClasses?: Record<string, boolean>;
   label?: string;
   labelPosition?: LabelPosition;
   labelWidth?: string;
@@ -69,6 +72,8 @@ export const Toggle = forwardRef(function Toggle(
     variant = "checkbox",
     indeterminate = defaultProps.indeterminate,
     className,
+    variantClassName,
+    statusClasses = {},
     label,
     labelPosition = "end",
     labelWidth,
@@ -152,13 +157,7 @@ export const Toggle = forwardRef(function Toggle(
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
-        className={classnames(styles.resetAppearance, className, {
-          [styles.checkbox]: variant === "checkbox",
-          [styles.switch]: variant === "switch",
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
+        className={classnames(styles.resetAppearance, className, variantClassName, statusClasses)}
       />
     ),
     [
