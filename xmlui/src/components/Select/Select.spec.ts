@@ -452,32 +452,6 @@ test.describe("multiSelect", () => {
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
   });
 
-  test.fixme("label displayed for selected numeric value", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Fragment>
-        <Select initialValue="{[0]}" multiSelect>
-          <Option value="{0}" label="Zero"/>
-          <Option value="{1}" label="One"/>
-          <Option value="{2}" label="Two"/>
-        </Select>
-      </Fragment>
-    `);
-    await expect(page.getByText("Zero")).toBeVisible();
-  });
-
-  test.fixme("label displayed for selected object value", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Fragment>
-        <Select initialValue="{[{num:1}]}" multiSelect>
-          <Option value="{{num:1}}" label="Zero"/>
-          <Option value="{1}" label="One"/>
-          <Option value="{2}" label="Two"/>
-        </Select>
-      </Fragment>
-    `);
-    await expect(page.getByText("Zero")).toBeVisible();
-  });
-
   test("select multiple items without closing listbox", async ({
     page,
     initTestBed,
