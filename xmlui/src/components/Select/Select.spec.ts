@@ -384,8 +384,7 @@ test.describe("searchable select", () => {
     await expect(page.getByText("in-progress-msg")).not.toBeVisible();
   });
 
-  test.fixme("search filters option labels", async ({ initTestBed, page, createSelectDriver }) => {
-    // to fix: right now it filters the values, not the labels
+  test("search filters option labels", async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
       <Select searchable>
         <Option value="opt1" label="first"/>
@@ -394,6 +393,7 @@ test.describe("searchable select", () => {
       </Select>
     `);
     const driver = await createSelectDriver();
+    await driver.toggleOptionsVisibility();
     await driver.searchFor("econd");
     const options = await page.getByRole("option").all();
     expect(options).toHaveLength(1);

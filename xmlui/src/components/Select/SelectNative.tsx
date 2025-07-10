@@ -470,10 +470,11 @@ export const Select = forwardRef(function Select(
                         <Cmd
                           className={styles.command}
                           shouldFilter={searchable}
-                          filter={(value, search, keywords) => {
-                            const extendedValue = value + " " + keywords.join(" ");
-                            if (extendedValue.toLowerCase().includes(search.toLowerCase()))
-                              return 1;
+                          filter={(_, search, keywords) => {
+                            const lowSearch = search.toLowerCase();
+                            for (const kw of keywords) {
+                              if (kw.toLowerCase().includes(lowSearch)) return 1;
+                            }
                             return 0;
                           }}
                         >
@@ -576,7 +577,7 @@ export const ComboboxOption = forwardRef(function Combobox(
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
-      keywords={keywords}
+      keywords={[...keywords, label]}
     >
       <div className={styles.multiComboboxOptionContent}>
         {optionRenderer ? (

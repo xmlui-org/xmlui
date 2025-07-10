@@ -104,7 +104,7 @@ export class ComponentDriver {
   // NOTE: methods must be created using the arrow function notation.
   // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
 
-  click = async (options?: {timeout?: number, force?: boolean}) => {
+  click = async (options?: { timeout?: number; force?: boolean }) => {
     await this.locator.click(options);
   };
 
@@ -340,12 +340,16 @@ export class RangeDriver extends ComponentDriver {}
 // --- DatePicker
 
 export class DatePickerDriver extends ComponentDriver {
-  async toggleDropdownVisibility(){
+  async toggleDropdownVisibility() {
     await this.component.click();
   }
 
   async pickADay(value: string) {
-    await this.component.getByRole("gridcell", { name: value}).or(this.page.getByRole("gridcell", { name: value})).first().click({ force: true });
+    await this.component
+      .getByRole("gridcell", { name: value })
+      .or(this.page.getByRole("gridcell", { name: value }))
+      .first()
+      .click({ force: true });
   }
 }
 
@@ -357,7 +361,11 @@ export class AutoCompleteDriver extends ComponentDriver {
   }
 
   async selectLabel(value: string) {
-    await this.component.getByRole("option", { name: value }).or(this.page.getByRole("option", { name: value })).first().click({ force: true });
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
   }
 
   async searchFor(value: string) {
@@ -365,22 +373,31 @@ export class AutoCompleteDriver extends ComponentDriver {
   }
 
   async chooseIndex(index: number) {
-    await this.locator.getByRole("option").nth(index).or(this.page.getByRole("option").nth(index)).first().click();
+    await this.locator
+      .getByRole("option")
+      .nth(index)
+      .or(this.page.getByRole("option").nth(index))
+      .first()
+      .click();
   }
 }
 
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
-  async toggleOptionsVisibility(){
+  async toggleOptionsVisibility() {
     await this.component.click();
   }
 
   async selectLabel(value: string) {
-    await this.component.getByRole("option", { name: value }).or(this.page.getByRole("option", { name: value })).first().click({ force: true });
+    await this.component
+      .getByRole("option", { name: value })
+      .or(this.page.getByRole("option", { name: value }))
+      .first()
+      .click({ force: true });
   }
 
-  async selectFirstLabelPostSearh(label: string){
+  async selectFirstLabelPostSearh(label: string) {
     await this.searchFor(label);
     await this.chooseIndex(0);
   }
@@ -390,15 +407,23 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async chooseIndex(index: number) {
-    await this.locator.getByRole("option").nth(index).or(this.page.getByRole("option").nth(index)).first().click();
+    await this.locator
+      .getByRole("option")
+      .nth(index)
+      .or(this.page.getByRole("option").nth(index))
+      .first()
+      .click();
   }
 
   async selectMultipleLabels(values: string[]) {
     for (const value of values) {
-      await this.component.getByRole("option", {name: value}).or(this.page.getByRole("option", {name: value})).first().click();
+      await this.component
+        .getByRole("option", { name: value })
+        .or(this.page.getByRole("option", { name: value }))
+        .first()
+        .click();
     }
   }
-
 }
 
 // --- RadioGroup
@@ -575,7 +600,7 @@ export const extendLocator = (
 
 export class FormItemDriver extends ComponentDriver {
   get input() {
-    return (this.component.locator(">input").or(this.component)).first();
+    return this.component.locator(">input").or(this.component).first();
   }
 
   get textBox() {
