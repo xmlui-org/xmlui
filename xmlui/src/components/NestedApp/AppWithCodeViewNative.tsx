@@ -4,9 +4,13 @@ import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { Button } from "../Button/ButtonNative";
 import styles from "./NestedApp.module.scss";
+import { Tooltip } from "./Tooltip";
+import { RxOpenInNewWindow } from "react-icons/rx";
+import { LiaUndoAltSolid } from "react-icons/lia";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
+import Logo from "./logo.svg?react";
 
 type AppWithCodeViewNativeProps = {
   // Markdown content to display in the left column
@@ -91,6 +95,9 @@ export function AppWithCodeViewNative({
     return (
       <div className={styles.nestedAppContainer} style={{ height }}>
         <div className={styles.header}>
+          <div className={styles.wrapper}>
+            <Logo className={styles.logo} />
+          </div>
           <div className={styles.viewControls}>
             <Button
               onClick={() => setShowCode(true)}
@@ -113,9 +120,40 @@ export function AppWithCodeViewNative({
               UI
             </Button>
           </div>
+          <div className={styles.wrapper}>
+            {allowPlaygroundPopup && (
+              <Tooltip
+                trigger={
+                  <button
+                    className={styles.headerButton}
+                    onClick={() => {
+                      openPlayground();
+                    }}
+                  >
+                    <RxOpenInNewWindow />
+                  </button>
+                }
+                label="View and edit in new full-width window"
+              />
+            )}
+            <Tooltip
+              trigger={
+                <button
+                  className={styles.headerButton}
+                  onClick={() => {
+                    setShowCode(false);
+                    setRefreshVersion(refreshVersion + 1);
+                  }}
+                >
+                  <LiaUndoAltSolid />
+                </button>
+              }
+              label="Reset the app"
+            />
+          </div>
         </div>
         <div className={styles.contentContainer}>
-          {showCode && <Markdown style={{height: "100%"}}>{markdown}</Markdown>}
+          {showCode && <Markdown style={{ height: "100%" }}>{markdown}</Markdown>}
           {!showCode && (
             <IndexAwareNestedApp
               height={"100%"}
