@@ -23,7 +23,7 @@ const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components")
 
 generateComponentsSummary(
   path.join(componentsMetaFolder, OUTPUT_FILES.METADATA_JSON),
-  "components",
+  "",
   componentsOutFolder,
   "_overview.md",
   SUMMARY_FILE_CONFIG.COMPONENTS_OVERVIEW_HEADER,
@@ -124,7 +124,7 @@ function createSummaryTable(metadata, urlPath, filePath, hasRowNums = false) {
     })
     .map((component) => {
       const componentFilePath = path.join(filePath, `${component.displayName}.md`);
-      const componentUrl = `./${urlPath}/${component.displayName}`;
+      const componentUrl = urlPath ? `./${urlPath}/${component.displayName}` : `./${component.displayName}`;
       return [
         fs.existsSync(componentFilePath)
           ? `[${component.displayName}](${componentUrl})`

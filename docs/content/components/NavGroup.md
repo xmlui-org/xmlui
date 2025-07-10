@@ -14,8 +14,8 @@
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
 
-```xmlui-pg
----app copy display name="Example: NavGroup in App" height="230px"
+```xmlui-pg copy display name="Example: NavGroup in App" height="230px"
+---app
 <App layout="condensed">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
