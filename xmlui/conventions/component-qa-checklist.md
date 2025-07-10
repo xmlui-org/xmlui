@@ -4,6 +4,8 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
 
 ## 📋 Quick Reference
 
+**Component Location**: XMLUI components are located in the `xmlui/src/components` folder.
+
 **Component Status**: Use this checklist to verify component compliance before release.
 
 **Usage with Copilot**: Reference this document when asking Copilot to review or create XMLUI components.
