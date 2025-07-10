@@ -198,6 +198,8 @@ export function NestedApp({
 
     let shouldForceInit = mock && initialized && !interceptorWorker;
     if (shouldForceInit) {
+      // in this case we need to force initialize the interceptor worker
+      // to make sure that the mock is applied (this could be the case when the 'root' app is not using any mocks)
       forceInitialize();
     }
 
