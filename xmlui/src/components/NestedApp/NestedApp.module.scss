@@ -97,6 +97,10 @@ $width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
 .splitViewButton {
   padding: $padding-button-splitView-NestedApp !important;
   width: $width-button-splitView-NestedApp !important;
+
+  &:not(.active){
+    background-color: transparent;
+  }
 }
 
 .header {
