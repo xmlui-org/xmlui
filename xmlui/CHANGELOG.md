@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.71
+
+### Patch Changes
+
+- 5774c53: fix ssr issues with Theme components
+
 ## 0.9.70
 
 ### Patch Changes

@@ -96,7 +96,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
     if (width && typeof width === "string" && width.startsWith("var(")) {
       if (!resolvedCssVars[width]) {
         const varName = width.substring(4, width.length - 1);
-        const resolved = getComputedStyle(root!).getPropertyValue(varName);
+        const resolved = getComputedStyle(root || document.body).getPropertyValue(varName);
         resolvedCssVars[width] = resolved || _width;
       }
       return resolvedCssVars[width];

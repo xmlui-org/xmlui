@@ -204,29 +204,34 @@ export function NestedApp({
       forceInitialize();
     }
 
-    let nestedAppRoot = mock && !interceptorWorker ? null : (
-      <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
-        <div style={{ height, ...style, ...themeVarReset }}>
-          <AppRoot
-            isNested={true}
-            key={`app-${nestedAppId}-${refreshVersion}`}
-            previewMode={true}
-            standalone={true}
-            trackContainerHeight={height ? "fixed" : "auto"}
-            node={component}
-            globalProps={globalProps}
-            defaultTheme={activeTheme || config?.defaultTheme}
-            defaultTone={toneToApply as ThemeTone}
-            contributes={{
-              compoundComponents,
-              themes: config?.themes,
-            }}
-            resources={config?.resources}
-            extensionManager={componentRegistry.getExtensionManager()}
-          />
-        </div>
-      </ApiInterceptorProvider>
-    );
+    let nestedAppRoot =
+      mock && !interceptorWorker ? null : (
+        <ApiInterceptorProvider
+          interceptor={mock}
+          apiWorker={interceptorWorker}
+          waitForApiInterceptor={true}
+        >
+          <div style={{ height, ...style, ...themeVarReset }}>
+            <AppRoot
+              isNested={true}
+              key={`app-${nestedAppId}-${refreshVersion}`}
+              previewMode={true}
+              standalone={true}
+              trackContainerHeight={height ? "fixed" : "auto"}
+              node={component}
+              globalProps={globalProps}
+              defaultTheme={activeTheme || config?.defaultTheme}
+              defaultTone={toneToApply as ThemeTone}
+              contributes={{
+                compoundComponents,
+                themes: config?.themes,
+              }}
+              resources={config?.resources}
+              extensionManager={componentRegistry.getExtensionManager()}
+            />
+          </div>
+        </ApiInterceptorProvider>
+      );
 
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
