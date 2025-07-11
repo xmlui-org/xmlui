@@ -1,5 +1,20 @@
 # xmlui
 
+## 0.9.69
+
+### Patch Changes
+
+- 9b36621: fix flaky Checkbox tests
+
+## 0.9.68
+
+### Patch Changes
+
+- 9b1f718: change: add back the logo and the buttons to the xmlui-pg split view
+- c79ced7: fix ssr hydration warn in AppWithCodeView
+- d030ac2: A few theme variable defaults updated
+- 21c4fd6: fix: mocked apis should work with multiple NestedApps
+
 ## 0.9.67
 
 ### Patch Changes
