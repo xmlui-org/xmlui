@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.70
+
+### Patch Changes
+
+- 1da7847: Adjust CodeBlock theme variables for dark tone
+
 ## 0.9.69
 
 ### Patch Changes
