@@ -49,7 +49,7 @@ export const LinkMd = createMetadata({
     [`textColor-${COMP}--hover`]: `$color-primary-400`,
     [`textDecorationColor-${COMP}--hover`]: `textColor-${COMP}--hover`,
     [`textColor-${COMP}--active`]: "$color-primary-400",
-    [`textDecorationColor-${COMP}--active`]: "$color-primary-400",
+    [`textDecorationColor-${COMP}--active`]: `textColor-${COMP}--active`,
     [`textColor-${COMP}--hover--active`]: `$textColor-${COMP}--active`,
     [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`textDecorationLine-${COMP}`]: "underline",
@@ -62,6 +62,11 @@ export const LinkMd = createMetadata({
     [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-icon-${COMP}`]: "$space-0_5",
+    dark: {
+      [`textColor-${COMP}`]: "$color-primary-600",
+      [`textColor-${COMP}--hover`]: `$color-primary-500`,
+      [`textColor-${COMP}--active`]: "$color-primary-500",
+    }
   },
 });
 

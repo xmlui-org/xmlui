@@ -77,7 +77,16 @@ export const NestedAppMd = createMetadata({
     [`width-button-splitView-${COMP}`]: "60px",
     [`width-logo-splitView-${COMP}`]: "2rem",
     [`height-logo-splitView-${COMP}`]: "2rem",
+    [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-0",
+    [`color-button-splitView-${COMP}`]: "$color-surface-600",
+    [`color-button-splitView-${COMP}--active`]: "$color-primary",
     [`width-controls-${COMP}`]: "80px",
+    dark: {
+      [`backgroundColor-frame-${COMP}`]: "$color-surface-50",
+      [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-200",
+      [`color-button-splitView-${COMP}`]: "$color-surface-500",
+      [`color-button-splitView-${COMP}--active`]: "$color-surface-1",
+    },
   },
 });
 

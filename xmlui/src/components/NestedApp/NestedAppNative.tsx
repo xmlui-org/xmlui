@@ -75,6 +75,7 @@ export function NestedApp({
   popOutUrl,
   withFrame = defaultProps.withFrame,
   noHeader = defaultProps.noHeader,
+  splitView = defaultProps.splitView,
   style,
   refVersion = 0,
 }: NestedAppProps) {
