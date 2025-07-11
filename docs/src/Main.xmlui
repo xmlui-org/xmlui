@@ -54,6 +54,7 @@
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
                 <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
                 <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
+                <NavLink label="How To" to="/howto"/>
             </NavGroup>
             <NavGroup label="Reference">
                 <NavGroup label="Components">
@@ -295,6 +296,9 @@
             </Page>
             <Page url="/build-editor-component">
                 <DocumentPage url="/pages/build-editor-component.md" />
+            </Page>
+            <Page url="/howto">
+                <DocumentPage url="/pages/howto.md" />
             </Page>
             <Page url="/change-log">
                 <ChangeLog />
