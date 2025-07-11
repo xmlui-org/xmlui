@@ -23,7 +23,6 @@ export const CodeBlockMd = createMetadata({
     "borderColor-CodeBlock-highlightString-emphasis": "$color-attention",
     "border-CodeBlock": "0.5px solid $borderColor",
     "borderRadius-CodeBlock": "$space-2",
-    "boxShadow-CodeBlock": "none",
     "height-CodeBlock": "fit-content",
     "paddingVertical-content-CodeBlock": "0",
     "paddingHorizontal-content-CodeBlock": "0",

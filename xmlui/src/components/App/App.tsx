@@ -112,7 +112,7 @@ export const AppMd = createMetadata({
       "with one of the vertical layouts.",
   },
   defaultThemeVars: {
-    "maxWidth-Drawer": "20rem",
+    "maxWidth-Drawer": "100%",
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
