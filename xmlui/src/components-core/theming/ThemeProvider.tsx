@@ -306,7 +306,7 @@ function ThemeProvider({
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
     useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
-  const [root, setRoot] = useState(typeof document === "undefined" ? undefined : document.body);
+  const [root, setRoot] = useState(null);
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
@@ -333,7 +333,6 @@ function ThemeProvider({
     resources,
     root,
     themes,
-    localThemes,
   ]);
 
   const currentThemeContextValue = useMemo(() => {
