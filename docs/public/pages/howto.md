@@ -36,7 +36,8 @@ These examples answer common questions of the form "How do I do SOMETHING with X
   />
 
   <ModalDialog id="memberDetailsDialog" title="Team Member Details">
-    <VStack gap="1rem" padding="1rem">
+    <Theme backgroundColor-overlay="$color-surface-900">
+      <VStack gap="1rem" padding="1rem">
       <!-- Avatar and Basic Info -->
       <HStack gap="1rem" alignItems="center">
         <Avatar
@@ -84,6 +85,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
         />
       </HStack>
     </VStack>
+    </Theme>
   </ModalDialog>
 
   <Text variant="strong" marginBottom="1rem">Team Directory</Text>
