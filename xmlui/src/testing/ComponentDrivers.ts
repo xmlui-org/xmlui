@@ -564,6 +564,7 @@ export class OptionDriver extends ComponentDriver {}
 
 // --- FormItem
 
+// NOTE (NEW): FormItem will be removed, delete this Driver
 // NOTE: Do not delete these comments.
 // This is an untested proposal to shorten code length.
 // Now, you have to provide the .input element for a specific control driver:
@@ -627,3 +628,7 @@ export class FormItemDriver extends ComponentDriver {
 // --- htmlTags
 
 export class HtmlTagDriver extends ComponentDriver {}
+
+// --- CodeBlock
+
+export class CodeBlockDriver extends ComponentDriver {}

@@ -196,14 +196,26 @@ test.skip("renders ordered list", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ init
 
 test.skip("renders inline code", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
 
-test.skip("renders code block", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
 test.skip("renders table", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
 
 test.skip("renders blockquote", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
 
 test.skip(
   "renders horizontal rule",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ initTestBed }) => {},
+);
+
+test("renders code block", async ({ initTestBed, createMarkdownDriver }) => {
+  const code = "```\n" + "I did not expect this\n" + "```";
+  await initTestBed(`<Markdown><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
+});
+
+test.skip(
+  "renders code block with mock highlighter",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ initTestBed }) => {},
 );
