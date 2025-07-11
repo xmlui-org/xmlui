@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.69
+
+### Patch Changes
+
+- 9b36621: fix flaky Checkbox tests
+
 ## 0.9.68
 
 ### Patch Changes
