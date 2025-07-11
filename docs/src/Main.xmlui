@@ -316,9 +316,7 @@
         </Pages>
         <Footer>
             <CHStack width="100%" gap="0">
-                This site is an&nbsp;
-                <Logo inline="true" height="{mediaSize.phone ? '16px' : '20px'}"/>™
-                app. We use what we ship.
+                This site is an XMLUI app™.
             </CHStack>
         </Footer>
     </App>
