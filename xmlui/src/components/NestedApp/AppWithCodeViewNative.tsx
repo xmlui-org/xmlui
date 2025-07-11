@@ -101,21 +101,19 @@ export function AppWithCodeViewNative({
           <div className={styles.viewControls}>
             <Button
               onClick={() => setShowCode(true)}
-              variant={showCode ? "solid" : "ghost"}
-              className={classnames(styles.splitViewButton)}
-              style={{
-                backgroundColor: !showCode ? "transparent" : "",
-              }}
+              className={classnames(styles.splitViewButton, {
+                [styles.show]: showCode,
+                [styles.hide]: !showCode,
+              })}
             >
               XML
             </Button>
             <Button
               onClick={() => setShowCode(false)}
-              variant={showCode ? "ghost" : "solid"}
-              className={classnames(styles.splitViewButton)}
-              style={{
-                backgroundColor: showCode ? "transparent" : "",
-              }}
+              className={classnames(styles.splitViewButton, {
+                [styles.show]: !showCode,
+                [styles.hide]: showCode,
+              })}
             >
               UI
             </Button>
@@ -168,6 +166,7 @@ export function AppWithCodeViewNative({
               allowPlaygroundPopup={allowPlaygroundPopup}
               withFrame={false}
               noHeader={false}
+              splitView={true}
               popOutUrl={popOutUrl}
             />
           )}

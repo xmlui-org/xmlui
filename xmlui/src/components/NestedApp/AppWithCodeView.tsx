@@ -65,7 +65,9 @@ It supports both side-by-side and stacked layouts.`,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {},
+  defaultThemeVars: {
+    
+  },
 });
 
 export const appWithCodeViewComponentRenderer = createComponentRenderer(

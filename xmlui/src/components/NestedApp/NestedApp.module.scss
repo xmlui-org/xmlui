@@ -17,18 +17,27 @@ $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
 $backgroundColor-viewControls-NestedApp: createThemeVar(
-                "backgroundColor-viewControls-#{$component}"
+  "backgroundColor-viewControls-#{$component}"
 );
 $bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
 $paddingVertical-viewControls-button-NestedApp: createThemeVar(
-                "paddingVertical-viewControls-button-#{$component}"
+  "paddingVertical-viewControls-button-#{$component}"
 );
 $paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
-                "paddingHorizontal-viewControls-button-#{$component}"
+  "paddingHorizontal-viewControls-button-#{$component}"
 );
 $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
+$backgroundColor-button-splitView-NestedApp--active: createThemeVar(
+  "backgroundColor-button-splitView-#{$component}--active"
+);
+$color-button-splitView-NestedApp: createThemeVar(
+  "color-button-splitView-#{$component}"
+);
+$color-button-splitView-NestedApp--active: createThemeVar(
+  "color-button-splitView-#{$component}--active"
+);
 $bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 $height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
@@ -97,6 +106,21 @@ $width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
 .splitViewButton {
   padding: $padding-button-splitView-NestedApp !important;
   width: $width-button-splitView-NestedApp !important;
+  color: $color-button-splitView-NestedApp !important;
+
+  &.show {
+    background-color: $backgroundColor-button-splitView-NestedApp--active;
+    color: $color-button-splitView-NestedApp--active !important;
+    &:hover {
+      background-color: $backgroundColor-button-splitView-NestedApp--active !important;
+    }
+  }
+  &.hide {
+    background-color: transparent;
+    &:hover {
+      background-color: transparent !important;
+    }
+  }
 }
 
 .header {

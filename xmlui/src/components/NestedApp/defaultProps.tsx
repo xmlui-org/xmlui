@@ -5,5 +5,6 @@ export const defaultProps = {
   allowPlaygroundPopup: true,
   withFrame: true,
   noHeader: false,
+  splitView: false,
   components: EMPTY_ARRAY
 };

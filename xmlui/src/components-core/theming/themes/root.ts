@@ -210,6 +210,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-larger": "2.15rem",
     "fontSize-large": "1.5rem",
     "fontSize-medium": "1.25rem",
+    "fontSize-semimedium": "1.125rem",
     "fontSize-normal": "1rem",
     "fontSize-small": "0.875rem",
     "fontSize-code": "0.85rem",
