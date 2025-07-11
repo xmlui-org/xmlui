@@ -102,20 +102,18 @@ export function AppWithCodeViewNative({
             <Button
               onClick={() => setShowCode(true)}
               variant={showCode ? "solid" : "ghost"}
-              className={classnames(styles.splitViewButton)}
-              style={{
-                backgroundColor: !showCode ? "transparent" : "",
-              }}
+              className={classnames(styles.splitViewButton, {
+                [styles.active]: showCode,
+              })}
             >
               XML
             </Button>
             <Button
               onClick={() => setShowCode(false)}
               variant={showCode ? "ghost" : "solid"}
-              className={classnames(styles.splitViewButton)}
-              style={{
-                backgroundColor: showCode ? "transparent" : "",
-              }}
+              className={classnames(styles.splitViewButton, {
+                [styles.active]: !showCode,
+              })}
             >
               UI
             </Button>
