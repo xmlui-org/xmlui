@@ -39,7 +39,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
   <DataSource
     id="users_for_ds_dependency"
-    url="/api/users_for_ds_dependency"
+    url="/api/users_for_ds_dependency?nonce"
     inProgressNotificationMessage="Loading users..."
     when="{ nonce > 0 }"
     />
@@ -47,18 +47,21 @@ These examples answer common questions of the form "How do I do SOMETHING with X
   <DataSource
     id="departments_with_ds_dependency"
     url="/api/departments_with_ds_dependency"
-    when="{ users.loaded && nonce > 0 }"
+    when="{ users_for_ds_dependency.loaded }"
     inProgressNotificationMessage="Loading departments..."
   />
 
   <Select
     id="usersForDsDepencency"
     data="{users_for_ds_dependency}"
-    when="{users_for_ds_dependency.loaded}"
+    when="{departments_with_ds_dependency.loaded}"
     onDidChange="(newVal) => selectedId = newVal"
   >
     <Items data="{users_for_ds_dependency}">
-      <Option value="{$item.id}" label="{$item.name}" />
+      <Option
+        value="{$item.id}"
+        label="{$item.name} ({departments_with_ds_dependency.value.find(d => d.id === $item.departmentId)?.name})"
+     />
     </Items>
   </Select>
 
@@ -105,7 +108,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
   />
 
 <Button
-  label="Reload"
+  label="Run"
   onClick="{nonce++}"
 />
 
