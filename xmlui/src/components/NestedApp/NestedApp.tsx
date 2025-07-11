@@ -67,7 +67,7 @@ export const NestedAppMd = createMetadata({
     [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
     [`gap-frame-${COMP}`]: "0",
     [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
-    [`boxShadow-${COMP}`]: "$boxShadow-md",
+    [`boxShadow-${COMP}`]: "0px 0px 32px 0px rgba(0, 0, 0, 0.05)",
     [`backgroundColor-viewControls-${COMP}`]: "$color-primary-100",
     [`borderRadius-viewControls-${COMP}`]: "5px",
     [`padding-viewControls-${COMP}`]: "$space-0_5",
@@ -77,7 +77,7 @@ export const NestedAppMd = createMetadata({
     [`width-button-splitView-${COMP}`]: "60px",
     [`width-logo-splitView-${COMP}`]: "2rem",
     [`height-logo-splitView-${COMP}`]: "2rem",
-    [`width-controls-${COMP}`]: "76px",
+    [`width-controls-${COMP}`]: "80px",
   },
 });
 

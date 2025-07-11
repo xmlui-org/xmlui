@@ -91,8 +91,8 @@ export const TextMd = createMetadata({
     [`letterSpacing-${COMP}-caption`]: "0.05rem",
     [`fontSize-${COMP}-placeholder`]: "$fontSize-smaller",
     [`fontFamily-${COMP}-codefence`]: "$fontFamily-monospace",
-    [`paddingHorizontal-${COMP}-codefence`]: "$space-3",
-    [`paddingVertical-${COMP}-codefence`]: "$space-2",
+    [`paddingHorizontal-${COMP}-codefence`]: "$space-4",
+    [`paddingVertical-${COMP}-codefence`]: "$space-3",
     [`paddingVertical-${COMP}-paragraph`]: "$space-1",
     [`fontSize-${COMP}-subheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-subheading`]: "$fontWeight-bold",
@@ -106,6 +106,8 @@ export const TextMd = createMetadata({
 
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-6",
+    [`fontSize-${COMP}-markdown`]: `fontSize-${COMP}`,
+    [`fontWeight-${COMP}-markdown`]: `fontWeight-${COMP}`,
 
     [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
     [`borderColor-${COMP}-code`]: "$color-surface-100",

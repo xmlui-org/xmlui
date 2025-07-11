@@ -45,9 +45,9 @@ export const LinkMd = createMetadata({
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
     [`textColor-${COMP}`]: "$color-primary-500",
-    [`textDecorationColor-${COMP}`]: "$color-primary-500",
+    [`textDecorationColor-${COMP}`]: `textDecorationColor-${COMP}`,
     [`textColor-${COMP}--hover`]: `$color-primary-400`,
-    [`textDecorationColor-${COMP}--hover`]: "$color-primary-400",
+    [`textDecorationColor-${COMP}--hover`]: `textColor-${COMP}--hover`,
     [`textColor-${COMP}--active`]: "$color-primary-400",
     [`textDecorationColor-${COMP}--active`]: "$color-primary-400",
     [`textColor-${COMP}--hover--active`]: `$textColor-${COMP}--active`,
