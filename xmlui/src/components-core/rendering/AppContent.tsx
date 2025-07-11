@@ -56,6 +56,10 @@ type AppContentProps = {
   children?: ReactNode;
 };
 
+function safeGetComputedStyle(root?: HTMLElement) {
+  return getComputedStyle(root || document.body);
+}
+
 /**
  *  This component wraps the entire app into a container with these particular
  *  responsibilities:
@@ -167,21 +171,21 @@ export function AppContent({
   // --- Whenever the application root DOM object or the active theme changes, we sync
   // --- with the theme variable values (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
-    const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-phone"));
+    const mwPhone = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-phone"));
     setMaxWidthPhone(mwPhone);
     setMaxWidthPhoneLower(createLowerDimensionValue(mwPhone));
-    const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(
+    const mwLandscapePhone = safeGetComputedStyle(root).getPropertyValue(
       getVarKey("maxWidth-landscape-phone"),
     );
     setMaxWidthLandscapePhone(mwLandscapePhone);
     setMaxWidthLandscapePhoneLower(createLowerDimensionValue(mwLandscapePhone));
-    const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-tablet"));
+    const mwTablet = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
-    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-desktop"));
+    const mwDesktop = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-desktop"));
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
-    const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
+    const mwLargeDesktop = safeGetComputedStyle(root).getPropertyValue(
       getVarKey("maxWidth-large-desktop"),
     );
     setMaxWidthLargeDesktop(mwLargeDesktop);
