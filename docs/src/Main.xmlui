@@ -169,6 +169,7 @@
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
             <NavLink label="Model Context Protocol" to="/mcp"/>
+            <NavLink label="VSCode extension" to="/vscode" />
             <NavLink label="Change Log" to="/change-log"/>
             </NavGroup>
         </NavPanel>
@@ -305,6 +306,9 @@
             </Page>
             <Page url="/mcp">
                 <DocumentPage hideToc="true" url="/pages/mcp.md" />
+            </Page>
+            <Page url="/vscode">
+                <DocumentPage hideToc="true" url="/pages/vscode.md" />
             </Page>
             <Page url="/components/*">
                 <script>
