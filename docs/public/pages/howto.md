@@ -2,9 +2,157 @@
 
 These examples answer common questions of the form "How do I do SOMETHING with XMLUI?" The [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) provides two related tools. Agents can call `xmlui-list-howto` to list the entries here and `xmlui-search-howto` to search them.
 
+## Filter and transform data from an API
+
+```xmlui-pg noHeader
+---app
+<App>
+  <Test />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.people = [
+    { id: 1, name: 'Alice', active: true,  group: 'A' },
+    { id: 2, name: 'Bob',   active: false, group: 'B' },
+    { id: 3, name: 'Carol', active: true,  group: 'A' },
+    { id: 4, name: 'Dave',  active: true,  group: 'B' }
+  ]",
+  "operations": {
+    "get-people": {
+      "url": "/people",
+      "method": "get",
+      "handler": "return { status: 'ok', data: { items: $state.people } }"
+    }
+  }
+}
+---comp display
+<Component name="Test">
+
+  <!--
+  {
+    items:
+      [
+        { id: 1, name: 'Alice', active: true,  group: 'A' },
+        { id: 2, name: 'Bob',   active: false, group: 'B' },
+        { id: 3, name: 'Carol', active: true,  group: 'A' },
+        { id: 4, name: 'Dave',  active: true,  group: 'B' }
+      ]
+  }
+  -->
+
+  <!-- Use resultSelector to select the items array -->
+  <DataSource
+    id="allPeople"
+    url="/api/people"
+    resultSelector="data.items"
+  />
+
+  <!-- Use resultSelector to filter the items array -->
+  <DataSource
+    id="activePeople"
+    url="/api/people"
+    resultSelector="data.items.filter(p => p.active)"
+  />
+
+  <!-- Use transformResult -->
+
+  <!--
+  window.transformPeople = function(data) {
+    console.log(data);
+    const items = data.data.items;
+    const itemMap = {
+      A: 'Austin',
+      B: 'Boston'
+    };
+    return items.map(item => ({
+      ...item,
+      city: itemMap[item.group]
+    }));
+  };
+  -->
+
+  <DataSource
+    id="transformedPeople"
+    url="/api/people"
+    transformResult="{window.transformPeople}"
+  />
+
+  <Text>All people:</Text>
+  <List data="{allPeople}">
+    <Text>{$item.name} ({$item.group})</Text>
+  </List>
+
+  <Text>Active people:</Text>
+  <List data="{activePeople}">
+    <Text>{$item.name} ({$item.group})</Text>
+  </List>
+
+  <Text>Transformed people:</Text>
+  <List data="{transformedPeople}">
+    <Text>{$item.name} ({$item.city})</Text>
+  </List>
+
+
+</Component>
+```
+
+## Group items in List by a property
+
+```xmlui-pg noHeader
+---app
+<App>
+  <Test />
+</App>
+---api display
+{
+  "apiUrl": "/api",
+  "initialize": "$state.people_groupby = [
+    { id: 1, name: 'Alice', active: true,  group: 'A' },
+    { id: 2, name: 'Bob',   active: false, group: 'B' },
+    { id: 3, name: 'Carol', active: true,  group: 'A' },
+    { id: 4, name: 'Dave',  active: true,  group: 'B' }
+  ]",
+  "operations": {
+    "get-people-groupby": {
+      "url": "/people_groupby",
+      "method": "get",
+      "handler": "return { status: 'ok', data: { items: $state.people_groupby } }"
+    }
+  }
+}
+---comp display
+<Component name="Test">
+
+  <!--
+  {
+    items:
+      [
+        { id: 1, name: 'Alice', active: true,  group: 'A' },
+        { id: 2, name: 'Bob',   active: false, group: 'B' },
+        { id: 3, name: 'Carol', active: true,  group: 'A' },
+        { id: 4, name: 'Dave',  active: true,  group: 'B' }
+      ]
+  }
+  -->
+
+  <DataSource
+    id="allPeopleGroupBy"
+    url="/api/people_groupby"
+    resultSelector="data.items"
+  />
+  <List data="{allPeopleGroupBy}" groupBy="group">
+    <property name="groupHeaderTemplate">
+      <Text variant="subtitle">Group {$group.key}</Text>
+    </property>
+    <Text>{$item.name}</Text>
+  </List>
+</Component>
+```
+
 ## Delay a DataSource until another DataSource is ready
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app
 <App>
   <Test />
@@ -76,7 +224,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Hide an element until its DataSource is ready
 
-```xmlui-pg
+```xmlui-pg  noHeader
 ---app
 <App>
   <Test />
@@ -122,7 +270,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Use built-in form validation
 
-```xmlui-pg
+```xmlui-pg noHeader
 ---app
 <App>
   <Test />
@@ -151,7 +299,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Do custom form validation
 
-```xmlui-pg
+```xmlui-pg noHeader
 ---app
 <App>
   <Test />
@@ -466,8 +614,6 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 </Component>
 ```
-
-
 
 ## Debug a component
 
