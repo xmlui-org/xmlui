@@ -8,6 +8,7 @@ These are the key context variables available in XMLUI components.
 | `var.myVar`         | General             | A scoped variable                             |
 | `$item`             | Iterators           | The current item in a list/array              |
 | `$itemIndex`        | Iterators           | The current index in a list/array             |
+| `$group`            | List                | Groups defined by `groupBy`                   |
 | `$param`            | Event handlers      | The event's payload (e.g., form data)         |
 | `$data`             | Forms               | Consolidated data from FormItems              |
 | `$validationResult` | Forms               | Result of latest validation                   |
@@ -71,12 +72,19 @@ These are the key context variables available in XMLUI components.
   </Items>
   ```
 
-## Event handlers:
+## Event handlers
 
 ### `$param`
 
 - **Scope:** Available in event handlers, especially in `<event name="submit">` or API calls.
 - **What it is:** The data passed to the event or API call, often the form data at the time of submission.
+
+## List
+
+### `groupBy`
+
+- **Scope:** Available in the `groupHeaderTemplate` of a `List`
+- **What it is:** An object that contains items grouped by `$group.key`
 
 
 ## Forms
