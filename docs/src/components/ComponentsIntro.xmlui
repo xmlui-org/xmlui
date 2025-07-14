@@ -125,13 +125,15 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
       <ExpandableItem summary="view the transformStops function">
         <Markdown width="*">
           <![CDATA[
-```
+```javascript
 window.transformStops = function(stops) {
   return stops.map(function(stop) {
   // Helper to extract a value from additionalProperties by key
     function getProp(key) {
       if (!stop.additionalProperties) return '';
-      var propObj = stop.additionalProperties.find(function(p) { return p.key === key; });
+      var propObj = stop.additionalProperties.find(function(p) { 
+        return p.key === key; 
+      });
       return propObj ? propObj.value : '';
     }
     return {
