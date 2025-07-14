@@ -522,7 +522,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   const row = rows?.[rowIndex];
                   const key = row?.[idKey];
                   if (!row) {
-                    return null;
+                    return <Fragment key={rowIndex}/>;
                   }
                   // --- End change
                   switch (row._row_type) {
