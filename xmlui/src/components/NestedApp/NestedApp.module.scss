@@ -29,6 +29,9 @@ $paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
 );
 $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
+$backgroundColor-code-splitView-NestedApp: createThemeVar(
+  "backgroundColor-code-splitView-#{$component}"
+);
 $backgroundColor-button-splitView-NestedApp--active: createThemeVar(
   "backgroundColor-button-splitView-#{$component}--active"
 );
