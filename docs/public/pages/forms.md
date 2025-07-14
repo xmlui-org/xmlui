@@ -372,18 +372,6 @@ Try submitting with fewer than 10 characters.
 
 Try entering more than 11 characters.
 
-If you don't want to limit the number of characters, but instead mark longer text as invalid, set `syncToValidation` to `false`.
-
-
-```xmlui-pg
-<App>
-  <Form data="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
-  </Form>
-</App>
-```
-
-
 ### `minValue`
 
 ```xmlui-pg display
