@@ -1,4 +1,4 @@
-import styles from "./Switch.module.scss";
+import styles from "../Toggle/Toggle.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";

@@ -17,7 +17,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { LabelPosition } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { stat } from "fs";
 
 type ToggleProps = {
   id?: string;
@@ -34,8 +33,6 @@ type ToggleProps = {
   variant?: "checkbox" | "switch";
   indeterminate?: boolean;
   className?: string;
-  variantClassName?: string;
-  statusClasses?: Record<string, boolean>;
   label?: string;
   labelPosition?: LabelPosition;
   labelWidth?: string;
@@ -43,7 +40,6 @@ type ToggleProps = {
   required?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
-  autoFocus?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -73,8 +69,6 @@ export const Toggle = forwardRef(function Toggle(
     variant = "checkbox",
     indeterminate = defaultProps.indeterminate,
     className,
-    variantClassName,
-    statusClasses = {},
     label,
     labelPosition = "end",
     labelWidth,
@@ -82,7 +76,6 @@ export const Toggle = forwardRef(function Toggle(
     required,
     registerComponentApi,
     inputRenderer,
-    autoFocus = false,
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -90,15 +83,6 @@ export const Toggle = forwardRef(function Toggle(
   const inputId = id || generatedId;
 
   const innerRef = React.useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        innerRef.current?.focus();
-      }, 0);
-    }
-  }, [autoFocus]);
-
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
@@ -164,13 +148,17 @@ export const Toggle = forwardRef(function Toggle(
         required={required}
         readOnly={readOnly}
         aria-readonly={readOnly}
-        aria-checked={indeterminate ? "mixed" : value}
-        aria-required={required}
-        aria-disabled={!enabled}
+        aria-checked={value}
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
-        className={classnames(styles.resetAppearance, className, variantClassName, statusClasses)}
+        className={classnames(styles.resetAppearance, className, {
+          [styles.checkbox]: variant === "checkbox",
+          [styles.switch]: variant === "switch",
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
       />
     ),
     [
@@ -185,7 +173,6 @@ export const Toggle = forwardRef(function Toggle(
       validationStatus,
       value,
       variant,
-      indeterminate,
     ],
   );
 
