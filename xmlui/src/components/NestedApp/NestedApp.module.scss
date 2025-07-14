@@ -27,6 +27,13 @@ $paddingVertical-viewControls-button-NestedApp: createThemeVar(
 $paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
   "paddingHorizontal-viewControls-button-#{$component}"
 );
+$bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
+$borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
+$height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
+$width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
+$width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
+
+// --- Split view styles
 $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
 $backgroundColor-code-splitView-NestedApp: createThemeVar(
@@ -41,11 +48,12 @@ $color-button-splitView-NestedApp: createThemeVar(
 $color-button-splitView-NestedApp--active: createThemeVar(
   "color-button-splitView-#{$component}--active"
 );
-$bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
-$borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
-$height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
-$width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
-$width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
+$borderRadius-button-splitView-NestedApp: createThemeVar(
+  "borderRadius-button-splitView-#{$component}"
+);
+$borderColor-button-splitView-NestedApp: createThemeVar(
+  "borderColor-button-splitView-#{$component}"
+);
 
 // --- End of theme variables collection
 
@@ -110,6 +118,8 @@ $width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
   padding: $padding-button-splitView-NestedApp !important;
   width: $width-button-splitView-NestedApp !important;
   color: $color-button-splitView-NestedApp !important;
+  border-radius: $borderRadius-button-splitView-NestedApp !important;
+  border-color: $borderColor-button-splitView-NestedApp !important;
 
   &.show {
     background-color: $backgroundColor-button-splitView-NestedApp--active;

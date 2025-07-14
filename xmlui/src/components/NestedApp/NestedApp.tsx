@@ -81,6 +81,9 @@ export const NestedAppMd = createMetadata({
     [`color-button-splitView-${COMP}`]: "$color-surface-600",
     [`color-button-splitView-${COMP}--active`]: "$color-primary",
     [`width-controls-${COMP}`]: "80px",
+    [`backgroundColor-code-splitView-${COMP}`]: "$color-surface-0",
+    [`borderRadius-button-splitView-${COMP}`]: "$space-1",
+    [`borderColor-button-splitView-${COMP}`]: "transparent",
     dark: {
       [`backgroundColor-frame-${COMP}`]: "$color-surface-50",
       [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-200",
