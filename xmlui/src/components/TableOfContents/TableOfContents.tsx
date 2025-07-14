@@ -30,6 +30,13 @@ export const TableOfContentsMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.maxHeadingLevel,
     },
+    omitH1: {
+      description:
+        "If true, the `H1` heading is not included in the table of contents. " +
+        "This is useful when the `H1` is used for the page title and you want to avoid duplication.",
+      valueType: "boolean",
+      defaultValue: false,
+    }
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -75,6 +82,7 @@ export const tableOfContentsRenderer = createComponentRenderer(
         style={layoutCss}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
+        omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
       />
     );
   },
