@@ -20,7 +20,26 @@
 
 ## See it in action
 
-https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
+```xml
+<App>
+  <Select id="lines" initialValue="bakerloo">
+    <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
+        <Option value="{$item.id}" label="{$item.name}" />
+    </Items>
+  </Select>
+  <DataSource
+    id="tubeStations"
+    url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+    resultSelector="stations"/>
+  <Table data="{tubeStations}" height="280px">
+    <Column bindTo="name" />
+    <Column bindTo="modes" />
+  </Table>
+</App>
+```
+
+![xmlui](https://github.com/user-attachments/assets/93523e15-be19-47d1-913d-d8016c1e44e4)
+
 
 ## Getting started
 
@@ -49,9 +68,7 @@ Visit [docs.xmlui.com](https://docs.xmlui.com) for an introduction, a tutorial, 
 
 ## Contributing
 
-We welcome contributions to **xmlui**! If you have ideas for new features, suggestions, or find a bug, please open an issue on GitHub. Pull requests are also encouraged.
-
-Please read our [Contribution Guidelines](./CONTRIBUTING.md) before contributing.
+We welcome contributions! If you have ideas for new features, suggestions, or find a bug, please open an issue. Pull requests are also encouraged. (Please read our [Contribution Guidelines](./CONTRIBUTING.md) before contributing.)
 
 ## Feature Requests
 
