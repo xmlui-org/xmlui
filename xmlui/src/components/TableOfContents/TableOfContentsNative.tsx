@@ -20,19 +20,31 @@ type Props = {
   style?: CSSProperties;
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
+  omitH1?: boolean;
 };
 
 export const defaultProps = {
   smoothScrolling: false,
   maxHeadingLevel: 6,
+  omitH1: false,
 };
 
 export const TableOfContents = forwardRef(function TableOfContents(
-  { style, smoothScrolling = defaultProps.smoothScrolling, maxHeadingLevel = defaultProps.maxHeadingLevel }: Props,
+  {
+    style,
+    smoothScrolling = defaultProps.smoothScrolling,
+    maxHeadingLevel = defaultProps.maxHeadingLevel,
+    omitH1 = defaultProps.omitH1,
+  }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);
-  const { headings, scrollToAnchor, subscribeToActiveAnchorChange, activeAnchorId: initialActiveAnchorId } = useTableOfContents();
+  const {
+    headings,
+    scrollToAnchor,
+    subscribeToActiveAnchorChange,
+    activeAnchorId: initialActiveAnchorId,
+  } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
   useIsomorphicLayoutEffect(() => {
@@ -65,7 +77,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     <div className={styles.nav} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => {
-          if (value.level <= maxHeadingLevel) {
+          if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
             return (
               <li
                 key={value.id}

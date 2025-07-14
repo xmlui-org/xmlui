@@ -8,7 +8,11 @@
             <Slot when="{!$props.content && !$props.url}" />
             <DocumentLinks />
         </VStack>
-        <TableOfContents width="$space-64" when="{mediaSize.sizeIndex > 3 && !$props.hideToc}" maxHeadingLevel="3" />
+        <TableOfContents 
+            width="$space-64" 
+            when="{mediaSize.sizeIndex > 3 && !$props.hideToc}" 
+            maxHeadingLevel="3" 
+            omitH1 />
         <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
     </HStack>
 </Component>

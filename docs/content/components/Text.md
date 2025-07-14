@@ -348,6 +348,7 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | fontSize-Text | fontSize-Text |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-smaller | $fontSize-smaller |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
@@ -368,6 +369,7 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-markdown | fontWeight-Text | fontWeight-Text |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
@@ -401,10 +403,10 @@ This component does not expose any methods.
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-2 | $space-2 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |
 | [textColor](../styles-and-themes/common-units/#color)-Text | $textColor-primary | $textColor-primary |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-deleted | *none* | *none* |
