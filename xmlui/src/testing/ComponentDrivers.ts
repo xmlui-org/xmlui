@@ -632,3 +632,11 @@ export class HtmlTagDriver extends ComponentDriver {}
 // --- CodeBlock
 
 export class CodeBlockDriver extends ComponentDriver {}
+
+// --- Checkbox
+
+export class CheckboxDriver extends ComponentDriver {}
+
+// --- Label
+
+export class LabelDriver extends ComponentDriver {}

@@ -75,6 +75,10 @@ export const CheckboxMd = createMetadata({
     [`borderColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
+    // "outlineWidth-Checkbox-default--focus": "10px",
+    // "outlineColor-Checkbox-default--focus": "$color-primary-500",
+    // "outlineStyle-Checkbox-default--focus": "solid",
+    // "outlineOffset-Checkbox-default--focus": "2px",
   },
 });
 
@@ -94,6 +98,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
   }) => {
     const inputTemplate = node.props.inputTemplate;
     const validationStatus = extractValue(node.props.validationStatus);
+    console.log(inputTemplate)
     return (
       <Toggle
         inputRenderer={
@@ -123,7 +128,6 @@ export const checkboxComponentRenderer = createComponentRenderer(
         }}
         value={state?.value}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={validationStatus}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
