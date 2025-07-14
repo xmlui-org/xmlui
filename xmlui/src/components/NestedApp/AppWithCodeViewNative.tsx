@@ -166,7 +166,6 @@ export function AppWithCodeViewNative({
               allowPlaygroundPopup={allowPlaygroundPopup}
               withFrame={false}
               noHeader={false}
-              splitView={true}
               popOutUrl={popOutUrl}
             />
           )}
