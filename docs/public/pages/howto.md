@@ -2,6 +2,51 @@
 
 These examples answer common questions of the form "How do I do SOMETHING with XMLUI?" The [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) provides two related tools. Agents can call `xmlui-list-howto` to list the entries here and `xmlui-search-howto` to search them.
 
+## Modify a value reported in a Column
+
+```xmlui-pg noHeader
+---app
+<App>
+  <Test />
+</App>
+---comp display
+<Component name="Test">
+  <DataSource
+    id="invoices_with_badges"
+    url="/resources/files/invoices.json"
+    transformResult="{data => data.slice(0,5)}"
+  />
+  <Table data="{invoices_with_badges}">
+    <Column bindTo="invoice_number" />         <!-- empty tag for bound column -->
+    <Column bindTo="client" />
+    <Column bindTo="issue_date" />
+    <Column bindTo="due_date" />
+    <Column bindTo="paid_date" />
+    <Column>
+      ${$item.total}             <!-- unbound column, prepend $ to the $item value -->
+    </Column>
+    <Column>
+        <StatusBadge status="{$item.status}" />  <!-- embed component, pass value -->
+    </Column>
+  </Table>
+</Component>
+---comp display
+<Component
+    name="StatusBadge"
+    var.statusColors="{{
+        draft: { background: '#f59e0b', label: 'white' },
+        sent: { background: '#3b82f6', label: 'white' },
+        paid: { background: '#10b981', label: 'white' }
+    }}"
+>
+    <Badge
+        value="{$props.status}"
+        colorMap="{statusColors}"
+        variant="pill"
+    />
+</Component>
+```
+
 ## Filter and transform data from an API
 
 ```xmlui-pg noHeader
@@ -676,6 +721,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     label="Debug Unwrapped Data"
     onClick="console.log('Unwrapped userData:', JSON.parse(JSON.stringify(userData.value)))"
   />
+
 
 </Component>
 ```

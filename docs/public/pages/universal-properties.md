@@ -78,3 +78,4 @@ When the property is a string, the value is interpreted as an URL that returns J
    <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
 </List>
 ```
+
