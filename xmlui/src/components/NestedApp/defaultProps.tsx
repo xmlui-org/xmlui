@@ -1,5 +1,4 @@
 // Default props for NestedApp component
-import { initial } from "lodash-es";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 
 export const defaultProps = {
@@ -7,6 +6,5 @@ export const defaultProps = {
   withFrame: true,
   noHeader: false,
   splitView: false,
-  components: EMPTY_ARRAY,
-  initiallyShowCode: false,
+  components: EMPTY_ARRAY
 };
