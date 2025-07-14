@@ -1,4 +1,4 @@
-import { useState, type ReactNode, useCallback } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
@@ -7,7 +7,7 @@ import styles from "./NestedApp.module.scss";
 import { Tooltip } from "./Tooltip";
 import { RxOpenInNewWindow } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
-import { createQueryString } from "./utils";
+import { createQueryString, withoutTrailingSlash } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
 import Logo from "./logo.svg?react";
@@ -59,7 +59,9 @@ export function AppWithCodeViewNative({
   const { appGlobals } = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
-  const useHashBasedRouting = appGlobals?.useHashBasedRouting || true;
+  const safePopOutUrl = withoutTrailingSlash(
+    popOutUrl || appGlobals?.popOutUrl || "https://docs.xmlui.com/#/playground",
+  );
   const openPlayground = useCallback(async () => {
     const data = {
       standalone: {
@@ -83,91 +85,91 @@ export function AppWithCodeViewNative({
       },
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(
-      useHashBasedRouting
-        ? `https://docs.xmlui.com/#/playground#${appQueryString}`
-        : `https://docs.xmlui.com/playground#${appQueryString}`,
-      "_blank",
-    );
-  }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting]);
+    window.open(`${safePopOutUrl}/#${appQueryString}`, "_blank");
+  }, [app, components, title, activeTheme, api, activeTone, safePopOutUrl]);
 
-  if (splitView) {
+  if (withFrame) {
     return (
       <div className={styles.nestedAppContainer} style={{ height }}>
-        <div className={styles.header}>
-          <div className={styles.wrapper}>
-            <Logo className={styles.logo} />
-          </div>
-          <div className={styles.viewControls}>
-            <Button
-              onClick={() => setShowCode(true)}
-              className={classnames(styles.splitViewButton, {
-                [styles.show]: showCode,
-                [styles.hide]: !showCode,
-              })}
-            >
-              XML
-            </Button>
-            <Button
-              onClick={() => setShowCode(false)}
-              className={classnames(styles.splitViewButton, {
-                [styles.show]: !showCode,
-                [styles.hide]: showCode,
-              })}
-            >
-              UI
-            </Button>
-          </div>
-          <div className={styles.wrapper}>
-            {allowPlaygroundPopup && (
+        {!noHeader && (
+          <div className={styles.header}>
+            {!splitView && <span className={styles.headerText}>{title}</span>}
+            {splitView && (
+              <>
+                <div className={styles.wrapper}>
+                  <Logo className={styles.logo} />
+                </div>
+                <div className={styles.viewControls}>
+                  <Button
+                    onClick={() => setShowCode(true)}
+                    className={classnames(styles.splitViewButton, {
+                      [styles.show]: showCode,
+                      [styles.hide]: !showCode,
+                    })}
+                  >
+                    XML
+                  </Button>
+                  <Button
+                    onClick={() => setShowCode(false)}
+                    className={classnames(styles.splitViewButton, {
+                      [styles.show]: !showCode,
+                      [styles.hide]: showCode,
+                    })}
+                  >
+                    UI
+                  </Button>
+                </div>
+              </>
+            )}
+            <div className={styles.wrapper}>
+              {allowPlaygroundPopup && (
+                <Tooltip
+                  trigger={
+                    <button
+                      className={styles.headerButton}
+                      onClick={() => {
+                        openPlayground();
+                      }}
+                    >
+                      <RxOpenInNewWindow />
+                    </button>
+                  }
+                  label="View and edit in new full-width window"
+                />
+              )}
               <Tooltip
                 trigger={
                   <button
                     className={styles.headerButton}
                     onClick={() => {
-                      openPlayground();
+                      setShowCode(false);
+                      setRefreshVersion(refreshVersion + 1);
                     }}
                   >
-                    <RxOpenInNewWindow />
+                    <LiaUndoAltSolid />
                   </button>
                 }
-                label="View and edit in new full-width window"
+                label="Reset the app"
               />
-            )}
-            <Tooltip
-              trigger={
-                <button
-                  className={styles.headerButton}
-                  onClick={() => {
-                    setShowCode(false);
-                    setRefreshVersion(refreshVersion + 1);
-                  }}
-                >
-                  <LiaUndoAltSolid />
-                </button>
-              }
-              label="Reset the app"
-            />
+            </div>
           </div>
-        </div>
+        )}
         <div className={styles.contentContainer}>
-          {showCode && <Markdown style={{ height: "100%" }}>{markdown}</Markdown>}
+          {showCode && (
+            <Markdown style={{ height: "100%" }} className={styles.splitViewMarkdown}>
+              {markdown}
+            </Markdown>
+          )}
           {!showCode && (
             <IndexAwareNestedApp
               height={"100%"}
-              refVersion={refreshVersion}
               app={app}
               api={api}
               components={components}
               config={config}
               activeTone={activeTone}
               activeTheme={activeTheme}
-              title={title}
-              allowPlaygroundPopup={allowPlaygroundPopup}
-              withFrame={false}
-              noHeader={false}
-              splitView={true}
-              popOutUrl={popOutUrl}
+              refreshVersion={refreshVersion}
             />
           )}
         </div>
@@ -176,25 +178,17 @@ export function AppWithCodeViewNative({
   }
   return (
     <>
-      <div>
-        <Markdown>{markdown}</Markdown>
-      </div>
-      <div>
-        <IndexAwareNestedApp
-          app={app}
-          api={api}
-          components={components}
-          config={config}
-          activeTone={activeTone}
-          activeTheme={activeTheme}
-          title={title}
-          height={height}
-          allowPlaygroundPopup={allowPlaygroundPopup}
-          withFrame={withFrame}
-          noHeader={noHeader}
-          popOutUrl={popOutUrl}
-        />
-      </div>
+      {!!markdown && <Markdown>{markdown}</Markdown>}
+      <IndexAwareNestedApp
+        height={height}
+        app={app}
+        api={api}
+        components={components}
+        config={config}
+        activeTone={activeTone}
+        activeTheme={activeTheme}
+        refreshVersion={refreshVersion}
+      />
     </>
   );
 }
