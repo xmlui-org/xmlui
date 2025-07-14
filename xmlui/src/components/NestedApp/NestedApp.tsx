@@ -37,23 +37,9 @@ export const NestedAppMd = createMetadata({
         "This property defines the active tone for the nested app. " +
         "If not set, the default tone is used.",
     },
-    title: {
-      description: "The optional title of the nested app. If not set, no title is displayed.",
-    },
     height: {
       description:
         "The height of the nested app. If not set, the height is determined automatically.",
-    },
-    allowPlaygroundPopup: {
-      description:
-        "This property defines whether the nested app can be opened in the xmlui playground.",
-      valueType: "boolean",
-      defaultValue: defaultProps.allowPlaygroundPopup,
-    },
-    withFrame: {
-      description: "This property defines whether the nested app should be displayed with a frame.",
-      valueType: "boolean",
-      defaultValue: defaultProps.withFrame,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -106,10 +92,7 @@ export const nestedAppComponentRenderer = createComponentRenderer(
         config={extractValue(node.props?.config)}
         activeTheme={extractValue(node.props?.activeTheme)}
         activeTone={extractValue(node.props?.activeTone)}
-        title={extractValue(node.props?.title)}
         height={extractValue(node.props?.height)}
-        allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
-        withFrame={extractValue.asOptionalBoolean(node.props?.withFrame)}
       />
     );
   },
