@@ -115,7 +115,11 @@ export function NestedApp({
       markdown
         ? {
             type: "Theme",
-            props: { "height-CodeBlock": "100%" },
+            props: {
+              "height-CodeBlock": "100%",
+              "backgroundColor-CodeBlock": "$backgroundColor-code-splitView-NestedApp",
+              "border-CodeBlock": "none",
+            },
             children: [
               {
                 type: "Markdown",
@@ -394,7 +398,7 @@ export function NestedApp({
 
   return (
     <>
-      {!splitView && (<Markdown>{markdown}</Markdown>)}
+      {!splitView && <Markdown>{markdown}</Markdown>}
       <div
         ref={rootRef}
         style={{
