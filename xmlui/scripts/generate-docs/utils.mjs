@@ -201,18 +201,23 @@ export function getSectionBeforeAndAfter(buffer, sectionHeading) {
   const lines = strBufferToLines(buffer);
   const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
 
-  // Handle case where sectionHeading isn't found
+  // If sectionHeading isn't found, return the buffer unchanged
   if (sectionStartIdx === -1) {
     return { beforeSection: buffer, afterSection: "" };
   }
 
-  // Find the next heading after the section start
-  const afterLines = lines.slice(sectionStartIdx + 1);
-  const sectionEndIdx = afterLines.findIndex((line) => /^#+\s/.test(line));
-  const endIdx = sectionEndIdx === -1 ? afterLines.length : sectionEndIdx;
+  // Find the next heading after the section heading
+  let nextHeadingIdx = -1;
+  for (let i = sectionStartIdx + 1; i < lines.length; i++) {
+    if (/^#+\s/.test(lines[i])) {
+      nextHeadingIdx = i;
+      break;
+    }
+  }
 
+  // Remove lines after the section heading and before the next heading (or end of file)
   const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
-  const afterSection = afterLines.slice(0, endIdx).join("\n");
+  const afterSection = (nextHeadingIdx !== -1 ? lines.slice(nextHeadingIdx) : []).join("\n");
 
   return { beforeSection, afterSection };
 }
