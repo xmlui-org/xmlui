@@ -58,7 +58,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
   padding: $paddingVertical-content-CodeBlock $paddingHorizontal-content-CodeBlock;
   position: relative;
   display: flex;
-  align-items: center;
+  //align-items: center;
   min-height: 48px;
   height: 100%;
   overflow: hidden;

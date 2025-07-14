@@ -115,13 +115,14 @@ export function NestedApp({
       markdown
         ? {
             type: "Theme",
-            props: {},
+            props: { "height-CodeBlock": "100%" },
             children: [
               {
                 type: "Markdown",
                 props: {
                   content: markdown,
                   codeHighlighter,
+                  height: "100%",
                 },
               },
             ],
@@ -392,15 +393,18 @@ export function NestedApp({
   }, []);
 
   return (
-    <div
-      ref={rootRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        overflow: "auto",
-        position: "relative",
-        isolation: "isolate",
-      }}
-    />
+    <>
+      {!splitView && (<Markdown>{markdown}</Markdown>)}
+      <div
+        ref={rootRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "auto",
+          position: "relative",
+          isolation: "isolate",
+        }}
+      />
+    </>
   );
 }
