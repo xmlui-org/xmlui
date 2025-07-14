@@ -428,7 +428,7 @@ Evaluate predefined regex patterns: "email", "url", or "phone".
 ```
 
 
-See the [pattern property](/components/FormItem) of `FormItem`.
+See the [pattern property](/components/FormItem#pattern) of `FormItem`.
 
 ### `regex`
 
@@ -450,7 +450,8 @@ You can use multiple validations.
 ```xmlui-pg display
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
-    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
+    <FormItem bindTo="site" minLength="10" maxLength="30"
+      pattern="url" label="Multiple Validations" />
   </Form>
 </App>
 ```
