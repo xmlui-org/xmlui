@@ -25,7 +25,6 @@ When you reload the page you'll see fresh data.
 > [!INFO]
 > You can use the ![](/resources/pg-popout.svg) icon to open live elements, like the London Tube Status report, in a playground where you read and edit the XMLUI markup.
 
-
 This is the XMLUI markup you'll see in the playground.
 
 ```xmlui
@@ -34,6 +33,6 @@ This is the XMLUI markup you'll see in the playground.
 </List>
 ```
 
-The [List](/components/List/) component fetches JSON from a <a href="https://api.tfl.gov.uk/line/mode/tube/status" target="_blank">REST endpoint</a>, iterates through the array of objects returned from the API, and updates the [context variable](context-variables) called `$item` for each object. The [Text](/components/Text) component uses JavaScript dot notation and array indexing to extract station names and statuses from each `$item`.
+The [List](/components/List) component fetches JSON from a <a href="https://api.tfl.gov.uk/line/mode/tube/status" target="_blank">REST endpoint</a>, iterates through the array of objects returned from the API, and updates the [context variable](context-variables) called `$item` for each object. The [Text](/components/Text) component uses JavaScript dot notation and array indexing to extract station names and statuses from each `$item`.
 
 In this case the URL is static. In the next chapter you'll see how a data URL can vary to deliver changing data in response to UI interaction.
