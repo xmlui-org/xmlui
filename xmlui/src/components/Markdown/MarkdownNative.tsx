@@ -24,7 +24,7 @@ import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
-import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
+import { IndexAwareNestedApp } from "../NestedApp/NestedAppNative";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -343,7 +343,7 @@ export const Markdown = memo(function Markdown({
             const jsonContent = atob(dataContentBase64);
             const appProps = JSON.parse(jsonContent);
             return (
-              <NestedAppAndCodeViewNative
+              <IndexAwareNestedApp
                 markdown={markdownContent}
                 app={appProps.app}
                 config={appProps.config}
