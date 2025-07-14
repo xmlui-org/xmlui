@@ -372,18 +372,6 @@ Try submitting with fewer than 10 characters.
 
 Try entering more than 11 characters.
 
-If you don't want to limit the number of characters, but instead mark longer text as invalid, set `syncToValidation` to `false`.
-
-
-```xmlui-pg
-<App>
-  <Form data="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
-  </Form>
-</App>
-```
-
-
 ### `minValue`
 
 ```xmlui-pg display
@@ -428,7 +416,7 @@ Evaluate predefined regex patterns: "email", "url", or "phone".
 ```
 
 
-See the [pattern property](/components/FormItem) of `FormItem`.
+See the [pattern property](/components/FormItem#pattern) of `FormItem`.
 
 ### `regex`
 
@@ -450,7 +438,8 @@ You can use multiple validations.
 ```xmlui-pg display
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
-    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
+    <FormItem bindTo="site" minLength="10" maxLength="30"
+      pattern="url" label="Multiple Validations" />
   </Form>
 </App>
 ```

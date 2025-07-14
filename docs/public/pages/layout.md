@@ -294,8 +294,7 @@ You can assign the `horizontal` or `vertical` values to the `Stack` component's 
 
 ### Alignment
 
-The `horizontalAlignment` and `verticalAlignment` properties govern alignment within a stack, using values like `start`, `end`, and `center`. See the full list of values [here](/styles-and-themes/common-units#text-alignment-values)
-
+The `horizontalAlignment` and `verticalAlignment` properties govern alignment within a stack, using values like `start`, `end`, and `center`. See the full list of values [here](/styles-and-themes/common-units#alignment)
 
 This markup aligns the children of an `HStack` horizontally in the center:
 
