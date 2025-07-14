@@ -242,7 +242,6 @@ import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
-import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
 import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
 import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
@@ -556,7 +555,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(codeBlockComponentRenderer);
       // --- Nested app and related components
       this.registerCoreComponent(nestedAppComponentRenderer);
-      this.registerCoreComponent(appWithCodeViewComponentRenderer);
       // --- New Bootstrap-inspired components
       this.registerCoreComponent(carouselComponentRenderer);
       this.registerCoreComponent(accordionComponentRenderer);
