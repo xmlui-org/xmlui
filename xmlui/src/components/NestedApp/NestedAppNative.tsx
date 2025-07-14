@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react";
 import {
-  memo,
   startTransition,
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -50,9 +50,7 @@ type NestedAppProps = {
   withFrame?: boolean;
   noHeader?: boolean;
   style?: CSSProperties;
-  splitView?: boolean;
   refVersion?: number;
-  initiallyShowCode?: boolean;
 };
 
 export function LazyNestedApp(props: NestedAppProps) {
@@ -91,10 +89,8 @@ export function NestedApp({
   popOutUrl,
   withFrame = defaultProps.withFrame,
   noHeader = defaultProps.noHeader,
-  splitView = defaultProps.splitView,
   style,
   refVersion = 0,
-  initiallyShowCode,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -105,35 +101,7 @@ export function NestedApp({
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
-  const { interceptorWorker, initialized, forceInitialize } = useApiInterceptorContext();
-
-  const [showCode, setShowCode] = useState(initiallyShowCode);
-  const codeHighlighter = appGlobals.codeHighlighter;
-
-  const markdownComponent = useMemo<ComponentDef | null>(
-    () =>
-      markdown
-        ? {
-            type: "Theme",
-            props: {
-              "height-CodeBlock": "100%",
-              "backgroundColor-CodeBlock": "$backgroundColor-code-splitView-NestedApp",
-              "border-CodeBlock": "none",
-            },
-            children: [
-              {
-                type: "Markdown",
-                props: {
-                  content: markdown,
-                  codeHighlighter,
-                  height: "100%",
-                },
-              },
-            ],
-          }
-        : null,
-    [markdown, codeHighlighter],
-  );
+  const parentInterceptorContext = useApiInterceptorContext();
 
   useEffect(() => {
     setRefreshVersion(refVersion);
@@ -197,21 +165,57 @@ export function NestedApp({
     );
   }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting, popOutUrl]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!shadowRef.current && rootRef.current) {
       // Clone existing style and link tags
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
-      const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
-      styleSheets.forEach((el) => {
-        if (el.hasAttribute("data-theme-root")) {
-          return;
+
+      // This should run once to prepare the stylesheets
+      const sheetPromises = Array.from(document.styleSheets).map(async (sheet) => {
+        // Check if the owner element has the attribute you want to skip
+        if (
+          sheet.ownerNode &&
+          sheet.ownerNode instanceof Element &&
+          sheet.ownerNode.hasAttribute("data-theme-root")
+        ) {
+          return null; // Skip this stylesheet
         }
-        shadowRef.current.appendChild(el.cloneNode(true));
+        // Can't access cross-origin sheets, so skip them
+        if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
+          try {
+            // Create a new CSSStyleSheet object
+            const newSheet = new CSSStyleSheet();
+            // Get the CSS rules as text
+            const cssText = Array.from(sheet.cssRules)
+              .map((rule) => rule.cssText)
+              .join(" ");
+            // Apply the text to the new sheet object
+            await newSheet.replace(cssText);
+            return newSheet;
+          } catch (e) {
+            // console.error('Could not process stylesheet:', sheet.href, e);
+            return null;
+          }
+        }
+        return null;
+      });
+
+      // When your component mounts and the shadow root is available...
+      Promise.all(sheetPromises).then((sheets) => {
+        // Filter out any sheets that failed to load
+        const validSheets = sheets.filter(Boolean);
+
+        // Apply the array of constructed stylesheets to the shadow root
+        // This is synchronous and does not trigger new network requests
+        shadowRef.current.adoptedStyleSheets = validSheets;
       });
     }
     if (!contentRootRef.current && shadowRef.current) {
       contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
     }
+  }, []);
+
+  useEffect(() => {
     let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(app);
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
@@ -242,41 +246,33 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
-    let shouldForceInit = mock && initialized && !interceptorWorker;
-    if (shouldForceInit) {
-      // in this case we need to force initialize the interceptor worker
-      // to make sure that the mock is applied (this could be the case when the 'root' app is not using any mocks)
-      forceInitialize();
-    }
-
-    let nestedAppRoot =
-      mock && !interceptorWorker ? null : (
-        <ApiInterceptorProvider
-          interceptor={mock}
-          apiWorker={interceptorWorker}
-          waitForApiInterceptor={true}
-        >
-          <div style={{ height, ...style, ...themeVarReset }}>
-            <AppRoot
-              isNested={true}
-              key={`app-${nestedAppId}-${refreshVersion}`}
-              previewMode={true}
-              standalone={true}
-              trackContainerHeight={height ? "fixed" : "auto"}
-              node={showCode ? markdownComponent : component}
-              globalProps={globalProps}
-              defaultTheme={activeTheme || config?.defaultTheme}
-              defaultTone={toneToApply as ThemeTone}
-              contributes={{
-                compoundComponents,
-                themes: config?.themes,
-              }}
-              resources={config?.resources}
-              extensionManager={componentRegistry.getExtensionManager()}
-            />
-          </div>
-        </ApiInterceptorProvider>
-      );
+    let nestedAppRoot = (
+      <ApiInterceptorProvider
+        parentInterceptorContext={parentInterceptorContext}
+        interceptor={mock}
+        waitForApiInterceptor={true}
+      >
+        <div style={{ height, ...style, ...themeVarReset }}>
+          <AppRoot
+            isNested={true}
+            key={`app-${nestedAppId}-${refreshVersion}`}
+            previewMode={true}
+            standalone={true}
+            trackContainerHeight={height ? "fixed" : "auto"}
+            node={component}
+            globalProps={globalProps}
+            defaultTheme={activeTheme || config?.defaultTheme}
+            defaultTone={toneToApply as ThemeTone}
+            contributes={{
+              compoundComponents,
+              themes: config?.themes,
+            }}
+            resources={config?.resources}
+            extensionManager={componentRegistry.getExtensionManager()}
+          />
+        </div>
+      </ApiInterceptorProvider>
+    );
 
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
@@ -284,64 +280,36 @@ export function NestedApp({
           <div className={styles.nestedAppContainer}>
             {!noHeader && (
               <div className={classnames(styles.header)}>
-                {splitView && (
-                  <>
-                    <div className={styles.wrapper}>
-                      <Logo className={styles.logo} />
-                    </div>
-                    <div className={styles.viewControls}>
-                      <Button
-                        onClick={() => setShowCode(true)}
-                        className={classnames(styles.splitViewButton, {
-                          [styles.show]: showCode,
-                          [styles.hide]: !showCode,
-                        })}
-                      >
-                        XML
-                      </Button>
-                      <Button
-                        onClick={() => setShowCode(false)}
-                        className={classnames(styles.splitViewButton, {
-                          [styles.show]: !showCode,
-                          [styles.hide]: showCode,
-                        })}
-                      >
-                        UI
-                      </Button>
-                    </div>
-                  </>
-                )}
-                {!splitView && <span className={styles.headerText}>{title}</span>}
-                <div className={styles.wrapper}>
-                  {allowPlaygroundPopup && (
-                    <Tooltip
-                      trigger={
-                        <button
-                          className={styles.headerButton}
-                          onClick={() => {
-                            openPlayground();
-                          }}
-                        >
-                          <RxOpenInNewWindow />
-                        </button>
-                      }
-                      label="View and edit in new full-width window"
-                    />
-                  )}
+                <span className={styles.headerText}>{title}</span>
+                <div className={styles.spacer} />
+                {allowPlaygroundPopup && (
                   <Tooltip
                     trigger={
                       <button
                         className={styles.headerButton}
                         onClick={() => {
-                          setRefreshVersion(refreshVersion + 1);
+                          openPlayground();
                         }}
                       >
-                        <LiaUndoAltSolid />
+                        <RxOpenInNewWindow />
                       </button>
                     }
-                    label="Reset the app"
+                    label="View and edit in new full-width window"
                   />
-                </div>
+                )}
+                <Tooltip
+                  trigger={
+                    <button
+                      className={styles.headerButton}
+                      onClick={() => {
+                        setRefreshVersion(refreshVersion + 1);
+                      }}
+                    >
+                      <LiaUndoAltSolid />
+                    </button>
+                  }
+                  label="Reset the app"
+                />
               </div>
             )}
             {nestedAppRoot}
@@ -354,7 +322,6 @@ export function NestedApp({
   }, [
     activeTheme,
     allowPlaygroundPopup,
-    interceptorWorker,
     app,
     componentRegistry,
     components,
@@ -366,19 +333,15 @@ export function NestedApp({
     height,
     mock,
     nestedAppId,
+    noHeader,
     openPlayground,
+    parentInterceptorContext,
     refreshVersion,
+    style,
     theme.themeStyles,
     title,
     toneToApply,
     withFrame,
-    noHeader,
-    apiUrl,
-    initialized,
-    style,
-    forceInitialize,
-    showCode,
-    markdownComponent,
   ]);
 
   const mountedRef = useRef(false);
@@ -387,18 +350,17 @@ export function NestedApp({
     return () => {
       mountedRef.current = false;
       setTimeout(() => {
-        // Unmount the content root after a delay (and only it the component is not mounted anymore, could happen in dev mode - double useEffect call)
+        // Unmount the content root after a delay (and only if the component is not mounted anymore, could happen in dev mode - double useEffect call)
         if (!mountedRef.current) {
           contentRootRef.current?.unmount();
           contentRootRef.current = null;
         }
-      });
+      }, 0);
     };
   }, []);
 
   return (
     <>
-      {!splitView && <Markdown>{markdown}</Markdown>}
       <div
         ref={rootRef}
         style={{
