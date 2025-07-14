@@ -1,5 +1,14 @@
 import type { CSSProperties } from "react";
-import { startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  startTransition,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -12,7 +21,7 @@ import { RxOpenInNewWindow } from "react-icons/rx";
 import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { createQueryString } from "./utils";
@@ -22,8 +31,12 @@ import { useIndexerContext } from "../App/IndexerContext";
 import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { defaultProps } from "./defaultProps";
+import Logo from "./logo.svg?react";
+import { Button } from "../Button/ButtonNative";
+import { Markdown } from "../Markdown/MarkdownNative";
 
 type NestedAppProps = {
+  markdown?: string;
   api?: any;
   app: string;
   components?: any[];
@@ -39,9 +52,10 @@ type NestedAppProps = {
   style?: CSSProperties;
   splitView?: boolean;
   refVersion?: number;
+  initiallyShowCode?: boolean;
 };
 
-export function LazyNestedApp(props) {
+export function LazyNestedApp(props: NestedAppProps) {
   const [shouldRender, setShouldRender] = useState(false);
   useEffect(() => {
     startTransition(() => {
@@ -54,15 +68,17 @@ export function LazyNestedApp(props) {
   return <NestedApp {...props} />;
 }
 
-export function IndexAwareNestedApp(props) {
+export function IndexAwareNestedApp(props: NestedAppProps) {
   const { indexing } = useIndexerContext();
   if (indexing) {
     return null;
   }
+
   return <LazyNestedApp {...props} />;
 }
 
 export function NestedApp({
+  markdown,
   api,
   app,
   components = EMPTY_ARRAY,
@@ -78,6 +94,7 @@ export function NestedApp({
   splitView = defaultProps.splitView,
   style,
   refVersion = 0,
+  initiallyShowCode,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -89,6 +106,29 @@ export function NestedApp({
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
   const { interceptorWorker, initialized, forceInitialize } = useApiInterceptorContext();
+
+  const [showCode, setShowCode] = useState(initiallyShowCode);
+  const codeHighlighter = appGlobals.codeHighlighter;
+
+  const markdownComponent = useMemo<ComponentDef | null>(
+    () =>
+      markdown
+        ? {
+            type: "Theme",
+            props: {},
+            children: [
+              {
+                type: "Markdown",
+                props: {
+                  content: markdown,
+                  codeHighlighter,
+                },
+              },
+            ],
+          }
+        : null,
+    [markdown, codeHighlighter],
+  );
 
   useEffect(() => {
     setRefreshVersion(refVersion);
@@ -218,7 +258,7 @@ export function NestedApp({
               previewMode={true}
               standalone={true}
               trackContainerHeight={height ? "fixed" : "auto"}
-              node={component}
+              node={showCode ? markdownComponent : component}
               globalProps={globalProps}
               defaultTheme={activeTheme || config?.defaultTheme}
               defaultTone={toneToApply as ThemeTone}
@@ -239,36 +279,64 @@ export function NestedApp({
           <div className={styles.nestedAppContainer}>
             {!noHeader && (
               <div className={classnames(styles.header)}>
-                <span className={styles.headerText}>{title}</span>
-                <div className={styles.spacer} />
-                {allowPlaygroundPopup && (
+                {splitView && (
+                  <>
+                    <div className={styles.wrapper}>
+                      <Logo className={styles.logo} />
+                    </div>
+                    <div className={styles.viewControls}>
+                      <Button
+                        onClick={() => setShowCode(true)}
+                        className={classnames(styles.splitViewButton, {
+                          [styles.show]: showCode,
+                          [styles.hide]: !showCode,
+                        })}
+                      >
+                        XML
+                      </Button>
+                      <Button
+                        onClick={() => setShowCode(false)}
+                        className={classnames(styles.splitViewButton, {
+                          [styles.show]: !showCode,
+                          [styles.hide]: showCode,
+                        })}
+                      >
+                        UI
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {!splitView && <span className={styles.headerText}>{title}</span>}
+                <div className={styles.wrapper}>
+                  {allowPlaygroundPopup && (
+                    <Tooltip
+                      trigger={
+                        <button
+                          className={styles.headerButton}
+                          onClick={() => {
+                            openPlayground();
+                          }}
+                        >
+                          <RxOpenInNewWindow />
+                        </button>
+                      }
+                      label="View and edit in new full-width window"
+                    />
+                  )}
                   <Tooltip
                     trigger={
                       <button
                         className={styles.headerButton}
                         onClick={() => {
-                          openPlayground();
+                          setRefreshVersion(refreshVersion + 1);
                         }}
                       >
-                        <RxOpenInNewWindow />
+                        <LiaUndoAltSolid />
                       </button>
                     }
-                    label="View and edit in new full-width window"
+                    label="Reset the app"
                   />
-                )}
-                <Tooltip
-                  trigger={
-                    <button
-                      className={styles.headerButton}
-                      onClick={() => {
-                        setRefreshVersion(refreshVersion + 1);
-                      }}
-                    >
-                      <LiaUndoAltSolid />
-                    </button>
-                  }
-                  label="Reset the app"
-                />
+                </div>
               </div>
             )}
             {nestedAppRoot}
@@ -304,6 +372,8 @@ export function NestedApp({
     initialized,
     style,
     forceInitialize,
+    showCode,
+    markdownComponent,
   ]);
 
   const mountedRef = useRef(false);
