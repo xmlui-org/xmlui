@@ -14,7 +14,7 @@ We've already seen a number of XMLUI components in action: [DataSource](/compone
 
 ## Built-in components
 
-As an XMLUI developer you'll create user interfaces by combining these with others in the [core library](/components/), drawing from these categories:
+As an XMLUI developer you'll create user interfaces by combining these with others in the [core library](/components/_overview), drawing from these categories:
 
 **Data**: [AppState](/components/AppState),
 [DataSource](/components/DataSource),
