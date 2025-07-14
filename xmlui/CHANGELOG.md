@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.72
+
+### Patch Changes
+
+- 4ab3b8a: add omitH1 to TableOfContents
+- ac4a283: remove the AppWithCodeView component
+- 38454c9: fix ApiInterceptor race conditions (inside NestedApps)
+
 ## 0.9.71
 
 ### Patch Changes
