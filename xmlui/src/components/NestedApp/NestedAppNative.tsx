@@ -1,56 +1,30 @@
 import type { CSSProperties } from "react";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { startTransition, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import styles from "./NestedApp.module.scss";
-import classnames from "classnames";
 
 import { AppRoot } from "../../components-core/rendering/AppRoot";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
-import { LiaUndoAltSolid } from "react-icons/lia";
-import { RxOpenInNewWindow } from "react-icons/rx";
 import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
-import { Tooltip } from "./Tooltip";
+import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { createQueryString } from "./utils";
-import { useAppContext } from "../../components-core/AppContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
 import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
-import { defaultProps } from "./defaultProps";
-import Logo from "./logo.svg?react";
-import { Button } from "../Button/ButtonNative";
-import { Markdown } from "../Markdown/MarkdownNative";
 
 type NestedAppProps = {
-  markdown?: string;
   api?: any;
   app: string;
   components?: any[];
   config?: any;
   activeTone?: ThemeTone;
   activeTheme?: string;
-  title?: string;
   height?: string | number;
-  allowPlaygroundPopup?: boolean;
-  popOutUrl?: string;
-  withFrame?: boolean;
-  noHeader?: boolean;
   style?: CSSProperties;
-  refVersion?: number;
+  refreshVersion?: number;
 };
 
 export function LazyNestedApp(props: NestedAppProps) {
@@ -76,36 +50,23 @@ export function IndexAwareNestedApp(props: NestedAppProps) {
 }
 
 export function NestedApp({
-  markdown,
   api,
   app,
   components = EMPTY_ARRAY,
   config,
   activeTheme,
   activeTone,
-  title,
   height,
-  allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
-  popOutUrl,
-  withFrame = defaultProps.withFrame,
-  noHeader = defaultProps.noHeader,
   style,
-  refVersion = 0,
+  refreshVersion
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
   const contentRootRef = useRef<Root | null>(null);
-  const nestedAppId = useId();
-  const [refreshVersion, setRefreshVersion] = useState(refVersion);
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
-  const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
   const parentInterceptorContext = useApiInterceptorContext();
-
-  useEffect(() => {
-    setRefreshVersion(refVersion);
-  }, [refVersion]);
 
   //TODO illesg: we should come up with something to make sure that nestedApps don't overwrite each other's mocked api endpoints
   //   disabled for now, as it messes up the paths of not mocked APIs (e.g. resources/{staticJsonfiles})
@@ -132,38 +93,6 @@ export function NestedApp({
       // apiUrl: apiUrl + (apiObject.apiUrl || ""),
     };
   }, [api]);
-
-  const useHashBasedRouting = appGlobals?.useHashBasedRouting || true;
-  const openPlayground = useCallback(async () => {
-    const data = {
-      standalone: {
-        app,
-        components,
-        config: {
-          name: title,
-          themes: [],
-          defaultTheme: activeTheme,
-        },
-        api: api,
-      },
-      options: {
-        fixedTheme: false,
-        swapped: false,
-        previewMode: false,
-        orientation: "horizontal",
-        activeTheme,
-        activeTone,
-        content: "app",
-      },
-    };
-    const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(
-      useHashBasedRouting
-        ? `${popOutUrl ?? ""}/#/playground#${appQueryString}`
-        : `${popOutUrl ?? ""}/playground#${appQueryString}`,
-      "_blank",
-    );
-  }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting, popOutUrl]);
 
   useLayoutEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -246,82 +175,37 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
-    let nestedAppRoot = (
-      <ApiInterceptorProvider
-        parentInterceptorContext={parentInterceptorContext}
-        interceptor={mock}
-        waitForApiInterceptor={true}
-      >
-        <div style={{ height, ...style, ...themeVarReset }}>
-          <AppRoot
-            isNested={true}
-            key={`app-${nestedAppId}-${refreshVersion}`}
-            previewMode={true}
-            standalone={true}
-            trackContainerHeight={height ? "fixed" : "auto"}
-            node={component}
-            globalProps={globalProps}
-            defaultTheme={activeTheme || config?.defaultTheme}
-            defaultTone={toneToApply as ThemeTone}
-            contributes={{
-              compoundComponents,
-              themes: config?.themes,
-            }}
-            resources={config?.resources}
-            extensionManager={componentRegistry.getExtensionManager()}
-          />
-        </div>
-      </ApiInterceptorProvider>
-    );
-
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
-        {withFrame ? (
-          <div className={styles.nestedAppContainer}>
-            {!noHeader && (
-              <div className={classnames(styles.header)}>
-                <span className={styles.headerText}>{title}</span>
-                <div className={styles.spacer} />
-                {allowPlaygroundPopup && (
-                  <Tooltip
-                    trigger={
-                      <button
-                        className={styles.headerButton}
-                        onClick={() => {
-                          openPlayground();
-                        }}
-                      >
-                        <RxOpenInNewWindow />
-                      </button>
-                    }
-                    label="View and edit in new full-width window"
-                  />
-                )}
-                <Tooltip
-                  trigger={
-                    <button
-                      className={styles.headerButton}
-                      onClick={() => {
-                        setRefreshVersion(refreshVersion + 1);
-                      }}
-                    >
-                      <LiaUndoAltSolid />
-                    </button>
-                  }
-                  label="Reset the app"
-                />
-              </div>
-            )}
-            {nestedAppRoot}
+        <ApiInterceptorProvider
+          parentInterceptorContext={parentInterceptorContext}
+          key={`app-${refreshVersion}`}
+          interceptor={mock}
+          waitForApiInterceptor={true}
+        >
+          <div style={{ height, ...style, ...themeVarReset }}>
+            <AppRoot
+              isNested={true}
+              previewMode={true}
+              standalone={true}
+              trackContainerHeight={height ? "fixed" : "auto"}
+              node={component}
+              globalProps={globalProps}
+              defaultTheme={activeTheme || config?.defaultTheme}
+              defaultTone={toneToApply as ThemeTone}
+              contributes={{
+                compoundComponents,
+                themes: config?.themes,
+              }}
+              resources={config?.resources}
+              extensionManager={componentRegistry.getExtensionManager()}
+            />
           </div>
-        ) : (
-          nestedAppRoot
-        )}
+        </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
   }, [
     activeTheme,
-    allowPlaygroundPopup,
     app,
     componentRegistry,
     components,
@@ -332,16 +216,11 @@ export function NestedApp({
     config?.themes,
     height,
     mock,
-    nestedAppId,
-    noHeader,
-    openPlayground,
     parentInterceptorContext,
-    refreshVersion,
     style,
     theme.themeStyles,
-    title,
     toneToApply,
-    withFrame,
+    refreshVersion
   ]);
 
   const mountedRef = useRef(false);

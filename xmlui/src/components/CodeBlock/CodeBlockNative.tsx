@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import type { CSSProperties } from "react";
+import classnames from "classnames";
 
 type CodeBlockProps = {
   children?: React.ReactNode;
@@ -21,9 +22,10 @@ export const defaultProps = {
 };
 
 export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
+  // 'global-codeBlock' class is there so we could apply styles if this codeblock is used inside a splitView nested app
   if (!meta) {
     return (
-      <div className={styles.codeBlock} style={style}>
+      <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
         <div className={styles.codeBlockContent}>
           {children}
         </div>
@@ -31,7 +33,7 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
     );
   }
   return (
-    <div className={styles.codeBlock} style={style}>
+    <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
           <Text variant="em">{meta.filename}</Text>

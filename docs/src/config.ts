@@ -278,6 +278,7 @@ const App: StandaloneAppDescription = {
     },
     prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
+    popOutUrl: "/#/playground",
   },
 };
 

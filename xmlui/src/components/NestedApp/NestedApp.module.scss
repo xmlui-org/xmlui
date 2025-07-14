@@ -87,6 +87,15 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
     overflow: auto;
     display: flex;
     align-items: center;
+
+    .splitViewMarkdown{
+      :global(.global-codeBlock){
+        background-color: $backgroundColor-code-splitView-NestedApp;
+        height: 100%;
+        border: none;
+        border-radius: 0;
+      }
+    }
   }
 }
 
@@ -139,7 +148,7 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
 .header {
   width: 100%;
   display: flex;
-  align-content: center;
+  align-items: center;
   padding: t.$space-2;
   border-bottom: $borderBottom-header-NestedApp;
   justify-content: space-between;
@@ -147,6 +156,7 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
   .headerText {
     @include t.textVars($themeVars, "header-#{$component}");
     padding-left: t.$space-2;
+    margin-right: auto;
   }
 
   .headerButton {
