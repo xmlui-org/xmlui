@@ -11,9 +11,10 @@ To exercise XMLUI Invoice's import feature when running the demo app, you'll use
   id="fileInput"
   acceptsFileType="{['.csv']}"
   onDidChange="{ (val) => {
-      parsedCsv = window.parseCsv(val[0]).map((item, idx) => 
-        { return {...item, id: idx};});
-    }}"
+    parsedCsv = window.parseCsv(val[0]).map((item, idx) => {
+      return {...item, id: idx};
+    });
+  }}"
 />
 ```
 
@@ -31,15 +32,8 @@ It uses `rowDisabledPredicate` to disable a row if the name of any existing prod
   rowDisabledPredicate="{(row) => isDuplicate(row.name)}"
 >
   <Column header="Name">
-<<<<<<< HEAD
-    <Text color="{isDuplicate($item.name) 
+    <Text color="{isDuplicate($item.name)
         ? '$color-danger-500' : '$textColor-primary'}"
-||||||| parent of 84a262f7 (fix: code example lengths)
-    <Text color="{isDuplicate($item.name) ? '$color-danger-500' : '$textColor-primary'}">
-=======
-    <Text
-      color="{isDuplicate($item.name) ? '$color-danger-500' : '$textColor-primary'}"
->>>>>>> 84a262f7 (fix: code example lengths)
     >
       {$item.name} {isDuplicate($item.name) ? '(duplicate)' : ''}
     </Text>
@@ -69,20 +63,12 @@ The API doesn't support batch update so we use `Queue` to iterate over the selec
 ```xmlui /pluralize/
 <Queue id="importQueue" clearAfterFinish="true">
   <property name="progressFeedback">
-<<<<<<< HEAD
-    <Text value="Importing {pluralize(importQueue.getQueuedItems().length, 
-      'product', 'products')}"
-    />
-||||||| parent of 84a262f7 (fix: code example lengths)
-    <Text value="Importing {pluralize(importQueue.getQueuedItems().length, 'product', 'products')}"/>
-=======
     <Text value="Importing {
       pluralize(importQueue.getQueuedItems().length, 'product', 'products')
     }"/>
->>>>>>> 84a262f7 (fix: code example lengths)
   </property>
   <property name="resultFeedback">
-    <Text value="Imported {pluralize($completedItems.length, 
+    <Text value="Imported {pluralize($completedItems.length,
       'product', 'products')}"
     />
   </property>

@@ -190,7 +190,6 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
       </Items>
     </FormItem>
 
-<<<<<<< HEAD
     <FormItem
       type="datePicker"
       dateFormat="yyyy-MM-dd"
@@ -198,16 +197,7 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
       bindTo="issueDate"
       label="Issue date" width="25%"
     />
-||||||| parent of 84a262f7 (fix: code example lengths)
-        <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
-                  bindTo="issueDate" label="Issue date" width="25%"/>
-=======
-    <FormItem type="datePicker"
-              dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
-              bindTo="issueDate" label="Issue date" width="25%"/>
->>>>>>> 84a262f7 (fix: code example lengths)
 
-<<<<<<< HEAD
     <FormItem
       type="datePicker"
       dateFormat="yyyy-MM-dd"
@@ -215,36 +205,12 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
       bindTo="dueDate"
       label="Due date"
       width="25%" />
-||||||| parent of 84a262f7 (fix: code example lengths)
-        <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
-                  bindTo="dueDate" label="Due date" width="25%"/>
-      </FlowLayout>
-=======
-    <FormItem type="datePicker"
-              dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
-              bindTo="dueDate" label="Due date" width="25%"/>
->>>>>>> 84a262f7 (fix: code example lengths)
   </FlowLayout>
 
   <H2>Line Items</H2>
-<<<<<<< HEAD
   <FlowLayout
     fontWeight="bold"
     backgroundColor="$color-surface-100"
-||||||| parent of 84a262f7 (fix: code example lengths)
-      <H2>Line Items</H2>
-      <FlowLayout fontWeight="bold" backgroundColor="$color-surface-100" padding="$space-2">
-        <Text width="20%">Product/Service</Text>
-        <Text width="20%">Description</Text>
-        <Text width="20%">Quantity</Text>
-        <Text width="20%">Price</Text>
-        <Text width="20%">Amount</Text>
-      </FlowLayout>
-=======
-  <FlowLayout
-    fontWeight="bold"
-    backgroundColor="$color-surface-100"
->>>>>>> 84a262f7 (fix: code example lengths)
     padding="$space-2"
   >
     <Text width="20%">Product/Service</Text>
@@ -280,7 +246,6 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
         </Items>
       </FormItem>
       <Text width="20%">{ productDetails.value[0].description }</Text>
-<<<<<<< HEAD
       <FormItem
         width="20%"
         bindTo="quantity"
@@ -306,26 +271,6 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
         onClick="lineItemsForm.removeItem($itemIndex)">
         X
       </Button>
-||||||| parent of 84a262f7 (fix: code example lengths)
-      <HStack>
-        <Button onClick="lineItemsForm.addItem()">
-          Add Item
-        </Button>
-        <SpaceFiller/>
-        <Text>
-          Total: ${ window.lineItemTotal($data.lineItems) }
-        </Text>
-      </HStack>
-    </Card>
-=======
-      <FormItem width="20%" bindTo="quantity" type="number"
-                initialValue="1" minValue="1"/>
-      <FormItem width="20%" bindTo="price" startText="$"
-                initialValue="{ productDetails.value[0].price }"/>
-      <FormItem width="13%" bindTo="amount" startText="$" enabled="false"
-                initialValue="{ $item.price ? $item.quantity * $item.price : '' } "/>
-      <Button width="2rem" onClick="lineItemsForm.removeItem($itemIndex)">X</Button>
->>>>>>> 84a262f7 (fix: code example lengths)
     </FlowLayout>
   </FormItem>
   <HStack>
