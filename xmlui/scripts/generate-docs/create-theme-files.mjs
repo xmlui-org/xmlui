@@ -15,6 +15,19 @@ import {
 const OUTPUT_DIR = pathResolver.getOutputPaths().themes;
 const logger = createScopedLogger("ThemeGenerator");
 
+/**
+ * Counts the number of theme variables, excluding those that start with "---"
+ * @param {Object} themeVars - The theme variables object
+ * @returns {number} - The count of non-separator theme variables
+ */
+function countThemeVars(themeVars) {
+  if (!themeVars || typeof themeVars !== 'object') {
+    return 0;
+  }
+  
+  return Object.keys(themeVars).filter(key => !key.startsWith("---")).length;
+}
+
 async function generateThemeFiles() {
   logger.operationStart("theme file generation");
   
@@ -36,31 +49,51 @@ async function generateThemeFiles() {
     const themeVarsData = processComponentThemeVars(collectedComponentMetadata, logger);
 
     // Write theme files with error handling
+    let totalThemeVars = 0;
+    let exportedThemeCount = 0;
+    
     await iterateObjectEntries(collectedThemes, async (themeName, themeData) => {
       // Skip the abstract root theme
       if (themeName === "root") return;
 
+      // Prepare the complete theme vars object
+      const completeThemeVars = {
+        "--- App-bound root theme variables": "",
+        ...rootTheme.themeVars,
+        "--- App-bound theme-specific variables": "",
+        ...themeData.themeVars,
+        "--- Component-bound theme variables": "",
+        ...themeVarsData.base,
+        light: { ...themeData.themeVars.light, ...themeVarsData.light },
+        dark: { ...themeData.themeVars.dark, ...themeVarsData.dark },
+      };
+
+      // Count theme vars (excluding separators)
+      const themeVarCount = countThemeVars(completeThemeVars);
+      totalThemeVars += themeVarCount;
+      exportedThemeCount++;
+      
       const themePath = join(OUTPUT_DIR, `${themeName}.json`);
       const themeContent = JSON.stringify(
         {
           ...themeData,
-          themeVars: {
-            "--- App-bound root theme variables": "",
-            ...rootTheme.themeVars,
-            "--- App-bound theme-specific variables": "",
-            ...themeData.themeVars,
-            "--- Component-bound theme variables": "",
-            ...themeVarsData.base,
-            light: { ...themeData.themeVars.light, ...themeVarsData.light },
-            dark: { ...themeData.themeVars.dark, ...themeVarsData.dark },
-          },
+          themeVars: completeThemeVars,
         },
         null,
         2,
       );
 
       await writeFileWithLogging(themePath, themeContent, logger);
+      
+      logger.info(`Theme '${themeName}' exported with ${themeVarCount} theme variables`);
     }, { async: true });
+    
+    // Display summary of all exported themes
+    if (exportedThemeCount > 0) {
+      logger.info(`\n=== Theme Export Summary ===`);
+      logger.info(`Exported ${exportedThemeCount} theme files with a total of ${totalThemeVars} theme variables`);
+      logger.info(`Average of ${Math.round(totalThemeVars / exportedThemeCount)} theme variables per theme file`);
+    }
 
     logger.operationComplete("theme file generation");
     
