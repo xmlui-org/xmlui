@@ -90,90 +90,93 @@ export function AppWithCodeViewNative({
 
   if (withFrame) {
     return (
-      <div className={styles.nestedAppContainer} style={{ height }}>
-        {!noHeader && (
-          <div className={styles.header}>
-            {!splitView && <span className={styles.headerText}>{title}</span>}
-            {splitView && (
-              <>
-                <div className={styles.wrapper}>
-                  <Logo className={styles.logo} />
-                </div>
-                <div className={styles.viewControls}>
-                  <Button
-                    onClick={() => setShowCode(true)}
-                    className={classnames(styles.splitViewButton, {
-                      [styles.show]: showCode,
-                      [styles.hide]: !showCode,
-                    })}
-                  >
-                    XML
-                  </Button>
-                  <Button
-                    onClick={() => setShowCode(false)}
-                    className={classnames(styles.splitViewButton, {
-                      [styles.show]: !showCode,
-                      [styles.hide]: showCode,
-                    })}
-                  >
-                    UI
-                  </Button>
-                </div>
-              </>
-            )}
-            <div className={styles.wrapper}>
-              {allowPlaygroundPopup && (
+      <>
+        {!!markdown && !splitView && <Markdown>{markdown}</Markdown>}
+        <div className={styles.nestedAppContainer} style={{ height }}>
+          {!noHeader && (
+            <div className={styles.header}>
+              {!splitView && <span className={styles.headerText}>{title}</span>}
+              {splitView && (
+                <>
+                  <div className={styles.wrapper}>
+                    <Logo className={styles.logo} />
+                  </div>
+                  <div className={styles.viewControls}>
+                    <Button
+                      onClick={() => setShowCode(true)}
+                      className={classnames(styles.splitViewButton, {
+                        [styles.show]: showCode,
+                        [styles.hide]: !showCode,
+                      })}
+                    >
+                      XML
+                    </Button>
+                    <Button
+                      onClick={() => setShowCode(false)}
+                      className={classnames(styles.splitViewButton, {
+                        [styles.show]: !showCode,
+                        [styles.hide]: showCode,
+                      })}
+                    >
+                      UI
+                    </Button>
+                  </div>
+                </>
+              )}
+              <div className={styles.wrapper}>
+                {allowPlaygroundPopup && (
+                  <Tooltip
+                    trigger={
+                      <button
+                        className={styles.headerButton}
+                        onClick={() => {
+                          openPlayground();
+                        }}
+                      >
+                        <RxOpenInNewWindow />
+                      </button>
+                    }
+                    label="View and edit in new full-width window"
+                  />
+                )}
                 <Tooltip
                   trigger={
                     <button
                       className={styles.headerButton}
                       onClick={() => {
-                        openPlayground();
+                        setShowCode(false);
+                        setRefreshVersion(refreshVersion + 1);
                       }}
                     >
-                      <RxOpenInNewWindow />
+                      <LiaUndoAltSolid />
                     </button>
                   }
-                  label="View and edit in new full-width window"
+                  label="Reset the app"
                 />
-              )}
-              <Tooltip
-                trigger={
-                  <button
-                    className={styles.headerButton}
-                    onClick={() => {
-                      setShowCode(false);
-                      setRefreshVersion(refreshVersion + 1);
-                    }}
-                  >
-                    <LiaUndoAltSolid />
-                  </button>
-                }
-                label="Reset the app"
-              />
+              </div>
             </div>
+          )}
+          <div className={styles.contentContainer}>
+            {showCode && (
+              <Markdown style={{ height: "100%" }} className={styles.splitViewMarkdown}>
+                {markdown}
+              </Markdown>
+            )}
+            {!showCode && (
+              <IndexAwareNestedApp
+                height={"100%"}
+                app={app}
+                api={api}
+                components={components}
+                config={config}
+                activeTone={activeTone}
+                activeTheme={activeTheme}
+                refreshVersion={refreshVersion}
+              />
+            )}
           </div>
-        )}
-        <div className={styles.contentContainer}>
-          {showCode && (
-            <Markdown style={{ height: "100%" }} className={styles.splitViewMarkdown}>
-              {markdown}
-            </Markdown>
-          )}
-          {!showCode && (
-            <IndexAwareNestedApp
-              height={"100%"}
-              app={app}
-              api={api}
-              components={components}
-              config={config}
-              activeTone={activeTone}
-              activeTheme={activeTheme}
-              refreshVersion={refreshVersion}
-            />
-          )}
         </div>
-      </div>
+      </>
     );
   }
   return (
