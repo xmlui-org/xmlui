@@ -337,11 +337,15 @@ export const HelloWorldMd = createMetadata({
   },
   events: {
     onClick: {
-      description: "Triggered when the click button is pressed. Receives the current click count.",
+      description:
+        "Triggered when the click button is pressed. " +
+        "Receives the current click count.",
       type: "function",
     },
     onReset: {
-      description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+      description:
+        "Triggered when the reset button is pressed. " +
+        "Called when count is reset to 0.",
       type: "function",
     },
   },
@@ -365,7 +369,15 @@ export const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
+  ({ 
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    lookupEventHandler,
+    registerComponentApi,
+    updateState
+  }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
@@ -474,13 +486,15 @@ Components can expose methods that allow XMLUI applications to interact with the
 ### Add registerComponentApi prop to HelloWorldNative.tsx
 
 First, add the required imports:
-```js
+
+```js filename="HelloWorldNative.tsx" copy
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 ```
 
 Then add the props to the Props interface:
-```js
+
+```js filename="HelloWorldNative.tsx" copy
 type Props = {
   // ... existing props
   registerComponentApi?: RegisterComponentApiFn;
@@ -489,7 +503,8 @@ type Props = {
 ```
 
 Inside the component function, create the setValue method and register the API:
-```js
+
+```js filename="HelloWorldNative.tsx" copy
 const setValue = useEvent((newCount: number) => {
   setClickCount(newCount);
   updateState?.({ value: newCount });
@@ -523,7 +538,7 @@ const handleReset = (event: React.MouseEvent) => {
 
 ### Add exposed methods to HelloWorld.tsx metadata
 
-```js
+```js filename="HelloWorld.tsx" copy
 export const HelloWorldMd = createMetadata({
   // ... existing metadata
   apis: {
@@ -535,11 +550,20 @@ export const HelloWorldMd = createMetadata({
 ```
 
 **Update HelloWorld.tsx renderer:**
-```js
+
+```js filename="HelloWorld.tsx" copy
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    lookupEventHandler,
+    registerComponentApi,
+    updateState
+  }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
@@ -648,7 +672,8 @@ const [clickCount, setClickCount] = useState(0);
 XMLUI components can expose events that XMLUI apps can handle. This involves several steps:
 
 **1. Add event props to your component's Props interface:**
-```js
+
+```js copy
 type Props = {
   // ... other props
   onClick?: string;
@@ -657,7 +682,8 @@ type Props = {
 ```
 
 **2. Use event handler props in your component:**
-```js
+
+```js copy
 const handleClick = () => {
   const newCount = clickCount + 1;
   setClickCount(newCount);
@@ -673,7 +699,8 @@ const handleReset = () => {
 ```
 
 **3. Declare events in your component metadata:**
-```js
+
+```js copy
 events: {
   onClick: {
     description: "Triggered when the click button is pressed. Receives the current click count.",
@@ -687,7 +714,7 @@ events: {
 ```
 
 **4. Use lookupEventHandler in the renderer:**
-```js
+```js copy
 // In the renderer function
 return (
   <HelloWorld

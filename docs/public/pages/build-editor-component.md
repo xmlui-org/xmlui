@@ -50,7 +50,8 @@ export const editorComponentRenderer = {
 Register it in `ComponentProvider.tsx`.
 
 ```xmlui
-import { editorComponentRenderer as TableEditorRenderer } from "./components/TableEditor/TableEditor";
+import { editorComponentRenderer as TableEditorRenderer }
+  from "./components/TableEditor/TableEditor";
 
 if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
   this.registerCoreComponent(TableEditorRenderer);
@@ -81,7 +82,7 @@ Install Tiptap dependencies.
 
 Update `TableEditor.tsx`.
 
-```
+```js filename="TableEditor.tsx" copy
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
@@ -145,7 +146,7 @@ You can now edit the cells in the table.
 
 ## Step 4: Add an Insert Row button
 
-```xmlui {41-46}
+```js {41-46} copy filename="TableEditor.tsx"
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
@@ -219,64 +220,63 @@ You can now insert rows.
 
 Import and use `Button`.
 
+```js /Button/ copy filename="TableEditor.tsx"
+  import { useEditor, EditorContent } from "@tiptap/react";
+  import StarterKit from "@tiptap/starter-kit";
+  import Table from "@tiptap/extension-table";
+  import TableRow from "@tiptap/extension-table-row";
+  import TableCell from "@tiptap/extension-table-cell";
+  import TableHeader from "@tiptap/extension-table-header";
+  import { Button } from "../Button/ButtonNative";
 
-```xmlui /Button/
-   import { useEditor, EditorContent } from "@tiptap/react";
-   import StarterKit from "@tiptap/starter-kit";
-   import Table from "@tiptap/extension-table";
-   import TableRow from "@tiptap/extension-table-row";
-   import TableCell from "@tiptap/extension-table-cell";
-   import TableHeader from "@tiptap/extension-table-header";
-   import { Button } from "../Button/ButtonNative";
+  export function TableEditor() {
+    const editor = useEditor({
+      extensions: [
+        StarterKit,
+        Table.configure({ resizable: true }),
+        TableRow,
+        TableHeader,
+        TableCell,
+      ],
+      content: `
+        <table>
+          <thead>
+            <tr>
+              <th>Fruit</th>
+              <th>Color</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Apple</td>
+              <td>Red</td>
+            </tr>
+            <tr>
+              <td>Banana</td>
+              <td>Yellow</td>
+            </tr>
+          </tbody>
+        </table>
+      `,
+    });
 
-   export function TableEditor() {
-     const editor = useEditor({
-       extensions: [
-         StarterKit,
-         Table.configure({ resizable: true }),
-         TableRow,
-         TableHeader,
-         TableCell,
-       ],
-       content: `
-         <table>
-           <thead>
-             <tr>
-               <th>Fruit</th>
-               <th>Color</th>
-             </tr>
-           </thead>
-           <tbody>
-             <tr>
-               <td>Apple</td>
-               <td>Red</td>
-             </tr>
-             <tr>
-               <td>Banana</td>
-               <td>Yellow</td>
-             </tr>
-           </tbody>
-         </table>
-       `,
-     });
+    return (
+      <div>
+        <Button
+          onClick={() => editor && editor.commands.addRowAfter()}
+          disabled={!editor}
+        >
+          Insert Row
+        </Button>
+        <EditorContent editor={editor} />
+      </div>
+    );
+  }
 
-     return (
-       <div>
-         <Button
-           onClick={() => editor && editor.commands.addRowAfter()}
-           disabled={!editor}
-         >
-           Insert Row
-         </Button>
-         <EditorContent editor={editor} />
-       </div>
-     );
-   }
-
-   export const editorComponentRenderer = {
-     type: "TableEditor",
-     renderer: (props: any) => <TableEditor {...props} />
-   };
+  export const editorComponentRenderer = {
+    type: "TableEditor",
+    renderer: (props: any) => <TableEditor {...props} />
+  };
 ```
 
 You now have a proper themed XMLUI button.
@@ -291,7 +291,7 @@ To keep our code modular, we'll separate the editor's rendering logic into a min
 
 Create `TableEditorNative.tsx` alongside `TableEditor.tsx`.
 
-```xmlui
+```js filename="TableEditorNative.tsx" copy
 import { EditorContent } from "@tiptap/react";
 
 export function TableEditorNative({ editor }: { editor: any }) {
@@ -303,7 +303,7 @@ This component simply renders the Tiptap editor UI for a given editor instance.
 
 Now, let's expose a method to get the current HTML from the editor. Add this to `TableEditor.tsx`.
 
-```xmlui
+```js filename="TableEditorNative.tsx" copy
 React.useEffect(() => {
   if (registerComponentApi && editor) {
     registerComponentApi({
@@ -338,7 +338,7 @@ npm install turndown
 
 Then update `TableEditor.tsx` to use it.
 
-```xmlui /turndown/ {42-60}
+```js /turndown/ {42-60} filename="TableEditor.tsx"
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -464,7 +464,7 @@ We can improve the TableEditor by adding more table editing controls like Insert
 
 We chose to implement the controls in `TableEditor.tsx` because it provides the best balance of usability and flexibility. Users get a working table editor with sensible controls out of the box, while advanced users can still build custom UIs using the exposed API if needed.
 
-```xmlui {71-87}
+```js {71-87} filename="TableEditorNative.tsx"
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -583,14 +583,11 @@ Now we have this result.
 
 ![](/resources/devdocs/table_editor_07.png)
 
-
-
-
 ## Step 9: Add custom icons
 
 The table editor buttons currently use only text labels. Let's add custom SVG icons.
 
-```xmlui
+```js copy
 <Button
   onClick={() => editor && editor.commands.addRowAfter()}
   disabled={!editor}
@@ -627,7 +624,7 @@ Our TableEditor component currently uses hardcoded button styling. To make Table
 
 Try adding different theme props to your TableEditor:
 
-```xml
+```xmlui
 <TableEditor themeColor="secondary" variant="outlined" size="lg" />
 ```
 
@@ -635,7 +632,7 @@ The buttons remain blue and solid. This happens because XMLUI doesn't know which
 
 XMLUI components need metadata to define their allowed props.
 
-```xmlui {12-15} /TableEditorMd/
+```js {12-15} /TableEditorMd/ filename="TableEditorNative.tsx"
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -852,7 +849,7 @@ export const editorComponentRenderer = createComponentRenderer(
 
 We add the necessary imports to `TableEditor.tsx`.
 
-```tsx
+```js filename="TableEditor.tsx" copy
 import { createMetadata } from "../metadata-helpers";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
@@ -860,7 +857,7 @@ import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 
 We modify the TableEditor function to accept theme props.
 
-```tsx
+```js filename="TableEditor.tsx" copy
 export function TableEditor({
   registerComponentApi,
   themeColor = "primary",
@@ -878,7 +875,7 @@ export function TableEditor({
 
 We forward these props to all Button components.
 
-```tsx
+```js copy
 <Button
   onClick={() => editor && editor.commands.addRowAfter()}
   disabled={!editor}
@@ -892,7 +889,7 @@ We forward these props to all Button components.
 
 We add metadata that defines the allowed props:
 
-```tsx
+```js copy filename="TableEditor.tsx"
 export const TableEditorMd = createMetadata({
   description:
     "`TableEditor` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
@@ -926,7 +923,7 @@ export const TableEditorMd = createMetadata({
 
 We replace the simple renderer with a proper one that uses metadata:
 
-```tsx
+```js filename="TableEditor.tsx" copy
 export const editorComponentRenderer = createComponentRenderer(
   "TableEditor",
   TableEditorMd,
@@ -945,7 +942,7 @@ export const editorComponentRenderer = createComponentRenderer(
 
 Now TableEditor supports full theme customization.
 
-```xmlui
+```xmlui copy
   <TableEditor
     id="tableEditor"
   />
@@ -978,7 +975,7 @@ Now TableEditor supports full theme customization.
 
 To make your custom icon usable in XMLUI, wrap your SVG markup in a React component. This allows the icon to inherit color, size, and accessibility props from its parent.
 
-```tsx
+```js copy
 // File: xmlui/src/components/Icon/TableInsertRowIcon.tsx
 import React from "react";
 
@@ -1008,15 +1005,15 @@ export default function TableInsertRowIcon(props) {
 
 Register the icon in `IconProvider.tsx`.
 
-   ```tsx
-   import TableInsertRowIcon from "./Icon/TableInsertRowIcon";
+```js filename="IconProvider.tsx"
+import TableInsertRowIcon from "./Icon/TableInsertRowIcon";
 
-   registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...props} />);
-   ```
+registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...props} />);
+```
 
 Update `TableEditor.tsx`.
 
-```xmlui /<Icon/
+```js /<Icon/ filename="TableEditor.tsx"
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -1176,23 +1173,23 @@ export const editorComponentRenderer = createComponentRenderer(
 
 For icon-only buttons, use the `contextualLabel` prop to provide an accessible name.
 
-  ```xmlui
-  <Button icon="table-insert-row" contextualLabel="Insert a new row" />
-  ```
-  This ensures screen readers announce the button's purpose, even if only the icon is visible.
+```xmlui
+<Button icon="table-insert-row" contextualLabel="Insert a new row" />
+```
 
+This ensures screen readers announce the button's purpose, even if only the icon is visible.
 
 For decorative icons, use `aria-hidden="true"` to hide the icon from assistive technology.
 
-  ```xmlui
-  <Icon name="table-insert-row" aria-hidden="true" />
-  ```
+```xmlui
+<Icon name="table-insert-row" aria-hidden="true" />
+```
 
 ## Step 12: Make the Markdown reactive
 
 We want the Markdown display to update when changes happen in the editor. Make this change in `TableEditor.tsx`.
 
-```xmlui {6} {8-13}
+```js {6} {8-13} filename="TableEditor.tsx"
 React.useEffect(() => {
   if (!editor) return;
   const handler = () => {
@@ -1211,34 +1208,35 @@ React.useEffect(() => {
 
 Replace `events: {}` with this snippet.
 
-```xmlui
-  events: {
-    didChange: {
-      description: "Fired whenever the table content changes. Payload: { html, markdown }.",
-      isRequired: false,
-      type: "function",
-    },
+```js
+events: {
+  didChange: {
+    description: "Fired whenever the table content changes. Payload: { html, markdown }.",
+    isRequired: false,
+    type: "function",
   },
+},
 ```
 
 And do this.
 
-```xmlui {4-5} {12}
- export const editorComponentRenderer = createComponentRenderer(
-   "TableEditor",
-   TableEditorMd,
-  ({ node, extractValue, registerComponentApi, lookupEventHandler }) => {
-    const handler = lookupEventHandler?.("didChange");
-     return (
-       <TableEditor
-         themeColor={extractValue.asOptionalString(node.props.themeColor)}
-         variant={extractValue.asOptionalString(node.props.variant)}
-         size={extractValue.asOptionalString(node.props.size)}
-         registerComponentApi={registerComponentApi}
+```js {4-5} {12} copy
+export const editorComponentRenderer = createComponentRenderer(
+  "TableEditor",
+  TableEditorMd,
+({ node, extractValue, registerComponentApi, lookupEventHandler }) => {
+  const handler = lookupEventHandler?.("didChange");
+    return (
+      <TableEditor
+        themeColor={extractValue.asOptionalString(node.props.themeColor)}
+        variant={extractValue.asOptionalString(node.props.variant)}
+        size={extractValue.asOptionalString(node.props.size)}
+        registerComponentApi={registerComponentApi}
         onDidChange={handler}
-       />
-     );
-   },
+      />
+    );
+  },
+)
 ```
 
 Now the Markdown updates as you change the table.
@@ -1249,7 +1247,7 @@ Now the Markdown updates as you change the table.
 
 We'll want to control the editor's style with XMLUI theme variables, but first let's add basic styling in `TableEditor.module.scss`.
 
-```xmlui
+```css filename="TableEditor.module.css" copy
 .table-editor-root {
   padding: 8px;
   overflow-x: auto;
@@ -1278,7 +1276,7 @@ We'll want to control the editor's style with XMLUI theme variables, but first l
 
 Use the styles in `TableEditor.tsx`.
 
-```xlmui
+```js filename="TableEditor.tsx"
 return (
   <div className="table-editor-root">
     <div className="button-stack">
@@ -1320,7 +1318,7 @@ Here is the result.
 
 Now let's make `TableEditor` visually consistent with [Table](/components/Table) by reusing XMLUI theme variables for header, cell, and spacing styles. Here is the new `TableEditor.module.css`.
 
-```xmlui
+```scss filename="TableEditor.module.css" copy
 @use "../../components-core/theming/themes" as t;
 $componentName: "TableEditor";
 
@@ -1397,7 +1395,6 @@ Now the editor matches the look of XMLUI tables rendered directly using `Table` 
 ```xmlui-pg display noHeader
 <App var.markdown="">
 
-
   <Card>
     <TableEditor
       id="tableEditor"
@@ -1406,20 +1403,20 @@ Now the editor matches the look of XMLUI tables rendered directly using `Table` 
     />
   </Card>
 
-<Card>
-  <HStack>
-    <Text variant="codefence" preserveLinebreaks="{true}">
-      { markdown }
-    </Text>
-    <SpaceFiller />
-    <Button
-      icon="copy"
-      variant="ghost"
-      size="xs"
-      onClick="navigator.clipboard.writeText(markdown)"
-    />
-  </HStack>
-</Card>
+  <Card>
+    <HStack>
+      <Text variant="codefence" preserveLinebreaks="{true}">
+        { markdown }
+      </Text>
+      <SpaceFiller />
+      <Button
+        icon="copy"
+        variant="ghost"
+        size="xs"
+        onClick="navigator.clipboard.writeText(markdown)"
+      />
+    </HStack>
+  </Card>
 
 </App>
 ```
