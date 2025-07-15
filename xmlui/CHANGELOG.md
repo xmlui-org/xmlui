@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.74
+
+### Patch Changes
+
+- 0043c5d: NestedApp new prop: withSplashScreen
+
 ## 0.9.73
 
 ### Patch Changes
