@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
@@ -15,9 +15,10 @@ import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./InspectorButton.module.scss";
-import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ProjectCompilation } from "../abstractions/scripting/Compilation";
-import { PiFileCode } from "react-icons/pi";
+import { InspectorDialog } from "./devtools/InspectorDialog";
+import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
+import { XmlUiHelper } from "../parsers/xmlui-parser";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -51,21 +52,14 @@ export function InspectorProvider({
   projectCompilation?: ProjectCompilation;
   mockApi?: any;
 }) {
-  const { root } = useTheme();
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
   const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
   const [showCode, setShowCode] = useState(false);
-  const [devToolsSize, setDevToolsSize] = useState(0);
-  const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
   const [inspectMode, setInspectMode] = useState(false);
   const [clickPosition, setClickPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
   });
-  const componentRegistry = useComponentRegistry();
-
-  const devToolsEntry = componentRegistry.lookupComponentRenderer("XMLUIDevtools.DevTools");
-
   const contextValue: IInspectorContext = useMemo(() => {
     return {
       sources,
@@ -103,10 +97,6 @@ export function InspectorProvider({
       inspectedNode,
       setIsOpen: setShowCode,
       isOpen: showCode,
-      devToolsSize,
-      setDevToolsSize,
-      devToolsSide,
-      setDevToolsSide,
       devToolsEnabled: showCode,
       projectCompilation: projectCompilation,
       setInspectMode,
@@ -115,8 +105,6 @@ export function InspectorProvider({
       clickPosition,
     };
   }, [
-    devToolsSide,
-    devToolsSize,
     sources,
     inspectedNode,
     showCode,
@@ -127,13 +115,42 @@ export function InspectorProvider({
     mockApi,
   ]);
 
+  const serializedNode = useMemo(() => {
+    if (!inspectedNode) {
+      return "";
+    }
+    const xmluiHelper = new XmlUiHelper();
+    const fragment = xmluiHelper.transformComponentDefinition(inspectedNode);
+    return xmluiHelper.serialize(fragment);
+  }, [inspectedNode]);
+
+  const components = useMemo<string[]>(() => {
+    if (!projectCompilation) {
+      return [];
+    }
+    return projectCompilation.components.map((component) => {
+      return component.markupSource;
+    })
+  }, [projectCompilation]);
+
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         showCode &&
-        inspectedNode !== null &&
-        createPortal(devToolsEntry?.renderer({} as any), root)}
+        inspectedNode !== null && (
+          <InspectorDialog isOpen={showCode} setIsOpen={setShowCode} clickPosition={clickPosition}>
+            <AppWithCodeViewNative
+              height={"500px"}
+              allowPlaygroundPopup
+              splitView={true}
+              markdown={""}
+              api={mockApi}
+              app={serializedNode}
+              components={components}
+            />
+          </InspectorDialog>
+        )}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {

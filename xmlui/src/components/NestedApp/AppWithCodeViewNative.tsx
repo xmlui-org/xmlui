@@ -60,11 +60,11 @@ export function AppWithCodeViewNative({
   immediate
 }: AppWithCodeViewNativeProps): ReactNode {
   const [showCode, setShowCode] = useState(initiallyShowCode);
-  const { appGlobals } = useAppContext();
+  const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
   const safePopOutUrl = withoutTrailingSlash(
-    popOutUrl || appGlobals?.popOutUrl || "https://docs.xmlui.com/#/playground",
+    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.com/#/playground",
   );
   const openPlayground = useCallback(async () => {
     const data = {
