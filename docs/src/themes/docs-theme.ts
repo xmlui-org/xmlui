@@ -23,6 +23,16 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
     "maxWidth-Drawer": "100%",
+    "textColor-NavLink": "$color-secondary-600",
+    "color-indicator-NavLink--active": "transparent",
+    "color-indicator-NavLink--hover": "transparent",
+    "color-indicator-NavLink--pressed": "transparent",
+    "backgroundColor-NavLink--hover": "$color-surface-100",
+    "backgroundColor-NavLink--pressed": "$color-surface-100",
+    "fontWeight-NavLink--active": "bold",
+    "textColor-NavLink--hover": "$color-surface-900",
+    "textColor-NavLink--active": "$color-primary-500",
+    "textColor-NavLink--hover--active": "$color-primary-500",
 
     // --- Adjust a little bit of Markdown
     "fontSize-H1": "1.65rem",
