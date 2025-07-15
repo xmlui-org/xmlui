@@ -24,7 +24,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
 
 
 .overlay{
-  position: fixed;
+  position: absolute;
   display: grid;
   place-items: center;
   overflow-y: auto;
