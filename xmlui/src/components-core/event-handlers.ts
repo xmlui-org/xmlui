@@ -41,8 +41,9 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
       : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
     const eventHandler: EventHandler<any> = useCallback(
       (event) => {
+        // If the event handler is not defined, we do nothing
         if (onEvent) {
-          event.stopPropagation();
+          event?.stopPropagation();
           onEvent(event);
         }
       },
