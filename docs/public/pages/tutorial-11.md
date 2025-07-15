@@ -23,7 +23,6 @@ The table that displays imported products makes rows selectable, so you can impo
 
 It uses `rowDisabledPredicate` to disable a row if the name of any existing product matches the name of the product in the current row. The function `isDuplicate` also enables highlighting duplicate rows.
 
-
 ```xmlui /isDuplicate/
 <Table
   id="productsFromCsv"
@@ -32,8 +31,15 @@ It uses `rowDisabledPredicate` to disable a row if the name of any existing prod
   rowDisabledPredicate="{(row) => isDuplicate(row.name)}"
 >
   <Column header="Name">
+<<<<<<< HEAD
     <Text color="{isDuplicate($item.name) 
         ? '$color-danger-500' : '$textColor-primary'}"
+||||||| parent of 84a262f7 (fix: code example lengths)
+    <Text color="{isDuplicate($item.name) ? '$color-danger-500' : '$textColor-primary'}">
+=======
+    <Text
+      color="{isDuplicate($item.name) ? '$color-danger-500' : '$textColor-primary'}"
+>>>>>>> 84a262f7 (fix: code example lengths)
     >
       {$item.name} {isDuplicate($item.name) ? '(duplicate)' : ''}
     </Text>
@@ -63,9 +69,17 @@ The API doesn't support batch update so we use `Queue` to iterate over the selec
 ```xmlui /pluralize/
 <Queue id="importQueue" clearAfterFinish="true">
   <property name="progressFeedback">
+<<<<<<< HEAD
     <Text value="Importing {pluralize(importQueue.getQueuedItems().length, 
       'product', 'products')}"
     />
+||||||| parent of 84a262f7 (fix: code example lengths)
+    <Text value="Importing {pluralize(importQueue.getQueuedItems().length, 'product', 'products')}"/>
+=======
+    <Text value="Importing {
+      pluralize(importQueue.getQueuedItems().length, 'product', 'products')
+    }"/>
+>>>>>>> 84a262f7 (fix: code example lengths)
   </property>
   <property name="resultFeedback">
     <Text value="Imported {pluralize($completedItems.length, 
@@ -83,8 +97,7 @@ The API doesn't support batch update so we use `Queue` to iterate over the selec
 </Queue>
 ```
 
-> [!INFO]
-> `pluralize` is a [global helper function](/globals#pluralize).
+> [!INFO] `pluralize` is a [global helper function](/globals#pluralize).
 
 The import button uses the queue's `enqueueItems` method to populate the queue with the result of the table's `getSelectedItems` method.
 
@@ -95,4 +108,3 @@ The import button uses the queue's `enqueueItems` method to populate the queue w
   enabled="{productsFromCsv.getSelectedItems().length}"
 />
 ```
-

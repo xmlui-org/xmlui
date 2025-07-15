@@ -33,7 +33,9 @@ In `Main.xmlui`, a `DataSource` loads settings from the database and populates t
 ```xmlui /settingsLoader/ /settings.update/
 <DataSource id="settingsLoader" url="/api/settings">
   <event name="loaded">
-    settings.update({ avatar_border_radius: settingsLoader.value[0].avatar_border_radius });
+    settings.update({
+      avatar_border_radius: settingsLoader.value[0].avatar_border_radius
+    });
     delay(500);
   </event>
 </DataSource>
@@ -77,7 +79,7 @@ The Settings form uses a [TextBox](/components/TextBox) that updates AppState im
 ```
 
 This pattern provides:
+
 - **Immediate feedback** - UI updates as the user types
 - **Controlled persistence** - Database only updates on explicit save
 - **Error handling** - Save failures don't lose the user's input
-

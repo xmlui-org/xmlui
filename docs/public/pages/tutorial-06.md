@@ -1,9 +1,10 @@
 # Slider
+
 The `Dashboard` page continues with a chart of daily revenue that uses a [Slider](/components/Slider) to control both ends of a date range.
 
 Here is a simplified version of that mechanism. Try using both slider handles to adjust the date range and corresponding total revenue.
 
-```xmlui-pg  noHeader
+```xmlui-pg noHeader
 ---app display
 <App>
   <SliderDemo />
@@ -121,7 +122,9 @@ Here's `SliderDemo`.
       }"
     />
 
-    <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
+    <Text>
+      Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}
+    </Text>
 
   </VStack>
 </Component>
@@ -141,7 +144,9 @@ The Invoices app encapsulates this behavior in a custom component called `DateRa
   <variable name="maxEndDate" value="{ $props.maxDate }"/>
   <variable name="startDate" value="{ originalStartDate }"/>
   <variable name="endDate" value="{ maxEndDate }"/>
-  <variable name="totalDays" value="{ window.daysBetween(originalStartDate, maxEndDate)}"/>
+  <variable
+    name="totalDays"
+    value="{ window.daysBetween(originalStartDate, maxEndDate)}"/>
 
   <ChangeListener
     listenTo="{slider.value}"
@@ -164,10 +169,9 @@ The Invoices app encapsulates this behavior in a custom component called `DateRa
     initialValue="{ [0, totalDays] }"
     step="10"
     valueFormat="{ (value) => {
-            const date = window.sliderValueToDate(value, originalStartDate);
-            return date;
-            }
-        }"
+      const date = window.sliderValueToDate(value, originalStartDate);
+      return date;
+    }}"
   />
 </Component>
 ```
