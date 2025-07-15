@@ -162,7 +162,11 @@ export class ApiInterceptor {
     );
 
     //artificial delay for http requests
-    await delay();
+    if(this.apiDef.artificialDelay === undefined){
+      await delay("real");
+    } else if(this.apiDef.artificialDelay !== 0){
+      await delay(this.apiDef.artificialDelay);
+    }
     const cookieService = new CookieService();
     const headerService = new HeaderService();
     try {

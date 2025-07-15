@@ -366,6 +366,8 @@ export const Markdown = memo(function Markdown({
                 splitView={appProps.splitView ?? false}
                 initiallyShowCode={appProps.initiallyShowCode ?? false}
                 popOutUrl={appProps.popOutUrl}
+                immediate={appProps.immediate}
+                withSplashScreen={appProps.withSplashScreen}
               />
             );
           },

@@ -91,6 +91,8 @@ export type AppWrapperProps = {
   projectCompilation?: ProjectCompilation;
 
   children?: ReactNode;
+
+  onInit?: ()=>void;
 };
 
 /**
@@ -115,6 +117,7 @@ export const AppWrapper = ({
   sources,
   children,
   projectCompilation,
+  onInit,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -150,6 +153,7 @@ export const AppWrapper = ({
             >
               <ConfirmationModalContextProvider>
                 <AppContent
+                  onInit={onInit}
                   rootContainer={node as ContainerWrapperDef}
                   routerBaseName={baseName}
                   globalProps={globalProps}

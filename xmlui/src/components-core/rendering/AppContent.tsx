@@ -54,6 +54,7 @@ type AppContentProps = {
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
   children?: ReactNode;
+  onInit?: ()=>void;
 };
 
 function safeGetComputedStyle(root?: HTMLElement) {
@@ -78,6 +79,7 @@ export function AppContent({
   decorateComponentsWithTestId,
   debugEnabled,
   children,
+  onInit,
 }: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
@@ -238,6 +240,10 @@ export function AppContent({
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
 
+
+  useEffect(()=>{
+    onInit?.();
+  }, [onInit]);
 
   // useEffect(()=>{
   //   if(isWindowFocused){
