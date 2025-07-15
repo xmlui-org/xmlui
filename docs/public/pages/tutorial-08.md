@@ -140,7 +140,6 @@ This [Form](/components/Form) contains a dropdown menu of products, two date pic
     onCancel="invoiceForm.reset()">
 ```
 
-
 ## The payload
 
 A valid payload looks like this.
@@ -151,19 +150,19 @@ A valid payload looks like this.
   "dueDate": "2025-07-10",
   "client": "Abstergo Industries",
   "lineItems": [
-      { 
-        "quantity": "1", 
-        "amount": 105, 
-        "product": "API Integration", 
-        "price": 105 
-      },
-      { 
-        "quantity": "1", 
-        "amount": 115, 
-        "product": "Brand Strategy Consulting", 
-        "price": 115 
-      }
-   ]
+    {
+      "quantity": "1",
+      "amount": 105,
+      "product": "API Integration",
+      "price": 105
+    },
+    {
+      "quantity": "1",
+      "amount": 115,
+      "product": "Brand Strategy Consulting",
+      "price": 115
+    }
+  ]
 }
 ```
 
@@ -191,27 +190,27 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
       </Items>
     </FormItem>
 
-    <FormItem 
-      type="datePicker" 
-      dateFormat="yyyy-MM-dd" 
+    <FormItem
+      type="datePicker"
+      dateFormat="yyyy-MM-dd"
       initialValue="{ formatToday() }"
-      bindTo="issueDate" 
+      bindTo="issueDate"
       label="Issue date" width="25%"
     />
 
-    <FormItem 
-      type="datePicker" 
-      dateFormat="yyyy-MM-dd" 
+    <FormItem
+      type="datePicker"
+      dateFormat="yyyy-MM-dd"
       initialValue="{ formatToday(30) }"
-      bindTo="dueDate" 
-      label="Due date" 
+      bindTo="dueDate"
+      label="Due date"
       width="25%" />
   </FlowLayout>
 
   <H2>Line Items</H2>
-  <FlowLayout 
-    fontWeight="bold" 
-    backgroundColor="$color-surface-100" 
+  <FlowLayout
+    fontWeight="bold"
+    backgroundColor="$color-surface-100"
     padding="$space-2"
   >
     <Text width="20%">Product/Service</Text>
@@ -247,28 +246,28 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
         </Items>
       </FormItem>
       <Text width="20%">{ productDetails.value[0].description }</Text>
-      <FormItem 
-        width="20%" 
-        bindTo="quantity" 
-        type="number" 
-        initialValue="1" 
+      <FormItem
+        width="20%"
+        bindTo="quantity"
+        type="number"
+        initialValue="1"
         minValue="1"
       />
-      <FormItem 
-        width="20%" 
-        bindTo="price" 
-        startText="$" 
+      <FormItem
+        width="20%"
+        bindTo="price"
+        startText="$"
         initialValue="{ productDetails.value[0].price }"
       />
-      <FormItem 
-        width="13%" 
-        bindTo="amount" 
-        startText="$" 
+      <FormItem
+        width="13%"
+        bindTo="amount"
+        startText="$"
         enabled="false"
         initialValue="{ $item.price ? $item.quantity * $item.price : '' } "
       />
-      <Button 
-        width="2rem" 
+      <Button
+        width="2rem"
         onClick="lineItemsForm.removeItem($itemIndex)">
         X
       </Button>
@@ -317,11 +316,11 @@ The same function runs when the [APICall](/components/APICall) runs on form subm
       completedNotificationMessage="Invoice saved successfully"
       body="{
         {
-        client: $param.client,
-        issueDate: $param.issueDate,
-        dueDate: $param.dueDate,
-        total: window.lineItemTotal($data.lineItems),
-        items: JSON.stringify($param.lineItems || [])
+          client: $param.client,
+          issueDate: $param.issueDate,
+          dueDate: $param.dueDate,
+          total: window.lineItemTotal($data.lineItems),
+          items: JSON.stringify($param.lineItems || [])
         }
       }"
       onSuccess="Actions.navigate('/invoices')"

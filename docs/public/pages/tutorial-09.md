@@ -29,7 +29,7 @@ We've seen that the `Invoices` [Table](/components/Table) includes a `Details` [
 
 The `ModalDialog` wraps an `InvoiceDetails` component which displays an invoice and enables editing. Click the `Details` icon to open the viewer/editor.
 
-```xmlui-pg  noHeader
+```xmlui-pg noHeader
 ---app
 <App>
   <Table gap="0" data="{[window.sampleInvoice]}">
@@ -152,7 +152,9 @@ Here's the `InvoiceDetails` component.
             <StatusBadge status="{$item.status}" />
         </Column>
     </Table>
-    <Form submitUrl="/api/invoices/{$props.details.invoice_number}" submitMethod="PUT">
+    <Form submitUrl="/api/invoices/{$props.details.invoice_number}"
+          submitMethod="PUT"
+    >
         <FormItem
            label="Notes"
            bindTo="notes"
