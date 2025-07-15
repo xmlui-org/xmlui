@@ -139,6 +139,9 @@ async function generateComponentsOverview(overviewFile, summaryTitle, components
       .filter(name => name !== SUMMARY_CONFIG.COMPONENTS.fileName)
       .sort();
 
+    // Log the number of components
+    console.log(`Components Overview: ${componentNames.length} components`);
+
     // Create table header
     const tableHeader = `# ${summaryTitle} [#components-overview]
 

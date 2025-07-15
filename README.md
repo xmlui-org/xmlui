@@ -1,7 +1,7 @@
 ![NPM Version](https://img.shields.io/npm/v/xmlui?color=blue)
-![Components](https://img.shields.io/badge/Components-88-brightgreen)
-![Extension packages](https://img.shields.io/badge/Extension%20packages-8-brightgreen)
-![Theme variables](https://img.shields.io/badge/theme%20variables-3602-brightgreen)
+![Components](https://img.shields.io/badge/Components-92-brightgreen)
+![Extension packages](https://img.shields.io/badge/Extension%20packages-7-brightgreen)
+![Theme variables](https://img.shields.io/badge/theme%20variables-3639-brightgreen)
 
 # XMLUI
 

@@ -6,3 +6,5 @@ __setup
 __deploy
 .DS_Store
 .turbo
+test-results
+coverage
