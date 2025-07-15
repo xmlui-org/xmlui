@@ -14,7 +14,7 @@
 
 **Connected**. Read and write APIs with little or no scripting.
 
-**Modular**. Use a comprehensive suite of [components](https://docs.xmlui.com/components/_overview) that you can extend with — again! — little or no scripting.
+**Modular**. Use a comprehensive suite of [components](https://docs.xmlui.com/#components/_overview) that you can extend with — again! — little or no scripting.
 
 **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
