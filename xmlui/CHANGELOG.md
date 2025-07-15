@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.73
+
+### Patch Changes
+
+- 88bf4f6: extend formatHumanElapsedTime with a short format flag
+- fef53db: Allow specifying href targets with the markdown link tag
+- 6167648: Fix the useMouseEventHandlers hook
+- b2f4483: Fix missing code fence display
+- e9040c6: Make the nested app's header smaller
+
 ## 0.9.72
 
 ### Patch Changes
