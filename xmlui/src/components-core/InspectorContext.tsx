@@ -133,6 +133,42 @@ export function InspectorProvider({
     })
   }, [projectCompilation]);
 
+  const value = useMemo(() => {
+    const compSrc = inspectedNode?.debug?.source;
+
+    if (!compSrc) {
+      return "";
+    }
+    if (!sources) {
+      return "";
+    }
+    const { start, end, fileId } = compSrc;
+    const slicedSrc = sources[fileId].slice(start, end);
+
+    let dropEmptyLines = true;
+    const prunedLines: Array<string> = [];
+    let trimBeginCount: number | undefined = undefined;
+    slicedSrc.split("\n").forEach((line) => {
+      if (line.trim() === "" && dropEmptyLines) {
+        //drop empty lines from the beginning
+        return;
+      } else {
+        dropEmptyLines = false;
+        prunedLines.push(line);
+        const startingWhiteSpaces = line.search(/\S|$/);
+        if (
+          line.trim() !== "" &&
+          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
+        ) {
+          trimBeginCount = startingWhiteSpaces;
+        }
+      }
+    });
+    return prunedLines
+      .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
+      .join("\n");
+  }, [inspectedNode, sources]);
+
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
@@ -144,9 +180,12 @@ export function InspectorProvider({
               height={"500px"}
               allowPlaygroundPopup
               splitView={true}
-              markdown={""}
+              markdown={`\`\`\`xmlui
+${value}
+\`\`\``
+              }
               api={mockApi}
-              app={serializedNode}
+              app={value}
               components={components}
             />
           </InspectorDialog>

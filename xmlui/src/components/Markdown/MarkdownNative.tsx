@@ -43,14 +43,14 @@ type MarkdownProps = {
 function PreTagComponent({ id, children, codeHighlighter }) {
   // TEMP: After ironing out theming for syntax highlighting, this should be removed
   const { activeThemeTone } = useTheme();
-  const { appGlobals } = useAppContext();
+  const appContext = useAppContext();
 
   let _codeHighlighter = null;
   if (codeHighlighter) {
     _codeHighlighter = codeHighlighter;
   } else {
-    _codeHighlighter = isCodeHighlighter(appGlobals.codeHighlighter)
-      ? appGlobals.codeHighlighter
+    _codeHighlighter = isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)
+      ? appContext?.appGlobals?.codeHighlighter
       : null;
   }
 
