@@ -287,10 +287,15 @@ export const Markdown = memo(function Markdown({
 
             // --- Extract the optional target
             if (typeof children === "string") {
-              const match = children.match(/^(.*)\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
+              // Match a non-escaped pipe followed by target specification
+              const match = children.match(/^((?:[^|]|\\\|)*[^\\])\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
               if (match) {
-                label = match[1].trim();
+                // Unescape any escaped pipes in the label
+                label = match[1].trim().replace(/\\\|/g, '|');
                 target = match[2];
+              } else {
+                // If no target specification, unescape any escaped pipes in the whole text
+                label = children.replace(/\\\|/g, '|');
               }
             }
 
