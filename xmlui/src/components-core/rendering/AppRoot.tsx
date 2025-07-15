@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
@@ -53,6 +53,7 @@ export function AppRoot({
   children,
   projectCompilation,
   isNested = false,
+  onInit,
 }: AppWrapperProps & {
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
@@ -115,6 +116,7 @@ export function AppRoot({
           trackContainerHeight={trackContainerHeight}
           previewMode={previewMode}
           sources={sources}
+          onInit={onInit}
         >
           {children}
         </AppWrapper>

@@ -15,6 +15,8 @@ export type SegmentProps = {
   order?: number;
   patterns?: string[];
   borderedPatterns?: string[];
+  withSplashScreen?: boolean;
+  immediate?: boolean;
 };
 
 export type PlaygroundPattern = {
@@ -82,6 +84,16 @@ export function parseSegmentProps(input: string): SegmentProps {
   // --- Match the "noFrame" flag
   if (/\bnoFrame\b/.test(input)) {
     segment.noFrame = true;
+  }
+
+  // --- Match the "immediate" flag
+  if (/\bimmediate\b/.test(input)) {
+    segment.immediate = true;
+  }
+
+  // --- Match the "withSplashScreen" flag
+  if (/\bwithSplashScreen\b/.test(input)) {
+    segment.withSplashScreen = true;
   }
   
   // --- Match the "noHeader" flag
@@ -285,6 +297,8 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     splitView: pattern.default?.splitView,
     initiallyShowCode: pattern.default?.initiallyShowCode,
     popOutUrl: pattern.default?.popOutUrl,
+    immediate: pattern.default?.immediate,
+    withSplashScreen: pattern.default?.withSplashScreen,
   };
 
   // --- Extract optional playground attributes

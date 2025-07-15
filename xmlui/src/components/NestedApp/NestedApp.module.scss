@@ -55,6 +55,66 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
   "borderColor-button-splitView-#{$component}"
 );
 
+.nestedAppPlaceholder{
+  width: 100%;
+  height: 100%;
+  background-color: t.$backgroundColor;
+  position: relative;
+}
+
+.logoWrapper {
+  position: absolute;
+  left: calc(50% - 50px);
+  top: calc(50% - 50px);
+  width: 100px;
+  height: 100px;
+  transform: translateZ(0);
+  .animatedLogoPath{
+    will-change: stroke-dashoffset, stroke-dasharray;
+    /* The total length of the rectangle path is ~82. */
+    stroke-dasharray: 82;
+    stroke-dashoffset: 82;
+
+    /* Animation: name, duration, easing, and iteration count */
+    animation: draw-loop 3s ease-in-out infinite;
+  }
+}
+
+/* Defines the animation steps */
+@keyframes draw-loop {
+  /* At the start, the path is not drawn */
+  0% {
+    stroke-dashoffset: 82;
+  }
+  /* Animate to fully drawn over 40% of the duration */
+  40% {
+    stroke-dashoffset: 0;
+  }
+  /* Hold the fully drawn state until the end */
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.nestedAppRoot{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  isolation: isolate;
+  background-color: t.$backgroundColor;
+  clip-path: inset(50% round 50%);
+  transition: clip-path 1s, opacity 1s;
+
+  &:not(.initialized){
+    opacity: 0;
+  }
+
+  &.initialized{
+    opacity: 1;
+    clip-path: inset(0% round 0%);
+  }
+}
+
 // --- End of theme variables collection
 
 .nestedAppContainer {
@@ -89,6 +149,7 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
     align-items: center;
 
     .splitViewMarkdown{
+      height: 100%;
       :global(.global-codeBlock){
         background-color: $backgroundColor-code-splitView-NestedApp;
         height: 100%;
@@ -97,6 +158,10 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
       }
     }
   }
+}
+
+.hidden{
+  display: none;
 }
 
 :is(html[class~="dark"]) {

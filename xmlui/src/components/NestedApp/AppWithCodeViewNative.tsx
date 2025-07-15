@@ -33,6 +33,8 @@ type AppWithCodeViewNativeProps = {
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
   noHeader?: boolean;
+  immediate?: boolean;
+  withSplashScreen?: boolean;
 };
 
 /**
@@ -54,6 +56,8 @@ export function AppWithCodeViewNative({
   title,
   height,
   allowPlaygroundPopup,
+  withSplashScreen,
+  immediate
 }: AppWithCodeViewNativeProps): ReactNode {
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const { appGlobals } = useAppContext();
@@ -157,23 +161,22 @@ export function AppWithCodeViewNative({
             </div>
           )}
           <div className={styles.contentContainer}>
-            {showCode && (
-              <Markdown style={{ height: "100%" }} className={styles.splitViewMarkdown}>
-                {markdown}
-              </Markdown>
-            )}
-            {!showCode && (
-              <IndexAwareNestedApp
-                height={"100%"}
-                app={app}
-                api={api}
-                components={components}
-                config={config}
-                activeTone={activeTone}
-                activeTheme={activeTheme}
-                refreshVersion={refreshVersion}
-              />
-            )}
+            <Markdown className={classnames(styles.splitViewMarkdown, { [styles.hidden]: !showCode })}>
+              {markdown}
+            </Markdown>
+            <IndexAwareNestedApp
+              className={classnames({ [styles.hidden]: showCode })}
+              height={"100%"}
+              app={app}
+              api={api}
+              components={components}
+              config={config}
+              activeTone={activeTone}
+              activeTheme={activeTheme}
+              refreshVersion={refreshVersion}
+              withSplashScreen={withSplashScreen}
+              immediate={immediate}
+            />
           </div>
         </div>
       </>
@@ -191,6 +194,8 @@ export function AppWithCodeViewNative({
         activeTone={activeTone}
         activeTheme={activeTheme}
         refreshVersion={refreshVersion}
+        withSplashScreen={withSplashScreen}
+        immediate={immediate}
       />
     </>
   );

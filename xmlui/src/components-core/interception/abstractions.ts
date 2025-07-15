@@ -1,3 +1,5 @@
+import { DelayMode } from "msw";
+
 export type AuthDefinition = {
   defaultLoggedInUser?: any
 };
@@ -22,6 +24,8 @@ export type ApiInterceptorDefinition = {
   
   // Interceptor configuration
   config?: Record<string, any>;
+
+  artificialDelay?: number | DelayMode;
   
   // Information for code generators
   schemaDescriptor?: SchemaDescriptor
