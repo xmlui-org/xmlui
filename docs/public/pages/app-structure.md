@@ -36,7 +36,7 @@ The [XMLUI Invoice demo app](https://xmlui.com/#get-started) exhibits the typica
 |---|---|
 | **`index.html`** | The default webpage to display |
 | **`Main.xmlui`** | The XMLUI app's entry point |
-| **`config.json`** | The XMLUI app's [configuration file](/resources#configuration-file) |
+| **`config.json`** | The XMLUI app's configuration file |
 | **`components`** | The folder with your custom components |
 | **`resources`** | The folder with static app resources |
 | **`themes`** | The folder with your custom themes |
