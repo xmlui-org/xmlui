@@ -316,11 +316,11 @@ The same function runs when the [APICall](/components/APICall) runs on form subm
       completedNotificationMessage="Invoice saved successfully"
       body="{
         {
-        client: $param.client,
-        issueDate: $param.issueDate,
-        dueDate: $param.dueDate,
-        total: window.lineItemTotal($data.lineItems),
-        items: JSON.stringify($param.lineItems || [])
+          client: $param.client,
+          issueDate: $param.issueDate,
+          dueDate: $param.dueDate,
+          total: window.lineItemTotal($data.lineItems),
+          items: JSON.stringify($param.lineItems || [])
         }
       }"
       onSuccess="Actions.navigate('/invoices')"
