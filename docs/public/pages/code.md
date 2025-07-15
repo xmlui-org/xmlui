@@ -40,7 +40,7 @@ The last example uses a JavaScript [arrow function expression](https://developer
 
 ## Writing longer functions
 
-The most elaborate function we've seen so far was this one, used in [Components](/components) chapter to extract data from a complex API response.
+The most elaborate function we've seen so far was this one, used in [Components](/components-intro) chapter to extract data from a complex API response.
 
 ```js copy
 window.transformStops = function(stops) {

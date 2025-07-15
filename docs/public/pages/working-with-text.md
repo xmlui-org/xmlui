@@ -1,6 +1,6 @@
 # Working with Text
 
-Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/workingWithMarkdown).
+Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/working-with-markdown).
 
 You can nest text in any component that renders its children.
 
