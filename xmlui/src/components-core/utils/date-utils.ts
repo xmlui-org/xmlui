@@ -80,9 +80,10 @@ export function isDateTomorrow (date: string | Date) {
  * Returns strings like "now", "12 seconds ago", "3 hours ago", "today", "yesterday", "3 weeks ago", etc.
  * 
  * @param date The date to format
+ * @param shortFormat When true, uses abbreviated time units (e.g. "s" instead of "seconds")
  * @returns A human-readable elapsed time string
  */
-export function formatHumanElapsedTime(date: string | Date): string {
+export function formatHumanElapsedTime(date: string | Date, shortFormat = false): string {
   const now = new Date();
   const inputDate = new Date(date);
   
@@ -103,6 +104,38 @@ export function formatHumanElapsedTime(date: string | Date): string {
   const diffMonths = Math.floor(diffDays / 30);
   const diffYears = Math.floor(diffDays / 365);
   
+  // Define unit formats based on shortFormat parameter
+  const units = {
+    second: {
+      singular: shortFormat ? 's' : 'second',
+      plural: shortFormat ? 's' : 'seconds'
+    },
+    minute: {
+      singular: shortFormat ? 'min' : 'minute',
+      plural: shortFormat ? 'min' : 'minutes'
+    },
+    hour: {
+      singular: shortFormat ? 'hr' : 'hour',
+      plural: shortFormat ? 'hrs' : 'hours'
+    },
+    day: {
+      singular: shortFormat ? 'd' : 'day',
+      plural: shortFormat ? 'd' : 'days'
+    },
+    week: {
+      singular: shortFormat ? 'wk' : 'week',
+      plural: shortFormat ? 'wks' : 'weeks'
+    },
+    month: {
+      singular: shortFormat ? 'mo' : 'month',
+      plural: shortFormat ? 'mos' : 'months'
+    },
+    year: {
+      singular: shortFormat ? 'y' : 'year',
+      plural: shortFormat ? 'yrs' : 'years'
+    }
+  };
+  
   // Just now (within 10 seconds)
   if (diffSeconds < 10) {
     return "now";
@@ -110,17 +143,20 @@ export function formatHumanElapsedTime(date: string | Date): string {
   
   // Seconds ago (up to 1 minute)
   if (diffSeconds < 60) {
-    return `${diffSeconds} second${diffSeconds === 1 ? "" : "s"} ago`;
+    const unit = diffSeconds === 1 ? units.second.singular : units.second.plural;
+    return `${diffSeconds} ${unit} ago`;
   }
   
   // Minutes ago (up to 1 hour)
   if (diffMinutes < 60) {
-    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+    const unit = diffMinutes === 1 ? units.minute.singular : units.minute.plural;
+    return `${diffMinutes} ${unit} ago`;
   }
   
   // Hours ago (up to today)
   if (isToday(inputDate)) {
-    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+    const unit = diffHours === 1 ? units.hour.singular : units.hour.plural;
+    return `${diffHours} ${unit} ago`;
   }
   
   // Yesterday
@@ -130,19 +166,23 @@ export function formatHumanElapsedTime(date: string | Date): string {
   
   // Days ago (up to 1 week)
   if (diffDays < 7) {
-    return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+    const unit = diffDays === 1 ? units.day.singular : units.day.plural;
+    return `${diffDays} ${unit} ago`;
   }
   
   // Weeks ago (up to 4 weeks / 1 month)
   if (diffWeeks < 4) {
-    return `${diffWeeks} week${diffWeeks === 1 ? "" : "s"} ago`;
+    const unit = diffWeeks === 1 ? units.week.singular : units.week.plural;
+    return `${diffWeeks} ${unit} ago`;
   }
   
   // Months ago (up to 12 months / 1 year)
   if (diffMonths < 12) {
-    return `${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
+    const unit = diffMonths === 1 ? units.month.singular : units.month.plural;
+    return `${diffMonths} ${unit} ago`;
   }
   
   // Years ago
-  return `${diffYears} year${diffYears === 1 ? "" : "s"} ago`;
+  const unit = diffYears === 1 ? units.year.singular : units.year.plural;
+  return `${diffYears} ${unit} ago`;
 }

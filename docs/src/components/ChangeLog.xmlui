@@ -13,7 +13,7 @@
                             <HStack>
                                 <HStack verticalAlignment="baseline">
                                     <H2>{$item.tag_name}</H2>
-                                    <Text value="{formatHumanElapsedTime($item.published_at)}"/>
+                                    <Text value="{formatHumanElapsedTime($item.published_at, true)}"/>
                                 </HStack>
                                 <Fragment when="{$isFirst}">
                                     <SpaceFiller />
