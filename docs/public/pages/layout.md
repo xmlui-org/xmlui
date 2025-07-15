@@ -528,8 +528,8 @@ Here's a horizontal splitter that sets some constraints on the size of the prima
 ```xmlui-pg copy display height="200px" name="Example: Splitter"
 <HSplitter
   height="100%"
-  minPrimarySize="10%"
-  maxPrimarySize="90%">
+  minPrimarySize="15%"
+  maxPrimarySize="85%">
   <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>
   <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>
 </HSplitter>
