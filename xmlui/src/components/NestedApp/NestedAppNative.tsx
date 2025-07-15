@@ -290,13 +290,15 @@ export function NestedApp({
     setRevealAnimationFinished(true);
   }, []);
 
+  const shouldAnimate = withSplashScreen && !revealAnimationFinished;
   return (
     <div className={classnames(styles.nestedAppPlaceholder, className)}>
-      {withSplashScreen && !revealAnimationFinished && <AnimatedLogo />}
+      {shouldAnimate && <AnimatedLogo />}
       <div
         ref={rootRef}
         onTransitionEnd={animationFinished}
         className={classnames(styles.nestedAppRoot, {
+          [styles.shouldAnimate]: shouldAnimate,
           [styles.initialized]: initialized,
         })}
       />

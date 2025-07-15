@@ -102,16 +102,16 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
   position: relative;
   isolation: isolate;
   background-color: t.$backgroundColor;
-  clip-path: inset(50% round 50%);
-  transition: clip-path 1s, opacity 1s;
-
-  &:not(.initialized){
-    opacity: 0;
-  }
-
-  &.initialized{
-    opacity: 1;
-    clip-path: inset(0% round 0%);
+  &.shouldAnimate{
+    transition: clip-path 1s, opacity 1s;
+    clip-path: inset(50% round 50%);
+    &:not(.initialized){
+      opacity: 0;
+    }
+    &.initialized{
+      opacity: 1;
+      clip-path: inset(0% round 0%);
+    }
   }
 }
 
