@@ -12,9 +12,6 @@
             <SpaceFiller/>
             <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
-            <Link to="https://github.com/xmlui-org/xmlui">
-                <Button variant="ghost" icon="github" />
-            </Link>
         </AppHeader>
 
         <NavPanel when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
@@ -327,8 +324,12 @@
             </Page>
         </Pages>
         <Footer>
-            <CHStack width="100%" gap="0">
-                This site is an XMLUI app™.
+            <CHStack width="*">
+                This site is an XMLUI™ app.
+                <SpaceFiller />
+                <Link to="https://github.com/xmlui-org/xmlui/tree/main/docs/src" target="_blank">
+                    <Button variant="ghost" icon="github" />
+                </Link>
             </CHStack>
         </Footer>
     </App>

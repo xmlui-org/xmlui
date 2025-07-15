@@ -33,7 +33,7 @@
                                     </HStack>
                                 </Items>
                             </VStack>
-                            <Card backgroundColor="$backgroundColor-DownloadSection"
+                            <Card backgroundColor="$color-surface-50"
                                 padding="$space-2" marginTop="$space-2">
                                 <HStack verticalAlignment="center" padding="0">
                                     <Icon name="cube" />
