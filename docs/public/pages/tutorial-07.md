@@ -1,9 +1,9 @@
 # Invoices
 
-Here is the app's `Invoices` page, with a cached subset of data. To view the table full-width, and optionally make changes, use the <img src="/resources/pg-popout.svg" alt="" class="_htmlImage_1usjo_351" style="display: inline;"> icon to pop out to the full XMLUI playground.
+Here is the app's `Invoices` page, with a cached subset of data. To view the table full-width, and optionally make changes, use the ![](/resources/pg-popout.svg) icon to pop out to the full XMLUI playground.
 
 
-```xmlui-pg  noHeader
+```xmlui-pg
 ---app display
 <App>
   <Invoices />
