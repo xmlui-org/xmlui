@@ -37,7 +37,7 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { AppContext } from "../AppContext";
 import { renderChild } from "./renderChild";
-import type { GlobalProps} from "./AppRoot";
+import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
@@ -54,7 +54,7 @@ type AppContentProps = {
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
   children?: ReactNode;
-  onInit?: ()=>void;
+  onInit?: () => void;
 };
 
 function safeGetComputedStyle(root?: HTMLElement) {
@@ -151,8 +151,8 @@ export function AppContent({
         if (observer?.current) {
           observer.current.unobserve(root);
         }
-        if(trackContainerHeight === "auto"){
-          root.style.setProperty("--containerHeight", 'auto');
+        if (trackContainerHeight === "auto") {
+          root.style.setProperty("--containerHeight", "auto");
         } else {
           observer.current = new ResizeObserver((entries) => {
             root.style.setProperty("--containerHeight", entries[0].contentRect.height + "px");
@@ -240,8 +240,7 @@ export function AppContent({
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     onInit?.();
   }, [onInit]);
 
@@ -266,14 +265,25 @@ export function AppContent({
     if (lastHash.current !== hash) {
       lastHash.current = hash;
       if (!location.state?.preventHashScroll) {
+        const rootNode = root?.getRootNode();
+        const scrollBehavior = "instant";
         requestAnimationFrame(() => {
-          document
-            .getElementById(lastHash.current)
-            ?.scrollIntoView({ behavior: "instant", block: "start" });
+          if (!rootNode) return;
+          // --- If element is in shadow DOM
+          if (rootNode instanceof ShadowRoot) {
+            const el = rootNode.getElementById(lastHash.current);
+            if (!el) return;
+            scrollAncestorsToView(el, scrollBehavior);
+          } else {
+          // --- If element is in light DOM
+            document
+              .getElementById(lastHash.current)
+              ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+          }
         });
       }
     }
-  }, [location, scrollForceRefresh]);
+  }, [location, scrollForceRefresh, root]);
 
   const forceRefreshAnchorScroll = useCallback(() => {
     lastHash.current = "";
@@ -465,7 +475,7 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {(!!children && isValidElement(renderedRoot))
+        {!!children && isValidElement(renderedRoot)
           ? cloneElement(renderedRoot, null, children)
           : renderedRoot}
       </AppStateContext.Provider>
@@ -476,4 +486,55 @@ export function AppContent({
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
+}
+
+/**
+ * Scrolls all ancestors of the specified element into view up to the first shadow root the element is in.
+ * @param target The element to scroll to, can be in the light or shadow DOM
+ * @param scrollBehavior The scroll behavior
+ */
+function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior) {
+  const scrollables = getScrollableAncestors(target);
+  // It's important to start from the outermost and work inwards.
+  scrollables.reverse().forEach((container) => {
+    // Compute the position of target relative to container
+    const targetRect = target.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Scroll so that the target is visible in this container
+    if (targetRect.top < containerRect.top || targetRect.bottom > containerRect.bottom) {
+      // Only scroll vertically, add more logic for horizontal if needed
+      const offset = targetRect.top - containerRect.top + container.scrollTop;
+      container.scrollTo({ top: offset, behavior: scrollBehavior });
+    }
+    // Optionally handle horizontal scrolling similarly
+  });
+
+  function getScrollableAncestors(el: HTMLElement) {
+    const scrollables: HTMLElement[] = [];
+    let current = el;
+
+    while (current) {
+      let parent = current.parentElement;
+      // If no parentElement, might be in shadow DOM
+      if (!parent && current.getRootNode) {
+        break;
+        // NOTE: Disregard shadow DOM, because we will scroll everything otherwise
+        /* const root = current.getRootNode();
+        if (root && root instanceof ShadowRoot && root.host) {
+          parent = root.host as (HTMLElement | null);
+        } */
+      }
+      if (!parent) break;
+
+      // Check if this parent is scrollable
+      const style = getComputedStyle(parent);
+      if (/(auto|scroll|overlay)/.test(style.overflow + style.overflowY + style.overflowX)) {
+        scrollables.push(parent);
+      }
+      current = parent;
+    }
+
+    return scrollables;
+  }
 }
