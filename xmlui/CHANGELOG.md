@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.77
+
+### Patch Changes
+
+- c867f38: Change split view startup animation
+
 ## 0.9.76
 
 ### Patch Changes
