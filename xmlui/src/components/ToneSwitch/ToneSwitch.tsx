@@ -9,7 +9,7 @@ import classnames from "classnames";
 
 const COMP = "ToneSwitch";
 const LIGHT_ICON = "sun:ToneSwitch";
-const DARK_ICON = "moonThreeQuarter:ToneSwitch";
+const DARK_ICON = "moon:ToneSwitch";
 
 export const defaultProps = {
   lightIcon: LIGHT_ICON,
@@ -96,7 +96,7 @@ export function ToneSwitch({
                   ) : (
                     <Icon 
                       name={darkIcon} 
-                      fallback="moonThreeQuarter" 
+                      fallback="moon" 
                       className={styles.icon}
                     />
                   )}
