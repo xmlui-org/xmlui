@@ -179,9 +179,7 @@ export const FormItemMd = createMetadata({
       availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
-    inputTemplate: dComponent(
-      "This property is used to define a custom input template."
-    ),
+    inputTemplate: dComponent("This property is used to define a custom input template."),
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
       valueType: "string",
@@ -264,7 +262,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     } = node.props;
 
     //extractValue works as a memoization mechanism too (if there's nothing to resolve, it won't produce a new object every time)
-    const resolvedValidationPropsAndEvents: FormItemValidations = extractValue({
+    const resolvedValidationPropsAndEvents: FormItemValidations = {
       required: extractValue.asOptionalBoolean(required),
       requiredInvalidMessage: extractValue.asOptionalString(requiredInvalidMessage),
       minLength: extractValue.asOptionalNumber(minLength),
@@ -281,7 +279,7 @@ export const formItemComponentRenderer = createComponentRenderer(
       regex: extractValue.asOptionalString(regex),
       regexInvalidMessage: extractValue.asOptionalString(regexInvalidMessage),
       regexInvalidSeverity: parseSeverity(extractValue.asOptionalString(regexInvalidSeverity)),
-    });
+    };
 
     const nonLayoutCssProps = !layoutCss
       ? rest
