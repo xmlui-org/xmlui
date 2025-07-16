@@ -6,19 +6,18 @@ import type { IApiInterceptorContext } from "../../abstractions/AppContextDefs";
 import type { ApiInterceptorDefinition } from "../interception/abstractions";
 import { normalizePath } from "../utils/misc";
 import { ApiInterceptorContext } from "./useApiInterceptorContext";
+import type { ApiInterceptor } from "./ApiInterceptor";
 
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({
   interceptor,
   children,
-  useHashBasedRouting,
   parentInterceptorContext = null,
   waitForApiInterceptor = false,
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
   apiWorker?: SetupWorker;
-  useHashBasedRouting?: boolean;
   parentInterceptorContext?: IApiInterceptorContext;
   waitForApiInterceptor?: boolean;
 }) {
@@ -26,10 +25,39 @@ export function ApiInterceptorProvider({
   const [initialized, setInitialized] = useState(!interceptor);
   const [forceInitialize, setForceInitialize] = useState(false);
   const [interceptorWorker, setInterceptorWorker] = useState<SetupWorker | null>(null);
+  const [apiInstance, setApiInstance] = useState<ApiInterceptor | null>(null);
+
+  const useWorker = interceptor?.useWorker ?? true;
 
   // --- Whenever the interceptor changes, update the provider accordingly
+  let forceInitializeParent = parentInterceptorContext?.forceInitialize;
+  let parentInterceptorWorker = parentInterceptorContext?.interceptorWorker;
+
+
+
+  //// if we don't use a worker, we initialize the api instance directly
+  useEffect(()=>{
+    if(useWorker){
+      return;
+    }
+    if (!interceptor) {
+      return;
+    }
+
+    (async () => {
+      const { initMock } = await import("./initMock");
+      const apiInstance = await initMock(interceptor);
+      setApiInstance(apiInstance);
+      setInitialized(true);
+    })();
+  }, [interceptor, useWorker]);
+
+  //// if we use a worker, we initialize the worker with the api instance
   useEffect(() => {
-    if(!hasParentInterceptorContext){
+    if(!useWorker){
+      return;
+    }
+    if (!hasParentInterceptorContext) {
       if (interceptor || forceInitialize) {
         // setInitialized(false);
 
@@ -38,9 +66,16 @@ export function ApiInterceptorProvider({
         (async () => {
           // --- Create the worker on the fly
           if (process.env.VITE_MOCK_ENABLED) {
-            const { createApiInterceptorWorker } = await import("./apiInterceptorWorker");
+            const [{ createApiInterceptorWorker }, { initMock }] = await Promise.all([
+              useWorker
+                ? import("./apiInterceptorWorker")
+                : Promise.resolve({ createApiInterceptorWorker: () => null }),
+              import("./initMock"),
+            ]);
+
             if (interceptor || forceInitialize) {
-              interceptorWorker = await createApiInterceptorWorker(interceptor || {}, null);
+              const apiInstance = await initMock(interceptor || {});
+              interceptorWorker = await createApiInterceptorWorker(apiInstance);
               // if the apiWorker comes from the outside, we don't handle the lifecycle here
               const workerFileLocation = normalizePath(
                 process.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js",
@@ -49,8 +84,8 @@ export function ApiInterceptorProvider({
                 onUnhandledRequest: "bypass",
                 quiet: true,
                 serviceWorker: {
-                  url: workerFileLocation
-                }
+                  url: workerFileLocation,
+                },
               });
               setInterceptorWorker(interceptorWorker);
             }
@@ -59,7 +94,7 @@ export function ApiInterceptorProvider({
         })();
         return () => {
           // if the apiWorker comes from the outside, we don't handle the lifecycle here
-          if (!parentInterceptorContext?.interceptorWorker) {
+          if (!parentInterceptorWorker) {
             interceptorWorker?.stop();
           }
           setInitialized(false);
@@ -68,42 +103,53 @@ export function ApiInterceptorProvider({
         setInitialized(true);
       }
     } else {
-      if(interceptor){
-        if(parentInterceptorContext?.interceptorWorker){
-          (async () => {
-            const { createApiInterceptorWorker } = await import("./apiInterceptorWorker");
-            await createApiInterceptorWorker(interceptor, parentInterceptorContext?.interceptorWorker);
-            setTimeout(()=>{
-              setInitialized(true);
-            }, 0)
-          })()
-        } else {
-          parentInterceptorContext?.forceInitialize();
-        }
+      if (!interceptor) {
+        return;
       }
-
+      if (parentInterceptorWorker) {
+        (async () => {
+          const [{ createApiInterceptorWorker }, { initMock }] = await Promise.all([
+            import("./apiInterceptorWorker"),
+            import("./initMock"),
+          ]);
+          const apiInstance = await initMock(interceptor);
+          await createApiInterceptorWorker(apiInstance, parentInterceptorWorker);
+          setTimeout(() => {
+            setInitialized(true);
+          }, 0);
+        })();
+      } else {
+        forceInitializeParent?.();
+      }
     }
-  }, [forceInitialize, hasParentInterceptorContext, interceptor, parentInterceptorContext?.forceInitialize, parentInterceptorContext?.interceptorWorker]);
+  }, [
+    useWorker,
+    forceInitialize,
+    hasParentInterceptorContext,
+    interceptor,
+    forceInitializeParent,
+    parentInterceptorWorker,
+  ]);
 
   const isMocked = useCallback(
     (url) => interceptor !== undefined && !!process.env.VITE_MOCK_ENABLED,
     [interceptor],
   );
 
-  const doForceInitialize = useCallback(()=>{
+  const doForceInitialize = useCallback(() => {
     setForceInitialize(true);
   }, []);
 
   const contextValue: IApiInterceptorContext = useMemo(() => {
     return {
       interceptorWorker,
+      apiInstance,
       initialized: initialized,
       forceInitialize: doForceInitialize,
       isMocked: isMocked,
     };
-  }, [interceptorWorker, initialized, doForceInitialize, isMocked]);
+  }, [interceptorWorker, apiInstance, initialized, doForceInitialize, isMocked]);
 
-  // console.log("[ApiInterceptorProvider] Initialized:", initialized, "Interceptor:", interceptor, "Has parent", hasParentInterceptorContext, "waitForApiInterceptor", waitForApiInterceptor);
   return (
     <ApiInterceptorContext.Provider value={contextValue}>
       {waitForApiInterceptor && !initialized ? null : children}
