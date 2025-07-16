@@ -17,7 +17,7 @@ Provide the component with a list or key-value pairs in two ways:
 
 1. Only change the background color
 
-```xmlui-pg copy display {2} name="Example: only background color"
+```xmlui-pg copy {2} name="Example: only background color"
 <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
 </App>
@@ -41,9 +41,13 @@ Provide the component with a list or key-value pairs in two ways:
 
 The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.
 
-```xmlui-pg copy display name="Example: value" 
+```xmlui-pg copy name="Example: value" 
 <App>
-  <Badge value="Example badge" />
+  <Badge value="Example value" />
+  <Badge value="Example badge">
+    Example Child
+  </Badge>
+  <Badge />
 </App>  
 ```
 

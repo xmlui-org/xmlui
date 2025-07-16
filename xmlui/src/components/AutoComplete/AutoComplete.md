@@ -56,7 +56,7 @@
 <App>
   <AutoComplete multi="true">
     <property name="optionTemplate">
-      <Text textAlign="center" color="purple">{$item.label}</Text>
+      <Text textAlign="center" color="red">{$item.label}</Text>
     </property>
     <Option value="1" label="Bruce Wayne" />
     <Option value="2" label="Clark Kent" />

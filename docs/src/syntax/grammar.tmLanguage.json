@@ -223,7 +223,7 @@
       "patterns": [{ "include": "source.js" }]
     },
     "textWithBindingExpr": {
-      "patterns": [{ "include": "#entity" }, { "include": "#bindingExpr" }]
+      "patterns": [{ "include": "#entity" }, { "match": "\\\\{" }, { "include": "#bindingExpr" }]
     },
     "propOrVarTag": {
       "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:variable)|(?:property)|(?:prop))",

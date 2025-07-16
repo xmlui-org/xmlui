@@ -292,8 +292,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
-
 ### `loggedInUser` [#loggedinuser]
 
 Stores information about the currently logged-in user. By not defining this property, you can indicate that no user is logged in.

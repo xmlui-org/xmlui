@@ -17,14 +17,14 @@ This property defines the template to use for the logo. With this property, you 
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui-pg copy display {2-8} name="Example: logoTemplate" height="150px"
+```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="150px"
 <App>
   <AppHeader>
   <property name="logoTemplate">
-      <H3>
-        <Icon name="drive" />
-        DriveDiag
-      </H3>
+    <H3>
+      <Icon name="drive" />
+      DriveDiag
+    </H3>
   </property>
   </AppHeader>
   <NavPanel>

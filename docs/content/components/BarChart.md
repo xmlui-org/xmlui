@@ -2,6 +2,41 @@
 
 `BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories.
 
+The BarChart component accommodates the size of its parent unless you set it explicitly:
+
+```xmlui-pg copy display height="300px" name="Example: dimension determined by the parent" /Card height="240px" width="75%"/
+<Card height="240px" width="75%">
+  <BarChart
+    layout="horizontal"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44 },
+        { 'sprint': 'Sprint 2', 'A': 32 },
+        { 'sprint': 'Sprint 3', 'A': 48 },
+        { 'sprint': 'Sprint 4', 'A': 72 }
+       ]}"
+    dataKeys="{['A']}"
+    nameKey="sprint"
+  />
+</Card>
+```
+
+```xmlui-pg copy display height="300px" name="Example: dimension overwritten by Barchart" /height="240px"/ /height="200px"/
+<Card height="240px">
+  <BarChart
+    layout="horizontal"
+    height="200px"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44 },
+        { 'sprint': 'Sprint 2', 'A': 32 },
+        { 'sprint': 'Sprint 3', 'A': 48 },
+        { 'sprint': 'Sprint 4', 'A': 72 }
+       ]}"
+    dataKeys="{['A']}"
+    nameKey="sprint"
+  />
+</Card>
+```
+
 **Key features:**
 - **Flexible orientation**: Choose horizontal or vertical bar layouts
 - **Multiple data series**: Display several metrics on the same chart with different colored bars
@@ -52,9 +87,49 @@ Determines whether the legend should be displayed.
 
 This property determines how the bars are laid out.If set to `true`, bars with the same category will be stacked on top of each other rather than placed side by side.
 
-### `tickFormatter` [#tickformatter]
+### `tickFormatterX` [#tickformatterx]
 
-A function that formats the axis tick labels. It receives a tick value and returns a formatted string.
+A function that formats the tick labels on the X-axis. 
+
+```xmlui-pg copy display height="320px" name="Example: tickFormatterX"
+<App>
+  <BarChart
+    layout="horizontal"
+    height="240px"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44 },
+        { 'sprint': 'Sprint 2', 'A': 32 },
+        { 'sprint': 'Sprint 3', 'A': 48 },
+        { 'sprint': 'Sprint 4', 'A': 72 }
+       ]}"
+    dataKeys="{['A']}"
+    nameKey="sprint"
+    tickFormatterX="{(value) => '(' + value + ')'}"
+  />
+</App>
+```
+
+### `tickFormatterY` [#tickformattery]
+
+A function that formats the tick labels on the Y-axis. 
+
+```xmlui-pg copy display height="320px" name="Example: tickFormatterY"
+<App>
+  <BarChart
+    layout="horizontal"
+    height="240px"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44 },
+        { 'sprint': 'Sprint 2', 'A': 32 },
+        { 'sprint': 'Sprint 3', 'A': 48 },
+        { 'sprint': 'Sprint 4', 'A': 72 }
+       ]}"
+    dataKeys="{['A']}"
+    nameKey="sprint"
+    tickFormatterY="{(value) => value + '$'}"
+  />
+</App>
+```
 
 ## Events [#events]
 
