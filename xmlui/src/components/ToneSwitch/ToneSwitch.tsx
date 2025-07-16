@@ -41,7 +41,6 @@ export function ToneSwitch() {
   //console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
 
   const handleChange = (isDark: boolean) => {
-    console.log('ToneSwitch handleChange called with:', isDark); // Debug log
     setActiveThemeTone(isDark ? "dark" : "light");
   };
 
