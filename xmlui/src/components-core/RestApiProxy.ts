@@ -12,6 +12,7 @@ import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
+import type { ApiInterceptor } from "./interception/ApiInterceptor";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -112,11 +113,13 @@ function appendFormFieldValue(
 export default class RestApiProxy {
   private config: RestAPIAdapterPropsV2;
   private appContext?: AppContextObject;
+  public apiInstance?: ApiInterceptor;
 
-  constructor(appContext?: AppContextObject) {
+  constructor(appContext?: AppContextObject, apiInstance?: ApiInterceptor) {
     const conf = appContext?.appGlobals || { apiUrl: "" };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
+    this.apiInstance = apiInstance;
 
     // const xsrfToken = readCookie("XSRF-TOKEN");
     const xsrfHeaders =
@@ -416,12 +419,13 @@ export default class RestApiProxy {
       signal: abortSignal,
       body: requestBody,
     };
+    let url = this.generateFullApiUrl(relativePath, queryParams);
     if (onUploadProgress) {
       console.log("Falling back to axios. Reason: onUploadProgress specified");
       const axios = (await import("axios")).default;
       try {
         const response = await axios.request({
-          url: this.generateFullApiUrl(relativePath, queryParams),
+          url: url,
           method: options.method,
           headers: aggregatedHeaders,
           data: options.body,
@@ -439,7 +443,12 @@ export default class RestApiProxy {
         }
       }
     } else {
-      const response = await fetch(this.generateFullApiUrl(relativePath, queryParams), options);
+      let response;
+      if(this.apiInstance && this.apiInstance.hasMockForRequest(url, options)){
+        response = await this.apiInstance.executeMockedFetch(url, options);
+      } else {
+        response = await fetch(url, options);
+      }
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }

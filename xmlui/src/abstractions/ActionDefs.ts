@@ -2,6 +2,7 @@ import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ArrowExpression } from "../components-core/script-runner/ScriptingSourceTree";
+import type { ApiInterceptor } from "../components-core/interception/ApiInterceptor";
 
 // This type represents the options to use for looking up actions.
 export type LookupActionOptions = {
@@ -77,6 +78,7 @@ export interface ActionExecutionContext {
 
   // The appContext object passed to the current app
   appContext: AppContextObject;
+  apiInstance?: ApiInterceptor;
 
   // The lookup function to resolve a sync action by its name.
   lookupAction: LookupAsyncFnInner;
