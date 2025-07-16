@@ -266,8 +266,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
-
 %-PROP-END
 
 %-PROP-START scrollWholePage

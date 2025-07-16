@@ -192,7 +192,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```xmlui-pg copy display name="Example: Buttons with fixed width"
+```xmlui-pg copy name="Example: Buttons with fixed width"
 <App>
   <HStack>
     <Theme width-Button="120px">
