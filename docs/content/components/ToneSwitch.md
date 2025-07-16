@@ -17,13 +17,7 @@
 
 ## Properties [#properties]
 
-### `darkIcon (default: "moonWaning:ToneSwitch")` [#darkicon-default-moonwaning-toneswitch]
-
-The icon displayed when the theme is in dark mode. You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
-
-### `lightIcon (default: "sun:ToneSwitch")` [#lighticon-default-sun-toneswitch]
-
-The icon displayed when the theme is in light mode. You can change the default icon for all ToneSwitch instances with the "icon.light:ToneSwitch" declaration in the app configuration file.
+This component does not have any properties.
 
 ## Events [#events]
 

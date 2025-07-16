@@ -11,11 +11,6 @@ const COMP = "ToneSwitch";
 const LIGHT_ICON = "sun";
 const DARK_ICON = "moon";
 
-export const defaultProps = {
-  lightIcon: LIGHT_ICON,
-  darkIcon: DARK_ICON,
-};
-
 export const ToneSwitchMd = createMetadata({
   status: "stable",
   description: "`ToneSwitch` enables the user to switch between light and dark modes using a switch control.",
@@ -41,12 +36,9 @@ export const ToneSwitchMd = createMetadata({
   },
 });
 
-export function ToneSwitch({
-  lightIcon = defaultProps.lightIcon,
-  darkIcon = defaultProps.darkIcon,
-}) {
+export function ToneSwitch() {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
-  console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
+  //console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
 
   const handleChange = (isDark: boolean) => {
     console.log('ToneSwitch handleChange called with:', isDark); // Debug log
@@ -61,7 +53,7 @@ export function ToneSwitch({
         variant="switch"
         style={{ width: 'fit-content' }}
         inputRenderer={(contextVars) => {
-          console.log('ToneSwitch contextVars:', contextVars); // Debug log
+          //console.log('ToneSwitch contextVars:', contextVars); // Debug log
           return (
             <div
               className={classnames(styles.iconSwitch, {
@@ -72,13 +64,13 @@ export function ToneSwitch({
               <div className={styles.iconThumb}>
                 {!contextVars.$checked ? (
                   <Icon
-                    name={lightIcon}
+                    name={LIGHT_ICON}
                     fallback="sun"
                     className={styles.icon}
                   />
                 ) : (
                   <Icon
-                    name={darkIcon}
+                    name={DARK_ICON}
                     fallback="moon"
                     className={styles.icon}
                   />
@@ -100,10 +92,7 @@ export const toneSwitchComponentRenderer = createComponentRenderer(
   ToneSwitchMd,
   ({ node, extractValue }) => {
     return (
-      <ToneSwitch
-        lightIcon={extractValue.asOptionalString(node.props.lightIcon)}
-        darkIcon={extractValue.asOptionalString(node.props.darkIcon)}
-      />
+      <ToneSwitch />
     );
   },
 );
