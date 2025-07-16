@@ -43,8 +43,12 @@ The text that the component displays. If this is not defined, the component rend
 
 ```xmlui-pg copy display name="Example: value" 
 <App>
-  <Badge value="Example badge" />
-</App>  
+  <Badge value="Example value" />
+  <Badge value="Example badge">
+    Example Child
+  </Badge>
+  <Badge />
+</App>
 ```
 
 ### `variant (default: "badge")` [#variant-default-badge]

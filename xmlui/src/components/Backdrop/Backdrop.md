@@ -2,7 +2,7 @@
 
 ```xmlui-pg copy display name="Example: using Backdrop"
 <App>
-  <Backdrop opacity="0.2">
+  <Backdrop opacity="0.6">
     <Image 
       src="/resources/images/components/image/breakfast.jpg" 
       fit="cover" width="400px" />
