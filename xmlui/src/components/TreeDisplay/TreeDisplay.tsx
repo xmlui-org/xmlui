@@ -28,7 +28,7 @@ export const TreeDisplayMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$color-primary-50",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-CodeBlock",
     [`borderRadius-${COMP}`]: "8px",
     [`padding-${COMP}`]: "$space-4",
     [`paddingLeft-${COMP}`]: "$space-2",

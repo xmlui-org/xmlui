@@ -64,7 +64,6 @@ export function LazyNestedApp({
   ...restProps
 }: NestedAppProps & { immediate?: boolean }) {
   const [shouldRender, setShouldRender] = useState(immediate || false);
-  console.log("Rendering NestedApp with props:", restProps);
   useEffect(() => {
     if (!immediate) {
       startTransition(() => {
