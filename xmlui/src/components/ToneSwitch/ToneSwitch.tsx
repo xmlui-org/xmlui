@@ -90,19 +90,21 @@ export function ToneSwitch({
                   contextVars.$setChecked(!contextVars.$checked);
                 }}
               >
-                {!contextVars.$checked ? (
-                  <Icon 
-                    name={lightIcon} 
-                    fallback="sun" 
-                    className={styles.icon}
-                  />
-                ) : (
-                  <Icon 
-                    name={darkIcon} 
-                    fallback="moonFull" 
-                    className={styles.icon}
-                  />
-                )}
+                <div className={styles.iconThumb}>
+                  {!contextVars.$checked ? (
+                    <Icon 
+                      name={lightIcon} 
+                      fallback="sun" 
+                      className={styles.icon}
+                    />
+                  ) : (
+                    <Icon 
+                      name={darkIcon} 
+                      fallback="moonFull" 
+                      className={styles.icon}
+                    />
+                  )}
+                </div>
               </div>
             );
           }}

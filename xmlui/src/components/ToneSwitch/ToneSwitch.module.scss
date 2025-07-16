@@ -10,14 +10,33 @@ $themeVars: ();
 .iconSwitch {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
+  padding: 4px;
   border-radius: 20px;
   transition: background-color 0.3s ease;
   cursor: pointer;
   min-height: 32px;
-  min-width: 48px;
-  width: fit-content;
+  width: 56px;
+  position: relative;
+}
+
+.iconThumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.iconSwitch.light .iconThumb {
+  transform: translateX(0);
+}
+
+.iconSwitch.dark .iconThumb {
+  transform: translateX(24px);
 }
 
 .toneSwitchWrapper {
@@ -50,12 +69,13 @@ $themeVars: ();
 }
 
 .icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--icon-color, #666);
 }
 
 // --- We export the theme variables to add them to the component renderer
