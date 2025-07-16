@@ -41,7 +41,8 @@
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
                 <NavLink label="Markup" to="/markup"/>
-                <NavLink label="Code" to="/code"/>
+                <NavLink label="Component Scoping" to="/scoping"/>
+                <NavLink label="Scripting" to="/scripting"/>
                 <NavLink label="Layout" to="/layout"/>
                 <NavLink label="Working with Text" to="/working-with-text"/>
                 <NavLink label="Working with Markdown" to="/working-with-markdown"/>
@@ -226,8 +227,11 @@
             <Page url="/markup">
                 <DocumentPage url="/pages/markup.md"/>
             </Page>
-            <Page url="/code">
-                <DocumentPage url="/pages/code.md"/>
+            <Page url="/scoping">
+                <DocumentPage url="/pages/scoping.md"/>
+            </Page>
+            <Page url="/scripting">
+                <DocumentPage url="/pages/scripting.md"/>
             </Page>
             <Page url="/layout">
                 <DocumentPage url="/pages/layout.md"/>

@@ -1,4 +1,4 @@
-# XMLUI Code
+# XMLUI Scripting
 
 With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
 
