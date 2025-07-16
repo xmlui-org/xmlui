@@ -92,6 +92,7 @@
 | [TextBox](./TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
 | [Theme](./Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
 | [ToneChangerButton](./ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
+| [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
 | [VSplitter](./VSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
 | [VStack](./VStack) | This component represents a stack rendering its contents vertically. |
 
