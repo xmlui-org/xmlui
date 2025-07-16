@@ -45,7 +45,7 @@ function ThemeController() {
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `activeThemeTone` | `light` | `dark` | Current theme tone |
+| `activeThemeTone` | `light` or `dark` | Current theme tone |
 | `setActiveThemeTone` | `function` | Function to change theme tone |
 | `activeTheme` | `object` | Current theme configuration |
 | `setActiveThemeId` | `function` | Function to change theme |
