@@ -1,6 +1,6 @@
-## Component ID Scoping
+## Component Scoping
 
-Component IDs in XMLUI follow hierarchical scoping rules based on the component tree structure. Understanding these rules is crucial for sharing components like modals across your application.
+Components in XMLUI follow hierarchical scoping rules based on the component tree structure. Understanding these rules is crucial for sharing components like modals across your application.
 
 ## Scoping Rules
 
