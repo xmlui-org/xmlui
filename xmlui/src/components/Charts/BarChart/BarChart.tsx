@@ -47,32 +47,35 @@ export const BarChartMd = createMetadata({
     },
     hideX: {
       description:
-        "Determines whether the X-axis should be hidden. If set to \`true\`, the axis will not be rendered.",
+        "Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.",
       valueType: "boolean",
       defaultValue: defaultProps.hideX,
     },
     hideY: {
       description:
-        "Determines whether the Y-axis should be hidden. If set to \`true\`, the axis will not be rendered.",
+        "Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.",
       valueType: "boolean",
       defaultValue: defaultProps.hideY,
     },
     hideTickX: {
       description:
-        "Controls the visibility of the X-axis ticks. If set to \`true\`, tick labels on the X-axis will be hidden.",
+        "Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTickX,
     },
     hideTickY: {
       description:
-        "Controls the visibility of the Y-axis ticks. If set to \`true\`, tick labels on the Y-axis will be hidden.",
+        "Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTickY,
     },
-    tickFormatter: {
-      description:
-        "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
-      defaultValue: JSON.stringify(defaultProps.tickFormatter),
+    tickFormatterX: {
+      description: "A function that formats the tick labels on the X-axis. ",
+      defaultValue: JSON.stringify(defaultProps.tickFormatterX),
+    },
+    tickFormatterY: {
+      description: "A function that formats the tick labels on the Y-axis. ",
+      defaultValue: JSON.stringify(defaultProps.tickFormatterY),
     },
     showLegend: {
       description: "Determines whether the legend should be displayed.",
@@ -89,7 +92,8 @@ export const barChartComponentRenderer = createComponentRenderer(
     return (
       <BarChart
         style={layoutCss}
-        tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
+        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
+        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.layout)}
         nameKey={extractValue(node.props?.nameKey)}
