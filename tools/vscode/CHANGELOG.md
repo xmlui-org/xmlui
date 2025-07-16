@@ -1,5 +1,13 @@
 # xmlui-vscode
 
+## 0.9.75
+
+### Patch Changes
+
+- 2edefdd: feat: ensure xmlui-vscode is versioned with xmlui
+- Updated dependencies [c876be8]
+  - xmlui@0.9.75
+
 ## 0.1.2
 
 ### Patch Changes
