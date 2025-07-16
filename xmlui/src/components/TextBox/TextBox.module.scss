@@ -110,6 +110,19 @@ $componentName: "TextBox";
   cursor: default;
 }
 
+.passwordToggle {
+  cursor: pointer;
+  color: createThemeVar("Input:color-passwordToggle-#{$componentName}");
+  
+  &:hover {
+    color: createThemeVar("Input:color-passwordToggle-#{$componentName}--hover");
+  }
+  
+  &:focus {
+    color: createThemeVar("Input:color-passwordToggle-#{$componentName}--focus");
+  }
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);

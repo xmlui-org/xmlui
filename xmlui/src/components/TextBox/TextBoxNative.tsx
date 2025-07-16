@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef, useId } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, useId, useState } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
 
@@ -10,6 +10,15 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
+
+/**
+ * TextBox component that supports text input with various configurations.
+ * Features:
+ * - Standard text, password, and search input types
+ * - Input validation states
+ * - Start/end adornments (icons and text)
+ * - Password visibility toggle option
+ */
 
 type Props = {
   id?: string;
@@ -40,6 +49,11 @@ type Props = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  /**
+   * When true and type is "password", displays a toggle icon to show/hide password text
+   * Default: false
+   */
+  showPasswordToggle?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -97,12 +111,25 @@ export const TextBox = forwardRef(function TextBox(
     labelWidth,
     labelBreak,
     required,
+    showPasswordToggle,
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const _id = useId();
   id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // State to control password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Determine the actual input type based on the password visibility toggle
+  const actualType = (type === "password" && showPassword) ? "text" : type;
+  
+  // Toggle password visibility
+  const togglePasswordVisibility = useCallback(() => {
+    setShowPassword(prev => !prev);
+  }, []);
+  
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -165,6 +192,9 @@ export const TextBox = forwardRef(function TextBox(
     });
   }, [focus, registerComponentApi, setValue]);
 
+  console.log("showPasswordToggle", showPasswordToggle, type);
+  console.log("isPsw", type === "password" && showPasswordToggle)
+
   return (
     <ItemWithLabel
       id={id}
@@ -192,7 +222,7 @@ export const TextBox = forwardRef(function TextBox(
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input
           id={id}
-          type={type}
+          type={actualType}
           className={classnames(styles.input, { [styles.readOnly]: readOnly })}
           disabled={!enabled}
           value={localValue}
@@ -208,7 +238,15 @@ export const TextBox = forwardRef(function TextBox(
           tabIndex={enabled ? tabIndex : -1}
           required={required}
         />
-        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        {type === "password" && showPasswordToggle ? (
+          <Adornment
+            iconName={showPassword ? "email" : "phone"} 
+            className={classnames(styles.adornment)}
+            onClick={togglePasswordVisibility}
+          />
+        ) : (
+          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        )}
       </div>
     </ItemWithLabel>
   );

@@ -9,13 +9,21 @@ interface AdornmentProps {
   iconName?: string;
   text?: string;
   className?: string;
+  onClick?: () => void;
 }
 
-export function Adornment({ iconName, text, className }: AdornmentProps) {
+export function Adornment({ iconName, text, className, onClick }: AdornmentProps) {
   return (
     <>
       {iconName || text ? (
-        <div className={classnames(styles.wrapper, className)} role="presentation">
+        <div 
+          className={classnames(styles.wrapper, className, { 
+            [styles.clickable]: !!onClick 
+          })} 
+          role={onClick ? "button" : "presentation"}
+          onClick={onClick}
+          tabIndex={onClick ? 0 : undefined}
+        >
           <Icon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>

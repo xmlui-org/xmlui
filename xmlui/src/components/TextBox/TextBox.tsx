@@ -71,6 +71,11 @@ export const TextBoxMd = createMetadata({
         "This property defines the gap between the adornments and the input area. If not " +
         "set, the gap declared by the current theme is used.",
     },
+    showPasswordToggle: {
+      description:
+        "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+      defaultValue: false,
+    }
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -160,6 +165,7 @@ function renderTextBox(
       labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
       labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       required={extractValue.asOptionalBoolean(node.props.required)}
+      showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
     />
   );
 }
