@@ -156,7 +156,6 @@
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
                     <NavLink label="Theme Variable Defaults" to="/styles-and-themes/theme-variable-defaults"/>
                     <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
-                    <NavLink label="Thousands of Theme Variables" to="/styles-and-themes/xmlui-theme"/>
                 </NavGroup>
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
@@ -265,9 +264,6 @@
             </Page>
             <Page url="/styles-and-themes/common-units">
                 <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
-            </Page>
-            <Page url="/styles-and-themes/xmlui-theme">
-                <ThousandThemes />
             </Page>
             <Page url="/context-variables">
                 <DocumentPage url="/pages/context-variables.md" />
