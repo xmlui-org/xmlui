@@ -9,7 +9,7 @@ import classnames from "classnames";
 
 const COMP = "ToneSwitch";
 const LIGHT_ICON = "sun:ToneSwitch";
-const DARK_ICON = "moonFull:ToneSwitch";
+const DARK_ICON = "moonThreeQuarter:ToneSwitch";
 
 export const defaultProps = {
   lightIcon: LIGHT_ICON,
@@ -85,10 +85,6 @@ export function ToneSwitch({
                   [styles.light]: !contextVars.$checked,
                   [styles.dark]: contextVars.$checked
                 })}
-                onClick={() => {
-                  console.log('ToneSwitch clicked, current:', contextVars.$checked); // Debug log
-                  contextVars.$setChecked(!contextVars.$checked);
-                }}
               >
                 <div className={styles.iconThumb}>
                   {!contextVars.$checked ? (
@@ -100,7 +96,7 @@ export function ToneSwitch({
                   ) : (
                     <Icon 
                       name={darkIcon} 
-                      fallback="moonFull" 
+                      fallback="moonThreeQuarter" 
                       className={styles.icon}
                     />
                   )}

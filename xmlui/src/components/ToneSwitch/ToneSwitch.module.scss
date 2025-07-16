@@ -17,6 +17,7 @@ $themeVars: ();
   min-height: 32px;
   width: 56px;
   position: relative;
+  pointer-events: auto;
 }
 
 .iconThumb {
@@ -29,6 +30,7 @@ $themeVars: ();
   background-color: white;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
 }
 
 .iconSwitch.light .iconThumb {
@@ -76,6 +78,7 @@ $themeVars: ();
   align-items: center;
   justify-content: center;
   color: var(--icon-color, #666);
+  pointer-events: none;
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -8,9 +8,9 @@
 
 The icon displayed when the theme is in light mode. You can change the default icon for all ToneSwitch instances with the "icon.light:ToneSwitch" declaration in the app configuration file.
 
-### `darkIcon (default: "moon:ToneSwitch")`
+### `darkIcon (default: "moonThreeQuarter:ToneSwitch")`
 
-The icon displayed when the theme is in dark mode (full moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
+The icon displayed when the theme is in dark mode (3/4 moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
 
 ### `showIcons (default: true)`
 
