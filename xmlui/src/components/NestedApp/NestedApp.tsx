@@ -61,6 +61,7 @@ export const NestedAppMd = createMetadata({
     // --- Split view styles
     [`padding-button-splitView-${COMP}`]: "1px 6px",
     [`width-button-splitView-${COMP}`]: "60px",
+    [`height-button-splitView-${COMP}`]: "19px",
     [`width-logo-splitView-${COMP}`]: "1.5rem",
     [`height-logo-splitView-${COMP}`]: "2rem",
     [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-0",
