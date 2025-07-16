@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.75
+
+### Patch Changes
+
+- c876be8: Turn docs deploy to standard routing
+
 ## 0.9.74
 
 ### Patch Changes
