@@ -61,8 +61,10 @@ export function ToneSwitch({
   showIcons = defaultProps.showIcons,
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
+  console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
 
   const handleChange = (isDark: boolean) => {
+    console.log('ToneSwitch handleChange called with:', isDark); // Debug log
     setActiveThemeTone(isDark ? "dark" : "light");
   };
 
@@ -75,29 +77,38 @@ export function ToneSwitch({
           onDidChange={handleChange}
           variant="switch"
           style={{ width: 'fit-content' }}
-          inputRenderer={(contextVars) => (
-            <div className={classnames(styles.iconSwitch, {
+          inputRenderer={(contextVars) => {
+          console.log('ToneSwitch contextVars:', contextVars); // Debug log
+          return (
+          <div 
+          className={classnames(styles.iconSwitch, {
               [styles.light]: !contextVars.$checked,
               [styles.dark]: contextVars.$checked
-            })}>
-              <Icon 
-                name={lightIcon} 
-                fallback="sun" 
+              })}
+            onClick={() => {
+            console.log('ToneSwitch clicked, current:', contextVars.$checked); // Debug log
+            contextVars.$setChecked(!contextVars.$checked);
+          }}
+          >
+          <Icon 
+            name={lightIcon} 
+              fallback="sun" 
+              className={classnames(styles.icon, {
+              [styles.active]: !contextVars.$checked,
+              [styles.inactive]: contextVars.$checked
+            })}
+          />
+          <Icon 
+            name={darkIcon} 
+              fallback="moonFull" 
                 className={classnames(styles.icon, {
-                  [styles.active]: !contextVars.$checked,
-                  [styles.inactive]: contextVars.$checked
-                })}
-              />
-              <Icon 
-                name={darkIcon} 
-                fallback="moonFull" 
-                className={classnames(styles.icon, {
-                  [styles.active]: contextVars.$checked,
+                    [styles.active]: contextVars.$checked,
                   [styles.inactive]: !contextVars.$checked
                 })}
               />
             </div>
-          )}
+          );
+        }}
         />
       </div>
     );
