@@ -141,10 +141,11 @@ export function BarChart({
   const [tickAnchor, setTickAnchor] = useState<"end" | "middle">("middle");
   const [miniMode, setMiniMode] = useState(false);
   const [yAxisWidth, setYAxisWidth] = useState(40);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const calc = () => {
-      const width = containerRef.current?.offsetWidth || 800;
+      const width = containerRef?.current?.offsetWidth || 800;
       const spans = labelsRef.current?.querySelectorAll("span") || [];
       const yTicks = Array.from(
         document.querySelectorAll(".recharts-y-axis .recharts-layer tspan"),
@@ -189,12 +190,12 @@ export function BarChart({
       }
       setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: bottomMargin });
 
-      const chartHeight = containerRef.current?.offsetHeight || 300;
+      const chartHeight = containerRef?.current?.offsetHeight || 300;
       const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
       setYTickCount(maxYTicks);
       setXAxisHeight(Math.ceil(fontSize));
-      const containerHeight = containerRef.current?.offsetHeight || 0;
-      const containerWidth = containerRef.current?.offsetWidth || 0;
+      const containerHeight = containerRef?.current?.offsetHeight || 0;
+      const containerWidth = containerRef?.current?.offsetWidth || 0;
       const neededHeight = 10 + xAxisHeight + 10 + 32;
       const neededWidth = chartMargin.left + chartMargin.right + yAxisWidth + 32;
       setMiniMode(neededHeight > containerHeight || neededWidth > containerWidth);
@@ -203,7 +204,155 @@ export function BarChart({
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data, xAxisHeight]);
+  }, [data]);
+
+  const containerSize = useMemo(() => {
+    const parseSize = (value?: string) => {
+      if (!value) return "100%";
+      if (value.endsWith("px")) {
+        return parseInt(value, 10);
+      }
+      return value;
+    };
+
+    const width = parseSize(style?.width as string);
+    const height = parseSize(style?.height as string);
+
+    return {
+      width,
+      height,
+    };
+  }, [style?.width, style?.height]);
+
+  const content = useMemo(() => {
+    const auto = style?.width === "*" || style?.height === "*";
+    const chart = (
+      <ResponsiveContainer
+        ref={containerRef}
+        minWidth={60}
+        minHeight={60}
+        debounce={100}
+        width={auto ? "100%" : containerSize.width}
+        height={auto ? "100%" : containerSize.height}
+      >
+        <RBarChart
+          style={style}
+          accessibilityLayer
+          data={data}
+          layout={layout}
+          margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
+        >
+          <CartesianGrid vertical={true} strokeDasharray="3 3" />
+          {layout === "vertical" ? (
+            <>
+              <XAxis
+                type="number"
+                axisLine={false}
+                hide={miniMode || hideX}
+                tickFormatter={miniMode ? undefined : tickFormatterX}
+                tick={miniMode ? false : { fill: "currentColor", fontSize }}
+              />
+              <YAxis
+                hide={miniMode || hideY}
+                dataKey={nameKey}
+                type="category"
+                interval={"equidistantPreserveStart"}
+                tickLine={false}
+                tickFormatter={miniMode ? undefined : tickFormatterY}
+                tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+              />
+            </>
+          ) : (
+            <>
+              <XAxis
+                dataKey={nameKey}
+                type="category"
+                interval={interval}
+                tickLine={false}
+                angle={tickAngle}
+                textAnchor={tickAnchor}
+                tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+                tickFormatter={miniMode ? undefined : tickFormatterX}
+                height={miniMode || hideX ? 0 : xAxisHeight}
+                hide={miniMode || hideX}
+              />
+              <YAxis
+                type="number"
+                axisLine={false}
+                tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+                hide={miniMode || hideY}
+                tickCount={yTickCount}
+                tickFormatter={miniMode ? undefined : tickFormatterY}
+                width={miniMode || hideY || hideTickY ? 0 : 40}
+              />
+            </>
+          )}
+          {!miniMode && <Tooltip content={<TooltipContent />} />}
+          {Object.keys(config).map((key, index) => (
+            <Bar
+              key={index}
+              dataKey={key}
+              fill={config[key].color}
+              radius={stacked ? 0 : 8}
+              stackId={stacked ? "stacked" : undefined}
+              strokeWidth={1}
+            />
+          ))}
+          {showLegend && (
+            <RLegend
+              wrapperStyle={{
+                bottom: 0,
+                left: 0,
+                right: 0,
+                margin: "0 auto",
+                width: "100%",
+                textAlign: "center",
+              }}
+            />
+          )}
+        </RBarChart>
+      </ResponsiveContainer>
+    );
+
+    return auto ? (
+      <div
+        ref={wrapperRef}
+        style={{
+          flexGrow: 1,
+          width: containerSize.width,
+          height: containerSize.height,
+          padding: 0,
+          margin: 0,
+        }}
+      >
+        {chart}
+      </div>
+    ) : (
+      chart
+    );
+  }, [
+    data,
+    layout,
+    nameKey,
+    stacked,
+    dataKeys,
+    style,
+    miniMode,
+    chartMargin,
+    interval,
+    tickAngle,
+    tickAnchor,
+    xAxisHeight,
+    hideX,
+    hideY,
+    hideTickX,
+    hideTickY,
+    tickFormatterX,
+    tickFormatterY,
+    yTickCount,
+    showLegend,
+    config,
+  ]);
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -220,93 +369,7 @@ export function BarChart({
             </span>
           ))}
       </div>
-      <div
-        style={{
-          flexGrow: 1,
-          width: style.width || "100%",
-          height: style.height || "100%",
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        <ResponsiveContainer style={style} ref={containerRef} width="100%" height="100%" debounce={100}>
-          <RBarChart
-            accessibilityLayer
-            data={data}
-            layout={layout}
-            margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
-          >
-            <CartesianGrid vertical={true} strokeDasharray="3 3" />
-            {layout === "vertical" ? (
-              <>
-                <XAxis
-                  type="number"
-                  axisLine={false}
-                  hide={miniMode || hideX}
-                  tickFormatter={miniMode ? undefined : tickFormatterX}
-                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
-                />
-                <YAxis
-                  hide={miniMode || hideY}
-                  dataKey={nameKey}
-                  type="category"
-                  interval={"equidistantPreserveStart"}
-                  tickLine={false}
-                  tickFormatter={miniMode ? undefined : tickFormatterY}
-                  tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
-                />
-              </>
-            ) : (
-              <>
-                <XAxis
-                  dataKey={nameKey}
-                  type="category"
-                  interval={interval}
-                  tickLine={false}
-                  angle={tickAngle}
-                  textAnchor={tickAnchor}
-                  tick={miniMode ? false : !hideTickX &&{ fill: "currentColor", fontSize }}
-                  tickFormatter={miniMode ? undefined : tickFormatterX}
-                  height={miniMode || hideX ? 0 : xAxisHeight}
-                  hide={miniMode || hideX}
-                />
-                <YAxis
-                  type="number"
-                  axisLine={false}
-                  tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
-                  hide={miniMode || hideY}
-                  tickCount={yTickCount}
-                  tickFormatter={miniMode ? undefined : tickFormatterY}
-                  width={miniMode || hideY || hideTickY ? 0 : 40}
-                />
-              </>
-            )}
-            {!miniMode && <Tooltip content={<TooltipContent />} />}
-            {Object.keys(config).map((key, index) => (
-              <Bar
-                key={index}
-                dataKey={key}
-                fill={config[key].color}
-                radius={stacked ? 0 : 8}
-                stackId={stacked ? "stacked" : undefined}
-                strokeWidth={1}
-              />
-            ))}
-            {showLegend && (
-              <RLegend
-                wrapperStyle={{
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  margin: "0 auto",
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              />
-            )}
-          </RBarChart>
-        </ResponsiveContainer>
-      </div>
+      {content}
     </ChartProvider>
   );
 }
