@@ -737,7 +737,7 @@ function generateBaseTonesForColor(
       color200 = baseColor.lightness(baseL + lightStep * 3);
       color300 = baseColor.lightness(baseL + lightStep * 2);
       color400 = baseColor.lightness(baseL + lightStep * 1);
-      color500 = baseColor;
+      color500 = baseColor.lightness(baseL);
       color600 = baseColor.lightness(baseL - darkStep * 1);
       color700 = baseColor.lightness(baseL - darkStep * 2);
       color800 = baseColor.lightness(baseL - darkStep * 3);
