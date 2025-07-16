@@ -229,9 +229,8 @@ export function BarChart({
           margin: 0,
         }}
       >
-        <ResponsiveContainer ref={containerRef} width="100%" height="100%" debounce={100}>
+        <ResponsiveContainer style={style} ref={containerRef} width="100%" height="100%" debounce={100}>
           <RBarChart
-            style={style}
             accessibilityLayer
             data={data}
             layout={layout}
@@ -254,7 +253,7 @@ export function BarChart({
                   interval={"equidistantPreserveStart"}
                   tickLine={false}
                   tickFormatter={miniMode ? undefined : tickFormatterY}
-                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                  tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
                 />
               </>
             ) : (
@@ -266,7 +265,7 @@ export function BarChart({
                   tickLine={false}
                   angle={tickAngle}
                   textAnchor={tickAnchor}
-                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                  tick={miniMode ? false : !hideTickX &&{ fill: "currentColor", fontSize }}
                   tickFormatter={miniMode ? undefined : tickFormatterX}
                   height={miniMode || hideX ? 0 : xAxisHeight}
                   hide={miniMode || hideX}
