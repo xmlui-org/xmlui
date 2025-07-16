@@ -46,15 +46,6 @@ $themeVars: ();
   transform: translateX(calc(1rem + 4px));
 }
 
-.toneSwitchWrapper {
-  width: fit-content !important;
-  display: inline-block;
-
-  // Override the label width from Toggle component
-  :global(.label) {
-    width: fit-content !important;
-  }
-}
 
 // Alternative global override for the label class
 :global(.toneSwitchContainer) {
