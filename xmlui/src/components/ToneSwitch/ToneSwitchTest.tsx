@@ -8,17 +8,17 @@ export function ToneSwitchTest() {
       <h2>ToneSwitch Component Test</h2>
       
       <div style={{ marginBottom: '20px' }}>
-        <h3>Default ToneSwitch (with icons)</h3>
+        <h3>Default ToneSwitch (icon-based switch)</h3>
         <ToneSwitch />
       </div>
       
       <div style={{ marginBottom: '20px' }}>
-        <h3>ToneSwitch without icons</h3>
+        <h3>Standard switch design</h3>
         <ToneSwitch showIcons={false} />
       </div>
       
       <div style={{ marginBottom: '20px' }}>
-        <h3>ToneSwitch with custom icons</h3>
+        <h3>Custom icons in switch</h3>
         <ToneSwitch lightIcon="brightness" darkIcon="nightMode" />
       </div>
     </div>

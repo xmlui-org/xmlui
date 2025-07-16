@@ -1,0 +1,40 @@
+@use "../../components-core/theming/themes" as t;
+
+.iconSwitch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 16px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  min-height: 24px;
+}
+
+.iconSwitch.light {
+  background-color: t.getThemeVar('$color-surface-200');
+  color: t.getThemeVar('$color-text-primary');
+}
+
+.iconSwitch.dark {
+  background-color: t.getThemeVar('$color-primary-500');
+  color: t.getThemeVar('$color-surface-0');
+}
+
+.icon {
+  transition: opacity 0.3s ease;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon.active {
+  opacity: 1;
+}
+
+.icon.inactive {
+  opacity: 0.4;
+}

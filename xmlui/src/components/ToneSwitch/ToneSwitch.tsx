@@ -3,10 +3,12 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { createMetadata } from "../metadata-helpers";
+import styles from "./ToneSwitch.module.scss";
+import classnames from "classnames";
 
 const COMP = "ToneSwitch";
 const LIGHT_ICON = "sun:ToneSwitch";
-const DARK_ICON = "moon:ToneSwitch";
+const DARK_ICON = "moonFull:ToneSwitch";
 
 export const defaultProps = {
   lightIcon: LIGHT_ICON,
@@ -50,28 +52,47 @@ export function ToneSwitch({
     setActiveThemeTone(isDark ? "dark" : "light");
   };
 
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      {showIcons && (
-        <Icon 
-          name={lightIcon} 
-          fallback="sun" 
-          style={{ opacity: activeThemeTone === "light" ? 1 : 0.5 }}
-        />
-      )}
+  if (showIcons) {
+    // Custom icon-based switch
+    return (
       <Toggle
         value={activeThemeTone === "dark"}
         onDidChange={handleChange}
         variant="switch"
+        inputRenderer={(contextVars) => (
+          <div className={classnames(styles.iconSwitch, {
+            [styles.light]: !contextVars.$checked,
+            [styles.dark]: contextVars.$checked
+          })}>
+            <Icon 
+              name={lightIcon} 
+              fallback="sun" 
+              className={classnames(styles.icon, {
+                [styles.active]: !contextVars.$checked,
+                [styles.inactive]: contextVars.$checked
+              })}
+            />
+            <Icon 
+              name={darkIcon} 
+              fallback="moonFull" 
+              className={classnames(styles.icon, {
+                [styles.active]: contextVars.$checked,
+                [styles.inactive]: !contextVars.$checked
+              })}
+            />
+          </div>
+        )}
       />
-      {showIcons && (
-        <Icon 
-          name={darkIcon} 
-          fallback="moon" 
-          style={{ opacity: activeThemeTone === "dark" ? 1 : 0.5 }}
-        />
-      )}
-    </div>
+    );
+  }
+
+  // Fallback to standard switch without icons
+  return (
+    <Toggle
+      value={activeThemeTone === "dark"}
+      onDidChange={handleChange}
+      variant="switch"
+    />
   );
 }
 

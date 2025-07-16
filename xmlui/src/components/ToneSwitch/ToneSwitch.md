@@ -10,11 +10,11 @@ The icon displayed when the theme is in light mode. You can change the default i
 
 ### `darkIcon (default: "moon:ToneSwitch")`
 
-The icon displayed when the theme is in dark mode. You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
+The icon displayed when the theme is in dark mode (full moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
 
 ### `showIcons (default: true)`
 
-Whether to show icons next to the switch control. When true, displays sun and moon icons that fade based on the current theme.
+Whether to use icons as the switch control itself. When true, the switch becomes a pill-shaped toggle with sun and moon icons inside. When false, uses the standard switch design.
 
 ## Usage Examples
 
@@ -23,7 +23,7 @@ Whether to show icons next to the switch control. When true, displays sun and mo
 <ToneSwitch />
 ```
 
-### Without icons
+### Standard switch design
 ```xmlui
 <ToneSwitch showIcons="false" />
 ```
@@ -42,4 +42,4 @@ Whether to show icons next to the switch control. When true, displays sun and mo
 
 ## Styling
 
-The component uses the standard Switch styling from the XMLUI theme system. Icons are positioned with 8px gap spacing and transition opacity based on the active theme.
+The component uses either a custom icon-based switch design or the standard Switch styling from the XMLUI theme system. In icon mode, creates a pill-shaped toggle with sun and moon icons that transition opacity and background color based on the active theme.

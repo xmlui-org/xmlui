@@ -17,9 +17,9 @@
 
 ## Properties [#properties]
 
-### `darkIcon (default: "moon:ToneSwitch")` [#darkicon-default-moon-toneswitch]
+### `darkIcon (default: "moonFull:ToneSwitch")` [#darkicon-default-moon-toneswitch]
 
-The icon displayed when the theme is in dark mode. You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
+The icon displayed when the theme is in dark mode (full moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
 
 ### `lightIcon (default: "sun:ToneSwitch")` [#lighticon-default-sun-toneswitch]
 
@@ -27,19 +27,19 @@ The icon displayed when the theme is in light mode. You can change the default i
 
 ### `showIcons (default: true)` [#showicons-default-true]
 
-Whether to show icons next to the switch control. When true, displays sun and moon icons that fade based on the current theme.
+Whether to use icons as the switch control itself. When true, the switch becomes a pill-shaped toggle with sun and moon icons inside. When false, uses the standard switch design.
 
-```xmlui-pg {4,9} copy display name="Example: with and without icons"
+```xmlui-pg {4,9} copy display name="Example: icon switch vs standard switch"
 <App>
   <AppHeader>
     <SpaceFiller />
     <ToneSwitch showIcons="true" />
   </AppHeader>
-  <Card title="With Icons" />
+  <Card title="Icon-based Switch" />
   <Card>
     <HStack>
       <ToneSwitch showIcons="false" />
-      <Text>Without icons</Text>
+      <Text>Standard switch</Text>
     </HStack>
   </Card>
 </App>
@@ -55,4 +55,4 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-The component uses the standard Switch styling from the XMLUI theme system. Icons are positioned with 8px gap spacing and transition opacity based on the active theme.
+The component uses either a custom icon-based switch design or the standard Switch styling from the XMLUI theme system. In icon mode, creates a pill-shaped toggle with sun and moon icons that transition opacity and background color based on the active theme.
