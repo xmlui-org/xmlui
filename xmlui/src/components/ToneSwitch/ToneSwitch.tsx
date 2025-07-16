@@ -3,6 +3,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { createMetadata } from "../metadata-helpers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ToneSwitch.module.scss";
 import classnames from "classnames";
 
@@ -35,9 +36,22 @@ export const ToneSwitchMd = createMetadata({
       defaultValue: defaultProps.darkIcon,
     },
     showIcons: {
-      description: "Whether to show icons next to the switch control.",
+      description: "Whether to use icons as the switch control itself. When true, the switch becomes a pill-shaped toggle with sun and moon icons inside. When false, uses the standard switch design.",
       defaultValue: defaultProps.showIcons,
     },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}-light`]: "$color-surface-200",
+    [`color-${COMP}-light`]: "$color-text-primary",
+    [`backgroundColor-${COMP}-dark`]: "$color-primary-500",
+    [`color-${COMP}-dark`]: "$color-surface-0",
+
+    dark: {
+      [`backgroundColor-${COMP}-light`]: "$color-surface-700",
+      [`color-${COMP}-light`]: "$color-text-primary",
+    }
   },
 });
 

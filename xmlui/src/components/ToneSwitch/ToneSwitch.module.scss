@@ -1,5 +1,12 @@
 @use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
 .iconSwitch {
   display: flex;
   align-items: center;
@@ -12,13 +19,13 @@
 }
 
 .iconSwitch.light {
-  background-color: t.getThemeVar('$color-surface-200');
-  color: t.getThemeVar('$color-text-primary');
+  background-color: createThemeVar("backgroundColor-ToneSwitch-light");
+  color: createThemeVar("color-ToneSwitch-light");
 }
 
 .iconSwitch.dark {
-  background-color: t.getThemeVar('$color-primary-500');
-  color: t.getThemeVar('$color-surface-0');
+  background-color: createThemeVar("backgroundColor-ToneSwitch-dark");
+  color: createThemeVar("color-ToneSwitch-dark");
 }
 
 .icon {
@@ -37,4 +44,9 @@
 
 .icon.inactive {
   opacity: 0.4;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
