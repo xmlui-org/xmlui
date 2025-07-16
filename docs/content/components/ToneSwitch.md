@@ -17,9 +17,9 @@
 
 ## Properties [#properties]
 
-### `darkIcon (default: "moon:ToneSwitch")` [#darkicon-default-moon-toneswitch]
+### `darkIcon (default: "moonThreeQuarter:ToneSwitch")` [#darkicon-default-moon-toneswitch]
 
-The icon displayed when the theme is in dark mode (crescent moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
+The icon displayed when the theme is in dark mode (3/4 moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
 
 ### `lightIcon (default: "sun:ToneSwitch")` [#lighticon-default-sun-toneswitch]
 
