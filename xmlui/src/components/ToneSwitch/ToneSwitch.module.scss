@@ -12,12 +12,17 @@ $themeVars: ();
   align-items: center;
   padding: 4px;
   border-radius: 1rem;
-  transition: background-color 0.3s ease;
+  border: 1px solid createThemeVar("borderColor-ToneSwitch");
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
   min-height: 1rem;
   width: calc(1rem * 3);
   position: relative;
   pointer-events: auto;
+
+  &:hover {
+    border-color: createThemeVar("borderColor-ToneSwitch--hover");
+  }
 }
 
 .iconThumb {
@@ -38,7 +43,7 @@ $themeVars: ();
 }
 
 .iconSwitch.dark .iconThumb {
-  transform: translateX(calc(1rem * 2 - 2px));
+  transform: translateX(calc(1rem + 4px));
 }
 
 .toneSwitchWrapper {

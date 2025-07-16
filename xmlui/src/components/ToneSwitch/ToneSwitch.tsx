@@ -9,7 +9,7 @@ import classnames from "classnames";
 
 const COMP = "ToneSwitch";
 const LIGHT_ICON = "sun:ToneSwitch";
-const DARK_ICON = "moonThreeQuarter:ToneSwitch";
+const DARK_ICON = "moonWaning:ToneSwitch";
 
 export const defaultProps = {
   lightIcon: LIGHT_ICON,
@@ -47,10 +47,14 @@ export const ToneSwitchMd = createMetadata({
     [`color-${COMP}-light`]: "$color-text-primary",
     [`backgroundColor-${COMP}-dark`]: "$color-primary-500",
     [`color-${COMP}-dark`]: "$color-surface-0",
+    [`borderColor-${COMP}`]: "$color-surface-200",
+    [`borderColor-${COMP}--hover`]: "$color-surface-300",
 
     dark: {
       [`backgroundColor-${COMP}-light`]: "$color-surface-700",
       [`color-${COMP}-light`]: "$color-text-primary",
+      [`borderColor-${COMP}`]: "$color-surface-600",
+      [`borderColor-${COMP}--hover`]: "$color-surface-500",
     }
   },
 });
@@ -96,7 +100,7 @@ export function ToneSwitch({
                   ) : (
                     <Icon 
                       name={darkIcon} 
-                      fallback="moonThreeQuarter" 
+                      fallback="circle" 
                       className={styles.icon}
                     />
                   )}
