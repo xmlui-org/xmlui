@@ -1,20 +1,16 @@
 # ToneSwitch
 
-`ToneSwitch` enables users to switch between light and dark themes using a switch control with optional icons.
+`ToneSwitch` enables users to switch between light and dark themes using an icon-based toggle switch.
 
 ## Properties
 
-### `lightIcon (default: "sun:ToneSwitch")`
+### `lightIcon (default: \"sun:ToneSwitch\")`
 
-The icon displayed when the theme is in light mode. You can change the default icon for all ToneSwitch instances with the "icon.light:ToneSwitch" declaration in the app configuration file.
+The icon displayed when the theme is in light mode. You can change the default icon for all ToneSwitch instances with the \"icon.light:ToneSwitch\" declaration in the app configuration file.
 
-### `darkIcon (default: "moonThreeQuarter:ToneSwitch")`
+### `darkIcon (default: \"moonWaning:ToneSwitch\")`
 
-The icon displayed when the theme is in dark mode (3/4 moon icon). You can change the default icon for all ToneSwitch instances with the "icon.dark:ToneSwitch" declaration in the app configuration file.
-
-### `showIcons (default: true)`
-
-Whether to use icons as the switch control itself. When true, the switch becomes a pill-shaped toggle with sun and moon icons inside. When false, uses the standard switch design.
+The icon displayed when the theme is in dark mode. You can change the default icon for all ToneSwitch instances with the \"icon.dark:ToneSwitch\" declaration in the app configuration file.
 
 ## Usage Examples
 
@@ -23,23 +19,19 @@ Whether to use icons as the switch control itself. When true, the switch becomes
 <ToneSwitch />
 ```
 
-### Standard switch design
-```xmlui
-<ToneSwitch showIcons="false" />
-```
-
 ### Custom icons
 ```xmlui
-<ToneSwitch lightIcon="brightness" darkIcon="nightMode" />
+<ToneSwitch lightIcon=\"brightness\" darkIcon=\"nightMode\" />
 ```
 
 ## Behavior
 
 - The switch automatically reflects the current theme state
 - Clicking the switch toggles between light and dark themes
-- Icons (when shown) have reduced opacity when not active
+- Shows sun icon in light mode (thumb on left)
+- Shows moon icon in dark mode (thumb on right)
 - Includes proper ARIA labeling for accessibility
 
 ## Styling
 
-The component uses either a custom icon-based switch design or the standard Switch styling from the XMLUI theme system. In icon mode, creates a pill-shaped toggle with sun and moon icons that transition opacity and background color based on the active theme.
+The component uses an icon-based switch design with a sliding thumb that contains the theme-appropriate icon. The switch matches the size and styling of standard XMLUI switches.

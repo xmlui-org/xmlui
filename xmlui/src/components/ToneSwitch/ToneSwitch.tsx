@@ -14,7 +14,6 @@ const DARK_ICON = "moonWaning:ToneSwitch";
 export const defaultProps = {
   lightIcon: LIGHT_ICON,
   darkIcon: DARK_ICON,
-  showIcons: true,
 };
 
 export const ToneSwitchMd = createMetadata({
@@ -34,10 +33,6 @@ export const ToneSwitchMd = createMetadata({
         `the default icon for all ${COMP} instances with the "icon.dark:ToneSwitch" ` +
         `declaration in the app configuration file.`,
       defaultValue: defaultProps.darkIcon,
-    },
-    showIcons: {
-      description: "Whether to use icons as the switch control itself. When true, the switch becomes a pill-shaped toggle with sun and moon icons inside. When false, uses the standard switch design.",
-      defaultValue: defaultProps.showIcons,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -62,7 +57,6 @@ export const ToneSwitchMd = createMetadata({
 export function ToneSwitch({
   lightIcon = defaultProps.lightIcon,
   darkIcon = defaultProps.darkIcon,
-  showIcons = defaultProps.showIcons,
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
   console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
@@ -72,54 +66,42 @@ export function ToneSwitch({
     setActiveThemeTone(isDark ? "dark" : "light");
   };
 
-  if (showIcons) {
-    // Custom icon-based switch
-    return (
-      <div style={{ width: 'fit-content', display: 'inline-block' }} className="toneSwitchContainer">
-        <Toggle
-          value={activeThemeTone === "dark"}
-          onDidChange={handleChange}
-          variant="switch"
-          style={{ width: 'fit-content' }}
-          inputRenderer={(contextVars) => {
-            console.log('ToneSwitch contextVars:', contextVars); // Debug log
-            return (
-              <div 
-                className={classnames(styles.iconSwitch, {
-                  [styles.light]: !contextVars.$checked,
-                  [styles.dark]: contextVars.$checked
-                })}
-              >
-                <div className={styles.iconThumb}>
-                  {!contextVars.$checked ? (
-                    <Icon 
-                      name={lightIcon} 
-                      fallback="sun" 
-                      className={styles.icon}
-                    />
-                  ) : (
-                    <Icon 
-                      name={darkIcon} 
-                      fallback="circle" 
-                      className={styles.icon}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          }}
-        />
-      </div>
-    );
-  }
-
-  // Fallback to standard switch without icons
   return (
-    <Toggle
-      value={activeThemeTone === "dark"}
-      onDidChange={handleChange}
-      variant="switch"
-    />
+    <div style={{ width: 'fit-content', display: 'inline-block' }} className="toneSwitchContainer">
+      <Toggle
+        value={activeThemeTone === "dark"}
+        onDidChange={handleChange}
+        variant="switch"
+        style={{ width: 'fit-content' }}
+        inputRenderer={(contextVars) => {
+          console.log('ToneSwitch contextVars:', contextVars); // Debug log
+          return (
+            <div 
+              className={classnames(styles.iconSwitch, {
+                [styles.light]: !contextVars.$checked,
+                [styles.dark]: contextVars.$checked
+              })}
+            >
+              <div className={styles.iconThumb}>
+                {!contextVars.$checked ? (
+                  <Icon 
+                    name={lightIcon} 
+                    fallback="sun" 
+                    className={styles.icon}
+                  />
+                ) : (
+                  <Icon 
+                    name={darkIcon} 
+                    fallback="circle" 
+                    className={styles.icon}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        }}
+      />
+    </div>
   );
 }
 
@@ -134,7 +116,6 @@ export const toneSwitchComponentRenderer = createComponentRenderer(
       <ToneSwitch
         lightIcon={extractValue.asOptionalString(node.props.lightIcon)}
         darkIcon={extractValue.asOptionalString(node.props.darkIcon)}
-        showIcons={extractValue.asOptionalBoolean(node.props.showIcons)}
       />
     );
   },
