@@ -774,7 +774,27 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     </property>
   </AppHeader>
 
-  <MainContent />
+  <VStack gap="1rem">
+    <HStack gap="1rem">
+      <Text>Items ({settings.value.itemSize} size)</Text>
+      <Button
+        label="Settings"
+        size="sm"
+        onClick="settingsDialog.open()"
+      />
+    </HStack>
+
+    <List data="{items}">
+      <Card>
+        <VStack>
+          <Text>{$item.title}</Text>
+          <Fragment when="{settings.value.showDetails}">
+            <Text variant="caption">ID: {$item.id}</Text>
+          </Fragment>
+        </VStack>
+      </Card>
+    </List>
+  </VStack>
 
 </Component>
 ---comp display
@@ -801,32 +821,5 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
   </VStack>
 </Component>
----comp display
-<Component name="MainContent">
-  <AppState id="settings" bucket="appSettings" />
 
-  <VStack gap="1rem">
-
-    <HStack gap="1rem">
-      <Text>Items ({settings.value.itemSize} size)</Text>
-      <Button
-        label="Settings"
-        size="sm"
-        onClick="settingsDialog.open()"
-      />
-    </HStack>
-
-    <List data="{items}">
-      <Card>
-        <VStack>
-          <Text>{$item.title}</Text>
-          <Fragment when="{settings.value.showDetails}">
-            <Text variant="caption">ID: {$item.id}</Text>
-          </Fragment>
-        </VStack>
-      </Card>
-    </List>
-
-  </VStack>
-</Component>
 ```
