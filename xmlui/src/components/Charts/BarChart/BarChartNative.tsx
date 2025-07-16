@@ -26,7 +26,8 @@ export type BarChartProps = {
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
-  tickFormatter?: (value: any) => any;
+  tickFormatterX?: (value: any) => any;
+  tickFormatterY?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
 };
@@ -39,7 +40,8 @@ export const defaultProps: Pick<
   | "hideTickY"
   | "hideX"
   | "hideY"
-  | "tickFormatter"
+  | "tickFormatterX"
+  | "tickFormatterY"
   | "showLegend"
 > = {
   layout: "vertical",
@@ -48,7 +50,8 @@ export const defaultProps: Pick<
   hideTickY: false,
   hideX: false,
   hideY: false,
-  tickFormatter: (value) => value,
+  tickFormatterX: (value) => value,
+  tickFormatterY: (value) => value,
   showLegend: false,
 };
 
@@ -62,7 +65,8 @@ export function BarChart({
   hideTickY = defaultProps.hideTickY,
   hideY = defaultProps.hideY,
   hideX = defaultProps.hideX,
-  tickFormatter = defaultProps.tickFormatter,
+  tickFormatterX = defaultProps.tickFormatterX,
+  tickFormatterY = defaultProps.tickFormatterY,
   style,
   children,
   showLegend = defaultProps.showLegend,
@@ -240,6 +244,7 @@ export function BarChart({
                   type="number"
                   axisLine={false}
                   hide={miniMode || hideX}
+                  tickFormatter={miniMode ? undefined : tickFormatterX}
                   tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
                 <YAxis
@@ -248,7 +253,7 @@ export function BarChart({
                   type="category"
                   interval={"equidistantPreserveStart"}
                   tickLine={false}
-                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  tickFormatter={miniMode ? undefined : tickFormatterY}
                   tick={miniMode ? false : { fill: "currentColor", fontSize }}
                 />
               </>
@@ -262,7 +267,7 @@ export function BarChart({
                   angle={tickAngle}
                   textAnchor={tickAnchor}
                   tick={miniMode ? false : { fill: "currentColor", fontSize }}
-                  tickFormatter={miniMode ? undefined : tickFormatter}
+                  tickFormatter={miniMode ? undefined : tickFormatterX}
                   height={miniMode || hideX ? 0 : xAxisHeight}
                   hide={miniMode || hideX}
                 />
@@ -272,6 +277,7 @@ export function BarChart({
                   tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
                   hide={miniMode || hideY}
                   tickCount={yTickCount}
+                  tickFormatter={miniMode ? undefined : tickFormatterY}
                   width={miniMode || hideY || hideTickY ? 0 : 40}
                 />
               </>
