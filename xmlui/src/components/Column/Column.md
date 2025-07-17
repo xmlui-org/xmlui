@@ -396,6 +396,6 @@ Check what happens when you resize table columns:
 
 %-STYLE-START
 
-Styling is done via the [`Table` component](./Table.mdx).
+Styling is done via the [`Table` component](/components/Table).
 
 %-STYLE-END

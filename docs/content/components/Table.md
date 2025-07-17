@@ -221,7 +221,7 @@ By default, the value of this property is `true`.
 
 This optional property is used to specify the height of the table header.
 
-It accepts common [size values](./appearance/common-units.mdx#size-values).
+It accepts common [size values](/styles-and-themes/common-units#size-values).
 
 ```xmlui copy /headerHeight="60px"/
 <App>
@@ -1186,7 +1186,7 @@ Click on any of the column headers to trigger a new sorting:
 
 This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.
 
-Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
+Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
 ```xmlui copy {4}
 <App var.sortedBy="">
