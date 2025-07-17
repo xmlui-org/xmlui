@@ -8,19 +8,21 @@ import { normalizePath } from "../utils/misc";
 import { ApiInterceptorContext } from "./useApiInterceptorContext";
 import type { ApiInterceptor } from "./ApiInterceptor";
 
+type Props = {
+  interceptor?: ApiInterceptorDefinition;
+  children: ReactNode;
+  parentInterceptorContext?: IApiInterceptorContext;
+  waitForApiInterceptor?: boolean;
+  useHashBasedRouting?: boolean;
+}
+
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({
   interceptor,
   children,
   parentInterceptorContext = null,
   waitForApiInterceptor = false,
-}: {
-  interceptor?: ApiInterceptorDefinition;
-  children: ReactNode;
-  apiWorker?: SetupWorker;
-  parentInterceptorContext?: IApiInterceptorContext;
-  waitForApiInterceptor?: boolean;
-}) {
+}: Props) {
   const hasParentInterceptorContext = parentInterceptorContext !== null;
   const [initialized, setInitialized] = useState(!interceptor);
   const [forceInitialize, setForceInitialize] = useState(false);
