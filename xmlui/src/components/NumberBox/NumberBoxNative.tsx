@@ -123,6 +123,8 @@ export const NumberBox = forwardRef(function NumberBox(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  // --- Ensure the provided value is a number or null
+
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
   min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
 
