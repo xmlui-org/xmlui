@@ -20,7 +20,7 @@ This property sets the name value the Avatar uses to display initials. If neithe
 </App>
 ```
 
-### `size (default: "sm")` [#size-default-sm]
+### `size` (default: "sm") [#size-default-sm]
 
 This property defines the display size of the Avatar.
 

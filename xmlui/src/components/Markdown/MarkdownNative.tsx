@@ -534,61 +534,97 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 };
 
 type LinkAwareHeadingProps = {
+  level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   children: React.ReactNode;
-  level: string;
   showHeadingAnchors?: boolean;
 };
 
-function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
-  const appContext = useAppContext();
-  if (showHeadingAnchors === undefined) {
-    showHeadingAnchors = appContext?.appGlobals?.showHeadingAnchors ?? false;
-  }
-  let headingLabel: React.ReactNode = "";
-  let anchorId = "";
-  if (!children) return <></>;
+const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
+  const { appGlobals } = useAppContext();
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
-  if (typeof children === "string") {
-    [headingLabel, anchorId] = getCustomAnchor(children);
-    // At this point, the anchorId might still be empty
-  } else if (Array.isArray(children)) {
-    if (children.length === 0) return <></>;
-    if (children.length === 1) {
-      headingLabel = children[0];
-    } else {
-      headingLabel = children.slice(0, -1);
-      const last = children[children.length - 1];
+  // --- Extract the optional anchor
+  let anchor: string | undefined = undefined;
+  let label: React.ReactNode = children;
 
-      // Check for explicit anchor at the end
-      if (typeof last === "string") {
-        const match = last.trim().match(/^\[#([^\]]+)\]$/);
-        if (match && match.length > 0) {
-          anchorId = match[1];
-        } else {
-          // --- Generate a valid anchor ID from the last element
-          anchorId = headingToAnchorLink(extractTextNodes(last));
-        }
-      }
-    }
-  } else {
-    // Provided children are not a string or array but still valid React elements
-    // if it contains text, use it as the heading label
-    const headingContent = extractTextNodes(children);
-    if (!headingContent) return <></>;
-    headingLabel = children;
+  const textContent = getHeadingText(children);
+  const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
+  if (match) {
+    const labelText = match[1].trimEnd();
+    anchor = match[2];
+    label = getLabelContent(children, labelText);
   }
 
-  // Generate implicit anchor if not provided
-  if (!anchorId) {
-    anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
-  }
+  const headingId = anchor ?? getHeadingId(children);
 
   return (
-    <Heading level={level} id={anchorId} showAnchor={showHeadingAnchors}>
-      {headingLabel}
+    <Heading
+      level={level}
+      id={headingId}
+      className={styles.linkAwareHeading}
+      headingRef={headingRef}
+    >
+      {label}
+      {showHeadingAnchors && (
+        <a
+          href={`#${headingId}`}
+          className={styles.headingLink}
+          onClick={(e) => {
+            e.preventDefault();
+            appGlobals.events?.emit("scroll-to-anchor", { anchor: headingId });
+          }}
+        >
+          <Icon name="link" />
+        </a>
+      )}
     </Heading>
   );
+};
+
+function getHeadingId(children: React.ReactNode): string {
+  const text = getHeadingText(children);
+  return text
+    .toLowerCase()
+    .replace(/[^\w]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
+
+function getHeadingText(children: React.ReactNode): string {
+  if (typeof children === "string") {
+    return children;
+  }
+  if (Array.isArray(children)) {
+    return children.map(getHeadingText).join("");
+  }
+  if (React.isValidElement(children) && children.props.children) {
+    return getHeadingText(children.props.children);
+  }
+  return "";
+}
+
+const getLabelContent = (node: React.ReactNode, labelText: string): React.ReactNode => {
+  if (typeof node === "string") {
+    return labelText.includes(node) ? node : null;
+  }
+  if (Array.isArray(node)) {
+    const children = node.map((n) => getLabelContent(n, labelText)).filter(Boolean);
+    return children.length > 0 ? children : null;
+  }
+  if (React.isValidElement(node)) {
+    const nodeText = getHeadingText(node);
+    if (labelText.trim() === nodeText.trim()) {
+      return node;
+    }
+    if (labelText.includes(nodeText)) {
+      return node;
+    }
+    const newChildren = getLabelContent(node.props.children, labelText);
+    if (newChildren) {
+      return React.cloneElement(node, node.props, newChildren);
+    }
+  }
+  return null;
+};
 
 // --- Helper functions
 

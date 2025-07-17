@@ -4,11 +4,11 @@
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -30,11 +30,11 @@ it is `true` by default.
 </App>
 ```
 
-### `indeterminate (default: false)` [#indeterminate-default-false]
+### `indeterminate` (default: false) [#indeterminate-default-false]
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
-### `initialValue (default: false)` [#initialvalue-default-false]
+### `initialValue` (default: false) [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
@@ -51,11 +51,11 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")` [#labelposition-default-end]
+### `labelPosition` (default: "end") [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -81,7 +81,7 @@ Available values:
 
 This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -94,11 +94,11 @@ If true, the value of the component cannot be modified.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 

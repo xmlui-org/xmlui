@@ -34,7 +34,7 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 ## Properties [#properties]
 
-### `fallbackPath (default: "/")` [#fallbackpath-default-]
+### `fallbackPath` (default: "/") [#fallbackpath-default-]
 
 The fallback path when the current URL does not match any of the paths of the pages.
 

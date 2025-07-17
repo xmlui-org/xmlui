@@ -17,7 +17,7 @@ While it is visible, the action is yet to be completed; on completion, the UI lo
 
 ## Properties [#properties]
 
-### `delay (default: 400)` [#delay-default-400]
+### `delay` (default: 400) [#delay-default-400]
 
 The delay in milliseconds before the spinner is displayed.
 
@@ -36,7 +36,7 @@ Use the buttons to toggle between the two `Spinners`.
 </App>
 ```
 
-### `fullScreen (default: false)` [#fullscreen-default-false]
+### `fullScreen` (default: false) [#fullscreen-default-false]
 
 If set to `true`, the component will be rendered in a full screen container.
 

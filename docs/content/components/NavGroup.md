@@ -91,7 +91,7 @@ See the following for an example of all variants:
 
 ## Properties [#properties]
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -119,25 +119,25 @@ Look at this example:
 </App>
 ```
 
-### `iconHorizontalCollapsed (default: "chevronright")` [#iconhorizontalcollapsed-default-chevronright]
+### `iconHorizontalCollapsed` (default: "chevronright") [#iconhorizontalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconHorizontalExpanded (default: "chevronright")` [#iconhorizontalexpanded-default-chevronright]
+### `iconHorizontalExpanded` (default: "chevronright") [#iconhorizontalexpanded-default-chevronright]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronright")` [#iconverticalcollapsed-default-chevronright]
+### `iconVerticalCollapsed` (default: "chevronright") [#iconverticalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalExpanded (default: "chevrondown")` [#iconverticalexpanded-default-chevrondown]
+### `iconVerticalExpanded` (default: "chevrondown") [#iconverticalexpanded-default-chevrondown]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 

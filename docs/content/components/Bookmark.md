@@ -71,11 +71,11 @@ You can try; this example works like the previous one:
 
 ## Properties [#properties]
 
-### `level (default: 1)` [#level-default-1]
+### `level` (default: 1) [#level-default-1]
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
 
-### `omitFromToc (default: false)` [#omitfromtoc-default-false]
+### `omitFromToc` (default: false) [#omitfromtoc-default-false]
 
 If true, this bookmark will be excluded from the table of contents.
 

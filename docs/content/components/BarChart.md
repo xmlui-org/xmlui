@@ -53,23 +53,23 @@ This property is used to provide the component with data to display.The data nee
 
 This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.
 
-### `hideTickX (default: false)` [#hidetickx-default-false]
+### `hideTickX` (default: false) [#hidetickx-default-false]
 
 Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.
 
-### `hideTickY (default: false)` [#hideticky-default-false]
+### `hideTickY` (default: false) [#hideticky-default-false]
 
 Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.
 
-### `hideX (default: false)` [#hidex-default-false]
+### `hideX` (default: false) [#hidex-default-false]
 
 Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.
 
-### `hideY (default: false)` [#hidey-default-false]
+### `hideY` (default: false) [#hidey-default-false]
 
 Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.
 
-### `layout (default: "vertical")` [#layout-default-vertical]
+### `layout` (default: "vertical") [#layout-default-vertical]
 
 This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
 
@@ -79,11 +79,11 @@ Available values: `horizontal`, `vertical` **(default)**
 
 Specifies the key in the data objects that will be used to label the different data series.
 
-### `showLegend (default: false)` [#showlegend-default-false]
+### `showLegend` (default: false) [#showlegend-default-false]
 
 Determines whether the legend should be displayed.
 
-### `stacked (default: false)` [#stacked-default-false]
+### `stacked` (default: false) [#stacked-default-false]
 
 This property determines how the bars are laid out.If set to `true`, bars with the same category will be stacked on top of each other rather than placed side by side.
 

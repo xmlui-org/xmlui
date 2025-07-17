@@ -9,11 +9,11 @@
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -25,11 +25,11 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `Slider` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -46,15 +46,15 @@ Available values:
 
 This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `maxValue (default: 10)` [#maxvalue-default-10]
+### `maxValue` (default: 10) [#maxvalue-default-10]
 
 This property specifies the maximum value of the allowed input range.
 
-### `minStepsBetweenThumbs (default: 1)` [#minstepsbetweenthumbs-default-1]
+### `minStepsBetweenThumbs` (default: 1) [#minstepsbetweenthumbs-default-1]
 
 This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.
 
-### `minValue (default: 0)` [#minvalue-default-0]
+### `minValue` (default: 0) [#minvalue-default-0]
 
 This property specifies the minimum value of the allowed input range.
 
@@ -62,19 +62,19 @@ This property specifies the minimum value of the allowed input range.
 
 This optional property allows you to apply custom styles to the range element of the slider.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `showValues (default: true)` [#showvalues-default-true]
+### `showValues` (default: true) [#showvalues-default-true]
 
 This property controls whether the slider shows the current values of the thumbs.
 
-### `step (default: 1)` [#step-default-1]
+### `step` (default: 1) [#step-default-1]
 
 This property defines the increment value for the slider, determining the allowed intervals between selectable values.
 
@@ -82,7 +82,7 @@ This property defines the increment value for the slider, determining the allowe
 
 This optional property allows you to apply custom styles to the thumb elements of the slider.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -94,7 +94,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-### `valueFormat (default: "(value) => value.toString()")` [#valueformat-default-value-value-tostring]
+### `valueFormat` (default: "(value) => value.toString()") [#valueformat-default-value-value-tostring]
 
 This property allows you to customize how the values are displayed.
 

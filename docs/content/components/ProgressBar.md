@@ -10,7 +10,7 @@
 
 ## Properties [#properties]
 
-### `value (default: 0)` [#value-default-0]
+### `value` (default: 0) [#value-default-0]
 
 This property defines the progress value with a number between 0 and 1.
 

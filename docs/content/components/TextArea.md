@@ -6,11 +6,11 @@ It is often used in forms, see [this guide](/forms) for details.
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `autoSize (default: false)` [#autosize-default-false]
+### `autoSize` (default: false) [#autosize-default-false]
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
@@ -24,7 +24,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -34,7 +34,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `enterSubmits (default: true)` [#entersubmits-default-true]
+### `enterSubmits` (default: true) [#entersubmits-default-true]
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
@@ -52,7 +52,7 @@ See [Using Forms](../learning/forms.mdx) for details.
 </App>
 ```
 
-### `escResets (default: false)` [#escresets-default-false]
+### `escResets` (default: false) [#escresets-default-false]
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
@@ -72,11 +72,11 @@ The initial value displayed in the input field.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `TextArea` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -137,7 +137,7 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -147,7 +147,7 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -177,7 +177,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 </App>
 ```
 
-### `rows (default: 2)` [#rows-default-2]
+### `rows` (default: 2) [#rows-default-2]
 
 Specifies the number of rows the component initially has.
 
@@ -189,7 +189,7 @@ Specifies the number of rows the component initially has.
 </App>
 ```
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 

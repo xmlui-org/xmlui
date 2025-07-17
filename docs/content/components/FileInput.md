@@ -20,7 +20,7 @@ An optional list of file types the input controls accepts provided as a string a
 </App>
 ```
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -35,7 +35,7 @@ The ID of the icon to display in the button. You can change the default icon for
 </App>
 ```
 
-### `buttonIconPosition (default: "start")` [#buttoniconposition-default-start]
+### `buttonIconPosition` (default: "start") [#buttoniconposition-default-start]
 
 This optional string determines the location of the button icon.
 
@@ -60,7 +60,7 @@ This property is an optional string to set a label for the button part.
 </App>
 ```
 
-### `buttonPosition (default: "end")` [#buttonposition-default-end]
+### `buttonPosition` (default: "end") [#buttonposition-default-end]
 
 This property determines the position of the button relative to the input field.
 
@@ -85,7 +85,7 @@ Available values:
 </App>
 ```
 
-### `buttonThemeColor (default: "primary")` [#buttonthemecolor-default-primary]
+### `buttonThemeColor` (default: "primary") [#buttonthemecolor-default-primary]
 
 The button color scheme (primary, secondary, attention)
 
@@ -109,11 +109,11 @@ Available values: `solid`, `outlined`, `ghost`
 </App>
 ```
 
-### `directory (default: false)` [#directory-default-false]
+### `directory` (default: false) [#directory-default-false]
 
 This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -125,11 +125,11 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `FileInput` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -146,7 +146,7 @@ Available values:
 
 This property sets the width of the `FileInput` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `multiple (default: false)` [#multiple-default-false]
+### `multiple` (default: false) [#multiple-default-false]
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
 
@@ -161,15 +161,15 @@ This boolean property enables to add not just one (`false`), but multiple files 
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 

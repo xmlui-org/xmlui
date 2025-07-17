@@ -9,7 +9,7 @@
 
 ## Properties [#properties]
 
-### `orientation (default: "horizontal")` [#orientation-default-horizontal]
+### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
 Sets the main axis of the component
 
