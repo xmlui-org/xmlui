@@ -108,8 +108,8 @@ The engine accepts several color value types:
     </HStack>
     <H3>"'rgba' function"</H3>
     <HStack>
-      <CVStack width="32%" height="36px" backgroundColor="rgba(106, 90, 205, .5)"><Text value="rgb(106, 90, 205, .5)" /></CVStack>
-      <CVStack width="32%" height="36px" backgroundColor="rgba(80%, 40%, 20%, 80%)"><Text value="rgb(80%, 40%, 20%, 80%)" /></CVStack>
+      <CVStack width="32%" height="36px" backgroundColor="rgba(106, 90, 205, .5)"><Text value="rgba(106, 90, 205, .5)" /></CVStack>
+      <CVStack width="32%" height="36px" backgroundColor="rgba(80%, 40%, 20%, 80%)"><Text value="rgba(80%, 40%, 20%, 80%)" /></CVStack>
       <CVStack width="32%" height="36px" backgroundColor="rgba(70, 130, 180, 1)"><Text value="rgba(70, 130, 180, 1)" /></CVStack>
     </HStack>
     <H3>"'hsl' function"</H3>
@@ -691,6 +691,10 @@ This value specifies how words should break when reaching the end of a line.
       <Text>word-break: keep-all</Text>
       <Text wordBreak="keep-all">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
     </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: break-word</Text>
+      <Text wordBreak="break-word">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
   </FlowLayout>
 </App>
 ```
@@ -731,6 +735,10 @@ This value determines whether the browser should break lines within words when t
       <Text>word-wrap: break-word</Text>
       <Text wordWrap="break-word">This is a very long text with a verylongwordthatbreaks when needed</Text>
     </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: anywhere</Text>
+      <Text wordWrap="anywhere">This is a very long text with a verylongwordthatbreaks when needed</Text>
+    </VStack>
   </FlowLayout>
 </App>
 ```
@@ -750,17 +758,29 @@ This value sets whether lines of text are laid out horizontally or vertically, a
 ```xmlui-pg name="Writing mode examples"
 <App>
   <FlowLayout gap="24px">
-    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
       <Text>horizontal-tb</Text>
       <Text writingMode="horizontal-tb">Horizontal writing mode</Text>
     </VStack>
-    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
       <Text>vertical-rl</Text>
-      <Text writingMode="vertical-rl">Vertical/right-to-left</Text>
+      <Text writingMode="vertical-rl">Vertical 1</Text>
+      <Text writingMode="vertical-rl">Vertical 2</Text>
     </VStack>
-    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
       <Text>vertical-lr</Text>
-      <Text writingMode="vertical-lr">Vertical/left-to-right</Text>
+      <Text writingMode="vertical-lr">Vertical 1</Text>
+      <Text writingMode="vertical-lr">Vertical 2</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>sideways-rl</Text>
+      <Text writingMode="sideways-rl">Vertical 1</Text>
+      <Text writingMode="sideways-rl">Vertical 2</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>sideways-lr</Text>
+      <Text writingMode="sideways-lr">Vertical 1</Text>
+      <Text writingMode="sideways-lr">Vertical 2</Text>
     </VStack>
   </FlowLayout>
 </App>

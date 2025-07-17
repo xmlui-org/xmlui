@@ -126,7 +126,7 @@ A function that formats the tick labels on the Y-axis.
        ]}"
     dataKeys="{['A']}"
     nameKey="sprint"
-    tickFormatterY="{(value) => value + '$'}"
+    tickFormatterY="{(value) => '$' + value}"
   />
 </App>
 ```
