@@ -54,6 +54,16 @@ type Props = {
    * Default: false
    */
   showPasswordToggle?: boolean;
+  /**
+   * The icon to show when the password is visible
+   * Default: "eye"
+   */
+  passwordVisibleIcon?: string;
+  /**
+   * The icon to show when the password is hidden
+   * Default: "eye-off"
+   */
+  passwordHiddenIcon?: string;
 };
 
 export const defaultProps: Pick<
@@ -68,6 +78,8 @@ export const defaultProps: Pick<
   | "onBlur"
   | "onKeyDown"
   | "updateState"
+  | "passwordVisibleIcon"
+  | "passwordHiddenIcon"
 > = {
   type: "text",
   value: "",
@@ -79,6 +91,8 @@ export const defaultProps: Pick<
   onBlur: noop,
   onKeyDown: noop,
   updateState: noop,
+  passwordVisibleIcon: "eye",
+  passwordHiddenIcon: "eye-off",
 };
 
 export const TextBox = forwardRef(function TextBox(
@@ -112,6 +126,8 @@ export const TextBox = forwardRef(function TextBox(
     labelBreak,
     required,
     showPasswordToggle,
+    passwordVisibleIcon = defaultProps.passwordVisibleIcon,
+    passwordHiddenIcon = defaultProps.passwordHiddenIcon,
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -192,9 +208,6 @@ export const TextBox = forwardRef(function TextBox(
     });
   }, [focus, registerComponentApi, setValue]);
 
-  console.log("showPasswordToggle", showPasswordToggle, type);
-  console.log("isPsw", type === "password" && showPasswordToggle)
-
   return (
     <ItemWithLabel
       id={id}
@@ -240,8 +253,8 @@ export const TextBox = forwardRef(function TextBox(
         />
         {type === "password" && showPasswordToggle ? (
           <Adornment
-            iconName={showPassword ? "email" : "phone"} 
-            className={classnames(styles.adornment)}
+            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon} 
+            className={classnames(styles.adornment, styles.passwordToggle)}
             onClick={togglePasswordVisibility}
           />
         ) : (

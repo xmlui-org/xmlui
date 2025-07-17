@@ -112,6 +112,14 @@ Try to enter a longer value into the input field below.
 </App>
 ```
 
+### `passwordHiddenIcon (default: "eye-off")` [#passwordhiddenicon-default-eye-off]
+
+The icon to display when the password is hidden (when showPasswordToggle is true).
+
+### `passwordVisibleIcon (default: "eye")` [#passwordvisibleicon-default-eye]
+
+The icon to display when the password is visible (when showPasswordToggle is true).
+
 ### `placeholder` [#placeholder]
 
 An optional placeholder text that is visible in the input field when its empty.
@@ -135,6 +143,10 @@ Set this property to `true` to disallow changing the component value.
 ### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `showPasswordToggle (default: false)` [#showpasswordtoggle-default-false]
+
+If `true`, a toggle button is displayed to switch between showing and hiding the password input.
 
 ### `startIcon` [#starticon]
 
@@ -346,6 +358,10 @@ In the example below, typing in the `TextBox` will also display the length of th
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-error | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-success | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-warning | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-Input | $textColor-subtitle | $textColor-subtitle |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox--focus | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox--hover | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-success | *none* | *none* |
@@ -382,6 +398,8 @@ In the example below, typing in the `TextBox` will also display the length of th
 | [padding](../styles-and-themes/common-units/#size)-TextBox-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-warning | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Input | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-Input--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Input | $textColor-subtitle | $textColor-subtitle |

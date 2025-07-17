@@ -23,7 +23,7 @@ import {
   FiUserPlus,
   FiUsers,
   FiX,
-  FiMoon
+  FiMoon,
 } from "react-icons/fi";
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
@@ -41,7 +41,14 @@ import {
   BsSquareHalf,
 } from "react-icons/bs";
 import { GrDocumentConfig, GrEmoji, GrNext, GrPrevious } from "react-icons/gr";
-import { IoChatboxOutline, IoCubeOutline, IoPencil, IoSwapVertical } from "react-icons/io5";
+import {
+  IoChatboxOutline,
+  IoCubeOutline,
+  IoEyeOffOutline,
+  IoEyeOutline,
+  IoPencil,
+  IoSwapVertical,
+} from "react-icons/io5";
 import { MdOutlineDriveFileRenameOutline, MdOutlinePalette } from "react-icons/md";
 import { RiAttachment2, RiMessage2Line, RiStickyNoteLine } from "react-icons/ri";
 import { VscDebugStart, VscDebugStop, VscSplitHorizontal, VscSplitVertical } from "react-icons/vsc";
@@ -277,10 +284,18 @@ registerIconRenderer("sortasc", (props: IconBaseProps) => <SortAscendingIcon {..
 registerIconRenderer("sortdesc", (props: IconBaseProps) => <SortDescendingIcon {...props} />);
 registerIconRenderer("nosort", (props: IconBaseProps) => <NoSortIcon {...props} />);
 
-registerIconRenderer("admonition_info", (props: IconBaseProps) => <AdmonitionInfoIcon {...props} />);
-registerIconRenderer("admonition_warning", (props: IconBaseProps) => <AdmonitionWarningIcon {...props} />);
-registerIconRenderer("admonition_danger", (props: IconBaseProps) => <AdmonitionDangerIcon {...props} />);
-registerIconRenderer("admonition_note", (props: IconBaseProps) => <AdmonitionNoteIcon {...props} />);
+registerIconRenderer("admonition_info", (props: IconBaseProps) => (
+  <AdmonitionInfoIcon {...props} />
+));
+registerIconRenderer("admonition_warning", (props: IconBaseProps) => (
+  <AdmonitionWarningIcon {...props} />
+));
+registerIconRenderer("admonition_danger", (props: IconBaseProps) => (
+  <AdmonitionDangerIcon {...props} />
+));
+registerIconRenderer("admonition_note", (props: IconBaseProps) => (
+  <AdmonitionNoteIcon {...props} />
+));
 registerIconRenderer("admonition_tip", (props: IconBaseProps) => <AdmonitionTipIcon {...props} />);
 
 // --- IDE extras (temporary)
@@ -293,6 +308,9 @@ registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...prop
 registerIconRenderer("table-delete-row", (props) => <TableDeleteRowIcon {...props} />);
 registerIconRenderer("table-insert-column", (props) => <TableInsertColumnIcon {...props} />);
 registerIconRenderer("table-delete-column", (props) => <TableDeleteColumnIcon {...props} />);
+
+registerIconRenderer("eye", (props) => <IoEyeOutline {...props} />);
+registerIconRenderer("eye-off", (props) => <IoEyeOffOutline {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {
