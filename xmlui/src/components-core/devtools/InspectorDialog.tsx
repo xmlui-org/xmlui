@@ -62,7 +62,10 @@ function durationToSeconds(durationString?: string) {
 }
 
 export const InspectorDialog = React.forwardRef(
-  ({ children, style, isOpen, setIsOpen, clickPosition }: ModalProps, ref: React.Ref<HTMLDivElement>) => {
+  (
+    { children, style, isOpen, setIsOpen, clickPosition }: ModalProps,
+    ref: React.Ref<HTMLDivElement>,
+  ) => {
     const { root, getThemeVar } = useTheme();
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
@@ -97,9 +100,9 @@ export const InspectorDialog = React.forwardRef(
     };
 
     return (
-      <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setRendered}>
-        <Dialog.Portal container={root}>
-          <AnimatePresence onExitComplete={onExitComplete}>
+      <AnimatePresence onExitComplete={onExitComplete}>
+        <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setRendered}>
+          <Dialog.Portal container={root}>
             {rendered && (
               <Dialog.Overlay className={styles.overlay} forceMount>
                 <motion.div
@@ -136,7 +139,8 @@ export const InspectorDialog = React.forwardRef(
                     exit="exit"
                     transition={{
                       duration:
-                        durationToSeconds(getThemeVar("duration-startAnimation-ModalDialog")) || 0.8,
+                        durationToSeconds(getThemeVar("duration-startAnimation-ModalDialog")) ||
+                        0.8,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{ ...style, gap: undefined }}
@@ -146,9 +150,9 @@ export const InspectorDialog = React.forwardRef(
                 </MotionContent>
               </Dialog.Overlay>
             )}
-          </AnimatePresence>
-        </Dialog.Portal>
-      </Dialog.Root>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </AnimatePresence>
     );
   },
 );
