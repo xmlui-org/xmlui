@@ -7,7 +7,7 @@ For details on how to work with \`FlowLayout\` (like sizing children), see [this
 ## Using `SpaceFiller` with `FlowLayout` [#using-spacefiller-with-flowlayout]
 
 The `SpaceFiller` component can be used as a line break.
-See the [reference docs](./SpaceFiller.mdx) for details.
+See the [reference docs](/components/SpaceFiller) for details.
 
 ## Properties [#properties]
 

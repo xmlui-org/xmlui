@@ -282,6 +282,7 @@ export const FormItem = memo(function FormItem({
       formControl = (
         <NumberBox
           {...rest}
+          initialValue={initialValue}
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
@@ -304,6 +305,7 @@ export const FormItem = memo(function FormItem({
       formControl = (
         <NumberBox2
           {...rest}
+          initialValue={initialValue}
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}

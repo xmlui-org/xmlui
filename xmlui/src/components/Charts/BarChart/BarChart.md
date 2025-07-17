@@ -59,7 +59,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
        ]}"
     dataKeys="{['A']}"
     nameKey="sprint"
-    tickFormatterY="{(value) => value + '$'}"
+    tickFormatterY="{(value) => '$' + value}"
   />
 </App>
 ```

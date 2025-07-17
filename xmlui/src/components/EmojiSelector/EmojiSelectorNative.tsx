@@ -1,28 +1,15 @@
-import EmojiPicker, { EmojiStyle, Theme as EmojiPickerTheme } from "emoji-picker-react";
-
-import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import { noop } from "../../components-core/constants";
+import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+import type { EmojiSelectorProps } from "./DefaultProps";
+import { defaultProps } from "./DefaultProps";
 
 // =====================================================================================================================
 // React EmojiSelector component implementation
-
-type Props = {
-  theme?: EmojiPickerTheme;
-  select?: AsyncFunction;
-  autoFocus?: boolean;
-};
-
-export const defaultProps: Pick<Props, "theme" | "select" | "autoFocus"> = {
-  theme: EmojiPickerTheme.LIGHT,
-  select: noop,
-  autoFocus: false,
-};
 
 export const EmojiSelector = ({
   select = defaultProps.select,
   theme = defaultProps.theme,
   autoFocus = defaultProps.autoFocus,
-}: Props) => (
+}: EmojiSelectorProps) => (
   <EmojiPicker
     autoFocusSearch={autoFocus}
     onEmojiClick={async (emojiObject) => {

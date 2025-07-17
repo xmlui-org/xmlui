@@ -203,7 +203,7 @@ This event is triggered when the FileInput has received the focus.
 Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {3-4} display name="Example: gotFocus/lostFocus"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
 <App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -273,7 +273,7 @@ and note how the `Text` component displays the selected file's name:
 ## Styling [#styling]
 
 The `FileInput` component does not theme variables directly.
-However, it uses the [`Button`](./Button.mdx) and [`TextBox`](./TextBox.mdx) components under the hood.
+However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/TextBox) components under the hood.
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
-See [Button styling](./Button.mdx#styling) and [TextBox styling](./TextBox.mdx#styling).
+See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).

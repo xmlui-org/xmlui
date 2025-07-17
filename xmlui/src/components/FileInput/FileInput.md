@@ -133,7 +133,7 @@ Write in the input field and see how the `Text` underneath it is updated in acco
 Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {3-4} display name="Example: gotFocus/lostFocus"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
 <App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -154,7 +154,7 @@ Note how clicking elsewhere resets the text to the original.
 
 %-API-START focus
 
-```xmlui-pg copy {2-3} display name="Example: focus"
+```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
   <HStack>
     <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
@@ -167,7 +167,7 @@ Note how clicking elsewhere resets the text to the original.
 
 %-API-START open
 
-```xmlui-pg copy {3-4} display name="Example: open"
+```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
   <HStack>
     <Button label="Open FileInput" onClick="fileInputComponent.open()" />
@@ -189,7 +189,7 @@ Note how clicking elsewhere resets the text to the original.
 In the example below, select a file using the file browser of the `FileInput` component
 and note how the `Text` component displays the selected file's name:
 
-```xmlui-pg copy {2-3} display name="Example: value"
+```xmlui-pg copy {3-4} display name="Example: value"
 <App>
   <HStack>
     <Text value="Selected file name: {fileInputComponent.value}" />
@@ -203,9 +203,9 @@ and note how the `Text` component displays the selected file's name:
 %-STYLE-START
 
 The `FileInput` component does not theme variables directly.
-However, it uses the [`Button`](./Button.mdx) and [`TextBox`](./TextBox.mdx) components under the hood.
+However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/TextBox) components under the hood.
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
-See [Button styling](./Button.mdx#styling) and [TextBox styling](./TextBox.mdx#styling).
+See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).
 
 %-STYLE-END

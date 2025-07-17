@@ -2,6 +2,7 @@ import styles from "./FormItem.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useMemo } from "react";
 import {
   defaultValidationMode,
   formControlTypesMd,
@@ -262,24 +263,47 @@ export const formItemComponentRenderer = createComponentRenderer(
     } = node.props;
 
     //extractValue works as a memoization mechanism too (if there's nothing to resolve, it won't produce a new object every time)
-    const resolvedValidationPropsAndEvents: FormItemValidations = {
-      required: extractValue.asOptionalBoolean(required),
-      requiredInvalidMessage: extractValue.asOptionalString(requiredInvalidMessage),
-      minLength: extractValue.asOptionalNumber(minLength),
-      maxLength: extractValue.asOptionalNumber(maxLength),
-      lengthInvalidMessage: extractValue.asOptionalString(lengthInvalidMessage),
-      lengthInvalidSeverity: parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity)),
-      minValue: extractValue.asOptionalNumber(minValue),
-      maxValue: extractValue.asOptionalNumber(maxValue),
-      rangeInvalidMessage: extractValue.asOptionalString(rangeInvalidMessage),
-      rangeInvalidSeverity: parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity)),
-      pattern: extractValue.asOptionalString(pattern),
-      patternInvalidMessage: extractValue.asOptionalString(patternInvalidMessage),
-      patternInvalidSeverity: parseSeverity(extractValue.asOptionalString(patternInvalidSeverity)),
-      regex: extractValue.asOptionalString(regex),
-      regexInvalidMessage: extractValue.asOptionalString(regexInvalidMessage),
-      regexInvalidSeverity: parseSeverity(extractValue.asOptionalString(regexInvalidSeverity)),
-    };
+    const resolvedValidationPropsAndEvents: FormItemValidations = useMemo(
+      () => ({
+        required: extractValue.asOptionalBoolean(required),
+        requiredInvalidMessage: extractValue.asOptionalString(requiredInvalidMessage),
+        minLength: extractValue.asOptionalNumber(minLength),
+        maxLength: extractValue.asOptionalNumber(maxLength),
+        lengthInvalidMessage: extractValue.asOptionalString(lengthInvalidMessage),
+        lengthInvalidSeverity: parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity)),
+        minValue: extractValue.asOptionalNumber(minValue),
+        maxValue: extractValue.asOptionalNumber(maxValue),
+        rangeInvalidMessage: extractValue.asOptionalString(rangeInvalidMessage),
+        rangeInvalidSeverity: parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity)),
+        pattern: extractValue.asOptionalString(pattern),
+        patternInvalidMessage: extractValue.asOptionalString(patternInvalidMessage),
+        patternInvalidSeverity: parseSeverity(
+          extractValue.asOptionalString(patternInvalidSeverity),
+        ),
+        regex: extractValue.asOptionalString(regex),
+        regexInvalidMessage: extractValue.asOptionalString(regexInvalidMessage),
+        regexInvalidSeverity: parseSeverity(extractValue.asOptionalString(regexInvalidSeverity)),
+      }),
+      [
+        required,
+        requiredInvalidMessage,
+        minLength,
+        maxLength,
+        lengthInvalidMessage,
+        lengthInvalidSeverity,
+        minValue,
+        maxValue,
+        rangeInvalidMessage,
+        rangeInvalidSeverity,
+        pattern,
+        patternInvalidMessage,
+        patternInvalidSeverity,
+        regex,
+        regexInvalidMessage,
+        regexInvalidSeverity,
+        extractValue,
+      ],
+    );
 
     const nonLayoutCssProps = !layoutCss
       ? rest

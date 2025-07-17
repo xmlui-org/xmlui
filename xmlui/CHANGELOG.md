@@ -1,5 +1,21 @@
 # xmlui
 
+## 0.9.79
+
+### Patch Changes
+
+- ad21a31: enhance treeshaking
+
+## 0.9.78
+
+### Patch Changes
+
+- 94a68f0: Toggle password visibility in PasswordInput
+- 94a68f0: Extend markdown to render compound headings with code spans and anchors
+- 163a45c: Add ToneSwitch with icon customization
+- 7ce528b: fix: BarChart - size management
+- c6eb9a8: Fixed scrolling to specific Bookmarks inside nested apps.
+
 ## 0.9.77
 
 ### Patch Changes

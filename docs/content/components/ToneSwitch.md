@@ -17,7 +17,13 @@
 
 ## Properties [#properties]
 
-This component does not have any properties.
+### `iconDark` (default: "moon") [#icondark-default-moon]
+
+Icon to display for dark mode
+
+### `iconLight` (default: "sun") [#iconlight-default-sun]
+
+Icon to display for light mode
 
 ## Events [#events]
 
