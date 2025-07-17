@@ -22,8 +22,8 @@ async function zipDirectory(sourceDir: string, outPath: string = sourceDir) {
   console.log(`Zip file created: ${outPath}`);
 }
 
-async function zipDist({target = "ui.zip"}: {target?: string}) {
-  await zipDirectory(process.cwd() + "/dist", `${process.cwd()}/${target}`);
+async function zipDist({target = "ui.zip", source="dist"}: {target?: string, source?: string}) {
+  await zipDirectory(`${process.cwd()}/${source}`, `${process.cwd()}/${target}`);
 }
 
 function dedupeArg(arg: any) {
@@ -77,8 +77,8 @@ switch (script) {
     break;
   }
   case "zip-dist": {
-    const { target } = argv as any;
-    zipDist({target});
+    const { target, source } = argv as any;
+    zipDist({target, source});
     break;
   }
   default: {
