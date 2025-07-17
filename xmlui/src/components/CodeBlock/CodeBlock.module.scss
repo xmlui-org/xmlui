@@ -61,7 +61,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
   //align-items: center;
   min-height: 48px;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
 
   .codeBlockCopyButton {
     position: absolute;
