@@ -539,6 +539,48 @@ type LinkAwareHeadingProps = {
   showHeadingAnchors?: boolean;
 };
 
+function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): React.ReactNode {
+  if (!suffix) {
+    return node;
+  }
+
+  if (typeof node === "string") {
+    if (node.endsWith(suffix)) {
+      const result = node.slice(0, -suffix.length);
+      return result || null;
+    }
+    return node;
+  }
+
+  if (Array.isArray(node)) {
+    const newChildren = [...node];
+    let suffixRemaining = suffix;
+
+    for (let i = newChildren.length - 1; i >= 0 && suffixRemaining.length > 0; i--) {
+      const child = newChildren[i];
+      const childText = getHeadingText(child);
+
+      if (suffixRemaining.endsWith(childText)) {
+        newChildren[i] = null;
+        suffixRemaining = suffixRemaining.slice(0, -childText.length);
+      } else {
+        newChildren[i] = removeSuffixFromReactNodes(child, suffixRemaining);
+        // After this call, the suffix should have been removed from the child, so we are done.
+        suffixRemaining = "";
+      }
+    }
+
+    return newChildren.filter(Boolean);
+  }
+
+  if (React.isValidElement(node) && node.props.children) {
+    const newChildren = removeSuffixFromReactNodes(node.props.children, suffix);
+    return React.cloneElement(node, { ...node.props, children: newChildren });
+  }
+
+  return node;
+}
+
 const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
   const { appGlobals } = useAppContext();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -549,10 +591,11 @@ const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHead
 
   const textContent = getHeadingText(children);
   const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
+
   if (match) {
-    const labelText = match[1].trimEnd();
     anchor = match[2];
-    label = getLabelContent(children, labelText);
+    const anchorText = `[#${anchor}]`;
+    label = removeSuffixFromReactNodes(children, anchorText);
   }
 
   const headingId = anchor ?? getHeadingId(children);
