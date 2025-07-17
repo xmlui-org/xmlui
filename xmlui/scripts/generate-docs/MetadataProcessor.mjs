@@ -263,7 +263,7 @@ function addPropsSection(data, component) {
         ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
         : "";
     const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-    buffer += `### \`${propName}${propModifier}\`\n\n`;
+    buffer += `### \`${propName}\`${propModifier}\n\n`;
 
     buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
     buffer += "\n\n";

@@ -37,7 +37,7 @@ Provide the component with a list or key-value pairs in two ways:
 </App>
 ```
 
-### `value (required)` [#value-required]
+### `value` (required) [#value-required]
 
 The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.
 
@@ -51,7 +51,7 @@ The text that the component displays. If this is not defined, the component rend
 </App>  
 ```
 
-### `variant (default: "badge")` [#variant-default-badge]
+### `variant` (default: "badge") [#variant-default-badge]
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
 

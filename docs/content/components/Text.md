@@ -9,7 +9,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties [#properties]
 
-### `ellipses (default: true)` [#ellipses-default-true]
+### `ellipses` (default: true) [#ellipses-default-true]
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -48,7 +48,7 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-### `preserveLinebreaks (default: false)` [#preservelinebreaks-default-false]
+### `preserveLinebreaks` (default: false) [#preservelinebreaks-default-false]
 
 This property indicates if linebreaks should be preserved when displaying text.
 

@@ -44,7 +44,7 @@ You can use `Select` with dynamic options:
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -94,7 +94,7 @@ Click on the second field to see the custom empty list indicator.
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -118,11 +118,11 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `inProgress (default: false)` [#inprogress-default-false]
+### `inProgress` (default: false) [#inprogress-default-false]
 
 This property indicates whether the component is in progress. It can be used to show a loading message.
 
-### `inProgressNotificationMessage (default: "")` [#inprogressnotificationmessage-default-]
+### `inProgressNotificationMessage` (default: "") [#inprogressnotificationmessage-default-]
 
 This property indicates the message to display when the component is in progress.
 
@@ -130,11 +130,11 @@ This property indicates the message to display when the component is in progress
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `Select` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -151,7 +151,7 @@ Available values:
 
 This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `multiSelect (default: false)` [#multiselect-default-false]
+### `multiSelect` (default: false) [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -218,7 +218,7 @@ This property allows replacing the default template to display an option in the 
 </App>
 ```
 
-### `placeholder (default: "")` [#placeholder-default-]
+### `placeholder` (default: "") [#placeholder-default-]
 
 An optional placeholder text that is visible in the input field when its empty.
 
@@ -232,19 +232,19 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable (default: false)` [#searchable-default-false]
+### `searchable` (default: false) [#searchable-default-false]
 
 This property enables the search functionality in the dropdown list.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 

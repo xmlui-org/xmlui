@@ -11,7 +11,7 @@
 
 ## Properties [#properties]
 
-### `value (default: "XMLUI Application")` [#value-default-xmlui-application]
+### `value` (default: "XMLUI Application") [#value-default-xmlui-application]
 
 This property sets the page's title to display in the browser tab.
 

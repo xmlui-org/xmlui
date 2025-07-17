@@ -534,61 +534,140 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 };
 
 type LinkAwareHeadingProps = {
+  level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   children: React.ReactNode;
-  level: string;
   showHeadingAnchors?: boolean;
 };
 
-function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
-  const appContext = useAppContext();
-  if (showHeadingAnchors === undefined) {
-    showHeadingAnchors = appContext?.appGlobals?.showHeadingAnchors ?? false;
+function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): React.ReactNode {
+  if (!suffix) {
+    return node;
   }
-  let headingLabel: React.ReactNode = "";
-  let anchorId = "";
-  if (!children) return <></>;
 
-  if (typeof children === "string") {
-    [headingLabel, anchorId] = getCustomAnchor(children);
-    // At this point, the anchorId might still be empty
-  } else if (Array.isArray(children)) {
-    if (children.length === 0) return <></>;
-    if (children.length === 1) {
-      headingLabel = children[0];
-    } else {
-      headingLabel = children.slice(0, -1);
-      const last = children[children.length - 1];
+  if (typeof node === "string") {
+    if (node.endsWith(suffix)) {
+      const result = node.slice(0, -suffix.length);
+      return result || null;
+    }
+    return node;
+  }
 
-      // Check for explicit anchor at the end
-      if (typeof last === "string") {
-        const match = last.trim().match(/^\[#([^\]]+)\]$/);
-        if (match && match.length > 0) {
-          anchorId = match[1];
-        } else {
-          // --- Generate a valid anchor ID from the last element
-          anchorId = headingToAnchorLink(extractTextNodes(last));
-        }
+  if (Array.isArray(node)) {
+    const newChildren = [...node];
+    let suffixRemaining = suffix;
+
+    for (let i = newChildren.length - 1; i >= 0 && suffixRemaining.length > 0; i--) {
+      const child = newChildren[i];
+      const childText = getHeadingText(child);
+
+      if (suffixRemaining.endsWith(childText)) {
+        newChildren[i] = null;
+        suffixRemaining = suffixRemaining.slice(0, -childText.length);
+      } else {
+        newChildren[i] = removeSuffixFromReactNodes(child, suffixRemaining);
+        // After this call, the suffix should have been removed from the child, so we are done.
+        suffixRemaining = "";
       }
     }
-  } else {
-    // Provided children are not a string or array but still valid React elements
-    // if it contains text, use it as the heading label
-    const headingContent = extractTextNodes(children);
-    if (!headingContent) return <></>;
-    headingLabel = children;
+
+    return newChildren.filter(Boolean);
   }
 
-  // Generate implicit anchor if not provided
-  if (!anchorId) {
-    anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
+  if (React.isValidElement(node) && node.props.children) {
+    const newChildren = removeSuffixFromReactNodes(node.props.children, suffix);
+    return React.cloneElement(node, { ...node.props, children: newChildren });
   }
+
+  return node;
+}
+
+const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
+  const { appGlobals } = useAppContext();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // --- Extract the optional anchor
+  let anchor: string | undefined = undefined;
+  let label: React.ReactNode = children;
+
+  const textContent = getHeadingText(children);
+  const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
+
+  if (match) {
+    anchor = match[2];
+    const anchorText = `[#${anchor}]`;
+    label = removeSuffixFromReactNodes(children, anchorText);
+  }
+
+  const headingId = anchor ?? getHeadingId(children);
 
   return (
-    <Heading level={level} id={anchorId} showAnchor={showHeadingAnchors}>
-      {headingLabel}
+    <Heading
+      level={level}
+      id={headingId}
+      className={styles.linkAwareHeading}
+      headingRef={headingRef}
+    >
+      {label}
+      {showHeadingAnchors && (
+        <a
+          href={`#${headingId}`}
+          className={styles.headingLink}
+          onClick={(e) => {
+            e.preventDefault();
+            appGlobals.events?.emit("scroll-to-anchor", { anchor: headingId });
+          }}
+        >
+          <Icon name="link" />
+        </a>
+      )}
     </Heading>
   );
+};
+
+function getHeadingId(children: React.ReactNode): string {
+  const text = getHeadingText(children);
+  return text
+    .toLowerCase()
+    .replace(/[^\w]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
+
+function getHeadingText(children: React.ReactNode): string {
+  if (typeof children === "string") {
+    return children;
+  }
+  if (Array.isArray(children)) {
+    return children.map(getHeadingText).join("");
+  }
+  if (React.isValidElement(children) && children.props.children) {
+    return getHeadingText(children.props.children);
+  }
+  return "";
+}
+
+const getLabelContent = (node: React.ReactNode, labelText: string): React.ReactNode => {
+  if (typeof node === "string") {
+    return labelText.includes(node) ? node : null;
+  }
+  if (Array.isArray(node)) {
+    const children = node.map((n) => getLabelContent(n, labelText)).filter(Boolean);
+    return children.length > 0 ? children : null;
+  }
+  if (React.isValidElement(node)) {
+    const nodeText = getHeadingText(node);
+    if (labelText.trim() === nodeText.trim()) {
+      return node;
+    }
+    if (labelText.includes(nodeText)) {
+      return node;
+    }
+    const newChildren = getLabelContent(node.props.children, labelText);
+    if (newChildren) {
+      return React.cloneElement(node, node.props, newChildren);
+    }
+  }
+  return null;
+};
 
 // --- Helper functions
 

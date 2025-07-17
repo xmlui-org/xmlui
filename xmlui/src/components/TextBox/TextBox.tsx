@@ -71,6 +71,21 @@ export const TextBoxMd = createMetadata({
         "This property defines the gap between the adornments and the input area. If not " +
         "set, the gap declared by the current theme is used.",
     },
+    showPasswordToggle: {
+      description:
+        "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+      defaultValue: false,
+    },
+    passwordVisibleIcon: {
+      description: "The icon to display when the password is visible (when showPasswordToggle is true).",
+      valueType: "string",
+      defaultValue: "eye",
+    },
+    passwordHiddenIcon: {
+      description: "The icon to display when the password is hidden (when showPasswordToggle is true).",
+      valueType: "string",
+      defaultValue: "eye-off",
+    }
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -107,6 +122,7 @@ export const TextBoxMd = createMetadata({
     "outlineWidth-Input--focus": "$outlineWidth--focus",
     "outlineStyle-Input--focus": "$outlineStyle--focus",
     "outlineOffset-Input--focus": "$outlineOffset--focus",
+    "color-passwordToggle-Input": "$textColor-subtitle",
 
     light: {
       // --- No light-specific theme vars
@@ -160,6 +176,9 @@ function renderTextBox(
       labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
       labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       required={extractValue.asOptionalBoolean(node.props.required)}
+      showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
+      passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
+      passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
     />
   );
 }

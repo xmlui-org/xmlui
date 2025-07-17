@@ -41,7 +41,7 @@ and sets several theme variables to style the `ProgressBar` component:
 
 ## Properties [#properties]
 
-### `root (default: false)` [#root-default-false]
+### `root` (default: false) [#root-default-false]
 
 This property indicates whether the component is at the root of the application.
 
@@ -83,7 +83,7 @@ This property specifies which theme to use by setting the theme's id.
 </App>
 ```
 
-### `tone (default: "light")` [#tone-default-light]
+### `tone` (default: "light") [#tone-default-light]
 
 This property allows the setting of the current theme's tone.
 

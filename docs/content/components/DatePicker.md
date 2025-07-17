@@ -10,11 +10,11 @@
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dateFormat (default: "MM/dd/yyyy")` [#dateformat-default-mm-dd-yyyy]
+### `dateFormat` (default: "MM/dd/yyyy") [#dateformat-default-mm-dd-yyyy]
 
 The format of the date displayed in the input field
 
@@ -52,7 +52,7 @@ An optional array of dates that are disabled
 </App>  
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -80,7 +80,7 @@ This property sets the component's initial value.
 </App>  
 ```
 
-### `inline (default: false)` [#inline-default-false]
+### `inline` (default: false) [#inline-default-false]
 
 Whether to display the datepicker inline
 
@@ -88,11 +88,11 @@ Whether to display the datepicker inline
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -129,7 +129,7 @@ The optional start date of the selectable date range. If not defined, the range 
 </App>
 ```
 
-### `mode (default: "single")` [#mode-default-single]
+### `mode` (default: "single") [#mode-default-single]
 
 The mode of the datepicker (single or range)
 
@@ -152,11 +152,11 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>  
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `showWeekNumber (default: false)` [#showweeknumber-default-false]
+### `showWeekNumber` (default: false) [#showweeknumber-default-false]
 
 Whether to show the week number in the calendar
 
@@ -174,7 +174,7 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -201,7 +201,7 @@ Available values:
 </App>
 ```
 
-### `weekStartsOn (default: 0)` [#weekstartson-default-0]
+### `weekStartsOn` (default: 0) [#weekstartson-default-0]
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 

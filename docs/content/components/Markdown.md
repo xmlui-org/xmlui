@@ -99,7 +99,7 @@ This property sets the markdown content to display. Alternatively, you can nest 
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 
-### `removeIndents (default: true)` [#removeindents-default-true]
+### `removeIndents` (default: true) [#removeindents-default-true]
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 
