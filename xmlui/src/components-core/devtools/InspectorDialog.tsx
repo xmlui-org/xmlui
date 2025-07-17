@@ -100,9 +100,9 @@ export const InspectorDialog = React.forwardRef(
     };
 
     return (
-      <AnimatePresence onExitComplete={onExitComplete}>
-        <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setRendered}>
-          <Dialog.Portal container={root}>
+      <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setRendered}>
+        <Dialog.Portal container={root}>
+          <AnimatePresence onExitComplete={onExitComplete}>
             {rendered && (
               <Dialog.Overlay className={styles.overlay} forceMount>
                 <motion.div
@@ -150,9 +150,9 @@ export const InspectorDialog = React.forwardRef(
                 </MotionContent>
               </Dialog.Overlay>
             )}
-          </Dialog.Portal>
-        </Dialog.Root>
-      </AnimatePresence>
+          </AnimatePresence>
+        </Dialog.Portal>
+      </Dialog.Root>
     );
   },
 );
