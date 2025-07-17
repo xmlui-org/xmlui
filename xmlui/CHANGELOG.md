@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.79
+
+### Patch Changes
+
+- ad21a31: enhance treeshaking
+
 ## 0.9.78
 
 ### Patch Changes
