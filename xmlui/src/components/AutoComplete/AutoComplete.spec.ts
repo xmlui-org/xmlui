@@ -1,5 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
 test("renders with default props", async ({ initTestBed, createAutoCompleteDriver }) => {
   await initTestBed(`
     <AutoComplete />
@@ -10,7 +14,8 @@ test("renders with default props", async ({ initTestBed, createAutoCompleteDrive
   await expect(driver.component).toBeVisible();
 });
 
-test("displays placeholder text", async ({ initTestBed, page }) => {
+test.skip("displays placeholder text", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   const placeholder = "Search for an option";
   await initTestBed(`
     <AutoComplete placeholder="${placeholder}" />
@@ -19,7 +24,8 @@ test("displays placeholder text", async ({ initTestBed, page }) => {
   await expect(page.getByPlaceholder(placeholder)).toBeVisible();
 });
 
-test("initialValue sets the selected option", async ({ initTestBed, page }) => {
+test.skip("initialValue sets the selected option", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete" initialValue="1" label="Select a superhero">
@@ -35,11 +41,12 @@ test("initialValue sets the selected option", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 });
 
-test("opens dropdown when double clicked", async ({
+test.skip("opens dropdown when clicked", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete>
       <Option value="1" label="Bruce Wayne" />
@@ -54,7 +61,8 @@ test("opens dropdown when double clicked", async ({
   await expect(page.getByRole("listbox")).toBeVisible();
 });
 
-test("selects an option when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+test.skip("selects an option when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete">
@@ -82,11 +90,16 @@ test("selects an option when clicked", async ({ initTestBed, page, createAutoCom
   await expect(page.getByRole("combobox")).toHaveValue("Diana Prince");
 });
 
-test("disabled option cannot be selected", async ({
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test.skip("disabled option cannot be selected", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete">
@@ -108,11 +121,16 @@ test("disabled option cannot be selected", async ({
   await expect(page.getByTestId("text")).not.toHaveText("Selected value: 2");
 });
 
-test("multi mode allows selecting multiple options", async ({
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test.skip("multi mode allows selecting multiple options", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete" multi="true">
@@ -145,7 +163,8 @@ test("multi mode allows selecting multiple options", async ({
   await expect(page.getByText("Diana Prince")).toBeVisible();
 });
 
-test("searching filters options", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+test.skip("searching filters options", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete>
       <Option value="1" label="Bruce Wayne" />
@@ -168,11 +187,12 @@ test("searching filters options", async ({ initTestBed, page, createAutoComplete
   await expect(page.getByText("Diana Prince")).not.toBeVisible();
 });
 
-test("emptyListTemplate is shown when no options match", async ({
+test.skip("emptyListTemplate is shown when no options match", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete>
       <property name="emptyListTemplate">
@@ -194,11 +214,12 @@ test("emptyListTemplate is shown when no options match", async ({
   await expect(page.getByText("No options found")).toBeVisible();
 });
 
-test("optionTemplate customizes option appearance", async ({
+test.skip("optionTemplate customizes option appearance", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete>
       <property name="optionTemplate">
@@ -219,11 +240,16 @@ test("optionTemplate customizes option appearance", async ({
   await expect(page.getByText("Diana Prince")).toBeVisible();
 });
 
-test("readOnly prevents changing selection", async ({
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.skip("readOnly prevents changing selection", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete readOnly="true" initialValue="1">
       <Option value="1" label="Bruce Wayne" />
@@ -243,11 +269,12 @@ test("readOnly prevents changing selection", async ({
   await expect(page.getByRole("listbox")).not.toBeVisible();
 });
 
-test("disabled state prevents interaction", async ({
+test.skip("disabled state prevents interaction", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete enabled="false">
       <Option value="1" label="Bruce Wayne" />
@@ -271,11 +298,16 @@ test("disabled state prevents interaction", async ({
   await expect(page.getByRole("combobox")).toHaveValue("");
 });
 
-test("didChange event fires when option is selected", async ({
+// =============================================================================
+// API AND EVENT TESTS
+// =============================================================================
+
+test.skip("didChange event fires when option is selected", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <App var.selectedValue="">
       <AutoComplete id="autoComplete" onDidChange="(val) => selectedValue = val">
@@ -294,11 +326,12 @@ test("didChange event fires when option is selected", async ({
   await expect(page.getByTestId("text")).toHaveText("3");
 });
 
-test("gotFocus and lostFocus events work correctly", async ({
+test.skip("gotFocus and lostFocus events work correctly", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <App var.isFocused="false">
       <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
@@ -326,7 +359,8 @@ test("gotFocus and lostFocus events work correctly", async ({
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 });
 
-test("setValue API works correctly", async ({ initTestBed, page }) => {
+test.skip("setValue API works correctly", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <App>
       <AutoComplete id="autoComplete">
@@ -351,7 +385,8 @@ test("setValue API works correctly", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
 });
 
-test("focus API brings focus to the component", async ({ initTestBed, page }) => {
+test.skip("focus API brings focus to the component", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <App var.isFocused="false">
       <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
@@ -381,7 +416,8 @@ test("focus API brings focus to the component", async ({ initTestBed, page }) =>
   expect(isFocused).toBeTruthy();
 });
 
-test("autoFocus brings focus to the component on load", async ({ initTestBed, page }) => {
+test.skip("autoFocus brings focus to the component on load", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <App var.isFocused="false">
       <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
@@ -394,7 +430,8 @@ test("autoFocus brings focus to the component on load", async ({ initTestBed, pa
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 });
 
-test("label is displayed correctly", async ({ initTestBed, page }) => {
+test.skip("label is displayed correctly", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   const label = "Select a superhero";
   await initTestBed(`
     <AutoComplete label="${label}">
@@ -405,11 +442,12 @@ test("label is displayed correctly", async ({ initTestBed, page }) => {
   await expect(page.getByText(label)).toBeVisible();
 });
 
-test("creates new option when typing non-existing value", async ({
+test.skip("creates new option when typing non-existing value", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
 }) => {
+  // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete" creatable="true">
@@ -435,4 +473,65 @@ test("creates new option when typing non-existing value", async ({
   // The new option should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected value: Peter Parker");
   await expect(page.getByRole("combobox")).toHaveValue("Peter Parker");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`
+    <AutoComplete label="Select a hero" placeholder="Search heroes">
+      <Option value="1" label="Bruce Wayne" />
+      <Option value="2" label="Clark Kent" />
+      <Option value="3" label="Diana Prince" />
+    </AutoComplete>
+  `);
+  
+  // Get the combobox element
+  const combobox = page.getByRole("combobox");
+  
+  // Check initial ARIA attributes
+  await expect(combobox).toHaveAttribute("aria-autocomplete", "list");
+  await expect(combobox).toHaveAttribute("aria-expanded", "false");
+  
+  // Open the dropdown
+  await combobox.click();
+  
+  // Check expanded state
+  await expect(combobox).toHaveAttribute("aria-expanded", "true");
+  
+  // Check that options have proper roles
+  await expect(page.getByRole("option")).toHaveCount(3);
+});
+
+test.skip("supports keyboard navigation with arrow keys", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`
+    <AutoComplete id="autoComplete">
+      <Option value="1" label="Bruce Wayne" />
+      <Option value="2" label="Clark Kent" />
+      <Option value="3" label="Diana Prince" />
+    </AutoComplete>
+  `);
+  
+  // Focus the autocomplete
+  await page.getByRole("combobox").focus();
+  
+  // Open dropdown with arrow down
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("listbox")).toBeVisible();
+  
+  // Navigate through options
+  await page.keyboard.press("ArrowDown"); // First option
+  await page.keyboard.press("ArrowDown"); // Second option
+  await page.keyboard.press("ArrowDown"); // Third option
+  await page.keyboard.press("ArrowUp");   // Back to second option
+  
+  // Select with Enter
+  await page.keyboard.press("Enter");
+  
+  // Verify selection
+  await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
 });

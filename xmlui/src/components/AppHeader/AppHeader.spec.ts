@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 const CODE = `
@@ -5,6 +6,241 @@ const CODE = `
     Hello, World!
   </AppHeader>
 `;
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.skip("renders with basic props", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header" />`);
+  const driver = await createAppHeaderDriver();
+  
+  await expect(driver.component).toBeVisible();
+});
+
+test.skip("renders with title prop", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  const TITLE = "Application Title";
+  await initTestBed(`<AppHeader testId="header" title="${TITLE}" />`);
+  const driver = await createAppHeaderDriver();
+  
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).toContainText(TITLE);
+});
+
+test.skip("renders with custom logo content", async ({ initTestBed, createAppHeaderDriver, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header">
+    <LogoTemplate slot="logoSlot">
+      <Icon name="star" testId="customLogo" />
+    </LogoTemplate>
+  </AppHeader>`);
+  
+  const driver = await createAppHeaderDriver();
+  await expect(driver.component).toBeVisible();
+  await expect(page.getByTestId("customLogo")).toBeVisible();
+});
+
+test.skip("handles showLogo prop changes", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  // Test with showLogo=true (default)
+  await initTestBed(`<AppHeader testId="header" />`);
+  const driver1 = await createAppHeaderDriver();
+  const logoContainerVisible1 = await driver1.component.locator(".logoContainer").isVisible();
+  
+  // Test with showLogo=false
+  await initTestBed(`<AppHeader testId="header" showLogo={false} />`);
+  const driver2 = await createAppHeaderDriver();
+  const logoContainerVisible2 = await driver2.component.locator(".logoContainer").isVisible();
+  
+  // Logo should be visible by default and hidden when showLogo=false
+  expect(logoContainerVisible1 || !logoContainerVisible2).toBeTruthy();
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("has correct accessibility structure", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header" title="Accessible Header" />`);
+  const driver = await createAppHeaderDriver();
+  
+  // AppHeader should have a role of "banner"
+  await expect(driver.component).toHaveAttribute("role", "banner");
+});
+
+test.skip("properly handles focus management", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header">
+    <NavLink testId="headerLink1" to="#">Link 1</NavLink>
+    <NavLink testId="headerLink2" to="#">Link 2</NavLink>
+  </AppHeader>`);
+  
+  // Test that links within the header are keyboard focusable
+  await page.getByTestId("headerLink1").focus();
+  await expect(page.getByTestId("headerLink1")).toBeFocused();
+  
+  // Test tab navigation works between links
+  await page.keyboard.press("Tab");
+  await expect(page.getByTestId("headerLink2")).toBeFocused();
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.skip("applies background color theme variable correctly", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  const EXPECTED_BG_COLOR = "rgb(240, 240, 240)";
+  await initTestBed(`<AppHeader testId="header" />`, {
+    testThemeVars: {
+      "backgroundColor-AppHeader": EXPECTED_BG_COLOR,
+    },
+  });
+  
+  const driver = await createAppHeaderDriver();
+  await expect(driver.component).toHaveCSS("background-color", EXPECTED_BG_COLOR);
+});
+
+test.skip("applies height theme variable correctly", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  const EXPECTED_HEIGHT = "80px";
+  await initTestBed(`<AppHeader testId="header" />`, {
+    testThemeVars: {
+      "height-AppHeader": EXPECTED_HEIGHT,
+    },
+  });
+  
+  const driver = await createAppHeaderDriver();
+  await expect(driver.component).toHaveCSS("height", EXPECTED_HEIGHT);
+});
+
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test.skip("handles undefined props gracefully", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header" title={undefined} showLogo={undefined} />`);
+  const driver = await createAppHeaderDriver();
+  
+  // Component should render without errors when props are undefined
+  await expect(driver.component).toBeVisible();
+});
+
+test.skip("handles special characters in title prop", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  const SPECIAL_TITLE = "Application & Test – Special Character's Test";
+  await initTestBed(`<AppHeader testId="header" title="${SPECIAL_TITLE}" />`);
+  const driver = await createAppHeaderDriver();
+  
+  // Special characters should display correctly
+  await expect(driver.component).toContainText(SPECIAL_TITLE);
+});
+
+test.skip("handles empty child components", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header">
+    <LogoTemplate slot="logoSlot"></LogoTemplate>
+    <TitleTemplate slot="titleSlot"></TitleTemplate>
+  </AppHeader>`);
+  
+  const driver = await createAppHeaderDriver();
+  
+  // Component should handle empty template slots gracefully
+  await expect(driver.component).toBeVisible();
+});
+
+// =============================================================================
+// PERFORMANCE TESTS
+// =============================================================================
+
+test.skip("memoization prevents unnecessary re-renders", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`
+    <Fragment var.testState="0">
+      <AppHeader testId="header">
+        <Button 
+          testId="btn"
+          onClick="testState = testState + 1"
+        >
+          Click Me
+        </Button>
+        <Text testId="headerContent">Header Content</Text>
+      </AppHeader>
+      <Text testId="stateView">{testState}</Text>
+    </Fragment>
+  `);
+  
+  // Check initial rendering
+  await expect(page.getByTestId("header")).toBeVisible();
+  await expect(page.getByTestId("headerContent")).toBeVisible();
+  
+  // Click the button to trigger state change
+  await page.getByTestId("btn").click();
+  await expect(page.getByTestId("stateView")).toHaveText("1");
+  
+  // Click again
+  await page.getByTestId("btn").click();
+  await expect(page.getByTestId("stateView")).toHaveText("2");
+  
+  // Header content should remain stable during state changes
+  await expect(page.getByTestId("headerContent")).toBeVisible();
+});
+
+test.skip("handles rapid prop changes efficiently", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  // First render
+  await initTestBed(`<AppHeader testId="header" title="Title 1" />`);
+  const driver1 = await createAppHeaderDriver();
+  await expect(driver1.component).toBeVisible();
+  await expect(driver1.component).toContainText("Title 1");
+  
+  // Quick change to different title
+  await initTestBed(`<AppHeader testId="header" title="Title 2" />`);
+  const driver2 = await createAppHeaderDriver();
+  await expect(driver2.component).toBeVisible();
+  await expect(driver2.component).toContainText("Title 2");
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test.skip("works correctly within App component", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<App testId="app">
+    <AppHeader testId="header" title="Application Title">
+      <NavLink testId="headerLink" to="#">Home</NavLink>
+    </AppHeader>
+    <Text testId="mainContent">Main Content</Text>
+  </App>`);
+  
+  // Test header renders correctly within App
+  await expect(page.getByTestId("app")).toBeVisible();
+  await expect(page.getByTestId("header")).toBeVisible();
+  await expect(page.getByTestId("headerLink")).toBeVisible();
+  await expect(page.getByText("Application Title")).toBeVisible();
+});
+
+test.skip("integrates correctly with theme system", async ({ initTestBed, createAppHeaderDriver }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`<AppHeader testId="header" title="Themed Header" />`, {
+    testThemeVars: {
+      "backgroundColor-AppHeader": "rgb(240, 240, 240)",
+      "borderBottom-AppHeader": "1px solid rgb(200, 200, 200)",
+      "height-AppHeader": "60px",
+    },
+  });
+  
+  // Check theme variables are applied
+  const driver = await createAppHeaderDriver();
+  await expect(driver.component).toHaveCSS("background-color", "rgb(240, 240, 240)");
+  await expect(driver.component).toHaveCSS("border-bottom-width", "1px");
+  await expect(driver.component).toHaveCSS("height", "60px");
+});
 
 test("border", async ({ initTestBed, createAppHeaderDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";

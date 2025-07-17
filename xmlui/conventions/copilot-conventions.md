@@ -337,6 +337,21 @@ By following these conventions, we ensure consistent implementation and document
 
 XMLUI components require comprehensive end-to-end testing using Playwright to ensure reliability, accessibility, and performance. This convention establishes patterns for creating thorough test suites that cover all aspects of component behavior, from basic functionality to edge cases and performance optimizations.
 
+### Component Test Location Map
+
+| Component Type | Component Location | Test File Location |
+| -------------- | ----------------- | ----------------- |
+| Standard Components | `/xmlui/src/components/ComponentName/ComponentName.tsx` | `/xmlui/src/components/ComponentName/ComponentName.spec.ts` |
+| Container Components | `/xmlui/src/components/Container/Container.tsx` | `/xmlui/src/components/Container/Container.spec.ts` |
+| Form Components | `/xmlui/src/components/FormControl/FormControl.tsx` | `/xmlui/src/components/FormControl/FormControl.spec.ts` |
+
+**Critical Rules for Test Creation:**
+1. ✅ ALL component tests MUST be placed in the same folder as the component itself
+2. ✅ ALL newly created tests MUST use the `.skip` modifier
+3. ✅ Each skipped test MUST include the comment: `// TODO: review these Copilot-created tests`
+4. ❌ NEVER place tests in the global test directory (`/tests/tests/`)
+5. ❌ NEVER create non-skipped tests for new components
+
 ### Convention Rules
 
 1. **Test Structure and Organization**:
@@ -757,7 +772,7 @@ By following these conventions, XMLUI components will have comprehensive, reliab
 
 When creating skeleton tests for components, follow these guidelines to ensure consistency and maintainability across the test suite. These tests provide a roadmap for future implementation while maintaining a clear structure.
 
-#### Convention Rules
+#### Convention Rules (CRITICAL)
 
 1. **Test Structure Organization**:
    - Organize existing tests into appropriate categories (Basic Functionality, Accessibility, etc.)
@@ -769,10 +784,11 @@ When creating skeleton tests for components, follow these guidelines to ensure c
    - Use descriptive, action-oriented names that clearly indicate what's being tested
    - Be specific about the behavior or prop being verified
 
-3. **Skipped Test Creation**:
-   - Add new tests as skipped using the `.skip` modifier
-   - Include a standard TODO comment: `// TODO: review these Copilot-created tests`
-   - Implement a complete test body that follows test patterns for that category
+3. **Skipped Test Creation** (MANDATORY):
+   - ✅ ALL newly created tests MUST be skipped using the `.skip` modifier
+   - ✅ ALWAYS include the standard TODO comment: `// TODO: review these Copilot-created tests`
+   - ✅ Implement a complete test body that follows test patterns for that category
+   - ❌ NEVER create non-skipped tests when adding skeleton tests to components
 
 4. **Complete Implementation**:
    - Even in skipped tests, provide a complete implementation
@@ -903,4 +919,104 @@ test.skip("has correct accessibility attributes", async ({ initTestBed, createCo
 
 By following these conventions for skipped tests, you create a valuable roadmap for future test implementation while maintaining a clear and organized test structure. This approach helps ensure comprehensive test coverage even when all tests aren't immediately ready to run.
 
+### Test File Location Conventions (CRITICAL)
+
+When creating component tests, follow these location conventions:
+
+1. **Component-Level Test Location** (MANDATORY):
+   - ✅ Test files MUST be located in the same directory as the component being tested
+   - ✅ Use the naming convention `ComponentName.spec.ts` for test files
+   - ✅ Example: For a component defined in `/components/Button/Button.tsx`, the test MUST be at `/components/Button/Button.spec.ts`
+   - ❌ NEVER place test files in the global test directory (`/tests/tests/`)
+
+2. **Test Import Paths**:
+   - Import test utilities from the testing directory:
+     ```typescript
+     import { expect, test } from "../../testing/fixtures";
+     import { getElementStyle } from "../../testing/component-test-helpers";
+     ```
+   - Adjust import paths based on the relative location of the component and testing utilities
+
+3. **Component Driver Parameters**:
+   - Use the appropriate fixture parameters based on component needs:
+     ```typescript
+     test.skip("basic test", async ({ initTestBed, createComponentDriver }) => {
+       // For components with component drivers
+     });
+     ```
+
+4. **Test Execution Context**:
+   - Tests should be executed from the component's directory
+   - Run specific component tests with: `npx playwright test ComponentName.spec.ts`
+   - Test runners will automatically locate tests in the component directories
+
+This location convention ensures tests are closely associated with their components, making the codebase easier to maintain and navigate. It also simplifies the process of finding and updating tests when component implementations change.
+
 ### Test Execution and Verification
+
+### Proper Test File Structure Example
+
+Below is an example of a correctly structured skeleton test file for a component. Note that ALL tests are marked with `.skip` and include the required TODO comment:
+
+```typescript
+import { test, expect } from "../../testing/fixtures";
+import { getElementStyle } from "../../testing/component-test-helpers";
+
+// Constants for testing
+const RED = "rgb(255, 0, 0)";
+const GREEN = "rgb(0, 255, 0)";
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.skip("component renders with basic props", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName prop="value"/>`);
+  const driver = await createComponentDriver();
+  
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).toContainText("Expected Content");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("component has correct accessibility attributes", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName label="Accessible Label"/>`);
+  const driver = await createComponentDriver();
+  
+  await expect(driver.component).toHaveAttribute('role', 'button');
+  await expect(driver.component).toHaveAttribute('aria-label', 'Accessible Label');
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.skip("component applies theme variables correctly", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName />`, {
+    testThemeVars: {
+      "backgroundColor-ComponentName": RED,
+    },
+  });
+  
+  const driver = await createComponentDriver();
+  await expect(driver.component).toHaveCSS("background-color", RED);
+});
+
+// All remaining test categories follow the same pattern...
+```
+
+This example shows the proper structure with:
+1. Correct imports from the testing directory
+2. Section separators for test categories
+3. ALL tests marked with `.skip`
+4. Required TODO comment in each test
+5. Proper test implementation following the patterns
