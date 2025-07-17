@@ -5,7 +5,6 @@ import {
   type HTMLAttributeReferrerPolicy,
   type ReactNode,
   useMemo,
-  useCallback,
 } from "react";
 import { Link } from "@remix-run/react";
 import classnames from "classnames";
@@ -44,77 +43,31 @@ export const LinkNative = forwardRef(function LinkNative(
   props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const { to, children, icon, active = defaultProps.active, onClick, target, disabled = defaultProps.disabled, style, ...anchorProps } =
-    specifyTypes(props);
+  const {
+    to,
+    children,
+    icon,
+    active = defaultProps.active,
+    onClick,
+    target,
+    disabled = defaultProps.disabled,
+    style,
+    ...anchorProps
+  } = specifyTypes(props);
 
   const iconLink = !!icon && !children;
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
   }, [to]) as To;
 
-  const Node = !to ? "div" : Link;
-  
-  // For hash links, we'll use a regular anchor tag to avoid React Router interference
-  const isHashLink = typeof to === 'string' && to.startsWith('#');
-  const FinalNode = isHashLink ? "a" : Node;
-
-  // Handle hash navigation for same-page scrolling
-  const handleClick = useCallback((event: React.MouseEvent) => {
-    const toUrl = typeof to === 'string' ? to : to?.pathname;
-    
-    // Check if this is a hash link (starts with #)
-    if (toUrl && toUrl.startsWith('#')) {
-      const targetId = toUrl.substring(1);
-      const currentHash = window.location.hash;
-      
-      // Always prevent default for hash links and handle manually
-      event.preventDefault();
-      
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-        targetElement.scrollIntoView();
-        
-        // Build the new URL with existing hash route + fragment
-        const currentUrl = window.location.href;
-        const baseUrl = currentUrl.split('#')[0]; // Get everything before the first #
-        const existingHash = window.location.hash; // Current hash (e.g., #/about)
-        
-        let newUrl: string | URL;
-        if (existingHash && existingHash !== toUrl) {
-          // If there's an existing hash route, append the fragment to it
-          if (existingHash.includes('/#')) {
-            // Remove any existing fragment and add the new one
-            const hashRoute = existingHash.split('/#')[0];
-            newUrl = `${baseUrl}${hashRoute}/${toUrl}`;
-          } else {
-            // Just append the fragment to the existing hash
-            newUrl = `${baseUrl}${existingHash}/${toUrl}`;
-          }
-        } else {
-          // No existing hash or same fragment, just use the fragment
-          newUrl = `${baseUrl}${toUrl}`;
-        }
-        
-        window.history.pushState(null, '', newUrl);
-      }
-      
-      // Call the original onClick if provided
-      onClick?.();
-      return;
-    }
-    
-    // For all other cases, call the original onClick
-    onClick?.();
-  }, [to, onClick]);
-
+  const Node = to ? Link : "div";
   return (
-    <FinalNode
+    <Node
       ref={forwardedRef as any}
-      to={isHashLink ? undefined : smartTo}
-      href={isHashLink ? to as string : undefined}
+      to={smartTo}
       style={style}
       target={target}
-      onClick={handleClick}
+      onClick={onClick}
       className={classnames(styles.container, {
         [styles.iconLink]: iconLink,
         [styles.active]: active,
@@ -128,7 +81,7 @@ export const LinkNative = forwardRef(function LinkNative(
         </div>
       )}
       {children}
-    </FinalNode>
+    </Node>
   );
 });
 

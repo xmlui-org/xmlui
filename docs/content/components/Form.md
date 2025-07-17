@@ -49,7 +49,7 @@ The following example demonstrates using it:
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
 
-### `cancelLabel (default: "Cancel")` [#cancellabel-default-cancel]
+### `cancelLabel` (default: "Cancel") [#cancellabel-default-cancel]
 
 This property defines the label of the Cancel button.
 
@@ -61,7 +61,7 @@ This property sets the message to display when the form is submitted successfull
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -73,11 +73,11 @@ This property sets the message to display when the form submission fails.
 
 This property sets the message to display when the form is being submitted.
 
-### `itemLabelBreak (default: true)` [#itemlabelbreak-default-true]
+### `itemLabelBreak` (default: true) [#itemlabelbreak-default-true]
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
-### `itemLabelPosition (default: "top")` [#itemlabelposition-default-top]
+### `itemLabelPosition` (default: "top") [#itemlabelposition-default-top]
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
 
@@ -94,15 +94,15 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.
 
-### `keepModalOpenOnSubmit (default: false)` [#keepmodalopenonsubmit-default-false]
+### `keepModalOpenOnSubmit` (default: false) [#keepmodalopenonsubmit-default-false]
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel (default: "Saving...")` [#saveinprogresslabel-default-saving-]
+### `saveInProgressLabel` (default: "Saving...") [#saveinprogresslabel-default-saving-]
 
 This property defines the label of the Save button to display during the form data submit (save) operation.
 
-### `saveLabel (default: "Save")` [#savelabel-default-save]
+### `saveLabel` (default: "Save") [#savelabel-default-save]
 
 This property defines the label of the Save button.
 
@@ -114,7 +114,7 @@ This property sets the HTTP method to use when submitting the form data. If not 
 
 URL to submit the form data.
 
-### `swapCancelAndSave (default: false)` [#swapcancelandsave-default-false]
+### `swapCancelAndSave` (default: false) [#swapcancelandsave-default-false]
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 

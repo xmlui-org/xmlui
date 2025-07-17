@@ -9,11 +9,11 @@ The `App` component is the root container that defines your application's overal
 
 ## Properties [#properties]
 
-### `defaultTheme (default: "xmlui")` [#defaulttheme-default-xmlui]
+### `defaultTheme` (default: "xmlui") [#defaulttheme-default-xmlui]
 
 This property sets the app's default theme.
 
-### `defaultTone (default: "light")` [#defaulttone-default-light]
+### `defaultTone` (default: "light") [#defaulttone-default-light]
 
 This property sets the app's default tone ("light" or "dark").
 
@@ -292,8 +292,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
-
 ### `loggedInUser` [#loggedinuser]
 
 Stores information about the currently logged-in user. By not defining this property, you can indicate that no user is logged in.
@@ -335,11 +333,11 @@ Optional template of the app logo
 
 Optional application name (visible in the browser tab). When you do not define this property, the tab name falls back to the one defined in the app's configuration. If the name is not configured, "XMLUI App" is displayed in the tab.
 
-### `noScrollbarGutters (default: false)` [#noscrollbargutters-default-false]
+### `noScrollbarGutters` (default: false) [#noscrollbargutters-default-false]
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
-### `scrollWholePage (default: true)` [#scrollwholepage-default-true]
+### `scrollWholePage` (default: true) [#scrollwholepage-default-true]
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 

@@ -50,7 +50,7 @@ This property indicates the index of the active tab. The indexing starts from 0,
 </App>
 ```
 
-### `orientation (default: "horizontal")` [#orientation-default-horizontal]
+### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
 This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.
 

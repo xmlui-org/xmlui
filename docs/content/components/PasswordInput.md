@@ -4,11 +4,11 @@
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -24,7 +24,7 @@ This property sets an optional text to appear on the end (right side when the le
 
 This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
 
-### `initialValue (default: "")` [#initialvalue-default-]
+### `initialValue` (default: "") [#initialvalue-default-]
 
 This property sets the component's initial value.
 
@@ -32,11 +32,11 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -57,17 +57,29 @@ This property sets the width of the `TextBox` component's label. If not defined,
 
 This property sets the maximum length of the input it accepts.
 
+### `passwordHiddenIcon` (default: "eye-off") [#passwordhiddenicon-default-eye-off]
+
+The icon to display when the password is hidden (when showPasswordToggle is true).
+
+### `passwordVisibleIcon` (default: "eye") [#passwordvisibleicon-default-eye]
+
+The icon to display when the password is visible (when showPasswordToggle is true).
+
 ### `placeholder` [#placeholder]
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `showPasswordToggle` (default: false) [#showpasswordtoggle-default-false]
+
+If `true`, a toggle button is displayed to switch between showing and hiding the password input.
 
 ### `startIcon` [#starticon]
 
@@ -77,7 +89,7 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -186,6 +198,10 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-error | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-success | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-adornment-TextBox-warning | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-Input | $textColor-subtitle | $textColor-subtitle |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox--focus | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-passwordToggle-TextBox--hover | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-success | *none* | *none* |
@@ -222,6 +238,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [padding](../styles-and-themes/common-units/#size)-TextBox-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-warning | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Input | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-Input--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Input | $textColor-subtitle | $textColor-subtitle |

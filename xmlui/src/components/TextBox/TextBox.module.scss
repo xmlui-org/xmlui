@@ -24,23 +24,27 @@ $componentName: "TextBox";
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus-within {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
   }
 
-  &:has(.input:focus-visible){
-    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+  &:has(.input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
   }
 
   .input {
@@ -51,6 +55,21 @@ $componentName: "TextBox";
   }
   .adornment {
     color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+  }
+
+  .passwordToggle {
+    cursor: pointer;
+    color: createThemeVar("Input:color-passwordToggle-#{$componentName}");
+    padding-left: createThemeVar("Input:paddingLeft-passwordToggle-#{$componentName}");
+    padding-right: createThemeVar("Input:paddingRight-passwordToggle-#{$componentName}");
+
+    &:hover {
+      color: createThemeVar("Input:color-passwordToggle-#{$componentName}--hover");
+    }
+
+    &:focus {
+      color: createThemeVar("Input:color-passwordToggle-#{$componentName}--focus");
+    }
   }
 }
 

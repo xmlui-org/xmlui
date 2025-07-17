@@ -629,7 +629,7 @@ XMLUI declares these default color shade sets:
 ### Default Background Colors
 
 - `backgroundColor`: The default background color for all components
-- `backgroundColor-primary`: The background color used by components that build on the secondary color
+- `backgroundColor-primary`: The background color used by components that build on the primary color
 - `backgroundColor-secondary`: The background color used by components that build on the secondary color
 - `backgroundColor-attention`: The background color used by components that build on the attention color
 - `backgroundColor--disabled`: The background color representing the disabled state of a component

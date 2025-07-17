@@ -42,8 +42,9 @@ export type ApiInterceptorDefinition = {
   // Available operations
   operations?: Record<string, InterceptorOperationDef>;
   
-  auth?: AuthDefinition
-  
+  auth?: AuthDefinition;
+
+  useWorker?: boolean;
 };
 
 // Represents a single operation of the interceptor

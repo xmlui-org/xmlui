@@ -1,5 +1,30 @@
 # xmlui-vscode
 
+## 0.9.77
+
+### Patch Changes
+
+- Updated dependencies [c867f38]
+  - xmlui@0.9.77
+
+## 0.9.76
+
+### Patch Changes
+
+- 15bf622: fix: add escaped \{ to textmate syntax, eliminate double extraction of props in FormItem causing bugs with escaped open curly brace being parsed as start of binding expression.
+- Updated dependencies [aa08a8c]
+- Updated dependencies [15bf622]
+- Updated dependencies [5761868]
+  - xmlui@0.9.76
+
+## 0.9.75
+
+### Patch Changes
+
+- 2edefdd: feat: ensure xmlui-vscode is versioned with xmlui
+- Updated dependencies [c876be8]
+  - xmlui@0.9.75
+
 ## 0.1.2
 
 ### Patch Changes

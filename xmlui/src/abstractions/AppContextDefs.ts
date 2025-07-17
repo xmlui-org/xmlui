@@ -10,6 +10,7 @@ import type {
 } from "react-hot-toast";
 import type { ActionFunction } from "./ActionDefs";
 import type { SetupWorker } from "msw/browser";
+import type { ApiInterceptor } from "../components-core/interception/ApiInterceptor";
 
 // This interface defines the properties and services of an app context that the 
 // application components can use when implementing their behavior.
@@ -263,6 +264,7 @@ export interface IApiInterceptorContext {
   initialized: boolean;
   forceInitialize: ()=>void;
   interceptorWorker: SetupWorker | null;
+  apiInstance: ApiInterceptor | null;
 }
 
 type Message = ValueOrFunction<Renderable, Toast>;

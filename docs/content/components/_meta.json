@@ -90,6 +90,7 @@
   "TextBox": "TextBox",
   "Theme": "Theme",
   "ToneChangerButton": "ToneChangerButton",
+  "ToneSwitch": "ToneSwitch",
   "VSplitter": "VSplitter",
   "VStack": "VStack"
 }

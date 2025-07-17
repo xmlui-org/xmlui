@@ -59,7 +59,7 @@ In the following example, the two Option are functionally the same:
 
 ## Properties [#properties]
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property indicates whether the option is enabled or disabled.
 

@@ -58,11 +58,11 @@ However, you can create a link that executes an explicit action responding to th
 
 ## Properties [#properties]
 
-### `active (default: false)` [#active-default-false]
+### `active` (default: false) [#active-default-false]
 
 This property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its [`displayActive`](#displayactive) property is set to `true`.
 
-### `displayActive (default: true)` [#displayactive-default-true]
+### `displayActive` (default: true) [#displayactive-default-true]
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
@@ -77,7 +77,7 @@ This Boolean property indicates if the active state of a link should have a visu
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 

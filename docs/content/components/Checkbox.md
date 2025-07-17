@@ -7,7 +7,7 @@
 - **Validation support**: Built-in validation states for form error handling
 - **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
 
-To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](/forms).
+To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/forms).
 
 ## Use children as Content Template [#use-children-as-content-template]
 
@@ -31,11 +31,11 @@ In the following example, the two Checkbox are functionally the same:
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -54,7 +54,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `indeterminate (default: false)` [#indeterminate-default-false]
+### `indeterminate` (default: false) [#indeterminate-default-false]
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
@@ -83,7 +83,7 @@ The following sample binds the state of two checkboxes to one and updates the st
 Try this sample by clicking the bottom group of checkboxes.
 ```
 
-### `initialValue (default: false)` [#initialvalue-default-false]
+### `initialValue` (default: false) [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
@@ -102,11 +102,11 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
 This boolean value indicates if the `Checkbox` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")` [#labelposition-default-end]
+### `labelPosition` (default: "end") [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -132,7 +132,7 @@ Available values:
 
 This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -143,11 +143,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 

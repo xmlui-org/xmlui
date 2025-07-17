@@ -1,5 +1,25 @@
 # xmlui
 
+## 0.9.77
+
+### Patch Changes
+
+- c867f38: Change split view startup animation
+
+## 0.9.76
+
+### Patch Changes
+
+- aa08a8c: introducing ApiInterceptor->useWorker: true/false
+- 15bf622: fix: add escaped \{ to textmate syntax, eliminate double extraction of props in FormItem causing bugs with escaped open curly brace being parsed as start of binding expression.
+- 5761868: improve: BarChart - add tick formatter for X and Y axes
+
+## 0.9.75
+
+### Patch Changes
+
+- c876be8: Turn docs deploy to standard routing
+
 ## 0.9.74
 
 ### Patch Changes

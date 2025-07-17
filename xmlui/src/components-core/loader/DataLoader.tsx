@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import Papa from "papaparse";
 
@@ -22,6 +22,7 @@ import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
 import { createMetadata, d } from "../../components/metadata-helpers";
+import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -82,9 +83,11 @@ function DataLoader({
 
   const hasPaging = pagingDirection !== null;
 
+  const {apiInstance} = useApiInterceptorContext();
   const api = useMemo(() => {
-    return new RestApiProxy(appContext);
-  }, [appContext]);
+    return new RestApiProxy(appContext, apiInstance);
+  }, [apiInstance, appContext]);
+
 
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {

@@ -38,11 +38,11 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties [#properties]
 
-### `alwaysShowSelectionHeader (default: false)` [#alwaysshowselectionheader-default-false]
+### `alwaysShowSelectionHeader` (default: false) [#alwaysshowselectionheader-default-false]
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -134,7 +134,7 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
-### `enableMultiRowSelection (default: true)` [#enablemultirowselection-default-true]
+### `enableMultiRowSelection` (default: true) [#enablemultirowselection-default-true]
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -293,7 +293,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 </App>
 ```
 
-### `hideHeader (default: false)` [#hideheader-default-false]
+### `hideHeader` (default: false) [#hideheader-default-false]
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -603,7 +603,7 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
-### `isPaginated (default: false)` [#ispaginated-default-false]
+### `isPaginated` (default: false) [#ispaginated-default-false]
 
 This property adds pagination controls to the `Table`.
 
@@ -693,7 +693,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
 </App>
 ```
 
-### `noBottomBorder (default: false)` [#nobottomborder-default-false]
+### `noBottomBorder` (default: false) [#nobottomborder-default-false]
 
 This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.
 

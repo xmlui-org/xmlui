@@ -129,6 +129,7 @@ import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
 import { breakoutComponentRenderer } from "./Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
+import { toneSwitchComponentRenderer } from "./ToneSwitch/ToneSwitch";
 import { apiCallRenderer } from "./APICall/APICall";
 import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
@@ -543,6 +544,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(autoCompleteComponentRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(toneChangerButtonComponentRenderer);
+      this.registerCoreComponent(toneSwitchComponentRenderer);
       this.registerCoreComponent(inspectButtonComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);

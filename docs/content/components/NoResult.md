@@ -4,7 +4,7 @@
 
 ## Properties [#properties]
 
-### `hideIcon (default: false)` [#hideicon-default-false]
+### `hideIcon` (default: false) [#hideicon-default-false]
 
 This boolean property indicates if the icon should be hidden.
 
@@ -17,7 +17,7 @@ This boolean property indicates if the icon should be hidden.
 </App>
 ```
 
-### `icon (default: "noresult")` [#icon-default-noresult]
+### `icon` (default: "noresult") [#icon-default-noresult]
 
 This property defines the icon to display with the component.
 

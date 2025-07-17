@@ -8,3 +8,16 @@
   flex-shrink: 0;
   color: t.$textColor-subtitle;
 }
+
+.clickable {
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:focus {
+    outline: none;
+    color: red;
+  }
+}

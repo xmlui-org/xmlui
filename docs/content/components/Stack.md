@@ -14,7 +14,7 @@ For common scenarios, consider the specialized variants: [HStack](/components/HS
 
 ## Properties [#properties]
 
-### `gap (default: "$gap-normal")` [#gap-default-gap-normal]
+### `gap` (default: "$gap-normal") [#gap-default-gap-normal]
 
 Optional size value indicating the gap between child elements.
 
@@ -39,7 +39,7 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 </App>
 ```
 
-### `horizontalAlignment (default: "start")` [#horizontalalignment-default-start]
+### `horizontalAlignment` (default: "start") [#horizontalalignment-default-start]
 
 Manages the horizontal content alignment for each child element in the Stack.
 
@@ -56,13 +56,13 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `orientation (default: "vertical")` [#orientation-default-vertical]
+### `orientation` (default: "vertical") [#orientation-default-vertical]
 
 An optional property that governs the Stack's orientation (whether the Stack lays out its children in a row or a column).
 
 Available values: `horizontal`, `vertical` **(default)**
 
-### `reverse (default: false)` [#reverse-default-false]
+### `reverse` (default: false) [#reverse-default-false]
 
 Optional boolean property to reverse the order of child elements.
 
@@ -85,7 +85,7 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
-### `verticalAlignment (default: "start")` [#verticalalignment-default-start]
+### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
 
 Manages the vertical content alignment for each child element in the Stack.
 
@@ -99,7 +99,7 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `wrapContent (default: false)` [#wrapcontent-default-false]
+### `wrapContent` (default: false) [#wrapcontent-default-false]
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works only with horizontal orientations.
 

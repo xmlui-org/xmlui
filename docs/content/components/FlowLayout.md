@@ -11,7 +11,7 @@ See the [reference docs](./SpaceFiller.mdx) for details.
 
 ## Properties [#properties]
 
-### `columnGap (default: "$gap-normal")` [#columngap-default-gap-normal]
+### `columnGap` (default: "$gap-normal") [#columngap-default-gap-normal]
 
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.
 
@@ -35,7 +35,7 @@ The `columnGap` property specifies the space between items in a single row; it o
 You can observe no gap between the rows of the `FlowLayout`, as `columnGap` keeps the space between rows intact:
 ```
 
-### `gap (default: "$gap-normal")` [#gap-default-gap-normal]
+### `gap` (default: "$gap-normal") [#gap-default-gap-normal]
 
 This property defines the gap between items in the same row and between rows. The FlowLayout component creates a new row when an item is about to overflow the current row.
 
@@ -94,7 +94,7 @@ This markup demonstrates different `gap` values:
 All items within a `FlowLayout` instance fit in a single row, so `gap` affects only the space between items. The space between rows comes from the outermost `Stack`.
 ```
 
-### `rowGap (default: "$gap-normal")` [#rowgap-default-gap-normal]
+### `rowGap` (default: "$gap-normal") [#rowgap-default-gap-normal]
 
 The `rowGap` property specifies the space between the FlowLayout rows; it overrides the `gap` value.
 
