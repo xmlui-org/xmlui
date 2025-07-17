@@ -158,7 +158,6 @@ xmlui-pg {4} copy display name="Example: using ToneSwitch"
 
 %-DESC-END
 
-
 ### Generated Documentation
 
 When you run `npm run generate-all-docs` from `xmlui/xmlui`, the source documentation gets processed and generates the final documentation files in `docs/content/components/`.
