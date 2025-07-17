@@ -247,7 +247,7 @@ defaultThemeVars: {
   dark: {
     [`backgroundColor-${COMP}`]: "$color-surface-700",
   }
-},
+}
 ```
 
 ## Component Renderer Patterns
