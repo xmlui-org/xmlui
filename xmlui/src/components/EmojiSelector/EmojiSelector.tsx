@@ -1,7 +1,8 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { createMetadata, d, dAutoFocus } from "../metadata-helpers";
-import { EmojiSelector, defaultProps } from "./EmojiSelectorNative";
+import { EmojiSelector } from "./EmojiSelectorNative";
+import { defaultProps } from "./DefaultProps";
 
 const COMP = "EmojiSelector";
 
