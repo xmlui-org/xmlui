@@ -519,6 +519,14 @@ export class ComponentRegistry {
       this.registerCoreComponent(pieChartComponentRenderer);
     }
 
+    if(process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false"){
+      this.registerCoreComponent(emojiSelectorRenderer);
+    }
+
+    if(process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
+      this.registerCoreComponent(datePickerComponentRenderer);
+    }
+
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
       //TODO, if it proves to be a working solution, make these components skippable, too
       this.registerCoreComponent(pageMetaTitleComponentRenderer);
@@ -532,13 +540,11 @@ export class ComponentRegistry {
       this.registerCoreComponent(realTimeAdapterComponentRenderer);
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
-      this.registerCoreComponent(emojiSelectorRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
       this.registerCoreComponent(numberBox2ComponentRenderer);
       this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
       this.registerCoreComponent(fileInputRenderer);
-      this.registerCoreComponent(datePickerComponentRenderer);
       this.registerCoreComponent(spinnerComponentRenderer);
       this.registerCoreComponent(selectComponentRenderer);
       this.registerCoreComponent(autoCompleteComponentRenderer);
