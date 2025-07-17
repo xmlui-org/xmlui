@@ -57,6 +57,7 @@ $borderRadius-button-splitView-NestedApp: createThemeVar(
 $borderColor-button-splitView-NestedApp: createThemeVar(
   "borderColor-button-splitView-#{$component}"
 );
+$color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
 
 .nestedAppPlaceholder{
   width: 100%;
@@ -78,8 +79,8 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
 }
 
 .logoWrapper {
-  width: 25px;
-  height: 25px;
+  width: 50px;
+  height: 50px;
   transform: translateZ(0);
   .animatedLogoPath{
     will-change: stroke-dashoffset, stroke-dasharray;
@@ -95,9 +96,9 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
 .loadingText {
   margin-right: 12px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 19.2px; /* Increased by 20% from 16px */
+  font-size: 16px; /* Increased by 20% from 16px */
   font-weight: 500;
-  color: t.$textColor-primary;
+  color: $color-loadingText-NestedApp;
   text-align: right;
 }
 
