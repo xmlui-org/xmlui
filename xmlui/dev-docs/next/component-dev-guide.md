@@ -157,6 +157,7 @@ xmlui-pg {4} copy display name="Example: using ToneSwitch"
 </App>
 
 %-DESC-END
+```
 
 ### Generated Documentation
 
