@@ -29,6 +29,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   align-items: center;
   justify-content: center;
   inset: 0;
+  background-color: $backgroundColor-overlay-ModalDialog;
   padding: t.$space-4;
 }
 
