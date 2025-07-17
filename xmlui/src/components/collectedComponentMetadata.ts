@@ -72,6 +72,7 @@ import { FormSectionMd } from "./FormSection/FormSection";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
+import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
@@ -394,6 +395,7 @@ export const collectedComponentMetadata = {
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
   ToneChangerButton: ToneChangerButtonMd,
+  ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
   BarChart: BarChartMd,
   DonutChart: DonutChartMd,
