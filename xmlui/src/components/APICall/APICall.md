@@ -39,16 +39,12 @@ This property customizes the message displayed in a toast when the API invocatio
 
 This property takes either a string or a list of strings representing URL endpoints to invalidate the local data cache based on the given URL routes.
 
-See [working with caching in APICall](../tutorials/working-with-apiactions.mdx) for a hands-on tutorial.
-For a short overview on client side caching, see the [data caching section](../learning/apis-and-data/api-bindings.mdx#client-side-data-caching).
+For a short overview on client side caching, see the [DataSource component](/components/DataSource).
 
 %-PROP-END
 
 %-PROP-START updates
 
 This property takes either a string or a list of strings representing URL endpoints to indicate which data should be updated in the cache.
-
-See [working with caching in APICall](../tutorials/working-with-apiactions.mdx) for a hands-on tutorial.
-For a short overview on client side caching, see the [data caching section](../learning/apis-and-data/api-bindings.mdx#client-side-data-caching).
 
 %-PROP-END

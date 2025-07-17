@@ -429,4 +429,4 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-Styling is done via the [`Table` component](./Table.mdx).
+Styling is done via the [`Table` component](/components/Table).

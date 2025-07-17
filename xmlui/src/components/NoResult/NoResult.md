@@ -13,7 +13,7 @@
 
 %-PROP-START icon
 
-This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
+This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](/components/Icon).
 
 ```xmlui-pg copy display name="Example: icon"
 <App>
