@@ -19,6 +19,7 @@ import { ProjectCompilation } from "../abstractions/scripting/Compilation";
 import { InspectorDialog } from "./devtools/InspectorDialog";
 import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
 import { XmlUiHelper } from "../parsers/xmlui-parser";
+import { useAppContext } from "./AppContext";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -115,81 +116,9 @@ export function InspectorProvider({
     mockApi,
   ]);
 
-  const serializedNode = useMemo(() => {
-    if (!inspectedNode) {
-      return "";
-    }
-    const xmluiHelper = new XmlUiHelper();
-    const fragment = xmluiHelper.transformComponentDefinition(inspectedNode);
-    return xmluiHelper.serialize(fragment);
-  }, [inspectedNode]);
-
-  const components = useMemo<string[]>(() => {
-    if (!projectCompilation) {
-      return [];
-    }
-    return projectCompilation.components.map((component) => {
-      return component.markupSource;
-    })
-  }, [projectCompilation]);
-
-  const value = useMemo(() => {
-    const compSrc = inspectedNode?.debug?.source;
-
-    if (!compSrc) {
-      return "";
-    }
-    if (!sources) {
-      return "";
-    }
-    const { start, end, fileId } = compSrc;
-    const slicedSrc = sources[fileId].slice(start, end);
-
-    let dropEmptyLines = true;
-    const prunedLines: Array<string> = [];
-    let trimBeginCount: number | undefined = undefined;
-    slicedSrc.split("\n").forEach((line) => {
-      if (line.trim() === "" && dropEmptyLines) {
-        //drop empty lines from the beginning
-        return;
-      } else {
-        dropEmptyLines = false;
-        prunedLines.push(line);
-        const startingWhiteSpaces = line.search(/\S|$/);
-        if (
-          line.trim() !== "" &&
-          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
-        ) {
-          trimBeginCount = startingWhiteSpaces;
-        }
-      }
-    });
-    return prunedLines
-      .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
-      .join("\n");
-  }, [inspectedNode, sources]);
-
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
-      {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
-        showCode &&
-        inspectedNode !== null && (
-          <InspectorDialog isOpen={showCode} setIsOpen={setShowCode} clickPosition={clickPosition}>
-            <AppWithCodeViewNative
-              height={"500px"}
-              allowPlaygroundPopup
-              splitView={true}
-              markdown={`\`\`\`xmlui
-${value}
-\`\`\``
-              }
-              api={mockApi}
-              app={value}
-              components={components}
-            />
-          </InspectorDialog>
-        )}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {

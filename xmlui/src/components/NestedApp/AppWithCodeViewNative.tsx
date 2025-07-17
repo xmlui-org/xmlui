@@ -35,6 +35,8 @@ type AppWithCodeViewNativeProps = {
   noHeader?: boolean;
   immediate?: boolean;
   withSplashScreen?: boolean;
+  closeButton?: ReactNode;
+  controlsWidth?: string | number;
 };
 
 /**
@@ -57,7 +59,9 @@ export function AppWithCodeViewNative({
   height,
   allowPlaygroundPopup,
   withSplashScreen,
-  immediate
+  immediate,
+  closeButton = null,
+  controlsWidth,
 }: AppWithCodeViewNativeProps): ReactNode {
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const appContext = useAppContext();
@@ -102,7 +106,7 @@ export function AppWithCodeViewNative({
               {!splitView && <span className={styles.headerText}>{title}</span>}
               {splitView && (
                 <>
-                  <div className={styles.wrapper}>
+                  <div className={styles.wrapper} style={{ width: controlsWidth }}>
                     <Logo className={styles.logo} />
                   </div>
                   <div className={styles.viewControls}>
@@ -127,7 +131,7 @@ export function AppWithCodeViewNative({
                   </div>
                 </>
               )}
-              <div className={styles.wrapper}>
+              <div className={styles.wrapper} style={{ width: controlsWidth }}>
                 {allowPlaygroundPopup && (
                   <Tooltip
                     trigger={
@@ -157,11 +161,14 @@ export function AppWithCodeViewNative({
                   }
                   label="Reset the app"
                 />
+                {closeButton}
               </div>
             </div>
           )}
           <div className={styles.contentContainer}>
-            <Markdown className={classnames(styles.splitViewMarkdown, { [styles.hidden]: !showCode })}>
+            <Markdown
+              className={classnames(styles.splitViewMarkdown, { [styles.hidden]: !showCode })}
+            >
               {markdown}
             </Markdown>
             <IndexAwareNestedApp

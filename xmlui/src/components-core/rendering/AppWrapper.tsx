@@ -21,6 +21,7 @@ import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { LoggerProvider } from "../../logging/LoggerContext";
 import { LoggerInitializer } from "../../logging/LoggerInitializer";
 import type { ProjectCompilation } from "../../abstractions/scripting/Compilation";
+import { ComponentViewer } from "../ComponentViewer";
 
 export type TrackContainerHeight = "auto" | "fixed";
 export type AppWrapperProps = {
@@ -92,7 +93,7 @@ export type AppWrapperProps = {
 
   children?: ReactNode;
 
-  onInit?: ()=>void;
+  onInit?: () => void;
 };
 
 /**
@@ -162,6 +163,7 @@ export const AppWrapper = ({
                   debugEnabled={debugEnabled}
                   trackContainerHeight={trackContainerHeight}
                 >
+                  <ComponentViewer />
                   {children}
                 </AppContent>
               </ConfirmationModalContextProvider>
@@ -175,7 +177,9 @@ export const AppWrapper = ({
   // --- Select the router type for the app
   const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
-  const shouldSkipClientRouter = previewMode ? false : (typeof window === "undefined" || process.env.VITE_REMIX);
+  const shouldSkipClientRouter = previewMode
+    ? false
+    : typeof window === "undefined" || process.env.VITE_REMIX;
 
   return (
     <React.StrictMode>
@@ -186,7 +190,9 @@ export const AppWrapper = ({
 
           {/* Wrap the app in a router in other cases */}
           {!shouldSkipClientRouter && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+            <Router basename={Router === HashRouter ? undefined : baseName}>
+              {dynamicChildren}
+            </Router>
           )}
         </QueryClientProvider>
       </ErrorBoundary>
