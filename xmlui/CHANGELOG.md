@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.81
+
+### Patch Changes
+
+- 59680b7: Allow configuring the initiallyShowCode flag in ComponentViewer
+
 ## 0.9.80
 
 ### Patch Changes
