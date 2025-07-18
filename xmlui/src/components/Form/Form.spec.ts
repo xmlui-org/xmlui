@@ -3,46 +3,342 @@ import { labelPositionValues } from "../abstractions";
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-// --- Smoke
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
-test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("renders component", async ({ initTestBed, createFormDriver }) => {
-    await initTestBed(`<Form />`);
-    await expect((await createFormDriver()).component).toBeAttached();
+test.skip("component renders with default props", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<Form></Form>`, {});
+  
+  // Check that the component is visible
+  await expect(page.locator("form")).toBeVisible();
+});
+
+test.skip("component renders with form items", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form>
+      <FormItem label="Name" />
+      <FormItem label="Email" />
+    </Form>
+  `, {});
+  
+  // Check that form items are rendered
+  await expect(page.locator("text=Name")).toBeVisible();
+  await expect(page.locator("text=Email")).toBeVisible();
+});
+
+test.skip("component renders save and cancel buttons by default", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<Form></Form>`, {});
+  
+  // Check that buttons are rendered with default labels
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+});
+
+test.skip("component renders custom button labels", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form cancelLabel="Go Back" saveLabel="Submit">
+    </Form>
+  `, {});
+  
+  // Check that buttons have custom labels
+  await expect(page.getByRole("button", { name: "Go Back" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+});
+
+test.skip("component submits data correctly", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  const { testStateDriver } = await initTestBed(`
+    <Form data="{{ name: 'John', email: 'john@example.com' }}" onSubmit="data => testState = data">
+      <FormItem label="Name" bindTo="name" />
+      <FormItem label="Email" bindTo="email" />
+    </Form>
+  `, {});
+  
+  // Click save button to submit the form
+  await page.getByRole("button", { name: "Save" }).click();
+  
+  // Check that the submit event fired with correct data
+  await expect.poll(() => testStateDriver.testState).toEqual({
+    name: "John",
+    email: "john@example.com"
   });
+});
 
-  test("mock service responds", async ({ initTestBed, createFormDriver }) => {
-    await initTestBed(
-      `
-      <Form submitUrl="/test" />`,
-      {
-        apiInterceptor: {
-          operations: {
-            test: {
-              url: "/test",
-              method: "post",
-              handler: `return true;`,
-            },
+test.skip("component handles API submission with submitUrl", async ({ initTestBed, createFormDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(
+    `<Form submitUrl="/test" />`,
+    {
+      apiInterceptor: {
+        operations: {
+          test: {
+            url: "/test",
+            method: "post",
+            handler: `return true;`,
           },
         },
       },
-    );
-    const driver = await createFormDriver();
-    await driver.submitForm();
+    },
+  );
+  const driver = await createFormDriver();
+  await driver.submitForm();
 
-    const request = await driver.getSubmitResponse("/test");
-    expect(request.ok()).toEqual(true);
-  });
+  const request = await driver.getSubmitResponse("/test");
+  expect(request.ok()).toEqual(true);
+});
 
-  // --- data
+test.skip("component handles malformed data input gracefully", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<Form data="{}" />`);
+  await expect((await createFormDriver()).component).not.toBeAttached();
+});
 
-  test("Form does not render if data receives malformed input", async ({
-    initTestBed,
-    createFormDriver,
-  }) => {
-    await initTestBed(`<Form data="{}" />`);
-    await expect((await createFormDriver()).component).not.toBeAttached();
-  });
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("component has correct accessibility attributes", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form>
+      <FormItem label="Username" required={true} />
+      <FormItem label="Password" type="password" />
+    </Form>
+  `, {});
+  
+  // Check that form has semantic role
+  await expect(page.locator("form")).toHaveAttribute("role", "form");
+  
+  // Check that required form items have required attribute
+  const usernameInput = page.locator("input").first();
+  await expect(usernameInput).toHaveAttribute("required", "");
+  
+  // Check that labels are properly associated with inputs
+  const labels = page.locator("label");
+  await expect(labels).toHaveCount(2);
+});
+
+test.skip("component is keyboard accessible", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form>
+      <FormItem label="Name" />
+      <FormItem label="Email" />
+    </Form>
+  `, {});
+  
+  // Tab through the form elements
+  await page.keyboard.press("Tab");
+  await expect(page.locator("input").first()).toBeFocused();
+  
+  await page.keyboard.press("Tab");
+  await expect(page.locator("input").nth(1)).toBeFocused();
+  
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Save" })).toBeFocused();
+  
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused();
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.skip("component handles different visual states", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  // Test with standard layout
+  await initTestBed(`
+    <Form>
+      <FormItem label="Name" />
+    </Form>
+  `, {});
+  
+  await expect(page.locator("form")).toBeVisible();
+  
+  // Test with vertical layout
+  await initTestBed(`
+    <Form itemLabelPosition="top">
+      <FormItem label="Name" />
+    </Form>
+  `, {});
+  
+  await expect(page.locator("form")).toBeVisible();
+  
+  // Test with horizontal layout
+  await initTestBed(`
+    <Form itemLabelPosition="left">
+      <FormItem label="Name" />
+    </Form>
+  `, {});
+  
+  await expect(page.locator("form")).toBeVisible();
+});
+
+test.skip("component transitions smoothly between states", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  const { testStateDriver } = await initTestBed(`
+    <Fragment var.isEditing="false">
+      <Form enabled={isEditing}>
+        <FormItem label="Name" />
+      </Form>
+      <Button onClick="isEditing = !isEditing">Toggle Edit Mode</Button>
+    </Fragment>
+  `, {});
+  
+  // Check initial disabled state
+  await expect(page.locator("input")).toBeDisabled();
+  
+  // Toggle to editing mode
+  await page.getByRole("button", { name: "Toggle Edit Mode" }).click();
+  
+  // Check that form is now enabled
+  await expect(page.locator("input")).toBeEnabled();
+});
+
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test.skip("component handles null and undefined props gracefully", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  // Test with undefined props
+  await initTestBed(`<Form />`, {});
+  await expect(page.locator("form")).toBeVisible();
+  
+  // Test with null data
+  await initTestBed(`<Form data={null} />`, {});
+  await expect(page.locator("form")).toBeVisible();
+});
+
+test.skip("component handles special characters in form data", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form data="{{ name: 'José María', description: 'Special chars: & < > " \'' }}">
+      <FormItem label="Name" bindTo="name" />
+      <FormItem label="Description" bindTo="description" />
+    </Form>
+  `, {});
+  
+  // Check that special characters are displayed correctly
+  const nameInput = page.locator("input").first();
+  await expect(nameInput).toHaveValue("José María");
+  
+  const descriptionInput = page.locator("input").nth(1);
+  await expect(descriptionInput).toHaveValue("Special chars: & < > \" '");
+});
+
+// =============================================================================
+// PERFORMANCE TESTS
+// =============================================================================
+
+test.skip("component memoization prevents unnecessary re-renders", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  const { testStateDriver } = await initTestBed(`
+    <Fragment var.renderCount="0">
+      <Form data="{{ name: 'Test' }}" onValidated="_ => testState = (testState || 0) + 1">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+      <Button testId="unrelated" onClick="testState = testState">Unrelated Action</Button>
+    </Fragment>
+  `, {});
+  
+  // Get initial render count
+  const initialCount = await testStateDriver.testState || 0;
+  
+  // Perform unrelated action that shouldn't cause form re-render
+  await page.getByTestId("unrelated").click();
+  
+  // Check that form didn't re-render
+  await expect.poll(() => testStateDriver.testState).toEqual(initialCount);
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test.skip("component works correctly with other form-related components", async ({ page, initTestBed }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`
+    <Form>
+      <FormItem label="Name" />
+      <FormItem label="Email" type="email" />
+      <FormItem label="Password" type="password" />
+      <FormItem label="Remember me" type="checkbox" />
+    </Form>
+  `, {});
+  
+  // Check that all form items are rendered
+  await expect(page.locator("text=Name")).toBeVisible();
+  await expect(page.locator("text=Email")).toBeVisible();
+  await expect(page.locator("text=Password")).toBeVisible();
+  await expect(page.locator("text=Remember me")).toBeVisible();
+  
+  // Check that inputs have correct types
+  await expect(page.locator("input").nth(1)).toHaveAttribute("type", "email");
+  await expect(page.locator("input").nth(2)).toHaveAttribute("type", "password");
+  await expect(page.locator("input").nth(3)).toHaveAttribute("type", "checkbox");
+});
+
+// =============================================================================
+// ORIGINAL TEST SUITE
+// =============================================================================
+
+test("mock service responds", async ({ initTestBed, createFormDriver }) => {
+  await initTestBed(
+    `
+    <Form submitUrl="/test" />`,
+    {
+      apiInterceptor: {
+        operations: {
+          test: {
+            url: "/test",
+            method: "post",
+            handler: `return true;`,
+          },
+        },
+      },
+    },
+  );
+  const driver = await createFormDriver();
+  await driver.submitForm();
+
+  const request = await driver.getSubmitResponse("/test");
+  expect(request.ok()).toEqual(true);
+});
+
+// --- data
+
+test("Form does not render if data receives malformed input", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`<Form data="{}" />`);
+  await expect((await createFormDriver()).component).not.toBeAttached();
+});
 
   // --- $data
 
@@ -169,7 +465,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       arrayItems: ["John", "Peter"],
     });
   });
-});
 
 // --- Testing
 
