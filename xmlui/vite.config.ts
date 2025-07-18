@@ -89,13 +89,14 @@ export default ({ mode }) => {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
           mode === "standalone"
-            ? []
+            ? ["scheduler"] // Add scheduler as external even in standalone mode
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime"],
         output: {
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
             "react/jsx-runtime": "react/jsx-runtime",
+            scheduler: "scheduler", // Add scheduler global mapping
           },
         },
       },
