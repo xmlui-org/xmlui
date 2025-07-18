@@ -5,10 +5,13 @@ import { useDevTools } from "./InspectorContext";
 import { Tooltip } from "../components/NestedApp/Tooltip";
 import styles from "../components/NestedApp/NestedApp.module.scss";
 import { AiOutlineClose } from "react-icons/ai";
+import { useAppContext } from "./AppContext";
 
 export const ComponentViewer = () => {
   const { mockApi, setIsOpen, isOpen, inspectedNode, clickPosition, projectCompilation, sources } =
     useDevTools();
+
+  const { appGlobals } = useAppContext();
 
   const components = useMemo<string[]>(() => {
     if (!projectCompilation) {
@@ -62,6 +65,7 @@ export const ComponentViewer = () => {
       <AppWithCodeViewNative
         height={"500px"}
         allowPlaygroundPopup
+        initiallyShowCode={appGlobals?.initiallyShowCode ?? true}
         splitView={true}
         controlsWidth={"120px"}
         closeButton={
