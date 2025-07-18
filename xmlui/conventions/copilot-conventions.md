@@ -337,6 +337,21 @@ By following these conventions, we ensure consistent implementation and document
 
 XMLUI components require comprehensive end-to-end testing using Playwright to ensure reliability, accessibility, and performance. This convention establishes patterns for creating thorough test suites that cover all aspects of component behavior, from basic functionality to edge cases and performance optimizations.
 
+### Component Test Location Map
+
+| Component Type | Component Location | Test File Location |
+| -------------- | ----------------- | ----------------- |
+| Standard Components | `/xmlui/src/components/ComponentName/ComponentName.tsx` | `/xmlui/src/components/ComponentName/ComponentName.spec.ts` |
+| Container Components | `/xmlui/src/components/Container/Container.tsx` | `/xmlui/src/components/Container/Container.spec.ts` |
+| Form Components | `/xmlui/src/components/FormControl/FormControl.tsx` | `/xmlui/src/components/FormControl/FormControl.spec.ts` |
+
+**Critical Rules for Test Creation:**
+1. ✅ ALL component tests MUST be placed in the same folder as the component itself
+2. ✅ ALL newly created tests MUST use the `.skip` modifier
+3. ✅ Each skipped test MUST include the comment: `// TODO: review these Copilot-created tests`
+4. ❌ NEVER place tests in the global test directory (`/tests/tests/`)
+5. ❌ NEVER create non-skipped tests for new components
+
 ### Convention Rules
 
 1. **Test Structure and Organization**:
@@ -503,77 +518,505 @@ test("component works correctly in different layout contexts", async ({ initTest
 });
 ```
 
-### Test Execution and Verification
+### Component-Specific Testing Considerations
 
-1. **Run Tests with Playwright**:
-   ```bash
-   npx playwright test ComponentName.spec.ts
-   ```
-
-2. **Test Specific Categories**:
-   ```bash
-   npx playwright test ComponentName.spec.ts --grep "accessibility"
-   npx playwright test ComponentName.spec.ts --grep "edge case"
-   npx playwright test ComponentName.spec.ts --grep "performance"
-   ```
-
-3. **Parallel Test Execution**:
-   - Tests should be designed to run in parallel without conflicts
-   - Use proper test isolation and cleanup
-   - Verify test results with multiple workers
-
-### Common Testing Patterns
-
-1. **Theme Variable Testing**:
+#### Container Components (like Accordion)
+1. **Expansion State Testing**:
    ```typescript
-   test("component applies theme variables correctly", async ({ initTestBed, createComponentDriver }) => {
-     await initTestBed(`<ComponentName name="Theme Test"/>`, {
+   test("component expands and collapses correctly", async ({ initTestBed, createAccordionDriver }) => {
+     await initTestBed(`<Accordion><AccordionItem header="Test">Content</AccordionItem></Accordion>`, {});
+     const driver = await createAccordionDriver();
+     
+     // Test initial collapsed state
+     let content = driver.component.locator(".accordion-content");
+     await expect(content).not.toBeVisible();
+     
+     // Click to expand
+     const header = driver.component.locator(".accordion-header");
+     await header.click();
+     
+     // Test expanded state
+     await expect(content).toBeVisible();
+     
+     // Click to collapse
+     await header.click();
+     
+     // Test collapsed state again
+     await expect(content).not.toBeVisible();
+   });
+   ```
+
+2. **Multiple Item Testing**:
+   ```typescript
+   test("multiple items can expand independently", async ({ initTestBed, createAccordionDriver }) => {
+     await initTestBed(`
+       <Accordion>
+         <AccordionItem header="Item 1">Content 1</AccordionItem>
+         <AccordionItem header="Item 2">Content 2</AccordionItem>
+       </Accordion>
+     `, {});
+     
+     const driver = await createAccordionDriver();
+     const headers = driver.component.locator(".accordion-header").all();
+     
+     // Expand first item
+     await (await headers)[0].click();
+     
+     // Verify first expanded, second collapsed
+     let contents = driver.component.locator(".accordion-content").all();
+     await expect((await contents)[0]).toBeVisible();
+     await expect((await contents)[1]).not.toBeVisible();
+   });
+   ```
+
+3. **Component API Testing**:
+   ```typescript
+   test("component API methods work correctly", async ({ initTestBed, createAccordionDriver, page }) => {
+     const { testStateDriver } = await initTestBed(`
+       <Accordion ref="accordionRef">
+         <AccordionItem header="API Test">Content</AccordionItem>
+       </Accordion>
+       <Button id="expandBtn" onClick="accordionRef.expand('0'); testState = 'expanded'">Expand</Button>
+     `, {});
+     
+     const driver = await createAccordionDriver();
+     
+     // Test API method
+     await page.locator("#expandBtn").click();
+     await expect.poll(testStateDriver.testState).toEqual('expanded');
+     
+     // Verify component state changed
+     const content = driver.component.locator(".accordion-content");
+     await expect(content).toBeVisible();
+   });
+   ```
+
+4. **Icon Rendering Testing**:
+   ```typescript
+   test("component displays custom icons", async ({ initTestBed, createAccordionDriver }) => {
+     await initTestBed(`
+       <Accordion collapsedIcon="plus" expandedIcon="minus">
+         <AccordionItem header="Custom Icons">Content</AccordionItem>
+       </Accordion>
+     `, {});
+     
+     const driver = await createAccordionDriver();
+     
+     // Check collapsed icon
+     const icon = driver.component.locator(".chevron");
+     await expect(icon).toHaveAttribute("data-icon-name", "plus");
+     
+     // Expand and check expanded icon
+     const header = driver.component.locator(".accordion-header");
+     await header.click();
+     await expect(icon).toHaveAttribute("data-icon-name", "minus");
+   });
+   ```
+
+#### Components With Custom Templates
+
+1. **Custom Template Rendering**:
+   ```typescript
+   test("component renders custom templates correctly", async ({ initTestBed, createComponentDriver }) => {
+     await initTestBed(`
+       <ComponentName headerTemplate={
+         <div>
+           <Icon name="star" />
+           <Text fontWeight="bold">Custom Template</Text>
+         </div>
+       }>
+         Content
+       </ComponentName>
+     `, {});
+     
+     const driver = await createComponentDriver();
+     
+     // Verify template elements rendered correctly
+     await expect(driver.component.locator("svg[data-icon-name='star']")).toBeVisible();
+     await expect(driver.component.locator("text=Custom Template")).toBeVisible();
+   });
+   ```
+
+#### Testing Theme Variables
+
+1. **Theme Variable Application Testing**:
+   ```typescript
+   test("applies theme variables to specific element parts", async ({ initTestBed, createComponentDriver }) => {
+     await initTestBed(`<ComponentName />`, {
+       testThemeVars: {
+         "backgroundColor-header-ComponentName": "rgb(255, 0, 0)",
+         "color-content-ComponentName": "rgb(0, 255, 0)",
+       },
+     });
+     
+     const driver = await createComponentDriver();
+     
+     // Check styles applied to specific component parts
+     await expect(driver.component.locator(".header")).toHaveCSS("background-color", "rgb(255, 0, 0)");
+     await expect(driver.component.locator(".content")).toHaveCSS("color", "rgb(0, 255, 0)");
+   });
+   ```
+
+2. **Border and Padding Theme Variables**:
+   ```typescript
+   test("applies border and padding theme variables correctly", async ({ initTestBed, createComponentDriver }) => {
+     await initTestBed(`<ComponentName />`, {
+       testThemeVars: {
+         "border-ComponentName": "1px solid rgb(255, 0, 0)",
+         "padding-ComponentName": "10px",
+       },
+     });
+     
+     const driver = await createComponentDriver();
+     
+     // Check border properties
+     await expect(driver.component).toHaveCSS("border-width", "1px");
+     await expect(driver.component).toHaveCSS("border-style", "solid");
+     await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+     
+     // Check padding
+     await expect(driver.component).toHaveCSS("padding", "10px");
+   });
+   ```
+
+3. **Border Side-Specific Theme Variables**:
+   ```typescript
+   test("prioritizes specific border sides over general border", async ({ initTestBed, createComponentDriver }) => {
+     await initTestBed(`<ComponentName />`, {
+       testThemeVars: {
+         "border-ComponentName": "1px solid rgb(0, 0, 0)",
+         "borderLeft-ComponentName": "2px dashed rgb(255, 0, 0)",
+       },
+     });
+     
+     const driver = await createComponentDriver();
+     
+     // Check general borders applied to most sides
+     await expect(driver.component).toHaveCSS("border-top-width", "1px");
+     await expect(driver.component).toHaveCSS("border-right-width", "1px");
+     await expect(driver.component).toHaveCSS("border-bottom-width", "1px");
+     
+     // Check specific side override
+     await expect(driver.component).toHaveCSS("border-left-width", "2px");
+     await expect(driver.component).toHaveCSS("border-left-style", "dashed");
+     await expect(driver.component).toHaveCSS("border-left-color", "rgb(255, 0, 0)");
+   });
+   ```
+
+### Test Name and Organization Patterns
+
+1. **Naming Components Tests by Feature**:
+   - Avoid: `"test component with value X"`
+   - Prefer: `"renders with size=small correctly"`
+
+2. **Naming Pattern for Behavior Tests**:
+   - `"{verb} {feature} {when/with} {condition}"`
+   - Examples: 
+     - `"expands when header is clicked"`
+     - `"applies red background with danger prop"`
+     - `"renders placeholder when value is empty"`
+
+3. **Naming Pattern for Property Tests**:
+   - `"prioritizes {specific-prop} over {general-prop}"`
+   - `"applies {style} to {component-part} with {theme-var}"`
+   - Examples:
+     - `"prioritizes borderLeftWidth over borderWidth"`
+     - `"applies padding to all sides with padding theme var"`
+
+4. **Test Organization Patterns**:
+   ```typescript
+   // =============================================================================
+   // BASIC FUNCTIONALITY TESTS
+   // =============================================================================
+   
+   test("renders with basic props", async () => {});
+   test("updates display when props change", async () => {});
+   
+   // =============================================================================
+   // ACCESSIBILITY TESTS
+   // =============================================================================
+   
+   test("has correct accessibility attributes", async () => {});
+   test("is keyboard accessible when interactive", async () => {});
+   
+   // =============================================================================
+   // VISUAL STATE TESTS
+   // =============================================================================
+   
+   test("applies theme variables correctly", async () => {});
+   test("handles different visual states", async () => {});
+   
+   // =============================================================================
+   // EDGE CASE TESTS
+   // =============================================================================
+   
+   test("handles null and undefined props gracefully", async () => {});
+   test("handles special characters correctly", async () => {});
+   
+   // =============================================================================
+   // PERFORMANCE TESTS
+   // =============================================================================
+   
+   test("memoization prevents unnecessary re-renders", async () => {});
+   
+   // =============================================================================
+   // INTEGRATION TESTS
+   // =============================================================================
+   
+   test("works correctly in different layout contexts", async () => {});
+   ```
+
+By following these conventions, XMLUI components will have comprehensive, reliable, and maintainable end-to-end test suites that ensure quality and performance across all scenarios.
+
+### Skipped Test Creation Convention
+
+When creating skeleton tests for components, follow these guidelines to ensure consistency and maintainability across the test suite. These tests provide a roadmap for future implementation while maintaining a clear structure.
+
+#### Convention Rules (CRITICAL)
+
+1. **Test Structure Organization**:
+   - Organize existing tests into appropriate categories (Basic Functionality, Accessibility, etc.)
+   - Maintain clear section separators with consistent formatting
+   - Keep related tests grouped together within their sections
+
+2. **Test Naming Conventions**:
+   - Rename existing tests to follow naming conventions (as described in Test Name and Organization Patterns)
+   - Use descriptive, action-oriented names that clearly indicate what's being tested
+   - Be specific about the behavior or prop being verified
+
+3. **Skipped Test Creation** (MANDATORY):
+   - ✅ ALL newly created tests MUST be skipped using the `.skip` modifier
+   - ✅ ALWAYS include the standard TODO comment: `// TODO: review these Copilot-created tests`
+   - ✅ Implement a complete test body that follows test patterns for that category
+   - ❌ NEVER create non-skipped tests when adding skeleton tests to components
+
+4. **Complete Implementation**:
+   - Even in skipped tests, provide a complete implementation
+   - Include proper assertions that verify the expected behavior
+   - Structure the test to provide a clear example of how it should work when enabled
+
+#### Implementation Process
+
+1. **Organize Tests by Category**:
+   ```typescript
+   // =============================================================================
+   // BASIC FUNCTIONALITY TESTS
+   // =============================================================================
+
+   // (Basic tests here)
+
+   // =============================================================================
+   // ACCESSIBILITY TESTS
+   // =============================================================================
+
+   // (Accessibility tests here)
+   ```
+
+2. **Rename Existing Tests with Clear Patterns**:
+   - Before: `test("component test", async () => {...})`
+   - After: `test("renders with size={size} correctly", async () => {...})`
+
+3. **Add Skipped Tests with TODO Comments**:
+   ```typescript
+   test.skip("component applies correct theme variables", async ({ initTestBed, createComponentDriver }) => {
+     // TODO: review these Copilot-created tests
+     
+     await initTestBed(`<ComponentName />`, {
        testThemeVars: {
          "backgroundColor-ComponentName": "rgb(255, 0, 0)",
        },
      });
-     const driver = await createComponentDriver();
      
+     const driver = await createComponentDriver();
      await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
    });
    ```
 
-2. **CSS Property Verification**:
+4. **Implement Complete Test Bodies**:
    ```typescript
-   // Use specific CSS values and handle browser normalization
-   await expect(component).toHaveCSS("box-shadow", "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px");
-   ```
-
-3. **Event Handling Testing**:
-   ```typescript
-   test("component handles events correctly", async ({ initTestBed, createComponentDriver }) => {
+   test.skip("handles keyboard navigation correctly", async ({ initTestBed, createComponentDriver }) => {
+     // TODO: review these Copilot-created tests
+     
      const { testStateDriver } = await initTestBed(`
-       <ComponentName onClick="testState = 'clicked'"/>
+       <ComponentName 
+         onKeyDown="testState = 'key-pressed'"
+       />
      `, {});
      
      const driver = await createComponentDriver();
-     await driver.component.click();
      
-     await expect.poll(testStateDriver.testState).toEqual('clicked');
+     // Focus the component
+     await driver.component.focus();
+     await expect(driver.component).toBeFocused();
+     
+     // Test keyboard interaction
+     await driver.component.press('Enter');
+     await expect.poll(testStateDriver.testState).toEqual('key-pressed');
    });
    ```
 
-### Testing Best Practices
+#### Example Test Suite with Skipped Tests
 
-1. **Test Isolation**: Each test should be independent and not rely on other tests
-2. **Descriptive Names**: Use clear, descriptive test names that explain the behavior being tested
-3. **Comprehensive Coverage**: Cover all props, states, and edge cases
-4. **Performance Awareness**: Include tests for performance-critical scenarios
-5. **Accessibility Focus**: Always include accessibility testing
-6. **Error Handling**: Test error conditions and graceful degradation
-7. **Cross-Browser Compatibility**: Ensure tests work across different browsers
+```typescript
+import { test, expect } from '@playwright/test';
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test("renders with default props", async ({ initTestBed, createComponentDriver }) => {
+  await initTestBed(`<ComponentName />`, {});
+  const driver = await createComponentDriver();
+  await expect(driver.component).toBeVisible();
+});
+
+test.skip("updates display when prop changes", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  // Test with initial prop
+  await initTestBed(`<ComponentName value="initial" />`, {});
+  let driver = await createComponentDriver();
+  await expect(driver.component).toContainText("initial");
+  
+  // Test with updated prop
+  await initTestBed(`<ComponentName value="updated" />`, {});
+  driver = await createComponentDriver();
+  await expect(driver.component).toContainText("updated");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("has correct accessibility attributes", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName label="Accessible Component" />`, {});
+  const driver = await createComponentDriver();
+  
+  await expect(driver.component).toHaveAttribute('role', 'button');
+  await expect(driver.component).toHaveAttribute('aria-label', 'Accessible Component');
+  await expect(driver.component).toHaveAttribute('tabindex', '0');
+});
+```
+
+### Best Practices for Skipped Tests
+
+1. **Clear Reasoning**: The skipped test should clearly indicate why it's important to implement later
+2. **Full Implementation**: Implement the complete test body, not just a placeholder
+3. **Readable Examples**: Make the test easy to understand for developers who will enable it later
+4. **Descriptive Names**: Use clear test names that explain exactly what behavior is being tested
+5. **Proper Isolation**: Each skipped test should be independent of other tests
+6. **Comprehensive Coverage**: Create skipped tests for all important functionality, even if it's not implemented yet
 
 ### Common Mistakes to Avoid
 
-1. **Skipping Edge Cases**: Don't skip tests for null/undefined props or unusual inputs
-2. **Ignoring Accessibility**: Always include accessibility testing in your test suite
-3. **Performance Blindness**: Don't forget to test performance-critical scenarios
-4. **Test Interdependence**: Avoid tests that depend on the execution order or state from other tests
-5. **Incomplete Coverage**: Ensure all component props and behaviors are tested
+1. **Empty Test Bodies**: Don't create skipped tests without implementing the test body
+2. **Missing Comments**: Always include the TODO comment explaining these are Copilot-created tests
+3. **Vague Names**: Avoid generic test names like "test component behavior"
+4. **Untestable Assertions**: Don't make assertions that can't be tested with the current implementation
+5. **Incomplete Categories**: Make sure all required test categories (accessibility, etc.) are represented
 
-By following these conventions, XMLUI components will have comprehensive, reliable, and maintainable end-to-end test suites that ensure quality and performance across all scenarios.
+By following these conventions for skipped tests, you create a valuable roadmap for future test implementation while maintaining a clear and organized test structure. This approach helps ensure comprehensive test coverage even when all tests aren't immediately ready to run.
+
+### Test File Location Conventions (CRITICAL)
+
+When creating component tests, follow these location conventions:
+
+1. **Component-Level Test Location** (MANDATORY):
+   - ✅ Test files MUST be located in the same directory as the component being tested
+   - ✅ Use the naming convention `ComponentName.spec.ts` for test files
+   - ✅ Example: For a component defined in `/components/Button/Button.tsx`, the test MUST be at `/components/Button/Button.spec.ts`
+   - ❌ NEVER place test files in the global test directory (`/tests/tests/`)
+
+2. **Test Import Paths**:
+   - Import test utilities from the testing directory:
+     ```typescript
+     import { expect, test } from "../../testing/fixtures";
+     import { getElementStyle } from "../../testing/component-test-helpers";
+     ```
+   - Adjust import paths based on the relative location of the component and testing utilities
+
+3. **Component Driver Parameters**:
+   - Use the appropriate fixture parameters based on component needs:
+     ```typescript
+     test.skip("basic test", async ({ initTestBed, createComponentDriver }) => {
+       // For components with component drivers
+     });
+     ```
+
+4. **Test Execution Context**:
+   - Tests should be executed from the component's directory
+   - Run specific component tests with: `npx playwright test ComponentName.spec.ts`
+   - Test runners will automatically locate tests in the component directories
+
+This location convention ensures tests are closely associated with their components, making the codebase easier to maintain and navigate. It also simplifies the process of finding and updating tests when component implementations change.
+
+### Test Execution and Verification
+
+### Proper Test File Structure Example
+
+Below is an example of a correctly structured skeleton test file for a component. Note that ALL tests are marked with `.skip` and include the required TODO comment:
+
+```typescript
+import { test, expect } from "../../testing/fixtures";
+import { getElementStyle } from "../../testing/component-test-helpers";
+
+// Constants for testing
+const RED = "rgb(255, 0, 0)";
+const GREEN = "rgb(0, 255, 0)";
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.skip("component renders with basic props", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName prop="value"/>`);
+  const driver = await createComponentDriver();
+  
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).toContainText("Expected Content");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("component has correct accessibility attributes", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName label="Accessible Label"/>`);
+  const driver = await createComponentDriver();
+  
+  await expect(driver.component).toHaveAttribute('role', 'button');
+  await expect(driver.component).toHaveAttribute('aria-label', 'Accessible Label');
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.skip("component applies theme variables correctly", async ({ initTestBed, createComponentDriver }) => {
+  // TODO: review these Copilot-created tests
+  
+  await initTestBed(`<ComponentName />`, {
+    testThemeVars: {
+      "backgroundColor-ComponentName": RED,
+    },
+  });
+  
+  const driver = await createComponentDriver();
+  await expect(driver.component).toHaveCSS("background-color", RED);
+});
+
+// All remaining test categories follow the same pattern...
+```
+
+This example shows the proper structure with:
+1. Correct imports from the testing directory
+2. Section separators for test categories
+3. ALL tests marked with `.skip`
+4. Required TODO comment in each test
+5. Proper test implementation following the patterns
