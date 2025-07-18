@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.80
+
+### Patch Changes
+
+- 4598566: NumberBox and FromItem type="number" accepts numeric string as initialValue
+- 14e6a7d: feat: add splitView to code inspection
+- cf05bd2: Fix non-fatal StandaloneApp.tsx issue
+
 ## 0.9.79
 
 ### Patch Changes
