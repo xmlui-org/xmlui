@@ -362,6 +362,7 @@ export function AppContent({
       mediaSize,
       queryClient,
       standalone,
+      appIsInShadowDom: root?.getRootNode() instanceof ShadowRoot,
 
       // --- Date-related
       ...dateFunctions,
@@ -426,6 +427,7 @@ export function AppContent({
     embed,
     apiInterceptorContext,
     forceRefreshAnchorScroll,
+    root,
   ]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages

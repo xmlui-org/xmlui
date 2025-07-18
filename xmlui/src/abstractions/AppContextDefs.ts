@@ -58,6 +58,9 @@ export type AppContextObject = {
   // (for example, as part of a website), it returns `false`.
   standalone?: boolean;
 
+  // Indicates that the app is running in a shadow DOM.
+  appIsInShadowDom?: boolean;
+
   // ==============================================================================================
   // Date Utilities
 
