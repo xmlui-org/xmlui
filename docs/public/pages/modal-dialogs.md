@@ -94,7 +94,7 @@ When embedding a form in a dialog, the form's cancel and successful submit actio
 
 `ModalDialog` supports a few kinds of customization. For example, you can hide the close button displayed in the top-right dialog corner and add a restyled title to dialogs.
 
-```xmlui-pg display
+```xmlui-pg display height="220px"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="false">
