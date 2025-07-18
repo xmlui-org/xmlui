@@ -262,49 +262,6 @@ export const formItemComponentRenderer = createComponentRenderer(
       ...rest
     } = node.props;
 
-    //extractValue works as a memoization mechanism too (if there's nothing to resolve, it won't produce a new object every time)
-    const resolvedValidationPropsAndEvents: FormItemValidations = useMemo(
-      () => ({
-        required: extractValue.asOptionalBoolean(required),
-        requiredInvalidMessage: extractValue.asOptionalString(requiredInvalidMessage),
-        minLength: extractValue.asOptionalNumber(minLength),
-        maxLength: extractValue.asOptionalNumber(maxLength),
-        lengthInvalidMessage: extractValue.asOptionalString(lengthInvalidMessage),
-        lengthInvalidSeverity: parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity)),
-        minValue: extractValue.asOptionalNumber(minValue),
-        maxValue: extractValue.asOptionalNumber(maxValue),
-        rangeInvalidMessage: extractValue.asOptionalString(rangeInvalidMessage),
-        rangeInvalidSeverity: parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity)),
-        pattern: extractValue.asOptionalString(pattern),
-        patternInvalidMessage: extractValue.asOptionalString(patternInvalidMessage),
-        patternInvalidSeverity: parseSeverity(
-          extractValue.asOptionalString(patternInvalidSeverity),
-        ),
-        regex: extractValue.asOptionalString(regex),
-        regexInvalidMessage: extractValue.asOptionalString(regexInvalidMessage),
-        regexInvalidSeverity: parseSeverity(extractValue.asOptionalString(regexInvalidSeverity)),
-      }),
-      [
-        required,
-        requiredInvalidMessage,
-        minLength,
-        maxLength,
-        lengthInvalidMessage,
-        lengthInvalidSeverity,
-        minValue,
-        maxValue,
-        rangeInvalidMessage,
-        rangeInvalidSeverity,
-        pattern,
-        patternInvalidMessage,
-        patternInvalidSeverity,
-        regex,
-        regexInvalidMessage,
-        regexInvalidSeverity,
-        extractValue,
-      ],
-    );
-
     const nonLayoutCssProps = !layoutCss
       ? rest
       : Object.fromEntries(
@@ -320,6 +277,26 @@ export const formItemComponentRenderer = createComponentRenderer(
 
     return (
       <FormItem
+        // --- validation props
+        required={extractValue.asOptionalBoolean(required)}
+        requiredInvalidMessage={extractValue.asOptionalString(requiredInvalidMessage)}
+        minLength={extractValue.asOptionalNumber(minLength)}
+        maxLength={extractValue.asOptionalNumber(maxLength)}
+        lengthInvalidMessage={extractValue.asOptionalString(lengthInvalidMessage)}
+        lengthInvalidSeverity={parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity))}
+        minValue={extractValue.asOptionalNumber(minValue)}
+        maxValue={extractValue.asOptionalNumber(maxValue)}
+        rangeInvalidMessage={extractValue.asOptionalString(rangeInvalidMessage)}
+        rangeInvalidSeverity={parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity))}
+        pattern={extractValue.asOptionalString(pattern)}
+        patternInvalidMessage={extractValue.asOptionalString(patternInvalidMessage)}
+        patternInvalidSeverity={parseSeverity(
+          extractValue.asOptionalString(patternInvalidSeverity),
+        )}
+        regex={extractValue.asOptionalString(regex)}
+        regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
+        regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
+        //  ----
         style={layoutCss}
         layoutContext={layoutContext}
         labelBreak={extractValue.asOptionalBoolean(labelBreak)}
@@ -330,7 +307,6 @@ export const formItemComponentRenderer = createComponentRenderer(
         label={extractValue.asOptionalString(label)}
         labelPosition={extractValue.asOptionalString(labelPosition)}
         type={isCustomFormItem ? "custom" : formItemType}
-        validations={resolvedValidationPropsAndEvents}
         onValidate={lookupEventHandler("validate")}
         customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
         validationMode={extractValue.asOptionalString(validationMode)}
