@@ -11,7 +11,7 @@
             </property>
             <SpaceFiller/>
             <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
-            <ToneChangerButton/>
+            <ToneSwitch/>
         </AppHeader>
 
         <NavPanel when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
