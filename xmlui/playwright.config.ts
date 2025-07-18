@@ -62,5 +62,6 @@ export default defineConfig({
     timeout: 50 * 1000,
     port,
     reuseExistingServer: !process.env.CI,
+    cwd: process.env.CI ? __dirname : undefined,
   },
 });

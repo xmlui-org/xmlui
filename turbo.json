@@ -74,6 +74,10 @@
       "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
+    "xmlui-e2e#test:e2e-smoke": {
+      "dependsOn": ["build:test-bed", "build:xmlui-test-bed", "xmlui#test:e2e-smoke"],
+      "outputs": ["playwright-report/**"]
+    },
     "test:e2e-non-smoke": {
       "dependsOn": ["build:test-bed", "build:xmlui-test-bed", "test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
