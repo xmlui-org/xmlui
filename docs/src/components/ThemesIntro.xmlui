@@ -7,7 +7,7 @@
 We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). You can use the dropdown to switch from the default theme (`xmlui`) to one called `earthtone`. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
       ]]>
     </Markdown>
-    <HStack>
+    <HStack verticalAlignment="center">
       <Select
         id="pickTheme"
         width="30%"
@@ -17,7 +17,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
         <Option value="earthtone" label="earthtone"/>
         <Option value="docs-theme" label="xmlui"/>
       </Select>
-      <ToneChangerButton/>
+      <ToneSwitch/>
     </HStack>
     <Markdown>
       <![CDATA[

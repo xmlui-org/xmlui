@@ -26,7 +26,7 @@ Let's explore a subset of the app's navigation.
 
   </Pages>
 
-<Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
 
 </App>
 ---comp display
@@ -67,7 +67,7 @@ We've seen `vertical`, here's `horizontal`.
 
   </Pages>
 
-<Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
 
 </App>
 ---comp

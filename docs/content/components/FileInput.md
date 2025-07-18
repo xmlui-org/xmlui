@@ -226,7 +226,7 @@ This event is triggered when the FileInput has lost the focus.
 
 This method sets the focus on the FileInput.
 
-```xmlui-pg copy {2-3} display name="Example: focus"
+```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
   <HStack>
     <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
@@ -239,7 +239,7 @@ This method sets the focus on the FileInput.
 
 This API command triggers the file browsing dialog to open.
 
-```xmlui-pg copy {3-4} display name="Example: open"
+```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
   <HStack>
     <Button label="Open FileInput" onClick="fileInputComponent.open()" />
@@ -261,7 +261,7 @@ By setting an ID for the component, you can refer to the value of the field if s
 In the example below, select a file using the file browser of the `FileInput` component
 and note how the `Text` component displays the selected file's name:
 
-```xmlui-pg copy {2-3} display name="Example: value"
+```xmlui-pg copy {3-4} display name="Example: value"
 <App>
   <HStack>
     <Text value="Selected file name: {fileInputComponent.value}" />
