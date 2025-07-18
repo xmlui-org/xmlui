@@ -146,7 +146,7 @@ Each [Page](/components/Pages) is a container that binds to a route and holds XM
 
 ## Footer
 
-```xmlui-pg display name="Try clicking the Switch"
+```xmlui-pg display name="Try clicking the ToneSwitch"
 <App>
   <Footer>
     Built with XMLUI
