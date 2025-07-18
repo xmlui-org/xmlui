@@ -46,8 +46,13 @@ export async function getViteConfig({
     css: overrides.css,
     build: {
       rollupOptions: {
+        external: ["scheduler", ...(Array.isArray(overrides.build?.rollupOptions?.external) ? overrides.build?.rollupOptions?.external as string[] : [])],
         input: path.resolve(process.cwd(), "index.html"),
         output: {
+          globals: {
+            scheduler: "scheduler",
+            ...((overrides.build?.rollupOptions?.output as any)?.globals || {})
+          },
           assetFileNames: (assetInfo) => {
             const extType = assetInfo.name?.split(".").pop();
             if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType!)) {

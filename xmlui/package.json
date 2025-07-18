@@ -105,6 +105,7 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sass": "^1.89.2",
+    "scheduler": "^0.26.0",
     "scroll-into-view-if-needed": "^3.1.0",
     "shiki": "^1.14.1",
     "ts-node": "10.9.1",
