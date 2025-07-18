@@ -1,6 +1,6 @@
 import React, {
-  CSSProperties,
-  ReactNode,
+  type CSSProperties,
+  type ReactNode,
   useContext,
   useEffect,
   useMemo,
@@ -19,6 +19,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { useAppContext } from "../../components-core/AppContext";
 
 // Default props for ModalDialog component
 export const defaultProps = {
@@ -75,6 +76,7 @@ export const ModalDialogFrame = React.forwardRef(
     ) : null;
   },
 );
+ModalDialogFrame.displayName = "ModalDialogFrame";
 
 const ModalStateContext = React.createContext(null);
 
@@ -139,6 +141,8 @@ export const ModalDialog = React.forwardRef(
 
     const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
 
+    const { appIsInShadowDom } = useAppContext();
+
     useEffect(() => {
       if (isOpen) {
         modalRef.current?.focus();
@@ -168,7 +172,7 @@ export const ModalDialog = React.forwardRef(
         unRegisterForm: (id: string) => {
           registeredForms.current.delete(id);
         },
-        amITheSingleForm: (id) => {
+        amITheSingleForm: (id: string) => {
           return registeredForms.current.size === 1 && registeredForms.current.has(id);
         },
         requestClose: () => {
@@ -181,55 +185,77 @@ export const ModalDialog = React.forwardRef(
       return null;
     }
 
+    const Content = (
+      <Dialog.Content
+        className={classnames(styles.content)}
+        onPointerDownOutside={(event) => {
+          if (
+            event.target instanceof Element &&
+            event.target.closest("._debug-inspect-button") !== null
+          ) {
+            //we prevent the auto modal close on clicking the inspect button
+            event.preventDefault();
+          }
+        }}
+        ref={composedRef}
+        style={{ ...style, gap: undefined }}
+      >
+        {!!title && (
+          <Dialog.Title style={{ marginTop: 0 }}>
+            <header id="dialogTitle" className={styles.dialogTitle}>
+              {title}
+            </header>
+          </Dialog.Title>
+        )}
+        <div className={styles.innerContent} style={{ gap: style?.gap }}>
+          <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
+            {children}
+          </ModalVisibilityContext.Provider>
+        </div>
+        {closeButtonVisible && (
+          <Dialog.Close asChild={true}>
+            <Button
+              variant={"ghost"}
+              themeColor={"secondary"}
+              className={styles.closeButton}
+              aria-label="Close"
+              icon={<Icon name={"close"} size={"sm"} />}
+              orientation={"vertical"}
+            />
+          </Dialog.Close>
+        )}
+      </Dialog.Content>
+    );
+
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
         <Dialog.Portal container={root}>
-          {!fullScreen && <div className={styles.overlayBg} />}
-          <Dialog.Overlay
-            className={classnames(styles.overlay, {
-              [styles.fullScreen]: fullScreen,
-            })}
-          >
-            <Dialog.Content
-              className={classnames(styles.content)}
-              onPointerDownOutside={(event) => {
-                if (
-                  event.target instanceof Element &&
-                  event.target.closest("._debug-inspect-button") !== null
-                ) {
-                  //we prevent the auto modal close on clicking the inspect button
-                  event.preventDefault();
-                }
-              }}
-              ref={composedRef}
-              style={{ ...style, gap: undefined }}
+          {appIsInShadowDom && (
+            /*
+              In the Shadow DOM we can omit the Dialog.Overlay,
+              since we get the same result & the main content outside remains scrollable.
+            */
+            <div
+              className={classnames(styles.overlayBg, styles.nested, {
+                [styles.fullScreen]: fullScreen,
+              })}
             >
-              {!!title && (
-                <Dialog.Title style={{ marginTop: 0 }}>
-                  <header id="dialogTitle" className={styles.dialogTitle}>
-                    {title}
-                  </header>
-                </Dialog.Title>
-              )}
-              <div className={styles.innerContent} style={{ gap: style?.gap }}>
-                <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-                  {children}
-                </ModalVisibilityContext.Provider>
-              </div>
-              {closeButtonVisible && (
-                <Dialog.Close asChild={true}>
-                  <Button
-                    variant={"ghost"}
-                    themeColor={"secondary"}
-                    className={styles.closeButton}
-                    aria-label="Close"
-                    icon={<Icon name={"close"} size={"sm"} />}
-                    orientation={"vertical"}
-                  />
-                </Dialog.Close>
-              )}
-            </Dialog.Content>
-          </Dialog.Overlay>
+              {Content}
+            </div>
+          )}
+          {!appIsInShadowDom && (
+            <>
+              <div className={classnames(styles.overlayBg)} />
+              {/* This Overlay is responsible for the focus capture & scroll-lock */}
+              <Dialog.Overlay
+                className={classnames(styles.overlay, {
+                  [styles.fullScreen]: fullScreen,
+                })}
+              >
+                {Content}
+              </Dialog.Overlay>
+            </>
+          )}
         </Dialog.Portal>
       </Dialog.Root>
     );
