@@ -114,6 +114,7 @@
     "vite-plugin-svgr": "4.2.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11",
+    "framer-motion": "^12.18.1",
     "yargs": "17.7.2"
   },
   "devDependencies": {
