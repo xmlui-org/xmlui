@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { TextVariantElement } from "../abstractions";
 
@@ -108,8 +109,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const shortText = await createTextDriver("textShort");
     const longText = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await shortText.getComponentBounds();
-    const { height: heightTextLong } = await longText.getComponentBounds();
+    const { height: heightTextShort } = await getBounds(shortText);
+    const { height: heightTextLong } = await getBounds(longText);
 
     expect(heightTextLong).toEqual(heightTextShort * 2);
   });
@@ -127,12 +128,12 @@ please do not break it!"
       />
     </Fragment>
     `);
-    const { height: heightTextShort } = await (
+    const { height: heightTextShort } = await getBounds(
       await createTextDriver("textShort")
-    ).getComponentBounds();
-    const { height: heightTextLong } = await (
+    );
+    const { height: heightTextLong } = await getBounds(
       await createTextDriver("textLong")
-    ).getComponentBounds();
+    );
 
     expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
@@ -151,8 +152,8 @@ please do not break it!"
     const shortTextDriver = await createTextDriver("textShort");
     const longTextDriver = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await shortTextDriver.getComponentBounds();
-    const { height: heightTextLong } = await longTextDriver.getComponentBounds();
+    const { height: heightTextShort } = await getBounds(shortTextDriver);
+    const { height: heightTextLong } = await getBounds(longTextDriver);
 
     expect(heightTextShort).toEqual(heightTextLong);
     await expect(longTextDriver.component).toHaveCSS("text-overflow", "ellipsis");
@@ -170,8 +171,8 @@ please do not break it!"
     const shortTextDriver = await createTextDriver("textShort");
     const longTextDriver = await createTextDriver("textLong");
 
-    const { height: heightTextShort } = await shortTextDriver.getComponentBounds();
-    const { height: heightTextLong } = await longTextDriver.getComponentBounds();
+    const { height: heightTextShort } = await getBounds(shortTextDriver);
+    const { height: heightTextLong } = await getBounds(longTextDriver);
 
     expect(heightTextShort).toEqual(heightTextLong);
     await expect(longTextDriver.component).not.toHaveCSS("text-overflow", "ellipsis");
@@ -245,8 +246,8 @@ test("break long text", async ({ initTestBed, createTextDriver }) => {
 
   await expect(longText.component).toBeVisible();
 
-  const { height: heightTextShort } = await shortText.getComponentBounds();
-  const { height: heightTextLong } = await longText.getComponentBounds();
+  const { height: heightTextShort } = await getBounds(shortText);
+  const { height: heightTextLong } = await getBounds(longText);
 
   expect(heightTextShort).toBeLessThan(heightTextLong);
 });
@@ -261,9 +262,9 @@ test("Text is inline in HStack", async ({ initTestBed, createTextDriver, createI
       <Text testId="text1" >icon!</Text>
     </HStack>
   `);
-  const { top: topText0 } = await (await createTextDriver("text0")).getComponentBounds();
-  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
-  const { top: topText1 } = await (await createTextDriver("text1")).getComponentBounds();
+  const { top: topText0 } = await getBounds(await createTextDriver("text0"));
+  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+  const { top: topText1 } = await getBounds(await createTextDriver("text1"));
 
   expect(topText0).toEqual(topIcon0);
   expect(topIcon0).toEqual(topText1);
@@ -277,9 +278,9 @@ test("Text is block in VStack", async ({ initTestBed, createTextDriver, createIc
       <Text testId="text1" >icon!</Text>
     </VStack>
   `);
-  const { top: topText0 } = await (await createTextDriver("text0")).getComponentBounds();
-  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
-  const { top: topText1 } = await (await createTextDriver("text1")).getComponentBounds();
+  const { top: topText0 } = await getBounds(await createTextDriver("text0"));
+  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+  const { top: topText1 } = await getBounds(await createTextDriver("text1"));
 
   expect(topText0).toBeLessThan(topIcon0);
   expect(topIcon0).toBeLessThan(topText1);
@@ -300,8 +301,8 @@ test("Text overflows container dimensions", async ({
       </Text>
     </VStack>
   `);
-  const { width: widthLayout } = await (await createVStackDriver()).getComponentBounds();
-  const { width: widthText } = await (await createTextDriver("text")).getComponentBounds();
+  const { width: widthLayout } = await getBounds(await createVStackDriver());
+  const { width: widthText } = await getBounds(await createTextDriver("text"));
 
   expect(widthText).toEqual(widthTextExpected);
   expect(widthLayout).toEqual(widthLayoutExpected);

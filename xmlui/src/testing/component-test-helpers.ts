@@ -5,6 +5,7 @@ import type { StandaloneAppDescription } from "../components-core/abstractions/s
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import chroma, { type Color } from "chroma-js";
+import { ComponentDriver } from "./ComponentDrivers";
 
 type EntryPoint = string | ComponentDef;
 type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
@@ -73,7 +74,7 @@ export async function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
 }
 
-export async function getFullRectangle(locator: Locator) {
+/* export async function getFullRectangle(locator: Locator) {
   const boundingRect = await locator.evaluate((element) => element.getBoundingClientRect());
 
   const margins = await getElementStyles(locator, [
@@ -94,7 +95,7 @@ export async function getFullRectangle(locator: Locator) {
   const top = boundingRect.top - marginTop;
   const bottom = boundingRect.bottom + marginBottom;
   return { width, height, left, right, top, bottom };
-}
+} */
 
 export async function isElementOverflown(locator: Locator, direction: "x" | "y" | "both" = "both") {
   const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
@@ -132,10 +133,87 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   );
 }
 
-export async function getStyle(page: Page, testId: string, style: string) {
-  const locator = page.getByTestId(testId);
-  return await getElementStyle(locator, style);
+// ----------------------------------
+// ComponentDriver style helpers
+// ----------------------------------
+
+export async function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  style = Array.isArray(style) ? style : [style];
+  return (specifier).evaluate(
+    (element, styles) =>
+      Object.fromEntries(
+        styles.map((styleName) => [
+          styleName
+            .trim()
+            .split("-")
+            .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
+            .join(""),
+          window.getComputedStyle(element).getPropertyValue(styleName),
+        ]),
+      ),
+    style,
+  );
 }
+
+export async function getPaddings(specifier: ComponentDriver | Locator) {
+  const paddings = mapObject(
+    await getStyles(specifier, ["padding-left", "padding-right", "padding-top", "padding-bottom"]),
+    parseAsNumericCss,
+  );
+  return {
+    left: paddings.paddingLeft,
+    right: paddings.paddingRight,
+    top: paddings.paddingTop,
+    bottom: paddings.paddingBottom,
+  };
+}
+
+export async function getBorders(specifier: ComponentDriver | Locator) {
+  const borders = mapObject(
+    await getStyles(specifier, ["border-left", "border-right", "border-top", "border-bottom"]),
+    parseAsCssBorder,
+  );
+  return {
+    left: borders.borderLeft,
+    right: borders.borderRight,
+    top: borders.borderTop,
+    bottom: borders.borderBottom,
+  };
+}
+
+export async function getMargins(specifier: ComponentDriver | Locator) {
+  return getStyles(specifier, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
+}
+
+/**
+ * Retrieves the bounding rectangle of the component including **margins** and **padding**
+ * added to the dimensions.
+ */
+export async function getBounds(specifier: ComponentDriver | Locator) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  const boundingRect = await specifier.evaluate((element) =>
+    element.getBoundingClientRect(),
+  );
+  const m = mapObject(await getMargins(specifier), parseFloat);
+
+  const width = boundingRect.width + m.marginLeft + m.marginRight;
+  const height = boundingRect.height + m.marginTop + m.marginBottom;
+  const left = boundingRect.left - m.marginLeft;
+  const right = boundingRect.right + m.marginRight;
+  const top = boundingRect.top - m.marginTop;
+  const bottom = boundingRect.bottom + m.marginBottom;
+
+  return {
+    width,
+    height,
+    left,
+    right,
+    top,
+    bottom,
+  };
+}
+
 /**
  * Provides annotations for skipped tests and the ability to specify a reason.
  * Use it via the SKIP_REASON exported variable.
