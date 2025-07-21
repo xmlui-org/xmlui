@@ -41,7 +41,7 @@ This property sets how the image content should be resized to fit its container.
 | `contain` | The replaced content is scaled to maintain its aspect ratio while fitting within the image's container. The entire image is made to fill the container. |
 | `cover`   | The image is sized to maintain its aspect ratio while filling the element's entire content box. If the image's aspect ratio does not match the aspect ratio of its container, then the image will be clipped to fit. |
 
-```xmlui-pg copy display name="Example: fit"
+```xmlui-pg copy display name="Example: fit" {5,9}
 <App>
   <HStack padding="1rem" height="280px" gap="1rem">
     <Image 
@@ -79,7 +79,7 @@ This event is triggered when the Image is clicked.
 
 This event is triggered when the image is clicked.
 
-```xmlui-pg copy {5} display name="Example: click"
+```xmlui-pg copy {6} display name="Example: click"
 <App>
   <Stack height="280px" width="400px">
     <Image

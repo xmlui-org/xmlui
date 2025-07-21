@@ -1160,7 +1160,7 @@ Note how the `List` on the right has different borders:
 
 Note how the groups in the right `List` are expanded by default:
 
-```xmlui {3, 10}
+```xmlui /groupsInitiallyExpanded/
 <App>
   <HStack gap="$space-2">
     <List data="{[...]}" 
