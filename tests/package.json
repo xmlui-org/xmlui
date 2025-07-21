@@ -14,7 +14,8 @@
   "devDependencies": {
     "@playwright/test": "1.53.0",
     "cross-env": "7.0.3",
-    "serve": "14.2.0"
+    "serve": "14.2.0",
+    "scheduler": "0.23.2"
   },
   "msw": {
     "workerDirectory": "public"
