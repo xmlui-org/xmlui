@@ -156,6 +156,6 @@ Each [Page](/components/Pages) is a container that binds to a route and holds XM
 </App>
 ```
 
-Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneChangerSwitch](/components/ToneSwitch).
+Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneSwitch](/components/ToneSwitch).
 
 
