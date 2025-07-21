@@ -8,7 +8,7 @@
 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
-```xmlui-pg copy {1,6} display name="Example: custom Link content"
+```xmlui-pg copy {3-6} display name="Example: custom Link content"
 <App>
   <Link to="https://docs.xmlui.org/" target="_blank">
     <HStack verticalAlignment="center">
@@ -25,7 +25,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
-```xmlui-pg copy display name="Example: active"
+```xmlui-pg copy display name="Example: active" /active/
 <App>
   <Link>I'm an inactive link (by default)</Link>
   <Link active="true">I'm an active link</Link>
@@ -37,7 +37,7 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui-pg copy display name="Example: enabled"
+```xmlui-pg copy display name="Example: enabled" /enabled/
 <App>
   <Link>I'm an enabled link (by default)</Link>
   <Link enabled="false">I'm a disabled link</Link>

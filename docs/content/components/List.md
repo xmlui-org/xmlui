@@ -749,7 +749,7 @@ This Boolean property defines whether the list groups are initially expanded.
 
 Note how the groups in the right `List` are expanded by default:
 
-```xmlui {3, 10}
+```xmlui /groupsInitiallyExpanded/
 <App>
   <HStack gap="$space-2">
     <List data="{[...]}" 
