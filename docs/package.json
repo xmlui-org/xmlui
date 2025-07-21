@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "shiki": "^3.3.0",
+    "@shikijs/langs": "3.4.2",
     "xmlui": "*",
     "xmlui-playground": "*",
     "xmlui-search": "*"
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@octokit/rest": "^22.0.0",
     "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
     "strip-markdown": "6.0.0",
     "unified": "11.0.5"
   }

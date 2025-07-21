@@ -27,6 +27,7 @@ Nothing happens yet when you select a tube line. Let's wire up the selection to 
 
   <DataSource
     id="tubeStations"
+    when="{lines.value}"
     url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
     resultSelector="stations"/>
 

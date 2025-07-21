@@ -9,7 +9,8 @@
     "./docs",
     "./tools/create-app",
     "./tools/vscode",
-    "./packages/*"
+    "./packages/*",
+    "./xmlui-temp-build"
   ],
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
