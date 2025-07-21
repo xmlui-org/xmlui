@@ -167,15 +167,15 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 
 ### Drag and Drop
 
-| Value         | Description                                                                                                                                                                              |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `alias`       | An alias or shortcut is to be created.                                                                                                                                                   |
-| `copy`        | Something is to be copied.                                                                                                                                                               |
-| `move`        | Something is to be moved.                                                                                                                                                                |
+| Value         | Description                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| `alias`       | An alias or shortcut is to be created.                                                                        |
+| `copy`        | Something is to be copied.                                                                                    |
+| `move`        | Something is to be moved.                                                                                     |
 | `no‑drop`     | An item may not be dropped at the current location. On Windows and macOS, no-drop is the same as not-allowed. |
-| `not‑allowed` | The requested action will not be carried out.                                                                                                                                            |
-| `grab`        | Something can be grabbed (dragged to be moved).                                                                                                                                          |
-| `grabbing`    | Something is being grabbed (dragged to be moved).                                                                                                                                        |
+| `not‑allowed` | The requested action will not be carried out.                                                                 |
+| `grab`        | Something can be grabbed (dragged to be moved).                                                               |
+| `grabbing`    | Something is being grabbed (dragged to be moved).                                                             |
 
 ### Resizing and Scrolling
 
@@ -442,11 +442,11 @@ UI Engine uses these units with the CSS semantics:
 
 Properties such as `verticalAlignment` and `horizontalAlignment` set the alignment of content in a layout component vertically or horizontally.
 
-| Value | Description |
-| --- | --- |
-| `start` | Horizontal: `left` if direction is left-to-right and `right` if direction is right-to-left. Vertical: at the `top`. |
-| `end` | Horizontal: `right` if direction is left-to-right and `left` if direction is right-to-left. Vertical: at the `bottom`. |
-| `center` | The contents are centered within the container. |
+| Value    | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `start`  | Horizontal: `left` if direction is left-to-right and `right` if direction is right-to-left. Vertical: at the `top`.    |
+| `end`    | Horizontal: `right` if direction is left-to-right and `left` if direction is right-to-left. Vertical: at the `bottom`. |
+| `center` | The contents are centered within the container.                                                                        |
 
 ```xmlui-pg name="Horizontal Alignment Values"
 <VStack gap="8px" marginVertical="8px" paddingVertical="8px" width="600px" margin="auto">
@@ -530,7 +530,7 @@ You can use these style values:
 | `dashed` | Draws a dashed line. |
 | `wavy`   | Draws a wavy line.   |
 
-```xmlui-pg name="Text Decoration Values" height="240px"
+```xmlui-pg name="Text Decoration Values" height="265px"
 <VStack margin="8px" gap="8px">
   <Text textDecoration="underline">underline</Text>
   <Text textDecoration="red wavy underline">red wavy underline</Text>
@@ -604,10 +604,10 @@ The value of the `zoom` property controls the magnification level of a component
 
 This value controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as small caps), ligatures, and more.
 
-| Value        | Description                                                                                                           |
-| ------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `normal`     | Specifies a normal font face; none of the features below are activated.                                               |
-| `small-caps` | Specifies a font that is specifically designed with capital letters at the size of lowercase letters.                  |
+| Value        | Description                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `normal`     | Specifies a normal font face; none of the features below are activated.                               |
+| `small-caps` | Specifies a font that is specifically designed with capital letters at the size of lowercase letters. |
 
 ```xmlui-pg name="Font variant values"
 <App>
@@ -622,19 +622,20 @@ This value controls the usage of alternate glyphs in a font. These alternates in
 
 This value determines how line breaking works for languages that use a text wrapping system other than the standard space-based approach.
 
-| Value     | Description                                                                                                        |
-| --------- | ------------------------------------------------------------------------------------------------------------------ |
-| `auto`    | Uses the default line break rule.                                                                                  |
-| `loose`   | Relaxes the line-breaking rules, allowing more opportunities for a break.                                          |
-| `normal`  | Uses standard line break rules.                                                                                    |
-| `strict`  | Tightens the line-breaking rules, reducing the number of break opportunities.                                      |
-| `anywhere`| Allows a line break to be inserted between any character.                                                           |
+| Value      | Description                                                                   |
+| ---------- | ----------------------------------------------------------------------------- |
+| `auto`     | Uses the default line break rule.                                             |
+| `loose`    | Relaxes the line-breaking rules, allowing more opportunities for a break.     |
+| `normal`   | Uses standard line break rules.                                               |
+| `strict`   | Tightens the line-breaking rules, reducing the number of break opportunities. |
+| `anywhere` | Allows a line break to be inserted between any character.                     |
 
 ## Text Shadow Values [#text-shadow]
 
 This value adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
 
 A shadow is described by:
+
 - Horizontal offset (required)
 - Vertical offset (required)
 - Blur radius (optional)
@@ -658,9 +659,9 @@ This value specifies the amount of indentation (empty space) that should be left
 ```xmlui-pg name="Text indent examples"
 <App>
   <VStack gap="16px" width="100%">
-    <Text textIndent="0px">This paragraph has no text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
-    <Text textIndent="30px">This paragraph has a 30px text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
-    <Text textIndent="10%">This paragraph has a 10% text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="0px">This paragraph has <Text variant="strong">no text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="30px">This paragraph has a <Text variant="strong">30px text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="10%">This paragraph has a <Text variant="strong">10% text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
   </VStack>
 </App>
 ```
@@ -669,12 +670,12 @@ This value specifies the amount of indentation (empty space) that should be left
 
 This value specifies how words should break when reaching the end of a line.
 
-| Value     | Description                                                                                        |
-| --------- | -------------------------------------------------------------------------------------------------- |
-| `normal`  | Uses default line break rules.                                                                     |
-| `break-all`| May break between any two characters to prevent overflow.                                         |
-| `keep-all`| Prevents breaks for Chinese, Japanese, and Korean (CJK) text. Non-CJK text behavior is set to normal. |
-| `break-word`| Allows unbreakable words to be broken at arbitrary points if there are no acceptable break points. |
+| Value        | Description                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `normal`     | Uses default line break rules.                                                                        |
+| `break-all`  | May break between any two characters to prevent overflow.                                             |
+| `keep-all`   | Prevents breaks for Chinese, Japanese, and Korean (CJK) text. Non-CJK text behavior is set to normal. |
+| `break-word` | Allows unbreakable words to be broken at arbitrary points if there are no acceptable break points.    |
 
 ```xmlui-pg name="Word break examples"
 <App>
@@ -706,10 +707,10 @@ This value sets the length of white space between words and between tags. Positi
 ```xmlui-pg name="Word spacing examples"
 <App>
   <VStack gap="16px">
-    <Text wordSpacing="normal">This text has normal word spacing.</Text>
-    <Text wordSpacing="5px">This text has 5px word spacing.</Text>
-    <Text wordSpacing="10px">This text has 10px word spacing.</Text>
-    <Text wordSpacing="-2px">This text has -2px word spacing.</Text>
+    <Text wordSpacing="normal">This text has <Text variant="strong">normal</Text> word spacing.</Text>
+    <Text wordSpacing="5px">This text has <Text variant="strong">5px</Text> word spacing.</Text>
+    <Text wordSpacing="10px">This text has <Text variant="strong">10px</Text> word spacing.</Text>
+    <Text wordSpacing="-2px">This text has <Text variant="strong">-2px</Text> word spacing.</Text>
   </VStack>
 </App>
 ```
@@ -718,11 +719,11 @@ This value sets the length of white space between words and between tags. Positi
 
 This value determines whether the browser should break lines within words when they would otherwise overflow the container.
 
-| Value         | Description                                                                            |
-| ------------- | -------------------------------------------------------------------------------------- |
-| `normal`      | Lines may only break at normal break points (such as spaces between words).            |
-| `break-word`  | To prevent overflow, an otherwise unbreakable word may be broken at arbitrary points.  |
-| `anywhere`    | To prevent overflow, the browser may break between any two characters.                 |
+| Value        | Description                                                                           |
+| ------------ | ------------------------------------------------------------------------------------- |
+| `normal`     | Lines may only break at normal break points (such as spaces between words).           |
+| `break-word` | To prevent overflow, an otherwise unbreakable word may be broken at arbitrary points. |
+| `anywhere`   | To prevent overflow, the browser may break between any two characters.                |
 
 ```xmlui-pg name="Word wrap examples"
 <App>
@@ -747,13 +748,13 @@ This value determines whether the browser should break lines within words when t
 
 This value sets whether lines of text are laid out horizontally or vertically, as well as the direction in which blocks progress.
 
-| Value                  | Description                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------- |
-| `horizontal-tb`        | Content flows horizontally from left to right, vertically from top to bottom.                |
-| `vertical-rl`          | Content flows vertically from top to bottom, horizontally from right to left.                |
-| `vertical-lr`          | Content flows vertically from top to bottom, horizontally from left to right.                |
-| `sideways-rl`          | Content flows vertically from top to bottom and all glyphs are set sideways toward the right.|
-| `sideways-lr`          | Content flows vertically from top to bottom and all glyphs are set sideways toward the left. |
+| Value           | Description                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `horizontal-tb` | Content flows horizontally from left to right, vertically from top to bottom.                 |
+| `vertical-rl`   | Content flows vertically from top to bottom, horizontally from right to left.                 |
+| `vertical-lr`   | Content flows vertically from top to bottom, horizontally from left to right.                 |
+| `sideways-rl`   | Content flows vertically from top to bottom and all glyphs are set sideways toward the right. |
+| `sideways-lr`   | Content flows vertically from top to bottom and all glyphs are set sideways toward the left.  |
 
 ```xmlui-pg name="Writing mode examples"
 <App>
@@ -791,6 +792,7 @@ This value sets whether lines of text are laid out horizontally or vertically, a
 This value specifies the CSS property to animate, the duration of the transition effect, the timing function, and the delay before the transition starts. It creates smooth animations between property value changes.
 
 A transition value can include up to four parts (in any order):
+
 - **Property name**: Specifies the CSS property to transition (e.g., `opacity`, `color`, `width`)
 - **Duration**: How long the transition takes (e.g., `0.5s`, `300ms`)
 - **Timing function**: How the transition progresses over time (e.g., `ease`, `linear`)
@@ -798,11 +800,11 @@ A transition value can include up to four parts (in any order):
 
 You can specify multiple transitions by separating them with commas.
 
-| Timing Function Values | Description |
-| --------------------- | ----------- |
-| `ease`                | Starts slow, becomes fast, then ends slowly. This is the default value. |
-| `linear`              | Same speed from start to end. |
-| `ease-in`             | Starts slowly and accelerates. |
-| `ease-out`            | Starts quickly and decelerates. |
-| `ease-in-out`         | Starts slowly, speeds up in the middle, and ends slowly. |
-| `cubic-bezier(n,n,n,n)` | Define your own timing function with four values. |
+| Timing Function Values  | Description                                                             |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `ease`                  | Starts slow, becomes fast, then ends slowly. This is the default value. |
+| `linear`                | Same speed from start to end.                                           |
+| `ease-in`               | Starts slowly and accelerates.                                          |
+| `ease-out`              | Starts quickly and decelerates.                                         |
+| `ease-in-out`           | Starts slowly, speeds up in the middle, and ends slowly.                |
+| `cubic-bezier(n,n,n,n)` | Define your own timing function with four values.                       |
