@@ -5,7 +5,7 @@
         when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
             <property name="logoTemplate">
-                <Link to="https://xmlui.com/">
+                <Link to="https://xmlui.org/">
                     <Logo height="$space-8" />
                 </Link>
             </property>
