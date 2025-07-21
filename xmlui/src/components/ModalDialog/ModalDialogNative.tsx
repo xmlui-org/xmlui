@@ -19,7 +19,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
-import { useAppContext } from "../../components-core/AppContext";
 
 // Default props for ModalDialog component
 export const defaultProps = {
@@ -136,12 +135,14 @@ export const ModalDialog = React.forwardRef(
     ref,
   ) => {
     const { root } = useTheme();
+    // NOTE: at this point, we can't use useAppContext here,
+    // since the ModalDialog context provider (via ConfirmationModalContextProvider) is mounted outside of the AppContext,
+    // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
+    const isDialogRootInShadowDom = root?.getRootNode() instanceof ShadowRoot;
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
     const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
-
-    const { appIsInShadowDom } = useAppContext();
 
     useEffect(() => {
       if (isOpen) {
@@ -230,7 +231,7 @@ export const ModalDialog = React.forwardRef(
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
         <Dialog.Portal container={root}>
-          {appIsInShadowDom && (
+          {isDialogRootInShadowDom && (
             /*
               In the Shadow DOM we can omit the Dialog.Overlay,
               since we get the same result & the main content outside remains scrollable.
@@ -243,7 +244,7 @@ export const ModalDialog = React.forwardRef(
               {Content}
             </div>
           )}
-          {!appIsInShadowDom && (
+          {!isDialogRootInShadowDom && (
             <>
               <div className={classnames(styles.overlayBg)} />
               {/* This Overlay is responsible for the focus capture & scroll-lock */}
