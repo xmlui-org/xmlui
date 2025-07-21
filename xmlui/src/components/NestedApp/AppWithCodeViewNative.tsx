@@ -11,6 +11,7 @@ import { createQueryString, withoutTrailingSlash } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
 import Logo from "./logo.svg?react";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 type AppWithCodeViewNativeProps = {
   // Markdown content to display in the left column
@@ -66,18 +67,20 @@ export function AppWithCodeViewNative({
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
+
     const data = {
       standalone: {
         app,
         components,
         config: {
           name: title,
-          themes: [],
+          themes: [currentTheme],
           defaultTheme: activeTheme,
         },
         api: api,
@@ -87,8 +90,8 @@ export function AppWithCodeViewNative({
         swapped: false,
         previewMode: false,
         orientation: "horizontal",
-        activeTheme,
-        activeTone,
+        activeTheme: activeThemeId || activeTheme,
+        activeTone: activeTone || activeThemeTone,
         content: "app",
       },
     };

@@ -18,7 +18,7 @@ import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { Stack } from "./components/Stack/StackNative";
 import { Button } from "./components/Button/ButtonNative";
 import { Splitter } from "./components/Splitter/SplitterNative";
-import { useTheme } from "./components-core/theming/ThemeContext";
+import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
@@ -95,6 +95,7 @@ export {
   xmlUiMarkupToComponent,
   ApiInterceptorProvider,
   Spinner,
+  useThemes,
   builtInThemes,
   XmlUiHelper,
   Text,

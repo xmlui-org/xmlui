@@ -34,6 +34,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           previewMode: previewMode,
           orientation: options.orientation,
           activeTheme: options.activeTheme,
+          activeTone: options.activeTone,
           content: options.content,
         },
       };
@@ -44,6 +45,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       appDescription,
       options.fixedTheme,
       options.swapped,
+      options.activeTone,
       options.orientation,
       options.activeTheme,
       options.content,
@@ -57,7 +59,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   return (
     <div className={classnames(styles.header)}>
       <Box styles={{ padding: 0, justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", maxWidth: "280px", width: "100%" }}>
           <Logo style={{ width: "93.8281px", padding: 12, paddingLeft: 0 }} />
           {!options.previewMode && standalone && <CodeSelector />}
         </div>

@@ -10,7 +10,7 @@ import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
 import styles from "./StandalonePlaygroundNative.module.scss";
 import { useToast } from "../hooks/useToast";
-import { ErrorBoundary, Spinner } from "xmlui";
+import { ErrorBoundary, Spinner, useThemes } from "xmlui";
 import { Header } from "./Header";
 import { PlaygroundContent } from "./PlaygroundContent";
 
@@ -18,6 +18,7 @@ export const StandalonePlayground = () => {
   const { showToast } = useToast();
   const id = useId();
   const [loading, setLoading] = useState(true);
+  const { setActiveThemeTone } = useThemes();
 
   const queryParams = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -36,9 +37,11 @@ export const StandalonePlayground = () => {
           optionsInitialized({
             ...playgroundState.options,
             ...data.options,
+            content: "app",
             orientation: "horizontal",
           }),
         );
+        setActiveThemeTone(data.options.activeTone || "light");
         dispatch(contentChanged(data.options.content));
       } catch (e) {
         showToast({
@@ -70,25 +73,28 @@ export const StandalonePlayground = () => {
     playgroundState.editorStatus,
     playgroundState.status,
     playgroundState.options,
+    playgroundState.options.activeTone,
     playgroundState.text,
     playgroundState.originalAppDescription,
     playgroundState.appDescription,
     id,
   ]);
 
-  return <ToastProvider>
-    <PlaygroundContext.Provider value={playgroundContextValue}>
-      <ErrorBoundary>
-        {loading && <Spinner />}
-        {!loading && (
-          <div className={styles.standalonePlayground}>
-            {!playgroundState.options.previewMode && <Header standalone={true} />}
-            <div style={{ flexGrow: 1, overflow: "auto" }}>
-              <PlaygroundContent standalone={true} />
+  return (
+    <ToastProvider>
+      <PlaygroundContext.Provider value={playgroundContextValue}>
+        <ErrorBoundary>
+          {loading && <Spinner />}
+          {!loading && (
+            <div className={styles.standalonePlayground}>
+              {!playgroundState.options.previewMode && <Header standalone={true} />}
+              <div style={{ flexGrow: 1, overflow: "auto" }}>
+                <PlaygroundContent standalone={true} />
+              </div>
             </div>
-          </div>
-        )}
-      </ErrorBoundary>
-    </PlaygroundContext.Provider>
-  </ToastProvider>
+          )}
+        </ErrorBoundary>
+      </PlaygroundContext.Provider>
+    </ToastProvider>
+  );
 };
