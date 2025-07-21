@@ -2,6 +2,7 @@
 
   <DataSource
     id="stops"
+    when="{$props.line}"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
     transformResult="{window.transformStops}"
   />
