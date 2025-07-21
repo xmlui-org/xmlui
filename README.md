@@ -14,7 +14,7 @@
 
 **Connected**. Read and write APIs with little or no scripting.
 
-**Modular**. Use a comprehensive suite of [components](https://docs.xmlui.com/components/_overview) that you can extend with — again! — little or no scripting.
+**Modular**. Use a comprehensive suite of [components](https://docs.xmlui.org/components/_overview) that you can extend with — again! — little or no scripting.
 
 **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
@@ -59,11 +59,11 @@ Extract the files to a working folder and run the start script.
 
 ### See also
 
-Visit [demo.xmlui.com](https://demo.xmlui.com) to explore a gallery of components.
+Visit [demo.xmlui.org](https://demo.xmlui.org) to explore a gallery of components.
 
-Visit [docs.xmlui.com](https://docs.xmlui.com) for an introduction, a tutorial, and full documentation. The documentation site is itself an XMLUI app!
+Visit [docs.xmlui.org](https://docs.xmlui.org) for an introduction, a tutorial, and full documentation. The documentation site is itself an XMLUI app!
 
-<a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/9a54ae74-4f45-4079-a5d4-142e23fb4134" /></a>
+<a href="https://docs.xmlui.org"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/9a54ae74-4f45-4079-a5d4-142e23fb4134" /></a>
 
 
 ## Contributing

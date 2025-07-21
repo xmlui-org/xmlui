@@ -107,7 +107,7 @@ export const OUTPUT_FILES = {
 };
 
 export const URL_REFERENCES = {
-  DOCS: "https://docs.xmlui.com/",
+  DOCS: "https://docs.xmlui.org/",
 };
 
 // From MetadataProcessor.mjs

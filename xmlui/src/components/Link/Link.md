@@ -8,7 +8,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 ```xmlui-pg copy {1,6} display name="Example: custom Link content"
 <App>
-  <Link to="https://docs.xmlui.com/" target="_blank">
+  <Link to="https://docs.xmlui.org/" target="_blank">
     <HStack verticalAlignment="center">
       <Stack width="16px" height="16px" backgroundColor="purple" />
       XMLUI introduction
@@ -63,7 +63,7 @@ The following sample opens its link in a new tab:
 
 ```xmlui-pg copy display name="Example: target"
 <App>
-  <Link to="https://docs.xmlui.com/" target="_blank">
+  <Link to="https://docs.xmlui.org/" target="_blank">
     Open XMLUI overview in a new tab
   </Link>
 </App>

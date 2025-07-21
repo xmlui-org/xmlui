@@ -162,7 +162,7 @@ The following example opens the "About XMLUI" link in a new tab:
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" />
-    <NavLink label="About XMLUI" to="https://docs.xmlui.com/" target="_blank" />
+    <NavLink label="About XMLUI" to="https://docs.xmlui.org/" target="_blank" />
   </NavPanel>
   <Pages>
     <Page url="/">Home</Page>
