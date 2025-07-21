@@ -4,12 +4,10 @@ import produce from "immer";
 import type {
   ApiInterceptorDefinition,
   CompoundComponentDef,
-  ThemeDefinition, ThemeTone} from "xmlui";
-import {
-  errReportComponent,
-  xmlUiMarkupToComponent,
-  builtInThemes
+  ThemeDefinition,
+  ThemeTone,
 } from "xmlui";
+import { errReportComponent, xmlUiMarkupToComponent, builtInThemes } from "xmlui";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -96,7 +94,7 @@ export interface PlaygroundState {
   options: Options;
 }
 
-export function toneChanged(activeTone: string) {
+export function toneChanged(activeTone: ThemeTone) {
   return {
     type: PlaygroundActionKind.TONE_CHANGED,
     payload: {
@@ -191,6 +189,11 @@ export function editorStatusChanged(editorStatus: "loading" | "loaded") {
 
 export const playgroundReducer = produce((state: PlaygroundState, action: PlaygroundAction) => {
   switch (action.type) {
+    case PlaygroundActionKind.TONE_CHANGED: {
+      state.options.id = state.options.id + 1;
+      state.options.activeTone = action.payload.activeTone;
+      break;
+    }
     case PlaygroundActionKind.EDITOR_STATUS_CHANGED: {
       state.editorStatus = action.payload.editorStatus || "idle";
       break;
@@ -306,11 +309,6 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
         );
         state.options.language = "json";
       }
-      break;
-    }
-    case PlaygroundActionKind.TONE_CHANGED: {
-      state.options.id = state.options.id + 1;
-      state.options.activeTone = action.payload.activeTone;
       break;
     }
     case PlaygroundActionKind.TEXT_CHANGED:
