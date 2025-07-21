@@ -37,10 +37,11 @@ export const StandalonePlayground = () => {
           optionsInitialized({
             ...playgroundState.options,
             ...data.options,
+            content: "app",
             orientation: "horizontal",
           }),
         );
-        setActiveThemeTone(data.options.activeTone);
+        setActiveThemeTone(data.options.activeTone || "light");
         dispatch(contentChanged(data.options.content));
       } catch (e) {
         showToast({
@@ -72,6 +73,7 @@ export const StandalonePlayground = () => {
     playgroundState.editorStatus,
     playgroundState.status,
     playgroundState.options,
+    playgroundState.options.activeTone,
     playgroundState.text,
     playgroundState.originalAppDescription,
     playgroundState.appDescription,
