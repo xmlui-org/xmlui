@@ -47,7 +47,9 @@ import {
   ValidationSummaryDriver,
   VStackDriver,
   DatePickerDriver, AutoCompleteDriver,
-  CodeBlockDriver
+  CodeBlockDriver,
+  CheckboxDriver,
+  LabelDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -383,6 +385,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(CodeBlockDriver, testIdOrLocator);
     });
   },
+  createCheckboxDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(CheckboxDriver, testIdOrLocator);
+    });
+  },
+  createLabelDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(LabelDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -445,4 +457,6 @@ type TestDriverExtenderProps = {
   createOptionDriver: ComponentDriverMethod<OptionDriver>;
   createHtmlTagDriver: ComponentDriverMethod<HtmlTagDriver>;
   createCodeBlockDriver: ComponentDriverMethod<CodeBlockDriver>;
+  createCheckboxDriver: ComponentDriverMethod<CheckboxDriver>;
+  createLabelDriver: ComponentDriverMethod<LabelDriver>;
 };

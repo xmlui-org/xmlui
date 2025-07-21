@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { headingLevels } from "./abstractions";
 
@@ -92,7 +93,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
     const headingSizes = await Promise.all(
       headings.map(async (heading) => {
-        const { width, height } = await heading.getComponentBounds();
+        const { width, height } = await getBounds(heading);
         return { width, height };
       }),
     );
@@ -164,8 +165,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const shortHeading = await createHeadingDriver("headingShort");
     const longHeading = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await shortHeading.getComponentBounds();
-    const { height: heightHeadingLong } = await longHeading.getComponentBounds();
+    const { height: heightHeadingShort } = await getBounds(shortHeading);
+    const { height: heightHeadingLong } = await getBounds(longHeading);
 
     expect(heightHeadingLong).toEqual(heightHeadingShort * 2);
   });
@@ -183,12 +184,12 @@ please do not break it!"
       />
     </Fragment>
     `);
-    const { height: heightHeadingShort } = await (
+    const { height: heightHeadingShort } = await getBounds(
       await createHeadingDriver("headingShort")
-    ).getComponentBounds();
-    const { height: heightHeadingLong } = await (
+    );
+    const { height: heightHeadingLong } = await getBounds(
       await createHeadingDriver("headingLong")
-    ).getComponentBounds();
+    );
 
     expect(heightHeadingLong).toEqualWithTolerance(heightHeadingShort * 3, 0.01);
   });
@@ -207,8 +208,8 @@ please do not break it!"
     const shortTextDriver = await createHeadingDriver("headingShort");
     const longTextDriver = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await shortTextDriver.getComponentBounds();
-    const { height: heightHeadingLong } = await longTextDriver.getComponentBounds();
+    const { height: heightHeadingShort } = await getBounds(shortTextDriver);
+    const { height: heightHeadingLong } = await getBounds(longTextDriver);
 
     expect(heightHeadingShort).toEqual(heightHeadingLong);
     await expect(longTextDriver.component).toHaveCSS("text-overflow", "ellipsis");
@@ -226,8 +227,8 @@ please do not break it!"
     const shortTextDriver = await createHeadingDriver("headingShort");
     const longTextDriver = await createHeadingDriver("headingLong");
 
-    const { height: heightHeadingShort } = await shortTextDriver.getComponentBounds();
-    const { height: heightHeadingLong } = await longTextDriver.getComponentBounds();
+    const { height: heightHeadingShort } = await getBounds(shortTextDriver);
+    const { height: heightHeadingLong } = await getBounds(longTextDriver);
 
     expect(heightHeadingShort).toEqual(heightHeadingLong);
     await expect(longTextDriver.component).not.toHaveCSS("text-overflow", "ellipsis");
@@ -276,8 +277,8 @@ test("break long text", async ({ initTestBed, createHeadingDriver }) => {
 
   await expect(longHeading.component).toBeVisible();
 
-  const { height: heightHeadingShort } = await shortHeading.getComponentBounds();
-  const { height: heightHeadingLong } = await longHeading.getComponentBounds();
+  const { height: heightHeadingShort } = await getBounds(shortHeading);
+  const { height: heightHeadingLong } = await getBounds(longHeading);
 
   expect(heightHeadingShort).toBeLessThan(heightHeadingLong);
 });
@@ -296,9 +297,9 @@ test("Heading is inline in HStack", async ({
       <Heading testId="heading1" >icon!</Heading>
     </HStack>
   `);
-  const { top: topHeading0 } = await (await createHeadingDriver("heading0")).getComponentBounds();
-  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
-  const { top: topHeading1 } = await (await createHeadingDriver("heading1")).getComponentBounds();
+  const { top: topHeading0 } = await getBounds(await createHeadingDriver("heading0"));
+  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+  const { top: topHeading1 } = await getBounds(await createHeadingDriver("heading1"));
 
   expect(topHeading0).toEqual(topIcon0);
   expect(topIcon0).toEqual(topHeading1);
@@ -316,9 +317,9 @@ test("Heading is block in VStack", async ({
       <Heading testId="heading1" >icon!</Heading>
     </VStack>
   `);
-  const { top: topHeading0 } = await (await createHeadingDriver("heading0")).getComponentBounds();
-  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
-  const { top: topHeading1 } = await (await createHeadingDriver("heading1")).getComponentBounds();
+  const { top: topHeading0 } = await getBounds(await createHeadingDriver("heading0"));
+  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+  const { top: topHeading1 } = await getBounds(await createHeadingDriver("heading1"));
 
   expect(topHeading0).toBeLessThan(topIcon0);
   expect(topIcon0).toBeLessThan(topHeading1);
@@ -339,8 +340,8 @@ test("Heading overflows container dimensions", async ({
       </Heading>
     </VStack>
   `);
-  const { width: widthLayout } = await (await createVStackDriver()).getComponentBounds();
-  const { width: widthHeading } = await (await createHeadingDriver("heading")).getComponentBounds();
+  const { width: widthLayout } = await getBounds(await createVStackDriver());
+  const { width: widthHeading } = await getBounds(await createHeadingDriver("heading"));
 
   expect(widthHeading).toEqual(widthHeadingExpected);
   expect(widthLayout).toEqual(widthLayoutExpected);

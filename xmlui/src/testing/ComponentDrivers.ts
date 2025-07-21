@@ -26,81 +26,6 @@ export class ComponentDriver {
     return this.component.evaluate((el) => el.tagName.toLowerCase());
   }
 
-  async getStyles(style: string | string[]) {
-    style = Array.isArray(style) ? style : [style];
-    return this.component.evaluate(
-      (element, styles) =>
-        Object.fromEntries(
-          styles.map((styleName) => [
-            styleName
-              .trim()
-              .split("-")
-              .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
-              .join(""),
-            window.getComputedStyle(element).getPropertyValue(styleName),
-          ]),
-        ),
-      style,
-    );
-  }
-
-  async getPaddings() {
-    const paddings = mapObject(
-      await this.getStyles(["padding-left", "padding-right", "padding-top", "padding-bottom"]),
-      parseAsNumericCss,
-    );
-    return {
-      left: paddings.paddingLeft,
-      right: paddings.paddingRight,
-      top: paddings.paddingTop,
-      bottom: paddings.paddingBottom,
-    };
-  }
-
-  async getBorders() {
-    const borders = mapObject(
-      await this.getStyles(["border-left", "border-right", "border-top", "border-bottom"]),
-      parseAsCssBorder,
-    );
-    return {
-      left: borders.borderLeft,
-      right: borders.borderRight,
-      top: borders.borderTop,
-      bottom: borders.borderBottom,
-    };
-  }
-
-  async getMargins() {
-    return this.getStyles(["margin-left", "margin-right", "margin-top", "margin-bottom"]);
-  }
-
-  /**
-   * Retrieves the bounding rectangle of the component including **margins** and **padding**
-   * added to the dimensions.
-   */
-  async getComponentBounds() {
-    const boundingRect = await this.component.evaluate((element) =>
-      element.getBoundingClientRect(),
-    );
-    const m = mapObject(await this.getMargins(), parseFloat);
-
-    const width = boundingRect.width + m.marginLeft + m.marginRight;
-    const height = boundingRect.height + m.marginTop + m.marginBottom;
-    const left = boundingRect.left - m.marginLeft;
-    const right = boundingRect.right + m.marginRight;
-    const top = boundingRect.top - m.marginTop;
-    const bottom = boundingRect.bottom + m.marginBottom;
-
-    return {
-      width,
-      height,
-      left,
-      right,
-      top,
-      bottom,
-    };
-  }
-
   // NOTE: methods must be created using the arrow function notation.
   // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
 
@@ -123,6 +48,20 @@ export class ComponentDriver {
   hover = async (options?: { timeout?: number }) => {
     await this.locator.hover(options);
   };
+}
+
+export class InputComponentDriver extends ComponentDriver {
+  get field() {
+    return this.component.locator("input");
+  }
+
+  get label() {
+    return this.component.locator("label");
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
 }
 
 export class TestStateDriver {
@@ -456,33 +395,13 @@ export class NumberBoxDriver extends ComponentDriver {
 
 // --- TextBox
 
-export class TextBoxDriver extends ComponentDriver {
-  get field() {
-    return this.component.locator("input");
-  }
-
-  get label() {
-    return this.component.locator("label");
-  }
-
-  get placeholder() {
-    return this.field.getAttribute("placeholder");
-  }
-}
+export class TextBoxDriver extends InputComponentDriver {}
 
 // --- TextArea
 
-export class TextAreaDriver extends ComponentDriver {
+export class TextAreaDriver extends InputComponentDriver {
   get field() {
     return this.component.locator("textarea").or(this.component).last();
-  }
-
-  get label() {
-    return this.component.locator("label");
-  }
-
-  get placeholder() {
-    return this.field.getAttribute("placeholder");
   }
 }
 
@@ -536,7 +455,11 @@ export class NavPanelDriver extends ComponentDriver {}
 
 // --- Card
 
-export class CardDriver extends ComponentDriver {}
+export class CardDriver extends ComponentDriver {
+  get avatar() {
+    return this.component.getByRole("img", { name: "avatar" })
+  }
+}
 
 // --- Accordion
 
@@ -632,3 +555,15 @@ export class HtmlTagDriver extends ComponentDriver {}
 // --- CodeBlock
 
 export class CodeBlockDriver extends ComponentDriver {}
+
+// --- Checkbox
+
+export class CheckboxDriver extends InputComponentDriver {
+  get field() {
+    return this.component.getByRole("checkbox");
+  }
+}
+
+// --- Label
+
+export class LabelDriver extends ComponentDriver {}
