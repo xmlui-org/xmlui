@@ -1,0 +1,209 @@
+# XMLUI Standalone Build Optimization Guide
+
+To apply Gergo's optimization to a standalone XMLUI build, you need to configure the environment variables and build mode. Here's how:
+
+## 1. Set Build Mode to INLINE_ALL
+
+In your build script or command, use the `INLINE_ALL` build mode:
+
+```bash
+xmlui build --buildMode=INLINE_ALL
+```
+
+Or in your `package.json`:
+
+```json
+{
+  "scripts": {
+    "build": "xmlui build --buildMode=INLINE_ALL",
+    "build:optimized": "xmlui build --buildMode=INLINE_ALL --withMock=false"
+  }
+}
+```
+
+## 2. Configure Component Tree-Shaking via Environment Variables
+
+Create a `.env` file in your project root to specify which components to include/exclude:
+
+```bash
+# .env file - Only include components you actually use
+
+# Core components (usually needed)
+VITE_USED_COMPONENTS_App=true
+VITE_USED_COMPONENTS_Stack=true
+VITE_USED_COMPONENTS_Text=true
+VITE_USED_COMPONENTS_Button=true
+VITE_USED_COMPONENTS_Fragment=true
+
+# Conditional components - set to false to exclude
+VITE_USED_COMPONENTS_EmojiSelector=false
+VITE_USED_COMPONENTS_TableEditor=false
+VITE_USED_COMPONENTS_Charts=false
+VITE_USED_COMPONENTS_DatePicker=false
+VITE_USED_COMPONENTS_HelloWorld=false
+
+# HTML components (if you don't use raw HTML)
+VITE_INCLUDE_HTML_COMPONENTS=false
+
+# Rest components (includes many utility components)
+VITE_INCLUDE_REST_COMPONENTS=true
+```
+
+## 3. Production-Optimized Build Script
+
+Create a comprehensive build script:
+
+```json
+{
+  "scripts": {
+    "build:prod": "NODE_ENV=production xmlui build --buildMode=INLINE_ALL --withMock=false --withHostingMetaFiles=true",
+    "build:analyze": "npm run build:prod && xmlui zip-dist --target=dist/app.zip"
+  }
+}
+```
+
+## 4. Analyze Your Component Usage
+
+To determine which components to exclude, you can:
+
+### Option A: Analyze your XMLUI files
+```bash
+# Find all components used in your markup
+grep -r "<[A-Z]" src/ --include="*.xmlui" | sed 's/.*<\([A-Z][a-zA-Z]*\).*/\1/' | sort | uniq
+```
+
+### Option B: Use a more sophisticated analysis script
+Create `scripts/analyze-components.js`:
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+const glob = require('glob');
+
+// Find all .xmlui files
+const xmluiFiles = glob.sync('src/**/*.xmlui');
+const usedComponents = new Set();
+
+xmluiFiles.forEach(file => {
+  const content = fs.readFileSync(file, 'utf8');
+  // Extract component names (capitalized tags)
+  const matches = content.match(/<[A-Z][a-zA-Z]*/g);
+  if (matches) {
+    matches.forEach(match => {
+      const componentName = match.substring(1);
+      usedComponents.add(componentName);
+    });
+  }
+});
+
+console.log('Components used in your app:');
+Array.from(usedComponents).sort().forEach(comp => {
+  console.log(`VITE_USED_COMPONENTS_${comp}=true`);
+});
+
+console.log('\nComponents you can potentially exclude:');
+const allComponents = [
+  'EmojiSelector', 'TableEditor', 'Charts', 'DatePicker', 'HelloWorld',
+  'ColorPicker', 'FileUploadDropZone', 'Slider', 'Carousel', 'Accordion'
+];
+
+allComponents.forEach(comp => {
+  if (!usedComponents.has(comp)) {
+    console.log(`VITE_USED_COMPONENTS_${comp}=false`);
+  }
+});
+```
+
+## 5. Environment-Specific Builds
+
+Create different optimization levels:
+
+### .env.production
+```bash
+# Maximum optimization for production
+VITE_USED_COMPONENTS_EmojiSelector=false
+VITE_USED_COMPONENTS_TableEditor=false
+VITE_USED_COMPONENTS_Charts=false
+VITE_USED_COMPONENTS_DatePicker=false
+VITE_USED_COMPONENTS_HelloWorld=false
+VITE_USED_COMPONENTS_ColorPicker=false
+VITE_USED_COMPONENTS_FileUploadDropZone=false
+VITE_INCLUDE_HTML_COMPONENTS=false
+```
+
+### .env.development
+```bash
+# Include everything for development
+VITE_INCLUDE_REST_COMPONENTS=true
+# (let other components default to included)
+```
+
+## 6. Verify Bundle Size
+
+Compare your bundle sizes:
+
+```bash
+# Before optimization
+xmlui build --buildMode=CONFIG_ONLY
+ls -lh dist/
+
+# After optimization  
+xmlui build --buildMode=INLINE_ALL
+ls -lh dist/
+```
+
+## 7. Advanced: Custom Component Groups
+
+You can create logical groups for easier management:
+
+```bash
+# UI Components
+VITE_USED_COMPONENTS_Button=true
+VITE_USED_COMPONENTS_Card=true
+VITE_USED_COMPONENTS_Badge=true
+
+# Form Components  
+VITE_USED_COMPONENTS_TextBox=true
+VITE_USED_COMPONENTS_Checkbox=true
+VITE_USED_COMPONENTS_DatePicker=false
+
+# Chart Components (all or nothing)
+VITE_USED_COMPONENTS_Charts=false
+
+# Rich Components (usually not needed)
+VITE_USED_COMPONENTS_EmojiSelector=false
+VITE_USED_COMPONENTS_TableEditor=false
+VITE_USED_COMPONENTS_ColorPicker=false
+```
+
+## Expected Results
+
+With proper optimization, you should see:
+
+- **30-50% smaller bundle size** (depending on excluded components)
+- **Faster build times** (no post-processing with INLINE_ALL)
+- **Faster initial load** (less JavaScript to parse)
+- **Better tree-shaking** (Vite can eliminate unused code paths)
+
+## Common Components to Exclude
+
+Based on typical usage patterns:
+
+```bash
+# Usually safe to exclude unless specifically needed
+VITE_USED_COMPONENTS_EmojiSelector=false
+VITE_USED_COMPONENTS_TableEditor=false  
+VITE_USED_COMPONENTS_HelloWorld=false
+VITE_USED_COMPONENTS_ColorPicker=false
+VITE_USED_COMPONENTS_FileUploadDropZone=false
+VITE_USED_COMPONENTS_Slider=false
+VITE_USED_COMPONENTS_Carousel=false
+
+# Include only if you use charts
+VITE_USED_COMPONENTS_Charts=false
+
+# Include only if you need HTML passthrough
+VITE_INCLUDE_HTML_COMPONENTS=false
+```
+
+The key is to start with excluding obvious unused components and gradually optimize based on your specific app's needs.
