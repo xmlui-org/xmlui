@@ -583,7 +583,6 @@ function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): Reac
 
 const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
   const { appGlobals } = useAppContext();
-  const headingRef = useRef<HTMLHeadingElement>(null);
 
   // --- Extract the optional anchor
   let anchor: string | undefined = undefined;
@@ -605,7 +604,6 @@ const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHead
       level={level}
       id={headingId}
       className={styles.linkAwareHeading}
-      headingRef={headingRef}
     >
       {label}
       {showHeadingAnchors && (
