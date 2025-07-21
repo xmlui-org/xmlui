@@ -68,7 +68,7 @@ export function AppWithCodeViewNative({
   const [refreshVersion, setRefreshVersion] = useState(0);
 
   const safePopOutUrl = withoutTrailingSlash(
-    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.com/#/playground",
+    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
     const data = {
