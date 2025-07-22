@@ -7,7 +7,7 @@
     "preview": "xmlui preview",
     "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip",
-    "build-optimized": "VITE_USED_COMPONENTS_Tree=false VITE_INCLUDE_HTML_COMPONENTS=false npx xmlui-optimizer",
+    "build-optimized": "npx xmlui-optimizer",
     "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
   },
   "dependencies": {
