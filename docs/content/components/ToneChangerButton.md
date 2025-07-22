@@ -27,7 +27,9 @@ The icon displayed when the theme is in light mode and will switch to dark. You 
 
 ## Events [#events]
 
-This component does not have any events.
+### `click` [#click]
+
+This event is triggered when the ToneChangerButton is clicked.
 
 ## Exposed Methods [#exposed-methods]
 

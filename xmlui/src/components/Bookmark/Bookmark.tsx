@@ -37,6 +37,11 @@ export const BookmarkMd = createMetadata({
       defaultValue: defaultProps.omitFromToc,
     },
   },
+  apis: {
+    scrollIntoView: {
+      description: "Scrolls the bookmark into view.",
+    },
+  },
 });
 
 export const bookmarkComponentRenderer = createComponentRenderer(

@@ -93,7 +93,9 @@ This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollIntoView` [#scrollintoview]
+
+Scrolls the bookmark into view.
 
 ## Styling [#styling]
 
