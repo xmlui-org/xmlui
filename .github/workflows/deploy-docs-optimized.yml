@@ -50,7 +50,7 @@ jobs:
         # This step will give a clear error if authentication is the problem
         run: npm install ./xmlui-optimizer
 
-      - run: npm run release-ci-optimized
+      - run: cd docs && npm run release-ci-optimized
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
