@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.82
+
+### Patch Changes
+
+- 3bc29ae: fix: account for events with components inside them (like APICall) in a way that more syntax highlighters understand. VSCode worked fine, Shiki did not.
+- 1101bf5: Fix a React warning in MarkdownNative (headingRef)
+- cd8db58: Fixed ModalDialog overlay and fullScreen in nested apps. Now dialogs defined in nested apps stay inside them.
+- 13beb58: Fixed ModalDialog context error when dialog is called from ApiCall or components using "confirm" in XMLUI code.
+- 79c1d8a: fix: allow the playground to use the same tone as its source
+
 ## 0.9.81
 
 ### Patch Changes

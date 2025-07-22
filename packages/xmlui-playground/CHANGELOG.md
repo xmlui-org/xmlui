@@ -1,5 +1,11 @@
 # xmlui-playground
 
+## 0.1.7
+
+### Patch Changes
+
+- 79c1d8a: fix: allow the playground to use the same tone as its source
+
 ## 0.1.6
 
 ### Patch Changes
