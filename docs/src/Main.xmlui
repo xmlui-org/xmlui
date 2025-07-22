@@ -9,55 +9,70 @@
                     <Logo height="$space-8" />
                 </Link>
             </property>
-            <SpaceFiller/>
-            <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
-            <ToneSwitch/>
+            <SpaceFiller />
+            <Search
+                data="{appGlobals.plainTextContent}"
+                when="{mediaSize.sizeIndex > 2}" />
+            <ToneSwitch />
         </AppHeader>
-
-        <NavPanel when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
-            <Stack paddingHorizontal="$space-4" paddingBottom="$space-4" when="{mediaSize.sizeIndex <= 2}">
+        <NavPanel
+            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+            <Stack
+                paddingHorizontal="$space-4"
+                paddingBottom="$space-4"
+                when="{mediaSize.sizeIndex <= 2}">
                 <Search data="{appGlobals.plainTextContent}" />
             </Stack>
             <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
-                <NavLink label="Introduction" to="/"/>
-                <NavLink label="Reactive Data" to="/reactive-intro"/>
-                <NavLink label="Components" to="/components-intro"/>
-                <NavLink label="Themes" to="/themes-intro"/>
+                <NavLink label="Introduction" to="/" />
+                <NavLink label="Reactive Data" to="/reactive-intro" />
+                <NavLink label="Components" to="/components-intro" />
+                <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
             <NavGroup label="Tutorial">
-                <NavLink label="XMLUI Invoice" to="/tutorial-01"/>
-                <NavLink label="Main.xmlui" to="/tutorial-02"/>
-                <NavLink label="Navigation" to="/tutorial-03"/>
-                <NavLink label="InfoCards" to="/tutorial-04"/>
-                <NavLink label="Charts" to="/tutorial-05"/>
-                <NavLink label="Slider" to="/tutorial-06"/>
-                <NavLink label="Invoices" to="/tutorial-07"/>
-                <NavLink label="Create Invoice" to="/tutorial-08"/>
-                <NavLink label="Invoice Details" to="/tutorial-09"/>
-                <NavLink label="Search" to="/tutorial-10"/>
-                <NavLink label="Import" to="/tutorial-11"/>
-                <NavLink label="Settings" to="/tutorial-12"/>
+                <NavLink label="XMLUI Invoice" to="/tutorial-01" />
+                <NavLink label="Main.xmlui" to="/tutorial-02" />
+                <NavLink label="Navigation" to="/tutorial-03" />
+                <NavLink label="InfoCards" to="/tutorial-04" />
+                <NavLink label="Charts" to="/tutorial-05" />
+                <NavLink label="Slider" to="/tutorial-06" />
+                <NavLink label="Invoices" to="/tutorial-07" />
+                <NavLink label="Create Invoice" to="/tutorial-08" />
+                <NavLink label="Invoice Details" to="/tutorial-09" />
+                <NavLink label="Search" to="/tutorial-10" />
+                <NavLink label="Import" to="/tutorial-11" />
+                <NavLink label="Settings" to="/tutorial-12" />
             </NavGroup>
             <NavGroup label="Guides">
-                <NavLink label="App Structure" to="/app-structure"/>
-                <NavLink label="Markup" to="/markup"/>
-                <NavLink label="Component Scoping" to="/scoping"/>
-                <NavLink label="Scripting" to="/scripting"/>
-                <NavLink label="Layout" to="/layout"/>
-                <NavLink label="Working with Text" to="/working-with-text"/>
-                <NavLink label="Working with Markdown" to="/working-with-markdown"/>
-                <NavLink label="Routing and Links" to="/routing-and-links"/>
-                <NavLink label="Forms" to="/forms"/>
-                <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
-                <NavLink label="User-defined Components" to="/user-defined-components"/>
-                <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
-                <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
-                <NavLink label="How To" to="/howto"/>
+                <NavLink label="App Structure" to="/app-structure" />
+                <NavLink label="Markup" to="/markup" />
+                <NavLink label="Component Scoping" to="/scoping" />
+                <NavLink label="Scripting" to="/scripting" />
+                <NavLink label="Layout" to="/layout" />
+                <NavLink label="Working with Text" to="/working-with-text" />
+                <NavLink
+                    label="Working with Markdown"
+                    to="/working-with-markdown" />
+                <NavLink label="Routing and Links" to="/routing-and-links" />
+                <NavLink label="Forms" to="/forms" />
+                <NavLink label="Modal Dialogs" to="/modal-dialogs" />
+                <NavLink
+                    label="User-defined Components"
+                    to="/user-defined-components" />
+                <NavLink
+                    label="Build a HelloWorld Component"
+                    to="/build-hello-world-component" />
+                <NavLink
+                    label="Build a TableEditor Component"
+                    to="/build-editor-component" />
+                <NavLink label="How To" to="/howto" />
             </NavGroup>
             <NavGroup label="Reference">
                 <NavGroup label="Components">
                     <!-- GENERATED CONTENT/Component references links -->
-                    <NavLink label="Components Overview" to="/components/_overview" />
+                    <NavLink
+                        label="Components Overview"
+                        to="/components/_overview" />
                     <NavLink label="APICall" to="/components/APICall" />
                     <NavLink label="App" to="/components/App" />
                     <NavLink label="AppHeader" to="/components/AppHeader" />
@@ -73,19 +88,29 @@
                     <NavLink label="CHStack" to="/components/CHStack" />
                     <NavLink label="CVStack" to="/components/CVStack" />
                     <NavLink label="Card" to="/components/Card" />
-                    <NavLink label="ChangeListener" to="/components/ChangeListener" />
+                    <NavLink
+                        label="ChangeListener"
+                        to="/components/ChangeListener" />
                     <NavLink label="Checkbox" to="/components/Checkbox" />
                     <NavLink label="ColorPicker" to="/components/ColorPicker" />
                     <NavLink label="Column" to="/components/Column" />
-                    <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
+                    <NavLink
+                        label="ContentSeparator"
+                        to="/components/ContentSeparator" />
                     <NavLink label="DataSource" to="/components/DataSource" />
                     <NavLink label="DatePicker" to="/components/DatePicker" />
                     <NavLink label="DonutChart" to="/components/DonutChart" />
                     <NavLink label="DropdownMenu" to="/components/DropdownMenu" />
-                    <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
-                    <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
+                    <NavLink
+                        label="EmojiSelector"
+                        to="/components/EmojiSelector" />
+                    <NavLink
+                        label="ExpandableItem"
+                        to="/components/ExpandableItem" />
                     <NavLink label="FileInput" to="/components/FileInput" />
-                    <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
+                    <NavLink
+                        label="FileUploadDropZone"
+                        to="/components/FileUploadDropZone" />
                     <NavLink label="FlowLayout" to="/components/FlowLayout" />
                     <NavLink label="Footer" to="/components/Footer" />
                     <NavLink label="Form" to="/components/Form" />
@@ -112,7 +137,9 @@
                     <NavLink label="Logo" to="/components/Logo" />
                     <NavLink label="Markdown" to="/components/Markdown" />
                     <NavLink label="MenuItem" to="/components/MenuItem" />
-                    <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
+                    <NavLink
+                        label="MenuSeparator"
+                        to="/components/MenuSeparator" />
                     <NavLink label="ModalDialog" to="/components/ModalDialog" />
                     <NavLink label="NavGroup" to="/components/NavGroup" />
                     <NavLink label="NavLink" to="/components/NavLink" />
@@ -121,14 +148,20 @@
                     <NavLink label="NumberBox" to="/components/NumberBox" />
                     <NavLink label="Option" to="/components/Option" />
                     <NavLink label="Page" to="/components/Page" />
-                    <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
+                    <NavLink
+                        label="PageMetaTitle"
+                        to="/components/PageMetaTitle" />
                     <NavLink label="Pages" to="/components/Pages" />
-                    <NavLink label="PasswordInput" to="/components/PasswordInput" />
+                    <NavLink
+                        label="PasswordInput"
+                        to="/components/PasswordInput" />
                     <NavLink label="PieChart" to="/components/PieChart" />
                     <NavLink label="ProgressBar" to="/components/ProgressBar" />
                     <NavLink label="Queue" to="/components/Queue" />
                     <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                    <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
+                    <NavLink
+                        label="RealTimeAdapter"
+                        to="/components/RealTimeAdapter" />
                     <NavLink label="Redirect" to="/components/Redirect" />
                     <NavLink label="Select" to="/components/Select" />
                     <NavLink label="Slider" to="/components/Slider" />
@@ -141,38 +174,52 @@
                     <NavLink label="Switch" to="/components/Switch" />
                     <NavLink label="TabItem" to="/components/TabItem" />
                     <NavLink label="Table" to="/components/Table" />
-                    <NavLink label="TableOfContents" to="/components/TableOfContents" />
+                    <NavLink
+                        label="TableOfContents"
+                        to="/components/TableOfContents" />
                     <NavLink label="Tabs" to="/components/Tabs" />
                     <NavLink label="Text" to="/components/Text" />
                     <NavLink label="TextArea" to="/components/TextArea" />
                     <NavLink label="TextBox" to="/components/TextBox" />
                     <NavLink label="Theme" to="/components/Theme" />
-                    <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
+                    <NavLink
+                        label="ToneChangerButton"
+                        to="/components/ToneChangerButton" />
                     <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                     <NavLink label="VSplitter" to="/components/VSplitter" />
                     <NavLink label="VStack" to="/components/VStack" />
                     <!-- END GENERATED CONTENT/Component references links -->
-            </NavGroup>
-                <NavGroup label="Themes">
-                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
-                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
-                    <NavLink label="Theme Variable Defaults" to="/styles-and-themes/theme-variable-defaults"/>
-                    <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
                 </NavGroup>
-                <NavLink label="Context Variables" to="/context-variables"/>
-                <NavLink label="Globals" to="/globals"/>
-                <NavLink label="Helper Tags" to="/helper-tags"/>
-                <NavLink label="Universal Properties" to="/universal-properties"/>
-                <NavLink label="Template Properties" to="/template-properties"/>
-                <NavLink label="Palettes" to="/palettes"/>
-                <NavLink label="Icons" to="/icons"/>
-                <NavLink label="Glossary" to="/glossary"/>
-            <NavLink label="Model Context Protocol" to="/mcp"/>
-            <NavLink label="VSCode extension" to="/vscode" />
-            <NavLink label="Change Log" to="/change-log"/>
+                <NavGroup label="Themes">
+                    <NavLink
+                        label="Layout Properties"
+                        to="/styles-and-themes/layout-props" />
+                    <NavLink
+                        label="Theme Variables"
+                        to="/styles-and-themes/theme-variables" />
+                    <NavLink
+                        label="Theme Variable Defaults"
+                        to="/styles-and-themes/theme-variable-defaults" />
+                    <NavLink
+                        label="Common Units"
+                        to="/styles-and-themes/common-units" />
+                </NavGroup>
+                <NavLink label="Context Variables" to="/context-variables" />
+                <NavLink label="Globals" to="/globals" />
+                <NavLink label="Helper Tags" to="/helper-tags" />
+                <NavLink
+                    label="Universal Properties"
+                    to="/universal-properties" />
+                <NavLink label="Template Properties" to="/template-properties" />
+                <NavLink label="Palettes" to="/palettes" />
+                <NavLink label="Icons" to="/icons" />
+                <NavLink label="Glossary" to="/glossary" />
             </NavGroup>
+            <NavLink label="Model Context Protocol" to="/mcp" />
+            <NavLink label="News and reviews" to="/news-and-reviews" />
+            <NavLink label="VSCode extension" to="/vscode" />
+            <NavLink label="Change Log" to="/change-log" />
         </NavPanel>
-
         <Pages fallbackPath="/404">
             <Page url="/">
                 <DocumentPage hideToc="true" url="/pages/intro.md" />
@@ -181,10 +228,10 @@
                 <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
             </Page>
             <Page url="/components-intro">
-                <ComponentsIntro/>
+                <ComponentsIntro />
             </Page>
             <Page url="/themes-intro">
-                <ThemesIntro/>
+                <ThemesIntro />
             </Page>
             <Page url="/tutorial-01">
                 <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
@@ -223,52 +270,54 @@
                 <DocumentPage url="/pages/tutorial-12.md" />
             </Page>
             <Page url="/app-structure">
-                <DocumentPage url="/pages/app-structure.md"/>
+                <DocumentPage url="/pages/app-structure.md" />
             </Page>
             <Page url="/markup">
-                <DocumentPage url="/pages/markup.md"/>
+                <DocumentPage url="/pages/markup.md" />
             </Page>
             <Page url="/scoping">
-                <DocumentPage url="/pages/scoping.md"/>
+                <DocumentPage url="/pages/scoping.md" />
             </Page>
             <Page url="/scripting">
-                <DocumentPage url="/pages/scripting.md"/>
+                <DocumentPage url="/pages/scripting.md" />
             </Page>
             <Page url="/layout">
-                <DocumentPage url="/pages/layout.md"/>
+                <DocumentPage url="/pages/layout.md" />
             </Page>
             <Page url="/working-with-text">
-                <DocumentPage url="/pages/working-with-text.md"/>
+                <DocumentPage url="/pages/working-with-text.md" />
             </Page>
             <Page url="/working-with-markdown">
-                <DocumentPage url="/pages/working-with-markdown.md"/>
+                <DocumentPage url="/pages/working-with-markdown.md" />
             </Page>
             <Page url="/routing-and-links">
-                <DocumentPage url="/pages/routing-and-links.md"/>
+                <DocumentPage url="/pages/routing-and-links.md" />
             </Page>
             <Page url="/forms">
-                <DocumentPage url="/pages/forms.md"/>
+                <DocumentPage url="/pages/forms.md" />
             </Page>
             <Page url="/resources">
-                <DocumentPage url="/pages/resources.md"/>
+                <DocumentPage url="/pages/resources.md" />
             </Page>
             <Page url="/modal-dialogs">
-                <DocumentPage url="/pages/modal-dialogs.md"/>
+                <DocumentPage url="/pages/modal-dialogs.md" />
             </Page>
             <Page url="/user-defined-components">
-                <DocumentPage url="/pages/user-defined-components.md"/>
+                <DocumentPage url="/pages/user-defined-components.md" />
             </Page>
             <Page url="/styles-and-themes/layout-props">
-                <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
+                <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
             </Page>
             <Page url="/styles-and-themes/theme-variables">
-                <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
+                <DocumentPage url="/pages/styles-and-themes/theme-variables.md" />
             </Page>
             <Page url="/styles-and-themes/theme-variable-defaults">
-                <DocumentPage hideToc="true" url="/pages/styles-and-themes/theme-variable-defaults.md" />
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/styles-and-themes/theme-variable-defaults.md" />
             </Page>
             <Page url="/styles-and-themes/common-units">
-                <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
+                <DocumentPage url="/pages/styles-and-themes/common-units.md" />
             </Page>
             <Page url="/context-variables">
                 <DocumentPage url="/pages/context-variables.md" />
@@ -286,10 +335,10 @@
                 <DocumentPage url="pages/template-properties.md" />
             </Page>
             <Page url="/icons">
-                <Icons/>
+                <Icons />
             </Page>
             <Page url="/palettes">
-                <Palettes/>
+                <Palettes />
             </Page>
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
@@ -308,6 +357,9 @@
             </Page>
             <Page url="/mcp">
                 <DocumentPage hideToc="true" url="/pages/mcp.md" />
+            </Page>
+            <Page url="/news-and-reviews">
+                <DocumentPage hideToc="true" url="/pages/news-and-reviews.md" />
             </Page>
             <Page url="/vscode">
                 <DocumentPage hideToc="true" url="/pages/vscode.md" />
@@ -328,13 +380,13 @@
             <CHStack width="*">
                 This site is an XMLUI™ app.
                 <SpaceFiller />
-                <Link to="https://github.com/xmlui-org/xmlui/tree/main/docs/src" target="_blank">
+                <Link
+                    to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
+                    target="_blank">
                     <Button variant="ghost" icon="github" />
                 </Link>
             </CHStack>
         </Footer>
     </App>
-
-
-    <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
 </Fragment>
