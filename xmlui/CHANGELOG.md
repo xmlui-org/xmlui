@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.84
+
+### Patch Changes
+
+- c54abf3: update deps
+
 ## 0.9.83
 
 ### Patch Changes
