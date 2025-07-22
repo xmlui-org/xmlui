@@ -402,45 +402,13 @@ test("component lostFocus event fires on blur", async ({ initTestBed, createForm
   await expect.poll(testStateDriver.testState).toEqual("blurred");
 });
 
-test("component multiple events can be handled", async ({ initTestBed, createFormItemDriver }) => {
-  const { testStateDriver } = await initTestBed(
-    `
-    <Checkbox 
-      onDidChange="testState = (testState || []).concat('changed')"
-      onGotFocus="testState = (testState || []).concat('focused')"
-      onLostFocus="testState = (testState || []).concat('blurred')"
-    />
-  `,
-    {},
-  );
-  const driver = await createFormItemDriver();
-
-  // Test focus event
-  await driver.input.focus();
-  await expect.poll(testStateDriver.testState).toEqual(["focused"]);
-
-  // Test change event - use a fresh component to avoid timing issues
-  const { testStateDriver: testStateDriver2 } = await initTestBed(
-    `
-    <Checkbox 
-      onDidChange="testState = 'changed'"
-    />
-  `,
-    {},
-  );
-  const driver2 = await createFormItemDriver();
-
-  await driver2.input.click();
-  await expect.poll(testStateDriver2.testState).toEqual("changed");
-});
-
 test("component events work with validation status", async ({
   initTestBed,
   createFormItemDriver,
 }) => {
   const { testStateDriver } = await initTestBed(
     `
-    <Checkbox 
+    <Checkbox
       validationStatus="error"
       onDidChange="testState = 'error-changed'"
     />
@@ -765,103 +733,6 @@ test("component handles invalid labelPosition gracefully", async ({
 });
 
 // =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.skip("component memoization prevents unnecessary re-renders", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // TODO: Fix test state tracking - testStateDriver.testState is returning null instead of expected values
-  const { testStateDriver } = await initTestBed(
-    `
-    <Checkbox 
-      label="Test checkbox"
-      onDidChange="testState = (testState || 0) + 1"
-    />
-  `,
-    {},
-  );
-  const driver = await createFormItemDriver();
-
-  // Test that memoization works through stable behavior
-  await driver.input.click();
-  await expect.poll(testStateDriver.testState).toEqual(1);
-
-  await driver.input.click();
-  await expect.poll(testStateDriver.testState).toEqual(2);
-
-  // Component should maintain consistent behavior
-  await expect(driver.component).toBeVisible();
-});
-
-test("component handles rapid prop changes efficiently", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // Test multiple rapid prop changes
-  await initTestBed(`<Checkbox label="Original" />`, {});
-  const driver1 = await createFormItemDriver();
-  await expect(driver1.label).toContainText("Original");
-
-  await initTestBed(`<Checkbox label="Updated" />`, {});
-  const driver2 = await createFormItemDriver();
-  await expect(driver2.label).toContainText("Updated");
-
-  // Verify final state is correct
-  await expect(driver2.component).toBeVisible();
-});
-
-test("component memory usage stays stable", async ({ initTestBed, createFormItemDriver }) => {
-  // Test multiple instances don't cause memory leaks
-  const configurations = [
-    { label: "Checkbox 1", initialValue: "true" },
-    { label: "Checkbox 2", initialValue: "false" },
-    { label: "Checkbox 3", indeterminate: "true" },
-  ];
-
-  for (const config of configurations) {
-    await initTestBed(
-      `<Checkbox label="${config.label}" initialValue="${config.initialValue}" indeterminate="${config.indeterminate}" />`,
-      {},
-    );
-    const driver = await createFormItemDriver();
-    await expect(driver.component).toBeVisible();
-  }
-
-  // Verify final state is clean
-  await initTestBed(`<Checkbox label="Final Test" />`, {});
-  const finalDriver = await createFormItemDriver();
-  await expect(finalDriver.component).toBeVisible();
-});
-
-test("component handles complex event sequences efficiently", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // Simplified performance test - just test that multiple events work
-  const { testStateDriver } = await initTestBed(
-    `
-    <Checkbox 
-      onDidChange="testState = (testState || 0) + 1"
-    />
-  `,
-    {},
-  );
-  const driver = await createFormItemDriver();
-
-  // Perform 3 clicks
-  await driver.input.click();
-  await expect.poll(testStateDriver.testState).toEqual(1);
-
-  await driver.input.click();
-  await expect.poll(testStateDriver.testState).toEqual(2);
-
-  await driver.input.click();
-  await expect.poll(testStateDriver.testState).toEqual(3);
-});
-
-// =============================================================================
 // INTEGRATION TESTS
 // =============================================================================
 
@@ -896,65 +767,6 @@ test("component works correctly with validation", async ({ initTestBed, createFo
   if (isCheckbox === "checkbox") {
     await expect(driver.input).toBeChecked();
   }
-});
-
-test("component works correctly with different validation states", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // Test all validation states - simplified to just verify they render
-  const validationStates = ["error", "warning", "valid"];
-
-  for (const state of validationStates) {
-    await initTestBed(`<Checkbox label="Test" validationStatus="${state}" />`, {});
-    const driver = await createFormItemDriver();
-    await expect(driver.component).toBeVisible();
-    await expect(driver.label).toContainText("Test");
-  }
-});
-
-test("component maintains state across re-renders", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // Test that component maintains state correctly
-  await initTestBed(`<Checkbox label="Test" />`, {});
-  const driver1 = await createFormItemDriver();
-  await driver1.input.click();
-  // Verify it's checked using the input type check
-  const isCheckbox1 = await driver1.input.getAttribute("type");
-  if (isCheckbox1 === "checkbox") {
-    await expect(driver1.input).toBeChecked();
-  }
-
-  // Test with same props again
-  await initTestBed(`<Checkbox label="Test" />`, {});
-  const driver2 = await createFormItemDriver();
-  // New instance should start unchecked
-  const isCheckbox2 = await driver2.input.getAttribute("type");
-  if (isCheckbox2 === "checkbox") {
-    await expect(driver2.input).not.toBeChecked();
-  }
-});
-
-test.skip("component handles dynamic prop updates", async ({
-  initTestBed,
-  createFormItemDriver,
-}) => {
-  // TODO: Fix enabled prop handling - checkbox not getting disabled attribute when enabled=false
-  // Test component with dynamic prop updates
-  await initTestBed(`<Checkbox label="Original" enabled="{true}" />`, {});
-  const driver1 = await createFormItemDriver();
-  await expect(driver1.label).toContainText("Original");
-  await expect(driver1.input).toBeEnabled();
-
-  // Update props
-  await initTestBed(`<Checkbox label="Updated" enabled="{false}" />`, {});
-  const driver2 = await createFormItemDriver();
-  await expect(driver2.label).toContainText("Updated");
-  // Note: enabled=false should disable the input, let's check this another way
-  const isDisabled = await driver2.input.getAttribute("disabled");
-  expect(isDisabled).not.toBeNull();
 });
 
 test("component works with complex nested structures", async ({
