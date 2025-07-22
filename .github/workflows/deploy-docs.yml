@@ -9,10 +9,6 @@ on:
         required: false
         default: 10
 
-permissions:
-  contents: read
-  id-token: write
-  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
