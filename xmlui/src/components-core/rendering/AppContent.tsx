@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 
 import { version } from "../../../package.json";
 
-import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useThemes } from "../theming/ThemeContext";
@@ -269,9 +269,11 @@ export function AppContent({
         const scrollBehavior = "instant";
         requestAnimationFrame(() => {
           if (!rootNode) return;
-          // --- If element is in shadow DOM
-          if (rootNode instanceof ShadowRoot) {
-            const el = rootNode.getElementById(lastHash.current);
+          // --- If element is in shadow DOM (string-based type checking)
+          // --- Check constructor.name to avoid direct ShadowRoot type dependency
+          // --- More precise than duck typing, works reliably across different environments
+          if (typeof ShadowRoot !== 'undefined' && rootNode instanceof ShadowRoot) {
+            const el = (rootNode as any).getElementById(lastHash.current);
             if (!el) return;
             scrollAncestorsToView(el, scrollBehavior);
           } else {
@@ -362,7 +364,9 @@ export function AppContent({
       mediaSize,
       queryClient,
       standalone,
-      appIsInShadowDom: root?.getRootNode() instanceof ShadowRoot,
+      // String-based type checking: Use constructor.name to identify ShadowRoot
+      // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+      appIsInShadowDom: typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot,
 
       // --- Date-related
       ...dateFunctions,

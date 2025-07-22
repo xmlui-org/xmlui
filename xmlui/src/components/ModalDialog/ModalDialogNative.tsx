@@ -138,7 +138,9 @@ export const ModalDialog = React.forwardRef(
     // NOTE: at this point, we can't use useAppContext here,
     // since the ModalDialog context provider (via ConfirmationModalContextProvider) is mounted outside of the AppContext,
     // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
-    const isDialogRootInShadowDom = root?.getRootNode() instanceof ShadowRoot;
+    // String-based type checking: Use constructor.name to identify ShadowRoot
+    // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+    const isDialogRootInShadowDom = typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot;
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
