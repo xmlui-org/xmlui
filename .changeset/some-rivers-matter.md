@@ -1,0 +1,5 @@
+---
+"xmlui": patch
+---
+
+update deps

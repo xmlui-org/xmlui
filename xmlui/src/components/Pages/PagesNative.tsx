@@ -1,5 +1,6 @@
-import { CSSProperties, ReactNode, useContext, useMemo } from "react";
-import { Navigate, Route, Routes, useLocation, useParams, useResolvedPath } from "@remix-run/react";
+import type { CSSProperties, ReactNode } from "react";
+import { useMemo } from "react";
+import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import classnames from "classnames";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -7,7 +8,6 @@ import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstrac
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
-import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // Default props for Pages component
 export const defaultProps = {
@@ -108,7 +108,7 @@ export function Pages({
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        <Route path="*" element={<Navigate to={fallbackPath} replace />} />
+        <Route path="*" element={<Navigate to={fallbackPath} replace  />} />
       </Routes>
       {renderChild(restChildren)}
     </>
