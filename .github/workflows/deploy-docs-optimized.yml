@@ -1,0 +1,63 @@
+name: Deploy docs (optimized)
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_releases:
+        description: "Maximum number of releases to include in docs"
+        type: number
+        required: false
+        default: 10
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+      TURBO_UI: "false"
+    
+    steps:
+      - name: 1. Generate a token from the GitHub App 🤖
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          registry-url: https://registry.npmjs.org/
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - run: npm ci --prefer-offline
+
+      - name: 4. Configure Git to use the App's token 🔑
+        # The token generated in the first step is used here for authentication.
+        run: git config --global url."https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/".insteadOf "https://github.com/"
+      - name: 5. DEBUG - Attempt to clone the private repo
+        # This step will give a clear error if authentication is the problem
+        run: git clone https://github.com/xmlui-org/xmlui-optimizer.git
+      - name: DEBUG - install xmlui-optimizer
+        # This step will give a clear error if authentication is the problem
+        run: npm install ./xmlui-optimizer
+
+      - run: npm run release-ci-optimized
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
+
+      - name: "Run Azure webapp deploy action using publish profile credentials"
+        uses: azure/webapps-deploy@v2
+        with:
+          package: "docs/ui-optimized.zip"
+          app-name: xmlui-docs
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_DOCS }}
