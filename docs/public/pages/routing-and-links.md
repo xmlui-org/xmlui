@@ -57,6 +57,73 @@ http {
 ```
 
 
+## Serving from a subdirectory with proxy
+
+If you need to serve your XMLUI app from a subdirectory path (e.g., `/myapp/`) while proxying to a running XMLUI server, you can use this nginx configuration. This approach works with both hash-based and standard routing.
+
+### Nginx configuration
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+
+    location /myapp/ {
+        rewrite ^/myapp(/.*)$ $1 break;
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_intercept_errors on;
+        error_page 404 = /myapp/;
+    }
+}
+```
+
+### Base path configuration
+
+You'll need to configure the base path in your `index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+        window.__PUBLIC_PATH = '/myapp'
+    </script>
+    <script src="xmlui/0.9.23.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+### How it works
+
+This configuration:
+- Rewrites incoming `/myapp/...` requests to remove the prefix before proxying
+- Proxies requests to your XMLUI server running on port 8080
+- Redirects 404 errors back to `/myapp/` to enable SPA fallback behavior
+- Works with both routing modes: Hash-based routing rarely triggers 404s, while standard routing uses the 404 redirect for client-side navigation
+
+### Routing mode compatibility
+
+This subdirectory deployment works with both routing configurations:
+
+**Hash-based routing** (`useHashBasedRouting: true` - default):
+- URLs: `example.com/myapp/#/contacts`
+- Server sees: `example.com/myapp/`
+- Behavior: Serves app normally from base path
+
+**Standard routing** (`useHashBasedRouting: false` in config.json):
+- URLs: `example.com/myapp/contacts`
+- Server sees: `example.com/myapp/contacts`
+- Behavior: 404s redirect to `/myapp/` which loads the app, then client-side routing takes over
+
 ## Links
 
 XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
@@ -181,5 +248,4 @@ As a `NavLink` activity is based on matching, multiple active links may exist si
 Query parameters are not considered to be part of the route. So, in this sample, the Winter report and Summer report match the same route, "/report." If you select any of them, both links are marked active:
 
 The semantic meaning of routes is analogous to routes used at the backend. When you send two requests with the same routes but different query parameters, they will reach the same backend endpoint. Of course, that endpoint may consider the query parameters, process them, and respond differently. However, this differentiation is not in the routing but in the processing mechanism.
-
 
