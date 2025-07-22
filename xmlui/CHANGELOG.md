@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.83
+
+### Patch Changes
+
+- 8e3d6a3: Prevent the xmlui-optimizer to raise error on ShadowRoot
+- 8644010: Add a scrollIntoView api to Bookmark
+
 ## 0.9.82
 
 ### Patch Changes
