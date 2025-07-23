@@ -1,5 +1,5 @@
 <Component name="ComponentsIntro">
-  <DocumentPage>
+  <DocumentPageNoTOC>
     <Markdown>
       <![CDATA[
 # Components
@@ -131,8 +131,8 @@ window.transformStops = function(stops) {
   // Helper to extract a value from additionalProperties by key
     function getProp(key) {
       if (!stop.additionalProperties) return '';
-      var propObj = stop.additionalProperties.find(function(p) { 
-        return p.key === key; 
+      var propObj = stop.additionalProperties.find(function(p) {
+        return p.key === key;
       });
       return propObj ? propObj.value : '';
     }
@@ -168,5 +168,5 @@ When you use custom components to access, transform, and present data, your XMLU
 Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
       ]]>
     </Markdown>
-  </DocumentPage>
+  </DocumentPageNoTOC>
 </Component>

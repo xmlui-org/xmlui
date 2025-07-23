@@ -21,7 +21,7 @@
         'unlink', 'unknownfile', 'upload', 'user', 'userminus', 'users', 'valid',
         'warning', 'webp', 'xls', 'xlsx'
     ].toSorted()}">
-    <DocumentPage>
+    <DocumentPageNoTOC>
         <H1>
             Icons
         </H1>
@@ -36,5 +36,5 @@
                 </VStack>
             </Items>
         </FlowLayout>
-    </DocumentPage>
+    </DocumentPageNoTOC>
 </Component>
