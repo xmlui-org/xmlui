@@ -1,4 +1,4 @@
-import { getBounds, getHtmlAttributes, SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -39,21 +39,15 @@ test.describe("Basic Functionality", () => {
     await expect(driver.field).not.toBeChecked();
   });
 
-  test.fixme(
-    "component indeterminate state displays correctly",
-    SKIP_REASON.TEST_NOT_WORKING("Html attribute not showing up"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox indeterminate="{true}" />`);
-      const driver = await createCheckboxDriver();
-      // TODO: test this function
-      //const { indeterminate } = await getHtmlAttributes(driver.field, "indeterminate");
-      console.log(await driver.field.getAttribute("indeterminate"));
-      const isIndeterminate = await driver.field.evaluate(
-        (el: HTMLInputElement) => el.indeterminate,
-      );
-      expect(isIndeterminate).toBe(true);
-    },
-  );
+  test("component indeterminate state displays correctly", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(`<Checkbox indeterminate="{true}" />`);
+    const driver = await createCheckboxDriver();
+    const isIndeterminate = await driver.isIndeterminate();
+    expect(isIndeterminate).toBe(true);
+  });
 
   test("component click toggles checked state", async ({ initTestBed, createCheckboxDriver }) => {
     await initTestBed(`<Checkbox />`);
@@ -104,15 +98,14 @@ test.describe("Basic Functionality", () => {
     expect(afterClickChecked).toBe(initialChecked);
   });
 
-  test.fixme(
-    "component autoFocus focuses input on mount",
-    SKIP_REASON.TEST_NOT_WORKING("Times out on the assertion"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox autoFocus="{true}" />`);
-      const driver = await createCheckboxDriver();
-      await expect(driver.component).toBeFocused();
-    },
-  );
+  test("component autoFocus focuses input on mount", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(`<Checkbox autoFocus="{true}" />`);
+    const driver = await createCheckboxDriver();
+    await expect(driver.component).toBeFocused();
+  });
 
   test("component handles special characters in label", async ({
     initTestBed,
@@ -162,27 +155,22 @@ test.describe("Basic Functionality", () => {
     initTestBed,
     createCheckboxDriver,
   }) => {
-    // Test that component properly handles explicit false
     await initTestBed(`<Checkbox initialValue="{false}" />`);
     const driver = await createCheckboxDriver();
     await expect(driver.field).not.toBeChecked();
   });
 
-  test.fixme(
-    "component handles indeterminate with other states",
-    SKIP_REASON.TEST_NOT_WORKING("Attribute not showing up"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      // Test indeterminate with other properties
-      await initTestBed(`<Checkbox indeterminate="{true}" required="{true}" />`);
-      const driver = await createCheckboxDriver();
+  test("component handles indeterminate with other states", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(`<Checkbox indeterminate="{true}" required="{true}" />`);
+    const driver = await createCheckboxDriver();
+    const isIndeterminate = await driver.isIndeterminate();
 
-      const isIndeterminate = await driver.field.evaluate(
-        (el: HTMLInputElement) => el.indeterminate,
-      );
-      expect(isIndeterminate).toBe(true);
-      await expect(driver.field).toHaveAttribute("required");
-    },
-  );
+    expect(isIndeterminate).toBe(true);
+    await expect(driver.field).toHaveAttribute("required");
+  });
 });
 
 // =============================================================================
@@ -219,17 +207,12 @@ test.describe("Accessibility", () => {
     await expect(field).toBeChecked();
   });
 
-  test.fixme(
-    "component supports keyboard navigation",
-    SKIP_REASON.TEST_NOT_WORKING("Tab not working"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox label="Accept terms" />`);
-      const driver = await createCheckboxDriver();
-      const field = driver.component;
-      await field.press("Tab");
-      await expect(field).toBeFocused();
-    },
-  );
+  test("component supports keyboard navigation", async ({ initTestBed, createCheckboxDriver }) => {
+    const { keyboard } = await initTestBed(`<Checkbox />`);
+    const driver = await createCheckboxDriver();
+    await keyboard.press("Tab");
+    await expect(driver.field).toBeFocused();
+  });
 
   test("component has proper ARIA states", async ({ initTestBed, createCheckboxDriver }) => {
     await initTestBed(`<Checkbox label="Accept terms" />`);
@@ -239,14 +222,13 @@ test.describe("Accessibility", () => {
     await expect(field).toHaveAttribute("aria-checked", "true");
   });
 
-  test.fixme(
-    "component indeterminate has correct ARIA state",
-    SKIP_REASON.TEST_NOT_WORKING("Attribute not showing up"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox indeterminate="{true}" />`);
-      await expect((await createCheckboxDriver()).field).toHaveAttribute("aria-checked", "mixed");
-    },
-  );
+  test("component indeterminate has correct ARIA state", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(`<Checkbox indeterminate="{true}" />`);
+    await expect((await createCheckboxDriver()).field).toHaveAttribute("aria-checked", "mixed");
+  });
 
   test("component required has proper ARIA attributes", async ({
     initTestBed,
@@ -345,17 +327,24 @@ test.describe("Label", () => {
     expect(width).toEqual(expected);
   });
 
-  test.fixme(
-    "component labelBreak enables label line breaks",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Not how to test this"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(
-        `<Checkbox label="Very long label text that should break" labelBreak="{true}" />`,
-      );
-      const driver = await createCheckboxDriver();
-      await expect(driver.label).toHaveCSS("white-space", "normal");
-    },
-  );
+  test("component labelBreak enables label line breaks", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    const commonProps = `label="Very long label text that should break" labelWidth="100px"`;
+    await initTestBed(
+      `<Fragment>
+          <Checkbox ${commonProps} testId="break" labelBreak="{true}" />
+          <Checkbox ${commonProps} testId="oneLine" labelBreak="{false}" />
+        </Fragment>`,
+    );
+    const driverBreak = await createCheckboxDriver("break");
+    const driverOneLine = await createCheckboxDriver("oneLine");
+
+    const { height: heightBreak } = await getBounds(driverBreak.label);
+    const { height: heightOneLine } = await getBounds(driverOneLine.label);
+    expect(heightBreak).toBeGreaterThan(heightOneLine);
+  });
 
   test("component handles invalid labelPosition gracefully", async ({
     initTestBed,

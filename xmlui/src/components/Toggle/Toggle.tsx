@@ -38,6 +38,7 @@ type ToggleProps = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  autoFocus?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
 };
@@ -74,6 +75,7 @@ export const Toggle = forwardRef(function Toggle(
     labelWidth,
     labelBreak,
     required,
+    autoFocus,
     registerComponentApi,
     inputRenderer,
   }: ToggleProps,
@@ -125,6 +127,12 @@ export const Toggle = forwardRef(function Toggle(
     innerRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    if (innerRef.current && autoFocus) {
+      setTimeout(() => focus(), 0);
+    }
+  }, [focus, autoFocus]);
+
   const setValue = useEvent((newValue) => {
     updateValue(newValue);
   });
@@ -148,12 +156,13 @@ export const Toggle = forwardRef(function Toggle(
         required={required}
         readOnly={readOnly}
         aria-readonly={readOnly}
-        aria-checked={value}
+        aria-checked={indeterminate ? "mixed" : value}
         aria-required={required}
         aria-disabled={!enabled}
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
+        autoFocus={autoFocus}
         className={classnames(styles.resetAppearance, className, {
           [styles.checkbox]: variant === "checkbox",
           [styles.switch]: variant === "switch",
@@ -175,6 +184,8 @@ export const Toggle = forwardRef(function Toggle(
       validationStatus,
       value,
       variant,
+      indeterminate,
+      autoFocus,
     ],
   );
 
