@@ -140,7 +140,7 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
 export async function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
   style = Array.isArray(style) ? style : [style];
-  return (specifier).evaluate(
+  return specifier.evaluate(
     (element, styles) =>
       Object.fromEntries(
         styles.map((styleName) => [
@@ -154,6 +154,21 @@ export async function getStyles(specifier: ComponentDriver | Locator, style: str
       ),
     style,
   );
+}
+
+export async function getHtmlAttributes(
+  specifier: ComponentDriver | Locator,
+  attributes: string | string[],
+): Promise<{ [k: string]: string; }> {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  attributes = Array.isArray(attributes) ? attributes : [attributes];
+
+  const mapped = await Promise.all(
+    attributes.map(async (attr) => {
+      return [attr, await specifier.getAttribute(attr)];
+    }),
+  );
+  return Object.fromEntries(mapped);
 }
 
 export async function getPaddings(specifier: ComponentDriver | Locator) {
@@ -192,9 +207,7 @@ export async function getMargins(specifier: ComponentDriver | Locator) {
  */
 export async function getBounds(specifier: ComponentDriver | Locator) {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
-  const boundingRect = await specifier.evaluate((element) =>
-    element.getBoundingClientRect(),
-  );
+  const boundingRect = await specifier.evaluate((element) => element.getBoundingClientRect());
   const m = mapObject(await getMargins(specifier), parseFloat);
 
   const width = boundingRect.width + m.marginLeft + m.marginRight;
@@ -296,7 +309,7 @@ export function parseAsCssBorder(str: string) {
     throw new Error(`Too many border widths provided in ${str}`);
   }
 
-  const color = parts.filter(p => chroma.valid(p));
+  const color = parts.filter((p) => chroma.valid(p));
   if (color.length > 1) {
     throw new Error(`Too many border colors provided in ${str}`);
   }
@@ -307,19 +320,18 @@ export function parseAsCssBorder(str: string) {
     color: chroma(color[0]),
   };
   return result;
-
 }
 
 export interface NumericCSS {
   value: number;
   unit: CSSUnit;
-};
+}
 
 const numericCSSRegex = /^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/;
 
 export function isNumericCSS(str: any): str is NumericCSS {
   const parts = str.match(numericCSSRegex);
-  
+
   if (!parts) return false;
   if (parts.length < 3) return false;
   if (isNaN(parseFloat(parts[1]))) return false;

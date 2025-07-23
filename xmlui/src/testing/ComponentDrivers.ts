@@ -559,8 +559,10 @@ export class CodeBlockDriver extends ComponentDriver {}
 // --- Checkbox
 
 export class CheckboxDriver extends InputComponentDriver {
+  // If there is no label, only the input field is rendered, thus this.component=this.field
+  // If there IS a label, the input field is rendered last
   get field() {
-    return this.component.getByRole("checkbox");
+    return this.component.getByRole("checkbox").or(this.component).last();
   }
 }
 
