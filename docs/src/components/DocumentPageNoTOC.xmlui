@@ -5,11 +5,6 @@
       content="{$props.content}"
       data="{$props.url}" />
     <Slot when="{!$props.content && !$props.url}" />
-    <Fragment when="{$props.width}">
-      <DocumentLinks width="{$props.width}" />
-    </Fragment>
-    <Fragment when="{! $props.width}">
-      <DocumentLinks />
-    </Fragment>
+    <DocumentLinks />
   </Stack>
 </Component>
