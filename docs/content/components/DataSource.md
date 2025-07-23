@@ -150,7 +150,7 @@ This `resultSelector` builds an array of the `properties` objects.
 ```xmlui copy
 <DataSource
   id="contacts"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   resultSelector="results.map(item => item.properties )"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
 ```
@@ -182,7 +182,7 @@ This `resultSelector` filters the array of the `properties` objects to include o
 <DataSource
   id="contacts"
   resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
   />
 ````
@@ -227,21 +227,31 @@ The component triggers this event when the fetch operation has been completed an
 
 This property indicates if the data is being fetched.
 
+**Signature**: `get inProgress(): boolean`
+
 ### `isRefetching` [#isrefetching]
 
 This property indicates if the data is being re-fetched.
+
+**Signature**: `get isRefetching(): boolean`
 
 ### `loaded` [#loaded]
 
 This property indicates if the data has been loaded.
 
+**Signature**: `get loaded(): boolean`
+
 ### `refetch` [#refetch]
 
 This method requests the re-fetch of the data.
 
+**Signature**: `refetch(): void`
+
 ### `value` [#value]
 
 This property retrieves the data queried from the source after optional transformations.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 

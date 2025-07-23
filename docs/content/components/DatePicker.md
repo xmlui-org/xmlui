@@ -273,11 +273,16 @@ This event is triggered when the DatePicker has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the DatePicker.
+Focus the DatePicker component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This method sets the current value of the DatePicker.
+
+**Signature**: `set value(value: any): void`
+- `value`: The new value to set for the date picker.
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
 <App>
@@ -299,6 +304,8 @@ You can use this method to set the component's current value programmatically (`
 ### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 

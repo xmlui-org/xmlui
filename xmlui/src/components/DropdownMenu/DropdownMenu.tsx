@@ -71,7 +71,14 @@ export const DropdownMenuMd = createMetadata({
     willOpen: d(`This event fires when the \`${DDMCOMP}\` component is opened.`),
   },
   apis: {
-    close: d(`This method command closes the dropdown.`),
+    close: {
+      description: `This method command closes the dropdown.`,
+      signature: "close(): void",
+    },
+    open: {
+      description: `This method command opens the dropdown.`,
+      signature: "open(): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,

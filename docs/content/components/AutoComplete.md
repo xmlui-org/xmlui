@@ -164,15 +164,22 @@ This event is triggered when the AutoComplete has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the AutoComplete.
+This method focuses the AutoComplete component.
+
+**Signature**: `focus()`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API allows you to set the value of the component. If the value is not valid, the component will not update its internal state.
+
+**Signature**: `setValue(value: any)`
+- `value`: The value to set.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API allows you to get or set the value of the component. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 

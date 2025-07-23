@@ -105,8 +105,6 @@ If you want to run the sample with explicit state buckets (for example, with the
 
 %-API-START update
 
-This method updates the application state object bound to the `AppState` instance. The function's single argument is an object that specifies the new state value.
-
 If the argument is a hash object, it will be merged with the previous state value. Let's assume the previous state value was the following:
 
 ```json

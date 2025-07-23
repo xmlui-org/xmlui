@@ -70,9 +70,7 @@
             <NavGroup label="Reference">
                 <NavGroup label="Components">
                     <!-- GENERATED CONTENT/Component references links -->
-                    <NavLink
-                        label="Components Overview"
-                        to="/components/_overview" />
+                    <NavLink label="Components Overview" to="/components/_overview" />
                     <NavLink label="APICall" to="/components/APICall" />
                     <NavLink label="App" to="/components/App" />
                     <NavLink label="AppHeader" to="/components/AppHeader" />
@@ -88,29 +86,19 @@
                     <NavLink label="CHStack" to="/components/CHStack" />
                     <NavLink label="CVStack" to="/components/CVStack" />
                     <NavLink label="Card" to="/components/Card" />
-                    <NavLink
-                        label="ChangeListener"
-                        to="/components/ChangeListener" />
+                    <NavLink label="ChangeListener" to="/components/ChangeListener" />
                     <NavLink label="Checkbox" to="/components/Checkbox" />
                     <NavLink label="ColorPicker" to="/components/ColorPicker" />
                     <NavLink label="Column" to="/components/Column" />
-                    <NavLink
-                        label="ContentSeparator"
-                        to="/components/ContentSeparator" />
+                    <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
                     <NavLink label="DataSource" to="/components/DataSource" />
                     <NavLink label="DatePicker" to="/components/DatePicker" />
                     <NavLink label="DonutChart" to="/components/DonutChart" />
                     <NavLink label="DropdownMenu" to="/components/DropdownMenu" />
-                    <NavLink
-                        label="EmojiSelector"
-                        to="/components/EmojiSelector" />
-                    <NavLink
-                        label="ExpandableItem"
-                        to="/components/ExpandableItem" />
+                    <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
+                    <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
                     <NavLink label="FileInput" to="/components/FileInput" />
-                    <NavLink
-                        label="FileUploadDropZone"
-                        to="/components/FileUploadDropZone" />
+                    <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
                     <NavLink label="FlowLayout" to="/components/FlowLayout" />
                     <NavLink label="Footer" to="/components/Footer" />
                     <NavLink label="Form" to="/components/Form" />
@@ -137,9 +125,7 @@
                     <NavLink label="Logo" to="/components/Logo" />
                     <NavLink label="Markdown" to="/components/Markdown" />
                     <NavLink label="MenuItem" to="/components/MenuItem" />
-                    <NavLink
-                        label="MenuSeparator"
-                        to="/components/MenuSeparator" />
+                    <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
                     <NavLink label="ModalDialog" to="/components/ModalDialog" />
                     <NavLink label="NavGroup" to="/components/NavGroup" />
                     <NavLink label="NavLink" to="/components/NavLink" />
@@ -148,20 +134,14 @@
                     <NavLink label="NumberBox" to="/components/NumberBox" />
                     <NavLink label="Option" to="/components/Option" />
                     <NavLink label="Page" to="/components/Page" />
-                    <NavLink
-                        label="PageMetaTitle"
-                        to="/components/PageMetaTitle" />
+                    <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
                     <NavLink label="Pages" to="/components/Pages" />
-                    <NavLink
-                        label="PasswordInput"
-                        to="/components/PasswordInput" />
+                    <NavLink label="PasswordInput" to="/components/PasswordInput" />
                     <NavLink label="PieChart" to="/components/PieChart" />
                     <NavLink label="ProgressBar" to="/components/ProgressBar" />
                     <NavLink label="Queue" to="/components/Queue" />
                     <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                    <NavLink
-                        label="RealTimeAdapter"
-                        to="/components/RealTimeAdapter" />
+                    <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
                     <NavLink label="Redirect" to="/components/Redirect" />
                     <NavLink label="Select" to="/components/Select" />
                     <NavLink label="Slider" to="/components/Slider" />
@@ -174,17 +154,13 @@
                     <NavLink label="Switch" to="/components/Switch" />
                     <NavLink label="TabItem" to="/components/TabItem" />
                     <NavLink label="Table" to="/components/Table" />
-                    <NavLink
-                        label="TableOfContents"
-                        to="/components/TableOfContents" />
+                    <NavLink label="TableOfContents" to="/components/TableOfContents" />
                     <NavLink label="Tabs" to="/components/Tabs" />
                     <NavLink label="Text" to="/components/Text" />
                     <NavLink label="TextArea" to="/components/TextArea" />
                     <NavLink label="TextBox" to="/components/TextBox" />
                     <NavLink label="Theme" to="/components/Theme" />
-                    <NavLink
-                        label="ToneChangerButton"
-                        to="/components/ToneChangerButton" />
+                    <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
                     <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                     <NavLink label="VSplitter" to="/components/VSplitter" />
                     <NavLink label="VStack" to="/components/VStack" />

@@ -33,8 +33,14 @@ export const HelloWorldMd = createMetadata({
     },
   },
   apis: {
-    value: dValue(),
-    setValue: dSetValueApi(),
+    value: {
+      description: "This API returns the current value of the HelloWorld component.",
+      signature: "value(): string",
+    },
+    setValue: {
+      description: "This API sets a new value for the HelloWorld component.",
+      signature: "setValue(value: string): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

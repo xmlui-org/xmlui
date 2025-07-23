@@ -119,15 +119,22 @@ This event is triggered when the TextBox has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the TextBox.
+This method sets the focus on the `TextBox` component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `TextBox`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: string): void`
+- `value`: The new value to set. If the value is empty, it will clear the input.
 
 ### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): string | undefined`
 
 ## Styling [#styling]
 

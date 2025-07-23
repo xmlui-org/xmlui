@@ -61,8 +61,17 @@ export const CheckboxMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    value: dValueApi(),
-    setValue: dSetValueApi(),
+    value: {
+      description: `This method returns the current value of the ${COMP}.`,
+      signature: "get value(): boolean",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: boolean): void",
+      parameters: {
+        value: "The new value to set for the checkbox.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,

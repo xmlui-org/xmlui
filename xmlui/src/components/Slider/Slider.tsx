@@ -90,9 +90,21 @@ export const SliderMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This method sets the focus on the slider component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): number | [number, number] | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: number | [number, number] | undefined): void",
+      parameters: {
+        value: "The new value to set. Can be a single value or an array of values for range sliders.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

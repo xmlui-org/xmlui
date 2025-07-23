@@ -155,6 +155,10 @@ export const APICallMd = createMetadata({
         "This method triggers the invocation of the API. You can pass an arbitrary " +
         "number of parameters to the method. In the \`APICall\` instance, you can " +
         "access those with the \`$param\` and \`$params\` context values.",
+      signature: "execute(...params: any[])",
+      parameters: {
+        params: "An arbitrary number of parameters that can be used in the API call.",
+      },
     },
   },
 });

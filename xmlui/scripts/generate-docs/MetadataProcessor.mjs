@@ -11,17 +11,14 @@ import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, LOGGER_LEVELS, processError, ErrorWithSeverity } from "./logger.mjs";
 import { createTable, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
-import { 
-  iterateObjectEntries, 
-  processComponentSection 
-} from "./pattern-utilities.mjs";
+import { iterateObjectEntries, processComponentSection } from "./pattern-utilities.mjs";
 import {
   METADATA_SECTIONS,
   DIRECTIVE_CONFIG,
   SECTION_DISPLAY_NAMES,
   SECTION_REFERENCE_KEYS,
   COMMON_TABLE_HEADERS,
-  FILE_EXTENSIONS
+  FILE_EXTENSIONS,
 } from "./constants.mjs";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
@@ -120,23 +117,31 @@ export class MetadataProcessor {
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
-      result += combineDescriptionAndDescriptionRef(fileData, component, METADATA_SECTIONS.DESCRIPTION);
+      result += combineDescriptionAndDescriptionRef(
+        fileData,
+        component,
+        METADATA_SECTIONS.DESCRIPTION,
+      );
 
       // Add context variables if they exist
       if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
         result += "\n\n**Context variables available during execution:**";
         result += "\n\n";
-        
+
         // Use pattern utility for processing context variables
-        processComponentSection(component.contextVars, (contextVarName, contextVar) => {
-          if (contextVar.description) {
-            result += `- \`${contextVarName}\`: ${contextVar.description}\n`;
-          }
-        }, { 
-          filter: (name, contextVar) => !contextVar.isInternal && contextVar.description 
-        });
+        processComponentSection(
+          component.contextVars,
+          (contextVarName, contextVar) => {
+            if (contextVar.description) {
+              result += `- \`${contextVarName}\`: ${contextVar.description}\n`;
+            }
+          },
+          {
+            filter: (name, contextVar) => !contextVar.isInternal && contextVar.description,
+          },
+        );
       }
-      
+
       result += "\n\n";
 
       result += addChildrenTemplateSection(component);
@@ -254,7 +259,7 @@ function addPropsSection(data, component) {
   if (!component.props || Object.keys(component.props ?? {}).length === 0) {
     return buffer + "This component does not have any properties.";
   }
-  
+
   // Use pattern utility for processing props
   processComponentSection(component.props, (propName, prop) => {
     const isRequired = prop.isRequired === true ? "(required)" : "";
@@ -281,11 +286,22 @@ function addApisSection(data, component) {
   if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
     return buffer + "This component does not expose any methods.";
   }
-  
+
   // Use pattern utility for processing APIs
   processComponentSection(component.apis, (apiName, api) => {
     buffer += `### \`${apiName}\`\n\n`;
-    buffer += combineDescriptionAndDescriptionRef(data, api, METADATA_SECTIONS.API);
+    buffer += getComponentDescription(api);
+    buffer += "\n\n";
+    if (api.signature) {
+      buffer += `**Signature**: \`${api.signature}\`\n`;
+      if (api.parameters && Object.keys(api.parameters).length > 0) {
+        Object.entries(api.parameters).forEach(([name, param]) => {
+          buffer += `- \`${name}\`: ${param}\n`;
+        });
+        buffer += `\n`;
+      }
+    }
+    buffer += getComponentDescriptionRef(data, api, METADATA_SECTIONS.API);
     buffer += "\n\n";
   });
 
@@ -301,7 +317,7 @@ function addEventsSection(data, component) {
   if (!component.events || Object.keys(component.events ?? {}).length === 0) {
     return buffer + "This component does not have any events.";
   }
-  
+
   // Use pattern utility for processing events
   processComponentSection(component.events, (eventName, event) => {
     buffer += `### \`${eventName}\`\n\n`;
@@ -336,6 +352,25 @@ function addStylesSection(data, component) {
   }
 
   return buffer;
+}
+
+function getComponentDescription(component) {
+  let descriptionBuffer = "";
+
+  if (component[SECTION_DESCRIPTION]) {
+    descriptionBuffer = component[SECTION_DESCRIPTION];
+  }
+
+  return descriptionBuffer;
+}
+
+function getComponentDescriptionRef(data, component, sectionId) {
+  let fileBuffer = "";
+  if (component.hasOwnProperty(SECTION_DESCRIPTION_REF) && component[SECTION_DESCRIPTION_REF]) {
+    fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], sectionId);
+  }
+
+  return fileBuffer;
 }
 
 function combineDescriptionAndDescriptionRef(
@@ -815,9 +850,12 @@ const themeKeywordLinks = {
   textDecorationLine: "[textDecorationLine](../styles-and-themes/common-units/#textDecoration)",
   lineHeight: "[lineHeight](../styles-and-themes/common-units/#size)",
   borderEndEndRadius: "[borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)",
-  borderEndStartRadius: "[borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)",
-  borderStartEndRadius: "[borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)",
-  borderStartStartRadius: "[borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderEndStartRadius:
+    "[borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderStartEndRadius:
+    "[borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderStartStartRadius:
+    "[borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)",
   borderRadius: "[borderRadius](../styles-and-themes/common-units/#border-rounding)",
   borderHorizontal: "[borderHorizontal](../styles-and-themes/common-units/#border)",
   borderVertical: "[borderHorizontal](../styles-and-themes/common-units/#border)",

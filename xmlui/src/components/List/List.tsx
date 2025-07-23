@@ -103,14 +103,28 @@ export const ListMd = createMetadata({
   },
   childrenAsTemplate: "itemTemplate",
   apis: {
-    scrollToTop: d("This method scrolls the list to the top."),
-    scrollToBottom: d("This method scrolls the list to the bottom."),
-    scrollToIndex: d(
-      "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
-    ),
-    scrollToId: d(
-      "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
-    ),
+    scrollToTop: {
+      description: "This method scrolls the list to the top.",
+      signature: "scrollToTop(): void",
+    },
+    scrollToBottom: {
+      description: "This method scrolls the list to the bottom.",
+      signature: "scrollToBottom(): void",
+    },
+    scrollToIndex: {
+      description: "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
+      signature: "scrollToIndex(index: number): void",
+      parameters: {
+        index: "The index to scroll to.",
+      },
+    },
+    scrollToId: {
+      description: "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
+      signature: "scrollToId(id: string): void",
+      parameters: {
+        id: "The ID of the item to scroll to.",
+      },
+    },
   },
   contextVars: {
     $item: d("Current data item being rendered"),

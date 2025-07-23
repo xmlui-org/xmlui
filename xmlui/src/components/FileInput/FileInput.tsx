@@ -102,16 +102,25 @@ export const FileInputMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    value: d(
-      `By setting an ID for the component, you can refer to the value of the field if set. ` +
-        `If no value is set, the value will be undefined.`,
-    ),
-    setValue: d(
-      `(**NOT IMPLEMENTED YET**) You can use this method to set the component's ` +
-        `current value programmatically.`,
-    ),
-    focus: dFocus(COMP),
-    open: d(`This API command triggers the file browsing dialog to open.`),
+    value: {
+      description: "This property holds the current value of the component, which is an array of files.",
+      signature: "get value(): File[]",
+    },
+    setValue: {
+      description: "This method sets the current value of the component.",
+      signature: "setValue(files: File[]): void",
+      parameters: {
+        files: "An array of File objects to set as the current value of the component.",
+      },
+    },
+    focus: {
+      description: "This API command focuses the input field of the component.",
+      signature: "focus(): void",
+    },
+    open: {
+      description: "This API command triggers the file browsing dialog to open.",
+      signature: "open(): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

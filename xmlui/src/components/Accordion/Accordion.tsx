@@ -62,11 +62,21 @@ export const AccordionMd = createMetadata({
     displayDidChange: dDidChange(COMP),
   },
   apis: {
-    expanded: dExpanded(COMP),
-    expand: dExpand(COMP),
-    collapse: dCollapse(COMP),
+    expanded: {
+      description: `This method returns \`true\` if the accordion is expanded, and \`false\` if it is collapsed.`,
+      signature: "get expanded(): boolean",
+    },
+    expand: {
+      description: `This method expands the accordion, making its content visible.`,
+      signature: "expand()",
+    },
+    collapse: {
+      description: `This method collapses the accordion, hiding its content.`,
+      signature: "collapse()",
+    },
     toggle: {
-      description: `This method toggles the state of the ${COMP} between expanded and collapsed.`
+      description: `This method toggles the state of the ${COMP} between expanded and collapsed.`,
+      signature: "toggle()",
     },
     focus: dFocus(COMP),
   },

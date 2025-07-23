@@ -1,3 +1,4 @@
+import { sign } from "crypto";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import { Bookmark, defaultProps } from "./BookmarkNative";
@@ -39,6 +40,7 @@ export const BookmarkMd = createMetadata({
   },
   apis: {
     scrollIntoView: {
+      signature: "scrollIntoView()",
       description: "Scrolls the bookmark into view.",
     },
   },

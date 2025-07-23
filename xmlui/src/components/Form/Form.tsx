@@ -107,11 +107,18 @@ export const FormMd = createMetadata({
     ),
   },
   apis: {
-    reset: d(`Call this event to reset the form to its initial state.`),
-    update: d(
-      "You can pass a data object to update the form data. The properties in the passed data " +
+    reset: {
+      description: "This method resets the form to its initial state, clearing all user input.",
+      signature: "reset(): void",
+    },
+    update: {
+      description: "You can pass a data object to update the form data. The properties in the passed data " +
         "object are updated to their values accordingly. Other form properties remain intact.",
-    ),
+      signature: "update(data: Record<string, any>): void",
+      parameters: {
+        data: "An object containing the form data to update.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

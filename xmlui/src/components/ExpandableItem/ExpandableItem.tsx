@@ -55,12 +55,22 @@ export const ExpandableItemMd = createMetadata({
     ),
   },
   apis: {
-    expand: d(`This method expands the expandable item.`),
-    collapse: d(`This method collapses the expandable item.`),
-    toggle: d(`This method toggles the expandable item's expanded state.`),
-    isExpanded: d(
-      `This method returns a boolean indicating whether the expandable item is currently expanded.`,
-    ),
+    expand: {
+      description: `This method expands the item.`,
+      signature: "expand(): void",
+    },
+    collapse: {
+      description: `This method collapses the item.`,
+      signature: "collapse(): void",
+    },
+    toggle: {
+      description: `This method toggles the item's expanded state.`,
+      signature: "toggle(): void",
+    },
+    isExpanded: {
+      description: `This method returns a boolean indicating whether the item is currently expanded.`,
+      signature: "isExpanded(): boolean",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,

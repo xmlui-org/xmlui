@@ -114,12 +114,25 @@ export const DataSourceMd = createMetadata({
     error: d(`This event fires when a request results in an error.`),
   },
   apis: {
-    value: d(
-      "This property retrieves the data queried from the source after optional transformations.",
-    ),
-    inProgress: d("This property indicates if the data is being fetched."),
-    isRefetching: d("This property indicates if the data is being re-fetched."),
-    loaded: d("This property indicates if the data has been loaded."),
-    refetch: d("This method requests the re-fetch of the data."),
+    value: {
+      description: `This property retrieves the data queried from the source after optional transformations.`,
+      signature: "get value(): any",
+    },
+    inProgress: {
+      description: "This property indicates if the data is being fetched.",
+      signature: "get inProgress(): boolean",
+    },
+    isRefetching: {
+      description: "This property indicates if the data is being re-fetched.",
+      signature: "get isRefetching(): boolean",
+    },
+    loaded: {
+      description: "This property indicates if the data has been loaded.",
+      signature: "get loaded(): boolean",
+    },
+    refetch: {
+      description: "This method requests the re-fetch of the data.",
+      signature: "refetch(): void",
+    },
   },
 });

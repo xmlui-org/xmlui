@@ -191,15 +191,24 @@ export const FormItemMd = createMetadata({
     validate: d(`This event is used to define a custom validation function.`),
   },
   apis: {
-    addItem: d(
-      "Adds a new item to the `FormItem` data where the particular form item holds " +
-        "a list. The function has a single parameter, the data to add to the `FormItem`. " +
-        "The new item is appended to the end of the list.",
-    ),
-    removeItem: d(
-      "Removes the item specified by its index from the list held by the FormItem. " +
+    addItem: {
+      description:
+        "This method adds a new item to the list held by the FormItem. The function has a single " +
+        "parameter, the data to add to the FormItem. The new item is appended to the end of the list.",
+      signature: "addItem(data: any): void",
+      parameters: {
+        data: "The data to add to the FormItem's list.",
+      },
+    },
+    removeItem: {
+      description:
+        "Removes the item specified by its index from the list held by the FormItem. " +
         "The function has a single argument, the index to remove.",
-    ),
+      signature: "removeItem(index: number): void",
+      parameters: {
+        index: "The index of the item to remove from the FormItem's list.",
+      },
+    },
   },
   contextVars: {
     $value: d("Current value of the FormItem, accessible in expressions and code snippets"),

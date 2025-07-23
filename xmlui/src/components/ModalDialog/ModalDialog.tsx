@@ -42,15 +42,20 @@ export const ModalDialogMd = createMetadata({
     ),
   },
   apis: {
-    close: d(
-      `This method is used to close the \`${COMP}\`. Invoke it using \`modalId.close()\` ` +
+    close: {
+      description: `This method is used to close the \`${COMP}\`. Invoke it using \`modalId.close()\` ` +
         `where \`modalId\` refers to a \`ModalDialog\` component.`,
-    ),
-    open: d(
-      "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
-        "of parameters to the method. In the \`ModalDialog\` instance, you can access those " +
-        "with the \`$paramq` and \`$params\` context values.",
-    ),
+      signature: "close(): void",
+    },
+    open: {
+      description: "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
+        "of parameters to the method. In the `ModalDialog` instance, you can access those " +
+        "with the `\$param` and `\$params` context values.",
+      signature: "open(...params: any[]): void",
+      parameters: {
+        params: "An arbitrary number of parameters that can be used to pass data to the dialog.",
+      },
+    },
   },
   contextVars: {
     $param: d("First parameter passed to the `open()` method"),

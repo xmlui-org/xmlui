@@ -49,19 +49,27 @@ This event fires when the expandable item is expanded or collapsed. It provides 
 
 ### `collapse` [#collapse]
 
-This method collapses the expandable item.
+This method collapses the item.
+
+**Signature**: `collapse(): void`
 
 ### `expand` [#expand]
 
-This method expands the expandable item.
+This method expands the item.
+
+**Signature**: `expand(): void`
 
 ### `isExpanded` [#isexpanded]
 
-This method returns a boolean indicating whether the expandable item is currently expanded.
+This method returns a boolean indicating whether the item is currently expanded.
+
+**Signature**: `isExpanded(): boolean`
 
 ### `toggle` [#toggle]
 
-This method toggles the expandable item's expanded state.
+This method toggles the item's expanded state.
+
+**Signature**: `toggle(): void`
 
 ## Styling [#styling]
 

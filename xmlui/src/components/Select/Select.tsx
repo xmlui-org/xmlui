@@ -111,12 +111,26 @@ export const SelectMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    setValue: dSetValueApi(),
-    value: dValue(),
-    reset: d(
-      `This method resets the component to its initial value, or clears the selection if no initial value was provided.`,
-    ),
+    focus: {
+      description: `This method focuses the \`${COMP}\` component. You can use it to programmatically focus the component.`,
+      signature: "focus(): void",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: string | string[] | undefined): void",
+      parameters: {
+        value:
+          "The new value to set. Can be a single value or an array of values for multi-select.",
+      },
+    },
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): string | string[] | undefined",
+    },
+    reset: {
+      description: `This method resets the component to its initial value, or clears the selection if no initial value was provided.`,
+      signature: "reset(): void",
+    },
   },
   contextVars: {
     $item: d("Represents the current option's data (label and value properties)"),
