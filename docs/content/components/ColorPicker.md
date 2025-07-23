@@ -115,11 +115,16 @@ This event is triggered when the ColorPicker has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the ColorPicker.
+Focus the ColorPicker component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This method sets the current value of the ColorPicker.
+
+**Signature**: `set value(value: string): void`
+- `value`: The new value to set for the color picker.
 
 ```xmlui-pg copy display name="Example: setValue"
 <App>
@@ -145,7 +150,9 @@ You can use this method to set the component's current value programmatically (`
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This method returns the current value of the ColorPicker.
+
+**Signature**: `get value(): string`
 
 ## Styling [#styling]
 

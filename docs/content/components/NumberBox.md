@@ -346,12 +346,15 @@ This event is triggered when the `NumberBox` loses focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the NumberBox.
+This API focuses the input field of the `NumberBox`. You can use it to programmatically focus the field.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `NumberBox`. You can use it to programmatically change the value.
 
+**Signature**: `setValue(value: number | undefined): void`
 You can use this method to set the component's current value programmatically.
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
@@ -373,8 +376,9 @@ You can use this method to set the component's current value programmatically.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API retrieves the current value of the `NumberBox`. You can use it to get the value programmatically.
 
+**Signature**: `get value(): number | undefined`
 You can query this read-only API property to get the input component's current value.
 
 See an example in the `setValue` API method.

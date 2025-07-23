@@ -110,9 +110,18 @@ export const NumberBoxMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This API focuses the input field of the \`${COMP}\`. You can use it to programmatically focus the field.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): number | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: number | undefined): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

@@ -137,11 +137,21 @@ export const DatePickerMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `Focus the ${COMP} component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): any",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: any): void",
+      parameters: {
+        value: "The new value to set for the date picker.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

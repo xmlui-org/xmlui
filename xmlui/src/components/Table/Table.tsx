@@ -130,18 +130,32 @@ export const TableMd = createMetadata({
     ),
   },
   apis: {
-    clearSelection: d("This method clears the list of currently selected table rows."),
-    getSelectedItems: d(`This method returns the list of currently selected table rows items.`),
-    getSelectedIds: d(`This method returns the list of currently selected table rows IDs.`),
-    selectAll: d(
-      `This method selects all the rows in the table. This method has no effect if the ` +
+    clearSelection: {
+      description: `This method clears the list of currently selected table rows.`,
+      signature: "clearSelection(): void",
+    },
+    getSelectedItems: {
+      description: `This method returns the list of currently selected table rows items.`,
+      signature: "getSelectedItems(): Array<TableRowItem>",
+    },
+    getSelectedIds: {
+      description: `This method returns the list of currently selected table rows IDs.`,
+      signature: "getSelectedIds(): Array<string>",
+    },
+    selectAll: {
+      description: `This method selects all the rows in the table. This method has no effect if the ` +
         `rowsSelectable property is set to \`false\`.`,
-    ),
-    selectId: d(
-      `This method selects the row with the specified ID. This method has no effect if the ` +
+      signature: "selectAll(): void",
+    },
+    selectId: {
+      description: `This method selects the row with the specified ID. This method has no effect if the ` +
         `\`rowsSelectable\` property is set to \`false\`. The method argument can be a ` +
         `single id or an array of them.`,
-    ),
+      signature: "selectId(id: string | Array<string>): void",
+      parameters: {
+        id: `The ID of the row to select, or an array of IDs to select multiple rows.`,
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

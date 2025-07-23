@@ -52,8 +52,19 @@ export const SwitchMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    value: dValueApi(),
-    setValue: dSetValueApi(),
+    value: {
+      description:
+        `This property holds the current value of the ${COMP}, which can be either ` +
+        `"true" (on) or "false" (off).`,
+      signature: "get value():boolean",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: boolean): void",
+      parameters: {
+        value: "The new value to set. Can be either true (on) or false (off).",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -76,7 +87,7 @@ export const SwitchMd = createMetadata({
 
     dark: {
       [`backgroundColor-indicator-${COMP}`]: "$color-surface-500",
-    }
+    },
   },
 });
 

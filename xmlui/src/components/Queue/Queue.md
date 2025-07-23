@@ -82,11 +82,9 @@ This method returns the items currently in the queue with their entire context. 
 
 %-API-START remove
 
-This method removes an item from the queue. The parameter of this method is the unique ID of the item returned from the `enqueueItem` (or `enqueueItems` method.
-
 The following example emulates a file-processing application. When a file is about to save (in the `process` event), the processing fails with files that deny overwrite. In such a case, the `processError` event handler asks the user to confirm the overwrite action. In case of confirmation, the queue uses the `remove` action to discard the faulty queue item and enqueues the file again with the `accept` behavior so that it won't fail next time.
 
-```xmlui-pg copy {21} display name="Example: remove"
+```xmlui-pg copy {21} display name="Example: remove" height="240px"
 <App var.queued="{0}" var.processed="" var.skipped="{0}">
   <Button
     label="Add a new file to the queue"

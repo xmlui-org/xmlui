@@ -223,6 +223,21 @@ export type ComponentPropertyMetadata = {
   isRequired?: boolean;
 };
 
+// This type defines the metadata of a component API. It is used to describe the
+// methods that the component exposes for interaction.
+export type ComponentApiMetadata = {
+  // This field defines the description explaining the property. You can use markdown,
+  // as the UI may display this value.
+  readonly description: string;
+
+  // This field defines the signature of the API method using TypeScript-like syntax.
+  readonly signature?: string;
+
+  // This field defines the parameters of the API method. It is an object where each key
+  // is the parameter name, and the value is its description.
+  readonly parameters?: Record<string, string>;
+};
+
 // Components have metadata that the rendering engine uses to render the component.
 // This type defines the structure of such metadata.
 //
@@ -233,7 +248,7 @@ export type ComponentMetadata<
   TProps extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TEvents extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TContextValues extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
-  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentApiMetadata> = Record<string, any>,
 > = {
   // The current status of the component. This field is now mandatory.
   status?: "stable" | "experimental" | "deprecated" | "in progress";

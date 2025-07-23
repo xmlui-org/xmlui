@@ -115,9 +115,25 @@ Available values are:
 
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
-  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
     <EmojiSelector
-      onSelect="(reaction) => { emojiDropDown.close(); }"
+      onSelect="(reaction) => { emojiDropdown.close(); }"
+      autoFocus="true"
+    />
+  </DropdownMenu>
+</App>
+```
+
+%-API-END
+
+%-API-START open
+
+```xmlui-pg copy {2} display name="Example: open" height="300px"
+<App>
+  <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
+    <EmojiSelector
+      onSelect="(reaction) => { emojiDropdown.close(); }"
       autoFocus="true"
     />
   </DropdownMenu>

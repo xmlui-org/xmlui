@@ -154,11 +154,16 @@ The form infrastructure fires this event when the form is submitted successfully
 
 ### `reset` [#reset]
 
-Call this event to reset the form to its initial state.
+This method resets the form to its initial state, clearing all user input.
+
+**Signature**: `reset(): void`
 
 ### `update` [#update]
 
 You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.
+
+**Signature**: `update(data: Record<string, any>): void`
+- `data`: An object containing the form data to update.
 
 This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly. 
 

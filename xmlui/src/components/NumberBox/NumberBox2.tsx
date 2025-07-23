@@ -110,9 +110,18 @@ export const NumberBoxMd2 = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: "This method focuses the input field of the component.",
+      signature: "focus(): void",
+    },
+    value: {
+      description: "This API retrieves the current value of the component.",
+      signature: "get value(): number | undefined",
+    },
+    setValue: {
+      description: "This API sets the value of the component.",
+      signature: "setValue(value: number | undefined): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

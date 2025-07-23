@@ -97,6 +97,8 @@ This component does not have any events.
 
 Scrolls the bookmark into view.
 
+**Signature**: `scrollIntoView()`
+
 ## Styling [#styling]
 
 This component does not have any styles.

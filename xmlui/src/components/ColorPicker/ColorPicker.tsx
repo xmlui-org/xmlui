@@ -46,9 +46,21 @@ export const ColorPickerMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `Focus the ${COMP} component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `This method returns the current value of the ${COMP}.`,
+      signature: "get value(): string",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: string): void",
+      parameters: {
+        value: "The new value to set for the color picker.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

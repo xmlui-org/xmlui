@@ -30,10 +30,14 @@ export const AppStateMd = createMetadata({
     },
   },
   apis: {
-    update: d(
-      "This method updates the application state object bound to the `AppState` instance. The " +
-        "function's single argument is an object that specifies the new state value.",
-    ),
+    update: {
+      signature: "update(newState: Record<string, any>)",
+      description:
+        "This method updates the application state object bound to the `AppState` instance.",
+      parameters: {
+        newState: "An object that specifies the new state value.",
+      },
+    },
   },
   nonVisual: true,
 });

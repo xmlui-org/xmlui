@@ -154,7 +154,10 @@ This event is triggered when the Switch has lost the focus.
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `Switch`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: boolean): void`
+- `value`: The new value to set. Can be either true (on) or false (off).
 
 ```xmlui-pg copy {10,13,15} display name="Example: value and setValue"
 <App var.changes="">
@@ -178,7 +181,9 @@ You can use this method to set the component's current value programmatically (`
 
 ### `value` [#value]
 
-You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
+This property holds the current value of the Switch, which can be either "true" (on) or "false" (off).
+
+**Signature**: `get value():boolean`
 
 ## Styling [#styling]
 

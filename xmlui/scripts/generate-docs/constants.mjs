@@ -165,6 +165,7 @@ export const TABLE_CONFIG = {
 
 export const COMMON_TABLE_HEADERS = {
   VALUE_DESCRIPTION: ["Value", "Description"],
+  PARAMETER_DESCRIPTION: ["Name", "Description"],
   THEME_VARIABLE_DESCRIPTION: ["Theme Variable", "Description"]
 };
 

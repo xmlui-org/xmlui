@@ -31,14 +31,15 @@ export const TabsMd = createMetadata({
       valueType: "string",
     },
     tabTemplate: {
-      ...dComponent(
-        `This property declares the template for the clickable tab area.`
-      ),
+      ...dComponent(`This property declares the template for the clickable tab area.`),
       isInternal: true,
     },
   },
   apis: {
-    next: d(`This method selects the next tab.`),
+    next: {
+      description: `This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.`,
+      signature: "next(): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

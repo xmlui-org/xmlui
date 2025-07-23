@@ -49,31 +49,44 @@ export const QueueMd = createMetadata({
     ),
   },
   apis: {
-    enqueueItem: d(
-      `This method enqueues the item passed in the method parameter. The new item will be ` +
+    enqueueItem: {
+      description: `This method enqueues the item passed in the method parameter. The new item will be ` +
         `processed after the current queue items have been handled. The method retrieves the ` +
         `unique ID of the newly added item; this ID can be used later in other methods, ` +
         `such as \`remove\`.`,
-    ),
-    enqueueItems: d(
-      `This method enqueues the array of items passed in the method parameter. The new items ` +
+      signature: "enqueueItem(item: any): string",
+      parameters: {
+        item: "The item to enqueue.",
+      },
+    },
+    enqueueItems: {
+      description: `This method enqueues the array of items passed in the method parameter. The new items ` +
         `will be processed after the current queue items have been handled. The method ` +
         `retrieves an array of unique IDs, one for each new item. An item ID can be used later ` +
         `in other methods, such as \`remove\`.`,
-    ),
-    getQueuedItems: d(
-      `You can use this method to return the items in the queue. These items contain all ` +
+      signature: "enqueueItems(items: any[]): string[]",
+      parameters: {
+        items: "The array of items to enqueue.",
+      },
+    },
+    getQueuedItems: {
+      description: `You can use this method to return the items in the queue. These items contain all ` +
         `entries not removed from the queue yet, including pending, in-progress, and ` +
         `completed items.`,
-    ),
-    getQueueLength: d(
-      `This method retrieves the current queue length. The queue contains only those items ` +
+      signature: "getQueuedItems(): any[]",
+    },
+    getQueueLength: {
+      description: `This method retrieves the current queue length. The queue contains only those items ` +
         `that are not fully processed yet.`,
-    ),
-    remove: d(
-      `This method retrieves the current queue length. The queue contains only those items ` +
-        `that are not fully processed yet.`,
-    ),
+      signature: "getQueueLength(): number",
+    },
+    remove: {
+      description: `This method removes an item from the queue using its unique ID.`,
+      signature: "remove(itemId: string): void",
+      parameters: {
+        itemId: "The unique ID of the item to remove.",
+      },
+    },
   },
   contextVars: {
     $completedItems: d(

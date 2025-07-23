@@ -98,10 +98,14 @@ export const TextAreaMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
+    focus: {
+      description: `This method sets the focus on the \`${COMP}\` component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): string | undefined",
+    },
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),

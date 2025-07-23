@@ -116,15 +116,22 @@ This event is triggered when the Slider has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the Slider.
+This method sets the focus on the slider component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `Slider`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: number | [number, number] | undefined): void`
+- `value`: The new value to set. Can be a single value or an array of values for range sliders.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API retrieves the current value of the `Slider`. You can use it to get the value programmatically.
+
+**Signature**: `get value(): number | [number, number] | undefined`
 
 ## Styling [#styling]
 

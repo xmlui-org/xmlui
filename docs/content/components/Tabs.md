@@ -80,7 +80,9 @@ This component does not have any events.
 
 ### `next` [#next]
 
-This method selects the next tab.
+This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.
+
+**Signature**: `next(): void`
 
 ## Styling [#styling]
 

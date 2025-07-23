@@ -77,15 +77,17 @@ export const TextBoxMd = createMetadata({
       defaultValue: false,
     },
     passwordVisibleIcon: {
-      description: "The icon to display when the password is visible (when showPasswordToggle is true).",
+      description:
+        "The icon to display when the password is visible (when showPasswordToggle is true).",
       valueType: "string",
       defaultValue: "eye",
     },
     passwordHiddenIcon: {
-      description: "The icon to display when the password is hidden (when showPasswordToggle is true).",
+      description:
+        "The icon to display when the password is hidden (when showPasswordToggle is true).",
       valueType: "string",
       defaultValue: "eye-off",
-    }
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -93,11 +95,21 @@ export const TextBoxMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This method sets the focus on the \`${COMP}\` component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): string | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: string): void",
+      parameters: {
+        value: "The new value to set. If the value is empty, it will clear the input.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
