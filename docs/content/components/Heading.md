@@ -139,7 +139,11 @@ This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollIntoView` [#scrollintoview]
+
+Scrolls the heading into view.
+
+**Signature**: `scrollIntoView()`
 
 ## Styling [#styling]
 

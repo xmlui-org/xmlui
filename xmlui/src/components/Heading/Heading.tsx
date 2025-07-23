@@ -70,6 +70,12 @@ export const HeadingMd = createMetadata({
       type: "boolean",
     },
   },
+  apis: {
+    scrollIntoView: {
+      signature: "scrollIntoView()",
+      description: "Scrolls the heading into view.",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
