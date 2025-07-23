@@ -564,6 +564,10 @@ export class CheckboxDriver extends InputComponentDriver {
   get field() {
     return this.component.getByRole("checkbox").or(this.component).last();
   }
+
+  async isIndeterminate() {
+    return this.field.evaluate((el: HTMLInputElement) => el.indeterminate);
+  }
 }
 
 // --- Label

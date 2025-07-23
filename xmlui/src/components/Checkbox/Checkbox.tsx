@@ -138,6 +138,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(node.props.required)}
         indeterminate={extractValue.asOptionalBoolean(node.props.indeterminate)}
         registerComponentApi={registerComponentApi}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
       />
     );
   },

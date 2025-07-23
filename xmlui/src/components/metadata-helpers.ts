@@ -6,6 +6,7 @@ import type {
   PropertyValueType,
 } from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
+import { defaultProps } from "./FormItem/ItemWithLabel";
 
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
@@ -97,10 +98,10 @@ export function dLabelWidth(comp: string): ComponentPropertyMetadata {
 export function dLabelBreak(comp: string): ComponentPropertyMetadata {
   return {
     description:
-      `This boolean value indicates if the \`${comp}\` label can be split into multiple ` +
+      `This boolean value indicates whether the \`${comp}\` label can be split into multiple ` +
       `lines if it would overflow the available label width.`,
     valueType: "boolean",
-    defaultValue: false,
+    defaultValue: defaultProps.labelBreak,
   };
 }
 
@@ -267,8 +268,6 @@ export function dValue(): ComponentPropertyMetadata {
       `retrieve \`undefined\`.`,
   };
 }
-
-`You can query the component's value. If no value is set, it will retrieve \`undefined\`.`;
 
 export function dDidOpen(comp: string): ComponentPropertyMetadata {
   return {
