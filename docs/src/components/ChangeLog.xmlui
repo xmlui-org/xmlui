@@ -1,6 +1,6 @@
 <Component name="ChangeLog">
     <DataSource id="downloads" url="/resources/files/releases.json" method="GET" />
-    <DocumentPage>
+    <DocumentPageNoTOC>
         <HStack>
             <VStack
                     width="*"
@@ -23,7 +23,7 @@
                             <VStack paddingLeft="$padding-normal">
                                 <Items items="{$item.changes}">
                                     <HStack verticalAlignment="start">
-                                        <Link 
+                                        <Link
                                             to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
                                             paddingTop="$space-1_5"
                                             target="_blank">
@@ -55,5 +55,5 @@
                 </VStack>
             </VStack>
         </HStack>
-    </DocumentPage>
+    </DocumentPageNoTOC>
 </Component>

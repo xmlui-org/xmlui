@@ -198,10 +198,10 @@
         </NavPanel>
         <Pages fallbackPath="/404">
             <Page url="/">
-                <DocumentPage hideToc="true" url="/pages/intro.md" />
+                <DocumentPageNoTOC url="/pages/intro.md" />
             </Page>
             <Page url="/reactive-intro">
-                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
+                <DocumentPageNoTOC url="/pages/reactive-intro.md" />
             </Page>
             <Page url="/components-intro">
                 <ComponentsIntro />
@@ -210,43 +210,43 @@
                 <ThemesIntro />
             </Page>
             <Page url="/tutorial-01">
-                <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-01.md" />
             </Page>
             <Page url="/tutorial-02">
-                <DocumentPage url="/pages/tutorial-02.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-02.md" />
             </Page>
             <Page url="/tutorial-03">
-                <DocumentPage url="/pages/tutorial-03.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-03.md" />
             </Page>
             <Page url="/tutorial-04">
-                <DocumentPage url="/pages/tutorial-04.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-04.md" />
             </Page>
             <Page url="/tutorial-05">
-                <DocumentPage url="/pages/tutorial-05.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-05.md" />
             </Page>
             <Page url="/tutorial-06">
-                <DocumentPage url="/pages/tutorial-06.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-06.md" />
             </Page>
             <Page url="/tutorial-07">
-                <DocumentPage url="/pages/tutorial-07.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-07.md" />
             </Page>
             <Page url="/tutorial-08">
-                <DocumentPage url="/pages/tutorial-08.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-08.md" />
             </Page>
             <Page url="/tutorial-09">
-                <DocumentPage url="/pages/tutorial-09.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-09.md" />
             </Page>
             <Page url="/tutorial-10">
-                <DocumentPage url="/pages/tutorial-10.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-10.md" />
             </Page>
             <Page url="/tutorial-11">
-                <DocumentPage url="/pages/tutorial-11.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-11.md" />
             </Page>
             <Page url="/tutorial-12">
-                <DocumentPage url="/pages/tutorial-12.md" />
+                <DocumentPageNoTOC url="/pages/tutorial-12.md" />
             </Page>
             <Page url="/app-structure">
-                <DocumentPage url="/pages/app-structure.md" />
+                <DocumentPageNoTOC url="/pages/app-structure.md" />
             </Page>
             <Page url="/markup">
                 <DocumentPage url="/pages/markup.md" />
@@ -276,10 +276,10 @@
                 <DocumentPage url="/pages/resources.md" />
             </Page>
             <Page url="/modal-dialogs">
-                <DocumentPage url="/pages/modal-dialogs.md" />
+                <DocumentPageNoTOC url="/pages/modal-dialogs.md" />
             </Page>
             <Page url="/user-defined-components">
-                <DocumentPage url="/pages/user-defined-components.md" />
+                <DocumentPageNoTOC url="/pages/user-defined-components.md" />
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
@@ -288,9 +288,7 @@
                 <DocumentPage url="/pages/styles-and-themes/theme-variables.md" />
             </Page>
             <Page url="/styles-and-themes/theme-variable-defaults">
-                <DocumentPage
-                    hideToc="true"
-                    url="/pages/styles-and-themes/theme-variable-defaults.md" />
+                <DocumentPageNoTOC url="/pages/styles-and-themes/theme-variable-defaults.md" />
             </Page>
             <Page url="/styles-and-themes/common-units">
                 <DocumentPage url="/pages/styles-and-themes/common-units.md" />
@@ -317,7 +315,7 @@
                 <Palettes />
             </Page>
             <Page url="/glossary">
-                <DocumentPage hideToc="true" url="/pages/glossary.md" />
+                <DocumentPageNoTOC url="/pages/glossary.md" />
             </Page>
             <Page url="/build-hello-world-component">
                 <DocumentPage url="/pages/build-hello-world-component.md" />
@@ -332,13 +330,13 @@
                 <ChangeLog />
             </Page>
             <Page url="/mcp">
-                <DocumentPage hideToc="true" url="/pages/mcp.md" />
+                <DocumentPageNoTOC url="/pages/mcp.md" />
             </Page>
             <Page url="/news-and-reviews">
-                <DocumentPage hideToc="true" url="/pages/news-and-reviews.md" />
+                <DocumentPageNoTOC url="/pages/news-and-reviews.md" />
             </Page>
             <Page url="/vscode">
-                <DocumentPage hideToc="true" url="/pages/vscode.md" />
+                <DocumentPageNoTOC url="/pages/vscode.md" />
             </Page>
             <Page url="/components/*">
                 <script>
