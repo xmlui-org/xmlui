@@ -210,10 +210,6 @@
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
           "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
         },
-        "./syntax": {
-          "import": "./dist/lib/syntax.mjs",
-          "require": "./dist/lib/syntax.mjs"
-        },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.mjs",
           "require": "./dist/lib/syntax-monaco.mjs"
