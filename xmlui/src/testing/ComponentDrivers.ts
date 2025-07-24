@@ -6,6 +6,21 @@ export type ComponentDriverParams = {
   page: Page;
 };
 
+type ClickOption = {
+  button?: "left" | "right" | "middle";
+  clickCount?: number;
+  delay?: number;
+  force?: boolean;
+  modifiers?: Array<"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift">;
+  noWaitAfter?: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
+  timeout?: number;
+  trial?: boolean;
+};
+
 export class ComponentDriver {
   protected readonly locator: Locator;
   protected readonly page: Page;
@@ -29,7 +44,7 @@ export class ComponentDriver {
   // NOTE: methods must be created using the arrow function notation.
   // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
 
-  click = async (options?: { timeout?: number; force?: boolean }) => {
+  click = async (options?: ClickOption) => {
     await this.locator.click(options);
   };
 
@@ -457,7 +472,7 @@ export class NavPanelDriver extends ComponentDriver {}
 
 export class CardDriver extends ComponentDriver {
   get avatar() {
-    return this.component.getByRole("img", { name: "avatar" })
+    return this.component.getByRole("img", { name: "avatar" });
   }
 }
 
@@ -558,17 +573,7 @@ export class CodeBlockDriver extends ComponentDriver {}
 
 // --- Checkbox
 
-export class CheckboxDriver extends InputComponentDriver {
-  // If there is no label, only the input field is rendered, thus this.component=this.field
-  // If there IS a label, the input field is rendered last
-  get field() {
-    return this.component.getByRole("checkbox").or(this.component).last();
-  }
-
-  async isIndeterminate() {
-    return this.field.evaluate((el: HTMLInputElement) => el.indeterminate);
-  }
-}
+export class CheckboxDriver extends InputComponentDriver {}
 
 // --- Label
 

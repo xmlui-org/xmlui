@@ -133,6 +133,11 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   );
 }
 
+export async function isIndeterminate(specifier: ComponentDriver | Locator) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  return specifier.evaluate((el: HTMLInputElement) => el.indeterminate);
+}
+
 // ----------------------------------
 // ComponentDriver style helpers
 // ----------------------------------

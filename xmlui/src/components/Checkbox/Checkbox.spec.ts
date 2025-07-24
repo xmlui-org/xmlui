@@ -1,4 +1,4 @@
-import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds, isIndeterminate, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -6,170 +6,132 @@ import { expect, test } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("component renders with default props", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component renders", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
-    await expect(driver.field).toHaveAttribute("type", "checkbox");
+    await expect(page.getByRole("checkbox")).toBeVisible();
   });
 
-  test("component renders with label", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Checkbox label="Accept terms" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeVisible();
-    await expect(driver.label).toBeVisible();
-    await expect(driver.label).toContainText("Accept terms");
+  test("component renders with label", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox label="test" />`);
+    await expect(page.getByLabel("test")).toBeVisible();
   });
 
-  test("component initialValue sets checked state", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox initialValue="{true}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toBeChecked();
+  test("initialValue sets checked state", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox initialValue="true" />`);
+    await expect(page.getByRole("checkbox")).toBeChecked();
   });
 
-  test("component initialValue=false sets unchecked state", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox initialValue="{false}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).not.toBeChecked();
+  test("initialValue=false sets unchecked state", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox initialValue="false" />`);
+    await expect(page.getByRole("checkbox")).not.toBeChecked();
   });
 
-  test("component indeterminate state displays correctly", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox indeterminate="{true}" />`);
-    const driver = await createCheckboxDriver();
-    const isIndeterminate = await driver.isIndeterminate();
-    expect(isIndeterminate).toBe(true);
+  test("indeterminate state", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox indeterminate="true" />`);
+    const indeterminate = await isIndeterminate(page.getByRole("checkbox"));
+    expect(indeterminate).toBe(true);
   });
 
-  test("component click toggles checked state", async ({ initTestBed, createCheckboxDriver }) => {
+  test("indeterminate state with initialValue=true", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox indeterminate="true" initialValue="true" />`);
+    const checkbox = page.getByRole("checkbox");
+    const indeterminate = await isIndeterminate(checkbox);
+    expect(indeterminate).toBe(true);
+    await expect(checkbox).toBeChecked();
+  });
+
+  test("indeterminate state with initialValue=false", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox indeterminate="true" initialValue="false" />`);
+    const checkbox = page.getByRole("checkbox");
+    const indeterminate = await isIndeterminate(checkbox);
+    expect(indeterminate).toBe(true);
+    await expect(checkbox).not.toBeChecked();
+  });
+
+  test("component click toggles checked state", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox />`);
-    const driver = await createCheckboxDriver();
+    const checkbox = page.getByRole("checkbox");
 
     // Initially unchecked
-    await expect(driver.field).not.toBeChecked();
+    await expect(checkbox).not.toBeChecked();
 
     // Click to check
-    await driver.field.click();
-    await expect(driver.field).toBeChecked();
+    await checkbox.click();
+    await expect(checkbox).toBeChecked();
 
     // Click again to uncheck
-    await driver.field.click();
-    await expect(driver.field).not.toBeChecked();
+    await checkbox.click();
+    await expect(checkbox).not.toBeChecked();
   });
 
-  test("component required prop adds required attribute", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox required="{true}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toHaveAttribute("required");
+  test("component required prop adds required attribute", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox required="true" />`);
+    await expect(page.getByRole("checkbox")).toHaveAttribute("required");
   });
 
-  test("component enabled=false disables interaction", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox enabled="{false}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toBeDisabled();
+  test("enabled=false disables control", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox enabled="false" />`);
+    await expect(page.getByRole("checkbox")).toBeDisabled();
   });
 
-  test("component readOnly prevents state changes", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox readOnly="{true}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toHaveAttribute("readonly");
-
-    // Verify that clicking doesn't change the state
-    const initialChecked = await driver.field.isChecked();
-    await driver.field.click();
-    const afterClickChecked = await driver.field.isChecked();
-    expect(afterClickChecked).toBe(initialChecked);
+  test("enabled=false disables interaction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox enabled="false" initialValue="false" />`);
+    const checkbox = page.getByRole("checkbox");
+    checkbox.click({ force: true });
+    await expect(checkbox).not.toBeChecked();
   });
 
-  test("component autoFocus focuses input on mount", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("readOnly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox readOnly="true" />`);
+    await expect(page.getByRole("checkbox")).toHaveAttribute("readonly");
+  });
+
+  test("readOnly prevents state changes", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox readOnly="true" initialValue="false" />`);
+    const checkbox = page.getByRole("checkbox");
+    checkbox.click({ force: true });
+    await expect(checkbox).not.toBeChecked();
+  });
+
+  test("readOnly is not the same as disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox readOnly="true" enabled="true" />`);
+    await expect(page.getByRole("checkbox")).toHaveAttribute("readonly");
+    await expect(page.getByRole("checkbox")).not.toBeDisabled();
+  });
+
+  test("autoFocus focuses input on mount", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox autoFocus="{true}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.component).toBeFocused();
+    await expect(page.getByRole("checkbox")).toBeFocused();
   });
 
-  test("component handles special characters in label", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    // Test that component handles special characters in label
+  test("autoFocus focuses input on mount with label", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox autoFocus="{true}" label="test" />`);
+    await expect(page.getByRole("checkbox")).toBeFocused();
+  });
+
+  test("handle special characters in label", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="Accept terms &amp; conditions &lt;&gt;&amp;" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.label).toContainText("Accept terms & conditions <>&");
+    await expect(page.locator("label")).toContainText("Accept terms & conditions <>&");
   });
 
-  test("component handles Unicode characters in label", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    // Test that component handles Unicode characters
+  test("handle Unicode characters in label", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="同意条款 ✓" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.label).toContainText("同意条款 ✓");
+    await expect(page.locator("label")).toContainText("同意条款 ✓");
   });
 
-  test("component handles very long label text", async ({ initTestBed, createCheckboxDriver }) => {
-    // Test that component handles very long label text
+  test("component handles very long label text", async ({ initTestBed, page }) => {
     const longLabel =
       "This is a very long label that might cause layout issues or overflow problems " +
       "in the component rendering and should be handled gracefully by the component implementation";
     await initTestBed(`<Checkbox label="${longLabel}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.label).toContainText(longLabel);
-    await expect(driver.component).toBeVisible();
+    await expect(page.locator("label")).toContainText(longLabel);
   });
 
-  test("component handles rapid state changes", async ({ initTestBed, createCheckboxDriver }) => {
-    // Test that component handles rapid state changes
-    await initTestBed(`<Checkbox />`);
-    const driver = await createCheckboxDriver();
-
-    // Perform 10 rapid clicks
-    for (let i = 0; i < 10; i++) {
-      await driver.click();
-    }
-    // Should end up unchecked after 10 clicks (even number)
-    await expect(driver.field).not.toBeChecked();
-  });
-
-  test("component handles boolean false as initialValue", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox initialValue="{false}" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).not.toBeChecked();
-  });
-
-  test("component handles indeterminate with other states", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox indeterminate="{true}" required="{true}" />`);
-    const driver = await createCheckboxDriver();
-    const isIndeterminate = await driver.isIndeterminate();
-
-    expect(isIndeterminate).toBe(true);
-    await expect(driver.field).toHaveAttribute("required");
+  test("component handles rapid state changes", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox initialValue="false" />`);
+    const checkbox = page.getByRole("checkbox");
+    await checkbox.click({ clickCount: 10 });
+    await expect(checkbox).not.toBeChecked();
   });
 });
 
@@ -178,72 +140,54 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("component has correct accessibility attributes", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("label is associated with input", async ({ initTestBed, page }) => {
+    const label = "test";
+    await initTestBed(`<Checkbox label="${label}" />`);
+    const component = page.getByLabel(label, { exact: true });
+    expect(component).toHaveRole("checkbox");
+  });
+
+  test("pressing Space after focus checks the control", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox initialValue="false" />`);
+    const checkbox = page.getByRole("checkbox");
+    await checkbox.focus();
+    await expect(checkbox).toBeFocused();
+    await checkbox.press("Space");
+    await expect(checkbox).toBeChecked();
+  });
+
+  test("component supports keyboard navigation", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox />`);
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("checkbox")).toBeFocused();
+  });
+
+  test("aria-checked=false applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="Accept terms" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toHaveAttribute("type", "checkbox");
-    await expect(driver.field).toHaveAttribute("role", "checkbox");
+    await expect(page.getByRole("checkbox")).toHaveAttribute("aria-checked", "false");
   });
 
-  test("component label is associated with input", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("aria-checked=true applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="Accept terms" />`);
-    const driver = await createCheckboxDriver();
-    const inputId = await driver.field.getAttribute("id");
-    await expect(driver.label).toHaveAttribute("for", inputId);
+    const checkbox = page.getByRole("checkbox");
+    await expect(checkbox).toHaveAttribute("aria-checked", "false");
+    await checkbox.click();
+    await expect(checkbox).toHaveAttribute("aria-checked", "true");
   });
 
-  test("component is keyboard accessible", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Checkbox label="Accept terms" />`);
-    const field = (await createCheckboxDriver()).field;
-    await field.focus();
-    await expect(field).toBeFocused();
-    await field.press("Space");
-    await expect(field).toBeChecked();
-  });
-
-  test("component supports keyboard navigation", async ({ initTestBed, createCheckboxDriver }) => {
-    const { keyboard } = await initTestBed(`<Checkbox />`);
-    const driver = await createCheckboxDriver();
-    await keyboard.press("Tab");
-    await expect(driver.field).toBeFocused();
-  });
-
-  test("component has proper ARIA states", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`<Checkbox label="Accept terms" />`);
-    const field = (await createCheckboxDriver()).field;
-    await expect(field).toHaveAttribute("aria-checked", "false");
-    await field.click();
-    await expect(field).toHaveAttribute("aria-checked", "true");
-  });
-
-  test("component indeterminate has correct ARIA state", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("indeterminate has correct ARIA state", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox indeterminate="{true}" />`);
-    await expect((await createCheckboxDriver()).field).toHaveAttribute("aria-checked", "mixed");
+    await expect(page.getByRole("checkbox")).toHaveAttribute("aria-checked", "mixed");
   });
 
-  test("component required has proper ARIA attributes", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("required has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox required="{true}" />`);
-    await expect((await createCheckboxDriver()).field).toHaveAttribute("aria-required", "true");
+    await expect(page.getByRole("checkbox")).toHaveAttribute("aria-required", "true");
   });
 
-  test("component disabled has proper ARIA attributes", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("component disabled has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox enabled="{false}" />`);
-    await expect((await createCheckboxDriver()).field).toHaveAttribute("aria-disabled", "true");
+    await expect(page.getByRole("checkbox")).toHaveAttribute("aria-disabled", "true");
   });
 });
 
@@ -252,109 +196,88 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Label", () => {
-  test("component labelPosition=start positions label before input", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="start" />`);
-    const driver = await createCheckboxDriver();
-    const { left: checkboxLeft, right: checkboxRight } = await getBounds(driver.field);
-    const { left: labelLeft, right: labelRight } = await getBounds(driver.label);
+  test("labelPosition=start positions label before input", async ({ initTestBed, page }) => {
+    const labelText = "test";
+    await initTestBed(`<Checkbox direction="ltr" label="${labelText}" labelPosition="start" />`);
 
-    // Verify the component renders successfully with start position
-    await expect(driver.label).toBeVisible();
-    await expect(driver.field).toBeVisible();
+    const { left: checkboxLeft, right: checkboxRight } = await getBounds(
+      page.getByLabel(labelText, { exact: true }),
+    );
+    const { left: labelLeft, right: labelRight } = await getBounds(page.getByText(labelText));
+
     expect(labelLeft).toBeLessThan(checkboxLeft);
     expect(labelRight).toBeLessThan(checkboxRight);
   });
 
-  test("component labelPosition=end positions label after input", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="end" />`);
-    const driver = await createCheckboxDriver();
-    const { left: checkboxLeft, right: checkboxRight } = await getBounds(driver.field);
-    const { left: labelLeft, right: labelRight } = await getBounds(driver.label);
+  test("labelPosition=end positions label after input", async ({ initTestBed, page }) => {
+    const labelText = "test";
+    await initTestBed(`<Checkbox direction="ltr" label="${labelText}" labelPosition="end" />`);
 
-    // Verify the component renders successfully with end position
-    await expect(driver.label).toBeVisible();
-    await expect(driver.field).toBeVisible();
+    const { left: checkboxLeft, right: checkboxRight } = await getBounds(
+      page.getByLabel(labelText, { exact: true }),
+    );
+    const { left: labelLeft, right: labelRight } = await getBounds(page.getByText(labelText));
+
     expect(labelLeft).toBeGreaterThan(checkboxLeft);
     expect(labelRight).toBeGreaterThan(checkboxRight);
   });
 
-  test("component labelPosition=top positions label above input", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox label="test" labelPosition="top" />`);
-    const driver = await createCheckboxDriver();
-    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(driver.field);
-    const { top: labelTop, bottom: labelBottom } = await getBounds(driver.label);
+  test("labelPosition=top positions label above input", async ({ initTestBed, page }) => {
+    const labelText = "test";
+    await initTestBed(`<Checkbox label="${labelText}" labelPosition="top" />`);
 
-    // Verify the component renders successfully with top position
-    await expect(driver.label).toBeVisible();
-    await expect(driver.field).toBeVisible();
+    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(
+      page.getByLabel(labelText, { exact: true }),
+    );
+    const { top: labelTop, bottom: labelBottom } = await getBounds(page.getByText(labelText));
+
     expect(labelTop).toBeLessThan(checkboxTop);
     expect(labelBottom).toBeLessThan(checkboxBottom);
   });
 
-  test("component labelPosition=bottom positions label below input", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    await initTestBed(`<Checkbox label="test" labelPosition="bottom" />`);
-    const driver = await createCheckboxDriver();
-    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(driver.field);
-    const { top: labelTop, bottom: labelBottom } = await getBounds(driver.label);
+  test("labelPosition=bottom positions label below input", async ({ initTestBed, page }) => {
+    const labelText = "test";
+    await initTestBed(`<Checkbox label="${labelText}" labelPosition="bottom" />`);
 
-    // Verify the component renders successfully with bottom position
-    await expect(driver.label).toBeVisible();
-    await expect(driver.field).toBeVisible();
+    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(
+      page.getByLabel(labelText, { exact: true }),
+    );
+    const { top: labelTop, bottom: labelBottom } = await getBounds(page.getByText(labelText));
+
     expect(labelTop).toBeGreaterThan(checkboxTop);
     expect(labelBottom).toBeGreaterThan(checkboxBottom);
   });
 
-  test("component labelWidth applies custom label width", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
     const expected = 200;
-    await initTestBed(`<Checkbox label="Accept terms" labelWidth="${expected}px" />`);
-    const driver = await createCheckboxDriver();
-    const { width } = await getBounds(driver.label);
+    const labelText = "test test";
+    await initTestBed(`<Checkbox label="${labelText}" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText(labelText));
     expect(width).toEqual(expected);
   });
 
-  test("component labelBreak enables label line breaks", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    const commonProps = `label="Very long label text that should break" labelWidth="100px"`;
+  test("labelBreak enables label line breaks", async ({ initTestBed, page }) => {
+    const labelText = "Very long label text that should break";
+    const commonProps = `label="${labelText}" labelWidth="100px"`;
     await initTestBed(
       `<Fragment>
-          <Checkbox ${commonProps} testId="break" labelBreak="{true}" />
-          <Checkbox ${commonProps} testId="oneLine" labelBreak="{false}" />
-        </Fragment>`,
+        <Checkbox ${commonProps} testId="break" labelBreak="{true}" />
+        <Checkbox ${commonProps} testId="oneLine" labelBreak="{false}" />
+      </Fragment>`,
     );
-    const driverBreak = await createCheckboxDriver("break");
-    const driverOneLine = await createCheckboxDriver("oneLine");
+    const labelBreak = page.getByTestId("break").getByText(labelText, { exact: true });
+    const labelOneLine = page.getByTestId("oneLine").getByText(labelText, { exact: true });
+    const { height: heightBreak } = await getBounds(labelBreak);
+    const { height: heightOneLine } = await getBounds(labelOneLine);
 
-    const { height: heightBreak } = await getBounds(driverBreak.label);
-    const { height: heightOneLine } = await getBounds(driverOneLine.label);
     expect(heightBreak).toBeGreaterThan(heightOneLine);
   });
 
-  test("component handles invalid labelPosition gracefully", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
-    // Test that component handles invalid labelPosition without crashing
-    await initTestBed(`<Checkbox labelPosition="invalid" label="Test label" />`);
-    const driver = await createCheckboxDriver();
-    await expect(driver.field).toBeVisible();
-    await expect(driver.label).toBeVisible();
+  test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
+    const labelText = "Test label";
+    await initTestBed(`<Checkbox labelPosition="invalid" label="${labelText}" />`);
+    await expect(page.getByLabel(labelText, { exact: true })).toBeVisible();
+    await expect(page.getByText(labelText)).toBeVisible();
   });
 });
 
@@ -462,51 +385,39 @@ test.describe("Validation", () => {
 // =============================================================================
 
 test.describe("Event Handling", () => {
-  test("component didChange event fires on state change", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("didChange event fires on state change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
-      `<Checkbox onDidChange="testState = 'changed'" />`,
+      `<Checkbox initialValue="false" onDidChange="testState = 'changed'" />`,
     );
-    const driver = await createCheckboxDriver();
-    await driver.click();
+    await page.getByRole("checkbox").check();
     await expect.poll(testStateDriver.testState).toEqual("changed");
   });
 
-  test("component didChange event passes new value", async ({
-    initTestBed,
-    createCheckboxDriver,
-  }) => {
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
-      `<Checkbox onDidChange="(value) => testState = value" />`,
+      `<Checkbox initialValue="false" onDidChange="(value) => testState = value" />`,
     );
-    const driver = await createCheckboxDriver();
-
-    await driver.click();
+    const checkbox = page.getByRole("checkbox");
+    await checkbox.check();
     await expect.poll(testStateDriver.testState).toEqual(true);
-    await driver.click();
+    await checkbox.uncheck();
     await expect.poll(testStateDriver.testState).toEqual(false);
   });
 
-  test("component gotFocus event fires on focus", async ({ initTestBed, createCheckboxDriver }) => {
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<Checkbox onGotFocus="testState = 'focused'" />`,
     );
-    const driver = await createCheckboxDriver();
-
-    await driver.focus();
+    await page.getByRole("checkbox").focus();
     await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
-  test("component lostFocus event fires on blur", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component lostFocus event fires on blur", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<Checkbox onLostFocus="testState = 'blurred'" />`,
     );
-    const driver = await createCheckboxDriver();
-
-    await driver.focus();
-    await driver.blur();
+    await page.getByRole("checkbox").focus();
+    await page.getByRole("checkbox").blur();
     await expect.poll(testStateDriver.testState).toEqual("blurred");
   });
 });
