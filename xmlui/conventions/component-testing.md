@@ -1,39 +1,65 @@
 # Writing component tests 🧪
 
-note: this is a guide to code-generating AIs (hence the tone), but should be useful for humans too.
+This is a guide detailing the good testing practices with our test infrastructure. It is also useful for providing guard rails for AI to generate code (hence the tone).
 
 ## General structure of component tests
 
 Place component tests next to the component's implementation.
 Name should be `<ComponentName>.spec.ts`. For example, `Button.spec.ts`.
 
-Use `test.describe("category name")` to group test cases. Don't need a top level category that encompuses every test case.
+Use `test.describe("category name")` to group test cases. Don't need a top level category that encompases every test case.
 
-These test categories are :
+These test categories are:
 
 - [ ] Basic functionality tests
 - [ ] Accessibility tests
 - [ ] Edge case tests (null, undefined, unexpected input types like objects where text is expected)
-- [ ] Test cases for each property, event, exposed method of the component. Each such item can be it's own category, if there are sufficiently numerous test cases for it (like >= 5, but that's not a hard requirement). It might make sense to combine multiple properties, like `icon` and `iconPosition` These can be bundled together into a single category. These items are in the documentation of the componenet, which lives in the component's file, like `Button.tsx` next to the test file, but not in the native implementation file `ButtonNative.tsx`.
+- [ ] Test cases for each property, event, exposed method of the component. Each such item can be it's own category, if there are sufficiently numerous test cases for it (e.g. >= 5, but that's not a hard requirement).
+- [ ] In some cases it can be prudent to combine multiple properties, like `icon` and `iconPosition`. These can be bundled together into a single category. These attributes can be found in the documentation of the component, which lives in the component's file, such as `Button.tsx` next to the test file, but not in the native implementation file `ButtonNative.tsx`. Examples for properties, events, apis can be found in a separate file next to the implementation and test files with the format `<ComponentName>.md`.
 - [ ] Test cases for styling and theme variables. This section is not figured out yet, just leave an empty category for these and note with some words that, these kind of tests need some thought.
 
-## Guide on writing component test
+## Guide on writing component tests
 
 ### Initializing
 
-Xmlui is a declarative, reactive, component based web framework. In these tests, we provide the xml source code in an initializer function, such as:
+XMLUI is a declarative, reactive, component based web framework. As such, the source code is provided to an async initializer function that takes the XML-like source code as its only input parameter:
 
 ```ts
 await initTestBed(`<Checkbox label="hi there" />`);
 ```
 
-This will create a webpage where the whole content of it is the top level xmlui component.
+The function opens a web browser (the bundled default is Chrome), translates the source XMLUI code to JS binaries, bundles it and injects it as a runnable script in the browser.
+The result is a React web app. In the example above we get a checkbox input control with the label `hi there`.
 
 ### Obtaining a locator (element)
 
-Locate elements in a way a user would locate them guided by their intention. For example `const checkboxLocator = await page.getByRole('checkbox')`, rather than relying on internal structure like `page.locator("input").nth(2)`. If and only if there are more elements of the same type and it does not make sense to use text (because the test is not about labels or content text, or because the layout would change due to the presence of the content), prefer to use `testId`-s in the source code and use those test ids to locate the elements. You should aviod using `page.locator()` in test cases.
+Locate elements in a way a user would locate them. When choosing locators, keep specificity in mind.
+For example, instead of relying on internal structure like this:
 
-If it is possible to test something at the time of locationg the element, prefer that. `page.getByRole` is the prime example of this, because it also tests for accessibility and intent (the user is not looking for a div with a certain class on it, they are looking for an image or a button). Avoid long selectors, that could be more readable by adding some assertions. For example, this is better:
+```ts
+page.locator("input").nth(2)
+```
+
+Use `getByRole` if looking for an input control that is easily identified by its role:
+
+```ts
+const checkboxLocator = page.getByRole('checkbox');
+```
+
+When locating by text, prefer the `getByText` locator. Use the `{ exact: true }` option if necessary.
+If an element is nested deeper in the DOM tree, use multiple locators to drill down to get it:
+
+```ts
+const checkboxLocator = page.getByTestId("container").getByRole('checkbox');
+```
+
+When testing input controls with non-empty labels, try to locate its associated input control with the `getByLabel` locator.
+
+If and only if there are more elements of the same type and it does not make sense to use text (because the test is not about labels or content text, or because the layout would change due to the presence of the content), prefer to use `testId`-s in the source code and use those testIds to locate the elements.
+
+You should avoid using `page.locator()` in test cases.
+
+If it is possible to test something at the time of locating the element, prefer using that locator. `getByRole` is a prime example of this, because it also tests for accessibility and intent (the user is not looking for a div with a certain class on it, they are looking for an image or a button). Avoid long selectors, that could be more readable by adding some assertions. For example, this is better:
 
 ```ts
 const cb = page.getByRole("checkbox");
@@ -47,7 +73,11 @@ const cb = page.getByRole("checkbox", { disabled: true });
 await expect(cb).toBeVisible();
 ```
 
-However, if there are multiple elements of the same type and an option could differentiate them and assertions would need to be written out after locating the element anyway, this approach is better than using test ids. For example, this is a good use of the `{disabled: true}` option:
+However, the above approach has its merits: prefer using it over testIds if the following are true:
+- there are multiple elements of the same type and using option parameter can differentiate between them
+- assertions would need to be written after locating the element anyway
+
+ For example, this is a good use of the `{ disabled: true }` option:
 
 ```ts
 await initTestBed(`
@@ -61,9 +91,11 @@ const cb = page.getByRole("checkbox", { disabled: true });
 
 ### Writing actions and drivers
 
-Not all tests need actions. Some are just instantiating the webpage with a given component and then making assertions on that.
+Not all tests need actions. Some just instantiate the webpage with a given component and then make assertions on that.
 
-Actions are the most varried part of writing component tests. If and only if the action is super simple and consists of one step, and the action's name gives clarity on what it is doing, should you use actions directly on the locators. For example, this is good, because it is clear what the actions are doing, as the `check` and `uncheck` actions are complete in themselves:
+Actions are the most varried part of writing component tests. If, and only if, the action is super simple and consists of one step, and the action's name gives clarity on what it is doing, should you use actions directly on the locators.
+
+For example, the following is good practice, because it is clear what the actions are doing, as the `check` and `uncheck` actions are complete in themselves:
 
 ```ts
 const cb = page.getByRole("checkbox");
@@ -77,11 +109,11 @@ However, in any other case, you should use a component driver to encapsulate the
 
 ```ts
 await initTestBed(`
-    <Select searchable="true">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </FormItem>
+  <Select searchable="true">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </FormItem>
 `);
 const select = page.getByRole("combobox");
 const driver = await createSelectDriver(select);
@@ -93,7 +125,7 @@ await expect(select).toHaveValue("opt2");
 
 In this case, if the `searchFor` method were to be substituted with clicking on the locator and typing into the input field the label text, that would not convey the intent of the action, which is searching. Actions should have componenet-specific names. For example, a Dropdown can have a `toggleDropdownVisibility` method, which is pretty much just a click, but with a more meaningful name. You would not call it `click`.
 
-Drivers are derived from a base ComponentDriver class.
+Component-specific drivers are derived from a base ComponentDriver class.
 
 Sometimes you need to test events. The easies was is to do something like this:
 
@@ -113,4 +145,16 @@ Don't worry about how the testState is actually obtained. Just know that inside 
 
 ### Writing assertions
 
-Use web-first assertions, like `await expect(checkboxLocator).not.toBeChecked()`. If there is a built-in assertion, prefer that over an assertion checking against a the dom attributes. This is an antipattern: `    await expect(checkboxLocator).toHaveAttribute("type", "checkbox");` because it relies on the element being an input element.
+Use web-first assertions, like
+
+```ts
+await expect(checkboxLocator).not.toBeChecked()
+```
+
+If there is a built-in assertion, prefer that over an assertion checking against DOM attributes directly.
+
+This is an antipattern because it relies on the element being an input element:
+
+```ts
+await expect(checkboxLocator).toHaveAttribute("type", "checkbox");
+```
