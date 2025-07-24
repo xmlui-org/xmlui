@@ -1,10 +1,12 @@
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
-import type { CSSProperties} from "react";
+import type { CSSProperties } from "react";
 import { useEffect } from "react";
-import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
-import xmluiLight from "../syntax/monaco/xmlui-light";
-import xmluiDark from "../syntax/monaco/xmlui-dark";
-import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
+import {
+  xmluiThemeLight,
+  xmluiThemeDark,
+  xmluiGrammar,
+  xmluiScriptGrammar,
+} from "xmlui/syntax/monaco";
 
 export type EditorProps = {
   readOnly?: boolean;
@@ -31,18 +33,18 @@ export const Editor = ({
   useEffect(() => {
     if (monaco) {
       //xmlui markup
-      monaco.languages.register({ id: XmluiGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
-      monaco.editor.defineTheme("xmlui-light", xmluiLight);
-      monaco.editor.defineTheme("xmlui-dark", xmluiDark);
+      monaco.languages.register({ id: xmluiGrammar.id });
+      monaco.languages.setMonarchTokensProvider(xmluiGrammar.id, xmluiGrammar.language);
+      monaco.languages.setLanguageConfiguration(xmluiGrammar.id, xmluiGrammar.config);
+      monaco.editor.defineTheme("xmlui-light", xmluiThemeLight);
+      monaco.editor.defineTheme("xmlui-dark", xmluiThemeDark);
       if (language === "xmlui") {
         monaco.editor.setTheme(activeThemeTone === "dark" ? "xmlui-dark" : "xmlui-light");
       }
       //xmluiscript
-      monaco.languages.register({ id: XmluiScripGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiScripGrammar.id, XmluiScripGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
+      monaco.languages.register({ id: xmluiScriptGrammar.id });
+      monaco.languages.setMonarchTokensProvider(xmluiScriptGrammar.id, xmluiScriptGrammar.language);
+      monaco.languages.setLanguageConfiguration(xmluiScriptGrammar.id, xmluiScriptGrammar.config);
     }
   }, [monaco, language, activeThemeTone]);
 

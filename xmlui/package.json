@@ -167,7 +167,8 @@
   },
   "files": [
     "dist",
-    "src/styles"
+    "src/styles",
+    "src/syntax"
   ],
   "bin": {
     "xmlui": "./bin/bootstrap.js"
@@ -208,6 +209,14 @@
         "./vite-xmlui-plugin": {
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
           "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
+        },
+        "./syntax/monaco": {
+          "import": "./dist/lib/syntax-monaco.mjs",
+          "require": "./dist/lib/syntax-monaco.mjs"
+        },
+        "./syntax/textmate": {
+          "import": "./dist/lib/syntax-textmate.mjs",
+          "require": "./dist/lib/syntax-textmate.mjs"
         }
       }
     }
@@ -240,6 +249,14 @@
     "./language-server-web-worker": {
       "import": "./src/language-server/server-web-worker.ts",
       "require": "./src/language-server/server-web-worker.ts"
+    },
+    "./syntax/monaco": {
+      "import": "./src/syntax/monaco/index.ts",
+      "require": "./src/syntax/monaco/index.ts"
+    },
+    "./syntax/textmate": {
+      "import": "./src/syntax/textMate/index.ts",
+      "require": "./src/syntax/textMate/index.ts"
     }
   },
   "browserslist": {
