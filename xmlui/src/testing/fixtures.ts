@@ -2,7 +2,7 @@
 // The above exception is needed since it fires a false-positive
 // for the "use" function coming from the playwright test framework
 import { test as baseTest } from "@playwright/test";
-import type { Keyboard, Locator, Page } from "playwright-core";
+import type { Locator, Page } from "playwright-core";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
@@ -172,7 +172,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         clipboard: new Clipboard(page),
         width: width ?? 0,
         height: height ?? 0,
-        keyboard: page.keyboard,
       };
     });
   },
@@ -415,7 +414,6 @@ type TestDriverExtenderProps = {
     clipboard: Clipboard;
     width: number;
     height: number;
-    keyboard: Keyboard;
   }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,

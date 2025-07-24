@@ -19,12 +19,15 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValueApi,
 } from "../../components/metadata-helpers";
-import { defaultProps, Toggle } from "../Toggle/Toggle";
+import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
 import { MemoizedItem } from "../container-helpers";
+
+export const defaultProps = {
+  ...toggleDefaultProps,
+  labelPosition: "end",
+};
 
 const COMP = "Checkbox";
 
@@ -35,17 +38,17 @@ export const CheckboxMd = createMetadata({
     "checked/unchecked states. It's essential for settings, preferences, multi-select " +
     "lists, and accepting terms or conditions.",
   props: {
-    indeterminate: dIndeterminate(defaultProps.indeterminate),
+    indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
     label: dLabel(),
-    labelPosition: dLabelPosition("end"),
+    labelPosition: dLabelPosition(defaultProps.labelPosition),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     required: dRequired(),
-    initialValue: dInitialValue(defaultProps.initialValue),
+    initialValue: dInitialValue(toggleDefaultProps.initialValue),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(),
-    validationStatus: dValidationStatus(defaultProps.validationStatus),
+    validationStatus: dValidationStatus(toggleDefaultProps.validationStatus),
     description: dInternal(
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
