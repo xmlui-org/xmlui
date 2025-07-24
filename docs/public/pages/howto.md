@@ -906,27 +906,24 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     when="{modalState.value.isOpen}"
     onClose="modalState.update({isOpen: false})"
   >
-    <ProductForm
-      product="{modalState.value.product}"
-      mode="{modalState.value.mode}"
-    />
+    <Form
+      data="{modalState.value.product}"
+      onSubmit="saveProduct.execute({
+        id: modalState.value.mode === 'edit' ? modalState.value.product.id : null,
+        ...$data
+      })"
+      onSuccess="products.refetch()"
+      saveLabel="{modalState.value.mode === 'edit' ? 'Update Product' : 'Add Product'}"
+    >
+      <FormItem bindTo="name" label="Product Name" required="true" />
+      <FormItem bindTo="price" label="Price" type="number" required="true" />
+    </Form>
   </ModalDialog>
 
-  <!-- APICall to fetch product details before opening modal for edit -->
-  <APICall id="fetchProductDetails" url="/api/products/{$param}">
-    <event name="beforeRequest">
-      console.log('fetchProductDetails beforeRequest, param:', $param);
-    </event>
-    <event name="success">
-      console.log('fetchProductDetails success:', $result);
-      productDialog.open($result);
-    </event>
-    <event name="error">
-      console.log('fetchProductDetails error:', $error);
-    </event>
-  </APICall>
-
   <DataSource id="products" url="/api/products" />
+
+  <!-- APICall for saving product -->
+  <APICall id="saveProduct" url="/api/products" method="post" body="{JSON.stringify($param)}" />
 
   <VStack gap="1rem">
     <HStack gap="1rem" alignItems="center">
@@ -952,59 +949,5 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     </Table>
   </VStack>
 
-</Component>
----comp display
-<Component name="ProductForm" var.isEdit="{$props.mode === 'edit'}" var.formData="{{
-  name: isEdit ? $props.product.name : '',
-  price: isEdit ? $props.product.price : ''
-}}">
-  <AppState id="modalState" bucket="modalState" />
-
-  <VStack gap="1rem" padding="1rem">
-    <Text variant="strong">
-      {isEdit ? 'Edit Product' : 'Add New Product'}
-    </Text>
-
-        <!-- Active form fields -->
-    <VStack gap="1rem">
-      <TextBox
-        label="Product Name"
-        placeholder="Enter product name"
-        initialValue="{formData.name}"
-        onDidChange="(value) => formData.name = value"
-      />
-
-      <NumberBox
-        label="Price"
-        initialValue="{formData.price}"
-        onDidChange="(value) => formData.price = value"
-      />
-    </VStack>
-
-    <HStack gap="0.5rem">
-      <Button
-        label="Save"
-        size="sm"
-        onClick="saveProduct.execute({
-          id: isEdit ? $props.product.id : null,
-          ...formData
-        })"
-      />
-      <Button
-        label="Cancel"
-        size="sm"
-        variant="outlined"
-        onClick="modalState.update({isOpen: false})"
-      />
-    </HStack>
-  </VStack>
-
-  <!-- APICall for saving product -->
-  <APICall id="saveProduct" url="/api/products" method="post" body="{JSON.stringify($param)}">
-    <event name="success">
-      modalState.update({isOpen: false});
-      products.refetch();
-    </event>
-  </APICall>
 </Component>
 ```
