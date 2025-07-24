@@ -855,5 +855,159 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
   </VStack>
 </Component>
+```
+
+## Share Add and Edit ModalDialog
+
+```xmlui-pg noHeader height="500px"
+---app
+<App>
+  <Test />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.products = [
+    { id: 1, name: 'Laptop Pro', price: 1299 },
+    { id: 2, name: 'Wireless Mouse', price: 29 }
+  ]",
+  "operations": {
+    "get-products": {
+      "url": "/products",
+      "method": "get",
+      "handler": "console.log('get-products called, returning:', $state.products); return $state.products"
+    },
+    "get-product": {
+      "url": "/products/:id",
+      "method": "get",
+      "pathParamTypes": {
+        "id": "integer"
+      },
+      "handler": "return $state.products.find(p => p.id == $pathParams.id);"
+    },
+    "save-product": {
+      "url": "/products",
+      "method": "post",
+      "handler": "const data = JSON.parse($requestBody); console.log('parsed data:', data); if (data.id) { const index = $state.products.findIndex(p => p.id == data.id); if (index >= 0) { $state.products[index] = { ...$state.products[index], ...data }; return $state.products[index]; } } else { const newId = Math.max(...$state.products.map(p => p.id)) + 1; const newProduct = { id: newId, name: data.name, price: Number(data.price) }; $state.products.push(newProduct); return newProduct; }"
+    }
+  }
+}
+---comp display
+<Component name="Test">
+
+  <!-- Shared modal defined at App level - accessible to all components -->
+  <ModalDialog id="productDialog" title="Product Details">
+    <ProductForm product="{$param}" />
+  </ModalDialog>
+
+  <!-- APICall to fetch product details before opening modal for edit -->
+  <APICall id="fetchProductDetails" url="/api/products/{$param}">
+    <event name="beforeRequest">
+      console.log('fetchProductDetails beforeRequest, param:', $param);
+    </event>
+    <event name="success">
+      console.log('fetchProductDetails success:', $result);
+      productDialog.open($result);
+    </event>
+    <event name="error">
+      console.log('fetchProductDetails error:', $error);
+    </event>
+  </APICall>
+
+  <DataSource id="products" url="/api/products" />
+
+  <VStack gap="1rem">
+    <HStack gap="1rem" alignItems="center">
+      <Text variant="strong" fontSize="1.2rem">Product Inventory</Text>
+      <Button
+        label="Add New Product"
+        size="sm"
+        onClick="productDialog.open()"
+      />
+    </HStack>
+
+    <Table data="{products}">
+      <Column bindTo="name" />
+      <Column bindTo="price" />
+      <Column header="Actions">
+        <Button
+          label="Edit"
+          size="sm"
+          variant="outlined"
+          onClick="productDialog.open($item)"
+        />
+      </Column>
+    </Table>
+  </VStack>
+
+</Component>
+---comp display
+<Component name="ProductForm" var.isEdit="{!!$props.product}" var.formData="{{
+  name: isEdit ? $props.product.name : '',
+  price: isEdit ? $props.product.price : ''
+}}">
+  <VStack gap="1rem" padding="1rem">
+    <Text variant="strong">
+      {isEdit ? 'Edit Product' : 'Add New Product'}
+    </Text>
+
+    <Text>Debug - formData: {JSON.stringify(formData)}</Text>
+
+    <Fragment when="{isEdit}">
+      <Card padding="1rem" backgroundColor="$color-primary-50">
+        <VStack gap="0.5rem">
+          <Text variant="caption" color="$color-primary-700">
+            Editing: {$props.product.name}
+          </Text>
+          <Text variant="caption">
+            ID: {$props.product.id} | Category: {$props.product.category}
+          </Text>
+        </VStack>
+      </Card>
+    </Fragment>
+
+        <!-- Active form fields -->
+    <VStack gap="1rem">
+      <TextBox
+        label="Product Name"
+        placeholder="Enter product name"
+        initialValue="{formData.name}"
+        onDidChange="(value) => formData.name = value"
+      />
+
+      <NumberBox
+        label="Price"
+        initialValue="{formData.price}"
+        onDidChange="(value) => formData.price = value"
+      />
+    </VStack>
+
+    <HStack gap="0.5rem">
+      <Button
+        label="Save"
+        size="sm"
+        onClick="saveProduct.execute({
+          id: isEdit ? $props.product.id : null,
+          ...formData
+        })"
+      />
+      <Button
+        label="Cancel"
+        size="sm"
+        variant="outlined"
+        onClick="productDialog.close()"
+      />
+    </HStack>
+  </VStack>
+
+  <!-- APICall for saving product -->
+  <APICall id="saveProduct" url="/api/products" method="post" body="{JSON.stringify($param)}">
+    <event name="success">
+      productDialog.close();
+      products.refetch();
+    </event>
+  </APICall>
+</Component>
+```
 
 ```
