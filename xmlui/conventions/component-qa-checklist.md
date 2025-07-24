@@ -13,8 +13,9 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
 ## ⚠️ Component Review Scope
 
 **Skip HTML Tag Components**: HTML tag wrapper components in `HtmlTags.tsx` are marked as deprecated and scheduled for removal. **Skip these components during routine reviews** unless explicitly requested. Focus reviews on:
+
 - Core XMLUI components (Avatar, Button, Card, etc.)
-- Form components (TextBox, Checkbox, Select, etc.)  
+- Form components (TextBox, Checkbox, Select, etc.)
 - Layout components (Stack, App, Pages, etc.)
 - Advanced components (Charts, DatePicker, etc.)
 
@@ -27,7 +28,9 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
 ### ✅ File Organization Patterns
 
 #### Dual-File Pattern (Recommended)
+
 - [ ] **Native Component** (`ComponentNative.tsx`)
+
   - [ ] Uses `forwardRef` pattern
   - [ ] Contains pure React implementation
   - [ ] Defines `Props` type interface
@@ -43,6 +46,7 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
   - [ ] Maps XMLUI props to native props
 
 #### Single-File Pattern (Alternative)
+
 - [ ] **Combined Component** (`Component.tsx`)
   - [ ] Contains both React implementation and XMLUI renderer
   - [ ] Uses `createMetadata` for documentation
@@ -50,6 +54,7 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
   - [ ] Suitable for simple components or compositions
 
 ### ✅ File Naming Conventions
+
 - [ ] Component folder matches component name (PascalCase)
 - [ ] Native file: `ComponentName.tsx` or `ComponentNameNative.tsx`
 - [ ] Renderer file: `ComponentName.tsx`
@@ -63,6 +68,7 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
 ### ✅ Native Component Requirements
 
 #### forwardRef Pattern
+
 - [ ] Uses `forwardRef` with proper typing
 - [ ] Ref type is `Ref<any>` or specific HTML element type
 - [ ] Component function has descriptive name matching component
@@ -71,7 +77,7 @@ This document provides a comprehensive checklist for ensuring XMLUI components f
 // ✅ Good
 export const ComponentName = forwardRef(function ComponentName(
   { prop1, prop2, ...rest }: Props,
-  ref: Ref<HTMLDivElement>
+  ref: Ref<HTMLDivElement>,
 ) {
   // Implementation
 });
@@ -83,6 +89,7 @@ export const ComponentName = forwardRef((props, ref) => {
 ```
 
 #### Props and Default Values
+
 - [ ] `Props` type interface is defined
 - [ ] `defaultProps` object is exported
 - [ ] All props have proper TypeScript types
@@ -98,27 +105,31 @@ type Props = {
   style?: CSSProperties;
 };
 
-export const defaultProps: Pick<Props, 'size'> = {
+export const defaultProps: Pick<Props, "size"> = {
   size: "sm",
 };
 ```
 
 #### Memoization
+
 - [ ] Component wrapped with `memo` for performance
 - [ ] Expensive calculations use `useMemo`
 - [ ] Event handlers use `useCallback` when appropriate
 
 ```typescript
 // ✅ Good
-export const ComponentName = memo(forwardRef(function ComponentName(props, ref) {
-  const expensiveValue = useMemo(() => calculateValue(props.data), [props.data]);
-  // Implementation
-}));
+export const ComponentName = memo(
+  forwardRef(function ComponentName(props, ref) {
+    const expensiveValue = useMemo(() => calculateValue(props.data), [props.data]);
+    // Implementation
+  }),
+);
 ```
 
 ### ✅ React Hooks Rules and Patterns
 
 #### Hook Usage Rules (CRITICAL)
+
 - [ ] **Only call hooks at the top level** - Never inside loops, conditions, or nested functions
 - [ ] **Only call hooks from React functions** - Components or custom hooks only
 - [ ] **Custom hooks start with "use"** - Follow naming convention for custom hooks
@@ -129,11 +140,11 @@ export const ComponentName = memo(forwardRef(function ComponentName(props, ref) 
 function ComponentName() {
   const [value, setValue] = useState(initialValue);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     // Effect logic
   }, []);
-  
+
   // Component logic
 }
 
@@ -147,6 +158,7 @@ function ComponentName({ showFeature }) {
 ```
 
 #### useState Patterns
+
 - [ ] State initialized with proper default values
 - [ ] State updates use functional updates for dependent changes
 - [ ] Multiple related state values are grouped when appropriate
@@ -155,20 +167,21 @@ function ComponentName({ showFeature }) {
 ```typescript
 // ✅ Good
 const [count, setCount] = useState(0);
-const [user, setUser] = useState({ name: '', email: '' });
+const [user, setUser] = useState({ name: "", email: "" });
 
 // Functional update
-setCount(prevCount => prevCount + 1);
+setCount((prevCount) => prevCount + 1);
 
 // Object update (new object)
-setUser(prevUser => ({ ...prevUser, name: 'New Name' }));
+setUser((prevUser) => ({ ...prevUser, name: "New Name" }));
 
 // ❌ Bad - mutating state directly
-user.name = 'New Name'; // ❌ Direct mutation
+user.name = "New Name"; // ❌ Direct mutation
 setUser(user); // ❌ Same reference
 ```
 
 #### useEffect Patterns
+
 - [ ] Effect cleanup functions provided when needed
 - [ ] Dependencies array is complete and accurate
 - [ ] Effects are split by concern (separate effects for different purposes)
@@ -200,6 +213,7 @@ useEffect(() => {
 ```
 
 #### useCallback and useMemo Patterns
+
 - [ ] `useCallback` used for event handlers passed to child components
 - [ ] `useMemo` used for expensive computations
 - [ ] Dependencies are properly specified
@@ -207,9 +221,12 @@ useEffect(() => {
 
 ```typescript
 // ✅ Good
-const handleClick = useCallback((event) => {
-  onClick(event, value);
-}, [onClick, value]);
+const handleClick = useCallback(
+  (event) => {
+    onClick(event, value);
+  },
+  [onClick, value],
+);
 
 const expensiveValue = useMemo(() => {
   return heavyComputation(data);
@@ -217,11 +234,12 @@ const expensiveValue = useMemo(() => {
 
 // ❌ Bad - unnecessary useCallback
 const handleClick = useCallback(() => {
-  console.log('clicked');
+  console.log("clicked");
 }, []); // ❌ No dependencies needed for static function
 ```
 
 #### Custom Hook Patterns
+
 - [ ] Custom hooks start with "use" prefix
 - [ ] Custom hooks encapsulate related logic
 - [ ] Custom hooks return consistent interface
@@ -231,25 +249,27 @@ const handleClick = useCallback(() => {
 // ✅ Good
 function useCounter(initialValue = 0) {
   const [count, setCount] = useState(initialValue);
-  
+
   const increment = useCallback(() => {
-    setCount(prev => prev + 1);
+    setCount((prev) => prev + 1);
   }, []);
-  
+
   const decrement = useCallback(() => {
-    setCount(prev => prev - 1);
+    setCount((prev) => prev - 1);
   }, []);
-  
+
   return { count, increment, decrement };
 }
 
 // ❌ Bad - doesn't start with "use"
-function counter(initialValue = 0) { // ❌ Wrong naming
+function counter(initialValue = 0) {
+  // ❌ Wrong naming
   // Hook logic
 }
 ```
 
 #### Context and useContext Patterns
+
 - [ ] Context providers are placed at appropriate levels
 - [ ] Context values are memoized to prevent unnecessary re-renders
 - [ ] Custom hooks provide context access
@@ -261,12 +281,12 @@ const ThemeContext = createContext();
 
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
-  
+
   const value = useMemo(() => ({
     theme,
     setTheme
   }), [theme]);
-  
+
   return (
     <ThemeContext.Provider value={value}>
       {children}
@@ -287,12 +307,14 @@ function useTheme() {
 ### ✅ Accessibility Requirements
 
 #### ARIA Attributes
+
 - [ ] Proper `aria-label` for screen readers
 - [ ] `role` attribute when semantic HTML isn't sufficient
 - [ ] `aria-disabled` for disabled states
 - [ ] `aria-expanded` for expandable components
 
 #### Keyboard Navigation
+
 - [ ] Interactive elements are focusable (`tabIndex={0}`)
 - [ ] Non-interactive elements are not focusable
 - [ ] Enter and Space keys trigger actions
@@ -321,6 +343,7 @@ return (
 ```
 
 #### Focus Management
+
 - [ ] Focus states are visible
 - [ ] Focus is properly managed in modal dialogs
 - [ ] Focus returns to trigger element when closing
@@ -329,11 +352,13 @@ return (
 ### ✅ Event Handling
 
 #### Event Declaration
+
 - [ ] Events declared in component metadata
 - [ ] Event handlers properly typed
 - [ ] Event names follow convention (camelCase)
 
 #### Event Implementation
+
 - [ ] Events connected via `lookupEventHandler`
 - [ ] Event handlers are optional
 - [ ] Proper event object passed to handlers
@@ -347,6 +372,7 @@ onClick?: (event: React.MouseEvent) => void;
 ```
 
 #### Renderer Function Patterns
+
 - [ ] **No React hooks in renderer functions** (CRITICAL)
 - [ ] Renderer functions only contain JSX mapping logic
 - [ ] React hooks are used only in React components
@@ -372,11 +398,11 @@ export const componentRenderer = createComponentRenderer(
 // ✅ Good - Use React component wrapper when hooks needed
 const ComponentWithState = ({ initialValue, ...props }) => {
   const [state, setState] = useState(initialValue);
-  
+
   useEffect(() => {
     // Effect logic here
   }, []);
-  
+
   return <ComponentNative {...props} state={state} />;
 };
 
@@ -400,11 +426,11 @@ export const componentRenderer = createComponentRenderer(
   ComponentMd,
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {
     const [state, setState] = useState(); // ❌ Hook in renderer function
-    
+
     useEffect(() => { // ❌ Hook in renderer function
       // Effect logic
     }, []);
-    
+
     return (
       <ComponentNative
         prop1={extractValue(node.props.prop1)}
@@ -416,6 +442,7 @@ export const componentRenderer = createComponentRenderer(
 ```
 
 ### ✅ Common Events
+
 - [ ] `click` for clickable elements
 - [ ] `didChange` for value changes
 - [ ] `gotFocus` / `lostFocus` for focus events
@@ -426,12 +453,14 @@ export const componentRenderer = createComponentRenderer(
 ## 🎨 Styling and Theming
 
 ### ✅ SCSS Module Pattern
+
 - [ ] Component has dedicated SCSS module
 - [ ] Styles imported as `styles` object
 - [ ] Classes applied using `classnames` library
 - [ ] CSS variables follow naming convention
 
 ### ✅ Theme Variables
+
 - [ ] Theme variables defined in metadata
 - [ ] Variables follow `propertyName-ComponentName` pattern
 - [ ] Default theme variables provided
@@ -448,6 +477,7 @@ defaultThemeVars: {
 ```
 
 ### ✅ Responsive Design
+
 - [ ] Components adapt to different screen sizes
 - [ ] Breakpoints use consistent values
 - [ ] Text remains readable at all sizes
@@ -458,6 +488,7 @@ defaultThemeVars: {
 ## 📚 Metadata and Documentation
 
 ### ✅ Component Metadata
+
 - [ ] `createMetadata` used for documentation
 - [ ] Component description is comprehensive
 - [ ] All props documented with descriptions
@@ -466,6 +497,7 @@ defaultThemeVars: {
 - [ ] Component status indicated (`stable`, `experimental`, etc.)
 
 ### ✅ Prop Documentation
+
 - [ ] Each prop has clear description
 - [ ] Type information provided
 - [ ] Required props marked as `isRequired: true`
@@ -489,6 +521,7 @@ export const ComponentMd = createMetadata({
 ```
 
 ### ✅ Event Documentation
+
 - [ ] All events documented in metadata
 - [ ] Event descriptions explain when triggered
 - [ ] Event parameter types specified
@@ -498,6 +531,7 @@ export const ComponentMd = createMetadata({
 ## 🔄 State Management
 
 ### ✅ Internal State
+
 - [ ] Component state is properly managed
 - [ ] State updates are batched when possible
 - [ ] State is synchronized with XMLUI when needed
@@ -525,47 +559,25 @@ useEffect(() => {
 ```
 
 ### ✅ State Synchronization
+
 - [ ] Internal state synchronized with XMLUI
 - [ ] `updateState` called when values change
 - [ ] State updates are properly debounced if needed
 
 ---
 
-## 🧪 Testing
+## 📦 COMPONENT REGISTRATION
 
-### ✅ Component Driver
-- [ ] Component has dedicated driver class
-- [ ] Driver extends `ComponentDriver`
-- [ ] Driver provides component-specific methods
-- [ ] Driver used in all component tests
+### ✅ REGISTRATION PATTERN
 
-### ✅ Test Coverage
-- [ ] Basic functionality tests
-- [ ] Accessibility tests (REQUIRED)
-- [ ] Visual state tests
-- [ ] Edge case tests (null, undefined, special characters)
-- [ ] Performance tests (memoization, rapid changes)
-- [ ] Integration tests (layout contexts)
+- [ ] COMPONENT REGISTERED IN `COMPONENTREGISTRY`
+- [ ] CONDITIONAL REGISTRATION BASED ON ENVIRONMENT
+- [ ] COMPONENT NAME MATCHES METADATA
 
-### ✅ Test Organization
-- [ ] Tests grouped by category with section headers
-- [ ] Descriptive test names
-- [ ] Tests are independent and isolated
-- [ ] Tests use proper assertions
-
----
-
-## 📦 Component Registration
-
-### ✅ Registration Pattern
-- [ ] Component registered in `ComponentRegistry`
-- [ ] Conditional registration based on environment
-- [ ] Component name matches metadata
-
-```typescript
-// ✅ Good
-if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
-  this.registerCoreComponent(componentNameComponentRenderer);
+```TYPESCRIPT
+// ✅ GOOD
+IF (PROCESS.ENV.VITE_USED_COMPONENTS_COMPONENTNAME !== "FALSE") {
+  THIS.REGISTERCORECOMPONENT(COMPONENTNAMECOMPONENTRENDERER);
 }
 ```
 
@@ -574,6 +586,7 @@ if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
 ## 🚀 Performance
 
 ### ✅ Optimization Patterns
+
 - [ ] Component uses `memo` for re-render prevention
 - [ ] Expensive calculations are memoized
 - [ ] Event handlers are stable references
@@ -582,6 +595,7 @@ if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
 - [ ] Context values are memoized
 
 ### ✅ Hook Performance Best Practices
+
 - [ ] `useCallback` dependencies are minimal and stable
 - [ ] `useMemo` is used for expensive computations only
 - [ ] Context providers memoize their values
@@ -595,21 +609,21 @@ const ComponentName = memo(({ items, onItemClick }) => {
   const processedItems = useMemo(() => {
     return items.map(item => expensiveProcessing(item));
   }, [items]);
-  
+
   // Stable event handler
   const handleItemClick = useCallback((item) => {
     onItemClick(item);
   }, [onItemClick]);
-  
+
   // Split effects by concern
   useEffect(() => {
     trackPageView();
   }, []); // Only on mount
-  
+
   useEffect(() => {
     updateItems(processedItems);
   }, [processedItems]); // Only when items change
-  
+
   return (
     <div>
       {processedItems.map(item => (
@@ -621,6 +635,7 @@ const ComponentName = memo(({ items, onItemClick }) => {
 ```
 
 ### ✅ Memory Management
+
 - [ ] Event listeners properly cleaned up
 - [ ] Subscriptions disposed in cleanup
 - [ ] No memory leaks in component lifecycle
@@ -634,34 +649,34 @@ function ComponentName() {
   useEffect(() => {
     // Event listener cleanup
     const handleResize = () => updateLayout();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
     // Timer cleanup
     const timer = setTimeout(() => performAction(), 1000);
     return () => clearTimeout(timer);
   }, []);
-  
+
   useEffect(() => {
     // Subscription cleanup
     const subscription = dataService.subscribe(handleData);
     return () => subscription.unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     // Request cancellation
     const controller = new AbortController();
-    
+
     fetchData({ signal: controller.signal })
       .then(handleData)
-      .catch(error => {
-        if (error.name !== 'AbortError') {
+      .catch((error) => {
+        if (error.name !== "AbortError") {
           handleError(error);
         }
       });
-    
+
     return () => controller.abort();
   }, []);
 }
@@ -672,6 +687,7 @@ function ComponentName() {
 ## 📊 Component Status and Lifecycle
 
 ### ✅ Status Declaration
+
 - [ ] Component has explicit status in metadata (`status: "experimental" | "stable" | "deprecated"`)
 - [ ] Status is appropriate for component maturity level
 - [ ] Breaking changes are documented in status transitions
@@ -679,11 +695,13 @@ function ComponentName() {
 - [ ] Deprecated components include migration guidance
 
 ### ✅ Documentation Requirements by Status
+
 - [ ] **Experimental**: Clear warnings about API instability
 - [ ] **Stable**: Comprehensive documentation and examples
 - [ ] **Deprecated**: Deprecation timeline and alternatives
 
 ### ⚠️ Special Handling for Deprecated Components
+
 - [ ] **HTML Tag Components**: All components in `HtmlTags.tsx` are deprecated
   - [ ] Skip during routine component reviews
   - [ ] Do not enhance or extend these components
@@ -691,6 +709,7 @@ function ComponentName() {
   - [ ] Include migration guidance in documentation
 
 **Example:**
+
 ```typescript
 export const ComponentMd = createMetadata({
   status: "stable", // or "experimental" | "deprecated"
@@ -704,6 +723,7 @@ export const ComponentMd = createMetadata({
 ## 🎨 Template and Customization Standards
 
 ### ✅ Template Property Patterns
+
 - [ ] Template properties follow `*Template` suffix naming convention
 - [ ] **Template properties use `dComponent()` metadata helper** (CRITICAL)
 - [ ] Template documentation includes expected data structure
@@ -712,39 +732,42 @@ export const ComponentMd = createMetadata({
 - [ ] Template fallbacks are properly handled in implementation
 
 ### ✅ Template Import Requirements
+
 - [ ] `dComponent` imported from `../metadata-helpers` when templates are used
 - [ ] Import statement includes `dComponent` alongside other helpers
 
 ```typescript
 // ✅ Good - Import dComponent when using templates
-import { 
-  createMetadata, 
-  d, 
-  dComponent,  // Required for template properties
+import {
+  createMetadata,
+  d,
+  dComponent, // Required for template properties
   dEnabled,
-  dLabel 
+  dLabel,
 } from "../metadata-helpers";
 ```
 
 ### ✅ Template Property Documentation Standards
+
 - [ ] **All template properties use `dComponent()` consistently** (avoid `d()` for templates)
 - [ ] Properties requiring additional flags use spread operator pattern
 - [ ] Context variables are explicitly documented in descriptions
 - [ ] Internal templates are marked appropriately
 
 **✅ Correct Template Property Patterns:**
+
 ```typescript
 props: {
   // Standard template property
   optionTemplate: dComponent(
     `Template for rendering dropdown options. Context: $item (option data).`
   ),
-  
+
   // Empty state template
   emptyListTemplate: dComponent(
     `Template shown when no options are available. No additional context.`
   ),
-  
+
   // Template with additional properties
   tabTemplate: {
     ...dComponent(
@@ -752,7 +775,7 @@ props: {
     ),
     isInternal: true,
   },
-  
+
   // Template with complex context
   valueTemplate: dComponent(
     `Template for selected values in multi-select. Context: $item (selected item), $itemContext ({ removeItem }).`
@@ -761,20 +784,21 @@ props: {
 ```
 
 **❌ Incorrect Template Property Patterns:**
+
 ```typescript
 props: {
   // ❌ Wrong - using d() instead of dComponent()
   emptyListTemplate: d(
     "Template for empty state."
   ),
-  
+
   // ❌ Wrong - plain object instead of dComponent()
   tabTemplate: {
     description: "Template for tabs.",
     valueType: "ComponentDef",
     isInternal: true,
   },
-  
+
   // ❌ Wrong - missing context variable documentation
   optionTemplate: dComponent(
     `Template for options.`  // Missing $item context info
@@ -783,6 +807,7 @@ props: {
 ```
 
 ### ✅ Template Implementation
+
 - [ ] Templates receive appropriate context data
 - [ ] Template rendering uses `MemoizedItem` for performance
 - [ ] Template components handle missing data gracefully
@@ -790,6 +815,7 @@ props: {
 - [ ] Context variables are properly passed to templates
 
 **Template Usage Pattern:**
+
 ```typescript
 // ✅ Good - Template rendering with context
 valueRenderer={
@@ -812,6 +838,7 @@ valueRenderer={
 ```
 
 ### ✅ Template Property Compliance Checklist
+
 - [ ] **No template properties use `d()` helper** (should be `dComponent()`)
 - [ ] **No template properties use plain objects** (should use `dComponent()`)
 - [ ] **All template imports include `dComponent`** from metadata-helpers
@@ -824,6 +851,7 @@ valueRenderer={
 ## 🔧 Wrapper Component Guidelines
 
 ### ✅ Wrapper Component Standards
+
 - [ ] Simple re-exports are justified (avoid unnecessary wrappers)
 - [ ] Wrapper components maintain proper TypeScript exports
 - [ ] Wrapper components preserve original component metadata
@@ -831,6 +859,7 @@ valueRenderer={
 - [ ] Wrapper purpose is clearly documented
 
 ### ✅ When to Use Wrappers
+
 - [ ] **Valid**: Legacy compatibility layers
 - [ ] **Valid**: Component composition with added functionality
 - [ ] **Invalid**: Simple re-exports without added value
@@ -841,6 +870,7 @@ valueRenderer={
 ## 📊 Data Component Standards
 
 ### ✅ Data Fetching Components
+
 - [ ] Loading states are implemented with proper UI feedback
 - [ ] Error handling provides meaningful user feedback
 - [ ] Data components support polling/refresh patterns when appropriate
@@ -849,12 +879,14 @@ valueRenderer={
 - [ ] Data transformation patterns are consistent across components
 
 ### ✅ Data Flow Patterns
+
 - [ ] Components follow unidirectional data flow
 - [ ] Data mutations are handled through proper callbacks
 - [ ] Component state is minimized in favor of props
 - [ ] Data validation occurs at appropriate boundaries
 
 **Example:**
+
 ```typescript
 props: {
   resultSelector: d(
@@ -871,6 +903,7 @@ props: {
 ## 🌐 API and Data Manipulation Standards
 
 ### ✅ API Component Requirements
+
 - [ ] **HTTP methods handled comprehensively** (GET, POST, PUT, DELETE, PATCH)
 - [ ] **Request/response lifecycle documented** with clear event patterns
 - [ ] **Confirmation dialogs supported** for destructive operations
@@ -879,12 +912,14 @@ props: {
 - [ ] **Loading states managed** with proper UI feedback
 
 ### ✅ API Component Event Lifecycle
+
 - [ ] **beforeRequest**: Validation and preparation phase
 - [ ] **progress**: Loading state and intermediate updates
 - [ ] **success**: Successful completion handling
 - [ ] **error**: Error handling and user notification
 
 **Example:**
+
 ```typescript
 export const APICallMd = createMetadata({
   description: "API component for data manipulation operations",
@@ -899,6 +934,7 @@ export const APICallMd = createMetadata({
 ```
 
 ### ✅ Data Fetching and Caching
+
 - [ ] **Polling patterns supported** with configurable intervals
 - [ ] **Cache invalidation strategies** clearly defined
 - [ ] **Result selectors documented** with usage examples
@@ -910,6 +946,7 @@ export const APICallMd = createMetadata({
 ## 📊 Chart and Visualization Standards
 
 ### ✅ Chart Component Requirements
+
 - [ ] **Data visualization accessibility** for screen readers
 - [ ] **Responsive chart layouts** for different screen sizes
 - [ ] **Consistent data key patterns** across chart types
@@ -918,6 +955,7 @@ export const APICallMd = createMetadata({
 - [ ] **Interactive elements** properly accessible
 
 ### ✅ Chart Data Patterns
+
 - [ ] **Data structure documented** with clear examples
 - [ ] **Data validation implemented** with proper error handling
 - [ ] **Data transformation utilities** available and documented
@@ -925,6 +963,7 @@ export const APICallMd = createMetadata({
 - [ ] **Animation performance** optimized for smooth interactions
 
 **Example:**
+
 ```typescript
 export const BarChartMd = createMetadata({
   status: "experimental",
@@ -943,6 +982,7 @@ export const BarChartMd = createMetadata({
 ## 📝 Rich Content Component Standards
 
 ### ✅ Content Processing Requirements
+
 - [ ] **Content sanitization implemented** to prevent XSS attacks
 - [ ] **Keyboard navigation support** for rich content areas
 - [ ] **Undo/redo functionality** for editor components
@@ -951,6 +991,7 @@ export const BarChartMd = createMetadata({
 - [ ] **Export/import capabilities** documented and tested
 
 ### ✅ Editor Component Patterns
+
 - [ ] **Editor state management** follows controlled component patterns
 - [ ] **Plugin architecture supported** for extensibility
 - [ ] **Content validation** implemented with user feedback
@@ -958,6 +999,7 @@ export const BarChartMd = createMetadata({
 - [ ] **Collaborative editing** considerations documented
 
 **Example:**
+
 ```typescript
 export const MarkdownMd = createMetadata({
   description: "Rich markdown content processor with syntax highlighting",
@@ -975,6 +1017,7 @@ export const MarkdownMd = createMetadata({
 ## 🔌 External Library Integration Standards
 
 ### ✅ Integration Requirements
+
 - [ ] **External dependencies documented** with version compatibility
 - [ ] **Library integrations follow XMLUI patterns** consistently
 - [ ] **Theme consistency maintained** across external components
@@ -983,6 +1026,7 @@ export const MarkdownMd = createMetadata({
 - [ ] **Bundle size impact** documented and minimized
 
 ### ✅ Third-Party Component Wrapper Patterns
+
 - [ ] **Wrapper components use createComponentRenderer** when possible
 - [ ] **External component props mapped** to XMLUI conventions
 - [ ] **Error boundaries implemented** for external component failures
@@ -990,6 +1034,7 @@ export const MarkdownMd = createMetadata({
 - [ ] **Alternative implementations** considered for critical features
 
 **Example:**
+
 ```typescript
 // TipTap editor integration
 export const TableEditorMd = createMetadata({
@@ -1007,6 +1052,7 @@ export const TableEditorMd = createMetadata({
 ## ⚛️ React-Only Component Guidelines
 
 ### ✅ Non-XMLUI Component Standards
+
 - [ ] **Pure React components justified** with clear reasoning
 - [ ] **Theme integration maintained** despite bypassing XMLUI
 - [ ] **Documentation explains** why XMLUI patterns are not used
@@ -1014,12 +1060,14 @@ export const TableEditorMd = createMetadata({
 - [ ] **Components marked clearly** as non-XMLUI in documentation
 
 ### ✅ When React-Only is Acceptable
+
 - [ ] **Complex state management** not suited to XMLUI patterns
 - [ ] **Heavy external library integration** requiring direct React usage
 - [ ] **Performance-critical components** needing direct React optimizations
 - [ ] **Legacy integration** requiring specific React patterns
 
 **Example:**
+
 ```typescript
 // ProfileMenu - React-only component
 export const ProfileMenu = ({ loggedInUser }: Props) => {
@@ -1035,6 +1083,7 @@ export const ProfileMenu = ({ loggedInUser }: Props) => {
 ```
 
 ### ❌ React-Only Antipatterns
+
 - [ ] **Avoid**: Creating React-only components when XMLUI patterns would work
 - [ ] **Avoid**: Bypassing theme system without justification
 - [ ] **Avoid**: Missing documentation for architecture decisions
@@ -1045,6 +1094,7 @@ export const ProfileMenu = ({ loggedInUser }: Props) => {
 ## 📏 Component File Size and Modularization
 
 ### ✅ File Size Management
+
 - [ ] **Individual component files under 500 lines** (excluding generated content)
 - [ ] **Large component collections modularized** by logical groups
 - [ ] **Utility files separated** from component definitions
@@ -1052,16 +1102,18 @@ export const ProfileMenu = ({ loggedInUser }: Props) => {
 - [ ] **Monolithic files identified** and refactoring planned
 
 ### ✅ Modularization Strategies
+
 - [ ] **Related components grouped** in logical folders
 - [ ] **Shared utilities extracted** to common modules
 - [ ] **Registration files modular** to avoid massive imports
 - [ ] **Component dependencies minimized** through proper separation
 
 **Example - HtmlTags Modularization:**
+
 ```typescript
 // Instead of 2,500-line HtmlTags.tsx, create:
 // components/HtmlTags/TextTags.tsx
-// components/HtmlTags/MediaTags.tsx  
+// components/HtmlTags/MediaTags.tsx
 // components/HtmlTags/FormTags.tsx
 // components/HtmlTags/index.ts (barrel export)
 
@@ -1081,6 +1133,7 @@ export const mediaTagRenderers = {
 ```
 
 ### ❌ File Size Antipatterns
+
 - [ ] **Avoid**: Single files exceeding 500 lines without justification
 - [ ] **Avoid**: Mixing unrelated functionality in single files
 - [ ] **Avoid**: Generated content committed without build process
@@ -1091,6 +1144,7 @@ export const mediaTagRenderers = {
 ## 🧩 Child Component and Sub-Component Patterns
 
 ### ✅ Child Component Standards
+
 - [ ] **Child components use dedicated files** when exceeding 50 lines
 - [ ] **Consistent naming pattern** (ParentChild format)
 - [ ] **Parent relationship documented** in component metadata
@@ -1098,12 +1152,14 @@ export const mediaTagRenderers = {
 - [ ] **Parent-child context passing documented** with examples
 
 ### ✅ Sub-Component Architecture
+
 - [ ] **Child component registration** handled properly with parent
 - [ ] **Shared styling and theming** consistent between parent and children
 - [ ] **Child component lifecycle** managed by parent appropriately
 - [ ] **Context boundaries clear** between parent and child responsibilities
 
 **Example:**
+
 ```typescript
 // TabItem - Child component for Tabs
 export const TabItemMd = createMetadata({
@@ -1117,6 +1173,7 @@ export const TabItemMd = createMetadata({
 ```
 
 ### ❌ Child Component Antipatterns
+
 - [ ] **Avoid**: Inconsistent approaches to parent-child relationships
 - [ ] **Avoid**: Large child components inlined in parent files
 - [ ] **Avoid**: Missing documentation of parent-child contracts
@@ -1127,6 +1184,7 @@ export const TabItemMd = createMetadata({
 ## 📖 Context Variable Documentation
 
 ### ✅ Context Variable Standards
+
 - [ ] **All template components document** available context variables
 - [ ] **Context variables use `$variable` naming** convention consistently
 - [ ] **Variable types and descriptions provided** for all context data
@@ -1134,12 +1192,14 @@ export const TabItemMd = createMetadata({
 - [ ] **Context variable scope clearly defined** for nested components
 
 ### ✅ Template Context Patterns
+
 - [ ] **Standard context variables** used consistently (`$item`, `$index`, `$value`)
 - [ ] **Component-specific context** documented with clear examples
 - [ ] **Context data transformation** explained when applicable
 - [ ] **Context performance implications** considered for large datasets
 
 **Example:**
+
 ```typescript
 export const ColumnMd = createMetadata({
   description: "Table column with rich context support",
@@ -1170,6 +1230,7 @@ export const ColumnMd = createMetadata({
 ```
 
 ### ❌ Context Variable Antipatterns
+
 - [ ] **Avoid**: Missing context variable documentation for template components
 - [ ] **Avoid**: Inconsistent context variable naming across components
 - [ ] **Avoid**: Undocumented context data transformation
