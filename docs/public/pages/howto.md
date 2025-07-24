@@ -903,11 +903,10 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
   <!-- Modal controlled by AppState -->
   <ModalDialog
-    title="Product Details"
     when="{modalState.value.isOpen}"
     onClose="modalState.update({isOpen: false})"
   >
-    <Form 
+    <Form
       data="{modalState.value.product}"
       onSubmit="saveProduct.execute({
         id: modalState.value.mode === 'edit' ? modalState.value.product.id : null,
