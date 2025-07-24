@@ -895,9 +895,21 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 ---comp display
 <Component name="Test">
 
-  <!-- Shared modal defined at App level - accessible to all components -->
-  <ModalDialog id="productDialog" title="Product Details">
-    <ProductForm product="{$param}" />
+  <AppState id="modalState" bucket="modalState" initialValue="{{
+    isOpen: false,
+    product: null,
+    mode: 'add'
+  }}" />
+
+  <!-- Modal controlled by AppState -->
+  <ModalDialog
+    when="{modalState.value.isOpen}"
+    onClose="modalState.update({isOpen: false})"
+  >
+    <ProductForm
+      product="{modalState.value.product}"
+      mode="{modalState.value.mode}"
+    />
   </ModalDialog>
 
   <!-- APICall to fetch product details before opening modal for edit -->
@@ -922,7 +934,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
       <Button
         label="Add New Product"
         size="sm"
-        onClick="productDialog.open()"
+        onClick="modalState.update({isOpen: true, product: null, mode: 'add'})"
       />
     </HStack>
 
@@ -934,7 +946,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
           label="Edit"
           size="sm"
           variant="outlined"
-          onClick="productDialog.open($item)"
+          onClick="modalState.update({isOpen: true, product: $item, mode: 'edit'})"
         />
       </Column>
     </Table>
@@ -942,29 +954,16 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 </Component>
 ---comp display
-<Component name="ProductForm" var.isEdit="{!!$props.product}" var.formData="{{
+<Component name="ProductForm" var.isEdit="{$props.mode === 'edit'}" var.formData="{{
   name: isEdit ? $props.product.name : '',
   price: isEdit ? $props.product.price : ''
 }}">
+  <AppState id="modalState" bucket="modalState" />
+
   <VStack gap="1rem" padding="1rem">
     <Text variant="strong">
       {isEdit ? 'Edit Product' : 'Add New Product'}
     </Text>
-
-    <Text>Debug - formData: {JSON.stringify(formData)}</Text>
-
-    <Fragment when="{isEdit}">
-      <Card padding="1rem" backgroundColor="$color-primary-50">
-        <VStack gap="0.5rem">
-          <Text variant="caption" color="$color-primary-700">
-            Editing: {$props.product.name}
-          </Text>
-          <Text variant="caption">
-            ID: {$props.product.id} | Category: {$props.product.category}
-          </Text>
-        </VStack>
-      </Card>
-    </Fragment>
 
         <!-- Active form fields -->
     <VStack gap="1rem">
@@ -995,7 +994,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
         label="Cancel"
         size="sm"
         variant="outlined"
-        onClick="productDialog.close()"
+        onClick="modalState.update({isOpen: false})"
       />
     </HStack>
   </VStack>
@@ -1003,11 +1002,9 @@ These examples answer common questions of the form "How do I do SOMETHING with X
   <!-- APICall for saving product -->
   <APICall id="saveProduct" url="/api/products" method="post" body="{JSON.stringify($param)}">
     <event name="success">
-      productDialog.close();
+      modalState.update({isOpen: false});
       products.refetch();
     </event>
   </APICall>
 </Component>
-```
-
 ```
