@@ -120,7 +120,6 @@ import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
-import { codeComponentRenderer } from "../components-core/XmluiCodeHighlighter";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
@@ -253,7 +252,6 @@ import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
-
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -502,10 +500,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(imageComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter !== "false") {
-      this.registerCoreComponent(codeComponentRenderer);
-    }
-
     if (process.env.VITE_USED_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
     }
@@ -519,11 +513,11 @@ export class ComponentRegistry {
       this.registerCoreComponent(pieChartComponentRenderer);
     }
 
-    if(process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false"){
+    if (process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false") {
       this.registerCoreComponent(emojiSelectorRenderer);
     }
 
-    if(process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
+    if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
     }
 
@@ -821,7 +815,7 @@ export class ComponentRegistry {
    * @returns The component registry entry, if found; otherwise, undefined.
    */
   lookupComponentRenderer(componentName: string): ComponentRegistryEntry | undefined {
-    if(!componentName){
+    if (!componentName) {
       return undefined;
     }
     // componentName without namespace, 1. core, 2. app, 3. XMLUIExtension
@@ -835,7 +829,7 @@ export class ComponentRegistry {
 
     // order: componentName includes namespace, find in that pool
     const nameInfo = this.namePool.get(componentName);
-    if(!nameInfo){
+    if (!nameInfo) {
       return undefined;
     }
     return this.pool.get(nameInfo.namespace)?.get(nameInfo.name);

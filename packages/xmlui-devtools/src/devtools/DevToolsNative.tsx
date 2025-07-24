@@ -4,10 +4,14 @@ import { useTheme, useDevTools } from "xmlui";
 import styles from "./DevToolsNative.module.scss";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import loader from "@monaco-editor/loader";
-import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
-import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
-import xmluiLight from "../syntax/monaco/xmlui-light";
-import xmluiDark from "../syntax/monaco/xmlui-dark";
+
+import {
+  xmluiThemeLight,
+  xmluiThemeDark,
+  xmluiGrammar,
+  xmluiScriptGrammar,
+} from "xmlui/syntax/monaco";
+
 import { createQueryString } from "./utils";
 import { ModalDialog } from "./ModalDialog";
 
@@ -115,19 +119,22 @@ export const DevTools = () => {
       loader.init().then((monaco) => {
         if (!editorRef.current || monacoEditorInstance.current) return;
         if (!monacoSetupDone.current) {
-          monaco.languages.register({ id: XmluiGrammar.id });
-          monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
-          monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
+          monaco.languages.register({ id: xmluiGrammar.id });
+          monaco.languages.setMonarchTokensProvider(xmluiGrammar.id, xmluiGrammar.language);
+          monaco.languages.setLanguageConfiguration(xmluiGrammar.id, xmluiGrammar.config);
 
-          monaco.languages.register({ id: XmluiScripGrammar.id });
+          monaco.languages.register({ id: xmluiScriptGrammar.id });
           monaco.languages.setMonarchTokensProvider(
-            XmluiScripGrammar.id,
-            XmluiScripGrammar.language,
+            xmluiScriptGrammar.id,
+            xmluiScriptGrammar.language,
           );
-          monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
+          monaco.languages.setLanguageConfiguration(
+            xmluiScriptGrammar.id,
+            xmluiScriptGrammar.config,
+          );
 
-          monaco.editor.defineTheme("xmlui-light", xmluiLight);
-          monaco.editor.defineTheme("xmlui-dark", xmluiDark);
+          monaco.editor.defineTheme("xmlui-light", xmluiThemeLight);
+          monaco.editor.defineTheme("xmlui-dark", xmluiThemeDark);
 
           monacoSetupDone.current = true;
         }
@@ -146,7 +153,7 @@ export const DevTools = () => {
             top: 10,
             bottom: 10,
           },
-          stickyScroll: { enabled: false }
+          stickyScroll: { enabled: false },
         });
       });
     }

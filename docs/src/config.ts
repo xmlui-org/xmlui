@@ -9,9 +9,7 @@ import json from "@shikijs/langs/json";
 // @ts-ignore
 import html from "@shikijs/langs/html";
 
-import xmluiGrammar from "./syntax/grammar.tmLanguage.json";
-import xmluiThemeLight from "./syntax/textMate/xmlui-light.json";
-import xmluiThemeDark from "./syntax/textMate/xmlui-dark.json";
+import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
 
 import { unified } from "unified";
 import remarkParse from "remark-parse";
