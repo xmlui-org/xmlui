@@ -1,7 +1,7 @@
 // This file is auto-generated. Do not edit manually.
 export default {
   "a": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `a` tag.",
     "isHtmlTag": true,
     "props": {
@@ -35,12 +35,12 @@ export default {
     }
   },
   "address": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `address` tag.",
     "isHtmlTag": true
   },
   "area": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `area` tag.",
     "isHtmlTag": true,
     "props": {
@@ -77,17 +77,17 @@ export default {
     }
   },
   "article": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `article` tag.",
     "isHtmlTag": true
   },
   "aside": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `aside` tag.",
     "isHtmlTag": true
   },
   "audio": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `audio` tag.",
     "isHtmlTag": true,
     "props": {
@@ -115,17 +115,17 @@ export default {
     }
   },
   "b": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `b` tag.",
     "isHtmlTag": true
   },
   "bdi": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `bdi` tag.",
     "isHtmlTag": true
   },
   "bdo": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `bdo` tag.",
     "isHtmlTag": true,
     "props": {
@@ -135,7 +135,7 @@ export default {
     }
   },
   "blockquote": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `blockquote` tag.",
     "isHtmlTag": true,
     "props": {
@@ -145,12 +145,12 @@ export default {
     }
   },
   "br": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `br` tag.",
     "isHtmlTag": true
   },
   "button": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `button` tag.",
     "isHtmlTag": true,
     "props": {
@@ -190,7 +190,7 @@ export default {
     }
   },
   "canvas": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `canvas` tag.",
     "isHtmlTag": true,
     "props": {
@@ -203,22 +203,22 @@ export default {
     }
   },
   "caption": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `caption` tag.",
     "isHtmlTag": true
   },
   "cite": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `cite` tag.",
     "isHtmlTag": true
   },
   "code": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `code` tag.",
     "isHtmlTag": true
   },
   "col": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `col` tag.",
     "isHtmlTag": true,
     "props": {
@@ -228,7 +228,7 @@ export default {
     }
   },
   "colgroup": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `colgroup` tag.",
     "isHtmlTag": true,
     "props": {
@@ -238,7 +238,7 @@ export default {
     }
   },
   "data": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `data` tag.",
     "isHtmlTag": true,
     "props": {
@@ -248,17 +248,17 @@ export default {
     }
   },
   "datalist": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `datalist` tag.",
     "isHtmlTag": true
   },
   "dd": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `dd` tag.",
     "isHtmlTag": true
   },
   "del": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `del` tag.",
     "isHtmlTag": true,
     "props": {
@@ -271,7 +271,7 @@ export default {
     }
   },
   "details": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `details` tag.",
     "isHtmlTag": true,
     "props": {
@@ -289,12 +289,12 @@ export default {
     }
   },
   "dfn": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `dfn` tag.",
     "isHtmlTag": true
   },
   "dialog": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `dialog` tag.",
     "isHtmlTag": true,
     "props": {
@@ -304,27 +304,27 @@ export default {
     }
   },
   "div": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `div` tag.",
     "isHtmlTag": true
   },
   "dl": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `dl` tag.",
     "isHtmlTag": true
   },
   "dt": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `dt` tag.",
     "isHtmlTag": true
   },
   "em": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `em` tag.",
     "isHtmlTag": true
   },
   "embed": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `embed` tag.",
     "isHtmlTag": true,
     "props": {
@@ -343,7 +343,7 @@ export default {
     }
   },
   "fieldset": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `fieldset` tag.",
     "isHtmlTag": true,
     "props": {
@@ -359,22 +359,22 @@ export default {
     }
   },
   "figcaption": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `figcaption` tag.",
     "isHtmlTag": true
   },
   "figure": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `figure` tag.",
     "isHtmlTag": true
   },
   "footer": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `footer` tag.",
     "isHtmlTag": true
   },
   "form": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `form` tag.",
     "isHtmlTag": true,
     "props": {
@@ -405,7 +405,7 @@ export default {
     }
   },
   "h1": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h1` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -418,7 +418,7 @@ export default {
     }
   },
   "h2": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h2` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -431,7 +431,7 @@ export default {
     }
   },
   "h3": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h3` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -444,7 +444,7 @@ export default {
     }
   },
   "h4": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h4` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -457,7 +457,7 @@ export default {
     }
   },
   "h5": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h5` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -470,7 +470,7 @@ export default {
     }
   },
   "h6": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `h6` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -483,22 +483,22 @@ export default {
     }
   },
   "header": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `header` tag.",
     "isHtmlTag": true
   },
   "hr": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `hr` tag.",
     "isHtmlTag": true
   },
   "i": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `i` tag.",
     "isHtmlTag": true
   },
   "iframe": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `iframe` tag.",
     "isHtmlTag": true,
     "props": {
@@ -535,7 +535,7 @@ export default {
     }
   },
   "img": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `img` tag.",
     "isHtmlTag": true,
     "props": {
@@ -566,7 +566,7 @@ export default {
     }
   },
   "input": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `input` tag.",
     "isHtmlTag": true,
     "props": {
@@ -630,7 +630,7 @@ export default {
     }
   },
   "ins": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `ins` tag.",
     "isHtmlTag": true,
     "props": {
@@ -643,12 +643,12 @@ export default {
     }
   },
   "kbd": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `kbd` tag.",
     "isHtmlTag": true
   },
   "label": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `label` tag.",
     "isHtmlTag": true,
     "props": {
@@ -658,12 +658,12 @@ export default {
     }
   },
   "legend": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `legend` tag.",
     "isHtmlTag": true
   },
   "li": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `li` tag.",
     "isHtmlTag": true,
     "props": {
@@ -677,12 +677,12 @@ export default {
     }
   },
   "main": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `main` tag.",
     "isHtmlTag": true
   },
   "map": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `map` tag.",
     "isHtmlTag": true,
     "props": {
@@ -692,12 +692,12 @@ export default {
     }
   },
   "mark": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `mark` tag.",
     "isHtmlTag": true
   },
   "menu": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `menu` tag.",
     "isHtmlTag": true,
     "props": {
@@ -707,7 +707,7 @@ export default {
     }
   },
   "meter": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `meter` tag.",
     "isHtmlTag": true,
     "props": {
@@ -732,12 +732,12 @@ export default {
     }
   },
   "nav": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `nav` tag.",
     "isHtmlTag": true
   },
   "object": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `object` tag.",
     "isHtmlTag": true,
     "props": {
@@ -762,7 +762,7 @@ export default {
     }
   },
   "ol": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `ol` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -898,7 +898,7 @@ export default {
     }
   },
   "optgroup": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `optgroup` tag.",
     "isHtmlTag": true,
     "props": {
@@ -911,7 +911,7 @@ export default {
     }
   },
   "option": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `option` tag.",
     "isHtmlTag": true,
     "props": {
@@ -930,7 +930,7 @@ export default {
     }
   },
   "output": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `output` tag.",
     "isHtmlTag": true,
     "props": {
@@ -946,12 +946,12 @@ export default {
     }
   },
   "p": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `p` tag.",
     "isHtmlTag": true
   },
   "param": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `param` tag.",
     "isHtmlTag": true,
     "props": {
@@ -964,17 +964,17 @@ export default {
     }
   },
   "picture": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `picture` tag.",
     "isHtmlTag": true
   },
   "pre": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `pre` tag.",
     "isHtmlTag": true
   },
   "progress": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `progress` tag.",
     "isHtmlTag": true,
     "props": {
@@ -987,7 +987,7 @@ export default {
     }
   },
   "q": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `q` tag.",
     "isHtmlTag": true,
     "props": {
@@ -997,37 +997,37 @@ export default {
     }
   },
   "rp": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `rp` tag.",
     "isHtmlTag": true
   },
   "rt": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `rt` tag.",
     "isHtmlTag": true
   },
   "ruby": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `ruby` tag.",
     "isHtmlTag": true
   },
   "s": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `s` tag.",
     "isHtmlTag": true
   },
   "samp": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `samp` tag.",
     "isHtmlTag": true
   },
   "section": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `section` tag.",
     "isHtmlTag": true
   },
   "select": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `select` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1055,12 +1055,12 @@ export default {
     }
   },
   "small": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `small` tag.",
     "isHtmlTag": true
   },
   "source": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `source` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1082,32 +1082,32 @@ export default {
     }
   },
   "span": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `span` tag.",
     "isHtmlTag": true
   },
   "strong": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `strong` tag.",
     "isHtmlTag": true
   },
   "sub": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `sub` tag.",
     "isHtmlTag": true
   },
   "summary": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `summary` tag.",
     "isHtmlTag": true
   },
   "sup": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `sup` tag.",
     "isHtmlTag": true
   },
   "table": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `table` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1194,7 +1194,7 @@ export default {
     }
   },
   "tbody": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `tbody` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -1206,7 +1206,7 @@ export default {
     }
   },
   "td": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `td` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1290,12 +1290,12 @@ export default {
     }
   },
   "template": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `template` tag.",
     "isHtmlTag": true
   },
   "textarea": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `textarea` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1344,7 +1344,7 @@ export default {
     }
   },
   "tfoot": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `tfoot` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -1353,7 +1353,7 @@ export default {
     }
   },
   "th": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `th` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1429,7 +1429,7 @@ export default {
     }
   },
   "thead": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `thead` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -1485,7 +1485,7 @@ export default {
     }
   },
   "time": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `time` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1495,7 +1495,7 @@ export default {
     }
   },
   "tr": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `tr` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -1545,7 +1545,7 @@ export default {
     }
   },
   "track": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `track` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1567,12 +1567,12 @@ export default {
     }
   },
   "u": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `u` tag.",
     "isHtmlTag": true
   },
   "ul": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `ul` tag.",
     "isHtmlTag": true,
     "themeVars": {
@@ -1708,12 +1708,12 @@ export default {
     }
   },
   "var": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `var` tag.",
     "isHtmlTag": true
   },
   "video": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `video` tag.",
     "isHtmlTag": true,
     "props": {
@@ -1755,7 +1755,7 @@ export default {
     }
   },
   "wbr": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `wbr` tag.",
     "isHtmlTag": true
   },
@@ -1799,16 +1799,20 @@ export default {
     },
     "apis": {
       "expanded": {
-        "description": "This property indicates if the Accordion is expanded (`true`) or collapsed (`false`)."
+        "description": "This method returns `true` if the accordion is expanded, and `false` if it is collapsed.",
+        "signature": "get expanded(): boolean"
       },
       "expand": {
-        "description": "This method expands the Accordion."
+        "description": "This method expands the accordion, making its content visible.",
+        "signature": "expand()"
       },
       "collapse": {
-        "description": "This method collapses the Accordion."
+        "description": "This method collapses the accordion, hiding its content.",
+        "signature": "collapse()"
       },
       "toggle": {
-        "description": "This method toggles the state of the Accordion between expanded and collapsed."
+        "description": "This method toggles the state of the Accordion between expanded and collapsed.",
+        "signature": "toggle()"
       },
       "focus": {
         "description": "This method sets the focus on the Accordion."
@@ -1889,6 +1893,7 @@ export default {
     }
   },
   "APICall": {
+    "status": "stable",
     "description": "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.",
     "props": {
       "method": {
@@ -2002,7 +2007,11 @@ export default {
     },
     "apis": {
       "execute": {
-        "description": "This method triggers the invocation of the API. You can pass an arbitrary number of parameters to the method. In the `APICall` instance, you can access those with the `$param` and `$params` context values."
+        "description": "This method triggers the invocation of the API. You can pass an arbitrary number of parameters to the method. In the `APICall` instance, you can access those with the `$param` and `$params` context values.",
+        "signature": "execute(...params: any[])",
+        "parameters": {
+          "params": "An arbitrary number of parameters that can be used in the API call."
+        }
       }
     }
   },
@@ -2119,7 +2128,7 @@ export default {
       "width‑navPanel‑App": "This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts."
     },
     "defaultThemeVars": {
-      "maxWidth-Drawer": "20rem",
+      "maxWidth-Drawer": "100%",
       "width-navPanel-App": "$space-64",
       "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
@@ -2241,6 +2250,7 @@ export default {
     }
   },
   "AppState": {
+    "status": "stable",
     "description": "`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.",
     "props": {
       "bucket": {
@@ -2254,14 +2264,18 @@ export default {
     },
     "apis": {
       "update": {
-        "description": "This method updates the application state object bound to the `AppState` instance. The function's single argument is an object that specifies the new state value."
+        "signature": "update(newState: Record<string, any>)",
+        "description": "This method updates the application state object bound to the `AppState` instance.",
+        "parameters": {
+          "newState": "An object that specifies the new state value."
+        }
       }
     },
     "nonVisual": true
   },
   "AutoComplete": {
-    "description": "`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.",
     "status": "experimental",
+    "description": "`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.",
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
@@ -2347,9 +2361,9 @@ export default {
         "description": "This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "dropdownHeight": {
         "description": "This property sets the height of the dropdown list."
@@ -2364,7 +2378,8 @@ export default {
         "valueType": "ComponentDef"
       },
       "emptyListTemplate": {
-        "description": "This property defines the template to display when the list of options is empty."
+        "description": "This property defines the template to display when the list of options is empty.",
+        "valueType": "ComponentDef"
       }
     },
     "events": {
@@ -2380,13 +2395,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the AutoComplete."
+        "description": "This method focuses the AutoComplete component.",
+        "signature": "focus()"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "This API allows you to get or set the value of the component. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): any"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API allows you to set the value of the component. If the value is not valid, the component will not update its internal state.",
+        "signature": "setValue(value: any)",
+        "parameters": {
+          "value": "The value to set."
+        }
       }
     },
     "contextVars": {
@@ -2440,6 +2461,7 @@ export default {
       "Input:boxShadow-AutoComplete-default--hover": "var(--xmlui-boxShadow-AutoComplete-default--hover)",
       "Input:textColor-AutoComplete-default--hover": "var(--xmlui-textColor-AutoComplete-default--hover)",
       "Input:textColor-placeholder-AutoComplete-default": "var(--xmlui-textColor-placeholder-AutoComplete-default)",
+      "Input:fontSize-placeholder-AutoComplete-default": "var(--xmlui-fontSize-placeholder-AutoComplete-default)",
       "Input:borderRadius-AutoComplete-error": "var(--xmlui-borderRadius-AutoComplete-error)",
       "Input:borderColor-AutoComplete-error": "var(--xmlui-borderColor-AutoComplete-error)",
       "Input:borderWidth-AutoComplete-error": "var(--xmlui-borderWidth-AutoComplete-error)",
@@ -2453,6 +2475,7 @@ export default {
       "Input:boxShadow-AutoComplete-error--hover": "var(--xmlui-boxShadow-AutoComplete-error--hover)",
       "Input:textColor-AutoComplete-error--hover": "var(--xmlui-textColor-AutoComplete-error--hover)",
       "Input:textColor-placeholder-AutoComplete-error": "var(--xmlui-textColor-placeholder-AutoComplete-error)",
+      "Input:fontSize-placeholder-AutoComplete-error": "var(--xmlui-fontSize-placeholder-AutoComplete-error)",
       "Input:borderRadius-AutoComplete-warning": "var(--xmlui-borderRadius-AutoComplete-warning)",
       "Input:borderColor-AutoComplete-warning": "var(--xmlui-borderColor-AutoComplete-warning)",
       "Input:borderWidth-AutoComplete-warning": "var(--xmlui-borderWidth-AutoComplete-warning)",
@@ -2466,6 +2489,7 @@ export default {
       "Input:boxShadow-AutoComplete-warning--hover": "var(--xmlui-boxShadow-AutoComplete-warning--hover)",
       "Input:textColor-AutoComplete-warning--hover": "var(--xmlui-textColor-AutoComplete-warning--hover)",
       "Input:textColor-placeholder-AutoComplete-warning": "var(--xmlui-textColor-placeholder-AutoComplete-warning)",
+      "Input:fontSize-placeholder-AutoComplete-warning": "var(--xmlui-fontSize-placeholder-AutoComplete-warning)",
       "Input:borderRadius-AutoComplete-success": "var(--xmlui-borderRadius-AutoComplete-success)",
       "Input:borderColor-AutoComplete-success": "var(--xmlui-borderColor-AutoComplete-success)",
       "Input:borderWidth-AutoComplete-success": "var(--xmlui-borderWidth-AutoComplete-success)",
@@ -2479,6 +2503,7 @@ export default {
       "Input:boxShadow-AutoComplete-success--hover": "var(--xmlui-boxShadow-AutoComplete-success--hover)",
       "Input:textColor-AutoComplete-success--hover": "var(--xmlui-textColor-AutoComplete-success--hover)",
       "Input:textColor-placeholder-AutoComplete-success": "var(--xmlui-textColor-placeholder-AutoComplete-success)",
+      "Input:fontSize-placeholder-AutoComplete-success": "var(--xmlui-fontSize-placeholder-AutoComplete-success)",
       "Input:backgroundColor-AutoComplete--disabled": "var(--xmlui-backgroundColor-AutoComplete--disabled)",
       "Input:textColor-AutoComplete--disabled": "var(--xmlui-textColor-AutoComplete--disabled)",
       "Input:borderColor-AutoComplete--disabled": "var(--xmlui-borderColor-AutoComplete--disabled)",
@@ -2524,6 +2549,7 @@ export default {
     }
   },
   "Avatar": {
+    "status": "stable",
     "description": "`Avatar` displays a user or entity's profile picture as a circular image, with automatic fallback to initials when no image is provided. It's commonly used in headers, user lists, comments, and anywhere you need to represent a person or organization.",
     "props": {
       "size": {
@@ -2818,6 +2844,7 @@ export default {
     }
   },
   "Bookmark": {
+    "status": "stable",
     "description": "As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location.",
     "opaque": true,
     "props": {
@@ -2839,14 +2866,21 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the bookmark into view."
+      }
     }
   },
   "Breakout": {
+    "status": "stable",
     "description": "The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width."
   },
   "Button": {
-    "description": "`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.",
     "status": "stable",
+    "description": "`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.",
     "props": {
       "autoFocus": {
         "description": "Indicates if the button should receive focus when the page loads.",
@@ -3277,6 +3311,7 @@ export default {
     }
   },
   "Card": {
+    "status": "stable",
     "description": "`Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface.",
     "props": {
       "avatarUrl": {
@@ -3478,18 +3513,26 @@ export default {
     },
     "apis": {
       "canScrollPrev": {
-        "description": "This method returns `true` if the carousel can scroll to the previous slide."
+        "description": "This method returns `true` if the carousel can scroll to the previous slide.",
+        "signature": "canScrollPrev(): boolean"
       },
       "canScrollNext": {
-        "description": "This method returns `true` if the carousel can scroll to the next slide."
+        "description": "This method returns `true` if the carousel can scroll to the next slide.",
+        "signature": "canScrollNext(): boolean"
       },
       "scrollTo": {
-        "description": "This method scrolls the carousel to the specified slide index."
+        "description": "This method scrolls the carousel to the specified slide index.",
+        "signature": "scrollTo(index: number): void",
+        "parameters": {
+          "index": "The index of the slide to scroll to."
+        }
       },
       "scrollPrev": {
+        "signature": "scrollPrev(): void",
         "description": "This method scrolls the carousel to the previous slide."
       },
       "scrollNext": {
+        "signature": "scrollNext(): void",
         "description": "This method scrolls the carousel to the next slide."
       }
     },
@@ -3544,6 +3587,7 @@ export default {
     }
   },
   "ChangeListener": {
+    "status": "stable",
     "description": "`ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers.",
     "props": {
       "listenTo": {
@@ -3600,9 +3644,9 @@ export default {
         "description": "This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Checkbox` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `Checkbox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -3651,7 +3695,8 @@ export default {
         "isInternal": true
       },
       "inputTemplate": {
-        "description": "This property is used to define a custom checkbox input template"
+        "description": "This property is used to define a custom checkbox input template",
+        "valueType": "ComponentDef"
       }
     },
     "childrenAsTemplate": "inputTemplate",
@@ -3668,10 +3713,15 @@ export default {
     },
     "apis": {
       "value": {
-        "description": "You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked)."
+        "description": "This method returns the current value of the Checkbox.",
+        "signature": "get value(): boolean"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This method sets the current value of the Checkbox.",
+        "signature": "set value(value: boolean): void",
+        "parameters": {
+          "value": "The new value to set for the checkbox."
+        }
       }
     },
     "themeVars": {
@@ -3715,15 +3765,14 @@ export default {
       "Input:backgroundColor-checked-Checkbox-warning": "var(--xmlui-backgroundColor-checked-Checkbox-warning)",
       "Input:borderColor-checked-Checkbox-success": "var(--xmlui-borderColor-checked-Checkbox-success)",
       "Input:backgroundColor-checked-Checkbox-success": "var(--xmlui-backgroundColor-checked-Checkbox-success)",
-      "Input:borderColor-Switch": "var(--xmlui-borderColor-Switch)",
       "Input:backgroundColor-Switch": "var(--xmlui-backgroundColor-Switch)",
+      "Input:borderColor-Switch": "var(--xmlui-borderColor-Switch)",
+      "backgroundColor-indicator-Switch": "var(--xmlui-backgroundColor-indicator-Switch)",
+      "backgroundColor-checked-Switch": "var(--xmlui-backgroundColor-checked-Switch)",
+      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)",
       "Input:borderColor-Switch-default--hover": "var(--xmlui-borderColor-Switch-default--hover)",
       "Input:backgroundColor-Switch--disabled": "var(--xmlui-backgroundColor-Switch--disabled)",
       "Input:borderColor-Switch--disabled": "var(--xmlui-borderColor-Switch--disabled)",
-      "Input:borderColor-Switch-error": "var(--xmlui-borderColor-Switch-error)",
-      "Input:borderColor-Switch-warning": "var(--xmlui-borderColor-Switch-warning)",
-      "Input:borderColor-Switch-success": "var(--xmlui-borderColor-Switch-success)",
-      "backgroundColor-indicator-Switch": "var(--xmlui-backgroundColor-indicator-Switch)",
       "Input:borderColor-checked-Switch": "var(--xmlui-borderColor-checked-Switch)",
       "Input:backgroundColor-checked-Switch": "var(--xmlui-backgroundColor-checked-Switch)",
       "Input:borderColor-checked-Switch-error": "var(--xmlui-borderColor-checked-Switch-error)",
@@ -3736,7 +3785,10 @@ export default {
       "Input:outlineColor-Switch--focus": "var(--xmlui-outlineColor-Switch--focus)",
       "Input:outlineStyle-Switch--focus": "var(--xmlui-outlineStyle-Switch--focus)",
       "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
-      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
+      "backgroundColor-Switch-indicator--disabled": "var(--xmlui-backgroundColor-Switch-indicator--disabled)",
+      "Input:borderColor-Switch-error": "var(--xmlui-borderColor-Switch-error)",
+      "Input:borderColor-Switch-warning": "var(--xmlui-borderColor-Switch-warning)",
+      "Input:borderColor-Switch-success": "var(--xmlui-borderColor-Switch-success)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -3753,11 +3805,12 @@ export default {
     }
   },
   "CODE": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `code` tag.",
     "isHtmlTag": true
   },
   "ColorPicker": {
+    "status": "stable",
     "description": "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
     "props": {
       "initialValue": {
@@ -3793,9 +3846,9 @@ export default {
         "description": "This property sets the width of the `ColorPicker` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -3849,13 +3902,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the ColorPicker."
+        "description": "Focus the ColorPicker component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "This method returns the current value of the ColorPicker.",
+        "signature": "get value(): string"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This method sets the current value of the ColorPicker.",
+        "signature": "set value(value: string): void",
+        "parameters": {
+          "value": "The new value to set for the color picker."
+        }
       }
     },
     "themeVars": {
@@ -3899,6 +3958,7 @@ export default {
     }
   },
   "Column": {
+    "status": "stable",
     "description": "`Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.",
     "props": {
       "bindTo": {
@@ -3962,6 +4022,7 @@ export default {
     }
   },
   "ContentSeparator": {
+    "status": "stable",
     "description": "`ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections.",
     "props": {
       "size": {
@@ -4084,19 +4145,24 @@ export default {
     },
     "apis": {
       "value": {
-        "description": "This property retrieves the data queried from the source after optional transformations."
+        "description": "This property retrieves the data queried from the source after optional transformations.",
+        "signature": "get value(): any"
       },
       "inProgress": {
-        "description": "This property indicates if the data is being fetched."
+        "description": "This property indicates if the data is being fetched.",
+        "signature": "get inProgress(): boolean"
       },
       "isRefetching": {
-        "description": "This property indicates if the data is being re-fetched."
+        "description": "This property indicates if the data is being re-fetched.",
+        "signature": "get isRefetching(): boolean"
       },
       "loaded": {
-        "description": "This property indicates if the data has been loaded."
+        "description": "This property indicates if the data has been loaded.",
+        "signature": "get loaded(): boolean"
       },
       "refetch": {
-        "description": "This method requests the re-fetch of the data."
+        "description": "This method requests the re-fetch of the data.",
+        "signature": "refetch(): void"
       }
     }
   },
@@ -4174,9 +4240,9 @@ export default {
         "description": "This property sets the width of the `DatePicker` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `DatePicker` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "mode": {
         "description": "The mode of the datepicker (single or range)",
@@ -4289,13 +4355,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the DatePicker."
+        "description": "Focus the DatePicker component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): any"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This method sets the current value of the DatePicker.",
+        "signature": "set value(value: any): void",
+        "parameters": {
+          "value": "The new value to set for the date picker."
+        }
       }
     },
     "themeVars": {
@@ -4322,7 +4394,8 @@ export default {
       "Input:outlineStyle-DatePicker-default--focus": "var(--xmlui-outlineStyle-DatePicker-default--focus)",
       "Input:outlineOffset-DatePicker-default--focus": "var(--xmlui-outlineOffset-DatePicker-default--focus)",
       "Input:textColor-placeholder-DatePicker-default": "var(--xmlui-textColor-placeholder-DatePicker-default)",
-      "Input:textColor-adornment-DatePicker-default": "var(--xmlui-textColor-adornment-DatePicker-default)",
+      "Input:fontSize-placeholder-DatePicker-default": "var(--xmlui-fontSize-placeholder-DatePicker-default)",
+      "Input:color-adornment-DatePicker-default": "var(--xmlui-color-adornment-DatePicker-default)",
       "Input:borderRadius-DatePicker-error": "var(--xmlui-borderRadius-DatePicker-error)",
       "Input:borderColor-DatePicker-error": "var(--xmlui-borderColor-DatePicker-error)",
       "Input:borderWidth-DatePicker-error": "var(--xmlui-borderWidth-DatePicker-error)",
@@ -4340,7 +4413,8 @@ export default {
       "Input:outlineStyle-DatePicker-error--focus": "var(--xmlui-outlineStyle-DatePicker-error--focus)",
       "Input:outlineOffset-DatePicker-error--focus": "var(--xmlui-outlineOffset-DatePicker-error--focus)",
       "Input:textColor-placeholder-DatePicker-error": "var(--xmlui-textColor-placeholder-DatePicker-error)",
-      "Input:textColor-adornment-DatePicker-error": "var(--xmlui-textColor-adornment-DatePicker-error)",
+      "Input:fontSize-placeholder-DatePicker-error": "var(--xmlui-fontSize-placeholder-DatePicker-error)",
+      "Input:color-adornment-DatePicker-error": "var(--xmlui-color-adornment-DatePicker-error)",
       "Input:borderRadius-DatePicker-warning": "var(--xmlui-borderRadius-DatePicker-warning)",
       "Input:borderColor-DatePicker-warning": "var(--xmlui-borderColor-DatePicker-warning)",
       "Input:borderWidth-DatePicker-warning": "var(--xmlui-borderWidth-DatePicker-warning)",
@@ -4358,7 +4432,8 @@ export default {
       "Input:outlineStyle-DatePicker-warning--focus": "var(--xmlui-outlineStyle-DatePicker-warning--focus)",
       "Input:outlineOffset-DatePicker-warning--focus": "var(--xmlui-outlineOffset-DatePicker-warning--focus)",
       "Input:textColor-placeholder-DatePicker-warning": "var(--xmlui-textColor-placeholder-DatePicker-warning)",
-      "Input:textColor-adornment-DatePicker-warning": "var(--xmlui-textColor-adornment-DatePicker-warning)",
+      "Input:fontSize-placeholder-DatePicker-warning": "var(--xmlui-fontSize-placeholder-DatePicker-warning)",
+      "Input:color-adornment-DatePicker-warning": "var(--xmlui-color-adornment-DatePicker-warning)",
       "Input:borderRadius-DatePicker-success": "var(--xmlui-borderRadius-DatePicker-success)",
       "Input:borderColor-DatePicker-success": "var(--xmlui-borderColor-DatePicker-success)",
       "Input:borderWidth-DatePicker-success": "var(--xmlui-borderWidth-DatePicker-success)",
@@ -4376,7 +4451,8 @@ export default {
       "Input:outlineStyle-DatePicker-success--focus": "var(--xmlui-outlineStyle-DatePicker-success--focus)",
       "Input:outlineOffset-DatePicker-success--focus": "var(--xmlui-outlineOffset-DatePicker-success--focus)",
       "Input:textColor-placeholder-DatePicker-success": "var(--xmlui-textColor-placeholder-DatePicker-success)",
-      "Input:textColor-adornment-DatePicker-success": "var(--xmlui-textColor-adornment-DatePicker-success)",
+      "Input:fontSize-placeholder-DatePicker-success": "var(--xmlui-fontSize-placeholder-DatePicker-success)",
+      "Input:color-adornment-DatePicker-success": "var(--xmlui-color-adornment-DatePicker-success)",
       "Input:backgroundColor-DatePicker--disabled": "var(--xmlui-backgroundColor-DatePicker--disabled)",
       "Input:textColor-DatePicker--disabled": "var(--xmlui-textColor-DatePicker--disabled)",
       "Input:borderColor-DatePicker--disabled": "var(--xmlui-borderColor-DatePicker--disabled)",
@@ -4395,6 +4471,7 @@ export default {
     }
   },
   "DropdownMenu": {
+    "status": "stable",
     "description": "`DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space.",
     "props": {
       "label": {
@@ -4495,7 +4572,12 @@ export default {
     },
     "apis": {
       "close": {
-        "description": "This method command closes the dropdown."
+        "description": "This method command closes the dropdown.",
+        "signature": "close(): void"
+      },
+      "open": {
+        "description": "This method command opens the dropdown.",
+        "signature": "open(): void"
       }
     },
     "themeVars": {
@@ -4536,16 +4618,18 @@ export default {
     }
   },
   "EM": {
-    "status": "experimental",
+    "status": "deprecated",
     "description": "This component renders an HTML `em` tag.",
     "isHtmlTag": true
   },
   "Fragment": {
+    "status": "stable",
     "description": "`Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components.",
     "opaque": true,
     "props": {}
   },
   "MenuItem": {
+    "status": "stable",
     "description": "`MenuItem` represents individual clickable items within dropdown menus and other menu components. Each menu item can display text, icons, and respond to clicks with either navigation or custom actions, making it the building block for interactive menu systems.",
     "docFolder": "DropdownMenu",
     "props": {
@@ -4639,6 +4723,7 @@ export default {
     }
   },
   "SubMenuItem": {
+    "status": "stable",
     "description": "`SubMenuItem` creates hierarchical menu structures by acting as both a menu item and a container for nested menu items. When clicked or hovered, it reveals a submenu containing additional [MenuItem](/components/MenuItem), [MenuSeparator](/components/MenuSeparator), or other [SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level navigation and action organization.",
     "docFolder": "DropdownMenu",
     "props": {
@@ -4669,6 +4754,7 @@ export default {
     }
   },
   "ExpandableItem": {
+    "status": "stable",
     "description": "`ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses.",
     "props": {
       "summary": {
@@ -4723,16 +4809,20 @@ export default {
     },
     "apis": {
       "expand": {
-        "description": "This method expands the expandable item."
+        "description": "This method expands the item.",
+        "signature": "expand(): void"
       },
       "collapse": {
-        "description": "This method collapses the expandable item."
+        "description": "This method collapses the item.",
+        "signature": "collapse(): void"
       },
       "toggle": {
-        "description": "This method toggles the expandable item's expanded state."
+        "description": "This method toggles the item's expanded state.",
+        "signature": "toggle(): void"
       },
       "isExpanded": {
-        "description": "This method returns a boolean indicating whether the expandable item is currently expanded."
+        "description": "This method returns a boolean indicating whether the item is currently expanded.",
+        "signature": "isExpanded(): boolean"
       }
     },
     "themeVars": {
@@ -4894,9 +4984,9 @@ export default {
         "description": "This property sets the width of the `FileInput` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `FileInput` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `FileInput` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "buttonVariant": {
         "description": "The button variant to use",
@@ -4989,21 +5079,29 @@ export default {
     },
     "apis": {
       "value": {
-        "description": "By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined."
+        "description": "This property holds the current value of the component, which is an array of files.",
+        "signature": "get value(): File[]"
       },
       "setValue": {
-        "description": "(**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically."
+        "description": "This method sets the current value of the component.",
+        "signature": "setValue(files: File[]): void",
+        "parameters": {
+          "files": "An array of File objects to set as the current value of the component."
+        }
       },
       "focus": {
-        "description": "This method sets the focus on the FileInput."
+        "description": "This API command focuses the input field of the component.",
+        "signature": "focus(): void"
       },
       "open": {
-        "description": "This API command triggers the file browsing dialog to open."
+        "description": "This API command triggers the file browsing dialog to open.",
+        "signature": "open(): void"
       }
     },
     "themeVars": []
   },
   "FileUploadDropZone": {
+    "status": "stable",
     "description": "`FileUploadDropZone` enables users to upload files by dragging and dropping files from their local file system onto a designated area within the UI.",
     "props": {
       "text": {
@@ -5044,6 +5142,7 @@ export default {
     }
   },
   "FlowLayout": {
+    "status": "stable",
     "description": "`FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line.",
     "props": {
       "gap": {
@@ -5063,6 +5162,7 @@ export default {
     "themeVars": []
   },
   "Footer": {
+    "status": "stable",
     "description": "`Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles.",
     "themeVars": {
       "padding-Footer": "var(--xmlui-padding-Footer)",
@@ -5111,7 +5211,8 @@ export default {
       "verticalAlignment-Footer": "var(--xmlui-verticalAlignment-Footer)",
       "maxWidth-content-Footer": "var(--xmlui-maxWidth-content-Footer)",
       "gap-Footer": "var(--xmlui-gap-Footer)",
-      "maxWidth-App": "var(--xmlui-maxWidth-App)"
+      "maxWidth-App": "var(--xmlui-maxWidth-App)",
+      "margin-Footer": "var(--xmlui-margin-Footer)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -5123,6 +5224,7 @@ export default {
       "borderTop-Footer": "1px solid $borderColor",
       "padding-Footer": "$space-2 $space-4",
       "gap-Footer": "$space-normal",
+      "margin-Footer": "0 auto",
       "light": {},
       "dark": {}
     }
@@ -5241,10 +5343,15 @@ export default {
     },
     "apis": {
       "reset": {
-        "description": "Call this event to reset the form to its initial state."
+        "description": "This method resets the form to its initial state, clearing all user input.",
+        "signature": "reset(): void"
       },
       "update": {
-        "description": "You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact."
+        "description": "You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.",
+        "signature": "update(data: Record<string, any>): void",
+        "parameters": {
+          "data": "An object containing the form data to update."
+        }
       }
     },
     "themeVars": {
@@ -5270,6 +5377,7 @@ export default {
   },
   "FormItem": {
     "status": "stable",
+    "allowArbitraryProps": true,
     "description": "`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.",
     "props": {
       "bindTo": {
@@ -5510,7 +5618,8 @@ export default {
         "defaultValue": "error"
       },
       "inputTemplate": {
-        "description": "This property is used to define a custom input template."
+        "description": "This property is used to define a custom input template.",
+        "valueType": "ComponentDef"
       },
       "gap": {
         "description": "This property defines the gap between the adornments and the input area.",
@@ -5525,10 +5634,18 @@ export default {
     },
     "apis": {
       "addItem": {
-        "description": "Adds a new item to the `FormItem` data where the particular form item holds a list. The function has a single parameter, the data to add to the `FormItem`. The new item is appended to the end of the list."
+        "description": "This method adds a new item to the list held by the FormItem. The function has a single parameter, the data to add to the FormItem. The new item is appended to the end of the list.",
+        "signature": "addItem(data: any): void",
+        "parameters": {
+          "data": "The data to add to the FormItem's list."
+        }
       },
       "removeItem": {
-        "description": "Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove."
+        "description": "Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove.",
+        "signature": "removeItem(index: number): void",
+        "parameters": {
+          "index": "The index of the item to remove from the FormItem's list."
+        }
       }
     },
     "contextVars": {
@@ -5567,9 +5684,57 @@ export default {
   },
   "FormSection": {
     "status": "experimental",
-    "description": "`FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout)."
+    "description": "`FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout).",
+    "props": {
+      "heading": {
+        "description": "The heading text to be displayed at the top of the form section.",
+        "type": "string"
+      },
+      "headingLevel": {
+        "description": "The semantic and visual level of the heading.",
+        "availableValues": [
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6"
+        ],
+        "defaultValue": "h3"
+      },
+      "headingWeight": {
+        "description": "The font weight of the heading.",
+        "type": "string",
+        "defaultValue": "bold"
+      },
+      "info": {
+        "description": "Informational text displayed below the heading.",
+        "type": "string"
+      },
+      "infoFontSize": {
+        "description": "The font size of the informational text.",
+        "type": "string",
+        "defaultValue": "0.8rem"
+      },
+      "paddingTop": {
+        "description": "The top padding of the FlowLayout where the section's children are placed.",
+        "type": "string",
+        "defaultValue": "$space-normal"
+      },
+      "columnGap": {
+        "description": "The gap between columns of items within the section.",
+        "type": "string",
+        "defaultValue": "3rem"
+      },
+      "rowGap": {
+        "description": "The gap between rows of items within the section.",
+        "type": "string",
+        "defaultValue": "$space-normal"
+      }
+    }
   },
   "Heading": {
+    "status": "stable",
     "description": "`Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents).",
     "props": {
       "value": {
@@ -5608,6 +5773,12 @@ export default {
       "showAnchor": {
         "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
         "type": "boolean"
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
       }
     },
     "themeVars": {
@@ -6085,6 +6256,7 @@ export default {
     }
   },
   "H1": {
+    "status": "stable",
     "description": "Represents a heading level 1 text",
     "specializedFrom": "Heading",
     "props": {
@@ -6573,6 +6745,7 @@ export default {
     }
   },
   "H2": {
+    "status": "stable",
     "description": "Represents a heading level 2 text",
     "specializedFrom": "Heading",
     "props": {
@@ -7060,6 +7233,7 @@ export default {
     }
   },
   "H3": {
+    "status": "stable",
     "description": "Represents a heading level 3 text",
     "specializedFrom": "Heading",
     "props": {
@@ -7547,6 +7721,7 @@ export default {
     }
   },
   "H4": {
+    "status": "stable",
     "description": "Represents a heading level 4 text",
     "specializedFrom": "Heading",
     "props": {
@@ -8034,6 +8209,7 @@ export default {
     }
   },
   "H5": {
+    "status": "stable",
     "description": "Represents a heading level 5 text",
     "specializedFrom": "Heading",
     "props": {
@@ -8521,6 +8697,7 @@ export default {
     }
   },
   "H6": {
+    "status": "stable",
     "description": "Represents a heading level 6 text",
     "specializedFrom": "Heading",
     "props": {
@@ -9050,6 +9227,7 @@ export default {
     }
   },
   "Image": {
+    "status": "stable",
     "description": "`Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions.",
     "props": {
       "src": {
@@ -9089,6 +9267,7 @@ export default {
     "themeVars": []
   },
   "Items": {
+    "status": "stable",
     "description": "`Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration.",
     "props": {
       "items": {
@@ -9130,6 +9309,7 @@ export default {
     "opaque": true
   },
   "Link": {
+    "status": "stable",
     "description": "`Link` creates clickable navigation elements for internal app routes or external URLs. You can use the `label` and `icon` properties for simple text links, or embed custom components like buttons, cards, or complex layouts for rich interactive link presentations.",
     "props": {
       "to": {
@@ -9270,11 +9450,11 @@ export default {
     "defaultThemeVars": {
       "border-Link": "0px solid $borderColor",
       "textColor-Link": "$color-primary-500",
-      "textDecorationColor-Link": "$color-primary-500",
+      "textDecorationColor-Link": "textDecorationColor-Link",
       "textColor-Link--hover": "$color-primary-400",
-      "textDecorationColor-Link--hover": "$color-primary-400",
+      "textDecorationColor-Link--hover": "textColor-Link--hover",
       "textColor-Link--active": "$color-primary-400",
-      "textDecorationColor-Link--active": "$color-primary-400",
+      "textDecorationColor-Link--active": "textColor-Link--active",
       "textColor-Link--hover--active": "$textColor-Link--active",
       "textUnderlineOffset-Link": "$space-1",
       "textDecorationLine-Link": "underline",
@@ -9286,7 +9466,12 @@ export default {
       "fontSize-Link": "inherit",
       "fontWeight-Link--active": "$fontWeight-bold",
       "gap-icon-Link": "$gap-tight",
-      "padding-icon-Link": "$space-0_5"
+      "padding-icon-Link": "$space-0_5",
+      "dark": {
+        "textColor-Link": "$color-primary-600",
+        "textColor-Link--hover": "$color-primary-500",
+        "textColor-Link--active": "$color-primary-500"
+      }
     }
   },
   "List": {
@@ -9370,16 +9555,26 @@ export default {
     "childrenAsTemplate": "itemTemplate",
     "apis": {
       "scrollToTop": {
-        "description": "This method scrolls the list to the top."
+        "description": "This method scrolls the list to the top.",
+        "signature": "scrollToTop(): void"
       },
       "scrollToBottom": {
-        "description": "This method scrolls the list to the bottom."
+        "description": "This method scrolls the list to the bottom.",
+        "signature": "scrollToBottom(): void"
       },
       "scrollToIndex": {
-        "description": "This method scrolls the list to a specific index. The method accepts an index as a parameter."
+        "description": "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
+        "signature": "scrollToIndex(index: number): void",
+        "parameters": {
+          "index": "The index to scroll to."
+        }
       },
       "scrollToId": {
-        "description": "This method scrolls the list to a specific item. The method accepts an item ID as a parameter."
+        "description": "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
+        "signature": "scrollToId(id: string): void",
+        "parameters": {
+          "id": "The ID of the item to scroll to."
+        }
       }
     },
     "contextVars": {
@@ -9413,10 +9608,16 @@ export default {
         "description": "Alternative text for the logo image for accessibility.",
         "type": "string",
         "defaultValue": "Logo"
+      },
+      "inline": {
+        "description": "When set to true, the image will be displayed as an inline element instead of a block element.",
+        "type": "boolean",
+        "defaultValue": false
       }
     }
   },
   "Markdown": {
+    "status": "stable",
     "description": "`Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown).",
     "themeVars": {
       "textColor-Text": "var(--xmlui-textColor-Text)",
@@ -9627,6 +9828,7 @@ export default {
     }
   },
   "MenuSeparator": {
+    "status": "stable",
     "description": "`MenuSeparator` displays a separator line between menu items to group related menu options within `DropdownMenu`.",
     "docFolder": "DropdownMenu",
     "themeVars": {
@@ -9668,6 +9870,7 @@ export default {
     }
   },
   "ModalDialog": {
+    "status": "stable",
     "description": "`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.",
     "props": {
       "fullScreen": {
@@ -9694,10 +9897,15 @@ export default {
     },
     "apis": {
       "close": {
-        "description": "This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component."
+        "description": "This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.",
+        "signature": "close(): void"
       },
       "open": {
-        "description": "This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$paramq` and `$params` context values."
+        "description": "This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$param` and `$params` context values.",
+        "signature": "open(...params: any[]): void",
+        "parameters": {
+          "params": "An arbitrary number of parameters that can be used to pass data to the dialog."
+        }
       }
     },
     "contextVars": {
@@ -9750,6 +9958,7 @@ export default {
     }
   },
   "NavGroup": {
+    "status": "stable",
     "description": "`NavGroup` creates collapsible containers for organizing related navigation items into hierarchical menu structures. It groups `NavLink` components and other `NavGroup` components, providing expandable submenus with customizable icons and states.",
     "props": {
       "label": {
@@ -9805,6 +10014,7 @@ export default {
     }
   },
   "NavLink": {
+    "status": "stable",
     "description": "`NavLink` creates interactive navigation items that connect users to different destinations within an app or external URLs. It automatically indicates active states, supports custom icons and labels, and can execute custom actions instead of navigation when needed.",
     "props": {
       "to": {
@@ -9965,6 +10175,7 @@ export default {
     }
   },
   "NavPanel": {
+    "status": "stable",
     "description": "`NavPanel` defines the navigation structure within an App, serving as a container for NavLink and NavGroup components that create your application's primary navigation menu. Its appearance and behavior automatically adapt based on the App's layout configuration.",
     "props": {
       "logoTemplate": {
@@ -10048,6 +10259,7 @@ export default {
     }
   },
   "NoResult": {
+    "status": "stable",
     "description": "`NoResult` displays a visual indication that a query or search returned nothing.",
     "props": {
       "label": {
@@ -10158,9 +10370,9 @@ export default {
         "description": "This property sets the width of the `NumberBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `NumberBox` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `NumberBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -10269,13 +10481,16 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the NumberBox."
+        "description": "This API focuses the input field of the `NumberBox`. You can use it to programmatically focus the field.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "This API retrieves the current value of the `NumberBox`. You can use it to get the value programmatically.",
+        "signature": "get value(): number | undefined"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `NumberBox`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: number | undefined): void"
       }
     },
     "themeVars": {
@@ -10301,7 +10516,8 @@ export default {
       "Input:outlineStyle-NumberBox-default--focus": "var(--xmlui-outlineStyle-NumberBox-default--focus)",
       "Input:outlineOffset-NumberBox-default--focus": "var(--xmlui-outlineOffset-NumberBox-default--focus)",
       "Input:textColor-placeholder-NumberBox-default": "var(--xmlui-textColor-placeholder-NumberBox-default)",
-      "Input:textColor-adornment-NumberBox-default": "var(--xmlui-textColor-adornment-NumberBox-default)",
+      "Input:fontSize-placeholder-NumberBox-default": "var(--xmlui-fontSize-placeholder-NumberBox-default)",
+      "Input:color-adornment-NumberBox-default": "var(--xmlui-color-adornment-NumberBox-default)",
       "Input:borderRadius-NumberBox-error": "var(--xmlui-borderRadius-NumberBox-error)",
       "Input:borderColor-NumberBox-error": "var(--xmlui-borderColor-NumberBox-error)",
       "Input:borderWidth-NumberBox-error": "var(--xmlui-borderWidth-NumberBox-error)",
@@ -10323,7 +10539,8 @@ export default {
       "Input:outlineStyle-NumberBox-error--focus": "var(--xmlui-outlineStyle-NumberBox-error--focus)",
       "Input:outlineOffset-NumberBox-error--focus": "var(--xmlui-outlineOffset-NumberBox-error--focus)",
       "Input:textColor-placeholder-NumberBox-error": "var(--xmlui-textColor-placeholder-NumberBox-error)",
-      "Input:textColor-adornment-NumberBox-error": "var(--xmlui-textColor-adornment-NumberBox-error)",
+      "Input:fontSize-placeholder-NumberBox-error": "var(--xmlui-fontSize-placeholder-NumberBox-error)",
+      "Input:color-adornment-NumberBox-error": "var(--xmlui-color-adornment-NumberBox-error)",
       "Input:borderRadius-NumberBox-warning": "var(--xmlui-borderRadius-NumberBox-warning)",
       "Input:borderColor-NumberBox-warning": "var(--xmlui-borderColor-NumberBox-warning)",
       "Input:borderWidth-NumberBox-warning": "var(--xmlui-borderWidth-NumberBox-warning)",
@@ -10345,7 +10562,8 @@ export default {
       "Input:outlineStyle-NumberBox-warning--focus": "var(--xmlui-outlineStyle-NumberBox-warning--focus)",
       "Input:outlineOffset-NumberBox-warning--focus": "var(--xmlui-outlineOffset-NumberBox-warning--focus)",
       "Input:textColor-placeholder-NumberBox-warning": "var(--xmlui-textColor-placeholder-NumberBox-warning)",
-      "Input:textColor-adornment-NumberBox-warning": "var(--xmlui-textColor-adornment-NumberBox-warning)",
+      "Input:fontSize-placeholder-NumberBox-warning": "var(--xmlui-fontSize-placeholder-NumberBox-warning)",
+      "Input:color-adornment-NumberBox-warning": "var(--xmlui-color-adornment-NumberBox-warning)",
       "Input:borderRadius-NumberBox-success": "var(--xmlui-borderRadius-NumberBox-success)",
       "Input:borderColor-NumberBox-success": "var(--xmlui-borderColor-NumberBox-success)",
       "Input:borderWidth-NumberBox-success": "var(--xmlui-borderWidth-NumberBox-success)",
@@ -10367,13 +10585,15 @@ export default {
       "Input:outlineStyle-NumberBox-success--focus": "var(--xmlui-outlineStyle-NumberBox-success--focus)",
       "Input:outlineOffset-NumberBox-success--focus": "var(--xmlui-outlineOffset-NumberBox-success--focus)",
       "Input:textColor-placeholder-NumberBox-success": "var(--xmlui-textColor-placeholder-NumberBox-success)",
-      "Input:textColor-adornment-NumberBox-success": "var(--xmlui-textColor-adornment-NumberBox-success)",
+      "Input:fontSize-placeholder-NumberBox-success": "var(--xmlui-fontSize-placeholder-NumberBox-success)",
+      "Input:color-adornment-NumberBox-success": "var(--xmlui-color-adornment-NumberBox-success)",
       "Input:backgroundColor-NumberBox--disabled": "var(--xmlui-backgroundColor-NumberBox--disabled)",
       "Input:textColor-NumberBox--disabled": "var(--xmlui-textColor-NumberBox--disabled)",
       "Input:borderColor-NumberBox--disabled": "var(--xmlui-borderColor-NumberBox--disabled)"
     }
   },
   "Option": {
+    "status": "stable",
     "description": "`Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components.",
     "props": {
       "label": {
@@ -10394,6 +10614,7 @@ export default {
     "childrenAsTemplate": "optionTemplate"
   },
   "PageMetaTitle": {
+    "status": "stable",
     "description": "`PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles.",
     "props": {
       "value": {
@@ -10417,6 +10638,7 @@ export default {
     }
   },
   "Pages": {
+    "status": "stable",
     "description": "`Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL.",
     "props": {
       "fallbackPath": {
@@ -10436,6 +10658,7 @@ export default {
     "themeVars": []
   },
   "ProgressBar": {
+    "status": "stable",
     "description": "`ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete).",
     "props": {
       "value": {
@@ -10460,6 +10683,7 @@ export default {
     }
   },
   "Queue": {
+    "status": "stable",
     "description": "`Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display.",
     "props": {
       "progressFeedback": {
@@ -10493,19 +10717,33 @@ export default {
     },
     "apis": {
       "enqueueItem": {
-        "description": "This method enqueues the item passed in the method parameter. The new item will be processed after the current queue items have been handled. The method retrieves the unique ID of the newly added item; this ID can be used later in other methods, such as `remove`."
+        "description": "This method enqueues the item passed in the method parameter. The new item will be processed after the current queue items have been handled. The method retrieves the unique ID of the newly added item; this ID can be used later in other methods, such as `remove`.",
+        "signature": "enqueueItem(item: any): string",
+        "parameters": {
+          "item": "The item to enqueue."
+        }
       },
       "enqueueItems": {
-        "description": "This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`."
+        "description": "This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`.",
+        "signature": "enqueueItems(items: any[]): string[]",
+        "parameters": {
+          "items": "The array of items to enqueue."
+        }
       },
       "getQueuedItems": {
-        "description": "You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items."
+        "description": "You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items.",
+        "signature": "getQueuedItems(): any[]"
       },
       "getQueueLength": {
-        "description": "This method retrieves the current queue length. The queue contains only those items that are not fully processed yet."
+        "description": "This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.",
+        "signature": "getQueueLength(): number"
       },
       "remove": {
-        "description": "This method retrieves the current queue length. The queue contains only those items that are not fully processed yet."
+        "description": "This method removes an item from the queue using its unique ID.",
+        "signature": "remove(itemId: string): void",
+        "parameters": {
+          "itemId": "The unique ID of the item to remove."
+        }
       }
     },
     "contextVars": {
@@ -10518,6 +10756,7 @@ export default {
     }
   },
   "RadioGroup": {
+    "status": "stable",
     "description": "`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.",
     "props": {
       "initialValue": {
@@ -10596,9 +10835,9 @@ export default {
         "description": "This property sets the width of the `RadioGroup` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       }
     },
     "events": {
@@ -10614,28 +10853,26 @@ export default {
     },
     "themeVars": {
       "gap-RadioGroupOption": "var(--xmlui-gap-RadioGroupOption)",
-      "Input:backgroundColor-RadioGroupOption-default": "var(--xmlui-backgroundColor-RadioGroupOption-default)",
       "borderWidth-RadioGroupOption": "var(--xmlui-borderWidth-RadioGroupOption)",
+      "borderWidth-RadioGroupOption-validation": "var(--xmlui-borderWidth-RadioGroupOption-validation)",
       "Input:borderColor-RadioGroupOption-default": "var(--xmlui-borderColor-RadioGroupOption-default)",
+      "Input:borderColor-checked-RadioGroupOption": "var(--xmlui-borderColor-checked-RadioGroupOption)",
       "Input:borderColor-RadioGroupOption-default--hover": "var(--xmlui-borderColor-RadioGroupOption-default--hover)",
       "Input:borderColor-RadioGroupOption-default--active": "var(--xmlui-borderColor-RadioGroupOption-default--active)",
       "Input:borderColor-RadioGroupOption--disabled": "var(--xmlui-borderColor-RadioGroupOption--disabled)",
-      "Input:color-RadioGroupOption--disabled": "var(--xmlui-color-RadioGroupOption--disabled)",
       "Input:borderColor-RadioGroupOption-error": "var(--xmlui-borderColor-RadioGroupOption-error)",
       "Input:borderColor-RadioGroupOption-warning": "var(--xmlui-borderColor-RadioGroupOption-warning)",
       "Input:borderColor-RadioGroupOption-success": "var(--xmlui-borderColor-RadioGroupOption-success)",
-      "Input:backgroundColor-checked-RadioGroupOption-indicator": "var(--xmlui-backgroundColor-checked-RadioGroupOption-indicator)",
-      "backgroundColor-checked-RadioGroupOption-default": "var(--xmlui-backgroundColor-checked-RadioGroupOption-default)",
-      "backgroundColor-checked-RadioGroupOption--disabled": "var(--xmlui-backgroundColor-checked-RadioGroupOption--disabled)",
-      "backgroundColor-checked-RadioGroupOption-error": "var(--xmlui-backgroundColor-checked-RadioGroupOption-error)",
-      "backgroundColor-checked-RadioGroupOption-warning": "var(--xmlui-backgroundColor-checked-RadioGroupOption-warning)",
-      "backgroundColor-checked-RadioGroupOption-success": "var(--xmlui-backgroundColor-checked-RadioGroupOption-success)",
+      "Input:backgroundColor-RadioGroupOption-default": "var(--xmlui-backgroundColor-RadioGroupOption-default)",
+      "Input:backgroundColor-checked-RadioGroupOption": "var(--xmlui-backgroundColor-checked-RadioGroupOption)",
+      "Input:backgroundColor-checked-RadioGroupOption--disabled": "var(--xmlui-backgroundColor-checked-RadioGroupOption--disabled)",
+      "Input:color-RadioGroupOption--disabled": "var(--xmlui-color-RadioGroupOption--disabled)",
       "Input:fontSize-RadioGroupOption": "var(--xmlui-fontSize-RadioGroupOption)",
       "Input:fontWeight-RadioGroupOption": "var(--xmlui-fontWeight-RadioGroupOption)",
-      "Input:color-RadioGroupOption-default": "var(--xmlui-color-RadioGroupOption-default)",
-      "Input:color-RadioGroupOption-error": "var(--xmlui-color-RadioGroupOption-error)",
-      "Input:color-RadioGroupOption-warning": "var(--xmlui-color-RadioGroupOption-warning)",
-      "Input:color-RadioGroupOption-success": "var(--xmlui-color-RadioGroupOption-success)",
+      "Input:textColor-RadioGroupOption-default": "var(--xmlui-textColor-RadioGroupOption-default)",
+      "Input:textColor-RadioGroupOption-error": "var(--xmlui-textColor-RadioGroupOption-error)",
+      "Input:textColor-RadioGroupOption-warning": "var(--xmlui-textColor-RadioGroupOption-warning)",
+      "Input:textColor-RadioGroupOption-success": "var(--xmlui-textColor-RadioGroupOption-success)",
       "Input:outlineWidth-RadioGroupOption--focus": "var(--xmlui-outlineWidth-RadioGroupOption--focus)",
       "Input:outlineColor-RadioGroupOption--focus": "var(--xmlui-outlineColor-RadioGroupOption--focus)",
       "Input:outlineStyle-RadioGroupOption--focus": "var(--xmlui-outlineStyle-RadioGroupOption--focus)",
@@ -10644,20 +10881,19 @@ export default {
     "defaultThemeVars": {
       "gap-RadioGroupOption": "$space-1_5",
       "borderWidth-RadioGroupOption": "1px",
-      "backgroundColor-checked-RadioGroupOption-indicator": "$backgroundColor-primary",
-      "backgroundColor-checked-RadioGroupOption--disabled": "$borderColor-RadioGroupOption--disabled",
-      "backgroundColor-checked-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
-      "backgroundColor-checked-RadioGroupOption-warning": "$borderColor-RadioGroupOption-warning",
-      "backgroundColor-checked-RadioGroupOption-success": "$borderColor-RadioGroupOption-success",
-      "fontSize-RadioGroupOption": "$fontSize-small",
-      "fontWeight-RadioGroupOption": "$fontWeight-bold",
-      "textColor-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
-      "textColor-RadioGroupOption-warning": "$borderColor-RadioGroupOption-warning",
-      "textColor-RadioGroupOption-success": "$borderColor-RadioGroupOption-success",
-      "backgroundColor-checked-RadioGroupOption-default": "$color-primary-500",
+      "borderWidth-RadioGroupOption-validation": "2px",
       "borderColor-RadioGroupOption-default": "$color-surface-500",
+      "borderColor-checked-RadioGroupOption": "$color-primary-500",
       "borderColor-RadioGroupOption-default--hover": "$color-surface-700",
-      "borderColor-RadioGroupOption-default--active": "$color-primary-500"
+      "borderColor-RadioGroupOption-default--active": "$color-primary-500",
+      "borderColor-RadioGroupOption-error": "$borderColor-Input-default--error",
+      "borderColor-RadioGroupOption-warning": "$borderColor-Input-default--warning",
+      "borderColor-RadioGroupOption-success": "$borderColor-Input-default--success",
+      "backgroundColor-RadioGroupOption--disabled": "$backgroundColor--disabled",
+      "backgroundColor-checked-RadioGroupOption": "$color-primary-500",
+      "backgroundColor-checked-RadioGroupOption--disabled": "$textColor--disabled",
+      "fontSize-RadioGroupOption": "$fontSize-small",
+      "fontWeight-RadioGroupOption": "$fontWeight-bold"
     }
   },
   "RealTimeAdapter": {
@@ -10676,6 +10912,7 @@ export default {
     }
   },
   "Redirect": {
+    "status": "stable",
     "description": "`Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally.",
     "props": {
       "to": {
@@ -10685,8 +10922,8 @@ export default {
     }
   },
   "Select": {
-    "description": "`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.",
     "status": "stable",
+    "description": "`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.",
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
@@ -10764,7 +11001,7 @@ export default {
         "description": "This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Select` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `Select` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -10784,7 +11021,8 @@ export default {
         "description": "This property sets the height of the dropdown list. If not set, the height is determined automatically."
       },
       "emptyListTemplate": {
-        "description": "This optional property provides the ability to customize what is displayed when the list of options is empty."
+        "description": "This optional property provides the ability to customize what is displayed when the list of options is empty.",
+        "valueType": "ComponentDef"
       },
       "multiSelect": {
         "description": "The `true` value of the property indicates if the user can select multiple items.",
@@ -10817,16 +11055,23 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the Select."
+        "description": "This method focuses the `Select` component. You can use it to programmatically focus the component.",
+        "signature": "focus(): void"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `Select`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: string | string[] | undefined): void",
+        "parameters": {
+          "value": "The new value to set. Can be a single value or an array of values for multi-select."
+        }
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "This API retrieves the current value of the `Select`. You can use it to get the value programmatically.",
+        "signature": "get value(): string | string[] | undefined"
       },
       "reset": {
-        "description": "This method resets the component to its initial value, or clears the selection if no initial value was provided."
+        "description": "This method resets the component to its initial value, or clears the selection if no initial value was provided.",
+        "signature": "reset(): void"
       }
     },
     "contextVars": {
@@ -10871,6 +11116,7 @@ export default {
       "Input:outlineColor-Select-default--focus": "var(--xmlui-outlineColor-Select-default--focus)",
       "Input:outlineStyle-Select-default--focus": "var(--xmlui-outlineStyle-Select-default--focus)",
       "Input:outlineOffset-Select-default--focus": "var(--xmlui-outlineOffset-Select-default--focus)",
+      "Input:fontSize-placeholder-Select-default": "var(--xmlui-fontSize-placeholder-Select-default)",
       "Input:borderRadius-Select-error": "var(--xmlui-borderRadius-Select-error)",
       "Input:borderColor-Select-error": "var(--xmlui-borderColor-Select-error)",
       "Input:borderWidth-Select-error": "var(--xmlui-borderWidth-Select-error)",
@@ -10885,6 +11131,7 @@ export default {
       "Input:outlineColor-Select-error--focus": "var(--xmlui-outlineColor-Select-error--focus)",
       "Input:outlineStyle-Select-error--focus": "var(--xmlui-outlineStyle-Select-error--focus)",
       "Input:outlineOffset-Select-error--focus": "var(--xmlui-outlineOffset-Select-error--focus)",
+      "Input:fontSize-placeholder-Select-error": "var(--xmlui-fontSize-placeholder-Select-error)",
       "Input:borderRadius-Select-warning": "var(--xmlui-borderRadius-Select-warning)",
       "Input:borderColor-Select-warning": "var(--xmlui-borderColor-Select-warning)",
       "Input:borderWidth-Select-warning": "var(--xmlui-borderWidth-Select-warning)",
@@ -10899,6 +11146,7 @@ export default {
       "Input:outlineColor-Select-warning--focus": "var(--xmlui-outlineColor-Select-warning--focus)",
       "Input:outlineStyle-Select-warning--focus": "var(--xmlui-outlineStyle-Select-warning--focus)",
       "Input:outlineOffset-Select-warning--focus": "var(--xmlui-outlineOffset-Select-warning--focus)",
+      "Input:fontSize-placeholder-Select-warning": "var(--xmlui-fontSize-placeholder-Select-warning)",
       "Input:borderRadius-Select-success": "var(--xmlui-borderRadius-Select-success)",
       "Input:borderColor-Select-success": "var(--xmlui-borderColor-Select-success)",
       "Input:borderWidth-Select-success": "var(--xmlui-borderWidth-Select-success)",
@@ -10913,6 +11161,7 @@ export default {
       "Input:outlineColor-Select-success--focus": "var(--xmlui-outlineColor-Select-success--focus)",
       "Input:outlineStyle-Select-success--focus": "var(--xmlui-outlineStyle-Select-success--focus)",
       "Input:outlineOffset-Select-success--focus": "var(--xmlui-outlineOffset-Select-success--focus)",
+      "Input:fontSize-placeholder-Select-success": "var(--xmlui-fontSize-placeholder-Select-success)",
       "opacity-Select--disabled": "var(--xmlui-opacity-Select--disabled)",
       "Input:backgroundColor-Select--disabled": "var(--xmlui-backgroundColor-Select--disabled)",
       "Input:textColor-Select--disabled": "var(--xmlui-textColor-Select--disabled)",
@@ -10945,7 +11194,6 @@ export default {
       "borderRadius-menu-Select": "$borderRadius",
       "borderWidth-menu-Select": "1px",
       "borderColor-menu-Select": "$borderColor",
-      "minHeight-Input": "39px",
       "backgroundColor-Select-badge": "$color-primary-500",
       "fontSize-Select-badge": "$fontSize-small",
       "paddingHorizontal-Select-badge": "$space-1",
@@ -10960,7 +11208,8 @@ export default {
       "textColor-Select-badge": "$color-surface-50",
       "backgroundColor-item-Select": "$backgroundColor-dropdown-item",
       "backgroundColor-item-Select--hover": "$backgroundColor-dropdown-item--hover",
-      "backgroundColor-item-Select--active": "$backgroundColor-dropdown-item--active"
+      "backgroundColor-item-Select--active": "$backgroundColor-dropdown-item--active",
+      "borderColor-Select--disabled": "initial"
     }
   },
   "SelectionStore": {
@@ -11010,9 +11259,9 @@ export default {
         "description": "This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Slider` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `Slider` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "minValue": {
         "description": "This property specifies the minimum value of the allowed input range.",
@@ -11101,13 +11350,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the Slider."
+        "description": "This method sets the focus on the slider component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "This API retrieves the current value of the `Slider`. You can use it to get the value programmatically.",
+        "signature": "get value(): number | [number, number] | undefined"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `Slider`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: number | [number, number] | undefined): void",
+        "parameters": {
+          "value": "The new value to set. Can be a single value or an array of values for range sliders."
+        }
       }
     },
     "themeVars": {
@@ -11187,10 +11442,12 @@ export default {
     }
   },
   "SpaceFiller": {
+    "status": "stable",
     "description": "`SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used.",
     "themeVars": []
   },
   "Spinner": {
+    "status": "stable",
     "description": "`Spinner` is an animated indicator that represents an action in progress with no deterministic progress value.",
     "props": {
       "delay": {
@@ -11216,6 +11473,7 @@ export default {
     }
   },
   "Splitter": {
+    "status": "stable",
     "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
@@ -11283,6 +11541,7 @@ export default {
     }
   },
   "HSplitter": {
+    "status": "stable",
     "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
@@ -11351,6 +11610,7 @@ export default {
     "specializedFrom": "Splitter"
   },
   "VSplitter": {
+    "status": "stable",
     "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
@@ -11419,6 +11679,7 @@ export default {
     "specializedFrom": "Splitter"
   },
   "Stack": {
+    "status": "stable",
     "description": "`Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants.",
     "props": {
       "gap": {
@@ -11488,6 +11749,7 @@ export default {
     "themeVars": []
   },
   "CHStack": {
+    "status": "stable",
     "description": "This component represents a stack that renders its contents horizontally and aligns that in the center along both axes.",
     "props": {
       "gap": {
@@ -11558,6 +11820,7 @@ export default {
     "specializedFrom": "Stack"
   },
   "CVStack": {
+    "status": "stable",
     "description": "This component represents a stack that renders its contents vertically and aligns that in the center along both axes.",
     "props": {
       "gap": {
@@ -11628,6 +11891,7 @@ export default {
     "specializedFrom": "Stack"
   },
   "HStack": {
+    "status": "stable",
     "description": "This component represents a stack rendering its contents horizontally.",
     "props": {
       "gap": {
@@ -11698,6 +11962,7 @@ export default {
     "specializedFrom": "Stack"
   },
   "VStack": {
+    "status": "stable",
     "description": "This component represents a stack rendering its contents vertically.",
     "props": {
       "gap": {
@@ -11787,6 +12052,7 @@ export default {
     }
   },
   "Switch": {
+    "status": "stable",
     "description": "`Switch` enables users to toggle between two states: on and off.",
     "props": {
       "indeterminate": {
@@ -11823,9 +12089,9 @@ export default {
         "description": "This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `Switch` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
@@ -11887,10 +12153,15 @@ export default {
     },
     "apis": {
       "value": {
-        "description": "You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked)."
+        "description": "This property holds the current value of the Switch, which can be either \"true\" (on) or \"false\" (off).",
+        "signature": "get value():boolean"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `Switch`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: boolean): void",
+        "parameters": {
+          "value": "The new value to set. Can be either true (on) or false (off)."
+        }
       }
     },
     "themeVars": {
@@ -11934,15 +12205,14 @@ export default {
       "Input:backgroundColor-checked-Checkbox-warning": "var(--xmlui-backgroundColor-checked-Checkbox-warning)",
       "Input:borderColor-checked-Checkbox-success": "var(--xmlui-borderColor-checked-Checkbox-success)",
       "Input:backgroundColor-checked-Checkbox-success": "var(--xmlui-backgroundColor-checked-Checkbox-success)",
-      "Input:borderColor-Switch": "var(--xmlui-borderColor-Switch)",
       "Input:backgroundColor-Switch": "var(--xmlui-backgroundColor-Switch)",
+      "Input:borderColor-Switch": "var(--xmlui-borderColor-Switch)",
+      "backgroundColor-indicator-Switch": "var(--xmlui-backgroundColor-indicator-Switch)",
+      "backgroundColor-checked-Switch": "var(--xmlui-backgroundColor-checked-Switch)",
+      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)",
       "Input:borderColor-Switch-default--hover": "var(--xmlui-borderColor-Switch-default--hover)",
       "Input:backgroundColor-Switch--disabled": "var(--xmlui-backgroundColor-Switch--disabled)",
       "Input:borderColor-Switch--disabled": "var(--xmlui-borderColor-Switch--disabled)",
-      "Input:borderColor-Switch-error": "var(--xmlui-borderColor-Switch-error)",
-      "Input:borderColor-Switch-warning": "var(--xmlui-borderColor-Switch-warning)",
-      "Input:borderColor-Switch-success": "var(--xmlui-borderColor-Switch-success)",
-      "backgroundColor-indicator-Switch": "var(--xmlui-backgroundColor-indicator-Switch)",
       "Input:borderColor-checked-Switch": "var(--xmlui-borderColor-checked-Switch)",
       "Input:backgroundColor-checked-Switch": "var(--xmlui-backgroundColor-checked-Switch)",
       "Input:borderColor-checked-Switch-error": "var(--xmlui-borderColor-checked-Switch-error)",
@@ -11955,7 +12225,10 @@ export default {
       "Input:outlineColor-Switch--focus": "var(--xmlui-outlineColor-Switch--focus)",
       "Input:outlineStyle-Switch--focus": "var(--xmlui-outlineStyle-Switch--focus)",
       "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
-      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
+      "backgroundColor-Switch-indicator--disabled": "var(--xmlui-backgroundColor-Switch-indicator--disabled)",
+      "Input:borderColor-Switch-error": "var(--xmlui-borderColor-Switch-error)",
+      "Input:borderColor-Switch-warning": "var(--xmlui-borderColor-Switch-warning)",
+      "Input:borderColor-Switch-success": "var(--xmlui-borderColor-Switch-success)"
     },
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
@@ -11965,17 +12238,22 @@ export default {
       "backgroundColor-checked-Switch-warning": "$borderColor-Switch-warning",
       "borderColor-checked-Switch-success": "$borderColor-Switch-success",
       "backgroundColor-checked-Switch-success": "$borderColor-Switch-success",
-      "backgroundColor-Switch": "$backgroundColor-primary",
+      "backgroundColor-Switch": "$color-surface-0",
       "borderColor-Switch": "$color-surface-200",
       "borderWidth-Switch": "1px",
-      "backgroundColor-indicator-Switch": "$color-surface-200",
+      "backgroundColor-indicator-Switch": "$color-surface-400",
+      "backgroundColor-Switch-indicator--disabled": "$backgroundColor-primary",
       "backgroundColor-indicator-checked-Switch": "$backgroundColor-primary",
       "borderColor-checked-Switch": "$color-primary-500",
       "backgroundColor-checked-Switch": "$color-primary-500",
-      "backgroundColor-Switch--disabled": "$color-surface-200"
+      "backgroundColor-Switch--disabled": "$color-surface-200",
+      "dark": {
+        "backgroundColor-indicator-Switch": "$color-surface-500"
+      }
     }
   },
   "Table": {
+    "status": "stable",
     "description": "`Table` presents structured data for viewing, sorting, selection, and interaction.",
     "props": {
       "items": {
@@ -12063,19 +12341,27 @@ export default {
     },
     "apis": {
       "clearSelection": {
-        "description": "This method clears the list of currently selected table rows."
+        "description": "This method clears the list of currently selected table rows.",
+        "signature": "clearSelection(): void"
       },
       "getSelectedItems": {
-        "description": "This method returns the list of currently selected table rows items."
+        "description": "This method returns the list of currently selected table rows items.",
+        "signature": "getSelectedItems(): Array<TableRowItem>"
       },
       "getSelectedIds": {
-        "description": "This method returns the list of currently selected table rows IDs."
+        "description": "This method returns the list of currently selected table rows IDs.",
+        "signature": "getSelectedIds(): Array<string>"
       },
       "selectAll": {
-        "description": "This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`."
+        "description": "This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`.",
+        "signature": "selectAll(): void"
       },
       "selectId": {
-        "description": "This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them."
+        "description": "This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them.",
+        "signature": "selectId(id: string | Array<string>): void",
+        "parameters": {
+          "id": "The ID of the row to select, or an array of IDs to select multiple rows."
+        }
       }
     },
     "themeVars": {
@@ -12175,7 +12461,7 @@ export default {
     }
   },
   "TableOfContents": {
-    "status": "experimental",
+    "status": "stable",
     "description": "`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",
     "props": {
       "smoothScrolling": {
@@ -12187,6 +12473,11 @@ export default {
         "description": "Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.",
         "valueType": "number",
         "defaultValue": 6
+      },
+      "omitH1": {
+        "description": "If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "themeVars": {
@@ -12603,6 +12894,7 @@ export default {
     }
   },
   "TabItem": {
+    "status": "stable",
     "description": "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, providing both the tab header label and the content that displays when the tab is selected. As a non-visual structural component, it serves as a container that organizes content into distinct, switchable sections.",
     "docFolder": "Tabs",
     "props": {
@@ -12636,7 +12928,8 @@ export default {
     },
     "apis": {
       "next": {
-        "description": "This method selects the next tab."
+        "description": "This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.",
+        "signature": "next(): void"
       }
     },
     "themeVars": {
@@ -12671,6 +12964,7 @@ export default {
     }
   },
   "Text": {
+    "status": "stable",
     "description": "The `Text` component displays textual information in a number of optional styles and variants.",
     "props": {
       "value": {
@@ -12923,8 +13217,8 @@ export default {
       "letterSpacing-Text-caption": "0.05rem",
       "fontSize-Text-placeholder": "$fontSize-smaller",
       "fontFamily-Text-codefence": "$fontFamily-monospace",
-      "paddingHorizontal-Text-codefence": "$space-3",
-      "paddingVertical-Text-codefence": "$space-2",
+      "paddingHorizontal-Text-codefence": "$space-4",
+      "paddingVertical-Text-codefence": "$space-3",
       "paddingVertical-Text-paragraph": "$space-1",
       "fontSize-Text-subheading": "$fontSize-H6",
       "fontWeight-Text-subheading": "$fontWeight-bold",
@@ -12937,6 +13231,8 @@ export default {
       "fontWeight-Text-tableheading": "$fontWeight-bold",
       "marginTop-Text-markdown": "$space-3",
       "marginBottom-Text-markdown": "$space-6",
+      "fontSize-Text-markdown": "fontSize-Text",
+      "fontWeight-Text-markdown": "fontWeight-Text",
       "backgroundColor-Text-code": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-code": "$color-surface-100",
       "backgroundColor-Text-keyboard": "rgb(from $color-surface-100 r g b / 0.4)",
@@ -13018,9 +13314,9 @@ export default {
         "description": "This property sets the width of the `TextArea` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextArea` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `TextArea` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -13099,10 +13395,12 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the TextArea."
+        "description": "This method sets the focus on the `TextArea` component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): string | undefined"
       },
       "setValue": {
         "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
@@ -13130,7 +13428,7 @@ export default {
       "Input:outlineColor-Textarea-default--focus": "var(--xmlui-outlineColor-Textarea-default--focus)",
       "Input:outlineStyle-Textarea-default--focus": "var(--xmlui-outlineStyle-Textarea-default--focus)",
       "Input:outlineOffset-Textarea-default--focus": "var(--xmlui-outlineOffset-Textarea-default--focus)",
-      "Input:color-placeholder-Textarea-default": "var(--xmlui-color-placeholder-Textarea-default)",
+      "Input:textColor-placeholder-Textarea-default": "var(--xmlui-textColor-placeholder-Textarea-default)",
       "Input:fontSize-placeholder-Textarea-default": "var(--xmlui-fontSize-placeholder-Textarea-default)",
       "Input:borderRadius-Textarea-error": "var(--xmlui-borderRadius-Textarea-error)",
       "Input:borderColor-Textarea-error": "var(--xmlui-borderColor-Textarea-error)",
@@ -13153,7 +13451,7 @@ export default {
       "Input:outlineColor-Textarea-error--focus": "var(--xmlui-outlineColor-Textarea-error--focus)",
       "Input:outlineStyle-Textarea-error--focus": "var(--xmlui-outlineStyle-Textarea-error--focus)",
       "Input:outlineOffset-Textarea-error--focus": "var(--xmlui-outlineOffset-Textarea-error--focus)",
-      "Input:color-placeholder-Textarea-error": "var(--xmlui-color-placeholder-Textarea-error)",
+      "Input:textColor-placeholder-Textarea-error": "var(--xmlui-textColor-placeholder-Textarea-error)",
       "Input:fontSize-placeholder-Textarea-error": "var(--xmlui-fontSize-placeholder-Textarea-error)",
       "Input:borderRadius-Textarea-warning": "var(--xmlui-borderRadius-Textarea-warning)",
       "Input:borderColor-Textarea-warning": "var(--xmlui-borderColor-Textarea-warning)",
@@ -13176,7 +13474,7 @@ export default {
       "Input:outlineColor-Textarea-warning--focus": "var(--xmlui-outlineColor-Textarea-warning--focus)",
       "Input:outlineStyle-Textarea-warning--focus": "var(--xmlui-outlineStyle-Textarea-warning--focus)",
       "Input:outlineOffset-Textarea-warning--focus": "var(--xmlui-outlineOffset-Textarea-warning--focus)",
-      "Input:color-placeholder-Textarea-warning": "var(--xmlui-color-placeholder-Textarea-warning)",
+      "Input:textColor-placeholder-Textarea-warning": "var(--xmlui-textColor-placeholder-Textarea-warning)",
       "Input:fontSize-placeholder-Textarea-warning": "var(--xmlui-fontSize-placeholder-Textarea-warning)",
       "Input:borderRadius-Textarea-success": "var(--xmlui-borderRadius-Textarea-success)",
       "Input:borderColor-Textarea-success": "var(--xmlui-borderColor-Textarea-success)",
@@ -13199,7 +13497,7 @@ export default {
       "Input:outlineColor-Textarea-success--focus": "var(--xmlui-outlineColor-Textarea-success--focus)",
       "Input:outlineStyle-Textarea-success--focus": "var(--xmlui-outlineStyle-Textarea-success--focus)",
       "Input:outlineOffset-Textarea-success--focus": "var(--xmlui-outlineOffset-Textarea-success--focus)",
-      "Input:color-placeholder-Textarea-success": "var(--xmlui-color-placeholder-Textarea-success)",
+      "Input:textColor-placeholder-Textarea-success": "var(--xmlui-textColor-placeholder-Textarea-success)",
       "Input:fontSize-placeholder-Textarea-success": "var(--xmlui-fontSize-placeholder-Textarea-success)",
       "Input:backgroundColor-Textarea--disabled": "var(--xmlui-backgroundColor-Textarea--disabled)",
       "Input:textColor-Textarea--disabled": "var(--xmlui-textColor-Textarea--disabled)",
@@ -13248,9 +13546,9 @@ export default {
         "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -13312,6 +13610,20 @@ export default {
       },
       "gap": {
         "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
+      },
+      "showPasswordToggle": {
+        "description": "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+        "defaultValue": false
+      },
+      "passwordVisibleIcon": {
+        "description": "The icon to display when the password is visible (when showPasswordToggle is true).",
+        "valueType": "string",
+        "defaultValue": "eye"
+      },
+      "passwordHiddenIcon": {
+        "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
+        "valueType": "string",
+        "defaultValue": "eye-off"
       }
     },
     "events": {
@@ -13327,13 +13639,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the TextBox."
+        "description": "This method sets the focus on the `TextBox` component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): string | undefined"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `TextBox`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: string): void",
+        "parameters": {
+          "value": "The new value to set. If the value is empty, it will clear the input."
+        }
       }
     },
     "themeVars": {
@@ -13359,9 +13677,14 @@ export default {
       "Input:outlineColor-TextBox-default--focus": "var(--xmlui-outlineColor-TextBox-default--focus)",
       "Input:outlineStyle-TextBox-default--focus": "var(--xmlui-outlineStyle-TextBox-default--focus)",
       "Input:outlineOffset-TextBox-default--focus": "var(--xmlui-outlineOffset-TextBox-default--focus)",
-      "Input:color-placeholder-TextBox-default": "var(--xmlui-color-placeholder-TextBox-default)",
+      "Input:textColor-placeholder-TextBox-default": "var(--xmlui-textColor-placeholder-TextBox-default)",
       "Input:fontSize-placeholder-TextBox-default": "var(--xmlui-fontSize-placeholder-TextBox-default)",
       "Input:color-adornment-TextBox-default": "var(--xmlui-color-adornment-TextBox-default)",
+      "Input:color-passwordToggle-TextBox": "var(--xmlui-color-passwordToggle-TextBox)",
+      "Input:paddingLeft-passwordToggle-TextBox": "var(--xmlui-paddingLeft-passwordToggle-TextBox)",
+      "Input:paddingRight-passwordToggle-TextBox": "var(--xmlui-paddingRight-passwordToggle-TextBox)",
+      "Input:color-passwordToggle-TextBox--hover": "var(--xmlui-color-passwordToggle-TextBox--hover)",
+      "Input:color-passwordToggle-TextBox--focus": "var(--xmlui-color-passwordToggle-TextBox--focus)",
       "Input:borderRadius-TextBox-error": "var(--xmlui-borderRadius-TextBox-error)",
       "Input:borderColor-TextBox-error": "var(--xmlui-borderColor-TextBox-error)",
       "Input:borderWidth-TextBox-error": "var(--xmlui-borderWidth-TextBox-error)",
@@ -13383,7 +13706,7 @@ export default {
       "Input:outlineColor-TextBox-error--focus": "var(--xmlui-outlineColor-TextBox-error--focus)",
       "Input:outlineStyle-TextBox-error--focus": "var(--xmlui-outlineStyle-TextBox-error--focus)",
       "Input:outlineOffset-TextBox-error--focus": "var(--xmlui-outlineOffset-TextBox-error--focus)",
-      "Input:color-placeholder-TextBox-error": "var(--xmlui-color-placeholder-TextBox-error)",
+      "Input:textColor-placeholder-TextBox-error": "var(--xmlui-textColor-placeholder-TextBox-error)",
       "Input:fontSize-placeholder-TextBox-error": "var(--xmlui-fontSize-placeholder-TextBox-error)",
       "Input:color-adornment-TextBox-error": "var(--xmlui-color-adornment-TextBox-error)",
       "Input:borderRadius-TextBox-warning": "var(--xmlui-borderRadius-TextBox-warning)",
@@ -13407,7 +13730,7 @@ export default {
       "Input:outlineColor-TextBox-warning--focus": "var(--xmlui-outlineColor-TextBox-warning--focus)",
       "Input:outlineStyle-TextBox-warning--focus": "var(--xmlui-outlineStyle-TextBox-warning--focus)",
       "Input:outlineOffset-TextBox-warning--focus": "var(--xmlui-outlineOffset-TextBox-warning--focus)",
-      "Input:color-placeholder-TextBox-warning": "var(--xmlui-color-placeholder-TextBox-warning)",
+      "Input:textColor-placeholder-TextBox-warning": "var(--xmlui-textColor-placeholder-TextBox-warning)",
       "Input:fontSize-placeholder-TextBox-warning": "var(--xmlui-fontSize-placeholder-TextBox-warning)",
       "Input:color-adornment-TextBox-warning": "var(--xmlui-color-adornment-TextBox-warning)",
       "Input:borderRadius-TextBox-success": "var(--xmlui-borderRadius-TextBox-success)",
@@ -13431,7 +13754,7 @@ export default {
       "Input:outlineColor-TextBox-success--focus": "var(--xmlui-outlineColor-TextBox-success--focus)",
       "Input:outlineStyle-TextBox-success--focus": "var(--xmlui-outlineStyle-TextBox-success--focus)",
       "Input:outlineOffset-TextBox-success--focus": "var(--xmlui-outlineOffset-TextBox-success--focus)",
-      "Input:color-placeholder-TextBox-success": "var(--xmlui-color-placeholder-TextBox-success)",
+      "Input:textColor-placeholder-TextBox-success": "var(--xmlui-textColor-placeholder-TextBox-success)",
       "Input:fontSize-placeholder-TextBox-success": "var(--xmlui-fontSize-placeholder-TextBox-success)",
       "Input:color-adornment-TextBox-success": "var(--xmlui-color-adornment-TextBox-success)",
       "Input:backgroundColor-TextBox--disabled": "var(--xmlui-backgroundColor-TextBox--disabled)",
@@ -13452,12 +13775,13 @@ export default {
       "borderColor-Input-error": "$borderColor-Input-default--error",
       "borderColor-Input-warning": "$borderColor-Input-default--warning",
       "borderColor-Input-success": "$borderColor-Input-default--success",
-      "color-placeholder-Input": "$textColor-subtitle",
+      "textColor-placeholder-Input": "$textColor-subtitle",
       "color-adornment-Input": "$textColor-subtitle",
       "outlineColor-Input--focus": "$outlineColor--focus",
       "outlineWidth-Input--focus": "$outlineWidth--focus",
       "outlineStyle-Input--focus": "$outlineStyle--focus",
       "outlineOffset-Input--focus": "$outlineOffset--focus",
+      "color-passwordToggle-Input": "$textColor-subtitle",
       "light": {},
       "dark": {}
     }
@@ -13504,9 +13828,9 @@ export default {
         "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates whether the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -13568,6 +13892,20 @@ export default {
       },
       "gap": {
         "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
+      },
+      "showPasswordToggle": {
+        "description": "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+        "defaultValue": false
+      },
+      "passwordVisibleIcon": {
+        "description": "The icon to display when the password is visible (when showPasswordToggle is true).",
+        "valueType": "string",
+        "defaultValue": "eye"
+      },
+      "passwordHiddenIcon": {
+        "description": "The icon to display when the password is hidden (when showPasswordToggle is true).",
+        "valueType": "string",
+        "defaultValue": "eye-off"
       }
     },
     "events": {
@@ -13583,13 +13921,19 @@ export default {
     },
     "apis": {
       "focus": {
-        "description": "This method sets the focus on the TextBox."
+        "description": "This method sets the focus on the `TextBox` component.",
+        "signature": "focus(): void"
       },
       "value": {
-        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): string | undefined"
       },
       "setValue": {
-        "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+        "description": "This API sets the value of the `TextBox`. You can use it to programmatically change the value.",
+        "signature": "setValue(value: string): void",
+        "parameters": {
+          "value": "The new value to set. If the value is empty, it will clear the input."
+        }
       }
     },
     "themeVars": {
@@ -13615,9 +13959,14 @@ export default {
       "Input:outlineColor-TextBox-default--focus": "var(--xmlui-outlineColor-TextBox-default--focus)",
       "Input:outlineStyle-TextBox-default--focus": "var(--xmlui-outlineStyle-TextBox-default--focus)",
       "Input:outlineOffset-TextBox-default--focus": "var(--xmlui-outlineOffset-TextBox-default--focus)",
-      "Input:color-placeholder-TextBox-default": "var(--xmlui-color-placeholder-TextBox-default)",
+      "Input:textColor-placeholder-TextBox-default": "var(--xmlui-textColor-placeholder-TextBox-default)",
       "Input:fontSize-placeholder-TextBox-default": "var(--xmlui-fontSize-placeholder-TextBox-default)",
       "Input:color-adornment-TextBox-default": "var(--xmlui-color-adornment-TextBox-default)",
+      "Input:color-passwordToggle-TextBox": "var(--xmlui-color-passwordToggle-TextBox)",
+      "Input:paddingLeft-passwordToggle-TextBox": "var(--xmlui-paddingLeft-passwordToggle-TextBox)",
+      "Input:paddingRight-passwordToggle-TextBox": "var(--xmlui-paddingRight-passwordToggle-TextBox)",
+      "Input:color-passwordToggle-TextBox--hover": "var(--xmlui-color-passwordToggle-TextBox--hover)",
+      "Input:color-passwordToggle-TextBox--focus": "var(--xmlui-color-passwordToggle-TextBox--focus)",
       "Input:borderRadius-TextBox-error": "var(--xmlui-borderRadius-TextBox-error)",
       "Input:borderColor-TextBox-error": "var(--xmlui-borderColor-TextBox-error)",
       "Input:borderWidth-TextBox-error": "var(--xmlui-borderWidth-TextBox-error)",
@@ -13639,7 +13988,7 @@ export default {
       "Input:outlineColor-TextBox-error--focus": "var(--xmlui-outlineColor-TextBox-error--focus)",
       "Input:outlineStyle-TextBox-error--focus": "var(--xmlui-outlineStyle-TextBox-error--focus)",
       "Input:outlineOffset-TextBox-error--focus": "var(--xmlui-outlineOffset-TextBox-error--focus)",
-      "Input:color-placeholder-TextBox-error": "var(--xmlui-color-placeholder-TextBox-error)",
+      "Input:textColor-placeholder-TextBox-error": "var(--xmlui-textColor-placeholder-TextBox-error)",
       "Input:fontSize-placeholder-TextBox-error": "var(--xmlui-fontSize-placeholder-TextBox-error)",
       "Input:color-adornment-TextBox-error": "var(--xmlui-color-adornment-TextBox-error)",
       "Input:borderRadius-TextBox-warning": "var(--xmlui-borderRadius-TextBox-warning)",
@@ -13663,7 +14012,7 @@ export default {
       "Input:outlineColor-TextBox-warning--focus": "var(--xmlui-outlineColor-TextBox-warning--focus)",
       "Input:outlineStyle-TextBox-warning--focus": "var(--xmlui-outlineStyle-TextBox-warning--focus)",
       "Input:outlineOffset-TextBox-warning--focus": "var(--xmlui-outlineOffset-TextBox-warning--focus)",
-      "Input:color-placeholder-TextBox-warning": "var(--xmlui-color-placeholder-TextBox-warning)",
+      "Input:textColor-placeholder-TextBox-warning": "var(--xmlui-textColor-placeholder-TextBox-warning)",
       "Input:fontSize-placeholder-TextBox-warning": "var(--xmlui-fontSize-placeholder-TextBox-warning)",
       "Input:color-adornment-TextBox-warning": "var(--xmlui-color-adornment-TextBox-warning)",
       "Input:borderRadius-TextBox-success": "var(--xmlui-borderRadius-TextBox-success)",
@@ -13687,7 +14036,7 @@ export default {
       "Input:outlineColor-TextBox-success--focus": "var(--xmlui-outlineColor-TextBox-success--focus)",
       "Input:outlineStyle-TextBox-success--focus": "var(--xmlui-outlineStyle-TextBox-success--focus)",
       "Input:outlineOffset-TextBox-success--focus": "var(--xmlui-outlineOffset-TextBox-success--focus)",
-      "Input:color-placeholder-TextBox-success": "var(--xmlui-color-placeholder-TextBox-success)",
+      "Input:textColor-placeholder-TextBox-success": "var(--xmlui-textColor-placeholder-TextBox-success)",
       "Input:fontSize-placeholder-TextBox-success": "var(--xmlui-fontSize-placeholder-TextBox-success)",
       "Input:color-adornment-TextBox-success": "var(--xmlui-color-adornment-TextBox-success)",
       "Input:backgroundColor-TextBox--disabled": "var(--xmlui-backgroundColor-TextBox--disabled)",
@@ -13708,17 +14057,19 @@ export default {
       "borderColor-Input-error": "$borderColor-Input-default--error",
       "borderColor-Input-warning": "$borderColor-Input-default--warning",
       "borderColor-Input-success": "$borderColor-Input-default--success",
-      "color-placeholder-Input": "$textColor-subtitle",
+      "textColor-placeholder-Input": "$textColor-subtitle",
       "color-adornment-Input": "$textColor-subtitle",
       "outlineColor-Input--focus": "$outlineColor--focus",
       "outlineWidth-Input--focus": "$outlineWidth--focus",
       "outlineStyle-Input--focus": "$outlineStyle--focus",
       "outlineOffset-Input--focus": "$outlineOffset--focus",
+      "color-passwordToggle-Input": "$textColor-subtitle",
       "light": {},
       "dark": {}
     }
   },
   "Theme": {
+    "status": "stable",
     "description": "`Theme` creates styling contexts to customize the appearance of nested components without using CSS.",
     "allowArbitraryProps": true,
     "props": {
@@ -13754,6 +14105,50 @@ export default {
         "description": "The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the \"icon.darkToLight:ToneChangerButton\" declaration in the app configuration file.",
         "defaultValue": "darkToLight:ToneChangerButton"
       }
+    },
+    "events": {
+      "click": {
+        "description": "This event is triggered when the ToneChangerButton is clicked."
+      }
+    }
+  },
+  "ToneSwitch": {
+    "status": "stable",
+    "description": "`ToneSwitch` enables the user to switch between light and dark modes using a switch control.",
+    "props": {
+      "iconLight": {
+        "type": "string",
+        "description": "Icon to display for light mode",
+        "defaultValue": "sun"
+      },
+      "iconDark": {
+        "type": "string",
+        "description": "Icon to display for dark mode",
+        "defaultValue": "moon"
+      }
+    },
+    "themeVars": {
+      "borderColor-ToneSwitch": "var(--xmlui-borderColor-ToneSwitch)",
+      "borderColor-ToneSwitch--hover": "var(--xmlui-borderColor-ToneSwitch--hover)",
+      "backgroundColor-ToneSwitch-light": "var(--xmlui-backgroundColor-ToneSwitch-light)",
+      "color-ToneSwitch-light": "var(--xmlui-color-ToneSwitch-light)",
+      "backgroundColor-ToneSwitch-dark": "var(--xmlui-backgroundColor-ToneSwitch-dark)",
+      "color-ToneSwitch-dark": "var(--xmlui-color-ToneSwitch-dark)"
+    },
+    "limitThemeVarsToComponent": true,
+    "defaultThemeVars": {
+      "backgroundColor-ToneSwitch-light": "$color-surface-200",
+      "color-ToneSwitch-light": "$color-text-primary",
+      "backgroundColor-ToneSwitch-dark": "$color-primary-500",
+      "color-ToneSwitch-dark": "$color-surface-0",
+      "borderColor-ToneSwitch": "$color-surface-200",
+      "borderColor-ToneSwitch--hover": "$color-surface-300",
+      "dark": {
+        "backgroundColor-ToneSwitch-light": "$color-surface-700",
+        "color-ToneSwitch-light": "$color-text-primary",
+        "borderColor-ToneSwitch": "$color-surface-600",
+        "borderColor-ToneSwitch--hover": "$color-surface-500"
+      }
     }
   },
   "Tree": {
@@ -13774,8 +14169,8 @@ export default {
     }
   },
   "BarChart": {
-    "description": "`BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories.",
     "status": "experimental",
+    "description": "`BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories.",
     "docFolder": "Charts/BarChart",
     "props": {
       "data": {
@@ -13823,8 +14218,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
-      "tickFormatter": {
-        "description": "A function that formats the axis tick labels. It receives a tick value and returns a formatted string."
+      "tickFormatterX": {
+        "description": "A function that formats the tick labels on the X-axis. "
+      },
+      "tickFormatterY": {
+        "description": "A function that formats the tick labels on the Y-axis. "
       },
       "showLegend": {
         "description": "Determines whether the legend should be displayed.",
@@ -13834,8 +14232,8 @@ export default {
     }
   },
   "DonutChart": {
-    "description": "A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly.",
     "status": "experimental",
+    "description": "A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly.",
     "props": {
       "data": {
         "description": "The data to be displayed in the chart. Needs to be an array of objects."
@@ -13875,8 +14273,8 @@ export default {
     }
   },
   "LabelList": {
-    "description": "`LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance.",
     "status": "experimental",
+    "description": "`LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance.",
     "props": {
       "key": {
         "description": "The key that needs to be matched to the data series.",
@@ -13919,8 +14317,8 @@ export default {
     }
   },
   "Legend": {
-    "description": "`Legend` provides a standalone legend for chart components when you need custom positioning or styling beyond the chart's built-in `showLegend` property. Most charts can display legends automatically, but this component offers precise control over legend placement and alignment.",
     "status": "experimental",
+    "description": "`Legend` provides a standalone legend for chart components when you need custom positioning or styling beyond the chart's built-in `showLegend` property. Most charts can display legends automatically, but this component offers precise control over legend placement and alignment.",
     "props": {
       "align": {
         "description": "The alignment of the legend",
@@ -13945,8 +14343,8 @@ export default {
     }
   },
   "LineChart": {
-    "description": "`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.",
     "status": "experimental",
+    "description": "`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.",
     "props": {
       "data": {
         "description": "The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point."
@@ -13992,8 +14390,8 @@ export default {
     }
   },
   "PieChart": {
-    "description": "`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly.",
     "status": "experimental",
+    "description": "`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly.",
     "docFolder": "Charts/PieChart",
     "props": {
       "data": {
