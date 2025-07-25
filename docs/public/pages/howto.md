@@ -231,7 +231,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Delay a DataSource until another DataSource is ready
 
-```xmlui-pg  noHeader
+```xmlui-pg noHeader
 ---app
 <App>
   <Test />
@@ -303,7 +303,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Hide an element until its DataSource is ready
 
-```xmlui-pg  noHeader
+```xmlui-pg noHeader
 ---app
 <App>
   <Test />
@@ -346,7 +346,6 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 </Component>
 ```
 
-
 ## Use built-in form validation
 
 ```xmlui-pg noHeader
@@ -374,7 +373,6 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 </Component>
 ```
-
 
 ## Do custom form validation
 
@@ -447,9 +445,6 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 </Component>
 ```
 
-
-
-
 ## Make a set of equal-width cards
 
 ```xmlui-pg noHeader
@@ -521,7 +516,6 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 </Component>
 ```
-
 
 ## Set the initial value of a Select from fetched data
 
@@ -859,11 +853,60 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 
 ## Share Add and Edit ModalDialog
 
-```xmlui-pg noHeader height="500px"
+```xmlui-pg noHeader height="400px"
 ---app
 <App>
   <Test />
 </App>
+---comp
+<Component name="Test">
+  <!-- Get the current list of products -->
+  <DataSource id="products" url="/api/products" />
+
+  <HStack alignItems="center">
+    <Text variant="strong" fontSize="$fontSize-large">Product Inventory</Text>
+    <SpaceFiller />
+    <Button
+      label="Add New Product"
+      size="sm"
+      onClick="productModal.open('add')"
+    />
+  </HStack>
+
+    <Table data="{products}">
+      <Column bindTo="name" />
+      <Column bindTo="price" width="120px"/>
+      <Column header="Actions" width="240px">
+        <HStack>
+          <Button label="Edit" icon="pencil" size="sm" variant="outlined"
+            onClick="productModal.open('edit', $item)"
+          />
+          <Button label="Delete" icon="trash" size="sm" variant="outlined"
+            themeColor="attention">
+            <event name="click">
+              <APICall
+                method="delete"
+                url="/api/products/{$item.id}"
+                confirmMessage="Are you sure you want to delete '{$item.name}'?" />
+            </event>
+          </Button>
+        </HStack>
+      </Column>
+    </Table>
+
+  <!-- Use this dialog to add or edit products -->
+  <ModalDialog id="productModal">
+    <Form
+      data="{$params[1]}"
+      submitUrl="/api/products/{$params[0] === 'edit' ? $params[1].id : ''}"
+      submitMethod="{$params[0] === 'edit' ? 'put' : 'post'}"
+      saveLabel="{$params[0] === 'edit' ? 'Update' : 'Add'} Product"
+    >
+      <FormItem bindTo="name" label="Product Name" required="true" />
+      <FormItem bindTo="price" label="Price" type="number" required="true" />
+    </Form>
+  </ModalDialog>
+</Component>
 ---api
 {
   "apiUrl": "/api",
@@ -875,79 +918,42 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     "get-products": {
       "url": "/products",
       "method": "get",
-      "handler": "console.log('get-products called, returning:', $state.products); return $state.products"
+      "handler": "$state.products"
     },
-    "get-product": {
+    "insert-product": {
+      "url": "/products",
+      "method": "post",
+      "handler": "
+        const newId = $state.products.length > 0 ? Math.max(...$state.products.map(p => p.id)) + 1 : 1;
+        $state.products.push({
+          id: newId,
+          name: $requestBody.name,
+          price: Number($requestBody.price)
+        });
+      "
+    },
+    "update-product": {
       "url": "/products/:id",
-      "method": "get",
+      "method": "put",
       "pathParamTypes": {
         "id": "integer"
       },
-      "handler": "return $state.products.find(p => p.id == $pathParams.id);"
+      "handler": "
+        const oldItem = $state.products.find(p => p.id === $pathParams.id);
+        if (oldItem) {
+          oldItem.name = $requestBody.name;
+          oldItem.price = Number($requestBody.price);
+        }
+      "
     },
-    "save-product": {
-      "url": "/products",
-      "method": "post",
-      "handler": "const data = JSON.parse($requestBody); console.log('parsed data:', data); if (data.id) { const index = $state.products.findIndex(p => p.id == data.id); if (index >= 0) { $state.products[index] = { ...$state.products[index], ...data }; return $state.products[index]; } } else { const newId = Math.max(...$state.products.map(p => p.id)) + 1; const newProduct = { id: newId, name: data.name, price: Number(data.price) }; $state.products.push(newProduct); return newProduct; }"
+    "delete-product": {
+      "url": "/products/:id",
+      "method": "delete",
+      "pathParamTypes": {
+        "id": "integer"
+      },
+      "handler": "$state.products = $state.products.filter(p => p.id !== $pathParams.id)"
     }
   }
 }
----comp display
-<Component name="Test">
-
-  <AppState id="modalState" bucket="modalState" initialValue="{{
-    isOpen: false,
-    product: null,
-    mode: 'add'
-  }}" />
-
-  <!-- Modal controlled by AppState -->
-  <ModalDialog
-    when="{modalState.value.isOpen}"
-    onClose="modalState.update({isOpen: false})"
-  >
-    <Form
-      data="{modalState.value.product}"
-      onSubmit="saveProduct.execute({
-        id: modalState.value.mode === 'edit' ? modalState.value.product.id : null,
-        ...$data
-      })"
-      onSuccess="products.refetch()"
-      saveLabel="{modalState.value.mode === 'edit' ? 'Update Product' : 'Add Product'}"
-    >
-      <FormItem bindTo="name" label="Product Name" required="true" />
-      <FormItem bindTo="price" label="Price" type="number" required="true" />
-    </Form>
-  </ModalDialog>
-
-  <DataSource id="products" url="/api/products" />
-
-  <!-- APICall for saving product -->
-  <APICall id="saveProduct" url="/api/products" method="post" body="{JSON.stringify($param)}" />
-
-  <VStack gap="1rem">
-    <HStack gap="1rem" alignItems="center">
-      <Text variant="strong" fontSize="1.2rem">Product Inventory</Text>
-      <Button
-        label="Add New Product"
-        size="sm"
-        onClick="modalState.update({isOpen: true, product: null, mode: 'add'})"
-      />
-    </HStack>
-
-    <Table data="{products}">
-      <Column bindTo="name" />
-      <Column bindTo="price" />
-      <Column header="Actions">
-        <Button
-          label="Edit"
-          size="sm"
-          variant="outlined"
-          onClick="modalState.update({isOpen: true, product: $item, mode: 'edit'})"
-        />
-      </Column>
-    </Table>
-  </VStack>
-
-</Component>
 ```
