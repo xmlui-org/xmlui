@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.85
+
+### Patch Changes
+
+- ee8d6ad: Fix "required" validation issue with "integer" and "number" FormItem
+- 9ca7572: Extend the component API metadata with method signature and parameter descriptions
+- 6944d2f: Add a scrollIntoView method to Heading
+- c0c10e7: Added missing autoFocus feature and aria labels to Checkbox
+- cbe1ef2: Use grammar and syntax highlight files straight form the xmlui package, instead of duplicating them in every app.
+
 ## 0.9.84
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.19
+
+### Patch Changes
+
+- cbe1ef2: Use grammar and syntax highlight files straight form the xmlui package, instead of duplicating them in every app.
+
 ## 0.1.18
 
 ### Patch Changes
