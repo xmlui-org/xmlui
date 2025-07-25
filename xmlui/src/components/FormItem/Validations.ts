@@ -19,7 +19,7 @@ import { fieldValidated, type FormAction } from "../Form/formActions";
 function isInputEmpty(value: any) {
   if (value === undefined || value === null || value === "") return true;
   if (typeof value === "string") return value.trim().length === 0;
-
+  if (typeof value === "number") return false;
   return isEmpty(value);
 }
 
@@ -118,11 +118,12 @@ class FormItemValidator {
     if (!required) {
       return undefined;
     }
-    return {
+    const validationResult: SingleValidationResult = {
       isValid: !isInputEmpty(this.value),
       invalidMessage: requiredInvalidMessage || "This field is required",
       severity: "error",
     };
+    return validationResult;
   }
 
   private validateLength(): SingleValidationResult | undefined {
