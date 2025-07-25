@@ -197,62 +197,45 @@ test.describe("Accessibility", () => {
 
 test.describe("Label", () => {
   test("labelPosition=start positions label before input", async ({ initTestBed, page }) => {
-    const labelText = "test";
-    await initTestBed(`<Checkbox direction="ltr" label="${labelText}" labelPosition="start" />`);
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="start" />`);
 
-    const { left: checkboxLeft, right: checkboxRight } = await getBounds(
-      page.getByLabel(labelText, { exact: true }),
-    );
-    const { left: labelLeft, right: labelRight } = await getBounds(page.getByText(labelText));
+    const { left: checkboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight } = await getBounds(page.getByText("test"));
 
-    expect(labelLeft).toBeLessThan(checkboxLeft);
-    expect(labelRight).toBeLessThan(checkboxRight);
+    expect(labelRight).toBeLessThan(checkboxLeft);
   });
 
   test("labelPosition=end positions label after input", async ({ initTestBed, page }) => {
-    const labelText = "test";
-    await initTestBed(`<Checkbox direction="ltr" label="${labelText}" labelPosition="end" />`);
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="end" />`);
 
-    const { left: checkboxLeft, right: checkboxRight } = await getBounds(
-      page.getByLabel(labelText, { exact: true }),
-    );
-    const { left: labelLeft, right: labelRight } = await getBounds(page.getByText(labelText));
+    const { right: checkboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
 
-    expect(labelLeft).toBeGreaterThan(checkboxLeft);
-    expect(labelRight).toBeGreaterThan(checkboxRight);
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
   });
 
   test("labelPosition=top positions label above input", async ({ initTestBed, page }) => {
-    const labelText = "test";
-    await initTestBed(`<Checkbox label="${labelText}" labelPosition="top" />`);
+    await initTestBed(`<Checkbox label="test" labelPosition="top" />`);
 
-    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(
-      page.getByLabel(labelText, { exact: true }),
-    );
-    const { top: labelTop, bottom: labelBottom } = await getBounds(page.getByText(labelText));
+    const { top: checkboxTop } = await getBounds(page.getByLabel("test"));
+    const { bottom: labelBottom } = await getBounds(page.getByText("test"));
 
-    expect(labelTop).toBeLessThan(checkboxTop);
-    expect(labelBottom).toBeLessThan(checkboxBottom);
+    expect(labelBottom).toBeLessThan(checkboxTop);
   });
 
   test("labelPosition=bottom positions label below input", async ({ initTestBed, page }) => {
-    const labelText = "test";
-    await initTestBed(`<Checkbox label="${labelText}" labelPosition="bottom" />`);
+    await initTestBed(`<Checkbox label="test" labelPosition="bottom" />`);
 
-    const { top: checkboxTop, bottom: checkboxBottom } = await getBounds(
-      page.getByLabel(labelText, { exact: true }),
-    );
-    const { top: labelTop, bottom: labelBottom } = await getBounds(page.getByText(labelText));
+    const { bottom: checkboxBottom } = await getBounds(page.getByLabel("test"));
+    const { top: labelTop } = await getBounds(page.getByText("test"));
 
-    expect(labelTop).toBeGreaterThan(checkboxTop);
-    expect(labelBottom).toBeGreaterThan(checkboxBottom);
+    expect(labelTop).toBeGreaterThan(checkboxBottom);
   });
 
   test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
     const expected = 200;
-    const labelText = "test test";
-    await initTestBed(`<Checkbox label="${labelText}" labelWidth="${expected}px" />`);
-    const { width } = await getBounds(page.getByText(labelText));
+    await initTestBed(`<Checkbox label="test test" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test test"));
     expect(width).toEqual(expected);
   });
 
@@ -274,10 +257,9 @@ test.describe("Label", () => {
   });
 
   test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
-    const labelText = "Test label";
-    await initTestBed(`<Checkbox labelPosition="invalid" label="${labelText}" />`);
-    await expect(page.getByLabel(labelText, { exact: true })).toBeVisible();
-    await expect(page.getByText(labelText)).toBeVisible();
+    await initTestBed(`<Checkbox labelPosition="invalid" label="test" />`);
+    await expect(page.getByLabel("test")).toBeVisible();
+    await expect(page.getByText("test")).toBeVisible();
   });
 });
 
