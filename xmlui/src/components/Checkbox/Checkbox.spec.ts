@@ -81,7 +81,7 @@ test.describe("Basic Functionality", () => {
     await expect(checkbox).not.toBeChecked();
   });
 
-  test("readOnly", async ({ initTestBed, page }) => {
+  test("readOnly adds readonly attribute", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox readOnly="true" />`);
     await expect(page.getByRole("checkbox")).toHaveAttribute("readonly");
   });
@@ -99,27 +99,27 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("checkbox")).not.toBeDisabled();
   });
 
-  test("autoFocus focuses input on mount", async ({ initTestBed, page }) => {
+  test("autoFocus focuses checkbox on mount", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox autoFocus="{true}" />`);
     await expect(page.getByRole("checkbox")).toBeFocused();
   });
 
-  test("autoFocus focuses input on mount with label", async ({ initTestBed, page }) => {
+  test("autoFocus focuses checkbox on mount with label", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox autoFocus="{true}" label="test" />`);
     await expect(page.getByRole("checkbox")).toBeFocused();
   });
 
-  test("handle special characters in label", async ({ initTestBed, page }) => {
+  test("handles special characters in label", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="Accept terms &amp; conditions &lt;&gt;&amp;" />`);
     await expect(page.locator("label")).toContainText("Accept terms & conditions <>&");
   });
 
-  test("handle Unicode characters in label", async ({ initTestBed, page }) => {
+  test("handles Unicode characters in label", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox label="同意条款 ✓" />`);
     await expect(page.locator("label")).toContainText("同意条款 ✓");
   });
 
-  test("component handles very long label text", async ({ initTestBed, page }) => {
+  test("handles very long label text", async ({ initTestBed, page }) => {
     const longLabel =
       "This is a very long label that might cause layout issues or overflow problems " +
       "in the component rendering and should be handled gracefully by the component implementation";
@@ -127,7 +127,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("label")).toContainText(longLabel);
   });
 
-  test("component handles rapid state changes", async ({ initTestBed, page }) => {
+  test("handles rapid state changes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox initialValue="false" />`);
     const checkbox = page.getByRole("checkbox");
     await checkbox.click({ clickCount: 10 });
@@ -156,7 +156,7 @@ test.describe("Accessibility", () => {
     await expect(checkbox).toBeChecked();
   });
 
-  test("component supports keyboard navigation", async ({ initTestBed, page }) => {
+  test("supports keyboard navigation", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox />`);
     await page.keyboard.press("Tab");
     await expect(page.getByRole("checkbox")).toBeFocused();
@@ -185,7 +185,7 @@ test.describe("Accessibility", () => {
     await expect(page.getByRole("checkbox")).toHaveAttribute("aria-required", "true");
   });
 
-  test("component disabled has proper ARIA attributes", async ({ initTestBed, page }) => {
+  test("disabled checkbox has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox enabled="{false}" />`);
     await expect(page.getByRole("checkbox")).toHaveAttribute("aria-disabled", "true");
   });
@@ -256,7 +256,7 @@ test.describe("Label", () => {
     expect(heightBreak).toBeGreaterThan(heightOneLine);
   });
 
-  test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
+  test("handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox labelPosition="invalid" label="test" />`);
     await expect(page.getByLabel("test")).toBeVisible();
     await expect(page.getByText("test")).toBeVisible();
@@ -269,7 +269,7 @@ test.describe("Label", () => {
 
 test.describe("Validation", () => {
   test.skip(
-    "component validationStatus=error shows error styling",
+    "validationStatus=error shows error styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {
       await initTestBed(`<Checkbox validationStatus="error" />`);
@@ -279,13 +279,13 @@ test.describe("Validation", () => {
   );
 
   test.skip(
-    "checked component validationStatus=error shows error styling",
+    "checked checkbox with validationStatus=error shows error styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {},
   );
 
   test.skip(
-    "component validationStatus=warning shows warning styling",
+    "validationStatus=warning shows warning styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {
       await initTestBed(`<Checkbox validationStatus="warning" />`);
@@ -295,13 +295,13 @@ test.describe("Validation", () => {
   );
 
   test.skip(
-    "checked component validationStatus=warning shows error styling",
+    "checked checkbox with validationStatus=warning shows warning styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {},
   );
 
   test.skip(
-    "component validationStatus=valid shows valid styling",
+    "validationStatus=valid shows valid styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {
       await initTestBed(`<Checkbox validationStatus="valid" />`);
@@ -311,13 +311,13 @@ test.describe("Validation", () => {
   );
 
   test.skip(
-    "checked component validationStatus=valid shows error styling",
+    "checked checkbox with validationStatus=valid shows valid styling",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {},
   );
 
   test.skip(
-    "component handles invalid validationStatus gracefully",
+    "handles invalid validationStatus gracefully",
     SKIP_REASON.TO_BE_IMPLEMENTED("Fix implementation"),
     async ({ initTestBed, createCheckboxDriver }) => {
       // Test that component handles invalid validationStatus without crashing
@@ -394,7 +394,7 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
-  test("component lostFocus event fires on blur", async ({ initTestBed, page }) => {
+  test("lostFocus event fires on blur", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<Checkbox onLostFocus="testState = 'blurred'" />`,
     );
@@ -409,7 +409,7 @@ test.describe("Event Handling", () => {
 // =============================================================================
 
 test.describe("Api", () => {
-  test.skip("component value API returns current state", async ({
+  test.skip("value API returns current state", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -422,7 +422,7 @@ test.describe("Api", () => {
     // expect(value).toBe(true);
   });
 
-  test.skip("component setValue API updates state", async ({
+  test.skip("setValue API updates state", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -435,7 +435,7 @@ test.describe("Api", () => {
     // await expect(driver.input).toBeChecked();
   });
 
-  test.skip("component setValue API triggers events", async ({
+  test.skip("setValue API triggers events", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -448,7 +448,7 @@ test.describe("Api", () => {
     // await expect.poll(testStateDriver.testState).toEqual("api-changed");
   });
 
-  test.skip("component APIs work with validation", async ({
+  test.skip("APIs work with validation", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -469,7 +469,7 @@ test.describe("Api", () => {
 
 test.describe("Custom inputTemplate", () => {
   test.skip(
-    "component inputTemplate renders custom input",
+    "inputTemplate renders custom input",
     SKIP_REASON.XMLUI_BUG("setting inputTemplate throws error"),
     async ({ initTestBed, createButtonDriver }) => {
       //   await initTestBed(`
@@ -483,7 +483,7 @@ test.describe("Custom inputTemplate", () => {
   );
 
   test.skip(
-    "component inputTemplate maintains functionality",
+    "inputTemplate maintains functionality",
     SKIP_REASON.XMLUI_BUG("setting inputTemplate throws error"),
     async ({ initTestBed, createFormItemDriver }) => {
       // Test that custom input template maintains checkbox functionality
@@ -499,7 +499,7 @@ test.describe("Custom inputTemplate", () => {
   );
 
   test.skip(
-    "component inputTemplate with complex markup",
+    "inputTemplate with complex markup",
     SKIP_REASON.XMLUI_BUG("setting inputTemplate throws error"),
     async ({ initTestBed, createFormItemDriver }) => {
       // Test that inputTemplate can contain complex markup
@@ -524,47 +524,47 @@ test.describe("Custom inputTemplate", () => {
 
 test.describe("Theme variables", () => {
   test.skip(
-    "component applies theme backgroundColor",
+    "applies theme backgroundColor",
     SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createCheckboxDriver }) => {},
   );
 
-  test.skip("component applies theme borderColor", async ({
+  test.skip("applies theme borderColor", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme checked backgroundColor", async ({
+  test.skip("applies theme checked backgroundColor", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme checked borderColor", async ({
+  test.skip("applies theme checked borderColor", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme error validation colors", async ({
+  test.skip("applies theme error validation colors", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme warning validation colors", async ({
+  test.skip("applies theme warning validation colors", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme success validation colors", async ({
+  test.skip("applies theme success validation colors", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme disabled background color", async ({
+  test.skip("applies theme disabled background color", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
 
-  test.skip("component applies theme indicator background color", async ({
+  test.skip("applies theme indicator background color", async ({
     initTestBed,
     createCheckboxDriver,
   }) => {});
