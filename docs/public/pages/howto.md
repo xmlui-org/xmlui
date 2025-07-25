@@ -858,7 +858,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 <App>
   <Test />
 </App>
----comp
+---comp display
 <Component name="Test">
   <!-- Get the current list of products -->
   <DataSource id="products" url="/api/products" />
