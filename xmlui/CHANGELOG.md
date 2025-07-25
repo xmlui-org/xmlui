@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.86
+
+### Patch Changes
+
+- 48af60d: Temporarily suspend new checkbox e2e tests
+
 ## 0.9.85
 
 ### Patch Changes
