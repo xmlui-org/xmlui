@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.87
+
+### Patch Changes
+
+- 33846c2: Fix ios regex failure
+
 ## 0.9.86
 
 ### Patch Changes
