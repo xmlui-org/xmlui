@@ -147,6 +147,25 @@ type MockExternalApiOptions = {
   body?: Record<string, any>;
 };
 
+export class BackdropDriver extends ComponentDriver {
+  getBackdrop() {
+    return this.component.locator("> *").first();
+  }
+
+  getOverlay() {
+    return this.component.locator("> *").nth(1);
+  }
+
+  getDefaultBackgroundColor() { 
+    return "rgb(0, 0, 0)"; // Default backdrop color
+  }
+
+  getDefaultOpacity() {
+    return "0.1"; // Default backdrop opacity
+  }
+}
+
+
 export class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
     const { status = 200, headers = {}, body = {} } = apiOptions;
