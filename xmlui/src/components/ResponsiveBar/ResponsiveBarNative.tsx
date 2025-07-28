@@ -1,14 +1,14 @@
 import React, { type CSSProperties, forwardRef, type ReactNode, useEffect, useRef, useState } from "react";
 import classnames from "classnames";
 
-import styles from "./ResponsiveMenu.module.scss";
+import styles from "./ResponsiveBar.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
 
-type ResponsiveMenuProps = {
+type ResponsiveBarProps = {
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
@@ -17,23 +17,23 @@ type ResponsiveMenuProps = {
   className?: string;
 };
 
-export const defaultResponsiveMenuProps: Pick<
-  ResponsiveMenuProps,
+export const defaultResponsiveBarProps: Pick<
+  ResponsiveBarProps,
   "overflowIcon" | "overflowLabel"
 > = {
   overflowIcon: "dotmenuhorizontal",
   overflowLabel: "More",
 };
 
-export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
+export const ResponsiveBar = forwardRef(function ResponsiveBar(
   {
     children,
     registerComponentApi,
     style,
-    overflowIcon = defaultResponsiveMenuProps.overflowIcon,
-    overflowLabel = defaultResponsiveMenuProps.overflowLabel,
+    overflowIcon = defaultResponsiveBarProps.overflowIcon,
+    overflowLabel = defaultResponsiveBarProps.overflowLabel,
     className,
-  }: ResponsiveMenuProps,
+  }: ResponsiveBarProps,
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,45 +64,35 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
       return;
     }
     
-    // Account for the overflow button width and some margin
-    const overflowButtonWidth = 60; // More conservative estimate for ghost button with icon
+    // Account for the overflow button width - use a more conservative estimate
+    let overflowButtonWidth = 60; // More conservative estimate for ghost button with icon
+    const existingOverflowButton = container.querySelector(`.${styles.OverflowContainer} button`) as HTMLElement;
+    if (existingOverflowButton) {
+      const overflowRect = existingOverflowButton.getBoundingClientRect();
+      overflowButtonWidth = Math.max(60, Math.ceil(overflowRect.width) + 16); // Ensure minimum 60px with extra margin
+    }
     
-    // Get the visible items container to check current styles
+    // Get the visible items container (Stack) to check current styles
     const visibleContainer = container.querySelector(`.${styles.VisibleItems}`) as HTMLElement;
     
     if (!visibleContainer) {
       return;
     }
 
-    // Create a temporary container that matches the styling of the actual menu
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.visibility = 'hidden';
-    tempContainer.style.top = '-10000px';
-    tempContainer.style.left = '-10000px';
-    tempContainer.style.pointerEvents = 'none';
-    
-    // Copy computed styles from the visible container
-    const containerStyles = getComputedStyle(visibleContainer);
-    tempContainer.style.display = containerStyles.display;
-    tempContainer.style.gap = containerStyles.gap;
-    tempContainer.style.alignItems = containerStyles.alignItems;
-    tempContainer.style.fontFamily = containerStyles.fontFamily;
-    tempContainer.style.fontSize = containerStyles.fontSize;
-    tempContainer.style.fontWeight = containerStyles.fontWeight;
-    
-    document.body.appendChild(tempContainer);
+    // Get computed styles from both the main container and visible container
+    const containerStyles = getComputedStyle(container);
+    const visibleStyles = getComputedStyle(visibleContainer);
 
     // Instead of creating temporary elements, measure the actual rendered items
     const itemWidths: number[] = [];
     
-    // Get all current menu item elements
-    const menuItems = visibleContainer.querySelectorAll(`.${styles.MenuItem}`);
+    // Get all current bar item elements (ResponsiveBarItem components)
+    const barItems = visibleContainer.querySelectorAll(`.${styles.ResponsiveBarItem}`);
     
-    for (let i = 0; i < Math.min(childrenArray.length, menuItems.length); i++) {
-      const menuItem = menuItems[i] as HTMLElement;
-      if (menuItem) {
-        const rect = menuItem.getBoundingClientRect();
+    for (let i = 0; i < Math.min(childrenArray.length, barItems.length); i++) {
+      const barItem = barItems[i] as HTMLElement;
+      if (barItem) {
+        const rect = barItem.getBoundingClientRect();
         const width = Math.ceil(rect.width);
         itemWidths.push(width);
       } else {
@@ -111,7 +101,7 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
     }
     
     // If we have more children than rendered items, estimate remaining widths
-    for (let i = menuItems.length; i < childrenArray.length; i++) {
+    for (let i = barItems.length; i < childrenArray.length; i++) {
       // Use average of existing widths or a reasonable default
       const avgWidth = itemWidths.length > 0 ? 
         itemWidths.reduce((sum, w) => sum + w, 0) / itemWidths.length : 50;
@@ -119,9 +109,14 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
     }
 
     // Calculate which items fit with proper spacing
-    const gap = parseInt(containerStyles.gap) || 4;
-    const containerPadding = 8; // Account for container padding
-    const safetyBuffer = 8; // Add small buffer to prevent edge cases
+    const gap = parseInt(visibleStyles.gap) || 4;
+    
+    // Get actual padding from the main container styles
+    const paddingLeft = parseInt(containerStyles.paddingLeft) || 0;
+    const paddingRight = parseInt(containerStyles.paddingRight) || 0;
+    const containerPadding = paddingLeft + paddingRight;
+    
+    const safetyBuffer = 16; // Much larger buffer for measurement precision
     let currentWidth = containerPadding;
     const visible: ReactNode[] = [];
     const overflow: ReactNode[] = [];
@@ -134,23 +129,19 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
       const gapWidth = visible.length > 0 ? gap : 0;
       const totalItemWidth = itemWidth + gapWidth;
       
-      // Check if we need to start using overflow (with buffer for safety)
-      const wouldNeedOverflow = currentWidth + totalItemWidth + overflowButtonWidth + safetyBuffer > availableWidth;
+      // Always check if we need overflow space when there are remaining items
+      const hasRemainingItems = i < childrenArray.length - 1;
+      const spaceNeededForOverflow = hasRemainingItems ? overflowButtonWidth : 0;
       
-      if (wouldNeedOverflow && visible.length > 0) {
-        // This item and all remaining items go to overflow
-        for (let j = i; j < childrenArray.length; j++) {
-          if (childrenArray[j]) {
-            overflow.push(childrenArray[j]);
-          }
-        }
-        break;
-      } else if (currentWidth + totalItemWidth + safetyBuffer <= availableWidth) {
+      // Check if this item fits with the required space for overflow (if needed)
+      const totalSpaceNeeded = currentWidth + totalItemWidth + spaceNeededForOverflow + safetyBuffer;
+      
+      if (totalSpaceNeeded <= availableWidth) {
         // Item fits
         currentWidth += totalItemWidth;
         visible.push(child);
       } else {
-        // First item doesn't fit, put all items in overflow
+        // This item and all remaining items go to overflow
         for (let j = i; j < childrenArray.length; j++) {
           if (childrenArray[j]) {
             overflow.push(childrenArray[j]);
@@ -209,15 +200,15 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
   return (
     <div
       ref={containerRef}
-      className={classnames(styles.ResponsiveMenu, className)}
+      className={classnames(styles.ResponsiveBar, className)}
       style={style}
     >
         {/* Visible menu items */}
         <div className={styles.VisibleItems}>
           {(isCalculated ? visibleItems : childrenArray).map((item, index) => (
-            <div key={`visible-${index}`} className={styles.MenuItem}>
+            <ResponsiveBarItem key={`visible-${index}`}>
               {item}
-            </div>
+            </ResponsiveBarItem>
           ))}
         </div>
 
@@ -253,23 +244,23 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
   );
 });
 
-// Helper component for responsive menu items
-type ResponsiveMenuItemProps = {
+// Helper component for responsive bar items
+type ResponsiveBarItemProps = {
   children?: ReactNode;
   className?: string;
 };
 
-export const ResponsiveMenuItem = forwardRef(function ResponsiveMenuItem(
+export const ResponsiveBarItem = forwardRef(function ResponsiveBarItem(
   {
     children,
     className,
-  }: ResponsiveMenuItemProps,
+  }: ResponsiveBarItemProps,
   ref,
 ) {
   return (
     <div
       ref={ref as any}
-      className={classnames(styles.ResponsiveMenuItem, className)}
+      className={classnames(styles.ResponsiveBarItem, className)}
     >
       {children}
     </div>

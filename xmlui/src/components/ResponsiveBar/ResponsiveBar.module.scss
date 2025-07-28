@@ -1,0 +1,119 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-ResponsiveBar: createThemeVar("backgroundColor-ResponsiveBar");
+$borderColor-ResponsiveBar: createThemeVar("borderColor-ResponsiveBar");
+$borderWidth-ResponsiveBar: createThemeVar("borderWidth-ResponsiveBar");
+$borderStyle-ResponsiveBar: createThemeVar("borderStyle-ResponsiveBar");
+$padding-ResponsiveBar: createThemeVar("padding-ResponsiveBar");
+$gap-ResponsiveBar: createThemeVar("gap-ResponsiveBar");
+
+$backgroundColor-ResponsiveBarItem: createThemeVar("backgroundColor-ResponsiveBarItem");
+$color-ResponsiveBarItem: createThemeVar("color-ResponsiveBarItem");
+$fontFamily-ResponsiveBarItem: createThemeVar("fontFamily-ResponsiveBarItem");
+$fontSize-ResponsiveBarItem: createThemeVar("fontSize-ResponsiveBarItem");
+$fontWeight-ResponsiveBarItem: createThemeVar("fontWeight-ResponsiveBarItem");
+$padding-ResponsiveBarItem: createThemeVar("padding-ResponsiveBarItem");
+$borderRadius-ResponsiveBarItem: createThemeVar("borderRadius-ResponsiveBarItem");
+$gap-ResponsiveBarItem: createThemeVar("gap-ResponsiveBarItem");
+
+$backgroundColor-ResponsiveBarItem--hover: createThemeVar("backgroundColor-ResponsiveBarItem--hover");
+$color-ResponsiveBarItem--hover: createThemeVar("color-ResponsiveBarItem--hover");
+$backgroundColor-ResponsiveBarItem--active: createThemeVar("backgroundColor-ResponsiveBarItem--active");
+$color-ResponsiveBarItem--active: createThemeVar("color-ResponsiveBarItem--active");
+$color-ResponsiveBarItem--disabled: createThemeVar("color-ResponsiveBarItem--disabled");
+
+.ResponsiveBar {
+  display: flex;
+  align-items: center;
+  background-color: $backgroundColor-ResponsiveBar;
+  border: $borderWidth-ResponsiveBar $borderStyle-ResponsiveBar $borderColor-ResponsiveBar;
+  padding: $padding-ResponsiveBar;
+  gap: $gap-ResponsiveBar;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.VisibleItems {
+  display: flex;
+  align-items: center;
+  gap: $gap-ResponsiveBar;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0; // Allow flex items to shrink below content size
+}
+
+.MenuItem {
+  flex-shrink: 0; // Prevent individual menu items from shrinking
+}
+
+.OverflowContainer {
+  flex-shrink: 0; // Prevent overflow button from shrinking
+  margin-left: auto; // Push to the right
+}
+
+.ResponsiveBarItem {
+  display: flex;
+  align-items: center;
+  gap: $gap-ResponsiveBarItem;
+  padding: $padding-ResponsiveBarItem;
+  background-color: $backgroundColor-ResponsiveBarItem;
+  color: $color-ResponsiveBarItem;
+  font-family: $fontFamily-ResponsiveBarItem;
+  font-size: $fontSize-ResponsiveBarItem;
+  font-weight: $fontWeight-ResponsiveBarItem;
+  border: none;
+  border-radius: $borderRadius-ResponsiveBarItem;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(.disabled) {
+    background-color: $backgroundColor-ResponsiveBarItem--hover;
+    color: $color-ResponsiveBarItem--hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-ResponsiveBarItem--active;
+    outline-offset: 1px;
+  }
+
+  &.active {
+    background-color: $backgroundColor-ResponsiveBarItem--active;
+    color: $color-ResponsiveBarItem--active;
+  }
+
+  &.disabled {
+    color: $color-ResponsiveBarItem--disabled;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.Icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.Label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

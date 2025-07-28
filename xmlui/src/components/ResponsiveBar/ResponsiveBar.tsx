@@ -1,4 +1,4 @@
-import styles from "./ResponsiveMenu.module.scss";
+import styles from "./ResponsiveBar.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -6,17 +6,17 @@ import { createMetadata } from "../metadata-helpers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import {
-  defaultResponsiveMenuProps,
-  ResponsiveMenu,
-  ResponsiveMenuItem,
-} from "./ResponsiveMenuNative";
+  defaultResponsiveBarProps,
+  ResponsiveBar,
+  ResponsiveBarItem,
+} from "./ResponsiveBarNative";
 
-const RMCOMP = "ResponsiveMenuBar";
+const RMCOMP = "ResponsiveBar";
 
-export const ResponsiveMenuBarMd = createMetadata({
+export const ResponsiveBarMd = createMetadata({
   status: "stable",
   description:
-    "`ResponsiveMenuBar` provides a horizontal menu that automatically moves overflow " +
+    "`ResponsiveBar` provides a horizontal menu that automatically moves overflow " +
     "items to a dropdown when they don't fit in the available viewport width. " +
     "This pattern is commonly used in application menus (like VS Code's main menu) " +
     "to maintain usability across different screen sizes while preserving access " +
@@ -26,14 +26,14 @@ export const ResponsiveMenuBarMd = createMetadata({
       description:
         `This property defines the icon to display on the overflow dropdown button. ` +
         `You can change the default icon for all ${RMCOMP} instances with the ` +
-        `"icon.overflow:ResponsiveMenuBar" declaration in the app configuration file.`,
-      defaultValue: defaultResponsiveMenuProps.overflowIcon,
+        `"icon.overflow:ResponsiveBar" declaration in the app configuration file.`,
+      defaultValue: defaultResponsiveBarProps.overflowIcon,
       valueType: "string",
     },
     overflowLabel: {
       description:
         `This property defines the accessible label for the overflow dropdown button.`,
-      defaultValue: defaultResponsiveMenuProps.overflowLabel,
+      defaultValue: defaultResponsiveBarProps.overflowLabel,
       valueType: "string",
     },
   },
@@ -46,40 +46,40 @@ export const ResponsiveMenuBarMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`backgroundColor-${RMCOMP}`]: "$color-surface",
+    [`backgroundColor-${RMCOMP}`]: "transparent",
     [`borderColor-${RMCOMP}`]: "$borderColor-subtle",
     [`borderWidth-${RMCOMP}`]: "0",
     [`borderStyle-${RMCOMP}`]: "solid",
-    [`padding-${RMCOMP}`]: "$space-2 $space-3",
+    [`padding-${RMCOMP}`]: "0",
     [`gap-${RMCOMP}`]: "$space-1",
     
-    [`backgroundColor-ResponsiveMenuItem`]: "transparent",
-    [`color-ResponsiveMenuItem`]: "$textColor-primary",
-    [`fontFamily-ResponsiveMenuItem`]: "$fontFamily",
-    [`fontSize-ResponsiveMenuItem`]: "$fontSize-small",
-    [`fontWeight-ResponsiveMenuItem`]: "$fontWeight-medium",
-    [`padding-ResponsiveMenuItem`]: "$space-1 $space-2",
-    [`borderRadius-ResponsiveMenuItem`]: "$borderRadius-sm",
-    [`gap-ResponsiveMenuItem`]: "$space-1",
+    [`backgroundColor-ResponsiveBarItem`]: "transparent",
+    [`color-ResponsiveBarItem`]: "$textColor-primary",
+    [`fontFamily-ResponsiveBarItem`]: "$fontFamily",
+    [`fontSize-ResponsiveBarItem`]: "$fontSize-small",
+    [`fontWeight-ResponsiveBarItem`]: "$fontWeight-medium",
+    [`padding-ResponsiveBarItem`]: "0",
+    [`borderRadius-ResponsiveBarItem`]: "$borderRadius-sm",
+    [`gap-ResponsiveBarItem`]: "$space-1",
     
-    [`backgroundColor-ResponsiveMenuItem--hover`]: "$backgroundColor-action--hover",
-    [`color-ResponsiveMenuItem--hover`]: "$textColor-primary",
-    [`backgroundColor-ResponsiveMenuItem--active`]: "$backgroundColor-action--active",
-    [`color-ResponsiveMenuItem--active`]: "$color-primary",
-    [`color-ResponsiveMenuItem--disabled`]: "$textColor--disabled",
+    [`backgroundColor-ResponsiveBarItem--hover`]: "$backgroundColor-action--hover",
+    [`color-ResponsiveBarItem--hover`]: "$textColor-primary",
+    [`backgroundColor-ResponsiveBarItem--active`]: "$backgroundColor-action--active",
+    [`color-ResponsiveBarItem--active`]: "$color-primary",
+    [`color-ResponsiveBarItem--disabled`]: "$textColor--disabled",
   },
 });
 
-export const responsiveMenuBarComponentRenderer = createComponentRenderer(
+export const responsiveBarComponentRenderer = createComponentRenderer(
   RMCOMP,
-  ResponsiveMenuBarMd,
+  ResponsiveBarMd,
   ({ node, extractValue, renderChild, registerComponentApi, layoutCss }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
 
     return (
-      <ResponsiveMenu
+      <ResponsiveBar
         registerComponentApi={registerComponentApi}
         style={layoutCss}
         overflowIcon={extractValue(node.props?.overflowIcon)}
@@ -92,13 +92,13 @@ export const responsiveMenuBarComponentRenderer = createComponentRenderer(
             }
             
             return (
-              <ResponsiveMenuItem>
+              <ResponsiveBarItem>
                 {renderedChild}
-              </ResponsiveMenuItem>
+              </ResponsiveBarItem>
             );
           },
         })}
-      </ResponsiveMenu>
+      </ResponsiveBar>
     );
   },
 );

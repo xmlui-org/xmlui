@@ -1,6 +1,6 @@
 %-DESC-START
 
-`ResponsiveMenuItem` represents individual clickable items within a `ResponsiveMenu`. Each menu item can display text, icons, and respond to clicks. When the menu overflows, these items are automatically moved to the dropdown menu while maintaining their functionality and appearance.
+`ResponsiveMenuItem` represents individual clickable items within a `ResponsiveBar`. Each menu item can display text, icons, and respond to clicks. When the menu overflows, these items are automatically moved to the dropdown menu while maintaining their functionality and appearance.
 
 **Key features:**
 - **Consistent behavior**: Works the same whether visible or in overflow dropdown
@@ -11,12 +11,12 @@
 ```xmlui-pg copy display name="Example: Using ResponsiveMenuItem" height="240px"
 ---app copy display
 <App>
-  <ResponsiveMenu>
+  <ResponsiveBar>
     <ResponsiveMenuItem label="File" icon="file" />
     <ResponsiveMenuItem label="Edit" icon="edit" active />
     <ResponsiveMenuItem label="View" icon="eye" />
     <ResponsiveMenuItem label="Disabled" enabled={false} />
-  </ResponsiveMenu>
+  </ResponsiveBar>
 </App>
 ---desc
 Try clicking on the menu items and resizing to see overflow behavior:
@@ -30,12 +30,12 @@ You can add icons to menu items to improve visual recognition:
 
 ```xmlui-pg copy display name="Example: icon" height="240px"
 <App>
-  <ResponsiveMenu>
+  <ResponsiveBar>
     <ResponsiveMenuItem label="New File" icon="file-plus" />
     <ResponsiveMenuItem label="Open" icon="folder-open" />
     <ResponsiveMenuItem label="Save" icon="save" />
     <ResponsiveMenuItem label="Settings" icon="settings" />
-  </ResponsiveMenu>
+  </ResponsiveBar>
 </App>
 ```
 
@@ -47,12 +47,12 @@ Use the active property to indicate the current or selected menu item:
 
 ```xmlui-pg copy display name="Example: active" height="240px"
 <App>
-  <ResponsiveMenu>
+  <ResponsiveBar>
     <ResponsiveMenuItem label="Explorer" />
     <ResponsiveMenuItem label="Search" />
     <ResponsiveMenuItem label="Source Control" active />
     <ResponsiveMenuItem label="Extensions" />
-  </ResponsiveMenu>
+  </ResponsiveBar>
 </App>
 ```
 
