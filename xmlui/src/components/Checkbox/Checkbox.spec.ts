@@ -1,4 +1,4 @@
-import { getBounds, isIndeterminate } from "../../testing/component-test-helpers";
+import { getBounds, isIndeterminate, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -19,6 +19,33 @@ test.describe("Basic Functionality", () => {
   test("initialValue sets checked state", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox initialValue="true" />`);
     await expect(page.getByRole("checkbox")).toBeChecked();
+  });
+
+  ["yes", 1].forEach((value) => {
+    test.fixme(
+      `initialValue accepts as string value: ${value}`,
+      SKIP_REASON.UNSURE("These shouldn't work"),
+      async ({ initTestBed, page }) => {
+        await initTestBed(`<Checkbox initialValue="${value}" />`);
+        await expect(page.getByRole("checkbox")).not.toBeChecked();
+      },
+    );
+  });
+
+  ["yes", 1, {}, { a: "b" }, [], [1, 2]].forEach((value) => {
+    test.fixme(
+      `initialValue does not accepts value: ${JSON.stringify(value)}`,
+      SKIP_REASON.XMLUI_BUG("Inconsistent behaviour and inconsistent error messages"),
+      async ({ initTestBed, page }) => {
+        await initTestBed(`<Checkbox initialValue="{${value}}" />`);
+        await expect(page.getByRole("checkbox")).not.toBeAttached();
+      },
+    );
+  });
+
+  test("initialValue accepts empty as false", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox initialValue="" />`);
+    await expect(page.getByRole("checkbox")).not.toBeChecked();
   });
 
   test("initialValue=false sets unchecked state", async ({ initTestBed, page }) => {
@@ -377,6 +404,18 @@ test.describe("Custom inputTemplate", () => {
     await expect(page.getByRole("button")).toBeVisible();
   });
 
+  test.fixme(
+    "inputTemplate without <property>",
+    SKIP_REASON.XMLUI_BUG("Component throws error"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+      <Checkbox>
+        <Button/>
+      </Checkbox>`);
+      await expect(page.getByRole("button")).toBeVisible();
+    },
+  );
+
   test("inputTemplate fires didChange event", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Checkbox onDidChange="testState = 'custom-changed'">
@@ -426,6 +465,39 @@ test.describe("Custom inputTemplate", () => {
     await page.getByTestId("inner").click();
     await expect(page.getByRole("checkbox")).not.toBeChecked();
     await expect(page.getByTestId("inner")).toContainText("false");
+  });
+
+  test("$checked has no meaning outside component", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Checkbox initialValue="true">
+          <property name="inputTemplate">
+            <Button testId="inner" label="{$checked}" />
+          </property>
+        </Checkbox>
+        <Button testId="outer" label="{$checked}" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("inner")).toContainText("true");
+    await expect(page.getByTestId("outer")).toContainText("");
+  });
+
+  test("$setChecked has no meaning outside component", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Checkbox initialValue="true">
+          <property name="inputTemplate">
+            <Button testId="inner" label="{$checked}" />
+          </property>
+        </Checkbox>
+        <Button testId="outer" onClick="() => $setChecked(!$checked)" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("inner")).toContainText("true");
+    await expect(page.getByTestId("outer")).toContainText("");
+    await page.getByTestId("outer").click();
+    await expect(page.getByTestId("inner")).toContainText("true");
+    await expect(page.getByTestId("outer")).toContainText("");
   });
 
   test("inputTemplate didChange event", async ({ initTestBed, page }) => {
