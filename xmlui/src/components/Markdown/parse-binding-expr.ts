@@ -9,22 +9,37 @@ import { T_ARROW_EXPRESSION } from "../../components-core/script-runner/Scriptin
  * @returns the parsed text with resolved binding expressions
  */
 export function parseBindingExpression(text: string, extractValue: ValueExtractor) {
-  // Remove empty @{} expressions first
-  text = text.replaceAll(/(?<!\\)\@\{\s*\}/g, "");
+  // Remove empty @{} expressions first - Safari/Edge compatible version
+  text = text.replaceAll(/(^|[^\\])\@\{\s*\}/g, "$1");
 
-  // The (?<!\\) is a "negative lookbehind" in regex that ensures that
-  // if escaping the @{...} expression like this: \@{...}, we don't match it
-  const regex = /(?<!\\)\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
-  const result = text.replace(regex, (_, expr) => {
-    const extracted = extractValue(`{${expr}}`);
-    const resultExpr = mapByType(extracted);
-    // The result expression might be an object, in that case we stringify it here,
-    // at the last step, so that there are no unnecessary apostrophes
-    return typeof resultExpr === "object" && resultExpr !== null
-      ? JSON.stringify(resultExpr)
-      : resultExpr;
-  });
-  return result;
+  // Safari/Edge compatible iterative processing to handle adjacent bindings
+  // Process content bindings one at a time to avoid position conflicts
+  let previousText = "";
+  let iterations = 0;
+  while (text !== previousText && iterations < 100) { // Safety limit
+    previousText = text;
+    iterations++;
+
+    // Match first non-escaped @{...} with nested braces support
+    const match = text.match(/(^|[^\\])(\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\})/);
+    if (match) {
+      const fullMatch = match[0];
+      const prefix = match[1];
+      const expr = match[3];
+
+      const extracted = extractValue(`{${expr}}`);
+      const resultExpr = mapByType(extracted);
+      const replacement = typeof resultExpr === "object" && resultExpr !== null
+        ? JSON.stringify(resultExpr)
+        : resultExpr;
+
+      text = text.replace(fullMatch, prefix + replacement);
+    } else {
+      break; // No more matches
+    }
+  }
+
+  return text;
 
   // ---
 
