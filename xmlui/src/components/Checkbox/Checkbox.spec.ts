@@ -1,4 +1,4 @@
-import { getBounds, isIndeterminate, getElementStyle, SKIP_REASON, getPseudoElementStyle } from "../../testing/component-test-helpers";
+import { getBounds, isIndeterminate } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -183,6 +183,14 @@ test.describe("Accessibility", () => {
   test("required has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox required="{true}" />`);
     await expect(page.getByRole("checkbox")).toHaveAttribute("aria-required", "true");
+  });
+
+  test("required state has visual representation next to label", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(`<Checkbox required="{true}" label="test" />`);
+    await expect((await createCheckboxDriver()).requiredIndicator).toBeVisible();
   });
 
   test("component disabled has proper ARIA attributes", async ({ initTestBed, page }) => {
@@ -437,7 +445,7 @@ test.describe("Custom inputTemplate", () => {
 // THEME VARIABLE TESTS
 // =============================================================================
 
-test.describe("Theme variables", () => {
+test.describe("Theme Vars", () => {
   test("checked borderColor", async ({ initTestBed, page }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     await initTestBed(`<Checkbox initialValue="true" />`, {
@@ -539,6 +547,60 @@ test.describe("Theme variables", () => {
     });
     await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
   });
+
+  test("borderRadius", async ({ initTestBed, page }) => {
+    const CUSTOM_BORDER_RADIUS = "10px";
+    await initTestBed(`<Checkbox />`, {
+      testThemeVars: {
+        "borderRadius-Checkbox": CUSTOM_BORDER_RADIUS,
+      },
+    });
+    await expect(page.getByRole("checkbox")).toHaveCSS("border-radius", CUSTOM_BORDER_RADIUS);
+  });
+
+  test("outlineWidth on focus", async ({ initTestBed, page }) => {
+    const CUSTOM_OUTLINE_WIDTH = "10px";
+    await initTestBed(`<Checkbox />`, {
+      testThemeVars: {
+        "outlineWidth-Checkbox": CUSTOM_OUTLINE_WIDTH,
+      },
+    });
+    await page.getByRole("checkbox").focus();
+    await expect(page.getByRole("checkbox")).toHaveCSS("outline-width", CUSTOM_OUTLINE_WIDTH);
+  });
+
+  test("outlineColor on focus", async ({ initTestBed, page }) => {
+    const CUSTOM_OUTLINE_COLOR = "rgb(255, 0, 0)";
+    await initTestBed(`<Checkbox />`, {
+      testThemeVars: {
+        "outlineColor-Checkbox": CUSTOM_OUTLINE_COLOR,
+      },
+    });
+    await page.getByRole("checkbox").focus();
+    await expect(page.getByRole("checkbox")).toHaveCSS("outline-color", CUSTOM_OUTLINE_COLOR);
+  });
+
+  test("outlineOffset on focus", async ({ initTestBed, page }) => {
+    const CUSTOM_OUTLINE_OFFSET = "10px";
+    await initTestBed(`<Checkbox />`, {
+      testThemeVars: {
+        "outlineOffset-Checkbox": CUSTOM_OUTLINE_OFFSET,
+      },
+    });
+    await page.getByRole("checkbox").focus();
+    await expect(page.getByRole("checkbox")).toHaveCSS("outline-offset", CUSTOM_OUTLINE_OFFSET);
+  });
+
+  test("outlineStyle on focus", async ({ initTestBed, page }) => {
+    const CUSTOM_OUTLINE_STYLE = "dotted";
+    await initTestBed(`<Checkbox />`, {
+      testThemeVars: {
+        "outlineStyle-Checkbox": CUSTOM_OUTLINE_STYLE,
+      },
+    });
+    await page.getByRole("checkbox").focus();
+    await expect(page.getByRole("checkbox")).toHaveCSS("outline-style", CUSTOM_OUTLINE_STYLE);
+  });
 });
 
 // =============================================================================
@@ -546,110 +608,56 @@ test.describe("Theme variables", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  /* test(
-    "validationStatus=error shows error styling",
-    async ({ initTestBed, page }) => {
-      const EXPECTED_COLOR = "rgb(255, 0, 0)";
-      await initTestBed(`<Checkbox validationStatus="error" />`, {
-        testThemeVars: {
-          "backgroundColor-Checkbox-error": EXPECTED_COLOR,
-          "borderColor-Checkbox-error": EXPECTED_COLOR,
-        },
-      });
-      await expect(driver.component).toHaveClass(/error/);
-  }); */
-  /* test.skip(
-    "component validationStatus=error shows error styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox validationStatus="error" />`);
-      const driver = await createCheckboxDriver();
-      await expect(driver.component).toHaveClass(/error/);
-    },
-  );
+  test(`validationStatus=error correctly displayed`, async ({ initTestBed, page }) => {
+    const validationLevel = "error";
+    const EXPECTED_COLOR = "rgb(255, 0, 0)";
+    await initTestBed(`<Checkbox validationStatus="${validationLevel}" />`, {
+      testThemeVars: {
+        [`backgroundColor-Checkbox-${validationLevel}`]: EXPECTED_COLOR,
+        [`borderColor-Checkbox-${validationLevel}`]: EXPECTED_COLOR,
+      },
+    });
+    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
+    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
+  });
 
-  test.skip(
-    "checked component validationStatus=error shows error styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {},
-  );
+  test(`validationStatus=warning correctly displayed`, async ({ initTestBed, page }) => {
+    const validationLevel = "warning";
+    const EXPECTED_COLOR = "rgb(255, 0, 0)";
+    await initTestBed(`<Checkbox validationStatus="${validationLevel}" />`, {
+      testThemeVars: {
+        [`backgroundColor-Checkbox-${validationLevel}`]: EXPECTED_COLOR,
+        [`borderColor-Checkbox-${validationLevel}`]: EXPECTED_COLOR,
+      },
+    });
+    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
+    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
+  });
 
-  test.skip(
-    "component validationStatus=warning shows warning styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox validationStatus="warning" />`);
-      const driver = await createCheckboxDriver();
-      await expect(driver.component).toHaveClass(/warning/);
-    },
-  );
+  test(`validationStatus=valid correctly displayed`, async ({ initTestBed, page }) => {
+    const EXPECTED_COLOR = "rgb(255, 0, 0)";
+    await initTestBed(`<Checkbox validationStatus="valid" />`, {
+      testThemeVars: {
+        [`backgroundColor-Checkbox-success`]: EXPECTED_COLOR,
+        [`borderColor-Checkbox-success`]: EXPECTED_COLOR,
+      },
+    });
+    await expect(page.getByRole("checkbox")).toHaveCSS("background-color", EXPECTED_COLOR);
+    await expect(page.getByRole("checkbox")).toHaveCSS("border-color", EXPECTED_COLOR);
+  });
 
-  test.skip(
-    "checked component validationStatus=warning shows error styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {},
-  );
-
-  test.skip(
-    "component validationStatus=valid shows valid styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox validationStatus="valid" />`);
-      const driver = await createCheckboxDriver();
-      await expect(driver.component).toHaveClass(/valid/);
-    },
-  );
-
-  test.skip(
-    "checked component validationStatus=valid shows error styling",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {},
-  );
-
-  test.skip(
-    "component handles invalid validationStatus gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Fix implementation"),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      // Test that component handles invalid validationStatus without crashing
-      await initTestBed(`<Checkbox validationStatus="invalid" />`);
-      const driver = await createCheckboxDriver();
-      await expect(driver.component).toBeVisible();
-      // Should not have any validation classes for invalid status
-      await expect(driver.component).not.toHaveClass(/error/);
-      await expect(driver.component).not.toHaveClass(/warning/);
-      await expect(driver.component).not.toHaveClass(/valid/);
-    },
-  ); */
-
-  /* test.skip(
-    "component validation status maintains functionality",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      // TODO: Fix selector issue - driver.input is not finding the checkbox input correctly
-      await initTestBed(`<Checkbox validationStatus="error" label="Error checkbox" />`);
-      const driver = await createCheckboxDriver();
-
-      // Component should still be functional despite error status
-      await expect(driver.component).toBeVisible();
-      await expect(driver.input).not.toBeChecked();
-
-      // Should still be clickable
-      await driver.input.click();
-      await expect(driver.input).toBeChecked();
-    },
-  );
-
-  test.skip(
-    "component validation status with required state",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createCheckboxDriver }) => {
-      await initTestBed(`<Checkbox validationStatus="error" required="{true}" />`);
-      const driver = await createCheckboxDriver();
-
-      await expect(driver.component).toHaveClass(/error/);
-      await expect(driver.input).toHaveAttribute("required");
-    },
-  ); */
+  test("handles invalid validationStatus gracefully", async ({ initTestBed, page }) => {
+    const validationLevel = "invalid";
+    const NOT_EXPECTED_COLOR = "rgb(255, 0, 0)";
+    await initTestBed(`<Checkbox validationStatus="${validationLevel}" />`, {
+      testThemeVars: {
+        [`backgroundColor-Checkbox-${validationLevel}`]: NOT_EXPECTED_COLOR,
+        [`borderColor-Checkbox-${validationLevel}`]: NOT_EXPECTED_COLOR,
+      },
+    });
+    await expect(page.getByRole("checkbox")).not.toHaveCSS("background-color", NOT_EXPECTED_COLOR);
+    await expect(page.getByRole("checkbox")).not.toHaveCSS("border-color", NOT_EXPECTED_COLOR);
+  });
 });
 
 // =============================================================================

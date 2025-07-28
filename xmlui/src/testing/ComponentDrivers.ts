@@ -77,6 +77,10 @@ export class InputComponentDriver extends ComponentDriver {
   get placeholder() {
     return this.field.getAttribute("placeholder");
   }
+
+  get requiredIndicator() {
+    return this.component.getByText("*");
+  }
 }
 
 export class TestStateDriver {
