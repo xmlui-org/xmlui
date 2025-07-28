@@ -4,9 +4,7 @@ import { test, expect } from "../../testing/fixtures";
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test.skip("component renders with default value", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component renders with default value", async ({ page, initTestBed }) => {
   await initTestBed(`<ColorPicker />`, {});
   
   // Check that the component is visible
@@ -16,32 +14,34 @@ test.skip("component renders with default value", async ({ page, initTestBed }) 
   await expect(page.locator("input[type='color']")).toHaveValue("#000000");
 });
 
-test.skip("component updates when value changes", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<ColorPicker initialValue="#FF0000" />`, {});
+test("component updates when value changes", async ({ page, initTestBed }) => {
+  const COLOR_1 = "#ff0000"; // Red
+  const COLOR_2 = "#00ff00"; // Green
+
+  await initTestBed(`<ColorPicker initialValue="${COLOR_1}" />`, {});
   
   // Check that the initial color is set correctly
   const colorInput = page.locator("input[type='color']");
-  await expect(colorInput).toHaveValue("#FF0000");
+  await expect(colorInput).toHaveValue(COLOR_1);
   
   // Change the color
-  await colorInput.fill("#00FF00");
-  await expect(colorInput).toHaveValue("#00FF00");
+  await colorInput.fill(COLOR_2); // Green
+  await expect(colorInput).toHaveValue(COLOR_2);
 });
 
 test.skip("component fires didChange event when color is selected", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+  const COLOR_1 = "#ff0000"; // Red
+  const COLOR_2 = "#00ff00"; // Green
+
   const { testStateDriver } = await initTestBed(`
-    <ColorPicker initialValue="#FF0000" didChange="testState = $event" />
+    <ColorPicker initialValue="${COLOR_1}" didChange="testState = $event" />
   `, {});
   
   // Change the color
-  await page.locator("input[type='color']").fill("#00FF00");
+  await page.locator("input[type='color']").fill(COLOR_2);
   
   // Check that the event fired with the new color value
-  await expect.poll(() => testStateDriver.testState).toEqual("#00FF00");
+  await expect.poll(() => testStateDriver.testState()).toEqual(COLOR_2);
 });
 
 test.skip("component applies label correctly", async ({ page, initTestBed }) => {

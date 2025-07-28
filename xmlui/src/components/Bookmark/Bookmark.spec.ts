@@ -4,7 +4,7 @@ import { test, expect } from "../../testing/fixtures";
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test.skip("component renders with default props", async ({ page, initTestBed }) => {
+test("component renders with default props", async ({ page, initTestBed }) => {
   // TODO: review these Copilot-created tests
   
   await initTestBed(`<Bookmark>Content</Bookmark>`, {});
