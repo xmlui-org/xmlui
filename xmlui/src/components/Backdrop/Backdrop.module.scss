@@ -7,6 +7,9 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$backgroundColor-Backdrop: createThemeVar("backgroundColor-Backdrop");
+$opacity-Backdrop: createThemeVar("opacity-Backdrop");
+
 .backdropContainer {
   position: relative;
   display: inline-block;
@@ -18,6 +21,8 @@ $themeVars: ();
   left: 0;
   width: 100%;
   height: 100%;
+  background-color: $backgroundColor-Backdrop;
+  opacity: $opacity-Backdrop;
 }
 
 .overlay {

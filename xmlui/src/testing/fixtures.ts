@@ -49,7 +49,8 @@ import {
   DatePickerDriver, AutoCompleteDriver,
   CodeBlockDriver,
   CheckboxDriver,
-  LabelDriver
+  LabelDriver,
+  BackdropDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -198,6 +199,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createButtonDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(ButtonDriver, testIdOrLocator);
+    });
+  },
+  createBackdropDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(BackdropDriver, testIdOrLocator);
     });
   },
   createAvatarDriver: async ({ createDriver }, use) => {
@@ -420,6 +426,7 @@ type TestDriverExtenderProps = {
     testIdOrLocator?: string | Locator,
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
+  createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;
   createFormItemDriver: ComponentDriverMethod<FormItemDriver>;

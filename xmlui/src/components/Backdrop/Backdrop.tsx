@@ -3,7 +3,7 @@ import styles from "./Backdrop.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
-import { Backdrop, defaultProps } from "./BackdropNative";
+import { Backdrop } from "./BackdropNative";
 
 const COMP = "Backdrop";
 
@@ -22,15 +22,17 @@ export const BackdropMd = createMetadata({
     backgroundColor: {
       description: "The background color of the backdrop.",
       valueType: "string",
-      defaultValue: defaultProps.backgroundColor,
     },
     opacity: {
       description: "The opacity of the backdrop.",
       valueType: "string",
-      defaultValue: defaultProps.opacity,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "black",
+    [`opacity-${COMP}`]: "0.1",
+  }
 });
 
 export const backdropComponentRenderer = createComponentRenderer(
@@ -41,8 +43,8 @@ export const backdropComponentRenderer = createComponentRenderer(
       <Backdrop
         style={layoutCss}
         overlayTemplate={renderChild(node.props?.overlayTemplate)}
-        backgroundColor={extractValue.asOptionalString(node.props.backgroundColor)}
-        opacity={extractValue.asString(node.props.opacity)}
+        backgroundColor={extractValue.asOptionalString(node.props.backgroundColor, undefined)}
+        opacity={extractValue.asOptionalString(node.props.opacity, undefined)}
       >
         {renderChild(node.children)}
       </Backdrop>
