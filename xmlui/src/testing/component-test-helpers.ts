@@ -109,10 +109,17 @@ export async function isElementOverflown(locator: Locator, direction: "x" | "y" 
   return scrollWidth > width && scrollHeight > height;
 }
 
-export async function getElementStyle(locator: Locator, style: string) {
-  return locator.evaluate(
+export async function getElementStyle(specifier: Locator, style: string) {
+  return specifier.evaluate(
     (element, style) => window.getComputedStyle(element).getPropertyValue(style),
     style,
+  );
+}
+
+export async function getPseudoElementStyle(specifier: Locator, pseudoElement: string, style: string) {
+  return specifier.evaluate(
+    (element, obj) => window.getComputedStyle(element, obj.pseudoElement).getPropertyValue(obj.style),
+    {style, pseudoElement},
   );
 }
 
