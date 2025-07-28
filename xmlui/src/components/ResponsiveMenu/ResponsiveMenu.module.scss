@@ -1,0 +1,119 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-ResponsiveMenu: createThemeVar("backgroundColor-ResponsiveMenu");
+$borderColor-ResponsiveMenu: createThemeVar("borderColor-ResponsiveMenu");
+$borderWidth-ResponsiveMenu: createThemeVar("borderWidth-ResponsiveMenu");
+$borderStyle-ResponsiveMenu: createThemeVar("borderStyle-ResponsiveMenu");
+$padding-ResponsiveMenu: createThemeVar("padding-ResponsiveMenu");
+$gap-ResponsiveMenu: createThemeVar("gap-ResponsiveMenu");
+
+$backgroundColor-ResponsiveMenuItem: createThemeVar("backgroundColor-ResponsiveMenuItem");
+$color-ResponsiveMenuItem: createThemeVar("color-ResponsiveMenuItem");
+$fontFamily-ResponsiveMenuItem: createThemeVar("fontFamily-ResponsiveMenuItem");
+$fontSize-ResponsiveMenuItem: createThemeVar("fontSize-ResponsiveMenuItem");
+$fontWeight-ResponsiveMenuItem: createThemeVar("fontWeight-ResponsiveMenuItem");
+$padding-ResponsiveMenuItem: createThemeVar("padding-ResponsiveMenuItem");
+$borderRadius-ResponsiveMenuItem: createThemeVar("borderRadius-ResponsiveMenuItem");
+$gap-ResponsiveMenuItem: createThemeVar("gap-ResponsiveMenuItem");
+
+$backgroundColor-ResponsiveMenuItem--hover: createThemeVar("backgroundColor-ResponsiveMenuItem--hover");
+$color-ResponsiveMenuItem--hover: createThemeVar("color-ResponsiveMenuItem--hover");
+$backgroundColor-ResponsiveMenuItem--active: createThemeVar("backgroundColor-ResponsiveMenuItem--active");
+$color-ResponsiveMenuItem--active: createThemeVar("color-ResponsiveMenuItem--active");
+$color-ResponsiveMenuItem--disabled: createThemeVar("color-ResponsiveMenuItem--disabled");
+
+.ResponsiveMenu {
+  display: flex;
+  align-items: center;
+  background-color: $backgroundColor-ResponsiveMenu;
+  border: $borderWidth-ResponsiveMenu $borderStyle-ResponsiveMenu $borderColor-ResponsiveMenu;
+  padding: $padding-ResponsiveMenu;
+  gap: $gap-ResponsiveMenu;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.VisibleItems {
+  display: flex;
+  align-items: center;
+  gap: $gap-ResponsiveMenu;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0; // Allow flex items to shrink below content size
+}
+
+.MenuItem {
+  flex-shrink: 0; // Prevent individual menu items from shrinking
+}
+
+.OverflowContainer {
+  flex-shrink: 0; // Prevent overflow button from shrinking
+  margin-left: auto; // Push to the right
+}
+
+.ResponsiveMenuItem {
+  display: flex;
+  align-items: center;
+  gap: $gap-ResponsiveMenuItem;
+  padding: $padding-ResponsiveMenuItem;
+  background-color: $backgroundColor-ResponsiveMenuItem;
+  color: $color-ResponsiveMenuItem;
+  font-family: $fontFamily-ResponsiveMenuItem;
+  font-size: $fontSize-ResponsiveMenuItem;
+  font-weight: $fontWeight-ResponsiveMenuItem;
+  border: none;
+  border-radius: $borderRadius-ResponsiveMenuItem;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(.disabled) {
+    background-color: $backgroundColor-ResponsiveMenuItem--hover;
+    color: $color-ResponsiveMenuItem--hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-ResponsiveMenuItem--active;
+    outline-offset: 1px;
+  }
+
+  &.active {
+    background-color: $backgroundColor-ResponsiveMenuItem--active;
+    color: $color-ResponsiveMenuItem--active;
+  }
+
+  &.disabled {
+    color: $color-ResponsiveMenuItem--disabled;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.Icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.Label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

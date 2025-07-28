@@ -93,6 +93,10 @@ import {
   menuSeparatorRenderer,
   subMenuItemRenderer,
 } from "./DropdownMenu/DropdownMenu";
+import {
+  responsiveMenuComponentRenderer,
+  responsiveMenuItemRenderer,
+} from "./ResponsiveMenu/ResponsiveMenu";
 import { expandableItemComponentRenderer } from "./ExpandableItem/ExpandableItem";
 import { themeComponentRenderer } from "./Theme/Theme";
 import { merge } from "lodash-es";
@@ -551,6 +555,8 @@ export class ComponentRegistry {
       this.registerCoreComponent(menuItemRenderer);
       this.registerCoreComponent(subMenuItemRenderer);
       this.registerCoreComponent(menuSeparatorRenderer);
+      this.registerCoreComponent(responsiveMenuComponentRenderer);
+      this.registerCoreComponent(responsiveMenuItemRenderer);
       this.registerCoreComponent(expandableItemComponentRenderer);
       this.registerCoreComponent(tabsComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);
