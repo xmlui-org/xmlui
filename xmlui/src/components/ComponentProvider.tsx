@@ -94,8 +94,7 @@ import {
   subMenuItemRenderer,
 } from "./DropdownMenu/DropdownMenu";
 import {
-  responsiveMenuComponentRenderer,
-  responsiveMenuItemRenderer,
+  responsiveMenuBarComponentRenderer,
 } from "./ResponsiveMenu/ResponsiveMenu";
 import { expandableItemComponentRenderer } from "./ExpandableItem/ExpandableItem";
 import { themeComponentRenderer } from "./Theme/Theme";
@@ -555,8 +554,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(menuItemRenderer);
       this.registerCoreComponent(subMenuItemRenderer);
       this.registerCoreComponent(menuSeparatorRenderer);
-      this.registerCoreComponent(responsiveMenuComponentRenderer);
-      this.registerCoreComponent(responsiveMenuItemRenderer);
+      this.registerCoreComponent(responsiveMenuBarComponentRenderer);
       this.registerCoreComponent(expandableItemComponentRenderer);
       this.registerCoreComponent(tabsComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);

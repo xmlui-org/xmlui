@@ -4,7 +4,7 @@ import classnames from "classnames";
 import styles from "./ResponsiveMenu.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import { DropdownMenu, MenuItem, MenuSeparator } from "../DropdownMenu/DropdownMenuNative";
+import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
 
@@ -256,39 +256,22 @@ export const ResponsiveMenu = forwardRef(function ResponsiveMenu(
 // Helper component for responsive menu items
 type ResponsiveMenuItemProps = {
   children?: ReactNode;
-  label?: string;
-  onClick?: () => void;
-  icon?: ReactNode;
-  active?: boolean;
-  enabled?: boolean;
   className?: string;
 };
 
 export const ResponsiveMenuItem = forwardRef(function ResponsiveMenuItem(
   {
     children,
-    label,
-    onClick,
-    icon,
-    active = false,
-    enabled = true,
     className,
   }: ResponsiveMenuItemProps,
   ref,
 ) {
   return (
-    <button
+    <div
       ref={ref as any}
-      className={classnames(styles.ResponsiveMenuItem, className, {
-        [styles.active]: active,
-        [styles.disabled]: !enabled,
-      })}
-      onClick={enabled ? onClick : undefined}
-      disabled={!enabled}
-      type="button"
+      className={classnames(styles.ResponsiveMenuItem, className)}
     >
-      {icon && <span className={styles.Icon}>{icon}</span>}
-      <span className={styles.Label}>{label || children}</span>
-    </button>
+      {children}
+    </div>
   );
 });

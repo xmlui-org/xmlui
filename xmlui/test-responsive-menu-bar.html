@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResponsiveMenuBar Test</title>
+    <link rel="stylesheet" href="./dist/lib/index.css">
+    <style>
+        body { margin: 0; padding: 20px; font-family: system-ui; }
+        .container { width: 400px; border: 2px solid #0066cc; padding: 10px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>ResponsiveMenuBar Test</h1>
+    <p>This test shows the new ResponsiveMenuBar component that automatically wraps children as menu items.</p>
+    
+    <div class="container">
+        <XMLUI>
+            <ResponsiveMenuBar>
+                <Button label="File" />
+                <Button label="Edit" />
+                <Button label="View" />
+                <Button label="Selection" />
+                <Button label="Go" />
+                <Button label="Run" />
+                <Button label="Terminal" />
+                <Button label="Help" />
+                <Button label="Window" />
+                <Button label="Debug" />
+                <Button label="Extensions" />
+                <Button label="Settings" />
+            </ResponsiveMenuBar>
+        </XMLUI>
+    </div>
+    
+    <p>Try resizing the browser window to see the overflow behavior!</p>
+    
+    <script type="module">
+        import { initXmlUi } from './dist/lib/index-DaiVy3EO.mjs';
+        
+        initXmlUi().then(() => {
+            console.log('XMLUI initialized with lightweight ResponsiveMenuBar component');
+        });
+    </script>
+</body>
+</html>

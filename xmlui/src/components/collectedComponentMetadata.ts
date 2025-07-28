@@ -49,6 +49,7 @@ import { QueueMd } from "./Queue/Queue";
 import { RadioGroupMd } from "./RadioGroup/RadioGroup";
 import { RealTimeAdapterMd } from "./RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "./Redirect/Redirect";
+import { ResponsiveMenuBarMd } from "./ResponsiveMenu/ResponsiveMenu";
 import { SelectMd } from "./Select/Select";
 import { SelectionStoreMd } from "./SelectionStore/SelectionStore";
 import { SpaceFillerMd } from "./SpaceFiller/SpaceFiller";
@@ -370,6 +371,7 @@ export const collectedComponentMetadata = {
   RadioGroup: RadioGroupMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
+  ResponsiveMenuBar: ResponsiveMenuBarMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
   Slider: SliderMd,

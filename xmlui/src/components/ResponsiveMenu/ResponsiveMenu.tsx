@@ -2,30 +2,31 @@ import styles from "./ResponsiveMenu.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
-import { Icon } from "../Icon/IconNative";
+import { createMetadata } from "../metadata-helpers";
+import { isComponentDefChildren } from "../../components-core/utils/misc";
+import { NotAComponentDefError } from "../../components-core/EngineError";
 import {
   defaultResponsiveMenuProps,
   ResponsiveMenu,
   ResponsiveMenuItem,
 } from "./ResponsiveMenuNative";
 
-const RMCOMP = "ResponsiveMenu";
+const RMCOMP = "ResponsiveMenuBar";
 
-export const ResponsiveMenuMd = createMetadata({
+export const ResponsiveMenuBarMd = createMetadata({
   status: "stable",
   description:
-    "`ResponsiveMenu` provides a horizontal menu that automatically moves overflow " +
+    "`ResponsiveMenuBar` provides a horizontal menu that automatically moves overflow " +
     "items to a dropdown when they don't fit in the available viewport width. " +
     "This pattern is commonly used in application menus (like VS Code's main menu) " +
     "to maintain usability across different screen sizes while preserving access " +
-    "to all menu items.",
+    "to all menu items. Each child is automatically wrapped as a menu item.",
   props: {
     overflowIcon: {
       description:
         `This property defines the icon to display on the overflow dropdown button. ` +
         `You can change the default icon for all ${RMCOMP} instances with the ` +
-        `"icon.overflow:ResponsiveMenu" declaration in the app configuration file.`,
+        `"icon.overflow:ResponsiveMenuBar" declaration in the app configuration file.`,
       defaultValue: defaultResponsiveMenuProps.overflowIcon,
       valueType: "string",
     },
@@ -69,10 +70,14 @@ export const ResponsiveMenuMd = createMetadata({
   },
 });
 
-export const responsiveMenuComponentRenderer = createComponentRenderer(
+export const responsiveMenuBarComponentRenderer = createComponentRenderer(
   RMCOMP,
-  ResponsiveMenuMd,
+  ResponsiveMenuBarMd,
   ({ node, extractValue, renderChild, registerComponentApi, layoutCss }) => {
+    if (!isComponentDefChildren(node.children)) {
+      throw new NotAComponentDefError();
+    }
+
     return (
       <ResponsiveMenu
         registerComponentApi={registerComponentApi}
@@ -80,61 +85,22 @@ export const responsiveMenuComponentRenderer = createComponentRenderer(
         overflowIcon={extractValue(node.props?.overflowIcon)}
         overflowLabel={extractValue(node.props?.overflowLabel)}
       >
-        {renderChild(node.children)}
+        {renderChild(node.children, {
+          wrapChild: ({ node, extractValue, lookupEventHandler }, renderedChild, hints) => {
+            if (hints?.opaque) {
+              return renderedChild;
+            }
+            
+            return (
+              <ResponsiveMenuItem>
+                {renderedChild}
+              </ResponsiveMenuItem>
+            );
+          },
+        })}
       </ResponsiveMenu>
     );
   },
 );
 
-const RMICOMP = "ResponsiveMenuItem";
 
-export const ResponsiveMenuItemMd = createMetadata({
-  status: "stable",
-  description:
-    "`ResponsiveMenuItem` represents individual items within a ResponsiveMenu. " +
-    "Each item can display text, icons, and respond to clicks. When the menu " +
-    "overflows, these items are automatically moved to the dropdown menu while " +
-    "maintaining their functionality and appearance.",
-  docFolder: RMCOMP,
-  props: {
-    label: dLabel(),
-    icon: {
-      description: `This property names an optional icon to display with the menu item. You can use component-specific icons in the format "iconName:ResponsiveMenuItem".`,
-      valueType: "string",
-    },
-    active: {
-      description: `This property indicates if the specified menu item is active.`,
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    enabled: dEnabled(),
-  },
-  events: {
-    click: dClick(RMICOMP),
-  },
-});
-
-export const responsiveMenuItemRenderer = createComponentRenderer(
-  RMICOMP,
-  ResponsiveMenuItemMd,
-  ({ node, renderChild, lookupEventHandler, extractValue, layoutCss }) => {
-    const clickEventHandler = lookupEventHandler("click");
-
-    return (
-      <ResponsiveMenuItem
-        onClick={clickEventHandler}
-        label={extractValue(node.props?.label)}
-        icon={
-          node.props?.icon && (
-            <Icon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
-          )
-        }
-        active={extractValue.asOptionalBoolean(node.props.active, false)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
-        className={layoutCss ? 'custom-layout' : undefined}
-      >
-        {renderChild(node.children)}
-      </ResponsiveMenuItem>
-    );
-  },
-);
