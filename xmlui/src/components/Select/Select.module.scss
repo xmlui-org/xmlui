@@ -242,7 +242,7 @@ button.selectTrigger {
   position: relative;
   width: 100%;
   max-height: 280px;
-  z-index: 50;
+  z-index: 1000;
   overflow: auto;
   background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
@@ -318,7 +318,7 @@ button.selectTrigger {
 .selectItem {
   position: relative;
   display: flex;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   align-items: center;
   outline: none;
@@ -335,7 +335,7 @@ button.selectTrigger {
   .selectItemContent {
     width: 100%;
     display: flex;
-    cursor: default;
+    cursor: pointer;
     user-select: none;
     align-items: center;
     outline: none;

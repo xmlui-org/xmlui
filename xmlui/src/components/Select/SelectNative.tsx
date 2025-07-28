@@ -172,6 +172,11 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
         })}
+        onClick={(event) => {
+          // Prevent event propagation to parent elements (e.g., DropdownMenu)
+          // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+          event.stopPropagation();
+        }}
         ref={ref}
         autoFocus={autoFocus}
       >
@@ -400,7 +405,12 @@ export const Select = forwardRef(function Select(
                   onBlur={onBlur}
                   disabled={!enabled}
                   aria-expanded={open}
-                  onClick={() => setOpen((prev) => !prev)}
+                  onClick={(event) => {
+                    // Prevent event propagation to parent elements (e.g., DropdownMenu)
+                    // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+                    event.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
                   className={classnames(styles.selectTrigger, styles[validationStatus], {
                     [styles.disabled]: !enabled,
                     [styles.multi]: multiSelect,
@@ -576,6 +586,9 @@ export const ComboboxOption = forwardRef(function Combobox(
         }
         onChange(value);
       }}
+      onClick={(event) => {
+        event.stopPropagation();
+      }}
       data-state={selected ? "checked" : undefined}
       keywords={[...keywords, label]}
     >
@@ -604,6 +617,19 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         className={styles.selectItem}
         value={value + ""}
         disabled={!enabled}
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        onMouseEnter={(event) => {
+          // Ensure hover state is applied even in DropdownMenu context
+          const target = event.currentTarget;
+          target.setAttribute('data-highlighted', '');
+        }}
+        onMouseLeave={(event) => {
+          // Remove hover state when mouse leaves
+          const target = event.currentTarget;
+          target.removeAttribute('data-highlighted');
+        }}
         data-state={selectedValue === value && "checked"}
       >
         <div className={styles.selectItemContent}>
