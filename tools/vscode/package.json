@@ -3,7 +3,7 @@
   "displayName": "xmlui",
   "description": "Language support for XMLUI language",
   "icon": "resources/xmlui-logo.png",
-  "author": "Norbert Hajagos",
+  "author": "Xmlui.org",
   "publisher": "xmlui",
   "license": "MIT",
   "version": "0.9.85",
