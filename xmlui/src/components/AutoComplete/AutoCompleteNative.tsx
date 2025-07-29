@@ -32,7 +32,6 @@ import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { HiddenOption } from "../Select/HiddenOption";
 
 type AutoCompleteProps = {
   id?: string;
@@ -41,7 +40,6 @@ type AutoCompleteProps = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
-  optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
   onDidChange?: (newValue: string | string[]) => void;
@@ -80,7 +78,6 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   required: false,
   validationStatus: "none",
   creatable: false,
-  optionRenderer: defaultRenderer,
   updateState: noop,
   onDidChange: noop,
   onFocus: noop,
@@ -100,7 +97,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
     registerComponentApi,
-    optionRenderer = defaultProps.optionRenderer,
+
     emptyListTemplate,
     style,
     children,
@@ -258,18 +255,17 @@ export const AutoComplete = forwardRef(function AutoComplete(
       multi,
       value,
       onChange: toggleOption,
-      optionRenderer,
       options,
       inputValue,
       open,
       setOpen,
     };
-  }, [inputValue, multi, optionRenderer, options, toggleOption, value, open, setOpen]);
+  }, [inputValue, multi, options, toggleOption, value, open, setOpen]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
-      <OptionTypeProvider Component={HiddenOption}>
-        <OptionContext.Provider value={optionContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
+        <OptionTypeProvider Component={AutoCompleteOption}>
           <ItemWithLabel
             id={inputId}
             ref={forwardedRef}
@@ -435,8 +431,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
             </Popover>
           </ItemWithLabel>
           {children}
-        </OptionContext.Provider>
-      </OptionTypeProvider>
+        </OptionTypeProvider>
+      </OptionContext.Provider>
     </AutoCompleteContext.Provider>
   );
 });
@@ -479,9 +475,10 @@ function CreatableItem() {
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption({ value, label, enabled = true, keywords, readOnly }: Option) {
+function AutoCompleteOption(option: Option) {
+  const { value, label, enabled = true, keywords, readOnly, children } = option;
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer, multi, setOpen } = useAutoComplete();
+  const { value: selectedValue, onChange, multi, setOpen } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   return (
@@ -504,7 +501,9 @@ function AutoCompleteOption({ value, label, enabled = true, keywords, readOnly }
       data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
       keywords={keywords}
     >
-      {optionRenderer({ label, value })}
+      <div className={styles.autoCompleteOptionContent}>
+        {children || label}
+      </div>
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );

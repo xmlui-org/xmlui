@@ -178,19 +178,6 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        optionRenderer={
-          node.props.optionTemplate
-            ? (item) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionTemplate}
-                    item={item}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
       >
         {renderChild(node.children)}
       </AutoComplete>
