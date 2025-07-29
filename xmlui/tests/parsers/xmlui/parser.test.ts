@@ -5,82 +5,6 @@ import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
 describe("Xmlui parser", () => {
-  it("only close node start", () => {
-    const { node, getText, errors } = parseSource("</");
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.unexpectedCloseTag);
-  });
-
-  it("unexpected char", () => {
-    const { node, getText, errors } = parseSource("<A #/>");
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.invalidChar);
-    expect(errors[0].pos).toEqual(3);
-    expect(errors[0].end).toEqual(4);
-  });
-
-  it("unterminated comment", () => {
-    const { node, getText, errors } = parseSource("<Stack><!--</Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermComment);
-
-    expect(childElements.children!.length).toEqual(1);
-    expect(child0.kind).toEqual(SyntaxKind.ErrorNode);
-  });
-
-  it("unterminated string", () => {
-    const { node, getText, errors } = parseSource("<Stack> ' </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
-
-    expect(childElements.children!.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermStr);
-  });
-
-  it("unterminated CData", () => {
-    const { node, getText, errors } = parseSource("<Stack> <![CDATA[hi there </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-
-    expect(childElements.children!.length).toEqual(2);
-    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermCData);
-  });
-
-  it("bare unterminated CData", () => {
-    const { node, getText, errors } = parseSource("<![CDATA[hi there");
-
-    //The end of file token is the '+1'
-    expect(node.children!.length).toEqual(2 + 1);
-    expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
-    expect(errors[0].code).toEqual(ErrCodes.untermCData);
-  });
-
-  it("unterminated script", () => {
-    const { node, getText, errors } = parseSource("<Stack> <script>hi there </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-
-    expect(childElements.children!.length).toEqual(2);
-    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermScript);
-  });
-
   it("Single node works #1", () => {
     const { node, getText } = parseSource("<Stack />");
     const rootElem = node.children![0];
@@ -317,7 +241,9 @@ describe("Xmlui parser", () => {
     expect(child0.kind).toEqual(SyntaxKind.TextNode);
     expect(getText(child0)).equal("  hello\r\n\rbello  ");
   });
+});
 
+describe("Xmlui parser - expected errors", () => {
   it("Uppercase attribute results in error", () => {
     const { errors } = parseSource("<Stack A='1' />");
     expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
@@ -332,14 +258,145 @@ describe("Xmlui parser", () => {
     const { errors } = parseSource("<Text >");
     expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
   });
-});
 
-describe("Xmlui parser - expected errors", () => {
+  it("only close node start", () => {
+    const { node, getText, errors } = parseSource("</");
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].code).toEqual(ErrCodes.unexpectedCloseTag);
+  });
+
+  it("unexpected char", () => {
+    const src = "<A #/>";
+    const { node, getText, errors } = parseSource(src);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.pos).toEqual(3);
+    expect(err.end).toEqual(4);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<A #/>");
+  });
+
+  it("unterminated comment", () => {
+    const src = "<Stack><!--</Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+    const child0 = childElements.children[0];
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermComment);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack><!--</Stack>");
+
+    expect(childElements.children!.length).toEqual(1);
+    expect(child0.kind).toEqual(SyntaxKind.ErrorNode);
+  });
+
+  it("unterminated string", () => {
+    const src = "<Stack> ' </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+    const child0 = childElements.children[0];
+
+    expect(childElements.children!.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermStr);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack> ' </Stack>");
+  });
+
+  it("unterminated CData", () => {
+    const src = "<Stack> <![CDATA[hi there </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+
+    expect(childElements.children!.length).toEqual(2);
+    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      "<Stack> <![CDATA[hi there </Stack>",
+    );
+  });
+
+  it("bare unterminated CData", () => {
+    const src = "<![CDATA[hi there";
+    const { node, getText, errors } = parseSource(src);
+
+    //The end of file token is the '+1'
+    expect(node.children!.length).toEqual(2 + 1);
+    expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<![CDATA[hi there");
+  });
+
+  it("unterminated script", () => {
+    const src = "<Stack> <script>hi there </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+
+    expect(childElements.children!.length).toEqual(2);
+    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermScript);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      "<Stack> <script>hi there </Stack>",
+    );
+  });
+
+  it("multi-line scanner error - first line", () => {
+    const src = `<Stack ;>
+    <Button>Hello</Button>
+</Stack>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;>");
+  });
+
+  it("multi-line scanner error - middle line", () => {
+    const src = `<Stack>
+    <Button ;>Hello</Button>
+</Stack>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("    <Button ;>Hello</Button>");
+  });
+
+  it("multi-line scanner error - CRLF line endings", () => {
+    const src = "<Stack>\r\n<Button ;>Hello</Button>\r\n</Stack>";
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>");
+  });
+
   it("has invalid char after component name", () => {
-    const { node, getText, errors } = parseSource(`<Stack ;></Stack>`);
+    const src = `<Stack ;></Stack>`;
+    const { node, getText, errors } = parseSource(src);
 
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toEqual(ErrCodes.invalidChar);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;></Stack>");
+
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
