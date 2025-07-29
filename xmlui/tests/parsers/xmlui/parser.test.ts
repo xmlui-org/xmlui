@@ -243,29 +243,7 @@ describe("Xmlui parser", () => {
   });
 });
 
-describe("Xmlui parser - expected errors", () => {
-  it("Uppercase attribute results in error", () => {
-    const { errors } = parseSource("<Stack A='1' />");
-    expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
-  });
-
-  it("<> regression #1", () => {
-    const { errors } = parseSource("<>");
-    expect(errors[0].code).toBe(ErrCodes.expTagName);
-  });
-
-  it("<> regression #2", () => {
-    const { errors } = parseSource("<Text >");
-    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
-  });
-
-  it("only close node start", () => {
-    const { node, getText, errors } = parseSource("</");
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.unexpectedCloseTag);
-  });
-
+describe("Xmlui parser - expected scanner errors", () => {
   it("unexpected char", () => {
     const src = "<A #/>";
     const { node, getText, errors } = parseSource(src);
@@ -276,6 +254,25 @@ describe("Xmlui parser - expected errors", () => {
     expect(err.pos).toEqual(3);
     expect(err.end).toEqual(4);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<A #/>");
+  });
+
+  it("has invalid char after component name", () => {
+    const src = `<Stack ;></Stack>`;
+    const { node, getText, errors } = parseSource(src);
+
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;></Stack>");
+
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameId = nameNode.children[0];
+
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameId)).equal("Stack");
   });
 
   it("unterminated comment", () => {
@@ -387,24 +384,35 @@ describe("Xmlui parser - expected errors", () => {
     expect(err.code).toEqual(ErrCodes.invalidChar);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>");
   });
+});
 
-  it("has invalid char after component name", () => {
-    const src = `<Stack ;></Stack>`;
+describe("Xmlui parser - expected parser errors", () => {
+  it("only close node start", () => {
+    const src = "</";
     const { node, getText, errors } = parseSource(src);
 
-    expect(errors).toHaveLength(1);
+    expect(errors.length).toEqual(1);
     const err = errors[0];
-    expect(err.code).toEqual(ErrCodes.invalidChar);
-    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;></Stack>");
+    expect(err.code).toEqual(ErrCodes.unexpectedCloseTag);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("</");
+  });
 
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameId = nameNode.children[0];
+  it("Uppercase attribute results in error", () => {
+    const { errors } = parseSource("<Stack A='1' />");
+    expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
+  });
 
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameId)).equal("Stack");
+  it("no name for tag", () => {
+    const src = "<>";
+    const { errors } = parseSource(src);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<>");
+  });
+
+  it("no closing with known name", () => {
+    const { errors } = parseSource("<Text >");
+    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
   });
 
   it("Unmatched tag names", () => {
@@ -482,6 +490,44 @@ describe("Xmlui parser - expected errors", () => {
     console.log(errors);
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
+  });
+
+  it("multi-line unexpected close tag", () => {
+    const src = `<Stack>
+    <Button>Hello</Button>
+</Stack>
+</UnexpectedTag>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.unexpectedCloseTag);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`</Stack>
+</UnexpectedTag>`);
+  });
+
+  it("multi-line tag name mismatch", () => {
+    const src = `<Stack>
+    <Button>Hello</Button>
+</NotStack>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    // The error is on </NotStack>, so context includes one line above and below
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`    <Button>Hello</Button>
+</NotStack>`);
+  });
+
+  it("multi-line expected tag name", () => {
+    const src = `<Stack>
+<>
+</Stack>`;
+    const { errors } = parseSource(src);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`<Stack>
+<>
+</Stack>`);
   });
 });
 
