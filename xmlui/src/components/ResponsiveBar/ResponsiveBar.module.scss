@@ -34,20 +34,20 @@ $color-ResponsiveBarItem--disabled: createThemeVar("color-ResponsiveBarItem--dis
   align-items: center;
   background-color: $backgroundColor-ResponsiveBar;
   border: $borderWidth-ResponsiveBar $borderStyle-ResponsiveBar $borderColor-ResponsiveBar;
-  padding: $padding-ResponsiveBar;
-  gap: $gap-ResponsiveBar;
+  padding: 0; // Force zero padding - user cannot override
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  // gap is set dynamically via inline styles
 }
 
 .VisibleItems {
   display: flex;
   align-items: center;
-  gap: $gap-ResponsiveBar;
   flex: 1;
   overflow: hidden;
   min-width: 0; // Allow flex items to shrink below content size
+  // gap is set dynamically by parent's gap property
 }
 
 .MenuItem {

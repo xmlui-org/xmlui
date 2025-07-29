@@ -200,7 +200,7 @@ export const ResponsiveBar = forwardRef(function ResponsiveBar(
     if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      console.log('📐 ResponsiveBar: Container resized, isDropdownOpen:', isDropdownOpen);
+      console.log('📐 ResponsiveBar: Container resized');
       
       // Don't recalculate if dropdown is open to avoid closing it
       if (isDropdownOpen) {
@@ -317,35 +317,34 @@ export const ResponsiveBar = forwardRef(function ResponsiveBar(
                     variant="ghost"
                     icon={<Icon name={overflowIcon} fallback="dotmenuhorizontal" />}
                     aria-label={overflowLabel}
-                    onClick={() => {
-                      console.log('🔽 Dropdown trigger clicked, setting isDropdownOpen to true');
-                      setIsDropdownOpen(true);
-                    }}
+                    onClick={() => setIsDropdownOpen(true)}
                   />
                 }
                 onWillOpen={() => {
-                  console.log('🔽 DropdownMenu onWillOpen called, setting isDropdownOpen to true');
                   setIsDropdownOpen(true);
                   return Promise.resolve(true);
                 }}
-                onOpenChange={(isOpen) => {
-                  console.log('� DropdownMenu onOpenChange called, isOpen:', isOpen);
-                  setIsDropdownOpen(isOpen);
-                }}
               >
-                {overflowItems.map((item, index) => {
-                  // If the item is already a MenuItem, render it directly
-                  // Otherwise, wrap it in a MenuItem
-                  if (React.isValidElement(item) && item.type === MenuItem) {
-                    return <div key={`overflow-${index}`}>{item}</div>;
-                  }
-                  
-                  return (
-                    <MenuItem key={`overflow-${index}`}>
-                      {item}
-                    </MenuItem>
-                  );
-                })}
+                <div
+                  onMouseLeave={() => {
+                    // Reset dropdown state when menu closes
+                    setTimeout(() => setIsDropdownOpen(false), 100);
+                  }}
+                >
+                  {overflowItems.map((item, index) => {
+                    // If the item is already a MenuItem, render it directly
+                    // Otherwise, wrap it in a MenuItem
+                    if (React.isValidElement(item) && item.type === MenuItem) {
+                      return <div key={`overflow-${index}`}>{item}</div>;
+                    }
+                    
+                    return (
+                      <MenuItem key={`overflow-${index}`}>
+                        {item}
+                      </MenuItem>
+                    );
+                  })}
+                </div>
               </DropdownMenu>
             </div>
           )}

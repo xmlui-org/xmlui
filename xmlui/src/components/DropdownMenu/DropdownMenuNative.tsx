@@ -25,6 +25,7 @@ type DropdownMenuProps = {
   style?: CSSProperties;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
+  onOpenChange?: (isOpen: boolean) => void;
   disabled?: boolean;
   triggerButtonVariant?: string;
   triggerButtonThemeColor?: string;
@@ -55,6 +56,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     registerComponentApi,
     style,
     onWillOpen,
+    onOpenChange,
     alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
     triggerButtonVariant = defaultDropdownMenuProps.triggerButtonVariant,
@@ -85,6 +87,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
           }
         }
         setOpen(isOpen);
+        onOpenChange?.(isOpen);
       }}
     >
       <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any}>
