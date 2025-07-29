@@ -333,8 +333,8 @@ button.selectTrigger {
   }
 
   .selectItemContent {
-    width: 100%;
     display: flex;
+    flex: 1;
     cursor: pointer;
     user-select: none;
     align-items: center;
@@ -351,9 +351,9 @@ button.selectTrigger {
 }
 
 .selectItemIndicator {
-  position: absolute;
-  right: 0.5rem;
   display: flex;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
   height: 0.875rem;
   width: 0.875rem;
   align-items: center;

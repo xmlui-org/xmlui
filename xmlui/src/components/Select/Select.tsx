@@ -207,42 +207,6 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionLabelRenderer={
-          node.props.optionLabelTemplate
-            ? (item) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionLabelTemplate}
-                    item={item}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        optionRenderer={
-          node.props.optionTemplate
-            ? (item, val, inTrigger) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionTemplate}
-                    item={item}
-                    contextVars={{
-                      $selectedValue: val,
-                      $inTrigger: inTrigger,
-                    }}
-                    renderChild={(...args) =>
-                      multiSelect || searchable ? (
-                        renderChild(...args)
-                      ) : (
-                        <SelectItemText>{renderChild(...args)}</SelectItemText>
-                      )
-                    }
-                  />
-                );
-              }
-            : undefined
-        }
         valueRenderer={
           node.props.valueTemplate
             ? (item, removeItem) => {

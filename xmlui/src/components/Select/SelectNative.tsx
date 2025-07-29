@@ -118,6 +118,7 @@ interface SimpleSelectProps {
   autoFocus: boolean;
   placeholder: string;
   height: CSSProperties["height"];
+  width: number;
   children: ReactNode;
   readOnly: boolean;
 }
@@ -140,6 +141,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleS
     id,
     triggerRef,
     onFocus,
+    width,
     children,
     readOnly,
   } = props;
@@ -169,7 +171,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleS
   });
 
   return (
-    <SelectRoot value={stringValue} onValueChange={handleValueChange}>
+    <SelectRoot value={stringValue} onValueChange={handleValueChange} >
       <SelectTrigger
         id={id}
         aria-haspopup="listbox"
@@ -205,7 +207,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleS
         <SelectContent
           className={styles.selectContent}
           position="popper"
-          style={{ height: height }}
+          style={{ maxHeight: height, minWidth: width }}
         >
           <ScrollUpButton className={styles.selectScrollUpButton}>
             <Icon name="chevronup" />
@@ -494,7 +496,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   <SelectPortal container={root}>
                     <FocusScope asChild loop trapped>
                       <PopoverContent
-                        style={{ width, height: dropdownHeight }}
+                        style={{ minWidth: width, height: dropdownHeight }}
                         className={styles.selectContent}
                       >
                         <Cmd
@@ -564,6 +566,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 autoFocus={autoFocus}
                 placeholder={placeholder}
                 height={dropdownHeight}
+                width={width}
               >
                 {children}
               </SimpleSelect>
