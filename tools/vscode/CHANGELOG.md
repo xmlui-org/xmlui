@@ -1,5 +1,13 @@
 # xmlui-vscode
 
+## 0.9.88
+
+### Patch Changes
+
+- d4235e9: feat: layout properties displayed later in completion list
+- Updated dependencies [b79d7d8]
+  - xmlui@0.9.88
+
 ## 0.9.87
 
 ### Patch Changes
