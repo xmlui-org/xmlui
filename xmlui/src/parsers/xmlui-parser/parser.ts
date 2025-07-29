@@ -55,6 +55,19 @@ const RECOVER_CLOSE_TAG = [
   SyntaxKind.Script,
 ] as const;
 
+const needsExtendedContext = [
+  ErrCodes.unexpectedCloseTag,
+  ErrCodes.expCloseStartWithName,
+  ErrCodes.expCloseStart,
+  ErrCodes.tagNameMismatch,
+  ErrCodes.expEnd,
+  ErrCodes.expTagName,
+  ErrCodes.expTagOpen,
+  ErrCodes.expEndOrClose,
+  ErrCodes.expTagNameAfterNamespace,
+  ErrCodes.expTagNameAfterCloseStart,
+];
+
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
   getText: GetText;
@@ -377,17 +390,51 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function singleLineContextForScanner(pos: number): { contextPos: number; contextEnd: number } {
-    // Find the start of the line containing the error position
-    let contextPos = pos;
-    while (contextPos > 0 && text[contextPos - 1] !== "\n" && text[contextPos - 1] !== "\r") {
-      contextPos--;
+  change this, cuz it's bad
+  function getContextWithSurroundingLines(
+    pos: number,
+    end: number,
+    surroundingLinesCount: number,
+  ): { contextPos: number; contextEnd: number } {
+    // Find start of line containing pos
+    let errorLineStart = pos;
+    while (errorLineStart > 0 && text[errorLineStart - 1] !== "\n") {
+      errorLineStart--;
     }
 
-    // Find the end of the line containing the error position
-    let contextEnd = pos;
-    while (contextEnd < text.length && text[contextEnd] !== "\n" && text[contextEnd] !== "\r") {
+    // Find end of line containing end
+    let errorLineEnd = end;
+    while (errorLineEnd < text.length && text[errorLineEnd] !== "\n") {
+      errorLineEnd++;
+    }
+
+    // Go back the specified number of lines from error line start
+    let contextPos = errorLineStart;
+    for (let i = 0; i < surroundingLinesCount && contextPos > 0; i++) {
+      // Go back past line ending char
+      let prevEnd = contextPos - 1;
+      if (prevEnd >= 0) {
+        // Find start of previous line
+        let prevStart = prevEnd;
+        while (prevStart > 0 && text[prevStart - 1] !== "\n") {
+          prevStart--;
+        }
+        contextPos = prevStart;
+      } else {
+        contextPos = 0;
+        break;
+      }
+    }
+
+    // Go forward the specified number of lines from error line end
+    let contextEnd = errorLineEnd;
+    for (let i = 0; i < surroundingLinesCount && contextEnd < text.length; i++) {
+      // Skip line ending character
       contextEnd++;
+      // Find end of next line
+      while (contextEnd < text.length && text[contextEnd] !== "\n") {
+        contextEnd++;
+      }
     }
 
     return { contextPos, contextEnd };
@@ -395,14 +442,19 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
+
+    const { contextPos, contextEnd } = needsExtendedContext.includes(code)
+      ? getContextWithSurroundingLines(pos, end, 1)
+      : { contextPos: 0, contextEnd: 0 };
+
     errors.push({
       category,
       code,
       message,
       pos,
       end,
-      contextPos: 0,
-      contextEnd: 0,
+      contextPos,
+      contextEnd,
     });
   }
 
@@ -410,9 +462,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     { code, message, category }: GeneralDiagnosticMessage,
     pos: number,
     end: number,
-    contextPos: number = 0,
-    contextEnd: number = 0,
   ) {
+    const { contextPos, contextEnd } = needsExtendedContext.includes(code)
+      ? getContextWithSurroundingLines(pos, end, 1)
+      : { contextPos: 0, contextEnd: 0 };
+
     errors.push({
       category,
       code,
@@ -631,8 +685,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         startNode();
         node.children!.push(token);
 
-        const { contextPos, contextEnd } = singleLineContextForScanner(pos);
-        errorAt(err, pos, badPrefixEnd, contextPos, contextEnd);
+        const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, badPrefixEnd, 0);
+        errors.push({
+          category: err.category,
+          code: err.code,
+          message: err.message,
+          pos,
+          end: badPrefixEnd,
+          contextPos,
+          contextEnd,
+        });
         completeNode(SyntaxKind.ErrorNode);
 
         errFromScanner = undefined;
