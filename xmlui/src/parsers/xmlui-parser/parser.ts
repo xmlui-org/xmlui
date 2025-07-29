@@ -17,6 +17,8 @@ export interface Error {
   readonly message: string;
   readonly pos: number;
   readonly end: number;
+  readonly contextPos: number;
+  readonly contextEnd: number;
 }
 
 type IncompleteNode = {
@@ -375,6 +377,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+  function singleLineContextForScanner(pos: number): { contextPos: number; contextEnd: number } {
+    // Find the start of the line containing the error position
+    let contextPos = pos;
+    while (contextPos > 0 && text[contextPos - 1] !== "\n" && text[contextPos - 1] !== "\r") {
+      contextPos--;
+    }
+
+    // Find the end of the line containing the error position
+    let contextEnd = pos;
+    while (contextEnd < text.length && text[contextEnd] !== "\n" && text[contextEnd] !== "\r") {
+      contextEnd++;
+    }
+
+    return { contextPos, contextEnd };
+  }
+
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
     errors.push({
@@ -383,6 +401,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       message,
       pos,
       end,
+      contextPos: 0,
+      contextEnd: 0,
     });
   }
 
@@ -390,6 +410,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     { code, message, category }: GeneralDiagnosticMessage,
     pos: number,
     end: number,
+    contextPos: number = 0,
+    contextEnd: number = 0,
   ) {
     errors.push({
       category,
@@ -397,6 +419,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       message,
       pos,
       end,
+      contextPos,
+      contextEnd,
     });
   }
 
@@ -606,7 +630,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         scanner.resetTokenState(badPrefixEnd);
         startNode();
         node.children!.push(token);
-        errorAt(err, pos, badPrefixEnd);
+
+        const { contextPos, contextEnd } = singleLineContextForScanner(pos);
+        errorAt(err, pos, badPrefixEnd, contextPos, contextEnd);
         completeNode(SyntaxKind.ErrorNode);
 
         errFromScanner = undefined;
