@@ -30,7 +30,6 @@ export const SwitchMd = createMetadata({
   status: "stable",
   description: "`Switch` enables users to toggle between two states: on and off.",
   props: {
-    indeterminate: dIndeterminate(defaultProps.indeterminate),
     label: dLabel(),
     labelPosition: dLabelPosition("end"),
     labelWidth: dLabelWidth(COMP),
@@ -115,6 +114,7 @@ export const switchComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
