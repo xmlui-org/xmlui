@@ -1134,6 +1134,9 @@ function discoverDirectComponentDependenciesHelp(
   registry: ComponentRegistry,
   deps: Set<string>,
 ): Set<string> {
+  if (!component) {
+    return deps;
+  }
   const compName = component.type;
   if (!registry.hasComponent(compName)) {
     deps.add(compName);
