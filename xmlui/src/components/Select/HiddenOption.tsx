@@ -6,13 +6,19 @@ export function HiddenOption(option: Option) {
   const { optionRenderer, label } = option;
   const { onOptionRemove, onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
+  
+  // Store the rendered content as ReactNode, not DOM element
+  const renderedContent = optionRenderer?.({});
+  
   const opt: Option = useMemo(() => {
     return {
       ...option,
       label: label ?? node?.textContent ?? "",
       keywords: [label ?? node?.textContent ?? ""],
+      // Store the rendered ReactNode for dropdown display
+      renderedContent: renderedContent,
     };
-  }, [option, node, label]);
+  }, [option, node, label, renderedContent]);
 
   useEffect(() => {
     onOptionAdd(opt);
@@ -21,7 +27,7 @@ export function HiddenOption(option: Option) {
 
   return (
     <div ref={(el) => setNode(el)} style={{ display: "none" }}>
-      {optionRenderer?.({})}
+      {renderedContent}
     </div>
   );
 }

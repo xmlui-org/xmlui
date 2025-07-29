@@ -19,8 +19,8 @@ export const OptionMd = createMetadata({
         `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
-      "This property defines the value of the option. If \`value\` is not defined, " +
-        "\`Option\` will use the \`label\` as the value. If neither is defined, " +
+      "This property defines the value of the option. If `value` is not defined, " +
+        "`Option` will use the `label` as the value. If neither is defined, " +
         "the option is not displayed.",
     ),
     enabled: {
@@ -28,41 +28,27 @@ export const OptionMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
-    optionTemplate: d("This property is used to define a custom option template"),
   },
-  childrenAsTemplate: "optionTemplate",
 });
 
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
-  ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
-    const optionTemplate = node.props.optionTemplate;
-
-    const label = extractValue.asOptionalString(node.props.label) || extractValue(node.props.value);
-    const value = extractValue.asOptionalString(node.props.value) || extractValue(node.props.label);
-    if (label === undefined) {
+  ({ node, extractValue, layoutCss, renderChild }) => {
+    const label = extractValue.asOptionalString(node.props.label);
+    const value = extractValue.asOptionalString(node.props.value);
+    if (value === undefined) {
       return null;
     }
     return (
       <OptionNative
-        optionRenderer={
-          optionTemplate
-            ? (contextVars) => (
-                <MemoizedItem
-                  node={optionTemplate}
-                  renderChild={renderChild}
-                  contextVars={contextVars}
-                  layoutContext={layoutContext}
-                />
-              )
-            : undefined
-        }
         label={label}
         value={value}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
-      />
+      >
+        {renderChild(node.children)}
+      </OptionNative>
     );
   },
 );

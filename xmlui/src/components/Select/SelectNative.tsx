@@ -36,9 +36,8 @@ import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext, useOption } from "./OptionContext";
+import { OptionContext } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { HiddenOption } from "./HiddenOption";
 
 export const defaultProps = {
   enabled: true,
@@ -56,71 +55,75 @@ export const defaultProps = {
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
-type SelectProps = {
+
+// Core Select component props
+interface SelectProps {
+  // Basic props
   id?: string;
   initialValue?: ValueType;
   value?: ValueType;
   enabled?: boolean;
   placeholder?: string;
-  updateState?: UpdateStateFn;
-  optionLabelRenderer?: (item: Option) => ReactNode;
-  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
-  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
-  emptyListTemplate?: ReactNode;
+  autoFocus?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
+
+  // Styling
   style?: CSSProperties;
-  onDidChange?: (newValue: ValueType) => void;
   dropdownHeight?: CSSProperties["height"];
+
+  // Validation
   validationStatus?: ValidationStatus;
+
+  // Event handlers
+  onDidChange?: (newValue: ValueType) => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  registerComponentApi?: RegisterComponentApiFn;
-  children?: ReactNode;
-  autoFocus?: boolean;
+
+  // Multi-select and search
   searchable?: boolean;
   multiSelect?: boolean;
-  required?: boolean;
+
+  // Templates and renderers (legacy - kept for compatibility)
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
+  emptyListTemplate?: ReactNode;
+
+  // Progress state
+  inProgress?: boolean;
+  inProgressNotificationMessage?: string;
+
+  // Label configuration
   label?: string;
   labelPosition?: string;
   labelWidth?: string;
   labelBreak?: boolean;
-  inProgress?: boolean;
-  inProgressNotificationMessage?: string;
-  readOnly?: boolean;
-};
 
-const SimpleSelect = forwardRef(function SimpleSelect(
-  props: {
-    value: SingleValueType;
-    onValueChange: (selectedValue: SingleValueType) => void;
-    id: string;
-    style: React.CSSProperties;
-    onFocus: () => void;
-    onBlur: () => void;
-    enabled: boolean;
-    validationStatus: ValidationStatus;
-    triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
-    autoFocus: boolean;
-    placeholder: string;
-    height:
-      | "-moz-initial"
-      | "inherit"
-      | "initial"
-      | "revert"
-      | "revert-layer"
-      | "unset"
-      | "-moz-max-content"
-      | "-moz-min-content"
-      | "-webkit-fit-content"
-      | "auto"
-      | "fit-content"
-      | "max-content"
-      | "min-content"
-      | string
-      | number;
-    options: Set<Option>;
-    children: ReactNode;
-    readOnly: boolean;
-  },
+  // Internal
+  updateState?: UpdateStateFn;
+  registerComponentApi?: RegisterComponentApiFn;
+  children?: ReactNode;
+}
+
+// SimpleSelect props interface for better type safety
+interface SimpleSelectProps {
+  value: SingleValueType;
+  onValueChange: (selectedValue: SingleValueType) => void;
+  id: string;
+  style: React.CSSProperties;
+  onFocus: () => void;
+  onBlur: () => void;
+  enabled: boolean;
+  validationStatus: ValidationStatus;
+  triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
+  autoFocus: boolean;
+  placeholder: string;
+  height: CSSProperties["height"];
+  children: ReactNode;
+  readOnly: boolean;
+}
+
+const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleSelect(
+  props,
   forwardedRef,
 ) {
   const { root } = useTheme();
@@ -137,29 +140,36 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     id,
     triggerRef,
     onFocus,
-    options,
     children,
     readOnly,
   } = props;
 
+  // Compose refs for proper forwarding
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+
+  // Convert value to string for Radix UI compatibility
   const stringValue = useMemo(() => {
-    return value != undefined ? value + "" : undefined;
+    return value != undefined ? String(value) : undefined;
   }, [value]);
 
-  const onValChange = useCallback(
+  // Handle value changes with proper type conversion
+  const handleValueChange = useCallback(
     (val: string) => {
-      if (readOnly) {
-        return;
-      }
-      const match = Array.from(options).find((o) => `${o.value}` === val);
-      onValueChange(match?.value ?? val);
+      if (readOnly) return;
+      onValueChange(val);
     },
-    [onValueChange, options, readOnly],
+    [onValueChange, readOnly],
   );
 
+  // Generate trigger class names based on validation status
+  const triggerClassName = classnames(styles.selectTrigger, {
+    [styles.error]: validationStatus === "error",
+    [styles.warning]: validationStatus === "warning",
+    [styles.valid]: validationStatus === "valid",
+  });
+
   return (
-    <SelectRoot value={stringValue} onValueChange={onValChange}>
+    <SelectRoot value={stringValue} onValueChange={handleValueChange}>
       <SelectTrigger
         id={id}
         aria-haspopup="listbox"
@@ -167,11 +177,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
         onFocus={onFocus}
         onBlur={onBlur}
         disabled={!enabled}
-        className={classnames(styles.selectTrigger, {
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
+        className={triggerClassName}
         onClick={(event) => {
           // Prevent event propagation to parent elements (e.g., DropdownMenu)
           // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
@@ -182,11 +188,13 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       >
         <div className={styles.selectValue}>
           {readOnly ? (
-            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || (
-              <span aria-placeholder={placeholder}>{placeholder}</span>
-            )
+            // For readonly mode, find and display the selected option's label
+            <span aria-placeholder={placeholder}>{placeholder}</span>
           ) : (
-            <SelectValue aria-placeholder={placeholder} placeholder={placeholder} />
+            // For interactive mode, let Radix handle the display
+            <SelectValue aria-placeholder={placeholder} placeholder={placeholder}>
+              {value}
+            </SelectValue>
           )}
         </div>
         <SelectIcon asChild>
@@ -214,39 +222,53 @@ const SimpleSelect = forwardRef(function SimpleSelect(
   );
 });
 
-export const Select = forwardRef(function Select(
+export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
+    // Basic props
     id,
     initialValue,
     value,
     enabled = defaultProps.enabled,
     placeholder = defaultProps.placeholder,
-    updateState = noop,
+    autoFocus = defaultProps.autoFocus,
+    readOnly = false,
+    required = defaultProps.required,
+
+    // Styling
+    style,
+    dropdownHeight,
+
+    // Validation
     validationStatus = defaultProps.validationStatus,
+
+    // Event handlers
     onDidChange = noop,
     onFocus = noop,
     onBlur = noop,
-    registerComponentApi,
-    emptyListTemplate,
-    optionLabelRenderer,
-    optionRenderer,
-    valueRenderer,
-    style,
-    dropdownHeight,
-    children,
-    autoFocus = defaultProps.autoFocus,
+
+    // Multi-select and search
     searchable = defaultProps.searchable,
     multiSelect = defaultProps.multiSelect,
+
+    emptyListTemplate,
+    valueRenderer,
+
+    // Progress state
+    inProgress = defaultProps.inProgress,
+    inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
+
+    // Label configuration
     label,
     labelPosition,
     labelWidth,
     labelBreak = defaultProps.labelBreak,
-    required = defaultProps.required,
-    inProgress = defaultProps.inProgress,
-    inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
-    readOnly = false,
-  }: SelectProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+
+    // Internal
+    updateState = noop,
+    registerComponentApi,
+    children,
+  },
+  ref,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -369,32 +391,30 @@ export const Select = forwardRef(function Select(
     () => ({
       multiSelect,
       value,
-      optionLabelRenderer,
-      optionRenderer,
       onChange: toggleOption,
       setOpen,
     }),
-    [multiSelect, toggleOption, value, optionLabelRenderer, optionRenderer],
+    [multiSelect, toggleOption, value],
   );
 
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={HiddenOption}>
-          <ItemWithLabel
-            ref={ref}
-            id={inputId}
-            labelPosition={labelPosition as any}
-            label={label}
-            labelWidth={labelWidth}
-            labelBreak={labelBreak}
-            required={required}
-            enabled={enabled}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            style={style}
-          >
-            {searchable || multiSelect ? (
+        <ItemWithLabel
+          ref={ref}
+          id={inputId}
+          labelPosition={labelPosition as any}
+          label={label}
+          labelWidth={labelWidth}
+          labelBreak={labelBreak}
+          required={required}
+          enabled={enabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          style={style}
+        >
+          {searchable || multiSelect ? (
+            <OptionTypeProvider Component={ComboboxOption}>
               <Popover open={open} onOpenChange={setOpen} modal={false}>
                 <PopoverTrigger
                   id={inputId}
@@ -504,16 +524,20 @@ export const Select = forwardRef(function Select(
                             {inProgress && (
                               <div className={styles.loading}>{inProgressNotificationMessage}</div>
                             )}
-                            {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                              <ComboboxOption
-                                key={value}
-                                readOnly={readOnly}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                              />
-                            ))}
+                            {Array.from(options).map(
+                              ({ value, label, enabled, keywords, children }) => (
+                                <ComboboxOption
+                                  key={value}
+                                  readOnly={readOnly}
+                                  value={value}
+                                  label={label}
+                                  enabled={enabled}
+                                  keywords={keywords}
+                                >
+                                  {children}
+                                </ComboboxOption>
+                              ),
+                            )}
                             {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
                           </CmdList>
                         </Cmd>
@@ -522,12 +546,13 @@ export const Select = forwardRef(function Select(
                   </SelectPortal>
                 )}
               </Popover>
-            ) : (
+            </OptionTypeProvider>
+          ) : (
+            <OptionTypeProvider Component={SelectOption}>
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
                 value={value as SingleValueType}
-                options={options}
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}
@@ -540,12 +565,11 @@ export const Select = forwardRef(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
               >
-                {renderOptionsOrDefault(options, emptyListNode)}
+                {children}
               </SimpleSelect>
-            )}
-          </ItemWithLabel>
-          {children}
-        </OptionTypeProvider>
+            </OptionTypeProvider>
+          )}
+        </ItemWithLabel>
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
@@ -556,15 +580,8 @@ export const ComboboxOption = forwardRef(function Combobox(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
-  const { label, value, enabled = true, keywords, readOnly } = option;
-  const {
-    value: selectedValue,
-    onChange,
-    multiSelect,
-    optionLabelRenderer,
-    optionRenderer,
-    setOpen,
-  } = useSelect();
+  const { label, value, enabled = true, keywords, readOnly, children } = option;
+  const { value: selectedValue, onChange, multiSelect, setOpen } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.includes(value)
@@ -593,14 +610,8 @@ export const ComboboxOption = forwardRef(function Combobox(
       keywords={[...keywords, label]}
     >
       <div className={styles.multiComboboxOptionContent}>
-        {optionRenderer ? (
-          optionRenderer({ label, value, enabled, keywords }, selectedValue as any, false)
-        ) : (
-          <>
-            {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
-            {selected && <Icon name="checkmark" />}
-          </>
-        )}
+        {children || label}
+        {selected && <Icon name="checkmark" />}
       </div>
     </CmdItem>
   );
@@ -608,14 +619,16 @@ export const ComboboxOption = forwardRef(function Combobox(
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
-    const { value, label, enabled = true } = option;
-    const { optionLabelRenderer, optionRenderer, value: selectedValue } = useSelect();
+    const visibleContentRef = useRef<HTMLDivElement>(null);
+    const { value, label, enabled = true, children } = option;
+    const { value: selectedValue } = useSelect();
 
     return (
       <SelectItem
         ref={ref}
         className={styles.selectItem}
         value={value + ""}
+        textValue={label || visibleContentRef.current?.textContent}
         disabled={!enabled}
         onClick={(event) => {
           event.stopPropagation();
@@ -623,59 +636,27 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         onMouseEnter={(event) => {
           // Ensure hover state is applied even in DropdownMenu context
           const target = event.currentTarget;
-          target.setAttribute('data-highlighted', '');
+          target.setAttribute("data-highlighted", "");
         }}
         onMouseLeave={(event) => {
           // Remove hover state when mouse leaves
           const target = event.currentTarget;
-          target.removeAttribute('data-highlighted');
+          target.removeAttribute("data-highlighted");
         }}
         data-state={selectedValue === value && "checked"}
       >
-        <div className={styles.selectItemContent}>
-          {optionRenderer ? (
-            optionRenderer(
-              {
-                label,
-                value,
-                enabled,
-              },
-              selectedValue as any,
-              false,
-            )
-          ) : (
-            <>
-              <SelectItemText className={styles.selectItemContent}>
-                {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
-              </SelectItemText>
-              {selectedValue === value && (
-                <span className={styles.selectItemIndicator}>
-                  <SelectItemIndicator>
-                    <Icon name="checkmark" />
-                  </SelectItemIndicator>
-                </span>
-              )}
-            </>
-          )}
-        </div>
+        {/* SelectItemText is used by SelectValue to display the selected value */}
+        <span style={{ display: 'none' }}><SelectItemText>{label}</SelectItemText></span>
+        {/* Visible content in the dropdown */}
+        <div className={styles.selectItemContent} ref={visibleContentRef}>{children || label}</div>
+        {selectedValue === value && (
+          <SelectItemIndicator className={styles.selectItemIndicator}>
+            <Icon name="checkmark" />
+          </SelectItemIndicator>
+        )}
       </SelectItem>
     );
   },
 );
 
 SelectOption.displayName = "SelectOption";
-
-function renderOptionsOrDefault(options: Set<Option>, default_: any) {
-  if (options.size === 0) {
-    return default_;
-  }
-
-  return Array.from(options).map((option) => (
-    <SelectOption
-      key={option.value}
-      value={option.value}
-      label={option.label}
-      enabled={option.enabled}
-    />
-  ));
-}
