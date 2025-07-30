@@ -1,20 +1,15 @@
-import { ModuleResolver } from "../abstractions/scripting/modules";
-import {
-  ComponentDef,
-  ComponentMetadata,
-  CompoundComponentDef,
-} from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
-import { ParserError } from "../parsers/xmlui-parser/ParserError";
+import type { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
-import { Node } from "../parsers/xmlui-parser/syntax-node";
-import { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
-import { ModuleErrors } from "./script-runner/ScriptingSourceTree";
+import type { Node } from "../parsers/xmlui-parser/syntax-node";
+import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
+import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 
-interface ErrorWithLineColInfo extends ParseError {
+interface ErrorWithContext extends ParseError {
   line: number;
   col: number;
 }
@@ -24,7 +19,7 @@ export function xmlUiMarkupToComponent(
   fileId: string | number = 0,
 ): {
   component: null | ComponentDef | CompoundComponentDef;
-  errors: ErrorWithLineColInfo[];
+  errors: ErrorWithContext[];
   erroneousCompoundComponentName?: string;
 } {
   const { parse, getText } = createXmlUiParser(source);
@@ -46,7 +41,7 @@ export function xmlUiMarkupToComponent(
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorWithLineColInfo = {
+    const singleErr: ErrorWithContext = {
       message: (e as ParserError).message,
       col: 0,
       line: 0,
@@ -94,7 +89,7 @@ export function errReportMessage(message: string) {
  * It is a component and a compound component definition at the same time,
  * so that it can be used to render the errors for a compound component as well*/
 export function errReportComponent(
-  errors: ErrorWithLineColInfo[],
+  errors: ErrorWithContext[],
   fileName: number | string,
   compoundCompName: string | undefined,
 ) {
@@ -285,32 +280,39 @@ export function errReportModuleErrors(errors: ModuleErrors, fileName: number | s
   return comp;
 }
 
-function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithLineColInfo[] {
-  if (newlinePositions.length === 0) {
-    for (let err of errors) {
-      (err as ErrorWithLineColInfo).line = 1;
-      (err as ErrorWithLineColInfo).col = err.pos + 1;
-    }
-    return errors as ErrorWithLineColInfo[];
+function lineColFromOffset(
+  offset: number,
+  newlinePositions: number[],
+): { line: number; col: number } {
+  if (newlinePositions.length === 0 || offset < newlinePositions[0]) {
+    return { line: 1, col: offset + 1 };
   }
 
-  for (let err of errors) {
-    let i = 0;
-    for (; i < newlinePositions.length; ++i) {
-      const newlinePos = newlinePositions[i];
-      if (err.pos < newlinePos) {
-        (err as ErrorWithLineColInfo).line = i + 1;
-        (err as ErrorWithLineColInfo).col = err.pos - (newlinePositions[i - 1] ?? 0) + 1;
-        break;
-      }
-    }
-    const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
-    if (err.pos >= lastNewlinePos) {
-      (err as ErrorWithLineColInfo).line = newlinePositions.length + 1;
-      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos + 0;
+  let i = 0;
+  for (; i < newlinePositions.length; ++i) {
+    const newlinePos = newlinePositions[i];
+    if (offset < newlinePos) {
+      return {
+        line: i + 1,
+        col: offset - newlinePositions[i - 1],
+      };
     }
   }
-  return errors as ErrorWithLineColInfo[];
+
+  const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
+  return {
+    line: newlinePositions.length + 1,
+    col: offset - lastNewlinePos,
+  };
+}
+
+function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
+  for (let err of errors) {
+    const { line, col } = lineColFromOffset(err.pos, newlinePositions);
+    (err as ErrorWithContext).line = line;
+    (err as ErrorWithContext).col = col;
+  }
+  return errors as ErrorWithContext[];
 }
 
 function getCompoundCompName(node: Node, getText: GetText) {

@@ -382,7 +382,7 @@ describe("Xmlui parser - expected scanner errors", () => {
     expect(errors).toHaveLength(1);
     const err = errors[0];
     expect(err.code).toEqual(ErrCodes.invalidChar);
-    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>\r");
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>");
   });
 });
 
@@ -515,10 +515,21 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors).toHaveLength(1);
     const err = errors[0];
     expect(err.code).toBe(ErrCodes.tagNameMismatch);
-    // The error is on </NotStack>, so context includes one line above and below
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`    <Button>Hello</Button>
 </NotStack>
 `);
+  });
+
+  it("multi-line context CRLF", () => {
+    const src = `\r\n<Stack>\r\n<Button>Hello</NOTBUTTON>\r\n</Stack>
+  `;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      `<Stack>\r\n<Button>Hello</NOTBUTTON>\r\n</Stack>`,
+    );
   });
 
   it("multi-line expected tag name", () => {

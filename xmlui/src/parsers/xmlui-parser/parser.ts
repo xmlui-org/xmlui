@@ -395,20 +395,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     end: number,
     surroundingContextLines: number,
   ): { contextPos: number; contextEnd: number } {
-    let newlinesFound = 0;
-
-    let contextEnd: number;
-    let cursor = end;
-    while (cursor < text.length) {
-      if (text[cursor] === "\n") {
-        newlinesFound++;
-        if (newlinesFound > surroundingContextLines) {
-          break;
-        }
-      }
-      cursor++;
-    }
-    contextEnd = cursor;
+    let newlinesFound: number;
+    let cursor: number;
 
     let contextPos: number;
     cursor = pos;
@@ -424,15 +412,35 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
     contextPos = cursor + 1;
 
+    let contextEnd: number;
+    cursor = end;
+    newlinesFound = 0;
+    while (cursor < text.length) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
+        cursor++;
+      } else if (text[cursor] === "\r" && text[cursor + 1] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
+        cursor += 2;
+      } else {
+        cursor++;
+      }
+    }
+    contextEnd = cursor;
+
     return { contextPos, contextEnd };
   }
 
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
 
-    const { contextPos, contextEnd } = needsExtendedContext.includes(code)
-      ? getContextWithSurroundingLines(pos, end, 1)
-      : { contextPos: 0, contextEnd: 0 };
+    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
 
     errors.push({
       category,
@@ -450,9 +458,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     pos: number,
     end: number,
   ) {
-    const { contextPos, contextEnd } = needsExtendedContext.includes(code)
-      ? getContextWithSurroundingLines(pos, end, 1)
-      : { contextPos: 0, contextEnd: 0 };
+    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
 
     errors.push({
       category,
