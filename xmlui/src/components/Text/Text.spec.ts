@@ -1,4 +1,4 @@
-import { getBounds } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { TextVariantElement } from "../abstractions";
 
@@ -130,12 +130,8 @@ please do not break it!"
       />
     </Fragment>
     `);
-    const { height: heightTextShort } = await getBounds(
-      await createTextDriver("textShort")
-    );
-    const { height: heightTextLong } = await getBounds(
-      await createTextDriver("textLong")
-    );
+    const { height: heightTextShort } = await getBounds(await createTextDriver("textShort"));
+    const { height: heightTextLong } = await getBounds(await createTextDriver("textLong"));
 
     expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
@@ -298,7 +294,6 @@ test.describe("Visual States", () => {
       </Text>
     `);
     const driver = await createTextDriver();
-
     await expect(driver.component).toHaveText("test content here");
   });
 });

@@ -59,67 +59,27 @@ export async function initComponent(page: Page, appDescription: UnparsedAppDescr
 }
 
 /**
- * @param percentage a percenage value as a string, like "40%"
- * @param scalarOf100Percent The value to multiply the percentage by
+ * Scales a value by a percentage, using NumericCSS for parsing and clarity.
+ * @param scalarOf100Percent The value representing 100%.
+ * @param percentage A percentage string in the format "NN%", e.g., "40%". Must end with '%'.
+ * @returns The scaled value.
  */
-export function scalePercentBy(scalarOf100Percent: number, percentage: string) {
-  if (!percentage.endsWith("%")) {
-    throw new Error("argument doesn't end with % sign");
+export function scaleByPercent(scalarOf100Percent: number, percentage: string) {
+  const parsed = parseAsNumericCss(percentage);
+  if (parsed.unit !== "%") {
+    throw new Error(`Expected percentage unit (%), got: ${parsed.unit}`);
   }
-  const percentageNum = Number(percentage.slice(0, -1));
-  return (scalarOf100Percent / 100) * percentageNum;
+  return (scalarOf100Percent / 100) * parsed.value;
 }
 
 export async function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
 }
 
-/* export async function getFullRectangle(locator: Locator) {
-  const boundingRect = await locator.evaluate((element) => element.getBoundingClientRect());
-
-  const margins = await getElementStyles(locator, [
-    "margin-left",
-    "margin-right",
-    "margin-top",
-    "margin-bottom",
-  ]);
-  const marginLeft = parseFloat(margins["margin-left"]);
-  const marginRight = parseFloat(margins["margin-right"]);
-  const marginTop = parseFloat(margins["margin-top"]);
-  const marginBottom = parseFloat(margins["margin-bottom"]);
-
-  const width = boundingRect.width + marginLeft + marginRight;
-  const height = boundingRect.height + marginTop + marginBottom;
-  const left = boundingRect.left - marginLeft;
-  const right = boundingRect.right + marginRight;
-  const top = boundingRect.top - marginTop;
-  const bottom = boundingRect.bottom + marginBottom;
-  return { width, height, left, right, top, bottom };
-} */
-
-export async function isElementOverflown(locator: Locator, direction: "x" | "y" | "both" = "both") {
-  const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
-    element.clientWidth,
-    element.clientHeight,
-    element.scrollWidth,
-    element.scrollHeight,
-  ]);
-  if (direction === "x") return scrollWidth > width;
-  if (direction === "y") return scrollHeight > height;
-  return scrollWidth > width && scrollHeight > height;
-}
-
 export async function getElementStyle(specifier: Locator, style: string) {
   return specifier.evaluate(
     (element, style) => window.getComputedStyle(element).getPropertyValue(style),
     style,
-  );
-}
-
-export async function getPseudoElementStyle(specifier: Locator, pseudoElement: string, style: string) {
-  return specifier.evaluate(
-    (element, obj) => window.getComputedStyle(element, obj.pseudoElement).getPropertyValue(obj.style),
-    {style, pseudoElement},
   );
 }
 
@@ -145,6 +105,18 @@ export async function isIndeterminate(specifier: ComponentDriver | Locator) {
   return specifier.evaluate((el: HTMLInputElement) => el.indeterminate);
 }
 
+export async function overflows(locator: Locator, direction: "x" | "y" | "both" = "both") {
+  const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
+    element.clientWidth,
+    element.clientHeight,
+    element.scrollWidth,
+    element.scrollHeight,
+  ]);
+  if (direction === "x") return scrollWidth > width;
+  if (direction === "y") return scrollHeight > height;
+  return scrollWidth > width && scrollHeight > height;
+}
+
 // ----------------------------------
 // ComponentDriver style helpers
 // ----------------------------------
@@ -168,10 +140,33 @@ export async function getStyles(specifier: ComponentDriver | Locator, style: str
   );
 }
 
+export async function getPseudoStyles(
+  specifier: ComponentDriver | Locator,
+  pseudoElement: string,
+  style: string | string[],
+) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  style = Array.isArray(style) ? style : [style];
+  return specifier.evaluate(
+    (element, obj) =>
+      Object.fromEntries(
+        obj.style.map((styleName) => [
+          styleName
+            .trim()
+            .split("-")
+            .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
+            .join(""),
+          window.getComputedStyle(element, obj.pseudoElement).getPropertyValue(styleName),
+        ]),
+      ),
+    { style, pseudoElement },
+  );
+}
+
 export async function getHtmlAttributes(
   specifier: ComponentDriver | Locator,
   attributes: string | string[],
-): Promise<{ [k: string]: string; }> {
+): Promise<{ [k: string]: string }> {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
   attributes = Array.isArray(attributes) ? attributes : [attributes];
 
@@ -275,6 +270,10 @@ class TestSkipReason {
 
   TEST_INFRA_NOT_IMPLEMENTED(description?: string) {
     return this.addAnnotation("test infra not implemented", description);
+  }
+
+  REFACTOR(description?: string) {
+    return this.addAnnotation("refactor", description);
   }
 
   // Need to specify a reason here!

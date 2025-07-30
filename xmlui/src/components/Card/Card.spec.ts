@@ -1,4 +1,3 @@
-// import { getFullRectangle } from "../../testing/component-test-helpers";
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
@@ -42,10 +41,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test("displays avatar when avatarUrl is provided", async ({ initTestBed, createCardDriver }) => {
-    await initTestBed(`<Card avatarUrl="/public/resources/flower-640x480.jpg" />`);
+    await initTestBed(`<Card avatarUrl="/resources/flower-640x480.jpg" />`);
     const avatar = (await createCardDriver()).avatar;
     await expect(avatar).toBeVisible();
-    await expect(avatar).toHaveAttribute("src", "/public/resources/flower-640x480.jpg");
+    await expect(avatar).toHaveAttribute("src", "/resources/flower-640x480.jpg");
   });
 
   test("clicking linkTo title navigates", async ({ page, initTestBed, createCardDriver }) => {

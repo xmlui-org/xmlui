@@ -933,7 +933,7 @@ When creating component tests, follow these location conventions:
    - Import test utilities from the testing directory:
      ```typescript
      import { expect, test } from "../../testing/fixtures";
-     import { getElementStyle } from "../../testing/component-test-helpers";
+     import { getStyles } from "../../testing/component-test-helpers";
      ```
    - Adjust import paths based on the relative location of the component and testing utilities
 
@@ -960,7 +960,7 @@ Below is an example of a correctly structured skeleton test file for a component
 
 ```typescript
 import { test, expect } from "../../testing/fixtures";
-import { getElementStyle } from "../../testing/component-test-helpers";
+import { getStyles } from "../../testing/component-test-helpers";
 
 // Constants for testing
 const RED = "rgb(255, 0, 0)";

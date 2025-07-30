@@ -1,4 +1,4 @@
-import { getBounds, getElementStyle } from "../../testing/component-test-helpers";
+import { getBounds, getStyles } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 test.describe("Basic Functionality For All Variants", () => {
@@ -65,8 +65,8 @@ test.describe("Pill-specific Functionality", () => {
     const { width, height } = await getBounds(page.getByTestId("badge"));
     const smaller = Math.min(width, height);
     const minRadius = smaller / 2;
-    const radiusPx = await getElementStyle(page.getByTestId("badge"), "border-radius");
-    const radius = parseInt(radiusPx);
+    const { borderRadius } = await getStyles(page.getByTestId("badge"), "border-radius");
+    const radius = parseInt(borderRadius, 10);
 
     expect(radius).toBeGreaterThanOrEqual(minRadius);
   });
@@ -95,7 +95,7 @@ test.describe("Pill-specific Functionality", () => {
 });
 
 // =============================================================================
-// THEME VARIABLE TESTS
+// VISUAL STATE TESTS
 // =============================================================================
 
 test.describe("Theme Vars: Badge", () => {
