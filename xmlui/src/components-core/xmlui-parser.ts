@@ -285,7 +285,15 @@ function lineColFromOffset(
   newlinePositions: number[],
 ): { line: number; col: number } {
   if (newlinePositions.length === 0 || offset < newlinePositions[0]) {
+    // position is on the first line
     return { line: 1, col: offset + 1 };
+  } else if (offset > newlinePositions.at(-1)) {
+    // position is on the last line
+    const lastNewlinePos = newlinePositions.at(-1);
+    return {
+      line: newlinePositions.length + 1,
+      col: offset - lastNewlinePos,
+    };
   }
 
   let i = 0;
@@ -298,12 +306,6 @@ function lineColFromOffset(
       };
     }
   }
-
-  const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
-  return {
-    line: newlinePositions.length + 1,
-    col: offset - lastNewlinePos,
-  };
 }
 
 function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
