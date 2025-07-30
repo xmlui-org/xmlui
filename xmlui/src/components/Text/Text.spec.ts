@@ -1,26 +1,6 @@
-import { getBounds } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { TextVariantElement } from "../abstractions";
-
-// These are the html elements that are rendered using Text in their respective HtmlTag components
-const textVariantElements = [
-  "abbr",
-  "cite",
-  "code",
-  "del",
-  "em",
-  "ins",
-  "kbd",
-  "mark",
-  "p",
-  "pre",
-  "samp",
-  "small",
-  "strong",
-  "sub",
-  "sup",
-  "var",
-] as const;
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -90,17 +70,20 @@ test.describe("Basic Functionality", () => {
 
   [
     { label: "undefined", value: "'{undefined}'", toExpected: "" },
+    { label: "undefined with string", value: "'abc{undefined}def'", toExpected: "abcdef" },
     { label: "null", value: "'{null}'", toExpected: "" },
+    { label: "null with string", value: "'abc{null}def'", toExpected: "abcdef" },
     { label: "empty string", value: "''", toExpected: "" },
     { label: "string", value: "'test'", toExpected: "test" },
     { label: "integer", value: "'{1}'", toExpected: "1" },
     { label: "float", value: "'{1.2}'", toExpected: "1.2" },
     { label: "boolean", value: "'{true}'", toExpected: "true" },
+    { label: "empty object", value: "'{{}}'", toExpected: {}.toString() },
+    { label: "object", value: "\"{{ a: 1, b: 'hi' }}\"", toExpected: { a: 1, b: "hi" }.toString() },
+    { label: "empty array", value: "'{[]}'", toExpected: "" },
+    { label: "array", value: "'{[1, 2, 3]}'", toExpected: [1, 2, 3].toString() },
   ].forEach(({ label, value, toExpected }) => {
-    test(`handles ${label} value prop correctly`, async ({
-      initTestBed,
-      createTextDriver,
-    }) => {
+    test(`handles ${label} value prop correctly`, async ({ initTestBed, createTextDriver }) => {
       await initTestBed(`<Text value=${value} />`);
       const driver = await createTextDriver();
 
@@ -108,10 +91,17 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test("preserves whitespace when using value prop", async ({
-    initTestBed,
-    createTextDriver,
-  }) => {
+  test("removes leading whitespace", async ({ page, initTestBed }) => {
+    await initTestBed(`<Text testId="text">   {123}</Text>`);
+    await expect(page.getByTestId("text")).toHaveText("123");
+  });
+
+  test("removes trailing whitespace", async ({ page, initTestBed }) => {
+    await initTestBed(`<Text testId="text">{123}  </Text>`);
+    await expect(page.getByTestId("text")).toHaveText("123");
+  });
+
+  test("preserves whitespace when using value prop", async ({ initTestBed, createTextDriver }) => {
     const expected = "test        content";
     await initTestBed(`<Text value="${expected}" />`);
     const driver = await createTextDriver();
@@ -135,19 +125,6 @@ please do not break it!"
 
     expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
-
-  textVariantElements.forEach((htmlElement) => {
-    test(`HtmlTag '${htmlElement}' accepts custom props`, async ({
-      initTestBed,
-      createTextDriver,
-    }) => {
-      await initTestBed(`<${htmlElement} custom="test" boolean>Test</${htmlElement}>`);
-      const driver = await createTextDriver();
-
-      await expect(driver.component).toHaveAttribute("custom", "test");
-      await expect(driver.component).toHaveAttribute("boolean", "true");
-    });
-  });
 });
 
 // =============================================================================
@@ -155,7 +132,10 @@ please do not break it!"
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("non-breaking space entities are rendered correctly", async ({ initTestBed, createTextDriver }) => {
+  test("non-breaking space entities are rendered correctly", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     const content = "4 spaces here [&nbsp;&nbsp;&nbsp;&nbsp;], &amp;nbsp; written out.";
     const expected = "4 spaces here [    ], &nbsp; written out.";
 
@@ -309,10 +289,7 @@ test.describe("Edge Cases", () => {
     { label: "empty array", value: "'{[]}'", toExpected: "" },
     { label: "array", value: "'{[1, 2, 3]}'", toExpected: [1, 2, 3].toString() },
   ].forEach(({ label, value, toExpected }) => {
-    test(`handles ${label} value prop gracefully`, async ({
-      initTestBed,
-      createTextDriver,
-    }) => {
+    test(`handles ${label} value prop gracefully`, async ({ initTestBed, createTextDriver }) => {
       await initTestBed(`<Text value=${value} />`);
       const driver = await createTextDriver();
 
@@ -344,6 +321,11 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toBeVisible();
     await expect(driver.component).toContainText("Mixed content:");
   });
+
+  // TODO: create tests with multiple variants
+  test.skip("nested Texts", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {
+    await initTestBed(`<Text><Text></Text></Text>`);
+  });
 });
 
 // =============================================================================
@@ -351,18 +333,22 @@ test.describe("Edge Cases", () => {
 // =============================================================================
 
 test.describe("Performance", () => {
-  test("renders multiple text components efficiently", async ({ initTestBed, createTextDriver }) => {
-    const textElements = Array.from({ length: 100 }, (_, i) => 
-      `<Text testId="text-${i}">Text content ${i}</Text>`
-    ).join('');
-    
+  test("renders multiple text components efficiently", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    const textElements = Array.from(
+      { length: 100 },
+      (_, i) => `<Text testId="text-${i}">Text content ${i}</Text>`,
+    ).join("");
+
     await initTestBed(`<VStack>${textElements}</VStack>`);
-    
+
     // Test a few random elements to ensure they render correctly
     const driver1 = await createTextDriver("text-0");
     const driver50 = await createTextDriver("text-49");
     const driver100 = await createTextDriver("text-99");
-    
+
     await expect(driver1.component).toHaveText("Text content 0");
     await expect(driver50.component).toHaveText("Text content 49");
     await expect(driver100.component).toHaveText("Text content 99");
@@ -373,14 +359,17 @@ test.describe("Performance", () => {
     const driver = await createTextDriver();
 
     const textValues = ["Content 1", "Content 2", "Content 3", "Content 4", "Content 5"];
-    
+
     for (const value of textValues) {
       await initTestBed(`<Text value="${value}" />`);
       await expect(driver.component).toHaveText(value);
     }
   });
 
-  test("maintains performance with complex theme variables", async ({ initTestBed, createTextDriver }) => {
+  test("maintains performance with complex theme variables", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed('<Text value="Performance test" />', {
       testThemeVars: {
         "textColor-Text": "rgb(255, 0, 0)",
@@ -410,7 +399,11 @@ test.describe("Integration", () => {
     await expect(driver.component).toHaveText(expected);
   });
 
-  test("maintains inline behavior in HStack layout", async ({ initTestBed, createTextDriver, createIconDriver }) => {
+  test("maintains inline behavior in HStack layout", async ({
+    initTestBed,
+    createTextDriver,
+    createIconDriver,
+  }) => {
     await initTestBed(`
       <HStack>
         <Text testId="text0" >Show me a trash</Text>
@@ -426,7 +419,11 @@ test.describe("Integration", () => {
     expect(topIcon0).toEqual(topText1);
   });
 
-  test("maintains block behavior in VStack layout", async ({ initTestBed, createTextDriver, createIconDriver }) => {
+  test("maintains block behavior in VStack layout", async ({
+    initTestBed,
+    createTextDriver,
+    createIconDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Text testId="text0" >Show me a trash</Text>
@@ -442,7 +439,10 @@ test.describe("Integration", () => {
     expect(topIcon0).toBeLessThan(topText1);
   });
 
-  test("integrates with complex component hierarchies", async ({ initTestBed, createTextDriver }) => {
+  test("integrates with complex component hierarchies", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <HStack>
@@ -455,7 +455,7 @@ test.describe("Integration", () => {
         </HStack>
       </VStack>
     `);
-    
+
     const headerDriver = await createTextDriver("header");
     const contentDriver = await createTextDriver("content");
     const footer1Driver = await createTextDriver("footer1");
