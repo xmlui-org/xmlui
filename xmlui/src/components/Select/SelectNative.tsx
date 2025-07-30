@@ -192,25 +192,23 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           <Icon name="chevrondown" />
         </SelectIcon>
       </SelectTrigger>
-      {!readOnly && (
-        <SelectPortal container={root}>
-          <SelectContent
-            className={styles.selectContent}
-            position="popper"
-            style={{ height: height }}
-          >
-            <ScrollUpButton className={styles.selectScrollUpButton}>
-              <Icon name="chevronup" />
-            </ScrollUpButton>
-            <SelectViewport className={styles.selectViewport} role="listbox">
-              {children}
-            </SelectViewport>
-            <ScrollDownButton className={styles.selectScrollDownButton}>
-              <Icon name="chevrondown" />
-            </ScrollDownButton>
-          </SelectContent>
-        </SelectPortal>
-      )}
+      <SelectPortal container={root}>
+        <SelectContent
+          className={styles.selectContent}
+          position="popper"
+          style={{ height: height }}
+        >
+          <ScrollUpButton className={styles.selectScrollUpButton}>
+            <Icon name="chevronup" />
+          </ScrollUpButton>
+          <SelectViewport className={styles.selectViewport} role="listbox">
+            {children}
+          </SelectViewport>
+          <ScrollDownButton className={styles.selectScrollDownButton}>
+            <Icon name="chevrondown" />
+          </ScrollDownButton>
+        </SelectContent>
+      </SelectPortal>
     </SelectRoot>
   );
 });
