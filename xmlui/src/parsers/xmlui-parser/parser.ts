@@ -390,52 +390,39 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  change this, cuz it's bad
   function getContextWithSurroundingLines(
     pos: number,
     end: number,
-    surroundingLinesCount: number,
+    surroundingContextLines: number,
   ): { contextPos: number; contextEnd: number } {
-    // Find start of line containing pos
-    let errorLineStart = pos;
-    while (errorLineStart > 0 && text[errorLineStart - 1] !== "\n") {
-      errorLineStart--;
-    }
+    let newlinesFound = 0;
 
-    // Find end of line containing end
-    let errorLineEnd = end;
-    while (errorLineEnd < text.length && text[errorLineEnd] !== "\n") {
-      errorLineEnd++;
-    }
-
-    // Go back the specified number of lines from error line start
-    let contextPos = errorLineStart;
-    for (let i = 0; i < surroundingLinesCount && contextPos > 0; i++) {
-      // Go back past line ending char
-      let prevEnd = contextPos - 1;
-      if (prevEnd >= 0) {
-        // Find start of previous line
-        let prevStart = prevEnd;
-        while (prevStart > 0 && text[prevStart - 1] !== "\n") {
-          prevStart--;
+    let contextEnd: number;
+    let cursor = end;
+    while (cursor < text.length) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
         }
-        contextPos = prevStart;
-      } else {
-        contextPos = 0;
-        break;
       }
+      cursor++;
     }
+    contextEnd = cursor;
 
-    // Go forward the specified number of lines from error line end
-    let contextEnd = errorLineEnd;
-    for (let i = 0; i < surroundingLinesCount && contextEnd < text.length; i++) {
-      // Skip line ending character
-      contextEnd++;
-      // Find end of next line
-      while (contextEnd < text.length && text[contextEnd] !== "\n") {
-        contextEnd++;
+    let contextPos: number;
+    cursor = pos;
+    newlinesFound = 0;
+    while (cursor >= 0) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
       }
+      cursor--;
     }
+    contextPos = cursor + 1;
 
     return { contextPos, contextEnd };
   }
