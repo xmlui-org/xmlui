@@ -12,6 +12,7 @@ export type Option = {
   readOnly?: boolean;
   keywords?: string[];
   children?: ReactNode;
+  optionRenderer?: (contextVars: any) => ReactNode;
 };
 
 export type Accordion = {

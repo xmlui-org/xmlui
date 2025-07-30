@@ -122,6 +122,7 @@ interface SimpleSelectProps {
   children: ReactNode;
   readOnly: boolean;
   options: Option[];
+  emptyListNode: ReactNode;
 }
 
 const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
@@ -143,6 +144,8 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       width,
       children,
       readOnly,
+      emptyListNode,
+      options
     } = props;
 
     // Compose refs for proper forwarding
@@ -170,7 +173,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     });
 
     const selectedOption = useMemo(() => {
-      return props.options.find((option) => option.value === value);
+      return props.options.find((option) => String(option.value) === String(value));
     }, [props.options, value]);
 
     return (
@@ -215,6 +218,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             </ScrollUpButton>
             <SelectViewport className={styles.selectViewport} role="listbox">
               {children}
+              {options.length === 0 && emptyListNode}
             </SelectViewport>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />
@@ -314,7 +318,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             ? value.filter((v) => String(v) !== String(selectedValue))
             : [...value, selectedValue]
           : [selectedValue]
-        : selectedValue === value
+        : String(selectedValue) === String(value)
           ? null
           : selectedValue;
       updateState({ value: newSelectedValue });
@@ -555,7 +559,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
-                value={(value || initialValue) as SingleValueType}
+                value={value as SingleValueType}
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}
@@ -569,6 +573,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 height={dropdownHeight}
                 width={width}
                 options={Array.from(options)}
+                emptyListNode={emptyListNode}
               >
                 {children}
               </SimpleSelect>

@@ -34,18 +34,27 @@ export const OptionMd = createMetadata({
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
     const label = extractValue.asOptionalString(node.props.label);
     const value = extractValue.asOptionalString(node.props.value);
-    if (value === undefined) {
-      return null;
-    }
     return (
       <OptionNative
         label={label}
-        value={value}
+        value={value || label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
+        optionRenderer={
+          node.children?.length > 0
+            ? (contextVars) => (
+                <MemoizedItem
+                  node={node.children}
+                  renderChild={renderChild}
+                  contextVars={contextVars}
+                  layoutContext={layoutContext}
+                />
+              )
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </OptionNative>
