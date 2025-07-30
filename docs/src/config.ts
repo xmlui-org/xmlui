@@ -4,6 +4,10 @@ import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
+import scss from "@shikijs/langs/scss";
+// @ts-ignore
+import css from "@shikijs/langs/css";
+// @ts-ignore
 import json from "@shikijs/langs/json";
 
 // @ts-ignore
@@ -105,7 +109,7 @@ Object.keys(pagesRuntime).map((filePath) => {
 
 const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
-  langs: [js, json, html, xmluiGrammar],
+  langs: [js, json, html, xmluiGrammar, css, scss],
   // @ts-ignore
   themes: [xmluiThemeLight, xmluiThemeDark],
   engine: createJavaScriptRegexEngine(),
