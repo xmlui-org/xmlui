@@ -88,9 +88,9 @@ Whether to display the datepicker inline
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak` (default: false) [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` (default: "top") [#labelposition-default-top]
 
