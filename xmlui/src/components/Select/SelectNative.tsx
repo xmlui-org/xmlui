@@ -520,7 +520,7 @@ export const Select = forwardRef(function Select(
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
-                value={(value || initialValue) as SingleValueType}
+                value={value as SingleValueType}
                 options={options}
                 onValueChange={toggleOption}
                 id={inputId}
