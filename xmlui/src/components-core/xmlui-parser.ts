@@ -285,47 +285,31 @@ export function errReportModuleErrors(errors: ModuleErrors, fileName: number | s
  * @param offset the offset of the position in the string
  * @param newlinePositions the offsets of the newlines in the string in ascending order
  */
-function lineColFromOffset(
+function offsetToPosition(
   offset: number,
   newlinePositions: number[],
 ): { line: number; col: number } {
-  if (newlinePositions.length === 0) {
-    return { line: 1, col: offset + 1 };
-  }
-
-  // Binary search to find the first newline position > offset
   let left = 0;
   let right = newlinePositions.length;
-
   while (left < right) {
     const mid = Math.floor((left + right) / 2);
-    if (newlinePositions[mid] <= offset) {
+
+    if (newlinePositions[mid] < offset) {
       left = mid + 1;
     } else {
       right = mid;
     }
   }
 
-  // left is now the index of the first newline > offset
-  // So we're on line (left + 1)
-  const line = left + 1;
-
-  // Calculate column based on the previous newline position
-  let col: number;
-  if (left === 0) {
-    // We're on the first line
-    col = offset + 1;
-  } else {
-    // We're after newlinePositions[left - 1]
-    col = offset - newlinePositions[left - 1];
-  }
+  let line = left + 1;
+  let col = left === 0 ? offset + 1 : offset - newlinePositions[left - 1];
 
   return { line, col };
 }
 
 function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
   for (let err of errors) {
-    const { line, col } = lineColFromOffset(err.pos, newlinePositions);
+    const { line, col } = offsetToPosition(err.pos, newlinePositions);
     (err as ErrorWithContext).line = line;
     (err as ErrorWithContext).col = col;
   }
