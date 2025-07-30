@@ -280,6 +280,11 @@ export function errReportModuleErrors(errors: ModuleErrors, fileName: number | s
   return comp;
 }
 
+/**
+ * Converts a position in a string to a line and column number.
+ * @param offset the offset of the position in the string
+ * @param newlinePositions the offsets of the newlines in the string in ascending order
+ */
 function lineColFromOffset(
   offset: number,
   newlinePositions: number[],
@@ -296,16 +301,20 @@ function lineColFromOffset(
     };
   }
 
-  let i = 0;
-  for (; i < newlinePositions.length; ++i) {
-    const newlinePos = newlinePositions[i];
-    if (offset < newlinePos) {
-      return {
-        line: i + 1,
-        col: offset - newlinePositions[i - 1],
-      };
+  let bot = 0;
+  let top = newlinePositions.length;
+  while (top - bot > 1) {
+    const mid = bot + Math.floor((top - bot) / 2);
+    if (offset < newlinePositions[mid]) {
+      top = mid;
+    } else {
+      bot = mid + 1;
     }
   }
+  return {
+    line: bot + 1,
+    col: offset - newlinePositions[bot - 1],
+  };
 }
 
 function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
