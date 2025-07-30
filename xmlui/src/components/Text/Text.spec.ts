@@ -1,4 +1,4 @@
-import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { TextVariantElement } from "../abstractions";
 
