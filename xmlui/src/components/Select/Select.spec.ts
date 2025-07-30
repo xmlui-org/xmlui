@@ -638,3 +638,18 @@ test.describe("searchable multiselect", { tag: "@smoke" }, () => {
     await expect(page.getByTestId("text")).toHaveText("Selected value: 1,2");
   });
 });
+
+test("initialValue honored when used within Form", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Form>
+    
+      <Select id="mySelect" initialValue="opt3">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+      <Text testId="text">Selected value: {mySelect.value}</Text>
+    </Form>`);
+
+  await expect(page.getByTestId("text")).toHaveText("Selected value: opt3");
+});
