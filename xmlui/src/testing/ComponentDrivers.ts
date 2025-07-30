@@ -638,3 +638,147 @@ export class CheckboxDriver extends InputComponentDriver {
 // --- Label
 
 export class LabelDriver extends ComponentDriver {}
+
+// --- Spinner
+
+export class SpinnerDriver extends ComponentDriver {
+  /**
+   * Gets the main spinner element (the one with the ring animation)
+   */
+  get spinnerElement() {
+    // Filter for spinner elements and use the first one by default
+    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).first();
+  }
+
+  /**
+   * Gets a specific spinner element by index (for multiple spinners)
+   */
+  getSpinnerByIndex(index: number) {
+    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).nth(index);
+  }
+
+  /**
+   * Gets the fullscreen wrapper element (only exists when fullScreen=true)
+   */
+  get fullScreenWrapper() {
+    return this.page.locator('div[class*="_fullScreenSpinnerWrapper_"]');
+  }
+
+  /**
+   * Checks if the spinner is in fullscreen mode
+   */
+  async isFullScreen(): Promise<boolean> {
+    try {
+      const wrapper = this.fullScreenWrapper;
+      return await wrapper.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Gets the computed style of the spinner element
+   */
+  async getSpinnerStyle() {
+    const element = this.spinnerElement;
+    return await element.evaluate((el: HTMLElement) => {
+      const styles = window.getComputedStyle(el);
+      return {
+        display: styles.display,
+        position: styles.position,
+        width: styles.width,
+        height: styles.height,
+        animationDuration: styles.animationDuration,
+        className: el.className
+      };
+    });
+  }
+
+  /**
+   * Gets the animation duration from the child elements (where the actual animation occurs)
+   */
+  async getAnimationDuration(): Promise<string> {
+    const element = this.spinnerElement;
+    return await element.evaluate((el: HTMLElement) => {
+      // Check the first child div for animation duration
+      const firstChild = el.querySelector('div');
+      if (firstChild) {
+        const styles = window.getComputedStyle(firstChild);
+        return styles.animationDuration;
+      }
+      return '0s';
+    });
+  }
+
+  /**
+   * Waits for the spinner to appear
+   */
+  async waitForSpinner(timeout: number = 5000): Promise<void> {
+    await this.spinnerElement.waitFor({ state: 'visible', timeout });
+  }
+
+  /**
+   * Waits for the spinner to disappear
+   */
+  async waitForSpinnerToDisappear(timeout: number = 5000): Promise<void> {
+    await this.spinnerElement.waitFor({ state: 'hidden', timeout });
+  }
+
+  /**
+   * Checks if the spinner is visible
+   */
+  async isVisible(): Promise<boolean> {
+    return await this.spinnerElement.isVisible();
+  }
+
+  /**
+   * Gets the CSS class name to verify CSS modules are working
+   */
+  async getClassName(): Promise<string> {
+    return await this.spinnerElement.getAttribute('class') || '';
+  }
+
+  /**
+   * Gets the number of child div elements (should be 4 for the ring animation)
+   */
+  async getChildCount(): Promise<number> {
+    return await this.spinnerElement.evaluate((el: HTMLElement) => {
+      return el.querySelectorAll('div').length;
+    });
+  }
+
+  /**
+   * Gets the total number of spinner components on the page
+   */
+  async getSpinnerCount(): Promise<number> {
+    return await this.page.locator('[data-testid="test-id-component"]').count();
+  }
+
+  /**
+   * Gets a spinner by specific test ID
+   */
+  getSpinnerByTestId(testId: string) {
+    return this.page.locator(`[data-testid="${testId}"]`);
+  }
+
+  /**
+   * Checks if fullscreen mode has the correct wrapper structure
+   */
+  async getFullScreenWrapperInfo() {
+    const wrapper = this.fullScreenWrapper;
+    if (!await wrapper.isVisible()) {
+      return null;
+    }
+    
+    return await wrapper.evaluate((el: HTMLElement) => {
+      const parent = el.parentElement;
+      const styles = window.getComputedStyle(el);
+      return {
+        position: styles.position,
+        inset: styles.inset,
+        parentClassName: parent?.className || '',
+        hasSpinnerChild: !!el.querySelector('[class*="_lds-ring_"]')
+      };
+    });
+  }
+}

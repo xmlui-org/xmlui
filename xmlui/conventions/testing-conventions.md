@@ -189,7 +189,15 @@ npx playwright test ComponentName.spec.ts --grep "edge case"
 
 # Run tests in parallel
 npx playwright test ComponentName.spec.ts --workers=7
+
+# Use dot reporter while creating or updating tests (recommended)
+npx playwright test ComponentName.spec.ts --reporter=dot
 ```
+
+### Test Development Best Practices
+- **Use Dot Reporter**: When creating or updating end-to-end tests, use the `--reporter=dot` flag for cleaner, more concise output that focuses on test results rather than verbose logging
+- **Iterative Development**: Run tests frequently during development to catch issues early
+- **Parallel Execution**: Use `--workers=7` for faster test execution when running full test suites
 
 ## Best Practices
 
@@ -239,6 +247,7 @@ test.skip("advanced feature behavior", async ({ initTestBed, page }) => {
 - **Interactive**: Test all states, keyboard/mouse events, visual transitions  
 - **Layout**: Test arrangement, spacing, responsive behavior, nesting
 - **Composite**: Test sub-component interactions, data flow, performance
+- **Text Components**: Test value vs content prop precedence, whitespace handling, variant rendering
 
 ### Large Test Suite Creation
 1. **Analyze Similar Components** for reusable patterns
@@ -247,7 +256,125 @@ test.skip("advanced feature behavior", async ({ initTestBed, page }) => {
 4. **Test Data Types** comprehensively for input components
 5. **Choose Appropriate Tools**: `page.getByRole()` vs component drivers
 
+### Test Suite Restructuring Patterns
+
+When restructuring existing test suites:
+
+```typescript
+// Organize with test.describe() blocks for clarity
+test.describe("Basic Functionality", () => {
+  test("component renders", async ({ initTestBed, createComponentDriver }) => {
+    // Basic rendering test
+  });
+  
+  test("component renders with value prop", async ({ initTestBed, createComponentDriver }) => {
+    // Prop-based rendering test
+  });
+});
+
+test.describe("Accessibility", () => {
+  test("supports proper semantic HTML variants", async ({ initTestBed, createComponentDriver }) => {
+    // Semantic HTML testing
+  });
+});
+```
+
+### Component Variant Testing
+For components with multiple HTML variants (like Text component):
+
+```typescript
+// Test all variants systematically
+Object.entries(ComponentVariantEnum).forEach(([variant, htmlElement]) => {
+  test(`variant=${variant} renders correct HTML element: ${htmlElement}`, async ({
+    initTestBed,
+    createComponentDriver,
+  }) => {
+    await initTestBed(`<ComponentName variant="${variant}" />`);
+    const driver = await createComponentDriver();
+    
+    const tagName = await driver.getComponentTagName();
+    expect(tagName).toEqual(htmlElement);
+  });
+});
+```
+
+### Theme Variable Testing Patterns
+Group theme variable tests separately for clarity:
+
+```typescript
+test.describe("Theme Variables", () => {
+  test("textColor theme variable", async ({ initTestBed, createComponentDriver }) => {
+    const EXPECTED = "rgb(255, 0, 0)";
+    await initTestBed('<ComponentName value="test" />', {
+      testThemeVars: { "textColor-ComponentName": EXPECTED },
+    });
+    const component = (await createComponentDriver()).component;
+    await expect(component).toHaveCSS("color", EXPECTED);
+  });
+});
+```
+
+### Data Type Handling Comprehensive Testing
+For components that accept various data types:
+
+```typescript
+[
+  { label: "undefined", value: "'{undefined}'", toExpected: "" },
+  { label: "null", value: "'{null}'", toExpected: "" },
+  { label: "empty string", value: "''", toExpected: "" },
+  { label: "string", value: "'test'", toExpected: "test" },
+  { label: "integer", value: "'{1}'", toExpected: "1" },
+  { label: "float", value: "'{1.2}'", toExpected: "1.2" },
+  { label: "boolean", value: "'{true}'", toExpected: "true" },
+].forEach(({ label, value, toExpected }) => {
+  test(`handles ${label} value prop correctly`, async ({
+    initTestBed,
+    createComponentDriver,
+  }) => {
+    await initTestBed(`<ComponentName value=${value} />`);
+    const driver = await createComponentDriver();
+    await expect(driver.component).toHaveText(toExpected);
+  });
+});
+```
+
+### Performance Testing for Multiple Components
+```typescript
+test("renders multiple components efficiently", async ({ initTestBed, createComponentDriver }) => {
+  const elements = Array.from({ length: 100 }, (_, i) => 
+    `<ComponentName testId="comp-${i}">Content ${i}</ComponentName>`
+  ).join('');
+  
+  await initTestBed(`<Container>${elements}</Container>`);
+  
+  // Test random samples to verify efficiency
+  const driver1 = await createComponentDriver("comp-0");
+  const driver50 = await createComponentDriver("comp-49");
+  
+  await expect(driver1.component).toHaveText("Content 0");
+  await expect(driver50.component).toHaveText("Content 49");
+});
+```
+
 ### File Management
 For complete test file replacement: Use `rm` + `create_file` rather than large string replacements.
 
-This systematic approach ensures comprehensive, maintainable test coverage while building on proven patterns.
+### Backwards Compatibility
+When restructuring tests, consider keeping original smoke test sections:
+
+```typescript
+// =============================================================================
+// SMOKE TESTS (kept for compatibility)
+// =============================================================================
+
+test.describe("smoke tests", { tag: "@smoke" }, () => {
+  test("basic smoke test", async ({ initTestBed, createComponentDriver }) => {
+    await initTestBed(`<ComponentName value="Smoke test" />`);
+    const driver = await createComponentDriver();
+    
+    await expect(driver.component).toBeVisible();
+  });
+});
+```
+
+This systematic approach ensures comprehensive, maintainable test coverage while building on proven patterns and maintaining backwards compatibility with existing test infrastructure.
