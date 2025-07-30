@@ -73,7 +73,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   }
 }
 
-button.selectTrigger {
+.selectTrigger {
   min-height: 2.6rem;
   display: flex;
   padding: t.$space-1 t.$space-2;
@@ -97,14 +97,13 @@ button.selectTrigger {
     @include variant("success");
   }
 
-}
-
-.selectTrigger:disabled {
-  cursor: not-allowed;
-  opacity: createThemeVar("opacity-#{$componentName}--disabled");
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-  color: createThemeVar("Input:textColor-#{$componentName}--disabled");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+  &:disabled {
+    cursor: not-allowed;
+    opacity: createThemeVar("opacity-#{$componentName}--disabled");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+    color: createThemeVar("Input:textColor-#{$componentName}--disabled");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+  }
 }
 
 .selectTrigger > span {

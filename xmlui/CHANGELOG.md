@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.88
+
+### Patch Changes
+
+- b79d7d8: Fix flaky Checkbox e2e tests
+
 ## 0.9.87
 
 ### Patch Changes

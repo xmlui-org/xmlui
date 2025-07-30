@@ -102,7 +102,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           break;
         default:
           const errNode = errNodeUntil(RECOVER_FILE);
-          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end);
+          errorAt(DIAGS.unexpectedCloseTag, errNode!.pos, errNode!.end);
           break;
       }
     }
@@ -185,10 +185,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function parseOpeningTagName(): { node: Node; errInName: boolean } {
     startNode();
-    bump(SyntaxKind.Identifier);
+    const identNode = bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
-      errorAt(DIAGS.expTagNameAfterNamespace, nameNodeWithColon.pos, nameNodeWithColon.end);
+      const namespaceName = getText(identNode);
+      errorAt(
+        DIAGS.expTagNameAfterNamespace(namespaceName),
+        nameNodeWithColon.pos,
+        nameNodeWithColon.end,
+      );
       errNodeUntil([SyntaxKind.Identifier, ...RECOVER_OPEN_TAG]);
       return { node: nameNodeWithColon, errInName: true };
     } else {
@@ -231,7 +236,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     } else {
       const errNode = errNodeUntil(RECOVER_ATTR);
       if (errNode) {
-        errorAt(DIAGS.expAttrName, errNode.pos, errNode.end);
+        if (at(SyntaxKind.Equal)) {
+          errorAt(DIAGS.expAttrNameBeforeEq, errNode.pos, errNode.end);
+        } else {
+          errorAt(DIAGS.expAttrName, errNode.pos, errNode.end);
+        }
         completeNode(SyntaxKind.AttributeNode);
       } else {
         abandonNode();
@@ -265,15 +274,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         nsIdent = nameIdent;
         nameIdent = bump(SyntaxKind.Identifier);
       } else {
+        const namespaceName = getText(nameIdent);
         const errNode = errNodeUntil([
           SyntaxKind.Equal,
           SyntaxKind.Identifier,
           ...RECOVER_OPEN_TAG,
         ]);
+
         if (errNode) {
-          errorAt(DIAGS.expAttrNameAfterNamespace, errNode.pos, errNode.end);
+          errorAt(DIAGS.expAttrNameAfterNamespace(namespaceName), errNode.pos, errNode.end);
         } else {
-          error(DIAGS.expAttrNameAfterNamespace);
+          error(DIAGS.expAttrNameAfterNamespace(namespaceName));
         }
       }
     }
@@ -297,9 +308,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       } else {
         const errNode = errNodeUntil(RECOVER_CLOSE_TAG);
         if (errNode) {
-          errorAt(DIAGS.expTagName, errNode.pos, errNode.end);
+          errorAt(DIAGS.expTagNameAfterCloseStart, errNode.pos, errNode.end);
         } else {
-          error(DIAGS.expTagName);
+          error(DIAGS.expTagNameAfterCloseStart);
         }
       }
       if (!eat(SyntaxKind.NodeEnd)) {
@@ -320,10 +331,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function parseClosingTagName(): Node {
     startNode();
-    bump(SyntaxKind.Identifier);
+    const identNode = bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
-      errorAt(DIAGS.expTagNameAfterNamespace, nameNodeWithColon.pos, nameNodeWithColon.end);
+      errorAt(
+        DIAGS.expTagNameAfterNamespace(getText(identNode)),
+        nameNodeWithColon.pos,
+        nameNodeWithColon.end,
+      );
       errNodeUntil(RECOVER_OPEN_TAG);
       return nameNodeWithColon;
     } else {

@@ -188,17 +188,18 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleS
         ref={ref}
         autoFocus={autoFocus}
       >
-        <div className={styles.selectValue}>
-          {readOnly ? (
-            // For readonly mode, find and display the selected option's label
-            <span aria-placeholder={placeholder}>{placeholder}</span>
-          ) : (
-            // For interactive mode, let Radix handle the display
-            <SelectValue aria-placeholder={placeholder} placeholder={placeholder}>
-              {value}
-            </SelectValue>
-          )}
-        </div>
+       <SelectValue>
+         {
+           <div
+             className={classnames(styles.selectValue, {
+               [styles.selectValue]: value !== undefined,
+               [styles.placeholder]: value === undefined,
+             })}
+           >
+             {value ? value : readOnly ? "" : placeholder}
+           </div>
+         }
+       </SelectValue>
         <SelectIcon asChild>
           <Icon name="chevrondown" />
         </SelectIcon>
@@ -554,7 +555,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
-                value={value as SingleValueType}
+                value={(value || initialValue) as SingleValueType}
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}

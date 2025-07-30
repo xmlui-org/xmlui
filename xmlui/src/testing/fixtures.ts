@@ -33,6 +33,7 @@ import {
   NoResultDriver,
   NumberBoxDriver,
   OptionDriver,
+  ProgressBarDriver,
   RadioGroupDriver,
   RangeDriver,
   SelectDriver,
@@ -291,6 +292,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(TextAreaDriver, testIdOrLocator);
     });
   },
+  createProgressBarDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ProgressBarDriver, testIdOrLocator);
+    });
+  },
   createListDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(ListDriver, testIdOrLocator);
@@ -444,6 +450,7 @@ type TestDriverExtenderProps = {
   createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;
   createTextBoxDriver: ComponentDriverMethod<TextBoxDriver>;
   createTextAreaDriver: ComponentDriverMethod<TextAreaDriver>;
+  createProgressBarDriver: ComponentDriverMethod<ProgressBarDriver>;
   createListDriver: ComponentDriverMethod<ListDriver>;
   createTextDriver: ComponentDriverMethod<TextDriver>;
   createHeadingDriver: ComponentDriverMethod<HeadingDriver>;

@@ -58,9 +58,9 @@ This property defines the initial value of the selected option within the group.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak` (default: false) [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` (default: "top") [#labelposition-default-top]
 

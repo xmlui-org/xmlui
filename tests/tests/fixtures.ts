@@ -88,6 +88,9 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
         if (errors.length > 0){
           throw { errors: errors };
         }
+        if (!component) {
+          throw new Error("xmlUiMarkupToComponent returned null for component");
+        }
         const componentTestId = "test-id-component";
         (component as ComponentDef).children![0].testId ??= componentTestId;
 

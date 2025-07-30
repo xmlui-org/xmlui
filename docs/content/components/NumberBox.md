@@ -114,9 +114,9 @@ This boolean property signs whether the input field accepts integers only (`true
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak` (default: false) [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `NumberBox` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `NumberBox` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` (default: "top") [#labelposition-default-top]
 

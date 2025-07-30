@@ -30,10 +30,6 @@ it is `true` by default.
 </App>
 ```
 
-### `indeterminate` (default: false) [#indeterminate-default-false]
-
-The `true` value of this property signals that the component is in an _intedeterminate state_.
-
 ### `initialValue` (default: false) [#initialvalue-default-false]
 
 This property sets the component's initial value.
@@ -51,9 +47,9 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak` (default: false) [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `Switch` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` (default: "end") [#labelposition-default-end]
 

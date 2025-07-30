@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { mapObject, parseAsCssBorder, parseAsNumericCss } from "./component-test-helpers";
+import { getPseudoElementStyle } from "./component-test-helpers";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -76,6 +76,10 @@ export class InputComponentDriver extends ComponentDriver {
 
   get placeholder() {
     return this.field.getAttribute("placeholder");
+  }
+
+  get requiredIndicator() {
+    return this.component.getByText("*");
   }
 }
 
@@ -439,6 +443,34 @@ export class TextAreaDriver extends InputComponentDriver {
   }
 }
 
+// --- ProgressBar
+
+export class ProgressBarDriver extends ComponentDriver {
+  get wrapper() {
+    return this.component;
+  }
+
+  get bar() {
+    return this.component.locator("> div");
+  }
+
+  async getValue() {
+    const style = await this.bar.getAttribute("style");
+    if (!style) return 0;
+    
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? parseFloat(widthMatch[1]) / 100 : 0;
+  }
+
+  async getBarWidth() {
+    const style = await this.bar.getAttribute("style");
+    if (!style) return "0%";
+    
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? `${widthMatch[1]}%` : "0%";
+  }
+}
+
 // --- List
 
 export class ListDriver extends ComponentDriver {}
@@ -592,7 +624,16 @@ export class CodeBlockDriver extends ComponentDriver {}
 
 // --- Checkbox
 
-export class CheckboxDriver extends InputComponentDriver {}
+export class CheckboxDriver extends InputComponentDriver {
+  async getIndicatorColor() {
+    const specifier = this.component.getByRole("checkbox").or(this.component).last();
+    const indicatorStyleRaw = await getPseudoElementStyle(specifier, "::before", "box-shadow");
+    const colorMatch = indicatorStyleRaw.match(
+      /(rgba?\([^)]+\)|hsla?\([^)]+\)|#[a-fA-F0-9]{3,8})/
+    );
+    return colorMatch ? colorMatch[1] : null;
+  }
+}
 
 // --- Label
 
