@@ -204,7 +204,7 @@
                 <DocumentPageNoTOC url="/pages/reactive-intro.md" />
             </Page>
             <Page url="/components-intro">
-                <ComponentsIntro />
+                <DocumentPageNoTOC url="/pages/components-intro.md" />
             </Page>
             <Page url="/themes-intro">
                 <ThemesIntro />
