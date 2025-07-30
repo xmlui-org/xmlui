@@ -146,6 +146,9 @@ const SimpleSelect = forwardRef(function SimpleSelect(
   const stringValue = useMemo(() => {
     return value != undefined ? value + "" : undefined;
   }, [value]);
+  const selectedOption = useMemo(() => {
+    return Array.from(options).find((o) => `${o.value}` === stringValue);
+  }, [options, stringValue]);
 
   const onValChange = useCallback(
     (val: string) => {
@@ -175,36 +178,39 @@ const SimpleSelect = forwardRef(function SimpleSelect(
         ref={ref}
         autoFocus={autoFocus}
       >
-        <div className={styles.selectValue}>
-          {readOnly ? (
-            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || (
-              <span aria-placeholder={placeholder}>{placeholder}</span>
-            )
-          ) : (
-            <SelectValue aria-placeholder={placeholder} placeholder={placeholder} />
-          )}
-        </div>
+        {
+          <div
+            className={classnames(styles.selectValue, {
+              [styles.selectValue]: selectedOption !== undefined,
+              [styles.placeholder]: selectedOption === undefined,
+            })}
+          >
+            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+          </div>
+        }
         <SelectIcon asChild>
           <Icon name="chevrondown" />
         </SelectIcon>
       </SelectTrigger>
-      <SelectPortal container={root}>
-        <SelectContent
-          className={styles.selectContent}
-          position="popper"
-          style={{ height: height }}
-        >
-          <ScrollUpButton className={styles.selectScrollUpButton}>
-            <Icon name="chevronup" />
-          </ScrollUpButton>
-          <SelectViewport className={styles.selectViewport} role="listbox">
-            {children}
-          </SelectViewport>
-          <ScrollDownButton className={styles.selectScrollDownButton}>
-            <Icon name="chevrondown" />
-          </ScrollDownButton>
-        </SelectContent>
-      </SelectPortal>
+      {!readOnly && (
+        <SelectPortal container={root}>
+          <SelectContent
+            className={styles.selectContent}
+            position="popper"
+            style={{ height: height }}
+          >
+            <ScrollUpButton className={styles.selectScrollUpButton}>
+              <Icon name="chevronup" />
+            </ScrollUpButton>
+            <SelectViewport className={styles.selectViewport} role="listbox">
+              {children}
+            </SelectViewport>
+            <ScrollDownButton className={styles.selectScrollDownButton}>
+              <Icon name="chevrondown" />
+            </ScrollDownButton>
+          </SelectContent>
+        </SelectPortal>
+      )}
     </SelectRoot>
   );
 });
@@ -516,7 +522,7 @@ export const Select = forwardRef(function Select(
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
-                value={value as SingleValueType}
+                value={(value || initialValue) as SingleValueType}
                 options={options}
                 onValueChange={toggleOption}
                 id={inputId}
