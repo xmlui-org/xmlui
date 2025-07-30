@@ -36,7 +36,7 @@ import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext } from "./OptionContext";
+import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 export const defaultProps = {
@@ -121,109 +121,110 @@ interface SimpleSelectProps {
   width: number;
   children: ReactNode;
   readOnly: boolean;
+  options: Option[];
 }
 
-const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(function SimpleSelect(
-  props,
-  forwardedRef,
-) {
-  const { root } = useTheme();
-  const {
-    enabled,
-    onBlur,
-    autoFocus,
-    onValueChange,
-    validationStatus,
-    value,
-    height,
-    style,
-    placeholder,
-    id,
-    triggerRef,
-    onFocus,
-    width,
-    children,
-    readOnly,
-  } = props;
+const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
+  function SimpleSelect(props, forwardedRef) {
+    const { root } = useTheme();
+    const {
+      enabled,
+      onBlur,
+      autoFocus,
+      onValueChange,
+      validationStatus,
+      value,
+      height,
+      style,
+      placeholder,
+      id,
+      triggerRef,
+      onFocus,
+      width,
+      children,
+      readOnly,
+    } = props;
 
-  // Compose refs for proper forwarding
-  const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+    // Compose refs for proper forwarding
+    const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
-  // Convert value to string for Radix UI compatibility
-  const stringValue = useMemo(() => {
-    return value != undefined ? String(value) : undefined;
-  }, [value]);
+    // Convert value to string for Radix UI compatibility
+    const stringValue = useMemo(() => {
+      return value != undefined ? String(value) : undefined;
+    }, [value]);
 
-  // Handle value changes with proper type conversion
-  const handleValueChange = useCallback(
-    (val: string) => {
-      if (readOnly) return;
-      onValueChange(val);
-    },
-    [onValueChange, readOnly],
-  );
+    // Handle value changes with proper type conversion
+    const handleValueChange = useCallback(
+      (val: string) => {
+        if (readOnly) return;
+        onValueChange(val);
+      },
+      [onValueChange, readOnly],
+    );
 
-  // Generate trigger class names based on validation status
-  const triggerClassName = classnames(styles.selectTrigger, {
-    [styles.error]: validationStatus === "error",
-    [styles.warning]: validationStatus === "warning",
-    [styles.valid]: validationStatus === "valid",
-  });
+    // Generate trigger class names based on validation status
+    const triggerClassName = classnames(styles.selectTrigger, {
+      [styles.error]: validationStatus === "error",
+      [styles.warning]: validationStatus === "warning",
+      [styles.valid]: validationStatus === "valid",
+    });
 
-  return (
-    <SelectRoot value={stringValue} onValueChange={handleValueChange} >
-      <SelectTrigger
-        id={id}
-        aria-haspopup="listbox"
-        style={style}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        disabled={!enabled}
-        className={triggerClassName}
-        onClick={(event) => {
-          // Prevent event propagation to parent elements (e.g., DropdownMenu)
-          // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
-          event.stopPropagation();
-        }}
-        ref={ref}
-        autoFocus={autoFocus}
-      >
-       <SelectValue>
-         {
-           <div
-             className={classnames(styles.selectValue, {
-               [styles.selectValue]: value !== undefined,
-               [styles.placeholder]: value === undefined,
-             })}
-           >
-             {value ? value : readOnly ? "" : placeholder}
-           </div>
-         }
-       </SelectValue>
-        <SelectIcon asChild>
-          <Icon name="chevrondown" />
-        </SelectIcon>
-      </SelectTrigger>
-      <SelectPortal container={root}>
-        <SelectContent
-          className={styles.selectContent}
-          position="popper"
-          style={{ maxHeight: height, minWidth: width }}
+    const selectedOption = useMemo(() => {
+      return props.options.find((option) => option.value === value);
+    }, [props.options, value]);
+
+    return (
+      <SelectRoot value={stringValue} onValueChange={handleValueChange}>
+        <SelectTrigger
+          id={id}
+          aria-haspopup="listbox"
+          style={style}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={!enabled}
+          className={triggerClassName}
+          onClick={(event) => {
+            // Prevent event propagation to parent elements (e.g., DropdownMenu)
+            // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+            event.stopPropagation();
+          }}
+          ref={ref}
+          autoFocus={autoFocus}
         >
-          <ScrollUpButton className={styles.selectScrollUpButton}>
-            <Icon name="chevronup" />
-          </ScrollUpButton>
-          <SelectViewport className={styles.selectViewport} role="listbox">
-            {children}
-          </SelectViewport>
-          <ScrollDownButton className={styles.selectScrollDownButton}>
+          <div
+            className={classnames(styles.selectValue, {
+              [styles.selectValue]: value !== undefined,
+              [styles.placeholder]: value === undefined,
+            })}
+          >
+            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+          </div>
+
+          <SelectIcon asChild>
             <Icon name="chevrondown" />
-          </ScrollDownButton>
-        </SelectContent>
-      </SelectPortal>
-    </SelectRoot>
-  );
-});
+          </SelectIcon>
+        </SelectTrigger>
+        <SelectPortal container={root}>
+          <SelectContent
+            className={styles.selectContent}
+            position="popper"
+            style={{ maxHeight: height, minWidth: width }}
+          >
+            <ScrollUpButton className={styles.selectScrollUpButton}>
+              <Icon name="chevronup" />
+            </ScrollUpButton>
+            <SelectViewport className={styles.selectViewport} role="listbox">
+              {children}
+            </SelectViewport>
+            <ScrollDownButton className={styles.selectScrollDownButton}>
+              <Icon name="chevrondown" />
+            </ScrollDownButton>
+          </SelectContent>
+        </SelectPortal>
+      </SelectRoot>
+    );
+  },
+);
 
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
@@ -568,6 +569,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
                 width={width}
+                options={Array.from(options)}
               >
                 {children}
               </SimpleSelect>
@@ -626,6 +628,21 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     const visibleContentRef = useRef<HTMLDivElement>(null);
     const { value, label, enabled = true, children } = option;
     const { value: selectedValue } = useSelect();
+    const { onOptionRemove, onOptionAdd } = useOption();
+
+    const opt: Option = useMemo(() => {
+      return {
+        ...option,
+        label: label ?? visibleContentRef.current?.textContent ?? "",
+        keywords: [label ?? visibleContentRef.current?.textContent ?? ""],
+        // Store the rendered ReactNode for dropdown display
+      };
+    }, [option, label, visibleContentRef.current]);
+
+    useEffect(() => {
+      onOptionAdd(opt);
+      return () => onOptionRemove(opt);
+    }, [opt, onOptionAdd, onOptionRemove]);
 
     return (
       <SelectItem
@@ -650,9 +667,13 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         data-state={selectedValue === value && "checked"}
       >
         {/* SelectItemText is used by SelectValue to display the selected value */}
-        <span style={{ display: 'none' }}><SelectItemText>{label}</SelectItemText></span>
+        <span style={{ display: "none" }}>
+          <SelectItemText>{label}</SelectItemText>
+        </span>
         {/* Visible content in the dropdown */}
-        <div className={styles.selectItemContent} ref={visibleContentRef}>{children || label}</div>
+        <div className={styles.selectItemContent} ref={visibleContentRef}>
+          {children || label}
+        </div>
         {selectedValue === value && (
           <SelectItemIndicator className={styles.selectItemIndicator}>
             <Icon name="checkmark" />
