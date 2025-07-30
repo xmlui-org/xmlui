@@ -640,7 +640,7 @@ test.describe("searchable multiselect", { tag: "@smoke" }, () => {
 });
 
 //this is an upstream issue: https://github.com/radix-ui/primitives/issues/3135
-test.skip("initialValue honored when used within Form", async ({ initTestBed, page }) => {
+test("initialValue honored when used within Form", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Form>
     
