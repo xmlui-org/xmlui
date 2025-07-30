@@ -289,32 +289,38 @@ function lineColFromOffset(
   offset: number,
   newlinePositions: number[],
 ): { line: number; col: number } {
-  if (newlinePositions.length === 0 || offset < newlinePositions[0]) {
-    // position is on the first line
+  if (newlinePositions.length === 0) {
     return { line: 1, col: offset + 1 };
-  } else if (offset > newlinePositions.at(-1)) {
-    // position is on the last line
-    const lastNewlinePos = newlinePositions.at(-1);
-    return {
-      line: newlinePositions.length + 1,
-      col: offset - lastNewlinePos,
-    };
   }
 
-  let bot = 0;
-  let top = newlinePositions.length;
-  while (top - bot > 1) {
-    const mid = bot + Math.floor((top - bot) / 2);
-    if (offset < newlinePositions[mid]) {
-      top = mid;
+  // Binary search to find the first newline position > offset
+  let left = 0;
+  let right = newlinePositions.length;
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    if (newlinePositions[mid] <= offset) {
+      left = mid + 1;
     } else {
-      bot = mid + 1;
+      right = mid;
     }
   }
-  return {
-    line: bot + 1,
-    col: offset - newlinePositions[bot - 1],
-  };
+
+  // left is now the index of the first newline > offset
+  // So we're on line (left + 1)
+  const line = left + 1;
+
+  // Calculate column based on the previous newline position
+  let col: number;
+  if (left === 0) {
+    // We're on the first line
+    col = offset + 1;
+  } else {
+    // We're after newlinePositions[left - 1]
+    col = offset - newlinePositions[left - 1];
+  }
+
+  return { line, col };
 }
 
 function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
