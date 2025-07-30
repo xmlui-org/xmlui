@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.90
+
+### Patch Changes
+
+- 4b57f7e: Remove Spinner tests
+
 ## 0.9.89
 
 ### Patch Changes
