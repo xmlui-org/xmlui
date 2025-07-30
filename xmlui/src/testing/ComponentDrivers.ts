@@ -443,6 +443,34 @@ export class TextAreaDriver extends InputComponentDriver {
   }
 }
 
+// --- ProgressBar
+
+export class ProgressBarDriver extends ComponentDriver {
+  get wrapper() {
+    return this.component;
+  }
+
+  get bar() {
+    return this.component.locator("> div");
+  }
+
+  async getValue() {
+    const style = await this.bar.getAttribute("style");
+    if (!style) return 0;
+    
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? parseFloat(widthMatch[1]) / 100 : 0;
+  }
+
+  async getBarWidth() {
+    const style = await this.bar.getAttribute("style");
+    if (!style) return "0%";
+    
+    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
+    return widthMatch ? `${widthMatch[1]}%` : "0%";
+  }
+}
+
 // --- List
 
 export class ListDriver extends ComponentDriver {}
