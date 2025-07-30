@@ -152,7 +152,7 @@ export const TextBox = forwardRef(function TextBox(
         inputRef.current?.focus();
       }, 0);
     }
-  }, [autoFocus]);
+  }, [autoFocus, inputRef.current]);
 
   // --- NOTE: This is a workaround for the jumping caret issue.
   // --- Local state can sync up values that can get set asynchronously outside the component.
