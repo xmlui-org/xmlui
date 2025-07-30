@@ -13,7 +13,7 @@ This document outlines the testing conventions for XMLUI components using Playwr
 ### Import Structure
 ```typescript
 import { test, expect } from "../../testing/fixtures";
-import { getElementStyle } from "../../testing/component-test-helpers";
+import { getStyles } from "../../testing/component-test-helpers";
 ```
 
 ## Test Structure and Categories
