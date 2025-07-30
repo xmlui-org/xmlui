@@ -13,9 +13,8 @@ import {
   ScrollDownButton,
   ScrollUpButton,
   Trigger as SelectTrigger,
-  Value as SelectValue,
 } from "@radix-ui/react-select";
-import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -38,6 +37,7 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { HiddenOption } from "./HiddenOption";
 
 export const defaultProps = {
   enabled: true,
@@ -310,8 +310,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     (selectedValue: SingleValueType) => {
       const newSelectedValue = multiSelect
         ? Array.isArray(value)
-          ? value.includes(selectedValue)
-            ? value.filter((v) => v !== selectedValue)
+          ? value.map((v) => String(v)).includes(String(selectedValue))
+            ? value.filter((v) => String(v) !== String(selectedValue))
             : [...value, selectedValue]
           : [selectedValue]
         : selectedValue === value
@@ -418,7 +418,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           style={style}
         >
           {searchable || multiSelect ? (
-            <OptionTypeProvider Component={ComboboxOption}>
+            <OptionTypeProvider Component={HiddenOption}>
               <Popover open={open} onOpenChange={setOpen} modal={false}>
                 <PopoverTrigger
                   id={inputId}
@@ -495,7 +495,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   </div>
                 </PopoverTrigger>
                 {open && (
-                  <SelectPortal container={root}>
+                  <Portal container={root}>
                     <FocusScope asChild loop trapped>
                       <PopoverContent
                         style={{ minWidth: width, height: dropdownHeight }}
@@ -537,9 +537,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                                   label={label}
                                   enabled={enabled}
                                   keywords={keywords}
-                                >
-                                  {children}
-                                </ComboboxOption>
+                                />
                               ),
                             )}
                             {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
@@ -547,9 +545,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         </Cmd>
                       </PopoverContent>
                     </FocusScope>
-                  </SelectPortal>
+                  </Portal>
                 )}
               </Popover>
+              {children}
             </OptionTypeProvider>
           ) : (
             <OptionTypeProvider Component={SelectOption}>
@@ -590,8 +589,8 @@ export const ComboboxOption = forwardRef(function Combobox(
   const { value: selectedValue, onChange, multiSelect, setOpen } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.includes(value)
-      : selectedValue === value;
+      ? selectedValue.map((v) => String(v)).includes(value)
+      : String(selectedValue) === String(value);
   }, [selectedValue, value, multiSelect]);
 
   return (
