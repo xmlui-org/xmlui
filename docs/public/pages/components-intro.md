@@ -1,10 +1,7 @@
-<Component name="ComponentsIntro">
-  <DocumentPageNoTOC>
-    <Markdown>
-      <![CDATA[
 # Components
 
 We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource),
+
 [Items](/components/Items),
 [List](/components/List),
 [Markdown](/components/Markdown),
@@ -49,57 +46,19 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 
 You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
 
-```xmlui
-<TubeStops line="Bakerloo"/>
-```
-
-An instance of `TubeStops` extracts details for a given tube line. Multiple instances can be arranged on the display using layout components. For example, here's a two-column layout.
-
-```xmlui
-  <HStack>
-
-    <Stack width="50%">
-      <TubeStops line="victoria" />
-    </Stack>
-
-    <Stack width="50%">
-      <TubeStops line="waterloo-city" />
-    </Stack>
-
-  </HStack>
-```
-      ]]>
-    </Markdown>
-    <FlowLayout>
-      <Stack width="*">
-        <TubeStops line="victoria"/>
-      </Stack>
-      <Stack width="*">
-        <TubeStops line="waterloo-city"/>
-      </Stack>
-    </FlowLayout>
-    <H2>
-      Anatomy of a custom component
-    </H2>
-    <Text>
-      Here's the XMLUI markup for the
-      <Text variant="code">
-        TubeStops
-      </Text>
-      component.
-    </Text>
-    <FlowLayout>
-      <Markdown width="*">
-        <![CDATA[
-```xmlui
+```xmlui-pg
+---app display
+<App>
+  <TubeStops line="Bakerloo"/>
+</App>
+---comp display
 <Component name="TubeStops">
-
   <DataSource
     id="stops"
+    when="{$props.line}"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
     transformResult="{window.transformStops}"
   />
-
   <Text variant="strong">{$props.line}</Text>
 
   <Table data="{stops}">
@@ -119,12 +78,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 </Component>
 ```
-        ]]>
-      </Markdown>
 
-      <ExpandableItem summary="view the transformStops function">
-        <Markdown width="*">
-          <![CDATA[
 ```javascript
 window.transformStops = function(stops) {
   return stops.map(function(stop) {
@@ -149,12 +103,50 @@ window.transformStops = function(stops) {
   });
 }
 ```
-          ]]>
-        </Markdown>
-      </ExpandableItem>
+
+An instance of `TubeStops` extracts details for a given tube line. Multiple instances can be arranged on the display using layout components. For example, here's a two-column layout.
+
+```xmlui-pg display
+---app display
+<App>
+    <FlowLayout>
+      <Stack width="*">
+        <TubeStops line="victoria"/>
+      </Stack>
+      <Stack width="*">
+        <TubeStops line="waterloo-city"/>
+      </Stack>
     </FlowLayout>
-    <Markdown>
-      <![CDATA[
+</App>
+---comp
+<Component name="TubeStops">
+  <DataSource
+    id="stops"
+    when="{$props.line}"
+    url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
+    transformResult="{window.transformStops}"
+  />
+  <Text variant="strong">{$props.line}</Text>
+
+  <Table data="{stops}">
+    <Column width="3*" bindTo="name" />
+    <Column bindTo="zone" />
+    <Column bindTo="wifi" >
+      <Fragment when="{$item.wifi === 'yes'}">
+        <Icon name="checkmark"/>
+      </Fragment>
+    </Column>
+    <Column bindTo="toilets" >
+      <Fragment when="{$item.toilets === 'yes'}">
+        <Icon name="checkmark"/>
+      </Fragment>
+    </Column>
+  </Table>
+
+</Component>
+```
+
+
 The `TubeStops` component:
 
 - **Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`.
@@ -166,7 +158,3 @@ The `TubeStops` component:
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
 Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
-      ]]>
-    </Markdown>
-  </DocumentPageNoTOC>
-</Component>
