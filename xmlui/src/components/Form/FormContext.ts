@@ -101,6 +101,11 @@ export function useFormContextPart<T = unknown>(selector: (value: IFormContext) 
   return useContextSelector(FormContext, selector);
 }
 
+export function useIsInsideForm(){
+  const contextPart = useFormContextPart((value) => value?.dispatch);
+  return contextPart !== undefined;
+}
+
 export const formControlTypes = [
   "text",
   "password",
