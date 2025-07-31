@@ -52,7 +52,8 @@ import {
   CheckboxDriver,
   LabelDriver,
   BackdropDriver,
-  SpinnerDriver
+  SpinnerDriver,
+  DropdownMenuDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -414,6 +415,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(SpinnerDriver, testIdOrLocator);
     });
   },
+  createDropdownMenuDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(DropdownMenuDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -481,4 +487,5 @@ type TestDriverExtenderProps = {
   createCheckboxDriver: ComponentDriverMethod<CheckboxDriver>;
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
+  createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
 };
