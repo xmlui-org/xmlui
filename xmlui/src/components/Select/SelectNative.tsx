@@ -122,7 +122,7 @@ interface SimpleSelectProps {
   width: number;
   children: ReactNode;
   readOnly: boolean;
-  options: Option[];
+  options: Set<Option>;
   emptyListNode: ReactNode;
 }
 
@@ -146,7 +146,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       children,
       readOnly,
       emptyListNode,
-      options
+      options,
     } = props;
 
     // Compose refs for proper forwarding
@@ -173,9 +173,11 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       [styles.valid]: validationStatus === "valid",
     });
 
+    const optionsArray = useMemo(() => Array.from(options), [options]);
+
     const selectedOption = useMemo(() => {
-      return props.options.find((option) => String(option.value) === String(value));
-    }, [props.options, value]);
+      return optionsArray.find((option) => String(option.value) === String(value));
+    }, [optionsArray, value]);
 
     return (
       <SelectRoot value={stringValue} onValueChange={handleValueChange}>
@@ -219,7 +221,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             </ScrollUpButton>
             <SelectViewport className={styles.selectViewport} role="listbox">
               {children}
-              {options.length === 0 && emptyListNode}
+              {optionsArray.length === 0 && emptyListNode}
             </SelectViewport>
             <ScrollDownButton className={styles.selectScrollDownButton}>
               <Icon name="chevrondown" />
@@ -563,7 +565,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 ref={ref}
                 key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
                 value={value as SingleValueType}
-                options={options}
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}
@@ -576,7 +577,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
                 width={width}
-                options={Array.from(options)}
+                options={options}
                 emptyListNode={emptyListNode}
               >
                 {children}
