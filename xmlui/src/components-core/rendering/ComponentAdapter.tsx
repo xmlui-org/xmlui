@@ -165,10 +165,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
-  // if (safeNode.type.startsWith("Component")) {
-  //   console.log("renderer", renderer, safeNode.type);
-  //   console.log("registry", componentRegistry.getRegisteredComponentKeys().length);
-  // }
 
   // --- Obtain a function that can lookup an event handler, which is bound to a
   // --- particular event of this component instance
@@ -415,7 +411,10 @@ function slotRenderer(
       // --- The slot is not named
       if (!slotProps) {
         // --- simply render the children from the parent
-        return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
+        // --- The parent does not provide a template for the slot.
+        if (parentRenderContext.children) {
+          return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
+        }
       } else {
         // --- The slot has properties; let's render the children with the slot properties
         return (

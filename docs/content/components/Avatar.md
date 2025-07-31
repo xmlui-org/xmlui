@@ -28,10 +28,10 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `xs` | Extra small button |
-| `sm` | Small button **(default)** |
-| `md` | Medium button |
-| `lg` | Large button |
+| `xs` | Extra small |
+| `sm` | Small **(default)** |
+| `md` | Medium |
+| `lg` | Large |
 
 ```xmlui-pg copy display name="Example: size"
 <App>

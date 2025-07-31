@@ -64,7 +64,7 @@ import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
 import { AccordionMd } from "./Accordion/Accordion";
 import { TabItemMd } from "./Tabs/TabItem";
-import { FragmentMd } from "../components-core/Fragment";
+import { FragmentMd } from "./Fragment/Fragment";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
@@ -199,6 +199,7 @@ import { LineChartMd } from "./Charts/LineChart/LineChart";
 import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
+import { SlotMd } from "./Slot/Slot";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -373,6 +374,7 @@ export const collectedComponentMetadata = {
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
   Slider: SliderMd,
+  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
