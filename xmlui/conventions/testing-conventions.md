@@ -410,6 +410,10 @@ Object.entries(ComponentVariantEnum).forEach(([variant, htmlElement]) => {
 **Problem**: Tests fail when using `arguments[0]` to access event parameters in XMLUI markup.
 **Solution**: Use arrow function syntax instead: `onEvent="param => testState = param"`. The `arguments` object doesn't work in XMLUI's JavaScript evaluation context.
 
+### FileInput Component Testing Issues
+**Problem**: Focus/blur events don't fire on the expected elements in FileInput tests.
+**Solution**: FileInput uses a complex structure with dropzone integration. Focus events may need to target the correct button element or be skipped if the event handling is internal to the component. Use `test.skip()` for problematic event tests and focus on functional behavior instead.
+
 ### Label Association Testing
 **Problem**: Tests fail checking `aria-labelledby` on form inputs.
 **Solution**: Use `page.getByLabel()` for functional testing. XMLUI uses standard HTML `<label htmlFor="id">` association.

@@ -52,6 +52,7 @@ import {
   CheckboxDriver,
   DropdownMenuDriver,
   ExpandableItemDriver,
+  FileInputDriver,
   LabelDriver,
   BackdropDriver,
   SpinnerDriver
@@ -271,6 +272,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(ExpandableItemDriver, testIdOrLocator);
     });
   },
+  createFileInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileInputDriver, testIdOrLocator);
+    });
+  },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
@@ -464,6 +470,7 @@ type TestDriverExtenderProps = {
   createRangeDriver: ComponentDriverMethod<RangeDriver>;
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
   createExpandableItemDriver: ComponentDriverMethod<ExpandableItemDriver>;
+  createFileInputDriver: ComponentDriverMethod<FileInputDriver>;
   createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;

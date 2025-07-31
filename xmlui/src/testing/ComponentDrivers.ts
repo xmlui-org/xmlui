@@ -191,6 +191,70 @@ export class ExpandableItemDriver extends ComponentDriver {
   }
 }
 
+// --- FileInput
+
+export class FileInputDriver extends ComponentDriver {
+  getTextBox() {
+    return this.component.locator('input[readonly]');
+  }
+
+  getHiddenInput() {
+    return this.component.locator('input[type="file"]');
+  }
+
+  getBrowseButton() {
+    return this.component.locator('[class*="_button_"]');
+  }
+
+  getContainer() {
+    return this.component;
+  }
+
+  async isEnabled() {
+    const browseButton = this.getBrowseButton();
+    return !(await browseButton.isDisabled());
+  }
+
+  async getSelectedFiles() {
+    const textBox = this.getTextBox();
+    const value = await textBox.inputValue();
+    return value || "";
+  }
+
+  async openFileDialog() {
+    await this.getBrowseButton().click();
+  }
+
+  async getPlaceholder() {
+    const textBox = this.getTextBox();
+    return await textBox.getAttribute("placeholder") || "";
+  }
+
+  async focusButton() {
+    await this.getBrowseButton().focus();
+  }
+
+  async hasReadOnlyAttribute() {
+    const textBox = this.getTextBox();
+    return await textBox.getAttribute("readonly") !== null;
+  }
+
+  async getAcceptedFileTypes() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("accept") || "";
+  }
+
+  async isMultiple() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("multiple") !== null;
+  }
+
+  async isDirectory() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("webkitdirectory") !== null;
+  }
+}
+
 // --- Form
 
 type SubmitTrigger = "click" | "keypress";

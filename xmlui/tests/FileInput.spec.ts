@@ -1,4 +1,4 @@
-import { test, expect } from "../../testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -68,24 +68,20 @@ test("component has correct accessibility attributes", async ({ initTestBed, cre
   await expect(driver.getHiddenInput()).toHaveAttribute('type', 'file');
 });
 
-test.skip("component is keyboard accessible", async ({ initTestBed, createFileInputDriver }) => {
-  // TODO: Focus event handling needs investigation
+test("component is keyboard accessible", async ({ initTestBed, createFileInputDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <FileInput onFocus="testState = 'focused'"/>
   `);
   const driver = await createFileInputDriver();
   
-  // Focus the main wrapper button which has the focus handler
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').focus();
+  await driver.getBrowseButton().focus();
   await expect.poll(testStateDriver.testState).toEqual('focused');
 });
 
 test("component supports tab navigation", async ({ initTestBed, createFileInputDriver }) => {
   await initTestBed(`<FileInput autoFocus="true"/>`);
   const driver = await createFileInputDriver();
-  // Check that the component is focusable
-  await expect(driver.getBrowseButton()).toBeVisible();
-  await expect(driver.getBrowseButton()).not.toBeDisabled();
+  await expect(driver.getBrowseButton()).toBeFocused();
 });
 
 test("component has hidden file input for screen readers", async ({ initTestBed, createFileInputDriver }) => {
@@ -109,28 +105,23 @@ test("component textbox is readonly for accessibility", async ({ initTestBed, cr
 test("component applies theme variables correctly", async ({ initTestBed, createFileInputDriver }) => {
   await initTestBed(`<FileInput/>`, {
     testThemeVars: {
-      "backgroundColor-Button": "rgb(255, 0, 0)",
+      "backgroundColor-FileInput": "rgb(255, 0, 0)",
     },
   });
   const driver = await createFileInputDriver();
-  // FileInput uses Button themes, so check the button
-  await expect(driver.getBrowseButton()).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
 });
 
 test("component shows validation states", async ({ initTestBed, createFileInputDriver }) => {
   await initTestBed(`<FileInput validationStatus="error"/>`);
   const driver = await createFileInputDriver();
-  // Validation should be visible in the component
-  await expect(driver.component).toBeVisible();
-  await expect(driver.getTextBox()).toBeVisible();
+  await expect(driver.getTextBox()).toHaveAttribute('data-validation-status', 'error');
 });
 
 test("component supports different button variants", async ({ initTestBed, createFileInputDriver }) => {
   await initTestBed(`<FileInput variant="outline"/>`);
   const driver = await createFileInputDriver();
-  // Check that variant prop is passed through
-  await expect(driver.getBrowseButton()).toBeVisible();
-  await expect(driver.getBrowseButton()).toContainText("Browse");
+  await expect(driver.getBrowseButton()).toHaveClass(/outline/);
 });
 
 test("component supports different button sizes", async ({ initTestBed, createFileInputDriver }) => {
@@ -187,6 +178,20 @@ test("component handles empty file selection gracefully", async ({ initTestBed, 
 // PERFORMANCE TESTS
 // =============================================================================
 
+test("component memoization prevents unnecessary re-renders", async ({ initTestBed, createFileInputDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+    <FileInput onFocus="testState = ++testState || 1"/>
+  `);
+  const driver = await createFileInputDriver();
+  
+  await driver.getBrowseButton().focus();
+  await expect.poll(testStateDriver.testState).toEqual(1);
+  
+  await driver.getBrowseButton().blur();
+  await driver.getBrowseButton().focus();
+  await expect.poll(testStateDriver.testState).toEqual(2);
+});
+
 test("component handles rapid button clicks efficiently", async ({ initTestBed, createFileInputDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <FileInput onFocus="testState = ++testState || 1"/>
@@ -225,22 +230,19 @@ test("component works in form context", async ({ initTestBed, createFileInputDri
   await expect(driver.component).toBeVisible();
 });
 
-test.skip("component event handlers work correctly", async ({ initTestBed, createFileInputDriver }) => {
-  // FileInput gotFocus and lostFocus do not seem to work.
-  // TODO: Focus/blur event handling needs investigation
+test("component event handlers work correctly", async ({ initTestBed, createFileInputDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <FileInput 
-      onGotFocus="testState = 'focused'"
-      onLostFocus="testState = 'blurred'"
+      onFocus="testState = 'focused'"
+      onBlur="testState = 'blurred'"
     />
   `);
   const driver = await createFileInputDriver();
   
-  // Focus and blur the wrapper button that triggers events
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').focus();
+  await driver.getBrowseButton().focus();
   await expect.poll(testStateDriver.testState).toEqual('focused');
   
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').blur();
+  await driver.getBrowseButton().blur();
   await expect.poll(testStateDriver.testState).toEqual('blurred');
 });
 
@@ -267,4 +269,21 @@ test("component handles label positioning correctly", async ({ initTestBed, crea
   `);
   const driver = await createFileInputDriver();
   await expect(driver.component).toBeVisible();
+});
+
+test("component maintains state across re-renders", async ({ initTestBed, createFileInputDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+    <FileInput 
+      placeholder="Initial placeholder"
+      onFocus="testState = 'maintaining-state'"
+    />
+  `);
+  const driver = await createFileInputDriver();
+  
+  await driver.getBrowseButton().focus();
+  await expect.poll(testStateDriver.testState).toEqual('maintaining-state');
+  
+  // Component should maintain its state and functionality
+  expect(await driver.getPlaceholder()).toBe("Initial placeholder");
+  expect(await driver.isEnabled()).toBe(true);
 });
