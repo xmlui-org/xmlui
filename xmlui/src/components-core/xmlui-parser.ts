@@ -121,12 +121,17 @@ export function errReportComponent(
         const contextLines = e.contextSource.split("\n");
         let currentPos = 0;
 
+        // Calculate padding for line numbers to maintain alignment
+        const lastLineNumber = e.contextStartLine + contextLines.length - 1;
+        const maxDigits = lastLineNumber.toString().length;
+
         const contextChildren = [];
 
         for (let lineIdx = 0; lineIdx < contextLines.length; lineIdx++) {
           const line = contextLines[lineIdx];
           const lineNumber = e.contextStartLine + lineIdx;
-          const linePrefix = `${lineNumber} | `;
+          const paddedLineNumber = lineNumber.toString().padStart(maxDigits, "0");
+          const linePrefix = `${paddedLineNumber} | `;
 
           // Check if error spans this line
           const lineStart = currentPos;
