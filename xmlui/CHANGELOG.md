@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.9.90
+
+### Patch Changes
+
+- 4b57f7e: Remove Spinner tests
+
+## 0.9.89
+
+### Patch Changes
+
+- 2968eb9: fix initialValue handling in selects in forms
+- 94f4eb5: safari regexp error workaround for optimized build, revert select inside form fix
+- 8364c03: add new TextBox and TextArea test cases
+
 ## 0.9.88
 
 ### Patch Changes

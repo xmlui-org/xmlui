@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { getPseudoElementStyle } from "./component-test-helpers";
+import { getPseudoStyles } from "./component-test-helpers";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -627,8 +627,8 @@ export class CodeBlockDriver extends ComponentDriver {}
 export class CheckboxDriver extends InputComponentDriver {
   async getIndicatorColor() {
     const specifier = this.component.getByRole("checkbox").or(this.component).last();
-    const indicatorStyleRaw = await getPseudoElementStyle(specifier, "::before", "box-shadow");
-    const colorMatch = indicatorStyleRaw.match(
+    const { boxShadow } = await getPseudoStyles(specifier, "::before", "box-shadow");
+    const colorMatch = boxShadow.match(
       /(rgba?\([^)]+\)|hsla?\([^)]+\)|#[a-fA-F0-9]{3,8})/
     );
     return colorMatch ? colorMatch[1] : null;
@@ -638,3 +638,256 @@ export class CheckboxDriver extends InputComponentDriver {
 // --- Label
 
 export class LabelDriver extends ComponentDriver {}
+
+// --- Spinner
+
+export class SpinnerDriver extends ComponentDriver {
+  /**
+   * Gets the main spinner element (the one with the ring animation)
+   */
+  get spinnerElement() {
+    // Filter for spinner elements and use the first one by default
+    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).first();
+  }
+
+  /**
+   * Gets a specific spinner element by index (for multiple spinners)
+   */
+  getSpinnerByIndex(index: number) {
+    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).nth(index);
+  }
+
+  /**
+   * Gets the fullscreen wrapper element (only exists when fullScreen=true)
+   */
+  get fullScreenWrapper() {
+    return this.page.locator('div[class*="_fullScreenSpinnerWrapper_"]');
+  }
+
+  /**
+   * Checks if the spinner is in fullscreen mode
+   */
+  async isFullScreen(): Promise<boolean> {
+    try {
+      const wrapper = this.fullScreenWrapper;
+      return await wrapper.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Gets the computed style of the spinner element
+   */
+  async getSpinnerStyle() {
+    const element = this.spinnerElement;
+    return await element.evaluate((el: HTMLElement) => {
+      const styles = window.getComputedStyle(el);
+      return {
+        display: styles.display,
+        position: styles.position,
+        width: styles.width,
+        height: styles.height,
+        animationDuration: styles.animationDuration,
+        className: el.className
+      };
+    });
+  }
+
+  /**
+   * Gets the animation duration from the child elements (where the actual animation occurs)
+   */
+  async getAnimationDuration(): Promise<string> {
+    const element = this.spinnerElement;
+    return await element.evaluate((el: HTMLElement) => {
+      // Check the first child div for animation duration
+      const firstChild = el.querySelector('div');
+      if (firstChild) {
+        const styles = window.getComputedStyle(firstChild);
+        return styles.animationDuration;
+      }
+      return '0s';
+    });
+  }
+
+  /**
+   * Waits for the spinner to appear
+   */
+  async waitForSpinner(timeout: number = 5000): Promise<void> {
+    await this.spinnerElement.waitFor({ state: 'visible', timeout });
+  }
+
+  /**
+   * Waits for the spinner to disappear
+   */
+  async waitForSpinnerToDisappear(timeout: number = 5000): Promise<void> {
+    await this.spinnerElement.waitFor({ state: 'hidden', timeout });
+  }
+
+  /**
+   * Checks if the spinner is visible
+   */
+  async isVisible(): Promise<boolean> {
+    return await this.spinnerElement.isVisible();
+  }
+
+  /**
+   * Gets the CSS class name to verify CSS modules are working
+   */
+  async getClassName(): Promise<string> {
+    return await this.spinnerElement.getAttribute('class') || '';
+  }
+
+  /**
+   * Gets the number of child div elements (should be 4 for the ring animation)
+   */
+  async getChildCount(): Promise<number> {
+    return await this.spinnerElement.evaluate((el: HTMLElement) => {
+      return el.querySelectorAll('div').length;
+    });
+  }
+
+  /**
+   * Gets the total number of spinner components on the page
+   */
+  async getSpinnerCount(): Promise<number> {
+    return await this.page.locator('[data-testid="test-id-component"]').count();
+  }
+
+  /**
+   * Gets a spinner by specific test ID
+   */
+  getSpinnerByTestId(testId: string) {
+    return this.page.locator(`[data-testid="${testId}"]`);
+  }
+
+  /**
+   * Checks if fullscreen mode has the correct wrapper structure
+   */
+  async getFullScreenWrapperInfo() {
+    const wrapper = this.fullScreenWrapper;
+    if (!await wrapper.isVisible()) {
+      return null;
+    }
+    
+    return await wrapper.evaluate((el: HTMLElement) => {
+      const parent = el.parentElement;
+      const styles = window.getComputedStyle(el);
+      return {
+        position: styles.position,
+        inset: styles.inset,
+        parentClassName: parent?.className || '',
+        hasSpinnerChild: !!el.querySelector('[class*="_lds-ring_"]')
+      };
+    });
+  }
+}
+
+// --- DropdownMenu
+
+export class DropdownMenuDriver extends ComponentDriver {
+  /**
+   * Get the trigger button element
+   * For DropdownMenu, we'll look for the button on the page level since Radix UI may render it separately
+   */
+  getTrigger() {
+    return this.page.getByRole('button').first();
+  }
+
+  /**
+   * Open the dropdown menu
+   */
+  async open() {
+    const trigger = this.getTrigger();
+    await trigger.click();
+  }
+
+  /**
+   * Close the dropdown menu by clicking outside
+   */
+  async close() {
+    // Try clicking on the trigger first to close, then fall back to clicking outside
+    try {
+      await this.page.keyboard.press('Escape');
+    } catch {
+      // If escape doesn't work, try clicking on a safe area
+      await this.page.click('html');
+    }
+  }
+
+  /**
+   * Get all menu items
+   */
+  getMenuItems() {
+    return this.page.getByRole('menuitem');
+  }
+
+  /**
+   * Get a specific menu item by text
+   */
+  getMenuItem(text: string) {
+    return this.page.getByRole('menuitem', { name: text });
+  }
+
+  /**
+   * Click a menu item by text
+   */
+  async clickMenuItem(text: string) {
+    await this.getMenuItem(text).click();
+  }
+
+  /**
+   * Get submenu items
+   */
+  getSubMenuItems(parentText: string) {
+    // First hover over the parent submenu to open it
+    return this.page.getByText(parentText);
+  }
+
+  /**
+   * Open a submenu by hovering over it
+   */
+  async openSubMenu(submenuText: string) {
+    await this.page.getByText(submenuText).hover();
+  }
+
+  /**
+   * Get menu separators
+   */
+  getMenuSeparators() {
+    return this.page.locator('[class*="DropdownMenuSeparator"]');
+  }
+
+  /**
+   * Get the menu content container
+   */
+  getMenuContent() {
+    return this.page.locator('[class*="DropdownMenuContent"]');
+  }
+
+  /**
+   * Check if the menu is open
+   */
+  async isOpen() {
+    try {
+      const content = this.getMenuContent();
+      return await content.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for menu to open
+   */
+  async waitForOpen() {
+    await this.getMenuContent().waitFor({ state: 'visible' });
+  }
+
+  /**
+   * Wait for menu to close
+   */
+  async waitForClose() {
+    await this.getMenuContent().waitFor({ state: 'hidden' });
+  }
+}

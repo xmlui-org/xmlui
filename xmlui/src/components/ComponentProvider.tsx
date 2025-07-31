@@ -31,7 +31,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
-import { fragmentComponentRenderer } from "../components-core/Fragment";
+import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { badgeComponentRenderer } from "./Badge/Badge";
@@ -78,7 +78,7 @@ import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
 import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
-import { SlotHolder } from "../components-core/Slot";
+import { SlotHolder } from "./Slot/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
 import { markdownComponentRenderer } from "./Markdown/Markdown";

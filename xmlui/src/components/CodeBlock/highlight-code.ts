@@ -63,22 +63,33 @@ export function parseMetaAndHighlightCode(
   const { language, ...restMeta } = meta;
   if (language && codeHighlighter.availableLangs.includes(language)) {
     // NOTE: Keep in mind, at this point, we are working with the markdown text
-    const htmlCodeStr = codeHighlighter.highlight(codeStr, language, restMeta, themeTone);
-    const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
-    const classNames = match ? match[1] : null;
+    try{
+      const htmlCodeStr = codeHighlighter.highlight(codeStr, language, restMeta, themeTone);
+      const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
+      const classNames = match ? match[1] : null;
 
-    // NOTE: Why remove the <pre>?
-    // Shiki appends <pre> tags to the highlighted code,
-    // so we would get <pre><pre><code>...</code></pre></pre>
-    let cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
+      // NOTE: Why remove the <pre>?
+      // Shiki appends <pre> tags to the highlighted code,
+      // so we would get <pre><pre><code>...</code></pre></pre>
+      let cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
 
-    const numberedRowClass = meta.rowNumbers ? "numbered" : "";
-    cleanedHtmlStr = cleanedHtmlStr.replaceAll(
-      /<span class="line"/g,
-      `<span class="line ${numberedRowClass}"`,
-    );
+      const numberedRowClass = meta.rowNumbers ? "numbered" : "";
+      cleanedHtmlStr = cleanedHtmlStr.replaceAll(
+        /<span class="line"/g,
+        `<span class="line ${numberedRowClass}"`,
+      );
 
-    return { classNames, cleanedHtmlStr, codeStr, meta };
+      return { classNames, cleanedHtmlStr, codeStr, meta };
+    } catch (e){
+      // this could happen in safari after the optimized build (some regexp issues, could be remix/vite/shiki related, TBD)
+      return {
+        meta,
+        codeStr,
+        cleanedHtmlStr: codeStr,
+        classNames: null
+      };
+    }
+
   }
   return null;
 }

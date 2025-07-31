@@ -106,14 +106,14 @@ export const viewportSizeMd: PropertyValueDescription[] = [
 export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
+export const sizeNames = ["xs", "sm", "md", "lg"] as const;
 export const sizeMd: PropertyValueDescription[] = [
-  { value: "xs", description: "Extra small button" },
-  { value: "sm", description: "Small button" },
-  { value: "md", description: "Medium button" },
-  { value: "lg", description: "Large button" },
+  { value: "xs", description: "Extra small" },
+  { value: "sm", description: "Small" },
+  { value: "md", description: "Medium" },
+  { value: "lg", description: "Large" },
 ];
 const sizeValues = Object.keys(sizeMd);
-export const sizeNames = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
 
 // --- Available button themes
@@ -339,7 +339,28 @@ type TextPropertyValueDescription = PropertyValueDescription & {
   description: string;
 };
 
-export const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
+const TextVariantMapping = [
+  "abbr",
+  "cite",
+  "code",
+  "del",
+  "em",
+  "ins",
+  "kbd",
+  "mark",
+  "p",
+  "pre",
+  "samp",
+  "strong",
+  "sub",
+  "sup",
+  "var",
+  "h6",
+  "span",
+] as const;
+type TextVariantMappingType = typeof TextVariantMapping[number];
+
+export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   abbr: "abbr",
   cite: "cite",
   code: "code",
@@ -366,25 +387,6 @@ export const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
   tableheading: "h6",
   secondary: "span",
 };
-
-type TextVariantMapping =
-  | "abbr"
-  | "cite"
-  | "code"
-  | "del"
-  | "ins"
-  | "kbd"
-  | "mark"
-  | "samp"
-  | "sub"
-  | "sup"
-  | "var"
-  | "pre"
-  | "strong"
-  | "em"
-  | "span"
-  | "p"
-  | "h6";
 
 export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "abbr", description: "Represents an abbreviation or acronym" },

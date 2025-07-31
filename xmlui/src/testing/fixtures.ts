@@ -51,7 +51,9 @@ import {
   CodeBlockDriver,
   CheckboxDriver,
   LabelDriver,
-  BackdropDriver
+  BackdropDriver,
+  SpinnerDriver,
+  DropdownMenuDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -60,15 +62,16 @@ export { expect } from "./assertions";
 // -----------------------------------------------------------------
 // --- Utility
 
+
 /**
  * Writes an error in the console to indicate if multiple elements have the same testId
  */
 async function getOnlyFirstLocator(page: Page, testId: string) {
   const locators = page.getByTestId(testId);
   if ((await locators.count()) > 1) {
-    console.error(
-      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
-    );
+    // console.error(
+    //   `More than one element found with testId: ${testId}! Ignoring all but the first.`,
+    // );
     return locators.first();
   }
   return locators;
@@ -407,6 +410,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(LabelDriver, testIdOrLocator);
     });
   },
+  createSpinnerDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SpinnerDriver, testIdOrLocator);
+    });
+  },
+  createDropdownMenuDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(DropdownMenuDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -473,4 +486,6 @@ type TestDriverExtenderProps = {
   createCodeBlockDriver: ComponentDriverMethod<CodeBlockDriver>;
   createCheckboxDriver: ComponentDriverMethod<CheckboxDriver>;
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
+  createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
+  createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
 };

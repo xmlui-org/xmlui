@@ -38,6 +38,7 @@ import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "./HiddenOption";
+import { useIsInsideForm } from "../Form/FormContext";
 
 export const defaultProps = {
   enabled: true,
@@ -286,6 +287,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [options, setOptions] = useState(new Set<Option>());
   const generatedId = useId();
   const inputId = id || generatedId;
+  const isInForm = useIsInsideForm();
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -559,7 +561,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               <SimpleSelect
                 readOnly={!!readOnly}
                 ref={ref}
+                key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
                 value={value as SingleValueType}
+                options={options}
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}

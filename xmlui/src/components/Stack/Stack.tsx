@@ -2,7 +2,7 @@ import type React from "react";
 
 import styles from "./Stack.module.scss";
 
-import { type ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";

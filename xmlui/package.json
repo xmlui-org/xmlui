@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.88",
+  "version": "0.9.90",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -104,7 +104,6 @@
     "remark-gfm": "^4.0.1",
     "sass": "1.55.0",
     "scroll-into-view-if-needed": "^3.1.0",
-    "shiki": "^1.14.1",
     "ts-node": "10.9.1",
     "turndown": "^7.2.0",
     "unist-util-visit": "^5.0.0",

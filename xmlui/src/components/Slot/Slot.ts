@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../components/metadata-helpers";
-import { createPropHolderComponent } from "./renderers";
+import { createMetadata, d } from "../metadata-helpers";
+import { createPropHolderComponent } from "../../components-core/renderers";
 
 const COMP = "Slot";
 

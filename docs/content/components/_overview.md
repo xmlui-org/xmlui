@@ -14,14 +14,14 @@
 | [Bookmark](./Bookmark) | As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location. |
 | [Breakout](./Breakout) | The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width. |
 | [Button](./Button) | `Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels. |
+| [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
+| [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [Card](./Card) | `Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface. |
 | [ChangeListener](./ChangeListener) | `ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers. |
 | [Checkbox](./Checkbox) | `Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions. |
-| [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
 | [ColorPicker](./ColorPicker) | `ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values. |
 | [Column](./Column) | `Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content. |
 | [ContentSeparator](./ContentSeparator) | `ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections. |
-| [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [DataSource](./DataSource) | `DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data. |
 | [DatePicker](./DatePicker) | `DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction. |
 | [DonutChart](./DonutChart) | A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly. |
@@ -42,9 +42,9 @@
 | [H4](./H4) | Represents a heading level 4 text |
 | [H5](./H5) | Represents a heading level 5 text |
 | [H6](./H6) | Represents a heading level 6 text |
-| [Heading](./Heading) | `Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents). |
 | [HSplitter](./HSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
 | [HStack](./HStack) | This component represents a stack rendering its contents horizontally. |
+| [Heading](./Heading) | `Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents). |
 | [Icon](./Icon) | `Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references. Icons are commonly used in buttons, navigation elements, and status indicators. |
 | [Image](./Image) | `Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions. |
 | [Items](./Items) | `Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration. |
@@ -76,6 +76,7 @@
 | [Redirect](./Redirect) | `Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally. |
 | [Select](./Select) | `Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration. |
 | [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display. |
+| [Slot](./Slot) | Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered. |
 | [SpaceFiller](./SpaceFiller) | `SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used. |
 | [Spinner](./Spinner) | `Spinner` is an animated indicator that represents an action in progress with no deterministic progress value. |
 | [Splitter](./Splitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
@@ -95,4 +96,3 @@
 | [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
 | [VSplitter](./VSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
 | [VStack](./VStack) | This component represents a stack rendering its contents vertically. |
-

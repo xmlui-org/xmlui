@@ -6,15 +6,13 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Heading is rendered", async ({ initTestBed, createHeadingDriver }) => {
     await initTestBed(`<Heading />`);
     const driver = await createHeadingDriver();
-
     await expect(driver.component).toBeAttached();
   });
 
   headingLevels.forEach((htmlElement) => {
     test(`HtmlTag '${htmlElement}' is rendered`, async ({ initTestBed, createHeadingDriver }) => {
-      await initTestBed(`<h1 />`);
+      await initTestBed(`<${htmlElement} />`);
       const driver = await createHeadingDriver();
-
       await expect(driver.component).toBeAttached();
     });
   });
