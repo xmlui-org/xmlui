@@ -50,10 +50,13 @@ import {
   DatePickerDriver, AutoCompleteDriver,
   CodeBlockDriver,
   CheckboxDriver,
+  DropdownMenuDriver,
+  ExpandableItemDriver,
+  FileInputDriver,
+  FileUploadDropZoneDriver,
   LabelDriver,
   BackdropDriver,
-  SpinnerDriver,
-  DropdownMenuDriver
+  SpinnerDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -265,6 +268,21 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DatePickerDriver, testIdOrLocator);
     });
   },
+  createExpandableItemDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ExpandableItemDriver, testIdOrLocator);
+    });
+  },
+  createFileInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileInputDriver, testIdOrLocator);
+    });
+  },
+  createFileUploadDropZoneDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileUploadDropZoneDriver, testIdOrLocator);
+    });
+  },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
@@ -457,6 +475,9 @@ type TestDriverExtenderProps = {
   createSliderDriver: ComponentDriverMethod<SliderDriver>;
   createRangeDriver: ComponentDriverMethod<RangeDriver>;
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
+  createExpandableItemDriver: ComponentDriverMethod<ExpandableItemDriver>;
+  createFileInputDriver: ComponentDriverMethod<FileInputDriver>;
+  createFileUploadDropZoneDriver: ComponentDriverMethod<FileUploadDropZoneDriver>;
   createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
