@@ -46,6 +46,9 @@ jobs:
       - name: 5. DEBUG - Attempt to clone the private repo
         # This step will give a clear error if authentication is the problem
         run: git clone https://github.com/xmlui-org/xmlui-optimizer.git
+      - name: 5. Install optimizer's dependencies
+        run: npm install
+        working-directory: ./xmlui-optimizer
       - name: DEBUG - install xmlui-optimizer
         # This step will give a clear error if authentication is the problem
         run: npm install ./xmlui-optimizer

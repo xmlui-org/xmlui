@@ -142,6 +142,184 @@ export class AvatarDriver extends ComponentDriver {}
 
 export class SplitterDriver extends ComponentDriver {}
 
+// --- ExpandableItem
+
+export class ExpandableItemDriver extends ComponentDriver {
+  getSummary() {
+    return this.component.locator('[class*="_summary_"]');
+  }
+
+  getSummaryContent() {
+    return this.component.locator('[class*="_summaryContent_"]');
+  }
+
+  getContent() {
+    return this.component.locator('[class*="_content_"]');
+  }
+
+  getIcon() {
+    return this.component.locator('[class*="_icon_"] svg');
+  }
+
+  getSwitch() {
+    // Get the actual switch input element, not the wrapper
+    return this.component.getByRole('switch');
+  }
+
+  async isExpanded() {
+    return await this.component.locator('[class*="_content_"]').isVisible();
+  }
+
+  async isDisabled() {
+    return await this.component.evaluate((el) => el.className.includes('disabled'));
+  }
+
+  async expand() {
+    if (!(await this.isExpanded())) {
+      await this.getSummary().click();
+    }
+  }
+
+  async collapse() {
+    if (await this.isExpanded()) {
+      await this.getSummary().click();
+    }
+  }
+
+  async toggle() {
+    await this.getSummary().click();
+  }
+}
+
+// --- FileInput
+
+export class FileInputDriver extends ComponentDriver {
+  getTextBox() {
+    return this.component.locator('input[readonly]');
+  }
+
+  getHiddenInput() {
+    return this.component.locator('input[type="file"]');
+  }
+
+  getBrowseButton() {
+    return this.component.locator('[class*="_button_"]');
+  }
+
+  getContainer() {
+    return this.component;
+  }
+
+  async isEnabled() {
+    const browseButton = this.getBrowseButton();
+    return !(await browseButton.isDisabled());
+  }
+
+  async getSelectedFiles() {
+    const textBox = this.getTextBox();
+    const value = await textBox.inputValue();
+    return value || "";
+  }
+
+  async openFileDialog() {
+    await this.getBrowseButton().click();
+  }
+
+  async getPlaceholder() {
+    const textBox = this.getTextBox();
+    return await textBox.getAttribute("placeholder") || "";
+  }
+
+  async focusButton() {
+    await this.getBrowseButton().focus();
+  }
+
+  async hasReadOnlyAttribute() {
+    const textBox = this.getTextBox();
+    return await textBox.getAttribute("readonly") !== null;
+  }
+
+  async getAcceptedFileTypes() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("accept") || "";
+  }
+
+  async isMultiple() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("multiple") !== null;
+  }
+
+  async isDirectory() {
+    const hiddenInput = this.getHiddenInput();
+    return await hiddenInput.getAttribute("webkitdirectory") !== null;
+  }
+}
+
+// --- FileUploadDropZone
+
+export class FileUploadDropZoneDriver extends ComponentDriver {
+  getWrapper() {
+    return this.component.locator('[class*="_wrapper_"]');
+  }
+
+  getHiddenInput() {
+    return this.component.locator('input[type="file"]');
+  }
+
+  getDropPlaceholder() {
+    return this.component.locator('[class*="_dropPlaceholder_"]');
+  }
+
+  getDropIcon() {
+    return this.getDropPlaceholder().locator('svg');
+  }
+
+  async isDropPlaceholderVisible() {
+    return await this.getDropPlaceholder().isVisible();
+  }
+
+  async isEnabled() {
+    const input = this.getHiddenInput();
+    const isDisabled = await input.isDisabled();
+    return !isDisabled;
+  }
+
+  async getDropText() {
+    return await this.getDropPlaceholder().textContent() || "";
+  }
+
+  async triggerDragEnter() {
+    await this.component.dispatchEvent('dragenter');
+  }
+
+  async triggerDragLeave() {
+    await this.component.dispatchEvent('dragleave');
+  }
+
+  async triggerDrop(files: string[] = ['test.txt']) {
+    // Simulate file drop event
+    await this.component.dispatchEvent('drop', {
+      dataTransfer: {
+        files: files.map(name => ({ name, type: 'text/plain', size: 100 }))
+      }
+    });
+  }
+
+  async triggerPaste() {
+    await this.component.dispatchEvent('paste', {
+      clipboardData: {
+        files: [{ name: 'pasted.txt', type: 'text/plain', size: 50 }],
+        items: [{ kind: 'file', getAsFile: () => ({ name: 'pasted.txt' }) }]
+      }
+    });
+  }
+
+  async hasChildren() {
+    const childrenCount = await this.component.locator('> *:not(input):not([class*="_dropPlaceholder_"])').count();
+    return childrenCount > 0;
+  }
+}
+
 // --- Form
 
 type SubmitTrigger = "click" | "keypress";
