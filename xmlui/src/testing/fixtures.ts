@@ -53,6 +53,7 @@ import {
   DropdownMenuDriver,
   ExpandableItemDriver,
   FileInputDriver,
+  FileUploadDropZoneDriver,
   LabelDriver,
   BackdropDriver,
   SpinnerDriver
@@ -277,6 +278,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(FileInputDriver, testIdOrLocator);
     });
   },
+  createFileUploadDropZoneDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileUploadDropZoneDriver, testIdOrLocator);
+    });
+  },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
@@ -471,6 +477,7 @@ type TestDriverExtenderProps = {
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
   createExpandableItemDriver: ComponentDriverMethod<ExpandableItemDriver>;
   createFileInputDriver: ComponentDriverMethod<FileInputDriver>;
+  createFileUploadDropZoneDriver: ComponentDriverMethod<FileUploadDropZoneDriver>;
   createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;

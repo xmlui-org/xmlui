@@ -255,6 +255,71 @@ export class FileInputDriver extends ComponentDriver {
   }
 }
 
+// --- FileUploadDropZone
+
+export class FileUploadDropZoneDriver extends ComponentDriver {
+  getWrapper() {
+    return this.component.locator('[class*="_wrapper_"]');
+  }
+
+  getHiddenInput() {
+    return this.component.locator('input[type="file"]');
+  }
+
+  getDropPlaceholder() {
+    return this.component.locator('[class*="_dropPlaceholder_"]');
+  }
+
+  getDropIcon() {
+    return this.getDropPlaceholder().locator('svg');
+  }
+
+  async isDropPlaceholderVisible() {
+    return await this.getDropPlaceholder().isVisible();
+  }
+
+  async isEnabled() {
+    const input = this.getHiddenInput();
+    const isDisabled = await input.isDisabled();
+    return !isDisabled;
+  }
+
+  async getDropText() {
+    return await this.getDropPlaceholder().textContent() || "";
+  }
+
+  async triggerDragEnter() {
+    await this.component.dispatchEvent('dragenter');
+  }
+
+  async triggerDragLeave() {
+    await this.component.dispatchEvent('dragleave');
+  }
+
+  async triggerDrop(files: string[] = ['test.txt']) {
+    // Simulate file drop event
+    await this.component.dispatchEvent('drop', {
+      dataTransfer: {
+        files: files.map(name => ({ name, type: 'text/plain', size: 100 }))
+      }
+    });
+  }
+
+  async triggerPaste() {
+    await this.component.dispatchEvent('paste', {
+      clipboardData: {
+        files: [{ name: 'pasted.txt', type: 'text/plain', size: 50 }],
+        items: [{ kind: 'file', getAsFile: () => ({ name: 'pasted.txt' }) }]
+      }
+    });
+  }
+
+  async hasChildren() {
+    const childrenCount = await this.component.locator('> *:not(input):not([class*="_dropPlaceholder_"])').count();
+    return childrenCount > 0;
+  }
+}
+
 // --- Form
 
 type SubmitTrigger = "click" | "keypress";
