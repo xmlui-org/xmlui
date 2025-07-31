@@ -267,39 +267,48 @@ export function errReportComponent(
 
           currentPos = lineEnd + 1; // +1 for newline character
         }
-
-        return {
-          type: "VStack",
-          props: { gap: "$gap-tight" },
+        const errMsgComponenet = {
+          type: "HStack",
+          props: { gap: "0" },
           children: [
             {
-              type: "HStack",
-              props: { gap: "0" },
-              children: [
-                {
-                  type: "Text",
-                  props: {
-                    value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
-                    color: "$color-info",
-                  },
-                },
-                {
-                  type: "Text",
-                  props: { value: ` ${e.message}`, fontWeight: "bold" },
-                },
-              ],
+              type: "Text",
+              props: {
+                value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
+                color: "$color-info",
+              },
             },
             {
-              type: "VStack",
-              props: {
-                gap: "0",
-                padding: "$padding-normal",
-                backgroundColor: "$color-surface-variant",
-              },
-              children: contextChildren,
+              type: "Text",
+              props: { value: ` ${e.message}`, fontWeight: "bold" },
             },
           ],
         };
+        const context = {
+          type: "VStack",
+          props: {
+            gap: "0",
+            padding: "$padding-normal",
+            backgroundColor: "$color-surface-variant",
+          },
+          children: contextChildren,
+        };
+
+        const errComponenet = {
+          type: "VStack",
+          props: {
+            gap: "$gap-none",
+            borderLeft: "1px solid black",
+            borderTop: "1px solid black",
+            width: "fit-content",
+            padding: "4px",
+          },
+          children: [errMsgComponenet],
+        };
+        if (e.contextSource !== "" && e.pos !== 0 && e.end !== 0) {
+          errComponenet.children.push(context);
+        }
+        return errComponenet;
       });
     const comp: ComponentDef = {
       type: "VStack",
