@@ -145,6 +145,7 @@
                     <NavLink label="Redirect" to="/components/Redirect" />
                     <NavLink label="Select" to="/components/Select" />
                     <NavLink label="Slider" to="/components/Slider" />
+                    <NavLink label="Slot" to="/components/Slot" />
                     <NavLink label="SpaceFiller" to="/components/SpaceFiller" />
                     <NavLink label="Spinner" to="/components/Spinner" />
                     <NavLink label="Splitter" to="/components/Splitter" />
