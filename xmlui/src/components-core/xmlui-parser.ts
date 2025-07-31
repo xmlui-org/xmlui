@@ -126,7 +126,7 @@ export function errReportComponent(
         for (let lineIdx = 0; lineIdx < contextLines.length; lineIdx++) {
           const line = contextLines[lineIdx];
           const lineNumber = e.contextStartLine + lineIdx;
-          const linePrefix = `${lineNumber} |> `;
+          const linePrefix = `${lineNumber} | `;
 
           // Check if error spans this line
           const lineStart = currentPos;
@@ -227,6 +227,27 @@ export function errReportComponent(
                 },
               });
             }
+          } else if (lineEnd === errorStartInContext && errorStartInContext === errorEndInContext) {
+            // Zero-length error span - insert visible vertical bar
+            lineChildren.push({
+              type: "Text",
+              props: {
+                value: line,
+                fontFamily: "monospace",
+              },
+            });
+            lineChildren.push({
+              type: "Text",
+              props: {
+                value: " ",
+                preserveLinebreaks: true,
+                textDecorationLine: "underline",
+                fontFamily: "monospace",
+                fontWeight: "bold",
+                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                color: "$color-error",
+              },
+            });
           } else {
             // No error on this line
             lineChildren.push({
