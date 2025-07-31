@@ -317,7 +317,7 @@ test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) =
 });
 
 test(
-  "Optin without label and value is not rendered",
+  "Option without label and value is not rendered",
   { tag: "@smoke" },
   async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`

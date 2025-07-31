@@ -37,6 +37,11 @@ export const optionComponentRenderer = createComponentRenderer(
   ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
     const label = extractValue.asOptionalString(node.props.label);
     const value = extractValue.asOptionalString(node.props.value);
+
+    if (label === undefined && value === undefined) {
+      return null;
+    }
+
     return (
       <OptionNative
         label={label}
