@@ -113,9 +113,18 @@ export function errReportComponent(
         }
       })
       .map((e, idx) => {
+        // Split context source into lines and add line numbers
+        const contextLines = e.contextSource.split("\n");
+        const contextWithLineNumbers = contextLines
+          .map((line, lineIdx) => {
+            const lineNumber = e.contextStartLine + lineIdx;
+            return `${lineNumber} |> ${line}`;
+          })
+          .join("\n");
+
         return {
           type: "VStack",
-          props: { gap: "0px" },
+          props: { gap: "$gap-tight" },
           children: [
             {
               type: "HStack",
@@ -133,6 +142,16 @@ export function errReportComponent(
                   props: { value: ` ${e.message}`, fontWeight: "bold" },
                 },
               ],
+            },
+            {
+              type: "Text",
+              props: {
+                value: contextWithLineNumbers,
+                preserveLinebreaks: true,
+                fontFamily: "monospace",
+                padding: "$padding-normal",
+                backgroundColor: "$color-surface-variant",
+              },
             },
           ],
         };
