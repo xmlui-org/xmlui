@@ -88,6 +88,7 @@ interface SelectProps {
   // Templates and renderers (legacy - kept for compatibility)
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
 
   // Progress state
   inProgress?: boolean;
@@ -122,7 +123,6 @@ interface SimpleSelectProps {
   width: number;
   children: ReactNode;
   readOnly: boolean;
-  options: Set<Option>;
   emptyListNode: ReactNode;
 }
 
@@ -146,11 +146,11 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       children,
       readOnly,
       emptyListNode,
-      options,
     } = props;
 
     // Compose refs for proper forwarding
     const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+    const { options } = useSelect();
 
     // Convert value to string for Radix UI compatibility
     const stringValue = useMemo(() => {
@@ -188,7 +188,11 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           onFocus={onFocus}
           onBlur={onBlur}
           disabled={!enabled}
-          className={triggerClassName}
+          className={classnames(styles.selectTrigger, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
           onClick={(event) => {
             // Prevent event propagation to parent elements (e.g., DropdownMenu)
             // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
@@ -263,6 +267,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
     emptyListTemplate,
     valueRenderer,
+    optionRenderer,
 
     // Progress state
     inProgress = defaultProps.inProgress,
@@ -405,8 +410,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       value,
       onChange: toggleOption,
       setOpen,
+      options,
+      optionRenderer,
     }),
-    [multiSelect, toggleOption, value],
+    [multiSelect, toggleOption, value, options],
   );
 
   return (
@@ -536,18 +543,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                             {inProgress && (
                               <div className={styles.loading}>{inProgressNotificationMessage}</div>
                             )}
-                            {Array.from(options).map(
-                              ({ value, label, enabled, keywords, children }) => (
-                                <ComboboxOption
-                                  key={value}
-                                  readOnly={readOnly}
-                                  value={value}
-                                  label={label}
-                                  enabled={enabled}
-                                  keywords={keywords}
-                                />
-                              ),
-                            )}
+                            {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                              <ComboboxOption
+                                key={value}
+                                readOnly={readOnly}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                              />
+                            ))}
                             {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
                           </CmdList>
                         </Cmd>
@@ -577,7 +582,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 placeholder={placeholder}
                 height={dropdownHeight}
                 width={width}
-                options={options}
                 emptyListNode={emptyListNode}
               >
                 {children}
@@ -596,7 +600,7 @@ export const ComboboxOption = forwardRef(function Combobox(
 ) {
   const id = useId();
   const { label, value, enabled = true, keywords, readOnly, children } = option;
-  const { value: selectedValue, onChange, multiSelect, setOpen } = useSelect();
+  const { value: selectedValue, onChange, multiSelect, setOpen, optionRenderer } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.map((v) => String(v)).includes(value)
@@ -625,8 +629,14 @@ export const ComboboxOption = forwardRef(function Combobox(
       keywords={[...keywords, label]}
     >
       <div className={styles.multiComboboxOptionContent}>
-        {children || label}
-        {selected && <Icon name="checkmark" />}
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled, keywords }, selectedValue as any, false)
+        ) : (
+          <>
+            {children || label}
+            {selected && <Icon name="checkmark" />}
+          </>
+        )}
       </div>
     </CmdItem>
   );
@@ -636,7 +646,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
   (option, ref) => {
     const visibleContentRef = useRef<HTMLDivElement>(null);
     const { value, label, enabled = true, children } = option;
-    const { value: selectedValue } = useSelect();
+    const { value: selectedValue, optionRenderer } = useSelect();
     const { onOptionRemove, onOptionAdd } = useOption();
 
     const opt: Option = useMemo(() => {
@@ -680,13 +690,29 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
           <SelectItemText>{label}</SelectItemText>
         </span>
         {/* Visible content in the dropdown */}
-        <div className={styles.selectItemContent} ref={visibleContentRef}>
-          {children || label}
-        </div>
-        {selectedValue === value && (
-          <SelectItemIndicator className={styles.selectItemIndicator}>
-            <Icon name="checkmark" />
-          </SelectItemIndicator>
+        {optionRenderer ? (
+          <div className={styles.selectItemContent} ref={visibleContentRef}>
+            {optionRenderer(
+              {
+                label,
+                value,
+                enabled,
+              },
+              selectedValue as any,
+              false,
+            )}
+          </div>
+        ) : (
+          <>
+            <div className={styles.selectItemContent} ref={visibleContentRef}>
+              {children || label}
+            </div>
+            {selectedValue === value && (
+              <SelectItemIndicator className={styles.selectItemIndicator}>
+                <Icon name="checkmark" />
+              </SelectItemIndicator>
+            )}
+          </>
         )}
       </SelectItem>
     );

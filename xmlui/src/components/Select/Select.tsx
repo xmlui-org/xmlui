@@ -223,6 +223,29 @@ export const selectComponentRenderer = createComponentRenderer(
               }
             : undefined
         }
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item, val, inTrigger) => {
+              return (
+                <MemoizedItem
+                  node={node.props.optionTemplate}
+                  item={item}
+                  contextVars={{
+                    $selectedValue: val,
+                    $inTrigger: inTrigger,
+                  }}
+                  renderChild={(...args) =>
+                    multiSelect || searchable ? (
+                      renderChild(...args)
+                    ) : (
+                      <SelectItemText>{renderChild(...args)}</SelectItemText>
+                    )
+                  }
+                />
+              );
+            }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </Select>
