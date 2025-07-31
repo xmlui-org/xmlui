@@ -252,6 +252,9 @@
             <Page url="/markup">
                 <DocumentPage url="/pages/markup.md" />
             </Page>
+            <Page url="/scoping">
+                <DocumentPage url="/pages/scoping.md" />
+            </Page>
             <Page url="/scripting">
                 <DocumentPage url="/pages/scripting.md" />
             </Page>
