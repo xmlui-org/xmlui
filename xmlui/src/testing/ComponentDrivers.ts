@@ -142,6 +142,55 @@ export class AvatarDriver extends ComponentDriver {}
 
 export class SplitterDriver extends ComponentDriver {}
 
+// --- ExpandableItem
+
+export class ExpandableItemDriver extends ComponentDriver {
+  getSummary() {
+    return this.component.locator('[class*="_summary_"]');
+  }
+
+  getSummaryContent() {
+    return this.component.locator('[class*="_summaryContent_"]');
+  }
+
+  getContent() {
+    return this.component.locator('[class*="_content_"]');
+  }
+
+  getIcon() {
+    return this.component.locator('[class*="_icon_"] svg');
+  }
+
+  getSwitch() {
+    // Get the actual switch input element, not the wrapper
+    return this.component.getByRole('switch');
+  }
+
+  async isExpanded() {
+    return await this.component.locator('[class*="_content_"]').isVisible();
+  }
+
+  async isDisabled() {
+    return await this.component.evaluate((el) => el.className.includes('disabled'));
+  }
+
+  async expand() {
+    if (!(await this.isExpanded())) {
+      await this.getSummary().click();
+    }
+  }
+
+  async collapse() {
+    if (await this.isExpanded()) {
+      await this.getSummary().click();
+    }
+  }
+
+  async toggle() {
+    await this.getSummary().click();
+  }
+}
+
 // --- Form
 
 type SubmitTrigger = "click" | "keypress";

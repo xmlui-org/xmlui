@@ -50,10 +50,11 @@ import {
   DatePickerDriver, AutoCompleteDriver,
   CodeBlockDriver,
   CheckboxDriver,
+  DropdownMenuDriver,
+  ExpandableItemDriver,
   LabelDriver,
   BackdropDriver,
-  SpinnerDriver,
-  DropdownMenuDriver
+  SpinnerDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -265,6 +266,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DatePickerDriver, testIdOrLocator);
     });
   },
+  createExpandableItemDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ExpandableItemDriver, testIdOrLocator);
+    });
+  },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
@@ -457,6 +463,7 @@ type TestDriverExtenderProps = {
   createSliderDriver: ComponentDriverMethod<SliderDriver>;
   createRangeDriver: ComponentDriverMethod<RangeDriver>;
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
+  createExpandableItemDriver: ComponentDriverMethod<ExpandableItemDriver>;
   createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
