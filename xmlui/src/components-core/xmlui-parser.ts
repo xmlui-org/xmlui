@@ -113,14 +113,139 @@ export function errReportComponent(
         }
       })
       .map((e, idx) => {
-        // Split context source into lines and add line numbers
+        // Calculate relative positions within context
+        const errorStartInContext = e.pos - e.contextPos;
+        const errorEndInContext = e.end - e.contextPos;
+
+        // Split context source into lines and process each line
         const contextLines = e.contextSource.split("\n");
-        const contextWithLineNumbers = contextLines
-          .map((line, lineIdx) => {
-            const lineNumber = e.contextStartLine + lineIdx;
-            return `${lineNumber} |> ${line}`;
-          })
-          .join("\n");
+        let currentPos = 0;
+
+        const contextChildren = [];
+
+        for (let lineIdx = 0; lineIdx < contextLines.length; lineIdx++) {
+          const line = contextLines[lineIdx];
+          const lineNumber = e.contextStartLine + lineIdx;
+          const linePrefix = `${lineNumber} |> `;
+
+          // Check if error spans this line
+          const lineStart = currentPos;
+          const lineEnd = currentPos + line.length;
+
+          const lineChildren = [
+            {
+              type: "Text",
+              props: {
+                value: linePrefix,
+                fontFamily: "monospace",
+                color: "$color-info",
+              },
+            },
+          ];
+
+          if (errorStartInContext >= lineStart && errorStartInContext < lineEnd) {
+            // Error starts on this line
+            const beforeError = line.substring(0, errorStartInContext - lineStart);
+            const errorInLine = line.substring(
+              errorStartInContext - lineStart,
+              Math.min(errorEndInContext - lineStart, line.length),
+            );
+            const afterError = line.substring(Math.min(errorEndInContext - lineStart, line.length));
+
+            if (beforeError) {
+              lineChildren.push({
+                type: "Text",
+                props: {
+                  value: beforeError,
+                  fontFamily: "monospace",
+                },
+              });
+            }
+
+            if (errorInLine) {
+              lineChildren.push({
+                type: "Text",
+                props: {
+                  value: errorInLine,
+                  fontFamily: "monospace",
+                  textDecorationLine: "underline",
+                  textDecorationColor: "$color-error",
+                  backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                },
+              });
+            }
+
+            if (afterError) {
+              lineChildren.push({
+                type: "Text",
+                props: {
+                  value: afterError,
+                  fontFamily: "monospace",
+                },
+              });
+            }
+          } else if (errorStartInContext < lineStart && errorEndInContext > lineEnd) {
+            // Entire line is within error span
+            lineChildren.push({
+              type: "Text",
+              props: {
+                value: line,
+                fontFamily: "monospace",
+                textDecorationLine: "underline",
+                textDecorationColor: "$color-error",
+                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+              },
+            });
+          } else if (
+            errorStartInContext < lineStart &&
+            errorEndInContext >= lineStart &&
+            errorEndInContext < lineEnd
+          ) {
+            // Error ends on this line
+            const errorInLine = line.substring(0, errorEndInContext - lineStart);
+            const afterError = line.substring(errorEndInContext - lineStart);
+
+            if (errorInLine) {
+              lineChildren.push({
+                type: "Text",
+                props: {
+                  value: errorInLine,
+                  fontFamily: "monospace",
+                  textDecorationLine: "underline",
+                  textDecorationColor: "$color-error",
+                  backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                },
+              });
+            }
+
+            if (afterError) {
+              lineChildren.push({
+                type: "Text",
+                props: {
+                  value: afterError,
+                  fontFamily: "monospace",
+                },
+              });
+            }
+          } else {
+            // No error on this line
+            lineChildren.push({
+              type: "Text",
+              props: {
+                value: line,
+                fontFamily: "monospace",
+              },
+            });
+          }
+
+          contextChildren.push({
+            type: "HStack",
+            props: { gap: "0" },
+            children: lineChildren,
+          });
+
+          currentPos = lineEnd + 1; // +1 for newline character
+        }
 
         return {
           type: "VStack",
@@ -144,14 +269,13 @@ export function errReportComponent(
               ],
             },
             {
-              type: "Text",
+              type: "VStack",
               props: {
-                value: contextWithLineNumbers,
-                preserveLinebreaks: true,
-                fontFamily: "monospace",
+                gap: "0",
                 padding: "$padding-normal",
                 backgroundColor: "$color-surface-variant",
               },
+              children: contextChildren,
             },
           ],
         };
