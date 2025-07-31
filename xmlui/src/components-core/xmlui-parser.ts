@@ -9,9 +9,11 @@ import type { Node } from "../parsers/xmlui-parser/syntax-node";
 import type { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
 import type { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 
-interface ErrorWithContext extends ParseError {
-  line: number;
-  col: number;
+interface ErrorForDisplay extends ParseError {
+  contextStartLine: number;
+  contextSource: string;
+  errPosLine: number;
+  errPosCol: number;
 }
 
 export function xmlUiMarkupToComponent(
@@ -19,7 +21,7 @@ export function xmlUiMarkupToComponent(
   fileId: string | number = 0,
 ): {
   component: null | ComponentDef | CompoundComponentDef;
-  errors: ErrorWithContext[];
+  errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 } {
   const { parse, getText } = createXmlUiParser(source);
@@ -31,9 +33,9 @@ export function xmlUiMarkupToComponent(
         newlinePositions.push(i);
       }
     }
-    const errorsWithLines = addPositions(errors, newlinePositions);
+    const errorsForDisplay = addDisplayFieldsToErrors(errors, source, newlinePositions);
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    return { component: null, errors: errorsWithLines, erroneousCompoundComponentName };
+    return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
   }
   try {
     const component = nodeToComponentDef(node, getText, fileId);
@@ -41,14 +43,18 @@ export function xmlUiMarkupToComponent(
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorWithContext = {
+    const singleErr: ErrorForDisplay = {
       message: (e as ParserError).message,
-      col: 0,
-      line: 0,
+      errPosCol: 0,
+      errPosLine: 0,
       code: ErrCodes.expEq,
       category: DiagnosticCategory.Error,
       pos: 0,
       end: 0,
+      contextPos: 0,
+      contextEnd: 0,
+      contextSource: "",
+      contextStartLine: 0,
     };
     return {
       component: null,
@@ -89,7 +95,7 @@ export function errReportMessage(message: string) {
  * It is a component and a compound component definition at the same time,
  * so that it can be used to render the errors for a compound component as well*/
 export function errReportComponent(
-  errors: ErrorWithContext[],
+  errors: ErrorForDisplay[],
   fileName: number | string,
   compoundCompName: string | undefined,
 ) {
@@ -118,7 +124,7 @@ export function errReportComponent(
                 {
                   type: "Text",
                   props: {
-                    value: `#${idx + 1}: ${fileName} (${e.line}:${e.col}):\xa0`,
+                    value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
                     color: "$color-info",
                   },
                 },
@@ -307,15 +313,6 @@ function offsetToPosition(
   return { line, col };
 }
 
-function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithContext[] {
-  for (let err of errors) {
-    const { line, col } = offsetToPosition(err.pos, newlinePositions);
-    (err as ErrorWithContext).line = line;
-    (err as ErrorWithContext).col = col;
-  }
-  return errors as ErrorWithContext[];
-}
-
 function getCompoundCompName(node: Node, getText: GetText) {
   const rootTag = node?.children?.[0];
   const rootTagNameTokens = rootTag?.children?.find(
@@ -337,4 +334,22 @@ function getCompoundCompName(node: Node, getText: GetText) {
     return strLit.substring(1, strLit.length - 1);
   }
   return undefined;
+}
+function addDisplayFieldsToErrors(
+  errors: ParseError[],
+  source: string,
+  newlinePositions: number[],
+): ErrorForDisplay[] {
+  return errors.map((err) => {
+    const { line: errPosLine, col: errPosCol } = offsetToPosition(err.pos, newlinePositions);
+    const { line: contextStartLine } = offsetToPosition(err.contextPos, newlinePositions);
+
+    return {
+      ...err,
+      errPosLine,
+      errPosCol,
+      contextStartLine,
+      contextSource: source.substring(err.contextPos, err.contextEnd),
+    };
+  });
 }
