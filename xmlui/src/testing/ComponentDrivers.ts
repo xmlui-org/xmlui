@@ -782,3 +782,112 @@ export class SpinnerDriver extends ComponentDriver {
     });
   }
 }
+
+// --- DropdownMenu
+
+export class DropdownMenuDriver extends ComponentDriver {
+  /**
+   * Get the trigger button element
+   * For DropdownMenu, we'll look for the button on the page level since Radix UI may render it separately
+   */
+  getTrigger() {
+    return this.page.getByRole('button').first();
+  }
+
+  /**
+   * Open the dropdown menu
+   */
+  async open() {
+    const trigger = this.getTrigger();
+    await trigger.click();
+  }
+
+  /**
+   * Close the dropdown menu by clicking outside
+   */
+  async close() {
+    // Try clicking on the trigger first to close, then fall back to clicking outside
+    try {
+      await this.page.keyboard.press('Escape');
+    } catch {
+      // If escape doesn't work, try clicking on a safe area
+      await this.page.click('html');
+    }
+  }
+
+  /**
+   * Get all menu items
+   */
+  getMenuItems() {
+    return this.page.getByRole('menuitem');
+  }
+
+  /**
+   * Get a specific menu item by text
+   */
+  getMenuItem(text: string) {
+    return this.page.getByRole('menuitem', { name: text });
+  }
+
+  /**
+   * Click a menu item by text
+   */
+  async clickMenuItem(text: string) {
+    await this.getMenuItem(text).click();
+  }
+
+  /**
+   * Get submenu items
+   */
+  getSubMenuItems(parentText: string) {
+    // First hover over the parent submenu to open it
+    return this.page.getByText(parentText);
+  }
+
+  /**
+   * Open a submenu by hovering over it
+   */
+  async openSubMenu(submenuText: string) {
+    await this.page.getByText(submenuText).hover();
+  }
+
+  /**
+   * Get menu separators
+   */
+  getMenuSeparators() {
+    return this.page.locator('[class*="DropdownMenuSeparator"]');
+  }
+
+  /**
+   * Get the menu content container
+   */
+  getMenuContent() {
+    return this.page.locator('[class*="DropdownMenuContent"]');
+  }
+
+  /**
+   * Check if the menu is open
+   */
+  async isOpen() {
+    try {
+      const content = this.getMenuContent();
+      return await content.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for menu to open
+   */
+  async waitForOpen() {
+    await this.getMenuContent().waitFor({ state: 'visible' });
+  }
+
+  /**
+   * Wait for menu to close
+   */
+  async waitForClose() {
+    await this.getMenuContent().waitFor({ state: 'hidden' });
+  }
+}
