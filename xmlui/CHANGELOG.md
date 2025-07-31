@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.91
+
+### Patch Changes
+
+- 6a7d779: Review Slot implementation
+
 ## 0.9.90
 
 ### Patch Changes
