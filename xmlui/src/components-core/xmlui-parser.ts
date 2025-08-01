@@ -136,9 +136,9 @@ function createErrorReportComponent(
         const lineStart = currentPos;
         const lineEnd = currentPos + line.length;
 
-        const lineChildren = [
+        const lineChildren: ComponentDef[] = [
           {
-            type: "Text",
+            type: "Tex",
             props: {
               value: linePrefix,
               fontFamily: "monospace",
