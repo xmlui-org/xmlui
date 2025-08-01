@@ -17,6 +17,7 @@ import {
   BadgeDriver,
   ButtonDriver,
   CardDriver,
+  ContentSeparatorDriver,
   FormDriver,
   FormItemDriver,
   HeadingDriver,
@@ -211,6 +212,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createBackdropDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(BackdropDriver, testIdOrLocator);
+    });
+  },
+  createContentSeparatorDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ContentSeparatorDriver, testIdOrLocator);
     });
   },
   createAvatarDriver: async ({ createDriver }, use) => {
@@ -464,6 +470,7 @@ type TestDriverExtenderProps = {
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
   createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
+  createContentSeparatorDriver: ComponentDriverMethod<ContentSeparatorDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;
   createFormItemDriver: ComponentDriverMethod<FormItemDriver>;
