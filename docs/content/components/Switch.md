@@ -2,6 +2,16 @@
 
 `Switch` enables users to toggle between two states: on and off.
 
+## Switch Values [#switch-values]
+
+The `initialValue` and `value` properties of the switch are transformed to a Boolean value to display the on (`true`) or off (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
+
 ## Properties [#properties]
 
 ### `autoFocus` (default: false) [#autofocus-default-false]

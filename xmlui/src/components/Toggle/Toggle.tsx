@@ -85,8 +85,31 @@ export const Toggle = forwardRef(function Toggle(
   const inputId = id || generatedId;
 
   const innerRef = React.useRef<HTMLInputElement | null>(null);
+
+  const transformToLegitValue = (inp: any): boolean => {
+    if (typeof inp === "undefined" || inp === null) {
+      return false;
+    }
+    if (typeof inp === "boolean") {
+      return inp;
+    }
+    if (typeof inp === "number") {
+      return !isNaN(inp) && !!inp;
+    }
+    if (typeof inp === "string") {
+      return inp.trim() !== "" && inp.toLowerCase() !== "false";
+    }
+    if (Array.isArray(inp)) {
+      return inp.length > 0;
+    }
+    if (typeof inp === "object") {
+      return Object.keys(inp).length > 0;
+    }
+    return false;
+  };
+
   useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
+    updateState({ value: transformToLegitValue(initialValue) }, { initial: true });
   }, [initialValue, updateState]);
 
   const updateValue = useCallback(
@@ -134,7 +157,7 @@ export const Toggle = forwardRef(function Toggle(
   }, [focus, autoFocus]);
 
   const setValue = useEvent((newValue) => {
-    updateValue(newValue);
+    updateValue(transformToLegitValue(newValue));
   });
 
   useEffect(() => {
@@ -144,19 +167,20 @@ export const Toggle = forwardRef(function Toggle(
     });
   }, [focus, registerComponentApi, setValue]);
 
-  const input = useMemo(
-    () => (
+  const input = useMemo(() => {
+    const legitValue = transformToLegitValue(value);
+    return (
       <input
         id={inputId}
         ref={innerRef}
         type="checkbox"
         role={variant}
-        checked={value}
+        checked={legitValue}
         disabled={!enabled}
         required={required}
         readOnly={readOnly}
         aria-readonly={readOnly}
-        aria-checked={indeterminate ? "mixed" : value}
+        aria-checked={indeterminate ? "mixed" : legitValue}
         aria-required={required}
         aria-disabled={!enabled}
         onChange={onInputChange}
@@ -171,23 +195,22 @@ export const Toggle = forwardRef(function Toggle(
           [styles.valid]: validationStatus === "valid",
         })}
       />
-    ),
-    [
-      inputId,
-      className,
-      enabled,
-      handleOnBlur,
-      handleOnFocus,
-      onInputChange,
-      readOnly,
-      required,
-      validationStatus,
-      value,
-      variant,
-      indeterminate,
-      autoFocus,
-    ],
-  );
+    );
+  }, [
+    inputId,
+    className,
+    enabled,
+    handleOnBlur,
+    handleOnFocus,
+    onInputChange,
+    readOnly,
+    required,
+    validationStatus,
+    value,
+    variant,
+    indeterminate,
+    autoFocus,
+  ]);
 
   return (
     <ItemWithLabel
@@ -210,7 +233,7 @@ export const Toggle = forwardRef(function Toggle(
         <label className={styles.label}>
           <div className={styles.inputContainer}>{input}</div>
           {inputRenderer({
-            $checked: value,
+            $checked: transformToLegitValue(value),
             $setChecked: setValue,
           })}
         </label>
