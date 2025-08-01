@@ -32,6 +32,7 @@ import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { HiddenOption } from "../Select/HiddenOption";
 
 type AutoCompleteProps = {
   id?: string;
@@ -40,6 +41,7 @@ type AutoCompleteProps = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
   onDidChange?: (newValue: string | string[]) => void;
@@ -59,10 +61,6 @@ type AutoCompleteProps = {
   readOnly?: boolean;
   creatable?: boolean;
 };
-
-function defaultRenderer(item: Option) {
-  return <div>{item.label}</div>;
-}
 
 function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
   return newOptions.some((option) =>
@@ -111,6 +109,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     labelBreak,
     required = defaultProps.required,
     creatable = defaultProps.creatable,
+    optionRenderer,
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -184,7 +183,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       onDidChange(newSelectedValue);
       inputRef.current?.focus();
     },
-    [multi, value, updateState, onDidChange, inputRef.current]
+    [multi, value, updateState, onDidChange, inputRef.current],
   );
 
   useEffect(() => {
@@ -259,13 +258,14 @@ export const AutoComplete = forwardRef(function AutoComplete(
       inputValue,
       open,
       setOpen,
+      optionRenderer,
     };
-  }, [inputValue, multi, options, toggleOption, value, open, setOpen]);
+  }, [inputValue, multi, options, toggleOption, value, open, setOpen, optionRenderer]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={AutoCompleteOption}>
+        <OptionTypeProvider Component={HiddenOption}>
           <ItemWithLabel
             id={inputId}
             ref={forwardedRef}
@@ -478,7 +478,7 @@ function CreatableItem() {
 function AutoCompleteOption(option: Option) {
   const { value, label, enabled = true, keywords, readOnly, children } = option;
   const id = useId();
-  const { value: selectedValue, onChange, multi, setOpen } = useAutoComplete();
+  const { value: selectedValue, onChange, multi, setOpen, optionRenderer } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   return (
@@ -501,10 +501,19 @@ function AutoCompleteOption(option: Option) {
       data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
       keywords={keywords}
     >
-      <div className={styles.autoCompleteOptionContent}>
-        {children || label}
-      </div>
-      {selected && <Icon name="checkmark" />}
+      {children ? (
+        <>
+          <div className={styles.autoCompleteOptionContent}>{children}</div>
+          {selected && <Icon name="checkmark" />}
+        </>
+      ) : optionRenderer ? (
+        optionRenderer({ label, value, enabled }, selectedValue as any, false)
+      ) : (
+        <>
+          <div className={styles.autoCompleteOptionContent}>{label}</div>
+          {selected && <Icon name="checkmark" />}
+        </>
+      )}
     </CmdItem>
   );
 }
