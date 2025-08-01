@@ -241,7 +241,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   position: relative;
   width: 100%;
   max-height: 280px;
-  z-index: 50;
+  z-index: 1000;
   overflow: auto;
   background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
@@ -332,8 +332,9 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   }
 
   .selectItemContent {
-    width: 100%;
     display: flex;
+    flex: 1;
+    cursor: pointer;
     user-select: none;
     align-items: center;
     outline: none;
@@ -349,9 +350,9 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 }
 
 .selectItemIndicator {
-  position: absolute;
-  right: 0.5rem;
   display: flex;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
   height: 0.875rem;
   width: 0.875rem;
   align-items: center;

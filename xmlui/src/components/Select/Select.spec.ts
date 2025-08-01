@@ -266,17 +266,25 @@ test("emptyListTemplate shown when wrapped inside an App component", async ({
 });
 
 test("optionTemplate is shown", async ({ initTestBed, page, createSelectDriver }) => {
+
   await initTestBed(`
     <Select>
-      <property name="optionTemplate">
-        <Text>value={$item.value} label={$item.label}</Text>
-      </property>
-      <Option value="opt1" label="first"/>
+      <Items items="{[
+        { value: 'opt1', label: 'first' },
+        { value: 'opt2', label: 'second' },
+        { value: 'opt3', label: 'third' },
+      ]}">
+        <Option value="{$item.value}" label="{$item.label}">
+          <Text>Template for value {$item.value}</Text>
+        </Option>
+      </Items>
     </Select>
   `);
   const driver = await createSelectDriver();
   await driver.click();
-  await expect(page.getByRole("option", { name: "value=opt1 label=first" })).toBeVisible();
+  await expect(page.getByText("Template for value opt1")).toBeVisible();
+  await expect(page.getByText("Template for value opt2")).toBeVisible();
+  await expect(page.getByText("Template for value opt3")).toBeVisible();
 });
 
 test("labelBreak prop defaults to false", async ({ initTestBed, page, createSelectDriver }) => {
@@ -309,7 +317,7 @@ test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) =
 });
 
 test(
-  "Optin without label and value is not rendered",
+  "Option without label and value is not rendered",
   { tag: "@smoke" },
   async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
@@ -326,7 +334,7 @@ test(
 );
 
 test(
-  "Optin value defaults to label",
+  "Option value defaults to label",
   { tag: "@smoke" },
   async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
@@ -643,7 +651,6 @@ test.describe("searchable multiselect", { tag: "@smoke" }, () => {
 test("initialValue honored when used within Form", async ({ initTestBed, page }) => {
   await initTestBed(`
     <Form>
-    
       <Select id="mySelect" initialValue="opt3">
         <Option value="opt1" label="first"/>
         <Option value="opt2" label="second"/>

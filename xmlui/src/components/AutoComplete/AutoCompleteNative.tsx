@@ -41,7 +41,7 @@ type AutoCompleteProps = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
-  optionRenderer?: (item: any) => ReactNode;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
   onDidChange?: (newValue: string | string[]) => void;
@@ -62,10 +62,6 @@ type AutoCompleteProps = {
   creatable?: boolean;
 };
 
-function defaultRenderer(item: Option) {
-  return <div>{item.label}</div>;
-}
-
 function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
   return newOptions.some((option) =>
     Array.from(options).some((o) => o.value === option.value || o.label === option.label),
@@ -80,7 +76,6 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   required: false,
   validationStatus: "none",
   creatable: false,
-  optionRenderer: defaultRenderer,
   updateState: noop,
   onDidChange: noop,
   onFocus: noop,
@@ -100,7 +95,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
     registerComponentApi,
-    optionRenderer = defaultProps.optionRenderer,
+
     emptyListTemplate,
     style,
     children,
@@ -114,6 +109,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     labelBreak,
     required = defaultProps.required,
     creatable = defaultProps.creatable,
+    optionRenderer,
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -187,7 +183,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       onDidChange(newSelectedValue);
       inputRef.current?.focus();
     },
-    [multi, value, updateState, onDidChange, inputRef.current]
+    [multi, value, updateState, onDidChange, inputRef.current],
   );
 
   useEffect(() => {
@@ -258,18 +254,18 @@ export const AutoComplete = forwardRef(function AutoComplete(
       multi,
       value,
       onChange: toggleOption,
-      optionRenderer,
       options,
       inputValue,
       open,
       setOpen,
+      optionRenderer,
     };
-  }, [inputValue, multi, optionRenderer, options, toggleOption, value, open, setOpen]);
+  }, [inputValue, multi, options, toggleOption, value, open, setOpen, optionRenderer]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
-      <OptionTypeProvider Component={HiddenOption}>
-        <OptionContext.Provider value={optionContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
+        <OptionTypeProvider Component={HiddenOption}>
           <ItemWithLabel
             id={inputId}
             ref={forwardedRef}
@@ -435,8 +431,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
             </Popover>
           </ItemWithLabel>
           {children}
-        </OptionContext.Provider>
-      </OptionTypeProvider>
+        </OptionTypeProvider>
+      </OptionContext.Provider>
     </AutoCompleteContext.Provider>
   );
 });
@@ -479,9 +475,10 @@ function CreatableItem() {
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption({ value, label, enabled = true, keywords, readOnly }: Option) {
+function AutoCompleteOption(option: Option) {
+  const { value, label, enabled = true, keywords, readOnly, children } = option;
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer, multi, setOpen } = useAutoComplete();
+  const { value: selectedValue, onChange, multi, setOpen, optionRenderer } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   return (
@@ -504,8 +501,19 @@ function AutoCompleteOption({ value, label, enabled = true, keywords, readOnly }
       data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
       keywords={keywords}
     >
-      {optionRenderer({ label, value })}
-      {selected && <Icon name="checkmark" />}
+      {children ? (
+        <>
+          <div className={styles.autoCompleteOptionContent}>{children}</div>
+          {selected && <Icon name="checkmark" />}
+        </>
+      ) : optionRenderer ? (
+        optionRenderer({ label, value, enabled }, selectedValue as any, false)
+      ) : (
+        <>
+          <div className={styles.autoCompleteOptionContent}>{label}</div>
+          {selected && <Icon name="checkmark" />}
+        </>
+      )}
     </CmdItem>
   );
 }

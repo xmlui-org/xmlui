@@ -1,5 +1,5 @@
-</<Fragment>
-    <;App
+<Fragment>
+    <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}">
@@ -365,4 +365,3 @@
     </App>
     <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
 </Fragment>
-<

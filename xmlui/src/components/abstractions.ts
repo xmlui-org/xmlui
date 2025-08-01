@@ -11,7 +11,7 @@ export type Option = {
   style?: CSSProperties;
   readOnly?: boolean;
   keywords?: string[];
-  renderer?: (item: any) => ReactNode;
+  children?: ReactNode;
   optionRenderer?: (contextVars: any) => ReactNode;
 };
 
@@ -312,7 +312,7 @@ const TextVariantKeys = [
   "code", // use <code>
   "codefence", // use uniquely styled <![CDATA[
   "deleted", // use <del>
-  "inherit", 
+  "inherit",
   "inserted", // use <ins>
   "keyboard", // use <kbd>,
   "marked", // use <mark>

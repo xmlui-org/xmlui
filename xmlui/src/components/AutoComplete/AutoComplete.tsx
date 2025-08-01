@@ -27,6 +27,7 @@ import {
   d,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
+import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "AutoComplete";
 
@@ -180,11 +181,15 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         optionRenderer={
           node.props.optionTemplate
-            ? (item) => {
+            ? (item, val, inTrigger) => {
                 return (
                   <MemoizedItem
                     node={node.props.optionTemplate}
                     item={item}
+                    context={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
                     renderChild={renderChild}
                   />
                 );

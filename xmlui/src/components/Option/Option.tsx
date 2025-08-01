@@ -16,53 +16,56 @@ export const OptionMd = createMetadata({
   props: {
     label: d(
       `This property defines the text to display for the option. If \`label\` is not defined, ` +
-        `\`Option\` will use the \`value\` as the label.`,
+      `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
-      "This property defines the value of the option. If \`value\` is not defined, " +
-        "\`Option\` will use the \`label\` as the value. If neither is defined, " +
-        "the option is not displayed.",
+      "This property defines the value of the option. If `value` is not defined, " +
+      "`Option` will use the `label` as the value. If neither is defined, " +
+      "the option is not displayed.",
     ),
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
-    optionTemplate: d("This property is used to define a custom option template"),
   },
-  childrenAsTemplate: "optionTemplate",
 });
 
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
   ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
-    const optionTemplate = node.props.optionTemplate;
+    const label = extractValue.asOptionalString(node.props.label);
+    const value = extractValue.asOptionalString(node.props.value);
 
-    const label = extractValue.asOptionalString(node.props.label) || extractValue(node.props.value);
-    const value = extractValue.asOptionalString(node.props.value) || extractValue(node.props.label);
-    if (label === undefined) {
+    if (label === undefined && value === undefined) {
       return null;
     }
+
+    const hasTextNodeChild = node.children?.length === 1 && (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+    const textNodeChild = hasTextNodeChild ? renderChild(node.children) as string : undefined;
+
     return (
       <OptionNative
-        optionRenderer={
-          optionTemplate
-            ? (contextVars) => (
-                <MemoizedItem
-                  node={optionTemplate}
-                  renderChild={renderChild}
-                  contextVars={contextVars}
-                  layoutContext={layoutContext}
-                />
-              )
-            : undefined
-        }
-        label={label}
-        value={value}
+        label={label || textNodeChild}
+        value={value || label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
-      />
+        optionRenderer={
+          node.children?.length > 0
+            ? !hasTextNodeChild ? (contextVars) => (
+              <MemoizedItem
+                node={node.children}
+                renderChild={renderChild}
+                contextVars={contextVars}
+                layoutContext={layoutContext}
+              />
+            ) : undefined
+            : undefined
+        }
+      >
+        {!hasTextNodeChild && renderChild(node.children)}
+      </OptionNative>
     );
   },
 );
