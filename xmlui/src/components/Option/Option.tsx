@@ -16,12 +16,12 @@ export const OptionMd = createMetadata({
   props: {
     label: d(
       `This property defines the text to display for the option. If \`label\` is not defined, ` +
-        `\`Option\` will use the \`value\` as the label.`,
+      `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
       "This property defines the value of the option. If `value` is not defined, " +
-        "`Option` will use the `label` as the value. If neither is defined, " +
-        "the option is not displayed.",
+      "`Option` will use the `label` as the value. If neither is defined, " +
+      "the option is not displayed.",
     ),
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
@@ -42,26 +42,29 @@ export const optionComponentRenderer = createComponentRenderer(
       return null;
     }
 
+    const hasTextNodeChild = node.children?.length === 1 && (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+    const textNodeChild = hasTextNodeChild ? renderChild(node.children) as string : undefined;
+
     return (
       <OptionNative
-        label={label}
+        label={label || textNodeChild}
         value={value || label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
         optionRenderer={
           node.children?.length > 0
-            ? (contextVars) => (
-                <MemoizedItem
-                  node={node.children}
-                  renderChild={renderChild}
-                  contextVars={contextVars}
-                  layoutContext={layoutContext}
-                />
-              )
+            ? !hasTextNodeChild ? (contextVars) => (
+              <MemoizedItem
+                node={node.children}
+                renderChild={renderChild}
+                contextVars={contextVars}
+                layoutContext={layoutContext}
+              />
+            ) : undefined
             : undefined
         }
       >
-        {renderChild(node.children)}
+        {!hasTextNodeChild && renderChild(node.children)}
       </OptionNative>
     );
   },
