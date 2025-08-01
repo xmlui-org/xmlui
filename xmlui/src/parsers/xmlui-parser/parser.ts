@@ -17,6 +17,8 @@ export interface Error {
   readonly message: string;
   readonly pos: number;
   readonly end: number;
+  readonly contextPos: number;
+  readonly contextEnd: number;
 }
 
 type IncompleteNode = {
@@ -52,6 +54,19 @@ const RECOVER_CLOSE_TAG = [
   SyntaxKind.CData,
   SyntaxKind.Script,
 ] as const;
+
+const needsExtendedContext = [
+  ErrCodes.unexpectedCloseTag,
+  ErrCodes.expCloseStartWithName,
+  ErrCodes.expCloseStart,
+  ErrCodes.tagNameMismatch,
+  ErrCodes.expEnd,
+  ErrCodes.expTagName,
+  ErrCodes.expTagOpen,
+  ErrCodes.expEndOrClose,
+  ErrCodes.expTagNameAfterNamespace,
+  ErrCodes.expTagNameAfterCloseStart,
+];
 
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
@@ -375,14 +390,66 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+  function getContextWithSurroundingLines(
+    pos: number,
+    end: number,
+    surroundingContextLines: number,
+  ): { contextPos: number; contextEnd: number } {
+    let newlinesFound: number;
+    let cursor: number;
+
+    let contextPos: number;
+    cursor = pos;
+    newlinesFound = 0;
+    while (cursor >= 0) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
+      }
+      cursor--;
+    }
+    contextPos = cursor + 1;
+
+    let contextEnd: number;
+    cursor = end;
+    newlinesFound = 0;
+    while (cursor < text.length) {
+      if (text[cursor] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
+        cursor++;
+      } else if (text[cursor] === "\r" && text[cursor + 1] === "\n") {
+        newlinesFound++;
+        if (newlinesFound > surroundingContextLines) {
+          break;
+        }
+        cursor += 2;
+      } else {
+        cursor++;
+      }
+    }
+    contextEnd = cursor;
+
+    return { contextPos, contextEnd };
+  }
+
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
+
+    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
+
     errors.push({
       category,
       code,
       message,
       pos,
       end,
+      contextPos,
+      contextEnd,
     });
   }
 
@@ -391,12 +458,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     pos: number,
     end: number,
   ) {
+    const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, end, 1);
+
     errors.push({
       category,
       code,
       message,
       pos,
       end,
+      contextPos,
+      contextEnd,
     });
   }
 
@@ -606,7 +677,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         scanner.resetTokenState(badPrefixEnd);
         startNode();
         node.children!.push(token);
-        errorAt(err, pos, badPrefixEnd);
+
+        const { contextPos, contextEnd } = getContextWithSurroundingLines(pos, badPrefixEnd, 0);
+        errors.push({
+          category: err.category,
+          code: err.code,
+          message: err.message,
+          pos,
+          end: badPrefixEnd,
+          contextPos,
+          contextEnd,
+        });
         completeNode(SyntaxKind.ErrorNode);
 
         errFromScanner = undefined;
