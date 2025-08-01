@@ -41,7 +41,7 @@ export const DIAGS = {
   unexpectedCloseTag: {
     category: DiagnosticCategory.Error,
     code: ErrCodes.unexpectedCloseTag,
-    message: "Read '</', but there's no opening tag to close. You have too many closing tags.",
+    message: "Read '</', but there's no opening tag to close.",
   },
   expCloseStartWithName: function (openTagName: string) {
     return {
