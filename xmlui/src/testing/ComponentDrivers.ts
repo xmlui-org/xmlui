@@ -134,6 +134,40 @@ export class ButtonDriver extends ComponentDriver {
   }
 }
 
+// --- ContentSeparator
+
+export class ContentSeparatorDriver extends ComponentDriver {
+  get separator() {
+    return this.component;
+  }
+
+  async getOrientation() {
+    const classList = await this.separator.evaluate((el) => el.className);
+    
+    if (classList.includes('horizontal')) return 'horizontal';
+    if (classList.includes('vertical')) return 'vertical';
+    return 'unknown';
+  }
+
+  async getComputedHeight() {
+    return await this.separator.evaluate((el) => {
+      return window.getComputedStyle(el).height;
+    });
+  }
+
+  async getComputedWidth() {
+    return await this.separator.evaluate((el) => {
+      return window.getComputedStyle(el).width;
+    });
+  }
+
+  async getBackgroundColor() {
+    return await this.separator.evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+  }
+}
+
 // --- Avatar
 
 export class AvatarDriver extends ComponentDriver {}
@@ -798,7 +832,43 @@ export class HtmlTagDriver extends ComponentDriver {}
 
 // --- CodeBlock
 
-export class CodeBlockDriver extends ComponentDriver {}
+export class CodeBlockDriver extends ComponentDriver {
+  getHeader() {
+    return this.component.locator('[class*="codeBlockHeader"]');
+  }
+
+  getContent() {
+    return this.component.locator('[class*="codeBlockContent"]');
+  }
+
+  getCopyButton() {
+    return this.component.locator('[class*="codeBlockCopyButton"] button');
+  }
+
+  getFilename() {
+    return this.getHeader().locator('span');
+  }
+
+  async isCopyButtonVisible() {
+    return await this.getCopyButton().isVisible();
+  }
+
+  async hasHeader() {
+    return await this.getHeader().isVisible();
+  }
+
+  async getCodeText() {
+    return await this.getContent().textContent();
+  }
+
+  async clickCopyButton() {
+    await this.getCopyButton().click();
+  }
+
+  async hoverContent() {
+    await this.getContent().hover();
+  }
+}
 
 // --- Checkbox
 

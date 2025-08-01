@@ -5,43 +5,53 @@ import { expect, test } from "../../testing/fixtures";
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test.skip("renders with basic props", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
+test("renders with basic props", async ({ initTestBed, page }) => {
   await initTestBed(`<App name="Test App" testId="app"/>`);
   await expect(page.getByTestId("app")).toBeVisible();
 });
 
-test.skip("renders with different layout types", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  // Test with vertical layout
+test("renders with different layout types", async ({ initTestBed, page }) => {
+  await initTestBed(`<App layout="horizontal" testId="app"/>`);
+  await expect(page.getByTestId("app")).toBeVisible();
+
+  await initTestBed(`<App layout="horizontal-sticky" testId="app"/>`);
+  await expect(page.getByTestId("app")).toBeVisible();
+
+  await initTestBed(`<App layout="condensed" testId="app"/>`);
+  await expect(page.getByTestId("app")).toBeVisible();
+
+  await initTestBed(`<App layout="condensed-sticky" testId="app"/>`);
+  await expect(page.getByTestId("app")).toBeVisible();
+
   await initTestBed(`<App layout="vertical" testId="app"/>`);
   await expect(page.getByTestId("app")).toBeVisible();
   
-  // Test with vertical-sticky layout
   await initTestBed(`<App layout="vertical-sticky" testId="app"/>`);
   await expect(page.getByTestId("app")).toBeVisible();
+
+  await initTestBed(`<App layout="vertical-full-header" testId="app"/>`);
+  await expect(page.getByTestId("app")).toBeVisible();
 });
 
-test.skip("handles layout prop changes correctly", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  await initTestBed(`<App layout="vertical" testId="app"/>`);
+test("handles layout prop changes correctly", async ({ page, initTestBed, createButtonDriver }) => {
+  await initTestBed(`
+    <App var.lo="vertical" layout="{lo}" testId="app">
+      <Button testId="toggleLayout" label="Toggle" onClick="lo = 'horizontal'" />
+    </App>
+  `);
   
-  const verticalClasses = await page.getByTestId("app").getAttribute("class");
-  expect(verticalClasses).toContain("vertical");
-  
-  await initTestBed(`<App layout="horizontal" testId="app"/>`);
-  
-  const horizontalClasses = await page.getByTestId("app").getAttribute("class");
-  expect(horizontalClasses).toContain("horizontal");
+  const buttonDriver = await createButtonDriver("toggleLayout");
+  await expect(page.getByTestId("app")).toHaveClass(/vertical/);
+  buttonDriver.click();
+  await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
 });
 
-test.skip("sets document title from name prop", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
+test("sets document title from name prop", async ({ initTestBed, page }) => {
   const APP_NAME = "My Test Application";
   await initTestBed(`<App name="${APP_NAME}" testId="app"/>`);
   
-  // Document title check would need to be implemented once test infrastructure supports it
   await expect(page.getByTestId("app")).toBeVisible();
+  expect(await page.title()).toBe(APP_NAME);
 });
 
 // =============================================================================
@@ -113,125 +123,31 @@ test.skip("applies theme variables correctly", async ({ initTestBed, page }) => 
   await expect(page.getByTestId("app")).toHaveCSS("background-color", "rgb(240, 240, 240)");
 });
 
-test.skip("handles different visual states with scrolling options", async ({ initTestBed, page }) => {
+test("handles different visual states with scrolling options", async ({ initTestBed, page }) => {
   // TODO: review these Copilot-created tests
   // Test with scrollWholePage=true
   await initTestBed(`<App scrollWholePage="true" testId="app"/>`);
-  
-  const scrollWholePageClasses = await page.getByTestId("app").getAttribute("class");
-  expect(scrollWholePageClasses).toContain("scrollWholePage");
-  
+
+  await expect(page.getByTestId("app")).toHaveClass(/scrollWholePage/);
+
   // Test with scrollWholePage=false
   await initTestBed(`<App scrollWholePage="false" testId="app"/>`);
-  
-  const nonScrollWholePageClasses = await page.getByTestId("app").getAttribute("class");
-  expect(nonScrollWholePageClasses).not.toContain("scrollWholePage");
-});
 
-test.skip("applies media size classes correctly", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  await initTestBed(`<App testId="app" />`);
-  
-  // Media size class tests would need viewport configuration
-  await expect(page.getByTestId("app")).toBeVisible();
-  
-  const classes = await page.getByTestId("app").getAttribute("class");
-  expect(classes).toContain("wrapper"); // Basic class that should always be present
+  await expect(page.getByTestId("app")).not.toHaveClass(/scrollWholePage/);
 });
 
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================
 
-test.skip("handles undefined props gracefully", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
+test("handles undefined props gracefully", async ({ initTestBed, page }) => {
   await initTestBed(`<App testId="app" />`);
   
   await expect(page.getByTestId("app")).toBeVisible();
   
   // App should use a default layout
-  const defaultClasses = await page.getByTestId("app").getAttribute("class");
-  expect(defaultClasses).toContain("wrapper");
+  await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
 });
-
-test.skip("handles empty child components", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  await initTestBed(`<App testId="app">
-    <AppHeader testId="header"></AppHeader>
-    <NavPanel testId="nav"></NavPanel>
-    <Footer testId="footer"></Footer>
-  </App>`);
-  
-  await expect(page.getByTestId("app")).toBeVisible();
-  await expect(page.getByTestId("header")).toBeVisible();
-  await expect(page.getByTestId("nav")).toBeVisible();
-  await expect(page.getByTestId("footer")).toBeVisible();
-});
-
-test.skip("handles special characters in name prop", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  const SPECIAL_NAME = "Application & Test – Special Character's Test";
-  await initTestBed(`<App name="${SPECIAL_NAME}" testId="app"/>`);
-  
-  await expect(page.getByTestId("app")).toBeVisible();
-  
-  // Document title test would need to be implemented once infrastructure supports it
-});
-
-// =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.skip("memoization prevents unnecessary re-renders", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  await initTestBed(`
-    <Fragment var.testState="0">
-      <App testId="app">
-        <Button 
-          testId="btn"
-          onClick="testState = testState + 1"
-        >
-          Click Me
-        </Button>
-        <Text testId="content">Content</Text>
-      </App>
-      <Text testId="stateView">{testState}</Text>
-    </Fragment>
-  `);
-  
-  // Check initial rendering
-  await expect(page.getByTestId("app")).toBeVisible();
-  await expect(page.getByTestId("content")).toBeVisible();
-  
-  // Click the button
-  await page.getByTestId("btn").click();
-  await expect(page.getByTestId("stateView")).toHaveText("1");
-  
-  // Click again
-  await page.getByTestId("btn").click();
-  await expect(page.getByTestId("stateView")).toHaveText("2");
-  
-  // App should remain stable during state changes
-  await expect(page.getByTestId("content")).toBeVisible();
-});
-
-test.skip("handles rapid prop changes efficiently", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  // First render with vertical layout
-  await initTestBed(`<App layout="vertical" testId="app"/>`);
-  await expect(page.getByTestId("app")).toBeVisible();
-  
-  // Quick change to horizontal layout
-  await initTestBed(`<App layout="horizontal" testId="app"/>`);
-  await expect(page.getByTestId("app")).toBeVisible();
-  
-  const horizontalClasses = await page.getByTestId("app").getAttribute("class");
-  expect(horizontalClasses).toContain("horizontal");
-});
-
-// =============================================================================
-// INTEGRATION TESTS
-// =============================================================================
 
 test.skip("works correctly with basic content structure", async ({ initTestBed, page }) => {
   // TODO: review these Copilot-created tests

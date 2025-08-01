@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.92
+
+### Patch Changes
+
+- 347cda1: Review component e2e tests
+
 ## 0.9.91
 
 ### Patch Changes
