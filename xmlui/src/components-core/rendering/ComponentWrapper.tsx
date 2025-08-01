@@ -125,7 +125,7 @@ function transformNodeWithChildrenAsTemplate(node: ComponentDef, childrenAsTempl
   if (!node.children || node.children.length === 0) {
     return node;
   }
-  if (node.props[childrenAsTemplate]) {
+  if (node.props?.[childrenAsTemplate]) {
     throw Error("'" + childrenAsTemplate + "' is already used as a property.");
   }
   return {
