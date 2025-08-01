@@ -138,7 +138,7 @@ function createErrorReportComponent(
 
         const lineChildren: ComponentDef[] = [
           {
-            type: "Tex",
+            type: "Text",
             props: {
               value: linePrefix,
               fontFamily: "monospace",
