@@ -9,6 +9,16 @@
 
 To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/forms).
 
+## Checkbox Values [#checkbox-values]
+
+The `initialValue` and `value` properties of the checkbox are transformed to a Boolean value to display the checked (`true`) or unchecked (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
+
 ## Use children as Content Template [#use-children-as-content-template]
 
 The [inputTemplate](#inputtemplate) property can be replaced by setting the item template component directly as the Checkbox's child.
