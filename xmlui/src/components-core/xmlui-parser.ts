@@ -16,14 +16,16 @@ interface ErrorForDisplay extends ParseError {
   errPosCol: number;
 }
 
-export function xmlUiMarkupToComponent(
-  source: string,
-  fileId: string | number = 0,
-): {
+export type ParserResult = {
   component: null | ComponentDef | CompoundComponentDef;
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
-} {
+};
+
+export function xmlUiMarkupToComponent(
+  source: string,
+  fileId: string | number = 0,
+): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (errors.length > 0) {

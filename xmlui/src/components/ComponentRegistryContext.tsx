@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import type { ComponentRendererFn } from "../abstractions/RendererDefs";
-import { ComponentMetadata } from "../abstractions/ComponentDefs";
+import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 
 import type { ComponentRegistry } from "./ComponentProvider";
 

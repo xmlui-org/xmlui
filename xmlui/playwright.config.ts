@@ -14,7 +14,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = 3211;
 export default defineConfig({
-  testDir: "./src/components",
+  /* We're using the root directory since both src/components and tests-e2e folders are included */
+  //testDir: "./src/components",
   /* Run tests in files in parallel */
   fullyParallel: true,
   testMatch: "*.spec.ts",

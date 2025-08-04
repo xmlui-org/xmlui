@@ -1,16 +1,10 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 
-import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
-import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
+import { type ParserResult, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import chroma, { type Color } from "chroma-js";
 import { ComponentDriver } from "./ComponentDrivers";
-
-type EntryPoint = string | ComponentDef;
-type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
-  entryPoint?: EntryPoint;
-};
 
 export type ThemeTestDesc = {
   themeVar: string;
@@ -35,27 +29,15 @@ export async function getComponentTagName(locator: Locator) {
   return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
-function parseComponentIfNecessary(entryPoint: ComponentDef<any> | CompoundComponentDef | string) {
-  if (typeof entryPoint === "string") {
-    return xmlUiMarkupToComponent(entryPoint).component;
+export function parseComponentIfNecessary(rawComponent: ComponentDef<any> | CompoundComponentDef | string): ParserResult {
+  if (typeof rawComponent === "string") {
+    return xmlUiMarkupToComponent(rawComponent);
   }
-  return entryPoint;
-}
-
-export async function initComponent(page: Page, appDescription: UnparsedAppDescription) {
-  const { entryPoint } = appDescription;
-
-  const _appDescription: StandaloneAppDescription = {
-    name: "test bed app",
-    ...appDescription,
-    entryPoint: parseComponentIfNecessary(entryPoint),
+  return {
+    component: rawComponent,
+    errors: [],
+    erroneousCompoundComponentName: undefined,
   };
-
-  await page.addInitScript((app) => {
-    // @ts-ignore
-    window.TEST_ENV = app;
-  }, _appDescription);
-  await page.goto("/");
 }
 
 /**

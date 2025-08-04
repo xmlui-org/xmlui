@@ -4,7 +4,7 @@
 import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
-import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import {
@@ -48,7 +48,8 @@ import {
   ValidationDisplayDriver,
   ValidationSummaryDriver,
   VStackDriver,
-  DatePickerDriver, AutoCompleteDriver,
+  DatePickerDriver,
+  AutoCompleteDriver,
   CodeBlockDriver,
   CheckboxDriver,
   DropdownMenuDriver,
@@ -57,15 +58,14 @@ import {
   FileUploadDropZoneDriver,
   LabelDriver,
   BackdropDriver,
-  SpinnerDriver
+  SpinnerDriver,
 } from "./ComponentDrivers";
-import { initComponent } from "./component-test-helpers";
+import { parseComponentIfNecessary } from "./component-test-helpers";
 
 export { expect } from "./assertions";
 
 // -----------------------------------------------------------------
 // --- Utility
-
 
 /**
  * Writes an error in the console to indicate if multiple elements have the same testId
@@ -137,8 +137,9 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
 
-type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
+type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint" | "components"> & {
   testThemeVars?: Record<string, string>;
+  components?: string[];
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -166,16 +167,50 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       }
       const entryPoint = component as ComponentDef;
 
+      const components = description?.components?.map((c) => {
+        const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
+        if (erroneousCompoundComponentName) {
+          throw new Error(
+            `Error parsing component "${erroneousCompoundComponentName}": ${errors.join("\n")}`,
+          );
+        }
+        return component as CompoundComponentDef;
+      });
+
       if (source !== "" && entryPoint.children) {
         const sourceBaseComponent = entryPoint.children[0];
-        if (!sourceBaseComponent.testId) {
+        const isCompoundComponentRoot =
+          components &&
+          components?.length > 0 &&
+          components?.map((c) => c.name).includes(sourceBaseComponent.type);
+
+        if (!isCompoundComponentRoot && !sourceBaseComponent.testId) {
           sourceBaseComponent.testId = baseComponentTestId;
+        } else if (
+          isCompoundComponentRoot &&
+          sourceBaseComponent.children?.length === 1 &&
+          !sourceBaseComponent.children?.[0].testId
+        ) {
+          // If the source is a compound component, we need to set the testId on the first & only child
+          sourceBaseComponent.children[0].testId = baseComponentTestId;
         }
       }
-
       const themedDescription = mapThemeRelatedVars(description);
-      await initComponent(page, { ...themedDescription, entryPoint });
+
+      const _appDescription: StandaloneAppDescription = {
+        name: "test bed app",
+        ...themedDescription,
+        components,
+        entryPoint,
+      };
+
+      await page.addInitScript((app) => {
+        // @ts-ignore
+        window.TEST_ENV = app;
+      }, _appDescription);
       const { width, height } = page.viewportSize();
+      await page.goto("/");
+
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
         clipboard: new Clipboard(page),
