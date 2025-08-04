@@ -105,13 +105,8 @@ willOpen="testState = 'opening'"
 import { test, expect } from "../../testing/fixtures";
 
 test("component renders correctly", async ({ initTestBed }) => {
-  // --- Arrange
   await initTestBed(`<ComponentName prop="value"/>`, {});
-
-  // --- Act
-  // ...
-  // --- Assert
-  // ...
+  // Test implementation
 });
 ```
 
@@ -119,6 +114,16 @@ test("component renders correctly", async ({ initTestBed }) => {
 ```typescript
 // Basic usage
 await initTestBed(`<ComponentName prop="value"/>`, {});
+
+// With theme variables
+await initTestBed(`<ComponentName/>`, {
+  testThemeVars: { "backgroundColor-ComponentName": "rgb(255, 0, 0)" }
+});
+
+// With test state for events
+const { testStateDriver } = await initTestBed(`
+  <ComponentName onClick="testState = 'clicked'"/>
+`);
 ```
 
 ### Testing Approaches
@@ -154,10 +159,61 @@ test("expandable item icon rotates on expand", async ({ initTestBed, createExpan
 - Centrally defined in `ComponentDrivers.ts`
 - Use specific methods: `createProgressBarDriver()` not `createDriver(ProgressBarDriver)`
 
+## Required Test Examples
+
+### 1. Basic Functionality
+```typescript
+test("renders with basic props", async ({ initTestBed, page }) => {
+  await initTestBed(`<ComponentName size="sm" variant="primary"/>`);
+  await expect(page.getByTestId("component")).toBeVisible();
+  await expect(page.getByTestId("component")).toHaveCSS("font-size", "14px");
+});
+```
+
+### 2. Accessibility (REQUIRED)
+```typescript
+test("has correct accessibility attributes", async ({ initTestBed, page }) => {
+  await initTestBed(`<ComponentName label="Test Label"/>`);
+  const component = page.getByLabel("Test Label");
+  await expect(component).toHaveRole('button');
+});
+
+test("is keyboard accessible", async ({ initTestBed, page }) => {
+  const { testStateDriver } = await initTestBed(`<ComponentName onClick="testState = 'activated'"/>`);
+  
+  await page.getByRole("button").focus();
+  await page.getByRole("button").press('Enter');
+  await expect.poll(testStateDriver.testState).toEqual('activated');
+});
+```
+
+### 3. Theme Variables (REQUIRED)
+```typescript
+test("applies theme variables", async ({ initTestBed, page }) => {
+  await initTestBed(`<ComponentName/>`, {
+    testThemeVars: { "backgroundColor-ComponentName": "rgb(255, 0, 0)" }
+  });
+  await expect(page.getByTestId("component")).toHaveCSS("background-color", "rgb(255, 0, 0)");
+});
+```
+
+### 4. Edge Cases (REQUIRED)
+```typescript
+test("handles null props gracefully", async ({ initTestBed, page }) => {
+  await initTestBed(`<ComponentName/>`);
+  await expect(page.getByTestId("component")).toBeVisible();
+});
+
+test("handles special characters", async ({ initTestBed, page }) => {
+  await initTestBed(`<ComponentName label="Test with émojis 🚀 & quotes"/>`);
+  await expect(page.getByTestId("component")).toBeVisible();
+});
+```
+
 ## Test Naming & Patterns
 
 ### Naming Standards
-- Avoid using the "component" wotk in names, it's redundant
+- Avoid using the "component" word in names, it's redundant
 - Use concrete property, event, api, attribute, etc.
 
 - ✅ `"renders with 'variant' property"`
@@ -177,8 +233,6 @@ onExpandedChange="testState = arguments[0]"
 ```
 
 ## Test Execution
-
-Use these patterns while building tests
 
 ### Commands
 ```bash
@@ -207,9 +261,6 @@ npx playwright test ComponentName.spec.ts --reporter=line
 - **Generic Names**: Never use vague descriptions
 
 ### Use test.skip for comprehensive coverage
-
-- Add skip reason for skipped tests
-
 ```typescript
 test.skip("advanced feature behavior", async ({ initTestBed, page }) => {
   // TODO: review these tests for accuracy
@@ -230,12 +281,8 @@ test.skip("advanced feature behavior", async ({ initTestBed, page }) => {
 Object.entries(ComponentVariantEnum).forEach(([variant, htmlElement]) => {
   test(`variant=${variant} renders ${htmlElement}`, async ({ initTestBed, page }) => {
     await initTestBed(`<ComponentName variant="${variant}" />`);
-
-    // --- Act
-    // ...
-
-    // --- Assert
-    // ...
+    const tagName = await page.getByTestId("component").evaluate(el => el.tagName.toLowerCase());
+    expect(tagName).toEqual(htmlElement);
   });
 });
 
@@ -246,13 +293,8 @@ Object.entries(ComponentVariantEnum).forEach(([variant, htmlElement]) => {
   { label: "integer", value: "'{123}'", expected: "123" },
 ].forEach(({ label, value, expected }) => {
   test(`handles ${label} correctly`, async ({ initTestBed, page }) => {
-    await initTestBed(`<ComponentName value=${value} />`);
-
-    // --- Act
-    // ...
-
-    // --- Assert
-    // ...
+    await initTestBed(`<ComponentName value=${value} testId="component"/>`);
+    await expect(page.getByTestId("component")).toHaveText(expected);
   });
 });
 ```
@@ -281,7 +323,7 @@ DO NOT CHANGE ANYTHING FOLLOWING THIS PART. WHEN RESTRUCTURING THE DOCUMENT INCL
 - When you need to use a driver heavily, perhaps the component design is flaky
 - Drivers:
   - Execute actions
-  - Access compopnent internals
+  - Access component internals
 
 - Replace the "Page-Level Testing (Preferred)" pattern with a correct one
 - Replace the "Component Drivers" pattern with a correct one
