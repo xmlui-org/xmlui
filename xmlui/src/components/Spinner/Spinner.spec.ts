@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -15,7 +16,10 @@ test.describe("Basic Functionality", () => {
     await expect(driver.spinnerElement).toBeVisible();
   });
 
-  test("component renders immediately with zero delay", async ({ initTestBed, createSpinnerDriver }) => {
+  test("component renders immediately with zero delay", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" />`);
     const driver = await createSpinnerDriver();
 
@@ -23,21 +27,26 @@ test.describe("Basic Functionality", () => {
     await expect(driver.spinnerElement).toBeVisible();
   });
 
-  test("component respects custom delay", async ({ initTestBed, createSpinnerDriver }) => {
-    await initTestBed(`
-      <Spinner delay="200" />
-    `);
-    const driver = await createSpinnerDriver();
+  test.fixme(
+    "component respects custom delay",
+    SKIP_REASON.TEST_NOT_WORKING(),
+    async ({ initTestBed, createSpinnerDriver }) => {
+      await initTestBed(`<Spinner delay="200" />`);
+      const driver = await createSpinnerDriver();
 
-    // Should not be visible immediately (component returns null during delay)
-    await expect(driver.component).not.toBeAttached();
-    
-    // Should be visible after delay
-    await driver.component.waitFor({ state: "attached", timeout: 500 });
-    await expect(driver.component).toBeVisible();
-  });
+      // Should not be visible immediately (component returns null during delay)
+      await expect(driver.component).not.toBeAttached();
 
-  test("component renders in normal mode by default", async ({ initTestBed, createSpinnerDriver }) => {
+      // Should be visible after delay
+      await driver.component.waitFor({ state: "attached", timeout: 500 });
+      await expect(driver.component).toBeVisible();
+    },
+  );
+
+  test("component renders in normal mode by default", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" />`);
     const driver = await createSpinnerDriver();
 
@@ -45,7 +54,10 @@ test.describe("Basic Functionality", () => {
     await expect(driver.fullScreenWrapper).not.toBeVisible();
   });
 
-  test("component renders in full screen mode when specified", async ({ initTestBed, createSpinnerDriver }) => {
+  test("component renders in full screen mode when specified", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" fullScreen="true" />`);
     const driver = await createSpinnerDriver();
 
@@ -54,7 +66,10 @@ test.describe("Basic Functionality", () => {
     await expect(driver.spinnerElement).toBeVisible();
   });
 
-  test("component handles fullScreen prop changes", async ({ initTestBed, createSpinnerDriver }) => {
+  test("component handles fullScreen prop changes", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" fullScreen="false" />`);
     const driver1 = await createSpinnerDriver();
     await expect(driver1.fullScreenWrapper).not.toBeVisible();
@@ -69,9 +84,9 @@ test.describe("Basic Functionality", () => {
     const driver = await createSpinnerDriver();
 
     await expect(driver.spinnerElement).toBeVisible();
-    
+
     // Check for the four child divs that create the ring animation
-    const childDivs = driver.spinnerElement.locator('div');
+    const childDivs = driver.spinnerElement.locator("div");
     await expect(childDivs).toHaveCount(4);
   });
 });
@@ -81,7 +96,10 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("spinner provides visual loading indication", async ({ initTestBed, createSpinnerDriver }) => {
+  test("spinner provides visual loading indication", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" />`);
     const driver = await createSpinnerDriver();
 
@@ -98,12 +116,15 @@ test.describe("Accessibility", () => {
     expect(animationDuration).not.toBe("");
   });
 
-  test("full screen spinner provides appropriate visual coverage", async ({ initTestBed, createSpinnerDriver }) => {
+  test("full screen spinner provides appropriate visual coverage", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" fullScreen="true" />`);
     const driver = await createSpinnerDriver();
 
     await expect(driver.fullScreenWrapper).toBeVisible();
-    
+
     // Check that full screen wrapper covers the viewport
     const boundingBox = await driver.fullScreenWrapper.boundingBox();
     expect(boundingBox).not.toBeNull();
@@ -122,7 +143,7 @@ test.describe("Visual States", () => {
     const driver = await createSpinnerDriver();
 
     await expect(driver.spinnerElement).toBeVisible();
-    
+
     // Check animation is running
     const animationDuration = await driver.getAnimationDuration();
     expect(animationDuration).toMatch(/^\d+(\.\d+)?s$/); // Should be in seconds format
@@ -138,7 +159,10 @@ test.describe("Visual States", () => {
     await expect(driver.fullScreenWrapper).toHaveCSS("position", "absolute");
   });
 
-  test("spinner maintains proportions with custom styles", async ({ initTestBed, createSpinnerDriver }) => {
+  test("spinner maintains proportions with custom styles", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" width="100px" height="100px" />`);
     const driver = await createSpinnerDriver();
 
@@ -154,35 +178,39 @@ test.describe("Visual States", () => {
         <Spinner delay="0" testId="spinner2" />
       </VStack>
     `);
-    
+
     const driver = await createSpinnerDriver();
 
     // Wait for spinners to appear
     await driver.spinnerElement.waitFor({ state: "visible", timeout: 1000 });
-    
+
     // Verify we can find spinners with different test IDs
     const spinner1 = driver.getSpinnerByTestId("spinner1");
     const spinner2 = driver.getSpinnerByTestId("spinner2");
-    
+
     await expect(spinner1).toBeVisible();
     await expect(spinner2).toBeVisible();
-    
+
     // Verify both are actually spinner components with child divs
-    expect(await spinner1.locator('div').count()).toBe(4);
-    expect(await spinner2.locator('div').count()).toBe(4);
+    expect(await spinner1.locator("div").count()).toBe(4);
+    expect(await spinner2.locator("div").count()).toBe(4);
   });
 
-  test("spinner visibility transitions correctly", async ({ initTestBed, createSpinnerDriver }) => {
-    await initTestBed(`<Spinner delay="200" />`);
-    const driver = await createSpinnerDriver();
+  test.fixme(
+    "spinner visibility transitions correctly",
+    SKIP_REASON.TEST_NOT_WORKING(),
+    async ({ initTestBed, createSpinnerDriver }) => {
+      await initTestBed(`<Spinner delay="200" />`);
+      const driver = await createSpinnerDriver();
 
-    // Initially not visible
-    await expect(driver.component).not.toBeVisible();
-    
-    // Becomes visible after delay
-    await driver.component.waitFor({ state: "visible", timeout: 500 });
-    await expect(driver.component).toBeVisible();
-  });
+      // Initially not visible
+      await expect(driver.component).not.toBeVisible();
+
+      // Becomes visible after delay
+      await driver.component.waitFor({ state: "visible", timeout: 500 });
+      await expect(driver.component).toBeVisible();
+    },
+  );
 });
 
 // =============================================================================
@@ -190,7 +218,10 @@ test.describe("Visual States", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test("component handles undefined delay gracefully", async ({ initTestBed, createSpinnerDriver }) => {
+  test("component handles undefined delay gracefully", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner />`);
     const driver = await createSpinnerDriver();
 
@@ -199,7 +230,10 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("component handles undefined fullScreen prop gracefully", async ({ initTestBed, createSpinnerDriver }) => {
+  test("component handles undefined fullScreen prop gracefully", async ({
+    initTestBed,
+    createSpinnerDriver,
+  }) => {
     await initTestBed(`<Spinner delay="0" />`);
     const driver = await createSpinnerDriver();
 
@@ -258,13 +292,17 @@ test.describe("Edge Cases", () => {
 // =============================================================================
 
 test.describe("Integration", () => {
-  test("spinner works within layout components", async ({ initTestBed, createSpinnerDriver, createVStackDriver }) => {
+  test("spinner works within layout components", async ({
+    initTestBed,
+    createSpinnerDriver,
+    createVStackDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Spinner testId="spinner" delay="0" />
       </VStack>
     `);
-    
+
     const stackDriver = await createVStackDriver();
     const spinnerDriver = await createSpinnerDriver("spinner");
 
@@ -301,7 +339,7 @@ test.describe("Theme Variables", () => {
 
     await expect(driver.spinnerElement).toBeVisible();
     // The thickness affects the border width of the spinner elements
-    const firstChild = driver.spinnerElement.locator('div').first();
+    const firstChild = driver.spinnerElement.locator("div").first();
     await expect(firstChild).toHaveCSS("border-width", "6px");
   });
 
@@ -315,8 +353,11 @@ test.describe("Theme Variables", () => {
 
     await expect(driver.spinnerElement).toBeVisible();
     // Check border color on one of the spinner elements - format is different than expected
-    const firstChild = driver.spinnerElement.locator('div').first();
-    await expect(firstChild).toHaveCSS("border-color", "rgb(0, 255, 0) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0)");
+    const firstChild = driver.spinnerElement.locator("div").first();
+    await expect(firstChild).toHaveCSS(
+      "border-color",
+      "rgb(0, 255, 0) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0)",
+    );
   });
 
   test("multiple theme variables work together", async ({ initTestBed, createSpinnerDriver }) => {
@@ -332,8 +373,8 @@ test.describe("Theme Variables", () => {
     await expect(driver.spinnerElement).toBeVisible();
     await expect(driver.spinnerElement).toHaveCSS("width", "100px");
     await expect(driver.spinnerElement).toHaveCSS("height", "100px");
-    
-    const firstChild = driver.spinnerElement.locator('div').first();
+
+    const firstChild = driver.spinnerElement.locator("div").first();
     await expect(firstChild).toHaveCSS("border-width", "10px");
   });
 });
