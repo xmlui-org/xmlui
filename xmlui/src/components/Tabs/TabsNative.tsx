@@ -7,16 +7,21 @@ import {
   useMemo,
   useState,
 } from "react";
-import * as RTabs from "@radix-ui/react-tabs";
+import {
+  Root as RTabsRoot,
+  List as RTabsList,
+  Trigger as RTabsTrigger,
+} from "@radix-ui/react-tabs";
 
 import styles from "./Tabs.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { TabContext, useTabContextValue } from "../Tabs/TabContext";
+import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
 
 type Props = {
+  id?: string;
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
   tabRenderer?: (item: { label: string; isActive: boolean }) => ReactNode;
@@ -40,6 +45,7 @@ export const Tabs = forwardRef(function Tabs(
     tabRenderer,
     style,
     children,
+    id,
     registerComponentApi,
     className,
     distributeEvenly = defaultProps.distributeEvenly,
@@ -47,7 +53,16 @@ export const Tabs = forwardRef(function Tabs(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const [activeIndex, setActiveIndex] = useState(activeTab);
+  
+  // Ensure activeTab is within valid bounds
+  const validActiveTab = useMemo(() => {
+    if (tabItems.length === 0) return 0;
+    if (activeTab < 0) return 0;
+    if (activeTab >= tabItems.length) return 0; // Default to first tab if out of bounds
+    return activeTab;
+  }, [activeTab, tabItems.length]);
+  
+  const [activeIndex, setActiveIndex] = useState(validActiveTab);
   const currentTab = useMemo(() => {
     return tabItems[activeIndex]?.id;
   }, [activeIndex, tabItems]);
@@ -60,8 +75,8 @@ export const Tabs = forwardRef(function Tabs(
     if (activeTab !== undefined) {
       setActiveIndex(() => {
         const maxIndex = tabItems.length - 1;
-        const newIndex = activeTab - 1;
-        return newIndex < 0 ? 0 : newIndex > maxIndex ? maxIndex : newIndex;
+        const newIndex = activeTab; // activeTab should be 0-based index
+        return newIndex < 0 ? 0 : newIndex > maxIndex ? 0 : newIndex; // Default to first tab (0) when out of bounds
       });
     }
   }, [activeTab, tabItems.length]);
@@ -81,7 +96,8 @@ export const Tabs = forwardRef(function Tabs(
 
   return (
     <TabContext.Provider value={tabContextValue}>
-      <RTabs.Root
+      <RTabsRoot
+        id={id}
         ref={forwardedRef}
         className={classnames(styles.tabs, className)}
         value={`${currentTab}`}
@@ -95,24 +111,42 @@ export const Tabs = forwardRef(function Tabs(
         orientation={orientation}
         style={style}
       >
-        <RTabs.List className={styles.tabsList}>
+        <RTabsList className={styles.tabsList}>
           {tabItems.map((tab) =>
-            tabRenderer ? (
-              <RTabs.Trigger key={tab.id} value={tab.id} asChild={true}>
-                {tabRenderer({ label: tab.label, isActive: tab.id === currentTab })}
-              </RTabs.Trigger>
+            tab.labelRenderer ? (
+              <RTabsTrigger
+                role="tab"
+                className={classnames(styles.tabTrigger, {
+                  [styles.distributeEvenly]: distributeEvenly,
+                })}
+                key={tab.id}
+                value={tab.id}
+              >
+                {tab.labelRenderer({ ...tab, isActive: tab.id === currentTab })}
+              </RTabsTrigger>
+            ) : tabRenderer ? (
+              <RTabsTrigger key={tab.id} value={tab.id} asChild={true} role="tab">
+                {tabRenderer({ ...tab, isActive: tab.id === currentTab })}
+              </RTabsTrigger>
             ) : (
-              <RTabs.Trigger className={classnames(styles.tabTrigger, {
-                  [styles.distributeEvenly]: distributeEvenly
-              })} key={tab.id} value={tab.id}>
+              <RTabsTrigger
+                role="tab"
+                className={classnames(styles.tabTrigger, {
+                  [styles.distributeEvenly]: distributeEvenly,
+                })}
+                key={tab.id}
+                value={tab.id}
+              >
                 {tab.label}
-              </RTabs.Trigger>
+              </RTabsTrigger>
             ),
           )}
-          {(!distributeEvenly && !tabRenderer) && <div className={styles.filler} data-orientation={orientation} />}
-        </RTabs.List>
+          {!distributeEvenly && !tabRenderer && (
+            <div className={styles.filler} data-orientation={orientation} />
+          )}
+        </RTabsList>
         {children}
-      </RTabs.Root>
+      </RTabsRoot>
     </TabContext.Provider>
   );
 });

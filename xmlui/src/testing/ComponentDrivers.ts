@@ -1247,3 +1247,182 @@ export class DropdownMenuDriver extends ComponentDriver {
     await this.getMenuContent().waitFor({ state: 'hidden' });
   }
 }
+
+// --- Tabs
+
+export class TabsDriver extends ComponentDriver {
+  /**
+   * Get the tab list container
+   */
+  getTabList() {
+    return this.component.getByRole('tablist');
+  }
+
+  /**
+   * Get all tab elements
+   */
+  getTabs() {
+    return this.component.getByRole('tab');
+  }
+
+  /**
+   * Get a specific tab by its label/name
+   * 
+   * This handles both standard tab labels and custom templates
+   * 
+   * @param name - The visible text content containing this string will be matched
+   */
+  getTab(name: string) {
+    // First try standard role-based selection
+    try {
+      return this.component.getByRole('tab', { name });
+    } catch {
+      // If that fails, try finding the tab by text content
+      // This is more robust when dealing with custom templates
+      const tabs = this.component.getByRole('tablist').locator('role=tab');
+      return tabs.filter({
+        has: this.component.getByText(name, { exact: false })
+      });
+    }
+  }
+
+  /**
+   * Get the currently active tab panel
+   */
+  getActiveTabPanel() {
+    return this.component.getByRole('tabpanel');
+  }
+
+  /**
+   * Get all tab panels
+   */
+  getTabPanels() {
+    return this.component.locator('[role="tabpanel"]');
+  }
+
+  /**
+   * Click on a tab by its label/name
+   * 
+   * Works with both standard tab labels and custom tab templates
+   * 
+   * @param name - The visible text content containing this string will be matched
+   */
+  async clickTab(name: string) {
+    try {
+      await this.getTab(name).click();
+    } catch (e) {
+      // If clicking by getTab fails, try more direct approaches
+      const tabList = this.component.getByRole('tablist');
+      const allTabs = tabList.locator('role=tab');
+      
+      // Get all tabs and find the one containing our text
+      const count = await allTabs.count();
+      for (let i = 0; i < count; i++) {
+        const tab = allTabs.nth(i);
+        const text = await tab.textContent();
+        if (text && text.includes(name)) {
+          await tab.click();
+          return;
+        }
+      }
+      
+      throw new Error(`Could not find tab containing text "${name}". Available tabs might have different content.`);
+    }
+  }
+
+  /**
+   * Get the currently active tab
+   */
+  getActiveTab() {
+    return this.component.getByRole('tab', { selected: true });
+  }
+
+  /**
+   * Check if a specific tab is active
+   */
+  async isTabActive(name: string) {
+    const tab = this.getTab(name);
+    const ariaSelected = await tab.getAttribute('aria-selected');
+    return ariaSelected === 'true';
+  }
+
+  /**
+   * Get the number of tabs
+   */
+  async getTabCount() {
+    return await this.getTabs().count();
+  }
+
+  /**
+   * Get all tab labels/names
+   */
+  async getTabLabels() {
+    const tabs = this.getTabs();
+    const count = await tabs.count();
+    const labels = [];
+    
+    for (let i = 0; i < count; i++) {
+      const label = await tabs.nth(i).textContent();
+      if (label) {
+        labels.push(label.trim());
+      }
+    }
+    
+    return labels;
+  }
+
+  /**
+   * Get the content of the currently active tab panel
+   */
+  async getActiveTabContent() {
+    return await this.getActiveTabPanel().textContent();
+  }
+
+  /**
+   * Check if tabs are distributed evenly (have distributeEvenly class)
+   */
+  async hasDistributeEvenly() {
+    const firstTab = this.getTabs().first();
+    const className = await firstTab.getAttribute('class');
+    return className?.includes('distributeEvenly') || false;
+  }
+
+  /**
+   * Get the orientation of the tabs
+   */
+  async getOrientation() {
+    return await this.component.getAttribute('data-orientation') || 'horizontal';
+  }
+
+  /**
+   * Check if the filler element is visible
+   */
+  async isFillerVisible() {
+    const filler = this.component.locator('.filler');
+    try {
+      await filler.waitFor({ state: 'visible', timeout: 1000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Navigate tabs using keyboard
+   */
+  async navigateWithKeyboard(key: 'ArrowLeft' | 'ArrowRight' | 'ArrowUp' | 'ArrowDown' | 'Home' | 'End') {
+    // Focus on the currently active tab first
+    await this.getActiveTab().focus();
+    // Then press the specified key
+    await this.page.keyboard.press(key);
+  }
+
+  /**
+   * Check if a tab has custom content (not just text)
+   */
+  async hasCustomTabContent(name: string) {
+    const tab = this.getTab(name);
+    const children = await tab.locator('*').count();
+    return children > 0; // If it has child elements, it likely has custom content
+  }
+}

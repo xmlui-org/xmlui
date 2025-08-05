@@ -1,14 +1,14 @@
-import type { ForwardedRef} from "react";
+import type { ForwardedRef } from "react";
 import { forwardRef, useEffect, useId } from "react";
 import { Content } from "@radix-ui/react-tabs";
 
 import styles from "../Tabs/Tabs.module.scss";
 
 import type { Tab } from "../abstractions";
-import { useTabContext } from "../Tabs/TabContext";
+import { useTabContext } from "./TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, style }: Tab,
+  { children, label, labelRenderer, style }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
@@ -17,9 +17,10 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   useEffect(() => {
     register({
       label,
+      labelRenderer,
       id,
     });
-  }, [id, label, register]);
+  }, [id, label, labelRenderer, register]);
 
   useEffect(() => {
     return () => {
@@ -30,13 +31,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   if (activeTabId !== id) return null;
 
   return (
-    <Content
-      key={id}
-      value={id}
-      className={styles.tabsContent}
-      ref={forwardedRef}
-      style={style}
-    >
+    <Content key={id} value={id} className={styles.tabsContent} ref={forwardedRef} style={style}>
       {children}
     </Content>
   );

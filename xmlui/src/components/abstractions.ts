@@ -22,6 +22,7 @@ export type Accordion = {
 
 export type Tab = {
   label: string;
+  labelRenderer?: (contextVars: any) => ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
 };
