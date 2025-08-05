@@ -62,6 +62,7 @@ export const tabsComponentRenderer = createComponentRenderer(
   ({ extractValue, node, renderChild, layoutCss, registerComponentApi }) => {
     return (
       <Tabs
+        id={node?.uid}
         style={layoutCss}
         tabRenderer={
           !!node?.props?.tabTemplate

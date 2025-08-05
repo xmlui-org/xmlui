@@ -7,7 +7,7 @@ import type { Tab } from "../abstractions";
 type TabItem = Tab & { id: string };
 
 interface ITabContext{
-  register: (tabItem: {id: string, label: string}) => void;
+  register: (tabItem: TabItem) => void;
   unRegister: (id: string) => void;
   activeTabId: string;
 }
@@ -18,7 +18,7 @@ export const TabContext = createContext<ITabContext>({
 });
 
 export function useTabContextValue() {
-  const [tabItems, setTabItems] = useState<Array<{id: string, label: string}>>(EMPTY_ARRAY);
+  const [tabItems, setTabItems] = useState<TabItem[]>(EMPTY_ARRAY);
   const [activeTabId, setActiveTabId] = useState<string>("");
   const tabContextValue = useMemo(() => {
     return {
