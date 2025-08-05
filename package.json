@@ -5,7 +5,6 @@
   "private": true,
   "workspaces": [
     "./xmlui",
-    "./tests",
     "./docs",
     "./tools/create-app",
     "./tools/vscode",
