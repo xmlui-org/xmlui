@@ -685,7 +685,115 @@ export class ProgressBarDriver extends ComponentDriver {
 
 // --- List
 
-export class ListDriver extends ComponentDriver {}
+export class ListDriver extends ComponentDriver {
+  /**
+   * Gets all list item elements
+   */
+  get items() {
+    return this.component.locator('[data-list-item]').or(
+      this.component.locator('div').filter({ hasText: /^(?!.*Loading).*/ })
+    );
+  }
+
+  /**
+   * Gets the loading spinner element
+   */
+  get loadingSpinner() {
+    return this.component.locator('[class*="loadingWrapper"]');
+  }
+
+  /**
+   * Checks if the loading state is visible
+   */
+  async isLoading() {
+    return await this.loadingSpinner.isVisible().catch(() => false);
+  }
+
+  /**
+   * Gets group header elements
+   */
+  get groupHeaders() {
+    return this.component.locator('[data-group-header]').or(
+      this.component.locator('div').filter({ hasText: /^Category:|^Header:/ })
+    );
+  }
+
+  /**
+   * Gets group footer elements
+   */
+  get groupFooters() {
+    return this.component.locator('[data-group-footer]').or(
+      this.component.locator('div').filter({ hasText: /^End of/ })
+    );
+  }
+
+  /**
+   * Gets the empty state element
+   */
+  get emptyState() {
+    return this.component.locator('[data-empty-state]').or(
+      this.component.getByText('No items found!')
+    );
+  }
+
+  /**
+   * Scrolls the list to a specific position
+   */
+  async scrollTo(position: 'top' | 'bottom' | number) {
+    if (position === 'top') {
+      await this.component.evaluate(el => el.scrollTo({ top: 0 }));
+    } else if (position === 'bottom') {
+      await this.component.evaluate(el => el.scrollTo({ top: el.scrollHeight }));
+    } else {
+      await this.component.evaluate((el, pos) => el.scrollTo({ top: pos }), position);
+    }
+  }
+
+  /**
+   * Gets the number of visible items (for virtualization testing)
+   */
+  async getVisibleItemCount() {
+    return await this.items.count();
+  }
+
+  /**
+   * Gets item at specific index
+   */
+  getItemAt(index: number) {
+    return this.items.nth(index);
+  }
+
+  /**
+   * Gets item by text content
+   */
+  getItemByText(text: string) {
+    return this.component.getByText(text);
+  }
+
+  /**
+   * Checks if list is empty
+   */
+  async isEmpty() {
+    // Check for the actual "No data available" text that appears when list is empty
+    const noDataText = await this.component.textContent();
+    const hasNoDataMessage = noDataText?.includes('No data available') || noDataText?.includes('No items found');
+    
+    // Also check if there are any actual data items
+    const itemCount = await this.items.count();
+    const hasDataItems = itemCount > 0 && !hasNoDataMessage;
+    
+    return hasNoDataMessage || !hasDataItems;
+  }
+
+  /**
+   * Gets all text content from visible items
+   */
+  async getVisibleItemTexts() {
+    const items = await this.items.all();
+    const texts = await Promise.all(items.map(item => item.textContent()));
+    return texts.filter(text => text !== null);
+  }
+}
 
 // --- Text
 

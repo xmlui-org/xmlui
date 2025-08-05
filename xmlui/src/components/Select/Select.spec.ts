@@ -1,4 +1,3 @@
-import { initComponent } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test("dynamic options displayed with Items component", async ({
@@ -548,25 +547,26 @@ test.describe("multiSelect", () => {
   });
 
   test.skip('labelPosition="start" is right to select in rtl language', async ({ browser }) => {
-    const rightToLeftLanguage = "ar";
-    const context = await browser.newContext({
-      locale: rightToLeftLanguage,
-    });
-    const page = await context.newPage();
-    await initComponent(page, {
-      entryPoint: `
-          <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
-            <Option value="1" label="One"/>
-            <Option value="2" label="Two"/>
-          </Select>
-        `,
-    });
-    const { x: labelX } = await page.getByText("hi there").boundingBox();
-    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
-    const { x: selectX } = await select.boundingBox();
-    expect(labelX).toBeGreaterThan(selectX);
-    const checkedBrowserIsActuallyRTL_inThisTestCase = false;
-    expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
+    // TODO: fix this test
+    // const rightToLeftLanguage = "ar";
+    // const context = await browser.newContext({
+    //   locale: rightToLeftLanguage,
+    // });
+    // const page = await context.newPage();
+    // await initComponent(page, {
+    //   entryPoint: `
+    //       <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
+    //         <Option value="1" label="One"/>
+    //         <Option value="2" label="Two"/>
+    //       </Select>
+    //     `,
+    // });
+    // const { x: labelX } = await page.getByText("hi there").boundingBox();
+    // const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    // const { x: selectX } = await select.boundingBox();
+    // expect(labelX).toBeGreaterThan(selectX);
+    // const checkedBrowserIsActuallyRTL_inThisTestCase = false;
+    // expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
   });
 
   test("multiSelect autoFocus brings the focus to component", async ({

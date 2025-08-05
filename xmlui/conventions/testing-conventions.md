@@ -65,6 +65,42 @@ Checkbox.spec.ts is an excellent testing file with good examples, and it's a gre
 There's documentation for the components, which we call metadata. They lives in the component's file, like `Button.tsx` next to the testing file `Button.spec.ts`, but not in the native implementation file `ButtonNative.tsx`. Generally, you should not read or rely on the native implementation details.
 There's also documentation in the `.md` files, next to the component's file.
 
+#### Component Metadata (Required Reading)
+
+**ALWAYS read the component's `.tsx` file before creating tests.** The component files contain essential metadata that documents:
+
+- **Properties**: All available props with their types and descriptions
+- **Events**: Available event handlers and their parameters  
+- **Theme Variables**: Default values and names for CSS custom properties used in theme testing
+
+Use the documented theme variable names when creating theme tests instead of guessing:
+
+```typescript
+// ✅ CORRECT - Use documented theme variable names from metadata
+test("applies theme variables", async ({ initTestBed, page }) => {
+  await initTestBed(`<Button/>`, {
+    testThemeVars: { "backgroundColor-Button": "rgb(255, 0, 0)" }, // From metadata
+  });
+  await expect(page.getByTestId("component")).toHaveCSS("background-color", "rgb(255, 0, 0)");
+});
+```
+
+#### Documentation Files (Highly Recommended)
+
+**ALWAYS check for and read the component's `.md` documentation file** in the same directory. This documentation:
+
+- **Merges with metadata** to provide complete component information
+- **Contains comprehensive examples** showing real usage patterns
+- **Documents advanced features** and edge cases
+- **Provides context** for proper testing scenarios
+
+Example documentation locations:
+- `Button.tsx` - Contains metadata 
+- `Button.md` - Contains examples and detailed usage
+- `Button.spec.ts` - Your test file
+
+**Best Practice**: Read both the `.tsx` metadata AND the `.md` documentation before writing any tests to ensure comprehensive coverage of all documented features.
+
 ### Commands
 
 These commands should be ran inside the npm package named `xmlui`, which is inside the directory called `xmlui`.
