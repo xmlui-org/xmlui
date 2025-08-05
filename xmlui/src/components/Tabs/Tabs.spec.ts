@@ -173,18 +173,18 @@ test.describe("labelTemplate functionality", () => {
 });
 
 // =============================================================================
-// TAB RENDERER TESTS
+// TAB TEMPLATE TESTS
 // =============================================================================
 
 test.describe("tabTemplate functionality", () => {
-  test("tabRenderer customizes all tab labels", async ({ initTestBed, page }) => {
+  test("tabTemplate customizes all tab labels", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
         <property name="tabTemplate">
           <Text>Custom: {$item.label}</Text>
         </property>
         <TabItem label="Tab 1">Content 1</TabItem>
-        <TabItem label="Tab 2">Content 2</TabItem>
+        <TabItem label="Tab 2">Content 2</TabItem>  
         <TabItem label="Tab 3">Content 3</TabItem>
       </Tabs>
     `);
@@ -194,7 +194,7 @@ test.describe("tabTemplate functionality", () => {
     await expect(page.getByText("Custom: Tab 3")).toBeVisible();
   });
 
-  test.fixme("tabRenderer receives isActive state", async ({ initTestBed, page, createTabsDriver }) => {
+  test.fixme("tabTemplate receives isActive state", async ({ initTestBed, page, createTabsDriver }) => {
     await initTestBed(`
       <Tabs>
         <property name="tabTemplate">
