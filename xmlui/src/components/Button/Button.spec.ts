@@ -152,7 +152,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     });
   });
 
-  /* 
+  /*
   ["disabled", "hover", "active", "focused"].forEach((state) => {
     test.skip(
       `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
