@@ -113,9 +113,27 @@ npx playwright test ComponentName.spec.ts
 # Category-specific
 npx playwright test ComponentName.spec.ts --grep "accessibility"
 
-# Development (recommended during creation)
+# Development (recommended during creation) - prevents HTML report auto-opening
 npx playwright test ComponentName.spec.ts --reporter=line
+
+# Single worker for debugging (prevents race conditions)
+npx playwright test ComponentName.spec.ts --workers=1
+
+# Fast feedback during development (single worker + line reporter)
+npx playwright test ComponentName.spec.ts --workers=1 --reporter=line
 ```
+
+### Timeout Configuration
+
+XMLUI uses optimized timeout settings for faster feedback during development:
+
+- **Expect timeout**: 1000ms (1 second) - How long to wait for assertions like `expect.poll()`
+- **Test timeout**: 5 seconds - Maximum time for entire test execution
+- **Global timeout**: Configured in `playwright.config.ts`
+
+These settings ensure tests fail quickly when conditions aren't met, providing rapid feedback during development. The shorter expect timeout helps identify issues faster than the default 5-second timeout.
+
+**Important**: Never manually show the HTML report or wait for Ctrl+C during test development. Use `--reporter=line` to get immediate console feedback without browser interference.
 
 ### Event Handler Naming
 
