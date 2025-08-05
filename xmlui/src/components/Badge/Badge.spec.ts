@@ -118,7 +118,7 @@ test.describe("Theme Vars: Badge", () => {
     });
     await expect(page.getByTestId("badge")).toHaveCSS("color", EXPECTED_TEXT_COLOR);
   });
-  
+
   test("border", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
@@ -1281,7 +1281,7 @@ test.describe("Theme Vars: Pill", () => {
     const component = (await createBadgeDriver()).component;
     await expect(component).toHaveCSS("padding", EXPECTED_PADDING);
   });
-  
+
   test("pill: paddingHorizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_PADDING_HORIZONTAL = "6px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -1293,7 +1293,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-left", EXPECTED_PADDING_HORIZONTAL);
     await expect(component).toHaveCSS("padding-right", EXPECTED_PADDING_HORIZONTAL);
   });
-  
+
   test("pill: paddingVertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_PADDING_VERTICAL = "8px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -1305,19 +1305,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-top", EXPECTED_PADDING_VERTICAL);
     await expect(component).toHaveCSS("padding-bottom", EXPECTED_PADDING_VERTICAL);
   });
-  
+
   test("border", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1331,19 +1331,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderLeft", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderLeft-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1357,19 +1357,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderRight", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderRight-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1383,19 +1383,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderHorizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontal-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1409,12 +1409,12 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderHorizontal and borderLeft", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontal-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
@@ -1422,7 +1422,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1436,12 +1436,12 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", "8px");
     await expect(component).toHaveCSS("border-left-style", "double");
   });
-  
+
   test("borderHorizontal and borderRight", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontal-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
@@ -1449,7 +1449,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1463,19 +1463,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderTop", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderTop-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1489,19 +1489,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderBottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderBottom-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1515,19 +1515,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderVertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVertical-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1541,12 +1541,12 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderVertical and borderTop", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVertical-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
@@ -1554,7 +1554,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
     await expect(component).toHaveCSS("border-top-width", "8px");
     await expect(component).toHaveCSS("border-top-style", "double");
@@ -1568,12 +1568,12 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("borderVertical and border-bottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVertical-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
@@ -1581,7 +1581,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1595,19 +1595,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border-color", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderColor-Badge-pill": EXPECTED_COLOR,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1621,13 +1621,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderColor-Badge-pill": UPDATED,
@@ -1635,7 +1635,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", UPDATED);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1649,13 +1649,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-horizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontalColor-Badge-pill": UPDATED,
@@ -1663,7 +1663,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1677,13 +1677,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-left", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderLeftColor-Badge-pill": UPDATED,
@@ -1691,7 +1691,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1705,13 +1705,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-right", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderRightColor-Badge-pill": UPDATED,
@@ -1719,7 +1719,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1733,13 +1733,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-vertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVerticalColor-Badge-pill": UPDATED,
@@ -1747,7 +1747,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", UPDATED);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1761,13 +1761,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-top", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderTopColor-Badge-pill": UPDATED,
@@ -1775,7 +1775,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", UPDATED);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1789,13 +1789,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-color-bottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "rgb(0, 128, 0)";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderBottomColor-Badge-pill": UPDATED,
@@ -1803,7 +1803,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1817,19 +1817,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border-style", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderStyle-Badge-pill": EXPECTED_STYLE,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1843,13 +1843,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-style", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderStyle-Badge-pill": UPDATED,
@@ -1857,7 +1857,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", UPDATED);
@@ -1871,13 +1871,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", UPDATED);
   });
-  
+
   test("border, border-style-horizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontalStyle-Badge-pill": UPDATED,
@@ -1885,7 +1885,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1899,13 +1899,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", UPDATED);
   });
-  
+
   test("border, border-style-left", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderLeftStyle-Badge-pill": UPDATED,
@@ -1913,7 +1913,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1927,13 +1927,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", UPDATED);
   });
-  
+
   test("border, border-style-right", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderRightStyle-Badge-pill": UPDATED,
@@ -1941,7 +1941,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -1955,13 +1955,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-style-vertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVerticalStyle-Badge-pill": UPDATED,
@@ -1969,7 +1969,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", UPDATED);
@@ -1983,13 +1983,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-style-top", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderTopStyle-Badge-pill": UPDATED,
@@ -1997,7 +1997,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", UPDATED);
@@ -2011,13 +2011,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-style-bottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "double";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderBottomStyle-Badge-pill": UPDATED,
@@ -2025,7 +2025,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2039,19 +2039,19 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border-thickness", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(0, 128, 0)";
     const EXPECTED_WIDTH = "8px";
     const EXPECTED_STYLE = "dotted";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderWidth-Badge-pill": EXPECTED_WIDTH,
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2065,13 +2065,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderWidth-Badge-pill": UPDATED,
@@ -2079,7 +2079,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", UPDATED);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2093,13 +2093,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", UPDATED);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-horizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderHorizontalWidth-Badge-pill": UPDATED,
@@ -2107,7 +2107,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2121,13 +2121,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", UPDATED);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-left", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderLeftWidth-Badge-pill": UPDATED,
@@ -2135,7 +2135,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2149,13 +2149,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", UPDATED);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-right", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderRightWidth-Badge-pill": UPDATED,
@@ -2163,7 +2163,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2177,13 +2177,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-vertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderVerticalWidth-Badge-pill": UPDATED,
@@ -2191,7 +2191,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", UPDATED);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2205,13 +2205,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-top", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderTopWidth-Badge-pill": UPDATED,
@@ -2219,7 +2219,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", UPDATED);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2233,13 +2233,13 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("border, border-thickness-bottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED_COLOR = "rgb(255, 0, 0)";
     const EXPECTED_WIDTH = "5px";
     const EXPECTED_STYLE = "dotted";
     const UPDATED = "12px";
-  
+
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
       testThemeVars: {
         "borderBottomWidth-Badge-pill": UPDATED,
@@ -2247,7 +2247,7 @@ test.describe("Theme Vars: Pill", () => {
       },
     });
     const component = (await createBadgeDriver()).component;
-  
+
     await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -2261,7 +2261,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
   });
-  
+
   test("padding", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2275,7 +2275,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingHorizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2289,7 +2289,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingLeft", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2303,7 +2303,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingRight", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2317,7 +2317,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).not.toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingVertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2331,7 +2331,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).not.toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingTop", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2345,7 +2345,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).not.toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).not.toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("paddingBottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     await initTestBed(`<Badge variant="pill" value="test content"/>`, {
@@ -2359,7 +2359,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).not.toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("padding, paddingHorizontal", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
@@ -2375,7 +2375,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", UPDATED);
   });
-  
+
   test("padding, paddingLeft", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
@@ -2391,7 +2391,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", UPDATED);
   });
-  
+
   test("padding, paddingRight", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
@@ -2407,7 +2407,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("padding, paddingVertical", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
@@ -2423,7 +2423,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", UPDATED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("padding, paddingTop", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
@@ -2439,7 +2439,7 @@ test.describe("Theme Vars: Pill", () => {
     await expect(component).toHaveCSS("padding-bottom", EXPECTED);
     await expect(component).toHaveCSS("padding-left", EXPECTED);
   });
-  
+
   test("padding, paddingBottom", async ({ initTestBed, createBadgeDriver }) => {
     const EXPECTED = "100px";
     const UPDATED = "48px";
