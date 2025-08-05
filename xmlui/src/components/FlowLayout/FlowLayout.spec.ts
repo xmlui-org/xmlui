@@ -105,7 +105,7 @@ test.describe("Basic functionality", () => {
     const verticalGap = item3Bounds.y - (item1Bounds.y + item1Bounds.height);
     expect(verticalGap).toBeCloseTo(40, 0);
   });
-  
+
   test.skip("component applies theme variables correctly", async ({ page, initTestBed }) => {
     // TODO: review these Copilot-created tests
 

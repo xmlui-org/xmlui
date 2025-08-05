@@ -29,7 +29,9 @@ export async function getComponentTagName(locator: Locator) {
   return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
-export function parseComponentIfNecessary(rawComponent: ComponentDef<any> | CompoundComponentDef | string): ParserResult {
+export function parseComponentIfNecessary(
+  rawComponent: ComponentDef<any> | CompoundComponentDef | string,
+): ParserResult {
   if (typeof rawComponent === "string") {
     return xmlUiMarkupToComponent(rawComponent);
   }

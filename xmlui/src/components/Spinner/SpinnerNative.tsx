@@ -42,22 +42,22 @@ export const Spinner = forwardRef(function Spinner(
             <div></div>
             <div></div>
           </div>
-          ;
         </div>
       );
     }
-    return;
-    <div
-      className={styles["lds-ring"]}
-      role="status"
-      aria-label="Loading"
-      style={style}
-      ref={forwardedRef}
-    >
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>;
+    return (
+      <div
+        className={styles["lds-ring"]}
+        role="status"
+        aria-label="Loading"
+        style={style}
+        ref={forwardedRef}
+      >
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    );
   }
 });

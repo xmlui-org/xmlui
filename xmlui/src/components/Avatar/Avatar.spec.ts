@@ -377,7 +377,7 @@ test("avatar is keyboard accessible when clickable", async ({
 
   const { testStateDriver } = await initTestBed(
     `
-    <Avatar 
+    <Avatar
       name="${TEST_NAME}"
       onClick="testState = 'keyboard-activated'"
     />
@@ -407,8 +407,8 @@ test("click event provides correct event data", async ({ initTestBed, createAvat
   // Test that click events work correctly with event metadata
   const { testStateDriver } = await initTestBed(
     `
-    <Avatar 
-      name="${TEST_NAME}" 
+    <Avatar
+      name="${TEST_NAME}"
       url="${TEST_URL}"
       onClick="testState = 'click-event-fired'"
     />
@@ -466,8 +466,8 @@ test("avatar focus state works correctly", async ({ initTestBed, createAvatarDri
 
   const { testStateDriver } = await initTestBed(
     `
-    <Avatar 
-      name="${TEST_NAME}" 
+    <Avatar
+      name="${TEST_NAME}"
       onClick="testState = 'focused-and-clicked'"
     />
   `,
@@ -782,8 +782,8 @@ test("avatar memoization prevents unnecessary re-renders", async ({
 
   const { testStateDriver } = await initTestBed(
     `
-    <Avatar 
-      name="Memo User" 
+    <Avatar
+      name="Memo User"
       size="sm"
       onClick="testState = ++testState || 1"
     />

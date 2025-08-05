@@ -35,7 +35,7 @@ test.describe("Basic Functionality", () => {
     const driver = await createCardDriver();
     const title = driver.component.getByRole("heading");
     const subtitle = driver.component.getByText("Test Subtitle");
-    
+
     await expect(title).toHaveText("Test Title");
     await expect(subtitle).toBeVisible();
   });
@@ -73,7 +73,9 @@ test.describe("Basic Functionality", () => {
     createCardDriver,
   }) => {
     await initTestBed(`<Card showAvatar="true" title="John" />`);
-    await expect((await createCardDriver()).component.getByText("J", { exact: true })).toBeVisible();
+    await expect(
+      (await createCardDriver()).component.getByText("J", { exact: true }),
+    ).toBeVisible();
   });
 
   test("showAvatar=true with empty title displays no initials", async ({
@@ -138,7 +140,10 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Event Handling", () => {
-  test("click event is triggered when Card is clicked", async ({ initTestBed, createCardDriver }) => {
+  test("click event is triggered when Card is clicked", async ({
+    initTestBed,
+    createCardDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`<Card onClick="testState = true" />`);
     await (await createCardDriver()).click();
     await expect.poll(testStateDriver.testState).toEqual(true);

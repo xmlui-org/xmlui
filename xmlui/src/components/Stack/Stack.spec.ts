@@ -742,9 +742,9 @@ test.describe("Layout", () => {
       <VStack testId="stack" height="50px" width="300px" backgroundColor="cyan"
         overflowX="scroll">
         <Text width="400px" backgroundColor="silver" opacity="0.8">
-          This text sets its size explicitly bigger than its container. 
+          This text sets its size explicitly bigger than its container.
           As it does not fit into the container's viewport, it overflows.
-          However, its container supports horizontal scrolling so you can 
+          However, its container supports horizontal scrolling so you can
           see its content.
         </Text>
       </VStack>
