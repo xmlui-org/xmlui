@@ -28,7 +28,7 @@ test("has correct accessibility attributes", async ({ initTestBed, page }) => {
 });
 ```
 
-3. **Theme Variables** - CSS custom properties and fallback behavior. Use exact browser values: `"rgb(255, 0, 0)"` not `"red"`.
+3. **Theme Variables** - CSS custom properties and fallback behavior. Use exact browser values: `"rgb(255, 0, 0)"` not `"red"`. **Only include this category for components that support theme variables** (check component metadata for theme variable documentation).
 
 ```typescript
 test("applies theme variables", async ({ initTestBed, page }) => {
@@ -199,7 +199,7 @@ test.describe("Accessibility", () => {
 });
 
 // =============================================================================
-// THEME VARIABLE TESTS
+// THEME VARIABLE TESTS (Only for components that support theme variables)
 // =============================================================================
 
 test.describe("Theme Variables", () => {
