@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.9.93
+
+### Patch Changes
+
+- af17117: feat:add labelTemplate prop to TabItem component
+- 44da3d9: The transformation of Checkbox and Switch values (to Booleans) are now documented and tested
+- b7a6b9a: Fix formatHumanElapsedTime unit tests, make the local-independent
+- bc95844: improve: Select and AutoComplete components
+- 52d94a2: Fix the ComponentWrapper childrenAsTemplate issue
+- 6629ce5: New end-to-end tests reviewed
+- 0254471: Fixed the initialValue issue with TextArea
+- 3318cfb: feat: provide context in browser error reports
+
 ## 0.9.92
 
 ### Patch Changes
