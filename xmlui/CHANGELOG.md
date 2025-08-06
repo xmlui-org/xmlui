@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.94
+
+### Patch Changes
+
+- 1d9365c: feat: Tabs component - use headerTemplate instead of labelTemplate/tabTemplate
+
 ## 0.9.93
 
 ### Patch Changes
