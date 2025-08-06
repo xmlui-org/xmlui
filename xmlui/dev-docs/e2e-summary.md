@@ -1,31 +1,31 @@
 # XMLUI E2E Test Summary
 
-*Generated on: 2025-08-06 08:02:29 UTC*
+*Generated on: 2025-08-06 09:45:41 UTC*
 
 ## Summary Statistics
 
 - **Total XMLUI Components**: 100
-- **Components with E2E Tests**: 64
-- **Components without E2E Tests**: 36
-- **Test Coverage**: 64.0% of components have E2E tests
+- **Components with E2E Tests**: 66
+- **Components without E2E Tests**: 34
+- **Test Coverage**: 66.0% of components have E2E tests
 
-- **Total E2E Tests Run**: 2233
-- **Total Passed**: 1695
-- **Total Failed**: 0
-- **Total Skipped**: 538
-- **Pass Rate**: 75.9%
+- **Total E2E Tests Run**: 2278
+- **Total Passed**: 1763
+- **Total Failed**: 2
+- **Total Skipped**: 513
+- **Pass Rate**: 77.4%
 
 ## Component Test Details
 
 | Component Name | Tests Run | Passed | Failed | Skipped | Status |
 |----------------|-----------|--------|--------|---------|--------|
 | APICall | 46 | 37 | 0 | 9 | All Passed |
-| Accordion | 62 | 42 | 0 | 20 | All Passed |
-| App | 14 | 5 | 0 | 9 | All Passed |
+| Accordion | 55 | 42 | 0 | 13 | All Passed |
+| App | 13 | 6 | 0 | 7 | All Passed |
 | AppHeader | 12 | 10 | 0 | 2 | All Passed |
 | AppState | 14 | 14 | 0 | 0 | All Passed |
 | AutoComplete | 21 | 19 | 0 | 2 | All Passed |
-| Avatar | 91 | 87 | 0 | 4 | All Passed |
+| Avatar | 89 | 89 | 0 | 0 | All Passed |
 | Backdrop | 10 | 10 | 0 | 0 | All Passed |
 | Badge | 107 | 107 | 0 | 0 | All Passed |
 | BarChart | - | - | - | - | No E2E Tests |
@@ -51,7 +51,7 @@
 | FileUploadDropZone | 30 | 27 | 0 | 3 | All Passed |
 | FlowLayout | 32 | 0 | 0 | 32 | All Passed |
 | Footer | 56 | 42 | 0 | 14 | All Passed |
-| Form | 110 | 77 | 0 | 33 | All Passed |
+| Form | 110 | 77 | 2 | 31 | Some Failed |
 | FormItem | 58 | 58 | 0 | 0 | All Passed |
 | FormSection | - | - | - | - | No E2E Tests |
 | Fragment | 2 | 2 | 0 | 0 | All Passed |
@@ -63,9 +63,9 @@
 | H6 | - | - | - | - | Not Run/Failed |
 | HSplitter | - | - | - | - | No E2E Tests |
 | HStack | - | - | - | - | Not Run/Failed |
-| Heading | 54 | 46 | 0 | 8 | All Passed |
+| Heading | 50 | 50 | 0 | 0 | All Passed |
 | HoverCard | - | - | - | - | No E2E Tests |
-| Icon | - | - | - | - | No E2E Tests |
+| Icon | 54 | 52 | 0 | 2 | All Passed |
 | Image | 5 | 5 | 0 | 0 | All Passed |
 | Items | 25 | 25 | 0 | 0 | All Passed |
 | LabelList | - | - | - | - | No E2E Tests |
@@ -85,12 +85,12 @@
 | NumberBox | 174 | 15 | 0 | 159 | All Passed |
 | Option | - | - | - | - | No E2E Tests |
 | Page | - | - | - | - | No E2E Tests |
-| PageMetaTitle | - | - | - | - | No E2E Tests |
+| PageMetaTitle | 7 | 7 | 0 | 0 | All Passed |
 | Pages | - | - | - | - | No E2E Tests |
 | PasswordInput | - | - | - | - | No E2E Tests |
 | PieChart | - | - | - | - | No E2E Tests |
 | PositionedContainer | - | - | - | - | No E2E Tests |
-| ProgressBar | 31 | 21 | 0 | 10 | All Passed |
+| ProgressBar | 30 | 22 | 0 | 8 | All Passed |
 | Queue | - | - | - | - | No E2E Tests |
 | RadioGroup | 43 | 0 | 0 | 43 | All Passed |
 | RealTimeAdapter | - | - | - | - | No E2E Tests |
@@ -110,7 +110,7 @@
 | Table | - | - | - | - | No E2E Tests |
 | TableOfContents | - | - | - | - | No E2E Tests |
 | Tabs | 20 | 18 | 0 | 2 | All Passed |
-| Text | 111 | 108 | 0 | 3 | All Passed |
+| Text | 110 | 109 | 0 | 1 | All Passed |
 | TextArea | 71 | 71 | 0 | 0 | All Passed |
 | TextBox | 77 | 74 | 0 | 3 | All Passed |
 | Theme | 4 | 4 | 0 | 0 | All Passed |
