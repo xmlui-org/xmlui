@@ -9,7 +9,8 @@
 - **External ID support**: Optional `id` prop for TabItems with context exposure
 - **Dynamic content**: Works seamlessly with `Items` for data-driven tabs
 
-**Usage pattern:**
+## Using Tabs
+
 The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
 
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
@@ -23,6 +24,45 @@ The component accepts only [TabItem](/components/TabItem) components as children
     </TabItem>
     <TabItem label="Support">
       <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+## Dynamic Tabs
+
+You can create `TabItem` children dynamically:
+
+```xmlui-pg copy display name="Example: using Tabs with dynamic items" height="200px"
+<App>
+  <Tabs>
+    <Items data="{[1, 2, 3, 4]}">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item}"/>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
+## External TabItem identifiers
+
+TabItems can have an optional `id` prop that gets exposed in the `$header` context:
+
+```xmlui-pg copy display name="Example: External ID support" height="250px"
+<App>
+  <Tabs>
+    <TabItem label="Home" id="home-tab">
+      <property name="headerTemplate">
+        <Text>ID: {$header.id} | {$header.label}</Text>
+      </property>
+      Home content
+    </TabItem>
+    <TabItem label="Settings">
+      <property name="headerTemplate">
+        <Text>No ID | {$header.label}</Text>
+      </property>
+      Settings content
     </TabItem>
   </Tabs>
 </App>
@@ -72,21 +112,24 @@ The component accepts only [TabItem](/components/TabItem) components as children
 
 %-PROP-START headerTemplate
 
-```xmlui-pg copy {2-4} display name="Example: headerTemplate" height="200px"
+```xmlui-pg copy {3-8} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
 <App>
   <Tabs>
     <property name="headerTemplate">
-      <Text color="red">Account {$header.label}</Text>
+      <NavLink active="{$header.isActive}">
+        <Icon name="chevronright" />
+        <Text color="green">Account {$header.index}</Text>
+      </NavLink>
     </property>
-    <TabItem label="Account">
-      <Text>Account content</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream content</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support content</Text>
-    </TabItem>
+    <Items data="{[
+        {id: 1, name: 'AcmeCorp'}, 
+        {id: 2, name: 'BetaLLC'}, 
+        {id: 3, name: 'GammaInc'}]
+      }">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item.name}"/>
+      </TabItem>
+    </Items>
   </Tabs>
 </App>
 ```
@@ -96,6 +139,31 @@ The `headerTemplate` property allows you to customize the appearance of tab head
 - `index`: Zero-based index of the tab
 - `label`: The tab's label text
 - `isActive`: Boolean indicating if this tab is currently active
+
+Individual tab items have an optional identifier, which is passed to the header template.
+
+```xmlui-pg copy {3-7} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+<App>
+  <Tabs>
+    <property name="headerTemplate">
+      <NavLink active="{$header.isActive}">
+        {$header.label}{$header.id ? ' | ID: ' + $header.id : ''}
+      </NavLink>
+    </property>
+    <TabItem label="Home" id="home-tab">
+      Home content
+    </TabItem>
+    <TabItem label="Accounts" id="accounts-tab">
+      Accounts content
+    </TabItem>
+    <TabItem label="Settings">
+      Settings content
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+> [!INFO] Individual `TabItem` children can customize their [header templates](./TabItem#headertemplate), too.
 
 %-PROP-END
 
@@ -187,51 +255,6 @@ Each TabItem can have its own `headerTemplate` that overrides the global templat
     </TabItem>
     <TabItem label="Tab 2">
       Content 2
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-### Dynamic Tabs with Items
-
-Use the `Items` component to create tabs dynamically from data:
-
-```xmlui-pg copy display name="Example: Dynamic tabs with Items" height="250px"
-<App>
-  <Tabs>
-    <property name="headerTemplate">
-      <Text color="red">Account {$header.label}</Text>
-    </property>
-    <Items data="{[1, 2, 3, 4, 5]}">
-      <TabItem label="Account {$item}">
-        <property name="headerTemplate">
-          <Text color="blue">{$header.label} | {$item}</Text>
-        </property>
-        <Text>Content for account {$item}</Text>
-      </TabItem>
-    </Items>
-  </Tabs>
-</App>
-```
-
-### External ID Support
-
-TabItems can have an optional `id` prop that gets exposed in the `$header` context:
-
-```xmlui-pg copy display name="Example: External ID support" height="250px"
-<App>
-  <Tabs>
-    <TabItem label="Home" id="home-tab">
-      <property name="headerTemplate">
-        <Text>ID: {$header.id} | {$header.label}</Text>
-      </property>
-      Home content
-    </TabItem>
-    <TabItem label="Settings">
-      <property name="headerTemplate">
-        <Text>No ID | {$header.label}</Text>
-      </property>
-      Settings content
     </TabItem>
   </Tabs>
 </App>

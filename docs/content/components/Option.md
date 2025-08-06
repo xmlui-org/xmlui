@@ -37,26 +37,6 @@
 </App>
 ```
 
-## Use children as Content Template [#use-children-as-content-template]
-
-The [optionTemplate](#optiontemplate) property can be replaced by setting the item template component directly as the Option's child.
-In the following example, the two Option are functionally the same:
-
-```xmlui copy
-<App>
-  <!-- This is the same -->
-  <Option>
-    <property name="optionTemplate">
-      <Text>Template</Text>
-    </property>
-  </Option>
-  <!-- As this -->
-  <Option>
-    <Text>Template</Text>
-  </Option>
-</App>
-```
-
 ## Properties [#properties]
 
 ### `enabled` (default: true) [#enabled-default-true]
@@ -81,10 +61,6 @@ This property defines the text to display for the option. If `label` is not defi
   </Select>
 </App>
 ```
-
-### `optionTemplate` [#optiontemplate]
-
-This property is used to define a custom option template
 
 ### `value` [#value]
 

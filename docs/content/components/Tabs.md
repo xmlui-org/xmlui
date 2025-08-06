@@ -6,10 +6,13 @@
 - **Content organization**: Efficiently displays multiple content sections in a single interface area
 - **Flexible orientation**: Supports both horizontal (tabs on top) and vertical (tabs on side) layouts
 - **Active tab control**: Programmatically set which tab is initially selected
-- **Custom tab styling**: Configurable tab appearance via `tabTemplate` property
-- **Navigation methods**: Built-in methods for programmatic tab switching
+- **Custom header templates**: Configurable tab appearance via `headerTemplate` property
+- **Navigation methods**: Built-in methods for programmatic tab switching (`next()`, `prev()`, `setActiveTabIndex()`, `setActiveTabById()`)
+- **External ID support**: Optional `id` prop for TabItems with context exposure
+- **Dynamic content**: Works seamlessly with `Items` for data-driven tabs
 
-**Usage pattern:**
+## Using Tabs [#using-tabs]
+
 The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
 
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
@@ -23,6 +26,45 @@ The component accepts only [TabItem](/components/TabItem) components as children
     </TabItem>
     <TabItem label="Support">
       <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+## Dynamic Tabs [#dynamic-tabs]
+
+You can create `TabItem` children dynamically:
+
+```xmlui-pg copy display name="Example: using Tabs with dynamic items" height="200px"
+<App>
+  <Tabs>
+    <Items data="{[1, 2, 3, 4]}">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item}"/>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
+## External TabItem identifiers [#external-tabitem-identifiers]
+
+TabItems can have an optional `id` prop that gets exposed in the `$header` context:
+
+```xmlui-pg copy display name="Example: External ID support" height="250px"
+<App>
+  <Tabs>
+    <TabItem label="Home" id="home-tab">
+      <property name="headerTemplate">
+        <Text>ID: {$header.id} | {$header.label}</Text>
+      </property>
+      Home content
+    </TabItem>
+    <TabItem label="Settings">
+      <property name="headerTemplate">
+        <Text>No ID | {$header.label}</Text>
+      </property>
+      Settings content
     </TabItem>
   </Tabs>
 </App>
@@ -49,6 +91,63 @@ This property indicates the index of the active tab. The indexing starts from 0,
   </Tabs>
 </App>
 ```
+
+### `headerTemplate` [#headertemplate]
+
+This property declares the template for the clickable tab area.
+
+```xmlui-pg copy {3-8} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+<App>
+  <Tabs>
+    <property name="headerTemplate">
+      <NavLink active="{$header.isActive}">
+        <Icon name="chevronright" />
+        <Text color="green">Account {$header.index}</Text>
+      </NavLink>
+    </property>
+    <Items data="{[
+        {id: 1, name: 'AcmeCorp'}, 
+        {id: 2, name: 'BetaLLC'}, 
+        {id: 3, name: 'GammaInc'}]
+      }">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item.name}"/>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
+The `headerTemplate` property allows you to customize the appearance of tab headers. The template receives a `$header` context variable with the following properties:
+- `id` (optional): External ID if provided to TabItem
+- `index`: Zero-based index of the tab
+- `label`: The tab's label text
+- `isActive`: Boolean indicating if this tab is currently active
+
+Individual tab items have an optional identifier, which is passed to the header template.
+
+```xmlui-pg copy {3-7} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+<App>
+  <Tabs>
+    <property name="headerTemplate">
+      <NavLink active="{$header.isActive}">
+        {$header.label}{$header.id ? ' | ID: ' + $header.id : ''}
+      </NavLink>
+    </property>
+    <TabItem label="Home" id="home-tab">
+      Home content
+    </TabItem>
+    <TabItem label="Accounts" id="accounts-tab">
+      Accounts content
+    </TabItem>
+    <TabItem label="Settings">
+      Settings content
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+> [!INFO] Individual `TabItem` children can customize their [header templates](./TabItem#headertemplate), too.
 
 ### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
@@ -83,6 +182,24 @@ This component does not have any events.
 This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.
 
 **Signature**: `next(): void`
+
+### `prev` [#prev]
+
+This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.
+
+**Signature**: `prev(): void`
+
+### `setActiveTabById` [#setactivetabbyid]
+
+This method sets the active tab by its ID.
+
+**Signature**: `setActiveTabById(id: string): void`
+
+### `setActiveTabIndex` [#setactivetabindex]
+
+This method sets the active tab by index (0-based).
+
+**Signature**: `setActiveTabIndex(index: number): void`
 
 ## Styling [#styling]
 
