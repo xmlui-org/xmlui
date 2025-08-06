@@ -375,6 +375,96 @@ function displaySummary(components, componentTestMap, testResults) {
 }
 
 /**
+ * Generate and save markdown summary to dev-docs/e2e-summary.md
+ */
+function saveMarkdownSummary(components, componentTestMap, testResults) {
+  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  const devDocsPath = path.join(__dirname, '..', 'dev-docs', 'e2e-summary.md');
+  
+  let markdown = `# XMLUI E2E Test Summary\n\n`;
+  markdown += `*Generated on: ${timestamp} UTC*\n\n`;
+  
+  // Summary statistics
+  let totalComponents = 0;
+  let componentsWithTests = 0;
+  let totalTests = 0;
+  let totalPassed = 0;
+  let totalFailed = 0;
+  let totalSkipped = 0;
+  
+  for (const component of components) {
+    totalComponents++;
+    const testFiles = componentTestMap.get(component);
+    
+    if (testFiles && testFiles.length > 0) {
+      componentsWithTests++;
+      const results = testResults ? testResults.get(component) : null;
+      
+      if (results) {
+        totalTests += results.total;
+        totalPassed += results.passed;
+        totalFailed += results.failed;
+        totalSkipped += results.skipped;
+      }
+    }
+  }
+  
+  markdown += `## Summary Statistics\n\n`;
+  markdown += `- **Total XMLUI Components**: ${totalComponents}\n`;
+  markdown += `- **Components with E2E Tests**: ${componentsWithTests}\n`;
+  markdown += `- **Components without E2E Tests**: ${totalComponents - componentsWithTests}\n`;
+  markdown += `- **Test Coverage**: ${((componentsWithTests / totalComponents) * 100).toFixed(1)}% of components have E2E tests\n\n`;
+  
+  if (testResults) {
+    markdown += `- **Total E2E Tests Run**: ${totalTests}\n`;
+    markdown += `- **Total Passed**: ${totalPassed}\n`;
+    markdown += `- **Total Failed**: ${totalFailed}\n`;
+    markdown += `- **Total Skipped**: ${totalSkipped}\n`;
+    
+    if (totalTests > 0) {
+      const passRate = ((totalPassed / totalTests) * 100).toFixed(1);
+      markdown += `- **Pass Rate**: ${passRate}%\n`;
+    }
+    markdown += `\n`;
+  } else {
+    markdown += `- **Note**: E2E tests were not run - showing test coverage only\n\n`;
+  }
+  
+  // Component details table
+  markdown += `## Component Test Details\n\n`;
+  markdown += `| Component Name | Tests Run | Passed | Failed | Skipped | Status |\n`;
+  markdown += `|----------------|-----------|--------|--------|---------|--------|\n`;
+  
+  for (const component of components) {
+    const testFiles = componentTestMap.get(component);
+    
+    if (!testFiles || testFiles.length === 0) {
+      markdown += `| ${component} | - | - | - | - | No E2E Tests |\n`;
+    } else {
+      const results = testResults ? testResults.get(component) : null;
+      
+      if (!results) {
+        const status = testResults === null ? 'Has E2E Tests' : 'Not Run/Failed';
+        markdown += `| ${component} | - | - | - | - | ${status} |\n`;
+      } else {
+        const status = results.failed > 0 ? 'Some Failed' : 
+                      results.total === 0 ? 'No Tests' : 'All Passed';
+        
+        markdown += `| ${component} | ${results.total} | ${results.passed} | ${results.failed} | ${results.skipped} | ${status} |\n`;
+      }
+    }
+  }
+  
+  // Write the markdown file
+  try {
+    fs.writeFileSync(devDocsPath, markdown, 'utf8');
+    console.log(`\n✅ E2E test summary saved to: ${devDocsPath}`);
+  } catch (error) {
+    console.error(`❌ Failed to save markdown summary: ${error.message}`);
+  }
+}
+
+/**
  * Main execution function
  */
 function main() {
@@ -425,6 +515,9 @@ function main() {
     // Display summary
     displaySummary(components, componentTestMap, testResults);
     
+    // Save markdown summary
+    saveMarkdownSummary(components, componentTestMap, testResults);
+    
   } catch (error) {
     console.error('Error generating e2e test summary:', error.message);
     process.exit(1);
@@ -442,5 +535,6 @@ module.exports = {
   mapComponentsToTestFiles,
   runPlaywrightTests,
   parseTestResults,
-  displaySummary
+  displaySummary,
+  saveMarkdownSummary
 };
