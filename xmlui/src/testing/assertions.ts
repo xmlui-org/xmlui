@@ -1,12 +1,12 @@
 import { expect as baseExpect } from "@playwright/test";
 import type { Locator } from "playwright-core";
 import {
-  BorderSide,
-  CSSBorder,
-  CSSBorderStyle,
-  CSSColor,
+  type BorderSide,
+  type CSSBorder,
+  type CSSBorderStyle,
+  type CSSColor,
+  type NumericCSS,
   isBorderSide,
-  NumericCSS,
   numericCSSToString,
   parseAsCssBorder,
   parseAsCSSBorderStyle,
@@ -109,7 +109,7 @@ export const expect = baseExpect.extend({
       actual: undefined,
     };
   },
-
+  
   // ---
   // --- NOTE: Assertations below this line are experimental and are reserved for future test cases (ex. comparison tests)
   // ---

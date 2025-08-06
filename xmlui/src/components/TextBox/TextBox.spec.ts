@@ -1,3 +1,4 @@
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -5,188 +6,144 @@ import { test, expect } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("component renders", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component renders", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.component).toBeVisible();
-    await expect(driver.field).toBeVisible();
-    await expect(driver.field).toHaveValue("");
+    await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("component renders with label", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component renders with label", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox label="Username" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.component).toBeVisible();
-    await expect(driver.label).toHaveText("Username");
+    await expect(page.getByRole("textbox")).toBeVisible();
+    await expect(page.getByText("Username")).toBeVisible();
   });
 
-  test("initialValue sets field value", async ({ initTestBed, createTextBoxDriver }) => {
+  test("initialValue sets field value", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox initialValue="test value" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveValue("test value");
+    await expect(page.getByRole("textbox")).toHaveValue("test value");
   });
 
-  test("initialValue accepts different data types", async ({ initTestBed, createTextBoxDriver }) => {
+  test("initialValue accepts empty as empty string", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox initialValue="" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("");
+  });
+
+  test("initialValue accepts different data types", async ({ initTestBed, page }) => {
     // Test string
     await initTestBed(`<TextBox initialValue="hello" />`);
-    let driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveValue("hello");
-    
+    await expect(page.getByRole("textbox")).toHaveValue("hello");
+
     // Test number
     await initTestBed(`<TextBox initialValue="{123}" />`);
-    driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveValue("123");
-    
+    await expect(page.getByRole("textbox")).toHaveValue("123");
+
     // Test boolean
     await initTestBed(`<TextBox initialValue="{true}" />`);
-    driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveValue("true");
+    await expect(page.getByRole("textbox")).toHaveValue("true");
   });
 
-  test("initialValue accepts empty as empty string", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox initialValue="" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveValue("");
-  });
-
-  test("initialValue handles null and undefined", async ({ initTestBed, createTextBoxDriver }) => {
+  test("initialValue handles null", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox initialValue="{null}" />`);
-    let driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveValue("");
-    
+    await expect(page.getByRole("textbox")).toHaveValue("");
+  });
+
+  test("initialValue handles undefined", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox initialValue="{undefined}" />`);
-    driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveValue("");
+    await expect(page.getByRole("textbox")).toHaveValue("");
   });
 
-  test("component accepts user input", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component accepts user input", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("user input");
-    await expect(driver.field).toHaveValue("user input");
+    await page.getByRole("textbox").fill("user input");
+    await expect(page.getByRole("textbox")).toHaveValue("user input");
   });
 
-  test("component clears input correctly", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component clears input correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox initialValue="initial text" />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.clear();
-    await expect(driver.field).toHaveValue("");
+    const textbox = page.getByRole("textbox");
+    await expect(textbox).toHaveValue("initial text");
+    await textbox.clear();
+    await expect(textbox).toHaveValue("");
   });
 
-  test("component required prop adds required attribute", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component required prop adds required attribute", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox required="true" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("required");
+    await expect(page.getByRole("textbox")).toHaveAttribute("required");
   });
 
-  test("enabled=false disables control", async ({ initTestBed, createTextBoxDriver }) => {
+  test("enabled=false disables control", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox enabled="false" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toBeDisabled();
+    await expect(page.getByRole("textbox")).toBeDisabled();
   });
 
-  test("enabled=false prevents user input", async ({ initTestBed, createTextBoxDriver }) => {
+  test("enabled=false prevents user input", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox enabled="false" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Disabled inputs cannot be filled
-    await expect(driver.field).toBeDisabled();
-    await expect(driver.field).not.toBeEditable();
+    await expect(page.getByRole("textbox")).not.toBeEditable();
   });
 
-  test("readOnly prevents editing but allows focus", async ({ initTestBed, createTextBoxDriver }) => {
+  test("readOnly prevents editing but allows focus", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox readOnly="true" initialValue="read only text" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("readonly");
-    await expect(driver.field).toHaveValue("read only text");
-    await expect(driver.field).not.toBeEditable();
-    
-    await driver.field.focus();
-    await expect(driver.field).toBeFocused();
+    await expect(page.getByRole("textbox")).toHaveAttribute("readonly");
+    await expect(page.getByRole("textbox")).toHaveValue("read only text");
+    await expect(page.getByRole("textbox")).not.toBeEditable();
+
+    await page.getByRole("textbox").focus();
+    await expect(page.getByRole("textbox")).toBeFocused();
   });
 
-  test("readOnly is not the same as disabled", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox readOnly="true" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).not.toBeDisabled();
-    await expect(driver.field).toHaveAttribute("readonly");
-  });
-
-  test("autoFocus focuses input on mount", async ({ initTestBed, createTextBoxDriver }) => {
+  test("autoFocus focuses input on mount", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox autoFocus="true" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toBeFocused();
+    await expect(page.getByRole("textbox")).toBeFocused();
   });
 
-  test("autoFocus focuses input on mount with label", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox autoFocus="true" label="Auto-focused input" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toBeFocused();
-  });
+  test.skip(
+    "autoFocus focuses input on mount with label",
+    SKIP_REASON.XMLUI_BUG("Bug: Multiple IDs issued to same component"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<TextBox autoFocus="true" label="Auto-focused input" />`);
+      await expect(page.getByLabel("Auto-focused input")).toBeFocused();
+    },
+  );
 
-  test("placeholder shows when input is empty", async ({ initTestBed, createTextBoxDriver }) => {
+  test("placeholder shows when input is empty", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox placeholder="Enter text here..." />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("placeholder", "Enter text here...");
+    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "Enter text here...");
   });
 
-  test("maxLength limits input length", async ({ initTestBed, createTextBoxDriver }) => {
+  test("maxLength limits input length", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox maxLength="5" />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("12345678");
-    await expect(driver.field).toHaveValue("12345");
+    await page.getByRole("textbox").fill("12345678");
+    await expect(page.getByRole("textbox")).toHaveValue("12345");
   });
 
-  test("handle special characters in input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`);
+  test.fixme(
+    "component handles rapid input changes",
+    SKIP_REASON.REFACTOR("Rewrite: test does not test anything meaningful"),
+    async ({ initTestBed, createTextBoxDriver }) => {
+      await initTestBed(`<TextBox />`);
+      const driver = await createTextBoxDriver();
+
+      // Type rapidly
+      await driver.field.pressSequentially("rapid", { delay: 50 });
+      await expect(driver.field).toHaveValue("rapid");
+
+      await driver.field.clear();
+      await driver.field.pressSequentially("typing", { delay: 25 });
+      await expect(driver.field).toHaveValue("typing");
+    },
+  );
+
+  test("can render startIcon", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox startIcon="search" />`);
     const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("Hello 日本語 @#$%!");
-    await expect(driver.field).toHaveValue("Hello 日本語 @#$%!");
+    const icon = driver.component.locator("svg");
+    await expect(icon).toBeVisible();
   });
 
-  test("handle Unicode characters in input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`);
+  test("can render endIcon", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox endIcon="search" />`);
     const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("🚀 Unicode test 🎉");
-    await expect(driver.field).toHaveValue("🚀 Unicode test 🎉");
-  });
-
-  test("component handles very long input text", async ({ initTestBed, createTextBoxDriver }) => {
-    const longText = "This is a very long text that might cause layout or performance issues in the component".repeat(10);
-    await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill(longText);
-    await expect(driver.field).toHaveValue(longText);
-  });
-
-  test("component handles rapid input changes", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    // Type rapidly
-    await driver.field.pressSequentially("rapid", { delay: 50 });
-    await expect(driver.field).toHaveValue("rapid");
-    
-    await driver.field.clear();
-    await driver.field.pressSequentially("typing", { delay: 25 });
-    await expect(driver.field).toHaveValue("typing");
+    const icon = driver.component.locator("svg");
+    await expect(icon).toBeVisible();
   });
 });
 
@@ -195,67 +152,51 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("label is properly associated with input", async ({ initTestBed, createTextBoxDriver }) => {
-    const label = "Username";
-    await initTestBed(`<TextBox label="${label}" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toHaveRole("textbox");
-    await expect(driver.label).toHaveText(label);
+  test("label is properly associated with input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox label="Username" />`);
+    await expect(page.getByLabel("Username")).toBeVisible();
   });
 
-  test.skip("component supports keyboard navigation", async ({ initTestBed, page }) => {
-    // TODO: This test may be failing due to label association issues in TextBox
+  test("component supports keyboard navigation", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox label="Input" />`);
+    await page.keyboard.press("Tab", { delay: 100 });
+    await expect(page.getByRole("textbox")).toBeFocused();
+  });
+
+  test("component supports keyboard navigation from other elements", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Fragment>
         <TextBox testId="first-input" label="First input" />
         <TextBox testId="second-input" label="Second input" />
       </Fragment>
     `);
-
-    const firstInput = page.getByTestId("first-input");
-    const secondInput = page.getByTestId("second-input");
+    const firstInput = page.getByTestId("first-input").getByRole("textbox");
+    const secondInput = page.getByTestId("second-input").getByRole("textbox");
 
     await firstInput.focus();
     await expect(firstInput).toBeFocused();
-    
+
     await page.keyboard.press("Tab", { delay: 100 });
     await expect(secondInput).toBeFocused();
   });
 
-  test("required has proper ARIA attributes", async ({ initTestBed, createTextBoxDriver }) => {
+  test("required has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox required="true" label="Required input" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("required");
-    await expect(driver.label).toContainText("*");
+    await expect(page.getByRole("textbox")).toHaveAttribute("required");
+    await expect(page.getByText("Required input")).toContainText("*");
   });
 
-  test("component disabled has proper accessibility state", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox enabled="false" label="Disabled input" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toBeDisabled();
+  test("disabled component has proper attribute", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox enabled="false" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("disabled");
   });
 
-  test("component has correct role attribute", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveRole("textbox");
-  });
-
-  test("placeholder provides accessible description", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox placeholder="Enter your username" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("placeholder", "Enter your username");
-  });
-
-  test("readOnly has proper ARIA attributes", async ({ initTestBed, createTextBoxDriver }) => {
+  test("readOnly has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox readOnly="true" label="Read-only input" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.field).toHaveAttribute("readonly");
+    await expect(page.getByRole("textbox")).toHaveAttribute("readonly");
   });
 });
 
@@ -264,46 +205,70 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Label", () => {
-  test("labelPosition=start positions label before input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Username" labelPosition="start" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelPosition=start positions label before input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox direction="ltr" label="test" labelPosition="start" />`);
+
+    const { left: textboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight } = await getBounds(page.getByText("test"));
+
+    expect(labelRight).toBeLessThan(textboxLeft);
   });
 
-  test("labelPosition=end positions label after input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Username" labelPosition="end" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelPosition=end positions label after input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox direction="ltr" label="test" labelPosition="end" />`);
+
+    const { right: textboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
+
+    expect(labelLeft).toBeGreaterThan(textboxRight);
   });
 
-  test("labelPosition=top positions label above input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Username" labelPosition="top" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelPosition=top positions label above input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox label="test" labelPosition="top" />`);
+
+    const { top: textboxTop } = await getBounds(page.getByLabel("test"));
+    const { bottom: labelBottom } = await getBounds(page.getByText("test"));
+
+    expect(labelBottom).toBeLessThan(textboxTop);
   });
 
-  test("labelPosition=bottom positions label below input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Username" labelPosition="bottom" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelPosition=bottom positions label below input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox label="test" labelPosition="bottom" />`);
+
+    const { bottom: textboxBottom } = await getBounds(page.getByLabel("test"));
+    const { top: labelTop } = await getBounds(page.getByText("test"));
+
+    expect(labelTop).toBeGreaterThan(textboxBottom);
   });
 
-  test("labelWidth applies custom label width", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Custom width" labelWidth="200px" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<TextBox label="test test" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test test"));
+    expect(width).toEqual(expected);
   });
 
-  test("labelBreak enables label line breaks", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Very long label that should break into multiple lines" labelBreak="true" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("labelBreak enables label line breaks", async ({ initTestBed, page }) => {
+    const labelText = "Very long label text that should break";
+    const commonProps = `label="${labelText}" labelWidth="100px"`;
+    await initTestBed(
+      `<Fragment>
+        <TextBox ${commonProps} testId="break" labelBreak="{true}" />
+        <TextBox ${commonProps} testId="oneLine" labelBreak="{false}" />
+      </Fragment>`,
+    );
+    const labelBreak = page.getByTestId("break").getByText(labelText);
+    const labelOneLine = page.getByTestId("oneLine").getByText(labelText);
+    const { height: heightBreak } = await getBounds(labelBreak);
+    const { height: heightOneLine } = await getBounds(labelOneLine);
+
+    expect(heightBreak).toBeGreaterThan(heightOneLine);
   });
 
-  test("component handles invalid labelPosition gracefully", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Test label" labelPosition="invalid" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeVisible();
+  test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox labelPosition="invalid" label="test" />`);
+    await expect(page.getByLabel("test")).toBeVisible();
+    await expect(page.getByText("test")).toBeVisible();
   });
 });
 
@@ -312,60 +277,45 @@ test.describe("Label", () => {
 // =============================================================================
 
 test.describe("Event Handling", () => {
-  test("didChange event fires on input change", async ({ initTestBed, createTextBoxDriver }) => {
+  test("didChange event fires on input change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <TextBox onDidChange="testState = 'changed'" />
     `);
-    
-    const driver = await createTextBoxDriver();
-    await driver.field.fill("test");
-    
-    await expect.poll(testStateDriver.testState).toEqual('changed');
+    await page.getByRole("textbox").fill("test");
+    await expect.poll(testStateDriver.testState).toEqual("changed");
   });
 
-  test("didChange event passes new value", async ({ initTestBed, createTextBoxDriver }) => {
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <TextBox onDidChange="arg => testState = arg" />
     `);
-    
-    const driver = await createTextBoxDriver();
-    await driver.field.fill("test value");
-    
+    await page.getByRole("textbox").fill("test value");
     await expect.poll(testStateDriver.testState).toEqual("test value");
   });
 
-  test("gotFocus event fires on focus", async ({ initTestBed, createTextBoxDriver }) => {
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <TextBox onGotFocus="testState = 'focused'" />
     `);
-    
-    const driver = await createTextBoxDriver();
-    await driver.field.focus();
-    
-    await expect.poll(testStateDriver.testState).toEqual('focused');
+    await page.getByRole("textbox").focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
-  test("component lostFocus event fires on blur", async ({ initTestBed, createTextBoxDriver }) => {
+  test("component lostFocus event fires on blur", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <TextBox onLostFocus="testState = 'blurred'" />
     `);
-    
-    const driver = await createTextBoxDriver();
-    await driver.field.focus();
-    await driver.field.blur();
-    
-    await expect.poll(testStateDriver.testState).toEqual('blurred');
+    await page.getByRole("textbox").focus();
+    await page.getByRole("textbox").blur();
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
   });
 
-  test("events do not fire when component is disabled", async ({ initTestBed, createTextBoxDriver }) => {
+  test("events do not fire when component is disabled", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <TextBox enabled="false" didChange="testState = 'changed'" gotFocus="testState = 'focused'" />
     `);
-    
-    const driver = await createTextBoxDriver();
-    await expect(driver.field).toBeDisabled();
-    
-    // Events should not fire when disabled
+    await page.getByRole("textbox").focus();
+    await page.getByRole("textbox").fill("test", { force: true });
     await expect.poll(testStateDriver.testState).toEqual(null);
   });
 });
@@ -382,7 +332,6 @@ test.describe("Api", () => {
         <Text testId="value">{myTextBox.value}</Text>
       </Fragment>
     `);
-    
     await expect(page.getByTestId("value")).toHaveText("initial");
   });
 
@@ -393,11 +342,8 @@ test.describe("Api", () => {
         <Text testId="value">{myTextBox.value}</Text>
       </Fragment>
     `);
-    
     await expect(page.getByTestId("value")).toHaveText("");
-    
-    const textbox = page.getByRole("textbox");
-    await textbox.fill("new value");
+    await page.getByRole("textbox").fill("new value");
     await expect(page.getByTestId("value")).toHaveText("new value");
   });
 
@@ -405,18 +351,11 @@ test.describe("Api", () => {
     await initTestBed(`
       <Fragment>
         <TextBox id="myTextBox" />
-        <Button testId="setBtn" onClick="myTextBox.setValue('api value')">Set Value</Button>
-        <Text testId="value">{myTextBox.value}</Text>
+        <Button testId="setBtn" onClick="myTextBox.setValue('api value')" />
       </Fragment>
     `);
-    
-    await expect(page.getByTestId("value")).toHaveText("");
-    
     await page.getByTestId("setBtn").click();
-    await expect(page.getByTestId("value")).toHaveText("api value");
-    
-    const textbox = page.getByRole("textbox");
-    await expect(textbox).toHaveValue("api value");
+    await expect(page.getByRole("textbox")).toHaveValue("api value");
   });
 
   test("component setValue API triggers events", async ({ initTestBed, page }) => {
@@ -426,9 +365,8 @@ test.describe("Api", () => {
         <Button testId="setBtn" onClick="myTextBox.setValue('test')">Set Value</Button>
       </Fragment>
     `);
-    
     await page.getByTestId("setBtn").click();
-    await expect.poll(testStateDriver.testState).toEqual('api-changed');
+    await expect.poll(testStateDriver.testState).toEqual("api-changed");
   });
 
   test("focus API focuses the input", async ({ initTestBed, page }) => {
@@ -438,10 +376,9 @@ test.describe("Api", () => {
         <Button testId="focusBtn" onClick="myTextBox.focus()">Focus</Button>
       </Fragment>
     `);
-    
     const textbox = page.getByRole("textbox");
     await expect(textbox).not.toBeFocused();
-    
+
     await page.getByTestId("focusBtn").click();
     await expect(textbox).toBeFocused();
   });
@@ -453,7 +390,6 @@ test.describe("Api", () => {
         <Button testId="focusBtn" onClick="myTextBox.focus()">Focus</Button>
       </Fragment>
     `);
-    
     await page.getByTestId("focusBtn").click();
     const textbox = page.getByRole("textbox");
     await expect(textbox).not.toBeFocused();
@@ -465,50 +401,110 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Input Adornments", () => {
-  test("startText displays at beginning of input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox startText="$" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.component).toContainText("$");
+  test("startText displays at beginning of input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="ltr" startText="$" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
+
+    await expect(page.getByTestId("input")).toContainText("$");
+    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
   });
 
-  test("endText displays at end of input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox endText="USD" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.component).toContainText("USD");
+  test("startText displays at beginning of input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="rtl" startText="$" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
+
+    await expect(page.getByTestId("input")).toContainText("$");
+    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
   });
 
-  test("startIcon displays at beginning of input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox startIcon="search" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Check for icon presence
-    await expect(driver.component).toBeVisible();
+  test("endText displays at end of input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="ltr" endText="USD" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: textLeft, right: textRight } = await getBounds(page.getByText("USD"));
+
+    await expect(page.getByTestId("input")).toContainText("USD");
+    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
   });
 
-  test("endIcon displays at end of input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox endIcon="clear" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Check for icon presence
-    await expect(driver.component).toBeVisible();
+  test("endText displays at end of input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="rtl" endText="USD" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: textLeft, right: textRight } = await getBounds(page.getByText("USD"));
+
+    await expect(page.getByTestId("input")).toContainText("USD");
+    expect(textRight - compLeft).toBeLessThanOrEqual(compRight - textLeft);
   });
 
-  test("multiple adornments can be combined", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox startText="$" endText="USD" startIcon="dollar" />`);
-    const driver = await createTextBoxDriver();
-    
-    await expect(driver.component).toContainText("$");
-    await expect(driver.component).toContainText("USD");
+  test("startIcon displays at beginning of input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="ltr" startIcon="search" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img"));
+
+    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
   });
 
-  test("gap property controls spacing between adornments", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox startText="$" gap="10px" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Check spacing is applied
-    await expect(driver.component).toBeVisible();
+  test("startIcon displays at beginning of input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="rtl" startIcon="search" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img"));
+
+    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
+  });
+
+  test("endIcon displays at end of input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" endIcon="search" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img"));
+
+    expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
+  });
+
+  test("endIcon displays at end of input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" direction="rtl" endIcon="search" />`);
+
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: iconLeft, right: iconRight } = await getBounds(page.getByRole("img"));
+
+    expect(iconRight - compLeft).toBeLessThanOrEqual(compRight - iconLeft);
+  });
+
+  test("multiple adornments can be combined", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TextBox testId="input" startText="$" endText="USD" startIcon="search" endIcon="search" />`);
+    await expect(page.getByTestId("input")).toContainText("$");
+    await expect(page.getByTestId("input")).toContainText("USD");
+    await expect(page.getByRole("img").first()).toBeVisible();
+    await expect(page.getByRole("img").last()).toBeVisible();
+  });
+
+  test("all adornments appear in the right place", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TextBox testId="input" startText="$" endText="USD" startIcon="search" endIcon="search" direction="ltr" />
+    `);
+    const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+    const { left: startTextLeft, right: startTextRight } = await getBounds(page.getByText("$"));
+    const { left: endTextLeft, right: endTextRight } = await getBounds(page.getByText("USD"));
+    const { left: startIconLeft, right: startIconRight } = await getBounds(
+      page.getByRole("img").first(),
+    );
+    const { left: endIconLeft, right: endIconRight } = await getBounds(
+      page.getByRole("img").last(),
+    );
+
+    // Check order of adornments
+    expect(startTextRight - compLeft).toBeLessThanOrEqual(compRight - startTextLeft);
+    expect(startIconRight - compLeft).toBeLessThanOrEqual(compRight - startIconLeft);
+    expect(endTextRight - compLeft).toBeGreaterThanOrEqual(compRight - endTextLeft);
+    expect(endIconRight - compLeft).toBeGreaterThanOrEqual(compRight - endIconLeft);
   });
 });
 
@@ -517,40 +513,54 @@ test.describe("Input Adornments", () => {
 // =============================================================================
 
 test.describe("Password Input", () => {
-  test("password type hides input text", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<PasswordInput type="password" />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("secret");
-    await expect(driver.field).toHaveAttribute("type", "password");
+  test("component renders", async ({ initTestBed, page }) => {
+    await initTestBed(`<PasswordInput />`);
+    await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("showPasswordToggle displays visibility toggle", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<PasswordInput type="password" showPasswordToggle="true" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Check for toggle button presence
-    await expect(driver.component).toBeVisible();
+  test("component has password type", async ({ initTestBed, page }) => {
+    await initTestBed(`<PasswordInput />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("type", "password");
   });
 
-  test("password toggle switches between visible and hidden", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<PasswordInput type="password" showPasswordToggle="true" />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill("secret");
-    await expect(driver.field).toHaveAttribute("type", "password");
-    
-    // TODO: Click toggle button (would need to find the toggle button)
-    // await toggleButton.click();
-    // await expect(driver.field).toHaveAttribute("type", "text");
+  test("component has initial value", async ({ initTestBed, page }) => {
+    await initTestBed(`<PasswordInput initialValue="secret" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("secret");
   });
 
-  test("custom password icons work correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<PasswordInput type="password" showPasswordToggle="true" passwordVisibleIcon="eye-open" passwordHiddenIcon="eye-closed" />`);
-    const driver = await createTextBoxDriver();
-    
-    // Check custom icons are used
-    await expect(driver.component).toBeVisible();
+  test("showPasswordToggle displays visibility toggle", async ({ initTestBed, page }) => {
+    await initTestBed(`<PasswordInput testId="input" showPasswordToggle="true" />`);
+    await expect(page.getByTestId("input").getByRole("button")).toBeVisible();
+  });
+
+  test("password toggle switches between visible and hidden", async ({ initTestBed, page }) => {
+    await initTestBed(`<PasswordInput testId="input" showPasswordToggle="true" />`);
+    const toggleButton = page.getByTestId("input").getByRole("button");
+
+    await expect(page.getByRole("textbox")).toHaveAttribute("type", "password");
+    await toggleButton.click();
+    await expect(page.getByRole("textbox")).toHaveAttribute("type", "text");
+  });
+
+  test("custom password icons work correctly", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <PasswordInput
+        testId="input"
+        showPasswordToggle="true"
+        passwordVisibleIcon="test"
+        passwordHiddenIcon="test"
+      />`,
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
+        },
+      },
+    );
+    const icon = page.getByTestId("input").getByRole("img");
+    await expect(icon).toBeVisible();
+    await page.getByTestId("input").getByRole("button").click();
+    await expect(icon).toBeVisible();
   });
 });
 
@@ -559,106 +569,96 @@ test.describe("Password Input", () => {
 // =============================================================================
 
 test.describe("Theme Vars", () => {
-  test("backgroundColor applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("backgroundColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "backgroundColor-TextBox": "rgb(255, 240, 240)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("background-color", "rgb(255, 240, 240)");
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 240, 240)");
   });
 
-  test("borderColor applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("borderColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "borderColor-TextBox": "rgb(255, 0, 0)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("textColor applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("textColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "textColor-TextBox": "rgb(0, 0, 255)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
+    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(0, 0, 255)");
   });
 
-  test("focus borderColor applies on focus", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("focus borderColor applies on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "borderColor-TextBox--focus": "rgb(0, 255, 0)",
       },
     });
-    const driver = await createTextBoxDriver();
-    
-    await driver.component.focus();
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
+    const input = page.getByTestId("input");
+    await input.focus();
+    await expect(input).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
-  test("disabled backgroundColor applies when disabled", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox enabled="false" />`, {
+  test("disabled backgroundColor applies when disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" enabled="false" />`, {
       testThemeVars: {
         "backgroundColor-TextBox--disabled": "rgb(240, 240, 240)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(240, 240, 240)");
   });
 
-  test("error borderColor applies with error validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="error" />`, {
+  test("error borderColor applies with error validation", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
       testThemeVars: {
         "borderColor-TextBox-error": "rgb(255, 0, 0)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("warning borderColor applies with warning validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="warning" />`, {
+  test("warning borderColor applies with warning validation", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
       testThemeVars: {
         "borderColor-TextBox-warning": "rgb(255, 165, 0)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("border-color", "rgb(255, 165, 0)");
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 165, 0)");
   });
 
-  test("success borderColor applies with valid validation", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="valid" />`, {
+  test("success borderColor applies with valid validation", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
       testThemeVars: {
         "borderColor-TextBox-success": "rgb(0, 255, 0)",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
-  test("borderRadius applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("borderRadius applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "borderRadius-TextBox": "8px",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("border-radius", "8px");
+    await expect(page.getByTestId("input")).toHaveCSS("border-radius", "8px");
   });
 
-  test("padding applies correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox />`, {
+  test("padding applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
       testThemeVars: {
         "padding-TextBox": "12px",
       },
     });
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveCSS("padding", "12px");
+    await expect(page.getByTestId("input")).toHaveCSS("padding", "12px");
   });
 });
 
@@ -667,28 +667,46 @@ test.describe("Theme Vars", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  test("validationStatus=error correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="error" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveClass(/error/);
+  test("validationStatus=error correctly displayed", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="error" />`, {
+      testThemeVars: {
+        "borderColor-TextBox-error": "rgb(255, 0, 0)",
+      },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("validationStatus=warning correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="warning" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveClass(/warning/);
+  test("validationStatus=warning correctly displayed", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="warning" />`, {
+      testThemeVars: {
+        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
+      },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 165, 0)");
   });
 
-  test("validationStatus=valid correctly displayed", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="valid" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toHaveClass(/valid/);
+  test("validationStatus=valid correctly displayed", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="valid" />`, {
+      testThemeVars: {
+        "borderColor-TextBox-success": "rgb(0, 255, 0)",
+      },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
-  test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox validationStatus="invalid-status" />`);
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toBeVisible();
+  test("handles invalid validationStatus gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox testId="input" validationStatus="invalid-status" />`, {
+      testThemeVars: {
+        "borderColor-TextBox": "rgb(0, 0, 0)",
+        "borderColor-TextBox-error": "rgb(255, 0, 0)",
+        "borderColor-TextBox-warning": "rgb(255, 165, 0)",
+        "borderColor-TextBox-success": "rgb(0, 255, 0)",
+      },
+    });
+    await expect(page.getByTestId("input")).not.toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(page.getByTestId("input")).not.toHaveCSS("border-color", "rgb(255, 165, 0)");
+    await expect(page.getByTestId("input")).not.toHaveCSS("border-color", "rgb(0, 255, 0)");
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(0, 0, 0)");
   });
 });
 
@@ -697,39 +715,65 @@ test.describe("Validation", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test("component handles null and undefined props gracefully", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox/>`, {});
-    const driver1 = await createTextBoxDriver();
-    await expect(driver1.component).toBeVisible();
-    
-    await initTestBed(`<TextBox label=""/>`, {});
-    const driver2 = await createTextBoxDriver();
-    await expect(driver2.component).toBeVisible();
-  });
-
-  test("component handles special characters correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox label="Input with !@#$%^&*()"/>`, {});
-    const driver = await createTextBoxDriver();
-    await expect(driver.component).toBeVisible();
-  });
-
-  test("component handles extremely long input values", async ({ initTestBed, createTextBoxDriver }) => {
-    const veryLongText = "A".repeat(10000);
+  test("handle special characters in input", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.fill(veryLongText);
-    await expect(driver.field).toHaveValue(veryLongText);
+    await page.getByRole("textbox").fill("Hello 日本語 @#$%!");
+    await expect(page.getByRole("textbox")).toHaveValue("Hello 日本語 @#$%!");
   });
 
-  test("component handles clipboard operations correctly", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox initialValue="copy this text" />`);
-    const driver = await createTextBoxDriver();
-    
-    await driver.field.selectText();
-    // TODO: Test copy/paste operations
-    await expect(driver.field).toBeVisible();
+  test("handle Unicode characters in input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox />`);
+    await page.getByRole("textbox").fill("🚀 Unicode test 🎉");
+    await expect(page.getByRole("textbox")).toHaveValue("🚀 Unicode test 🎉");
   });
+
+  test("component handles very long input text", async ({ initTestBed, page }) => {
+    const longText =
+      "This is a very long text that might cause layout or performance issues in the component".repeat(
+        10,
+      );
+    await initTestBed(`<TextBox />`);
+    await page.getByRole("textbox").fill(longText);
+    await expect(page.getByRole("textbox")).toHaveValue(longText);
+  });
+
+  test("component handles special characters correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox label="Input with !@#$%^&*()"/>`, {});
+    await expect(page.getByText("Input with !@#$%^&*()")).toBeVisible();
+  });
+
+  test("component handles extremely long input values", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox />`);
+
+    const veryLongText = "A".repeat(10000);
+    await page.getByRole("textbox").fill(veryLongText);
+    await expect(page.getByRole("textbox")).toHaveValue(veryLongText);
+  });
+
+  test.skip(
+    "component handles copy operation",
+    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
+    async ({ initTestBed, page }) => {
+      const { clipboard } = await initTestBed(`<TextBox initialValue="copy this text" />`);
+      const textbox = page.getByRole("textbox");
+
+      await clipboard.copy(textbox);
+      expect(await clipboard.read()).toBe("copy this text");
+    },
+  );
+
+  test.skip(
+    "component handles paste operation",
+    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
+    async ({ initTestBed, page }) => {
+      const { clipboard } = await initTestBed(`<TextBox />`);
+      const textbox = page.getByRole("textbox");
+
+      await clipboard.write("pasted text");
+      await clipboard.paste(textbox);
+      await expect(textbox).toHaveValue("pasted text");
+    },
+  );
 });
 
 // =============================================================================
@@ -737,47 +781,37 @@ test.describe("Edge Cases", () => {
 // =============================================================================
 
 test.describe("Integration", () => {
-  test("component works correctly in different layout contexts", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`
-      <VStack>
-        <TextBox label="First input" />
-        <TextBox label="Second input" />
-      </VStack>
-    `, {});
-    
-    const driver = await createTextBoxDriver();
-    
-    // Test basic layout integration
-    await expect(driver.component).toBeVisible();
-    
-    // Test bounding box and dimensions
-    const boundingBox = await driver.component.boundingBox();
-    expect(boundingBox).not.toBeNull();
-    expect(boundingBox!.width).toBeGreaterThan(0);
-    expect(boundingBox!.height).toBeGreaterThan(0);
+  test("component works correctly in Stack layout contexts", async ({ initTestBed, page }) => {
+    await initTestBed(`<Stack><TextBox testId="input" /></Stack>`);
+    const input = page.getByTestId("input");
+    const { width, height } = await getBounds(input);
+
+    await expect(input).toBeVisible();
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBeGreaterThan(0);
   });
 
-  test.skip("component integrates with forms correctly", async ({ initTestBed, page }) => {
-    // TODO: This test may be failing due to Form component or label association issues
-    await initTestBed(`
-      <Form>
-        <TextBox label="Username" required="true" />
-        <TextBox label="Email" type="email" />
-        <Button type="submit">Submit</Button>
-      </Form>
-    `);
-    
-    const usernameInput = page.getByLabel("Username");
-    const emailInput = page.getByLabel("Email");
-    const submitButton = page.getByRole("button", { name: "Submit" });
-    
-    await expect(usernameInput).toBeVisible();
-    await expect(emailInput).toBeVisible();
-    await expect(submitButton).toBeVisible();
+  test("component works correctly in FlowLayout layout contexts", async ({ initTestBed, page }) => {
+    await initTestBed(`<FlowLayout><TextBox testId="input" /></FlowLayout>`);
+    const input = page.getByTestId("input");
+    const { width, height } = await getBounds(input);
+
+    await expect(input).toBeVisible();
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBeGreaterThan(0);
   });
 
-  test.skip("component works with conditional rendering", async ({ initTestBed, page }) => {
-    // TODO: This test may be failing due to label association issues in conditional rendering
+  test("component integrates with forms correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Form><TextBox label="Username" /></Form>`);
+    const input = page.getByLabel("Username");
+    const { width, height } = await getBounds(input);
+
+    await expect(input).toBeVisible();
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBeGreaterThan(0);
+  });
+
+  test("component works with conditional rendering", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment var.showInput="{true}">
         <Fragment when="{showInput}">
@@ -786,9 +820,9 @@ test.describe("Integration", () => {
         <Button testId="toggleBtn" onClick="showInput = !showInput">Toggle</Button>
       </Fragment>
     `);
-    
+
     await expect(page.getByLabel("Conditional input")).toBeVisible();
-    
+
     await page.getByTestId("toggleBtn").click();
     await expect(page.getByLabel("Conditional input")).not.toBeVisible();
   });

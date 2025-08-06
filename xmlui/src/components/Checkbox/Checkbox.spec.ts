@@ -1131,10 +1131,3 @@ test.describe("Validation", () => {
     await expect(page.getByRole("checkbox")).not.toHaveCSS("border-color", NOT_EXPECTED_COLOR);
   });
 });
-
-// =============================================================================
-// PERFORMANCE TESTS (This is a cool set of tests!)
-// =============================================================================
-
-// no memory leak, fast user input response, rapid prop change
-// TODO: Need to figure out how to do this

@@ -8,8 +8,8 @@ import type { ComponentDef, CompoundComponentDef } from "../abstractions/Compone
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import {
-  type ComponentDriver,
   type ComponentDriverParams,
+  type ComponentDriver,
   AccordionDriver,
   AppFooterDriver,
   AppHeaderDriver,
@@ -64,6 +64,8 @@ import { parseComponentIfNecessary } from "./component-test-helpers";
 
 export { expect } from "./assertions";
 
+const isCI = process?.env?.CI === "true";
+
 // -----------------------------------------------------------------
 // --- Utility
 
@@ -83,12 +85,28 @@ async function getOnlyFirstLocator(page: Page, testId: string) {
 
 class Clipboard {
   private page: Page;
+  private content: string = "";
 
   constructor(page: Page) {
     this.page = page;
   }
 
-  async getContent() {
+  init() {
+    return () => {
+      window.navigator.clipboard.readText = async () => this.content;
+      window.navigator.clipboard.read = async () => [new ClipboardItem({ "text/plain": this.content })];
+      window.navigator.clipboard.writeText = async (text) => { this.content = text };
+      window.navigator.clipboard.write = async (items) => {
+        for (const item of items) {
+          if (item.types.includes("text/plain")) {
+            this.content = await item.getType("text/plain").then((blob) => blob.text());
+          }
+        }
+      };
+    }
+  }
+
+  async read() {
     const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
     return handle.jsonValue();
   }
@@ -102,18 +120,33 @@ class Clipboard {
   }
 
   /**
-   * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver
+   * Copies the text from the given locator to the clipboard.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Select the text.
+   * 3. Copy the text to the clipboard. (ControlOrMeta+C)
+   *
+   * @param locator - a Locator to focus and copy from
    */
-  async copyFrom(driver: ComponentDriver) {
-    await driver.focus();
-    await driver.dblclick();
-    await this.page.keyboard.press("Control+c");
+  async copy(locator: Locator) {
+    await locator.focus();
+    await locator.selectText();
+    await this.page.keyboard.press("ControlOrMeta+C");
   }
 
-  async pasteTo(driver: ComponentDriver) {
-    await driver.focus();
-    await this.page.keyboard.press("Control+v");
+  /**
+   * Pastes the text from the clipboard to the given locator.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Paste the text from the clipboard. (ControlOrMeta+V)
+   *
+   * @param locator - a Locator to focus and paste to
+   */
+  async paste(locator: Locator) {
+    await locator.focus();
+    await this.page.keyboard.press("ControlOrMeta+V");
   }
 }
 
@@ -204,6 +237,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
         entryPoint,
       };
 
+      const clipboard = new Clipboard(page);
+      // --- Mock the clipboard API if in CI
+      if (isCI) {
+        await page.addInitScript(clipboard.init);
+      }
+
       await page.addInitScript((app) => {
         // @ts-ignore
         window.TEST_ENV = app;
@@ -213,7 +252,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
 
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
-        clipboard: new Clipboard(page),
+        clipboard,
         width: width ?? 0,
         height: height ?? 0,
       };

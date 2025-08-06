@@ -219,6 +219,8 @@ export const TextBox = forwardRef(function TextBox(
       enabled={enabled}
       style={style}
       ref={ref}
+      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
+      isInputTemplateUsed={true}
     >
       <div
         className={classnames(styles.inputRoot, {
