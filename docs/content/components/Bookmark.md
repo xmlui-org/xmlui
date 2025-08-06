@@ -71,6 +71,10 @@ You can try; this example works like the previous one:
 
 ## Properties [#properties]
 
+### `id` [#id]
+
+The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
+
 ### `level` (default: 1) [#level-default-1]
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
@@ -82,10 +86,6 @@ If true, this bookmark will be excluded from the table of contents.
 ### `title` [#title]
 
 Defines the text to display the bookmark in the table of contents. If this property is empty, the text falls back to the value of `id`.
-
-### `uid` [#uid]
-
-The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
 
 ## Events [#events]
 
