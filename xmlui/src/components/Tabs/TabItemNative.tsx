@@ -8,30 +8,37 @@ import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, labelRenderer, style }: Tab,
+  { children, label, headerRenderer, id, style }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const id = useId();
+  const tabId = useId();
   const { register, unRegister, activeTabId } = useTabContext();
 
   useEffect(() => {
     register({
       label,
-      labelRenderer,
+      headerRenderer,
+      innerId: tabId,
       id,
     });
-  }, [id, label, labelRenderer, register]);
+  }, [tabId, id, label, headerRenderer, register]);
 
   useEffect(() => {
     return () => {
-      unRegister(id);
+      unRegister(tabId);
     };
-  }, [id, unRegister]);
+  }, [tabId, unRegister]);
 
-  if (activeTabId !== id) return null;
+  if (activeTabId !== tabId) return null;
 
   return (
-    <Content key={id} value={id} className={styles.tabsContent} ref={forwardedRef} style={style}>
+    <Content
+      key={tabId}
+      value={tabId}
+      className={styles.tabsContent}
+      ref={forwardedRef}
+      style={style}
+    >
       {children}
     </Content>
   );

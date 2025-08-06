@@ -24,7 +24,7 @@ type Props = {
   id?: string;
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
-  tabRenderer?: (item: { label: string; isActive: boolean }) => ReactNode;
+  headerRenderer?: (item: { id?: string; index: number; label: string; isActive: boolean }) => ReactNode;
   style?: CSSProperties;
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
@@ -42,7 +42,7 @@ export const Tabs = forwardRef(function Tabs(
   {
     activeTab = defaultProps.activeTab,
     orientation = defaultProps.orientation,
-    tabRenderer,
+    headerRenderer,
     style,
     children,
     id,
@@ -88,11 +88,34 @@ export const Tabs = forwardRef(function Tabs(
     });
   });
 
+  const prev = useEvent(() => {
+    setActiveIndex((prevIndex) => {
+      const maxIndex = tabItems.length - 1;
+      return prevIndex <= 0 ? maxIndex : prevIndex - 1;
+    });
+  });
+
+  const setActiveTabIndex = useEvent((index: number) => {
+    if (index >= 0 && index < tabItems.length) {
+      setActiveIndex(index);
+    }
+  });
+
+  const setActiveTabById = useEvent((tabId: string) => {
+    const index = tabItems.findIndex((item) => item.id === tabId);
+    if (index !== -1) {
+      setActiveIndex(index);
+    }
+  });
+
   useEffect(() => {
     registerComponentApi?.({
       next,
+      prev,
+      setActiveTabIndex,
+      setActiveTabById,
     });
-  }, [next, registerComponentApi]);
+  }, [next, prev, setActiveTabIndex, setActiveTabById, registerComponentApi]);
 
   return (
     <TabContext.Provider value={tabContextValue}>
@@ -112,8 +135,8 @@ export const Tabs = forwardRef(function Tabs(
         style={style}
       >
         <RTabsList className={styles.tabsList}>
-          {tabItems.map((tab) =>
-            tab.labelRenderer ? (
+          {tabItems.map((tab, index) =>
+            tab.headerRenderer ? (
               <RTabsTrigger
                 role="tab"
                 className={classnames(styles.tabTrigger, {
@@ -122,11 +145,11 @@ export const Tabs = forwardRef(function Tabs(
                 key={tab.id}
                 value={tab.id}
               >
-                {tab.labelRenderer({ ...tab, isActive: tab.id === currentTab })}
+                {tab.headerRenderer({ id: tab.id, index, label: tab.label, isActive: tab.id === currentTab })}
               </RTabsTrigger>
-            ) : tabRenderer ? (
+            ) : headerRenderer ? (
               <RTabsTrigger key={tab.id} value={tab.id} asChild={true} role="tab">
-                {tabRenderer({ ...tab, isActive: tab.id === currentTab })}
+                {headerRenderer({ id: tab.id, index, label: tab.label, isActive: tab.id === currentTab })}
               </RTabsTrigger>
             ) : (
               <RTabsTrigger
@@ -141,7 +164,7 @@ export const Tabs = forwardRef(function Tabs(
               </RTabsTrigger>
             ),
           )}
-          {!distributeEvenly && !tabRenderer && (
+          {!distributeEvenly && !headerRenderer && (
             <div className={styles.filler} data-orientation={orientation} />
           )}
         </RTabsList>
