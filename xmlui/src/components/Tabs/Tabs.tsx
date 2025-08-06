@@ -30,15 +30,26 @@ export const TabsMd = createMetadata({
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
-    tabTemplate: {
+    headerTemplate: {
       ...dComponent(`This property declares the template for the clickable tab area.`),
-      isInternal: true,
     },
   },
   apis: {
     next: {
       description: `This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.`,
       signature: "next(): void",
+    },
+    prev: {
+      description: `This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.`,
+      signature: "prev(): void",
+    },
+    setActiveTabIndex: {
+      description: `This method sets the active tab by index (0-based).`,
+      signature: "setActiveTabIndex(index: number): void",
+    },
+    setActiveTabById: {
+      description: `This method sets the active tab by its ID.`,
+      signature: "setActiveTabById(id: string): void",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -64,12 +75,15 @@ export const tabsComponentRenderer = createComponentRenderer(
       <Tabs
         id={node?.uid}
         style={layoutCss}
-        tabRenderer={
-          !!node?.props?.tabTemplate
+        headerRenderer={
+          !!node?.props?.headerTemplate
             ? (item) => (
                 <MemoizedItem
-                  node={node.props.tabTemplate! as any}
-                  item={item}
+                  node={node.props.headerTemplate! as any}
+                  itemKey="$header"
+                  contextVars={{
+                    $header: item,
+                  }}
                   renderChild={renderChild}
                 />
               )

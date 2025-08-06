@@ -15,10 +15,10 @@ export const TabItemMd = createMetadata({
   docFolder: "Tabs",
   props: {
     label: dLabel(),
-    labelTemplate: dComponent("This property allows the customization of the TabItem label."),
+    headerTemplate: dComponent("This property allows the customization of the TabItem header."),
   },
   contextVars: {
-    $item: d("This context value represents an item when you define a tab item template."),
+    $header: d("This context value represents the header context with props: id (optional), index, label, isActive."),
   },
 });
 
@@ -28,14 +28,19 @@ export const tabItemComponentRenderer = createComponentRenderer(
   (rendererContext) => {
     const { node, renderChild, extractValue } = rendererContext;
     return (
-      <TabItemComponent label={extractValue(node.props.label)} labelRenderer={node.props.labelTemplate
+      <TabItemComponent id={extractValue(node.uid)} label={extractValue(node.props.label)} headerRenderer={node.props.headerTemplate
         ? (item) => {
             return (
               <MemoizedItem
-                node={node.props.labelTemplate}
-                item={item}
-                context={{
-                  $item: item,
+                node={node.props.headerTemplate}
+                itemKey="$header"
+                contextVars={{
+                  $header: {
+                    id: item.id,
+                    index: item.index,
+                    label: item.label,
+                    isActive: item.isActive,
+                  },
                 }}
                 renderChild={renderChild}
               />
