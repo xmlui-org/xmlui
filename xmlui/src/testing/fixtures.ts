@@ -94,7 +94,15 @@ class Clipboard {
   init() {
     return () => {
       window.navigator.clipboard.readText = async () => this.content;
+      window.navigator.clipboard.read = async () => [new ClipboardItem({ "text/plain": this.content })];
       window.navigator.clipboard.writeText = async (text) => { this.content = text };
+      window.navigator.clipboard.write = async (items) => {
+        for (const item of items) {
+          if (item.types.includes("text/plain")) {
+            this.content = await item.getType("text/plain").then((blob) => blob.text());
+          }
+        }
+      };
     }
   }
 
