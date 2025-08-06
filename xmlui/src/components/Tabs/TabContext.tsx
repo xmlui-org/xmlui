@@ -4,7 +4,7 @@ import produce from "immer";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import type { Tab } from "../abstractions";
 
-type TabItem = Tab & { id: string, innerId: string };
+type TabItem = Tab & { innerId: string };
 
 interface ITabContext{
   register: (tabItem: TabItem) => void;

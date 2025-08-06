@@ -80,8 +80,8 @@ export const tabsComponentRenderer = createComponentRenderer(
             ? (item) => (
                 <MemoizedItem
                   node={node.props.headerTemplate! as any}
-                  item={item}
-                  context={{
+                  itemKey="$header"
+                  contextVars={{
                     $header: item,
                   }}
                   renderChild={renderChild}

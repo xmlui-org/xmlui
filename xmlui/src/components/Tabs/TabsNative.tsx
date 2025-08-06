@@ -4,6 +4,7 @@ import {
   forwardRef,
   type ReactNode,
   useEffect,
+  useId,
   useMemo,
   useState,
 } from "react";
@@ -53,7 +54,8 @@ export const Tabs = forwardRef(function Tabs(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  
+  const tabsId = id || useId();
+
   // Ensure activeTab is within valid bounds
   const validActiveTab = useMemo(() => {
     if (tabItems.length === 0) return 0;
@@ -61,10 +63,10 @@ export const Tabs = forwardRef(function Tabs(
     if (activeTab >= tabItems.length) return 0; // Default to first tab if out of bounds
     return activeTab;
   }, [activeTab, tabItems.length]);
-  
+
   const [activeIndex, setActiveIndex] = useState(validActiveTab);
   const currentTab = useMemo(() => {
-    return tabItems[activeIndex]?.id;
+    return tabItems[activeIndex]?.innerId;
   }, [activeIndex, tabItems]);
 
   useEffect(() => {
@@ -102,7 +104,11 @@ export const Tabs = forwardRef(function Tabs(
   });
 
   const setActiveTabById = useEvent((tabId: string) => {
-    const index = tabItems.findIndex((item) => item.id === tabId);
+    // First try to find by external id, then by innerId
+    let index = tabItems.findIndex((item) => item.id === tabId);
+    if (index === -1) {
+      index = tabItems.findIndex((item) => item.innerId === tabId);
+    }
     if (index !== -1) {
       setActiveIndex(index);
     }
@@ -120,12 +126,12 @@ export const Tabs = forwardRef(function Tabs(
   return (
     <TabContext.Provider value={tabContextValue}>
       <RTabsRoot
-        id={id}
+        id={tabsId}
         ref={forwardedRef}
         className={classnames(styles.tabs, className)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
-          const newIndex = tabItems.findIndex((item) => item.id === tab);
+          const newIndex = tabItems.findIndex((item) => item.innerId === tab);
           if (newIndex !== activeIndex) {
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
@@ -134,31 +140,48 @@ export const Tabs = forwardRef(function Tabs(
         orientation={orientation}
         style={style}
       >
-        <RTabsList className={styles.tabsList}>
+        <RTabsList className={styles.tabsList} role="tablist">
           {tabItems.map((tab, index) =>
             tab.headerRenderer ? (
               <RTabsTrigger
                 role="tab"
+                aria-label={tab.label}
                 className={classnames(styles.tabTrigger, {
                   [styles.distributeEvenly]: distributeEvenly,
                 })}
-                key={tab.id}
-                value={tab.id}
+                key={tab.innerId}
+                value={tab.innerId}
               >
-                {tab.headerRenderer({ id: tab.id, index, label: tab.label, isActive: tab.id === currentTab })}
+                {tab.headerRenderer({ 
+                  ...(tab.id !== undefined && { id: tab.id }), 
+                  index, 
+                  label: tab.label, 
+                  isActive: tab.innerId === currentTab 
+                })}
               </RTabsTrigger>
             ) : headerRenderer ? (
-              <RTabsTrigger key={tab.id} value={tab.id} asChild={true} role="tab">
-                {headerRenderer({ id: tab.id, index, label: tab.label, isActive: tab.id === currentTab })}
+              <RTabsTrigger 
+                key={tab.innerId} 
+                value={tab.innerId} 
+                role="tab"
+                aria-label={tab.label}
+              >
+                {headerRenderer({ 
+                  ...(tab.id !== undefined && { id: tab.id }), 
+                  index, 
+                  label: tab.label, 
+                  isActive: tab.innerId === currentTab 
+                })}
               </RTabsTrigger>
             ) : (
               <RTabsTrigger
                 role="tab"
+                aria-label={tab.label}
                 className={classnames(styles.tabTrigger, {
                   [styles.distributeEvenly]: distributeEvenly,
                 })}
-                key={tab.id}
-                value={tab.id}
+                key={tab.innerId}
+                value={tab.innerId}
               >
                 {tab.label}
               </RTabsTrigger>

@@ -5,15 +5,15 @@ import { expect, test } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("component renders", async ({ initTestBed, createTabsDriver }) => {
+  test("component renders", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
       </Tabs>
     `);
-    const driver = await createTabsDriver();
-    await expect(driver.component).toBeAttached();
+    // Check that tabs component is rendered
+    await expect(page.getByRole('tablist')).toBeAttached();
   });
 
   test("renders tab labels correctly", async ({ initTestBed, page }) => {
@@ -86,32 +86,33 @@ test.describe("basic functionality", () => {
     await expect(page.getByText("Third content")).not.toBeVisible();
   });
 
-  test("orientation prop changes tab layout", async ({ initTestBed, createTabsDriver }) => {
+  test("orientation prop changes tab layout", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Tabs orientation="vertical">
+      <Tabs orientation="vertical" testId="vertical-tabs">
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
       </Tabs>
     `);
 
-    const driver = await createTabsDriver();
-    await expect(driver.component).toHaveAttribute("data-orientation", "vertical");
+    // Check that tabs component has vertical orientation
+    const tabsRoot = page.getByTestId("vertical-tabs");
+    await expect(tabsRoot).toHaveAttribute("data-orientation", "vertical");
   });
 });
 
 // =============================================================================
-// LABEL TEMPLATE TESTS
+// HEADER TEMPLATE TESTS
 // =============================================================================
 
-test.describe("labelTemplate functionality", () => {
-  test("renders custom labelTemplate instead of label", async ({ initTestBed, page }) => {
+test.describe("headerTemplate functionality", () => {
+  test("renders custom headerTemplate instead of label", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
         <TabItem label="Simple Label">
-          <property name="labelTemplate">
+          <property name="headerTemplate">
             <VStack gap="$space-1">
               <Text>Custom</Text>
-              <Text>Label</Text>
+              <Text>Header</Text>
             </VStack>
           </property>
           Content 1
@@ -120,22 +121,22 @@ test.describe("labelTemplate functionality", () => {
       </Tabs>
     `);
 
-    // Custom labelContent should be visible
+    // Custom header content should be visible
     await expect(page.getByText("Custom")).toBeVisible();
-    await expect(page.getByText("Label")).toBeVisible();
+    await expect(page.getByText("Header")).toBeVisible();
 
     // Simple label should be visible for second tab
     await expect(page.getByRole("tab", { name: "Tab 2" })).toBeVisible();
   });
 
-  test("labelTemplate takes priority over tabTemplate", async ({ initTestBed, page }) => {
+  test("headerTemplate takes priority over global headerTemplate", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
-        <property name="tabTemplate">
-          <Text>Global: {$item.label}</Text>
+        <property name="headerTemplate">
+          <Text>Global: {$header.label}</Text>
         </property>
         <TabItem label="Tab 1">
-          <property name="labelTemplate">
+          <property name="headerTemplate">
             <Text>Custom Content</Text>
           </property>
           Content 1
@@ -144,21 +145,21 @@ test.describe("labelTemplate functionality", () => {
       </Tabs>
     `);
 
-    // First tab should use labelContent
+    // First tab should use individual headerTemplate
     await expect(page.getByText("Custom Content")).toBeVisible();
 
-    // Second tab should use tabTemplate
+    // Second tab should use global headerTemplate
     await expect(page.getByText("Global: Tab 2")).toBeVisible();
   });
 
-  test("complex labelTemplate with icons and badges", async ({ initTestBed, page }) => {
+  test("complex headerTemplate with icons and badges", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
         <TabItem label="Tab 1">
-          <property name="labelTemplate">
+          <property name="headerTemplate">
             <HStack gap="$space-2" alignItems="center">
-              <Text>Custom: {$item.label}</Text>
-              <Badge>{$item.isActive ? 'Active' : ''}</Badge>
+              <Text>Custom: {$header.label}</Text>
+              <Badge>{$header.isActive ? 'Active' : ''}</Badge>
             </HStack>
           </property>
           Content 1
@@ -170,18 +171,78 @@ test.describe("labelTemplate functionality", () => {
     await expect(page.getByText("Custom: Tab 1")).toBeVisible();
     await expect(page.getByText("Active")).toBeVisible();
   });
+
+  test("headerTemplate receives correct context props", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="First Tab">
+          <property name="headerTemplate">
+            <VStack gap="$space-1">
+              <Text>Index: {$header.index}</Text>
+              <Text>Label: {$header.label}</Text>
+              <Text>Active: {$header.isActive ? 'Yes' : 'No'}</Text>
+            </VStack>
+          </property>
+          Content 1
+        </TabItem>
+        <TabItem label="Second Tab">Content 2</TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByText("Index: 0")).toBeVisible();
+    await expect(page.getByText("Label: First Tab")).toBeVisible();
+    await expect(page.getByText("Active: Yes")).toBeVisible();
+  });
+
+  test("headerTemplate receives external id when provided", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="First Tab" id="custom-tab-1">
+          <property name="headerTemplate">
+            <VStack gap="$space-1">
+              <Text>ID: {$header.id}</Text>
+              <Text>Label: {$header.label}</Text>
+              <Text>Has ID: {$header.id ? 'Yes' : 'No'}</Text>
+            </VStack>
+          </property>
+          Content 1
+        </TabItem>
+        <TabItem label="Second Tab">
+          <property name="headerTemplate">
+            <VStack gap="$space-1">
+              <Text>Label: {$header.label}</Text>
+              <Text>Has ID: {$header.id ? 'Yes' : 'No'}</Text>
+            </VStack>
+          </property>
+          Content 2
+        </TabItem>
+      </Tabs>
+    `);
+
+    // First tab should show the external id
+    await expect(page.getByText("ID: custom-tab-1")).toBeVisible();
+    await expect(page.getByText("Label: First Tab")).toBeVisible();
+    await expect(page.getByText("Has ID: Yes")).toBeVisible();
+
+    // Click second tab
+    await page.getByRole("tab", { name: "Second Tab" }).click();
+
+    // Second tab should not have id in context
+    await expect(page.getByText("Label: Second Tab")).toBeVisible();
+    await expect(page.getByText("Has ID: No")).toBeVisible();
+  });
 });
 
 // =============================================================================
-// TAB TEMPLATE TESTS
+// GLOBAL HEADER TEMPLATE TESTS
 // =============================================================================
 
-test.describe("tabTemplate functionality", () => {
-  test("tabTemplate customizes all tab labels", async ({ initTestBed, page }) => {
+test.describe("global headerTemplate functionality", () => {
+  test("global headerTemplate customizes all tab headers", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
-        <property name="tabTemplate">
-          <Text>Custom: {$item.label}</Text>
+        <property name="headerTemplate">
+          <Text>Custom: {$header.label}</Text>
         </property>
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>  
@@ -194,37 +255,34 @@ test.describe("tabTemplate functionality", () => {
     await expect(page.getByText("Custom: Tab 3")).toBeVisible();
   });
 
-  test.fixme("tabTemplate receives isActive state", async ({ initTestBed, page, createTabsDriver }) => {
+  test("global headerTemplate receives isActive state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Tabs>
-        <property name="tabTemplate">
-          <Text>{$item.isActive ? 'Active: ' : ''}{$item.label}</Text>
+        <property name="headerTemplate">
+          <Text>{$header.isActive ? 'Active: ' : ''}{$header.label}</Text>
         </property>
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
       </Tabs>
     `);
 
-    const driver = await createTabsDriver();
-
     // First tab should be active initially
     await expect(page.getByText("Active: Tab 1")).toBeVisible();
     await expect(page.getByText("Tab 2")).toBeVisible();
 
     // Click second tab
-    await driver.clickTab("Tab 2");
+    await page.getByText("Tab 2").click();
     await expect(page.getByText("Tab 1")).toBeVisible();
     await expect(page.getByText("Active: Tab 2")).toBeVisible();
   });
 
-  test.fixme("tabTemplate with complex content", async ({ initTestBed, page, createTabsDriver }) => {
-    const driver = await createTabsDriver();
+  test("global headerTemplate with complex content", async ({ initTestBed, page }) => {
 
     await initTestBed(`
       <Tabs>
-        <property name="tabTemplate">
+        <property name="headerTemplate">
           <HStack>
-            <Text>{$item.label} {$item.isActive ? 'active' : ''}</Text>
+            <Text>{$header.label} {$header.isActive ? 'active' : ''}</Text>
           </HStack>
         </property>
         <TabItem label="Home">Home content</TabItem>
@@ -234,7 +292,7 @@ test.describe("tabTemplate functionality", () => {
 
     await expect(page.getByText("Home active")).toBeVisible();
 
-    await driver.clickTab("Settings");
+    await page.getByText("Settings").click();
     await expect(page.getByText("Settings active")).toBeVisible();
   });
 });
@@ -256,9 +314,9 @@ test.describe("filler element", () => {
     await expect(filler).not.toBeVisible();
   });
 
-  test("filler is hidden when tabRenderer is used", async ({ initTestBed, page }) => {
+  test("filler is hidden when headerRenderer is used", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Tabs tabRenderer="{(item) => item.label}">
+      <Tabs headerRenderer="{(item) => item.label}">
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
       </Tabs>
@@ -274,10 +332,10 @@ test.describe("filler element", () => {
 // =============================================================================
 
 test.describe("edge cases", () => {
-  test("handles empty tabs", async ({ initTestBed, createTabsDriver }) => {
+  test("handles empty tabs", async ({ initTestBed, page }) => {
     await initTestBed(`<Tabs></Tabs>`);
-    const driver = await createTabsDriver();
-    await expect(driver.component).toBeAttached();
+    // Check that empty tabs component is rendered
+    await expect(page.getByRole('tablist')).toBeAttached();
   });
 
   test("handles single tab", async ({ initTestBed, page }) => {
@@ -392,6 +450,143 @@ test.describe("accessibility", () => {
 });
 
 // =============================================================================
+// API METHODS TESTS (Note: API methods are tested indirectly through UI interactions)
+// The API methods next(), prev(), setActiveTabIndex(), and setActiveTabById() are available
+// but require a proper test harness to test directly. For now, we test the underlying functionality.
+// =============================================================================
+
+test.describe("API functionality verification", () => {
+  test("tabs can be navigated programmatically (simulating next() behavior)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="Tab 1">Content 1</TabItem>
+        <TabItem label="Tab 2">Content 2</TabItem>
+        <TabItem label="Tab 3">Content 3</TabItem>
+      </Tabs>
+    `);
+
+    // Initially first tab is active
+    await expect(page.getByText("Content 1")).toBeVisible();
+
+    // Simulate next() behavior by clicking tabs in sequence
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByText("Content 2")).toBeVisible();
+    await expect(page.getByText("Content 1")).not.toBeVisible();
+
+    await page.getByRole("tab", { name: "Tab 3" }).click();
+    await expect(page.getByText("Content 3")).toBeVisible();
+    await expect(page.getByText("Content 2")).not.toBeVisible();
+
+    // Wrap to first tab
+    await page.getByRole("tab", { name: "Tab 1" }).click();
+    await expect(page.getByText("Content 1")).toBeVisible();
+    await expect(page.getByText("Content 3")).not.toBeVisible();
+  });
+
+  test("tabs support reverse navigation (simulating prev() behavior)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="Tab 1">Content 1</TabItem>
+        <TabItem label="Tab 2">Content 2</TabItem>
+        <TabItem label="Tab 3">Content 3</TabItem>
+      </Tabs>
+    `);
+
+    // Start from first tab
+    await expect(page.getByText("Content 1")).toBeVisible();
+
+    // Simulate prev() behavior - go to last tab
+    await page.getByRole("tab", { name: "Tab 3" }).click();
+    await expect(page.getByText("Content 3")).toBeVisible();
+
+    // Go to second tab
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByText("Content 2")).toBeVisible();
+
+    // Go to first tab
+    await page.getByRole("tab", { name: "Tab 1" }).click();
+    await expect(page.getByText("Content 1")).toBeVisible();
+  });
+
+  test("tabs can be set by index (simulating setActiveTabIndex() behavior)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="Tab 1">Content 1</TabItem>
+        <TabItem label="Tab 2">Content 2</TabItem>
+        <TabItem label="Tab 3">Content 3</TabItem>
+      </Tabs>
+    `);
+
+    // Initially first tab (index 0) is active
+    await expect(page.getByText("Content 1")).toBeVisible();
+
+    // Set to index 2 (third tab)
+    await page.getByRole("tab", { name: "Tab 3" }).click();
+    await expect(page.getByText("Content 3")).toBeVisible();
+    await expect(page.getByText("Content 1")).not.toBeVisible();
+
+    // Set to index 1 (second tab)
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByText("Content 2")).toBeVisible();
+    await expect(page.getByText("Content 3")).not.toBeVisible();
+
+    // Set to index 0 (first tab)
+    await page.getByRole("tab", { name: "Tab 1" }).click();
+    await expect(page.getByText("Content 1")).toBeVisible();
+    await expect(page.getByText("Content 2")).not.toBeVisible();
+  });
+
+  test("activeTab prop sets initial tab correctly (simulating setActiveTabIndex())", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs activeTab="{2}">
+        <TabItem label="Tab 1">Content 1</TabItem>
+        <TabItem label="Tab 2">Content 2</TabItem>
+        <TabItem label="Tab 3">Content 3</TabItem>
+      </Tabs>
+    `);
+
+    // Third tab should be active initially (index 2)
+    await expect(page.getByText("Content 3")).toBeVisible();
+    await expect(page.getByText("Content 1")).not.toBeVisible();
+    await expect(page.getByText("Content 2")).not.toBeVisible();
+  });
+
+  test("API methods work with headerTemplate (visual verification)", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Tabs id="tabs">
+          <property name="headerTemplate">
+            <Text>{$header.isActive ? 'Active: ' : ''}{$header.label}</Text>
+          </property>
+          <TabItem label="Tab 1">Content 1</TabItem>
+          <TabItem label="Tab 2">Content 2</TabItem>
+          <TabItem label="Tab 3">Content 3</TabItem>
+        </Tabs>
+        <Button onClick="tabs.prev()">Prev</Button>
+        <Button onClick="tabs.next()">Next</Button>
+      </Fragment>
+    `);
+
+    // Initially first tab is active
+    await expect(page.getByText("Active: Tab 1")).toBeVisible();
+    await expect(page.getByText("Tab 2")).toBeVisible();
+    await expect(page.getByText("Tab 3")).toBeVisible();
+
+    // Simulate next() behavior by clicking second tab
+    await page.getByRole("button", { name: "Next" }).click();
+    await expect(page.getByText("Active: Tab 2")).toBeVisible();
+    await expect(page.getByText("Tab 1")).toBeVisible();
+    await expect(page.getByText("Tab 3")).toBeVisible();
+
+    // Simulate prev() behavior by clicking first tab
+    await page.getByRole("button", { name: "Prev" }).click();
+    await expect(page.getByText("Active: Tab 1")).toBeVisible();
+    await expect(page.getByText("Tab 2")).toBeVisible();
+    await expect(page.getByText("Tab 3")).toBeVisible();
+  });
+});
+
+// =============================================================================
 // DYNAMIC CONTENT TESTS
 // =============================================================================
 
@@ -411,5 +606,34 @@ test.describe("dynamic content", () => {
 
     await page.getByRole("tab", { name: "Second" }).click();
     await expect(page.getByText("Content for Second")).toBeVisible();
+  });
+
+  test("headerTemplate works with dynamic content from Items", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <property name="headerTemplate">
+          <Text color="red">Account {$header.label}</Text>
+        </property>
+        <Items data="{[1, 2, 3, 4, 5]}">
+          <TabItem label="Account {$item}">
+            <property name="headerTemplate">
+              <Text when="true" color="blue">{$header.label} | {$item}</Text>
+            </property>
+            Content for account {$item}
+          </TabItem>
+        </Items>
+      </Tabs>
+    `);
+
+    // Check that individual headerTemplate takes priority and has access to both $header and $item
+    await expect(page.getByText("Account 1 | 1")).toBeVisible();
+    await expect(page.getByText("Account 2 | 2")).toBeVisible();
+    await expect(page.getByText("Account 3 | 3")).toBeVisible();
+    await expect(page.getByText("Account 4 | 4")).toBeVisible();
+    await expect(page.getByText("Account 5 | 5")).toBeVisible();
+
+    // Test clicking on different tabs
+    await page.getByText("Account 3 | 3").click();
+    await expect(page.getByText("Content for account 3")).toBeVisible();
   });
 });
