@@ -59,7 +59,6 @@ import {
   LabelDriver,
   BackdropDriver,
   SpinnerDriver,
-  TabsDriver,
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
 
@@ -480,11 +479,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
-  createTabsDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
-      return createDriver(TabsDriver, testIdOrLocator);
-    });
-  },
 });
 
 // --- Types
@@ -557,5 +551,4 @@ type TestDriverExtenderProps = {
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
-  createTabsDriver: ComponentDriverMethod<TabsDriver>;
 };
