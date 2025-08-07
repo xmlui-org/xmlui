@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.95
+
+### Patch Changes
+
+- af6a7a0: fix: Tabs - fixed the inconsistency in the headerTemplate.
+- 69a2a8f: Fix the useEventHaddler hook
+- 29c68fe: fix: H1 ... H6 now ignores the level property
+
 ## 0.9.94
 
 ### Patch Changes
