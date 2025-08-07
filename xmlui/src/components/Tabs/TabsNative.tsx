@@ -141,33 +141,39 @@ export const Tabs = forwardRef(function Tabs(
         style={style}
       >
         <RTabsList className={styles.tabsList} role="tablist">
-          {tabItems.map((tab, index) =>
+          {tabItems.map((tab, index) => (
             <RTabsTrigger
-              role="tab"
-              aria-label={tab.label}
-              className={classnames(styles.tabTrigger, {
-                [styles.distributeEvenly]: distributeEvenly,
-              })}
               key={tab.innerId}
               value={tab.innerId}
+              asChild
             >
-              {tab.headerRenderer ?
-                tab.headerRenderer({
-                  ...(tab.id !== undefined && { id: tab.id }),
-                  index,
-                  label: tab.label,
-                  isActive: tab.innerId === currentTab
-                })
-                : headerRenderer ?
-                  headerRenderer({
-                    ...(tab.id !== undefined && { id: tab.id }),
-                    index,
-                    label: tab.label,
-                    isActive: tab.innerId === currentTab
-                  })
-                  : tab.label}
+              <div
+                role="tab"
+                aria-label={tab.label}
+                className={classnames(styles.tabTrigger, {
+                  [styles.distributeEvenly]: distributeEvenly,
+                })}
+              >
+                {
+                  tab.headerRenderer ?
+                    tab.headerRenderer({
+                      ...(tab.id !== undefined && { id: tab.id }),
+                      index,
+                      label: tab.label,
+                      isActive: tab.innerId === currentTab
+                    })
+                    : headerRenderer ?
+                      headerRenderer({
+                        ...(tab.id !== undefined && { id: tab.id }),
+                        index,
+                        label: tab.label,
+                        isActive: tab.innerId === currentTab
+                      })
+                      : tab.label
+                }
+              </div>
             </RTabsTrigger>
-          )}
+          ))}
           {!distributeEvenly && !headerRenderer && (
             <div className={styles.filler} data-orientation={orientation} />
           )}
