@@ -1,26 +1,26 @@
 # XMLUI E2E Test Summary
 
-*Generated on: 2025-08-07 06:49:22 UTC*
+*Generated on: 2025-08-07 08:40:49 UTC*
 
 ## Summary Statistics
 
 - **Total XMLUI Components**: 100
-- **Components with E2E Tests**: 69
-- **Components without E2E Tests**: 31
-- **Test Coverage**: 69.0% of components have E2E tests
+- **Components with E2E Tests**: 72
+- **Components without E2E Tests**: 28
+- **Test Coverage**: 72.0% of components have E2E tests
 
-- **Total E2E Tests Run**: 2358
-- **Total Passed**: 1835
+- **Total E2E Tests Run**: 2415
+- **Total Passed**: 1906
 - **Total Failed**: 2
-- **Total Skipped**: 521
-- **Pass Rate**: 77.8%
+- **Total Skipped**: 507
+- **Pass Rate**: 78.9%
 
 ## Component Test Details
 
 | Component Name | Tests Run | Passed | Failed | Skipped | Status |
 |----------------|-----------|--------|--------|---------|--------|
 | APICall | 46 | 37 | 0 | 9 | All Passed |
-| Accordion | 56 | 42 | 0 | 14 | All Passed |
+| Accordion | 55 | 42 | 0 | 13 | All Passed |
 | App | 13 | 6 | 0 | 7 | All Passed |
 | AppHeader | 12 | 10 | 0 | 2 | All Passed |
 | AppState | 14 | 14 | 0 | 0 | All Passed |
@@ -61,7 +61,7 @@
 | H4 | - | - | - | - | Not Run/Failed |
 | H5 | - | - | - | - | Not Run/Failed |
 | H6 | - | - | - | - | Not Run/Failed |
-| HSplitter | - | - | - | - | No E2E Tests |
+| HSplitter | - | - | - | - | Not Run/Failed |
 | HStack | - | - | - | - | Not Run/Failed |
 | Heading | 50 | 50 | 0 | 0 | All Passed |
 | HoverCard | - | - | - | - | No E2E Tests |
@@ -101,13 +101,13 @@
 | Slot | - | - | - | - | No E2E Tests |
 | SpaceFiller | 9 | 9 | 0 | 0 | All Passed |
 | Spinner | 13 | 12 | 0 | 1 | All Passed |
-| Splitter | 19 | 0 | 0 | 19 | All Passed |
+| Splitter | 46 | 46 | 0 | 0 | All Passed |
 | Stack | 47 | 47 | 0 | 0 | All Passed |
 | StickyBox | - | - | - | - | No E2E Tests |
 | SubMenuItem | - | - | - | - | No E2E Tests |
 | Switch | 92 | 92 | 0 | 0 | All Passed |
 | TabItem | - | - | - | - | No E2E Tests |
-| Table | - | - | - | - | No E2E Tests |
+| Table | 31 | 25 | 0 | 6 | All Passed |
 | TableOfContents | - | - | - | - | No E2E Tests |
 | Tabs | 28 | 28 | 0 | 0 | All Passed |
 | Text | 110 | 109 | 0 | 1 | All Passed |
@@ -117,5 +117,5 @@
 | ToneChangerButton | 28 | 27 | 0 | 1 | All Passed |
 | ToneSwitch | 14 | 7 | 0 | 7 | All Passed |
 | Tree | - | - | - | - | No E2E Tests |
-| VSplitter | - | - | - | - | No E2E Tests |
+| VSplitter | - | - | - | - | Not Run/Failed |
 | VStack | - | - | - | - | Not Run/Failed |
