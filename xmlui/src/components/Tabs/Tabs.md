@@ -45,95 +45,16 @@ You can create `TabItem` children dynamically:
 </App>
 ```
 
-## External TabItem identifiers
-
-TabItems can have an optional `id` prop that gets exposed in the `$header` context:
-
-```xmlui-pg copy display name="Example: External ID support" height="250px"
-<App>
-  <Tabs>
-    <TabItem label="Home" id="home-tab">
-      <property name="headerTemplate">
-        <Text>ID: {$header.id} | {$header.label}</Text>
-      </property>
-      Home content
-    </TabItem>
-    <TabItem label="Settings">
-      <property name="headerTemplate">
-        <Text>No ID | {$header.label}</Text>
-      </property>
-      Settings content
-    </TabItem>
-  </Tabs>
-</App>
-```
-
 %-DESC-END
-
-%-PROP-START activeTab
-
-```xmlui-pg copy display name="Example: activeTab" height="200px"
-<App>
-  <Tabs activeTab="2">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START orientation
-
-```xmlui-pg copy display name="Example: orientation horizontal" height="200px"
-<App>
-  <Tabs orientation="horizontal">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-```xmlui-pg copy name="Example: orientation vertical" height="220px"
-<App>
-  <Tabs orientation="vertical">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-%-PROP-END
 
 %-PROP-START headerTemplate
 
-```xmlui-pg copy {3-8} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
 <App>
   <Tabs>
     <property name="headerTemplate">
-        <Icon name="chevronright" />
-        <Text color="green">Account {$header.index}</Text>
+      <Icon name="chevronright" />
+      <Text color="green">Account {$header.index}</Text>
     </property>
     <Items data="{[
         {id: 1, name: 'AcmeCorp'}, 
@@ -156,7 +77,7 @@ The `headerTemplate` property allows you to customize the appearance of tab head
 
 Individual tab items have an optional identifier, which is passed to the header template.
 
-```xmlui-pg copy {3-7} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -179,14 +100,9 @@ Individual tab items have an optional identifier, which is passed to the header 
 
 %-PROP-END
 
-## API Methods
+%-API-START next
 
-The Tabs component provides several methods for programmatic navigation:
-
-### next()
-Navigates to the next tab. If currently on the last tab, wraps around to the first tab.
-
-```xmlui-pg copy display name="Example: next() method" height="250px"
+```xmlui-pg copy display name="Example: next()" /next/ height="250px"
 <App>
   <Fragment>
     <Tabs id="myTabs">
@@ -199,10 +115,11 @@ Navigates to the next tab. If currently on the last tab, wraps around to the fir
 </App>
 ```
 
-### prev()
-Navigates to the previous tab. If currently on the first tab, wraps around to the last tab.
+%-API-END
 
-```xmlui-pg copy display name="Example: prev() method" height="250px"
+%-API-START prev
+
+```xmlui-pg copy display name="Example: prev()" /prev/ height="250px"
 <App>
   <Fragment>
     <Tabs id="myTabs">
@@ -215,10 +132,11 @@ Navigates to the previous tab. If currently on the first tab, wraps around to th
 </App>
 ```
 
-### setActiveTabIndex(index: number)
-Sets the active tab by its zero-based index.
+%-API-END
 
-```xmlui-pg copy display name="Example: setActiveTabIndex() method" height="250px"
+%-API-START setActiveTabIndex
+
+```xmlui-pg copy display name="Example: setActiveTabIndex()" /setActiveTabIndex/ height="250px"
 <App>
   <Fragment>
     <Tabs id="myTabs">
@@ -226,48 +144,26 @@ Sets the active tab by its zero-based index.
       <TabItem label="Tab 2">Content 2</TabItem>
       <TabItem label="Tab 3">Content 3</TabItem>
     </Tabs>
-    <Button onClick="myTabs.setActiveTabIndex(2)">Go to Tab 3</Button>
+    <Button onClick="myTabs.setActiveTabIndex(2)">Go to Tab 3 (by Index)</Button>
   </Fragment>
 </App>
 ```
 
-### setActiveTabById(id: string)
-Sets the active tab by its external ID (if provided) or internal ID.
+%-API-END
 
-```xmlui-pg copy display name="Example: setActiveTabById() method" height="250px"
+%-API-START setActiveTabById
+
+```xmlui-pg copy display name="Example: setActiveTabById()" /setActiveTabById/ height="250px"
 <App>
   <Fragment>
     <Tabs id="myTabs">
-      <TabItem label="Tab 1" id="home">Home Content</TabItem>
-      <TabItem label="Tab 2" id="settings">Settings Content</TabItem>
-      <TabItem label="Tab 3" id="help">Help Content</TabItem>
+      <TabItem label="Home" id="home">Home Content</TabItem>
+      <TabItem label="Settings" id="settings">Settings Content</TabItem>
+      <TabItem label="Help" id="help">Help Content</TabItem>
     </Tabs>
-    <Button onClick="myTabs.setActiveTabById('settings')">Go to Settings</Button>
+    <Button onClick="myTabs.setActiveTabById('settings')">Go to Settings (by ID)</Button>
   </Fragment>
 </App>
 ```
 
-## Advanced Features
-
-### Individual Tab Header Templates
-
-Each TabItem can have its own `headerTemplate` that overrides the global template:
-
-```xmlui-pg copy display name="Example: Individual header templates" height="250px"
-<App>
-  <Tabs>
-    <property name="headerTemplate">
-      <Text>Global: {$header.label}</Text>
-    </property>
-    <TabItem label="Tab 1">
-      <property name="headerTemplate">
-        <Text color="blue">Custom: {$header.label}</Text>
-      </property>
-      Content 1
-    </TabItem>
-    <TabItem label="Tab 2">
-      Content 2
-    </TabItem>
-  </Tabs>
-</App>
-```
+%-API-END
