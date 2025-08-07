@@ -539,7 +539,115 @@ In case there would be a lot of duplication for testing a property that has the 
 
 ## Good test case patterns
 
-fill in later
+### Layout/Positioning Tests
+
+Components that support layout properties (like `labelPosition`, `direction`, positioning, sizing) should include tests that verify visual arrangement using the `getBounds` utility function.
+
+#### Best Practices for Layout Testing
+
+- **Import getBounds**: Import from `"../../testing/component-test-helpers"` 
+- **Use descriptive coordinates**: Destructure specific properties like `{ left, right, top, bottom }`
+- **Test both directions**: Include RTL tests when direction affects layout
+- **Verify invalid values**: Test graceful handling of invalid layout properties
+
+#### Testing Element Positioning
+
+Use `getBounds()` to get element coordinates and verify relative positioning:
+
+```typescript
+test("ComponentName appears at the correct side of ComponentName2", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <ComponentName testId="comp1" />
+      <ComponentName2 testId="comp2" />
+    <Fragment>
+  `);
+
+  const { left: comp1Left } = await getBounds(page.getByTestId("comp1"));
+  const { right: comp2Right } = await getBounds(page.getByTestId("comp2"));
+
+  expect(comp1Left).toBeLessThan(comp2Right);
+});
+```
+
+#### Testing Directional Layout (RTL/LTR)
+
+Test layout behavior in both directions when applicable:
+
+```typescript
+test("startText displays at beginning of input (rtl)", async ({ initTestBed, page }) => {
+  await initTestBed(`<TextBox testId="input" direction="rtl" startText="$" />`);
+
+  const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+  const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
+
+  await expect(page.getByTestId("input")).toContainText("$");
+  expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
+});
+```
+
+#### Testing Size Properties
+
+Verify width, height, and other sizing properties:
+
+```typescript
+test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
+  const expected = 200;
+  await initTestBed(`<InputComponent label="test test" labelWidth="${expected}px" />`);
+  const { width } = await getBounds(page.getByText("test test"));
+  expect(width).toEqual(expected);
+});
+```
+
+#### Testing Complex Layout Arrangements
+
+For components with multiple positioned elements, test their relative arrangement:
+
+```typescript
+test("all adornments appear in the right place", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <TextBox testId="input" startText="$" endText="USD" startIcon="search" endIcon="search" direction="ltr" />
+  `);
+  const { left: compLeft, right: compRight } = await getBounds(page.getByTestId("input"));
+  const { left: startTextLeft, right: startTextRight } = await getBounds(page.getByText("$"));
+  const { left: endTextLeft, right: endTextRight } = await getBounds(page.getByText("USD"));
+  const { left: startIconLeft, right: startIconRight } = await getBounds(
+    page.getByRole("img").first(),
+  );
+  const { left: endIconLeft, right: endIconRight } = await getBounds(
+    page.getByRole("img").last(),
+  );
+
+  // Check order of adornments relative to their container component bounds
+  expect(startTextRight - compLeft).toBeLessThanOrEqual(compRight - startTextLeft);
+  expect(startIconRight - compLeft).toBeLessThanOrEqual(compRight - startIconLeft);
+  expect(endTextRight - compLeft).toBeGreaterThanOrEqual(compRight - endTextLeft);
+  expect(endIconRight - compLeft).toBeGreaterThanOrEqual(compRight - endIconLeft);
+});
+```
+
+### Testing Input Component API
+
+Test the following in a `test.describe("Api", () => {...})` block for input components (such as TextBox, Checkbox, Slider, etc.):
+
+- value
+- setValue
+- focus
+
+#### Example
+
+```typescript
+test("component setValue API updates state", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <TextBox id="myTextBox" />
+      <Button testId="setBtn" onClick="myTextBox.setValue('api value')" />
+    </Fragment>
+  `);
+  await page.getByTestId("setBtn").click();
+  await expect(page.getByRole("textbox")).toHaveValue("api value");
+});
+```
 
 ## Bad test case patterns
 
