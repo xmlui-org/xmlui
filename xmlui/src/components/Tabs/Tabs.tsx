@@ -76,7 +76,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         id={node?.uid}
         style={layoutCss}
         headerRenderer={
-          !!node?.props?.headerTemplate
+          node?.props?.headerTemplate
             ? (item) => (
                 <MemoizedItem
                   node={node.props.headerTemplate! as any}

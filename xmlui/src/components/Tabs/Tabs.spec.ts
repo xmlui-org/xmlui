@@ -447,17 +447,158 @@ test.describe("accessibility", () => {
     await page.keyboard.press("ArrowLeft");
     await expect(page.getByRole("tab", { name: "Tab 2" })).toBeFocused();
   });
-});
+  // =============================================================================
 
-// =============================================================================
-// API METHODS TESTS (Note: API methods are tested indirectly through UI interactions)
-// The API methods next(), prev(), setActiveTabIndex(), and setActiveTabById() are available
-// but require a proper test harness to test directly. For now, we test the underlying functionality.
-// =============================================================================
+  test.describe("API functionality verification", () => {
+    test("next() method cycles through all tabs correctly", async ({ initTestBed, page }) => {
+      await initTestBed(`
+      <Fragment>
+        <Tabs id="tabs">
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+        <Button onClick="tabs.next()" testId="next-btn">
+          Next Tab
+        </Button>
+      </Fragment>
+    `);
 
-test.describe("API functionality verification", () => {
-  test("tabs can be navigated programmatically (simulating next() behavior)", async ({ initTestBed, page }) => {
-    await initTestBed(`
+      // Initially Account tab should be active (first tab)
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+
+      // Call next() - should move to Stream tab
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+
+      // Call next() again - should move to Support tab
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+
+      // Call next() from last tab - should cycle back to Account tab
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+    });
+
+    test("prev() method cycles through all tabs correctly in reverse", async ({ initTestBed, page }) => {
+      await initTestBed(`
+      <Fragment>
+        <Tabs id="tabs">
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+        <Button onClick="tabs.prev()" testId="prev-btn">
+          Previous Tab
+        </Button>
+      </Fragment>
+    `);
+
+      // Initially Account tab should be active (first tab)
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+
+      // Call prev() from first tab - should cycle to Support tab (last tab)
+      await page.getByTestId("prev-btn").click();
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+
+      // Call prev() again - should move to Stream tab
+      await page.getByTestId("prev-btn").click();
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+
+      // Call prev() again - should move to Account tab
+      await page.getByTestId("prev-btn").click();
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+    });
+
+    test("next() and prev() methods work together for full navigation", async ({ initTestBed, page }) => {
+      await initTestBed(`
+      <Fragment>
+        <Tabs id="tabs">
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+        <Button onClick="tabs.next()" testId="next-btn">
+          Next Tab
+        </Button>
+        <Button onClick="tabs.prev()" testId="prev-btn">
+          Previous Tab
+        </Button>
+      </Fragment>
+    `);
+
+      // Start at Account tab
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+
+      // Go forward twice: Account -> Stream -> Support
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+
+      // Go back once: Support -> Stream
+      await page.getByTestId("prev-btn").click();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+
+      // Go forward to cycle: Stream -> Support -> Account
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+
+      await page.getByTestId("next-btn").click();
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+    });
+
+    test("tabs can be navigated programmatically (simulating next() behavior)", async ({ initTestBed, page }) => {
+      await initTestBed(`
       <Tabs>
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
@@ -465,26 +606,32 @@ test.describe("API functionality verification", () => {
       </Tabs>
     `);
 
-    // Initially first tab is active
-    await expect(page.getByText("Content 1")).toBeVisible();
+      // Initially first tab is active
+      await expect(page.getByText("Content 1")).toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+      await expect(page.getByText("Content 3")).not.toBeVisible();
 
-    // Simulate next() behavior by clicking tabs in sequence
-    await page.getByRole("tab", { name: "Tab 2" }).click();
-    await expect(page.getByText("Content 2")).toBeVisible();
-    await expect(page.getByText("Content 1")).not.toBeVisible();
+      // Simulate next() - move to second tab
+      await page.getByRole("tab", { name: "Tab 2" }).click();
+      await expect(page.getByText("Content 1")).not.toBeVisible();
+      await expect(page.getByText("Content 2")).toBeVisible();
+      await expect(page.getByText("Content 3")).not.toBeVisible();
 
-    await page.getByRole("tab", { name: "Tab 3" }).click();
-    await expect(page.getByText("Content 3")).toBeVisible();
-    await expect(page.getByText("Content 2")).not.toBeVisible();
+      // Simulate next() - move to third tab
+      await page.getByRole("tab", { name: "Tab 3" }).click();
+      await expect(page.getByText("Content 1")).not.toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+      await expect(page.getByText("Content 3")).toBeVisible();
 
-    // Wrap to first tab
-    await page.getByRole("tab", { name: "Tab 1" }).click();
-    await expect(page.getByText("Content 1")).toBeVisible();
-    await expect(page.getByText("Content 3")).not.toBeVisible();
-  });
+      // Simulate next() - should cycle back to first tab
+      await page.getByRole("tab", { name: "Tab 1" }).click();
+      await expect(page.getByText("Content 1")).toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+      await expect(page.getByText("Content 3")).not.toBeVisible();
+    });
 
-  test("tabs support reverse navigation (simulating prev() behavior)", async ({ initTestBed, page }) => {
-    await initTestBed(`
+    test("tabs can be navigated backwards programmatically (simulating prev() behavior)", async ({ initTestBed, page }) => {
+      await initTestBed(`
       <Tabs>
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
@@ -492,52 +639,30 @@ test.describe("API functionality verification", () => {
       </Tabs>
     `);
 
-    // Start from first tab
-    await expect(page.getByText("Content 1")).toBeVisible();
+      // Initially first tab is active
+      await expect(page.getByText("Content 1")).toBeVisible();
 
-    // Simulate prev() behavior - go to last tab
-    await page.getByRole("tab", { name: "Tab 3" }).click();
-    await expect(page.getByText("Content 3")).toBeVisible();
+      // Simulate prev() from first tab - should cycle to last tab
+      await page.getByRole("tab", { name: "Tab 3" }).click();
+      await expect(page.getByText("Content 1")).not.toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+      await expect(page.getByText("Content 3")).toBeVisible();
 
-    // Go to second tab
-    await page.getByRole("tab", { name: "Tab 2" }).click();
-    await expect(page.getByText("Content 2")).toBeVisible();
+      // Simulate prev() - move to second tab
+      await page.getByRole("tab", { name: "Tab 2" }).click();
+      await expect(page.getByText("Content 1")).not.toBeVisible();
+      await expect(page.getByText("Content 2")).toBeVisible();
+      await expect(page.getByText("Content 3")).not.toBeVisible();
 
-    // Go to first tab
-    await page.getByRole("tab", { name: "Tab 1" }).click();
-    await expect(page.getByText("Content 1")).toBeVisible();
-  });
+      // Simulate prev() - move to first tab
+      await page.getByRole("tab", { name: "Tab 1" }).click();
+      await expect(page.getByText("Content 1")).toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+      await expect(page.getByText("Content 3")).not.toBeVisible();
+    });
 
-  test("tabs can be set by index (simulating setActiveTabIndex() behavior)", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Tabs>
-        <TabItem label="Tab 1">Content 1</TabItem>
-        <TabItem label="Tab 2">Content 2</TabItem>
-        <TabItem label="Tab 3">Content 3</TabItem>
-      </Tabs>
-    `);
-
-    // Initially first tab (index 0) is active
-    await expect(page.getByText("Content 1")).toBeVisible();
-
-    // Set to index 2 (third tab)
-    await page.getByRole("tab", { name: "Tab 3" }).click();
-    await expect(page.getByText("Content 3")).toBeVisible();
-    await expect(page.getByText("Content 1")).not.toBeVisible();
-
-    // Set to index 1 (second tab)
-    await page.getByRole("tab", { name: "Tab 2" }).click();
-    await expect(page.getByText("Content 2")).toBeVisible();
-    await expect(page.getByText("Content 3")).not.toBeVisible();
-
-    // Set to index 0 (first tab)
-    await page.getByRole("tab", { name: "Tab 1" }).click();
-    await expect(page.getByText("Content 1")).toBeVisible();
-    await expect(page.getByText("Content 2")).not.toBeVisible();
-  });
-
-  test("activeTab prop sets initial tab correctly (simulating setActiveTabIndex())", async ({ initTestBed, page }) => {
-    await initTestBed(`
+    test("activeTab prop sets initial tab correctly (simulating setActiveTabIndex())", async ({ initTestBed, page }) => {
+      await initTestBed(`
       <Tabs activeTab="{2}">
         <TabItem label="Tab 1">Content 1</TabItem>
         <TabItem label="Tab 2">Content 2</TabItem>
@@ -545,14 +670,163 @@ test.describe("API functionality verification", () => {
       </Tabs>
     `);
 
-    // Third tab should be active initially (index 2)
-    await expect(page.getByText("Content 3")).toBeVisible();
-    await expect(page.getByText("Content 1")).not.toBeVisible();
-    await expect(page.getByText("Content 2")).not.toBeVisible();
-  });
+      // Third tab should be active initially (index 2)
+      await expect(page.getByText("Content 3")).toBeVisible();
+      await expect(page.getByText("Content 1")).not.toBeVisible();
+      await expect(page.getByText("Content 2")).not.toBeVisible();
+    });
 
-  test("API methods work with headerTemplate (visual verification)", async ({ initTestBed, page }) => {
-    await initTestBed(`
+    test("ArrowRight key cycles through all tabs correctly (keyboard navigation)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Tabs>
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+      `);
+
+      // Initially Account tab should be active and focused
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+
+      // Focus the first tab
+      await page.getByRole("tab", { name: "Account" }).focus();
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
+
+      // Press ArrowRight - should move to Stream tab
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
+
+      // Press ArrowRight again - should move to Support tab
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
+
+      // Press ArrowRight from last tab - should cycle back to Account tab
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
+    });
+
+    test("ArrowLeft key cycles through all tabs correctly in reverse (keyboard navigation)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Tabs>
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+      `);
+
+      // Initially Account tab should be active
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+
+      // Focus the first tab
+      await page.getByRole("tab", { name: "Account" }).focus();
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
+
+      // Press ArrowLeft from first tab - should cycle to Support tab (last tab)
+      await page.keyboard.press("ArrowLeft");
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
+
+      // Press ArrowLeft again - should move to Stream tab
+      await page.keyboard.press("ArrowLeft");
+      await expect(page.getByText("Account Content")).not.toBeVisible();
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
+
+      // Press ArrowLeft again - should move to Account tab
+      await page.keyboard.press("ArrowLeft");
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByText("Stream Content")).not.toBeVisible();
+      await expect(page.getByText("Support Content")).not.toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
+    });
+
+    test("ArrowRight and ArrowLeft keys work together for full keyboard navigation", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Tabs>
+          <TabItem label="Account">
+            <Text>Account Content</Text>
+          </TabItem>
+          <TabItem label="Stream">
+            <Text>Stream Content</Text>
+          </TabItem>
+          <TabItem label="Support">
+            <Text>Support Content</Text>
+          </TabItem>
+        </Tabs>
+      `);
+
+      // Start at Account tab and focus it
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+      await page.getByRole("tab", { name: "Account" }).focus();
+
+      // Go forward twice: Account -> Stream -> Support
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
+
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
+
+      // Go back once: Support -> Stream
+      await page.keyboard.press("ArrowLeft");
+      await expect(page.getByText("Stream Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Stream" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Stream" })).toBeFocused();
+
+      // Go forward to cycle: Stream -> Support -> Account
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Support Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Support" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Support" })).toBeFocused();
+
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByText("Account Content")).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Account" })).toBeFocused();
+    });
+
+    test("API methods work with headerTemplate (visual verification)", async ({ initTestBed, page }) => {
+      await initTestBed(`
       <Fragment>
         <Tabs id="tabs">
           <property name="headerTemplate">
@@ -567,22 +841,23 @@ test.describe("API functionality verification", () => {
       </Fragment>
     `);
 
-    // Initially first tab is active
-    await expect(page.getByText("Active: Tab 1")).toBeVisible();
-    await expect(page.getByText("Tab 2")).toBeVisible();
-    await expect(page.getByText("Tab 3")).toBeVisible();
+      // Initially first tab is active
+      await expect(page.getByText("Active: Tab 1")).toBeVisible();
+      await expect(page.getByText("Tab 2")).toBeVisible();
+      await expect(page.getByText("Tab 3")).toBeVisible();
 
-    // Simulate next() behavior by clicking second tab
-    await page.getByRole("button", { name: "Next" }).click();
-    await expect(page.getByText("Active: Tab 2")).toBeVisible();
-    await expect(page.getByText("Tab 1")).toBeVisible();
-    await expect(page.getByText("Tab 3")).toBeVisible();
+      // Simulate next() behavior by clicking second tab
+      await page.getByRole("button", { name: "Next" }).click();
+      await expect(page.getByText("Active: Tab 2")).toBeVisible();
+      await expect(page.getByText("Tab 1")).toBeVisible();
+      await expect(page.getByText("Tab 3")).toBeVisible();
 
-    // Simulate prev() behavior by clicking first tab
-    await page.getByRole("button", { name: "Prev" }).click();
-    await expect(page.getByText("Active: Tab 1")).toBeVisible();
-    await expect(page.getByText("Tab 2")).toBeVisible();
-    await expect(page.getByText("Tab 3")).toBeVisible();
+      // Simulate prev() behavior by clicking first tab
+      await page.getByRole("button", { name: "Prev" }).click();
+      await expect(page.getByText("Active: Tab 1")).toBeVisible();
+      await expect(page.getByText("Tab 2")).toBeVisible();
+      await expect(page.getByText("Tab 3")).toBeVisible();
+    });
   });
 });
 
