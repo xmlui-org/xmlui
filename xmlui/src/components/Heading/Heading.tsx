@@ -273,6 +273,7 @@ function renderHeading({
   renderChild,
 }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
+  delete restProps.level; // Remove level from restProps as it is handled separately
   return (
     <Heading
       uid={node.uid}
