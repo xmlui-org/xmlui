@@ -1,19 +1,19 @@
 # XMLUI E2E Test Summary
 
-*Generated on: 2025-08-07 04:27:25 UTC*
+*Generated on: 2025-08-07 06:18:35 UTC*
 
 ## Summary Statistics
 
 - **Total XMLUI Components**: 100
-- **Components with E2E Tests**: 66
-- **Components without E2E Tests**: 34
-- **Test Coverage**: 66.0% of components have E2E tests
+- **Components with E2E Tests**: 69
+- **Components without E2E Tests**: 31
+- **Test Coverage**: 69.0% of components have E2E tests
 
-- **Total E2E Tests Run**: 2294
-- **Total Passed**: 1780
+- **Total E2E Tests Run**: 2345
+- **Total Passed**: 1823
 - **Total Failed**: 2
-- **Total Skipped**: 512
-- **Pass Rate**: 77.6%
+- **Total Skipped**: 520
+- **Pass Rate**: 77.7%
 
 ## Component Test Details
 
@@ -99,7 +99,7 @@
 | SelectionStore | - | - | - | - | No E2E Tests |
 | Slider | 39 | 0 | 0 | 39 | All Passed |
 | Slot | - | - | - | - | No E2E Tests |
-| SpaceFiller | - | - | - | - | No E2E Tests |
+| SpaceFiller | 9 | 9 | 0 | 0 | All Passed |
 | Spinner | 13 | 12 | 0 | 1 | All Passed |
 | Splitter | 19 | 0 | 0 | 19 | All Passed |
 | Stack | 35 | 35 | 0 | 0 | All Passed |
@@ -114,8 +114,8 @@
 | TextArea | 71 | 71 | 0 | 0 | All Passed |
 | TextBox | 85 | 81 | 0 | 4 | All Passed |
 | Theme | 4 | 4 | 0 | 0 | All Passed |
-| ToneChangerButton | - | - | - | - | No E2E Tests |
-| ToneSwitch | - | - | - | - | No E2E Tests |
+| ToneChangerButton | 28 | 27 | 0 | 1 | All Passed |
+| ToneSwitch | 14 | 7 | 0 | 7 | All Passed |
 | Tree | - | - | - | - | No E2E Tests |
 | VSplitter | - | - | - | - | No E2E Tests |
 | VStack | - | - | - | - | Not Run/Failed |
