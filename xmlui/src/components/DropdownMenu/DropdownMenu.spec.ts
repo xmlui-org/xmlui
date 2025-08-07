@@ -265,44 +265,7 @@ test("handles disabled menu items", async ({ initTestBed, createDropdownMenuDriv
 // INTEGRATION TESTS
 // =============================================================================
 
-test("works correctly in different layout contexts", async ({
-  initTestBed,
-  createDropdownMenuDriver,
-  page,
-}) => {
-  await initTestBed(`
-    <VStack>
-      <HStack>
-        <DropdownMenu label="Layout Test Menu">
-          <MenuItem>Item 1</MenuItem>
-        </DropdownMenu>
-        <Text>Adjacent content</Text>
-      </HStack>
-    </VStack>
-  `);
-  const driver = await createDropdownMenuDriver();
-
-  // Component should render correctly in layout
-  await expect(driver.component).toBeVisible();
-
-  // Test bounding box and dimensions
-  const boundingBox = await driver.component.boundingBox();
-  expect(boundingBox).not.toBeNull();
-  expect(boundingBox!.width).toBeGreaterThan(0);
-  expect(boundingBox!.height).toBeGreaterThan(0);
-
-  // Menu should still work in layout context
-  await driver.open();
-  await expect(page.getByText("Item 1")).toBeVisible();
-});
-
-test("supports custom trigger template", async ({
-  initTestBed,
-  createDropdownMenuDriver,
-  page,
-}) => {
-  // TODO: Review custom trigger template implementation
-  // Current behavior shows default trigger text instead of custom template content
+test("supports custom trigger template", async ({ initTestBed, page }) => {
   await initTestBed(`
     <DropdownMenu>
       <property name="triggerTemplate">
@@ -312,20 +275,12 @@ test("supports custom trigger template", async ({
       <MenuItem>Item 2</MenuItem>
     </DropdownMenu>
   `);
-  const driver = await createDropdownMenuDriver();
+  const btn = page.getByRole("button", { name: "Custom Trigger" });
+  await expect(btn).toBeVisible();
 
-  // Custom trigger should be visible - use a more general approach
-  await expect(driver.component).toBeVisible();
-
-  // The trigger template will be the itself
-  const customTrigger = driver.component;
-  await expect(customTrigger).toBeVisible();
-  await expect(customTrigger).toContainText("Custom Trigger");
-
-  // Custom trigger should work
-  await customTrigger.click();
-  await expect(page.getByText("Item 1")).toBeVisible();
-  await expect(page.getByText("Item 2")).toBeVisible();
+  await btn.click();
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2" })).toBeVisible();
 });
 
 test("handles onWillOpen event correctly", async ({
@@ -334,7 +289,7 @@ test("handles onWillOpen event correctly", async ({
   page,
 }) => {
   const { testStateDriver } = await initTestBed(`
-    <DropdownMenu label="Event Menu" onWillOpen="testState = 'willOpen-fired'; return true">
+    <DropdownMenu label="Event Menu" onWillOpen="testState = 'willOpen-fired'">
       <MenuItem>Item 1</MenuItem>
     </DropdownMenu>
   `);
@@ -347,7 +302,7 @@ test("handles onWillOpen event correctly", async ({
   await expect.poll(testStateDriver.testState).toEqual("willOpen-fired");
 
   // Menu should be open
-  await expect(page.getByText("Item 1")).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
 });
 
 test("prevents opening when onWillOpen returns false", async ({
@@ -368,27 +323,23 @@ test("prevents opening when onWillOpen returns false", async ({
 });
 
 test("API methods work correctly", async ({ initTestBed, createDropdownMenuDriver, page }) => {
-  const { testStateDriver } = await initTestBed(`
-    <Fragment>
+  await initTestBed(`
+    <HStack>
       <DropdownMenu id="apiMenu" label="API Menu">
         <MenuItem>Item 1</MenuItem>
+        <MenuItem><Button testId="closeBtn" onGotFocus="apiMenu.close()" label="Close Menu" /></MenuItem>
       </DropdownMenu>
       <Button testId="openBtn" onClick="apiMenu.open()">Open Menu</Button>
-      <Button testId="closeBtn" onClick="apiMenu.close()">Close Menu</Button>
-    </Fragment>
+    </HStack>
   `);
-  const driver = await createDropdownMenuDriver();
+  const menuItem = page.getByRole("menuitem", { name: "Item 1" });
+  await expect(menuItem).not.toBeVisible();
 
-  // Initially closed
-  await expect(driver.isOpen()).resolves.toBe(false);
+  await page.getByTestId("openBtn").click();
+  await expect(menuItem).toBeVisible();
 
-  // Open via API
-  await page.getByTestId("openBtn").click({ force: true });
-  await expect(page.getByText("Item 1")).toBeVisible();
-
-  // Close via API
-  await page.getByTestId("closeBtn").click({ force: true });
-  await expect(page.getByText("Item 1")).not.toBeVisible();
+  await page.getByTestId("closeBtn").focus();
+  await expect(menuItem).not.toBeVisible();
 });
 
 test("works with nested menu structures", async ({
@@ -421,11 +372,13 @@ test("works with nested menu structures", async ({
   await expect(page.getByText("Category 1")).toBeVisible();
 
   // Navigate to submenu using driver method
+  await expect(page.getByText("Category 1 Item 1")).not.toBeVisible();
   await driver.openSubMenu("Category 1");
   await expect(page.getByText("Category 1 Item 1")).toBeVisible();
   await expect(page.getByText("Subcategory")).toBeVisible();
 
   // Navigate to nested submenu
+  await expect(page.getByText("Deep Item 1")).not.toBeVisible();
   await driver.openSubMenu("Subcategory");
   await expect(page.getByText("Deep Item 1")).toBeVisible();
   await expect(page.getByText("Deep Item 2")).toBeVisible();

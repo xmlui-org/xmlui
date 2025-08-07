@@ -190,8 +190,6 @@ This method sends a message to the content window of the iframe.
 - `message`: The message to send to the iframe's content window.
 - `targetOrigin`: The origin to which the message should be sent. Defaults to '*'.
 
-Send a message to the iframe's content window. This is useful for communicating with embedded content.
-
 ```xmlui-pg copy display name="Example: postMessage" /postMessage/
 <App>
   <VStack var.messageStatus="Ready to send" gap="$space-2">
