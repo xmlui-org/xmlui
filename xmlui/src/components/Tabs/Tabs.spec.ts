@@ -57,17 +57,29 @@ test.describe("basic functionality", () => {
       </Tabs>
     `);
 
+    // Wait for tabs to be fully rendered
+    await expect(page.getByRole('tablist')).toBeAttached();
+    await expect(page.getByRole("tab", { name: "Tab 1" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Tab 2" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Tab 3" })).toBeVisible();
+
     // Initially first tab is active
     await expect(page.getByText("First content")).toBeVisible();
     await expect(page.getByText("Second content")).not.toBeVisible();
+    await expect(page.getByText("Third content")).not.toBeVisible();
+    await expect(page.getByRole("tab", { name: "Tab 1" })).toHaveAttribute("aria-selected", "true");
 
-    // Click second tab
+    // Click second tab and wait for transition
     await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByRole("tab", { name: "Tab 2" })).toHaveAttribute("aria-selected", "true");
     await expect(page.getByText("First content")).not.toBeVisible();
     await expect(page.getByText("Second content")).toBeVisible();
+    await expect(page.getByText("Third content")).not.toBeVisible();
 
-    // Click third tab
+    // Click third tab and wait for transition
     await page.getByRole("tab", { name: "Tab 3" }).click();
+    await expect(page.getByRole("tab", { name: "Tab 3" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByText("First content")).not.toBeVisible();
     await expect(page.getByText("Second content")).not.toBeVisible();
     await expect(page.getByText("Third content")).toBeVisible();
   });
