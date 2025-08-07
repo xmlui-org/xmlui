@@ -100,10 +100,8 @@ This property declares the template for the clickable tab area.
 <App>
   <Tabs>
     <property name="headerTemplate">
-      <NavLink active="{$header.isActive}">
         <Icon name="chevronright" />
         <Text color="green">Account {$header.index}</Text>
-      </NavLink>
     </property>
     <Items data="{[
         {id: 1, name: 'AcmeCorp'}, 
@@ -130,9 +128,7 @@ Individual tab items have an optional identifier, which is passed to the header 
 <App>
   <Tabs>
     <property name="headerTemplate">
-      <NavLink active="{$header.isActive}">
-        {$header.label}{$header.id ? ' | ID: ' + $header.id : ''}
-      </NavLink>
+      {$header.label}{$header.id ? ' | ID: ' + $header.id : ''}
     </property>
     <TabItem label="Home" id="home-tab">
       Home content
@@ -155,9 +151,25 @@ This property indicates the orientation of the component. In horizontal orientat
 
 Available values: `horizontal` **(default)**, `vertical`
 
-```xmlui-pg copy display name="Example: orientation" height="200px"
+```xmlui-pg copy display name="Example: orientation horizontal" height="200px"
 <App>
   <Tabs orientation="horizontal">
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+```xmlui-pg copy name="Example: orientation vertical" height="220px"
+<App>
+  <Tabs orientation="vertical">
     <TabItem label="Account">
       <Text>Account</Text>
     </TabItem>
