@@ -9,7 +9,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
-import { min } from "date-fns";
 
 export const defaultProps = {
   step: 1,
@@ -107,7 +106,7 @@ export const Slider = forwardRef(
 
     // Process initialValue on mount
     useEffect(() => {
-      let initialVal;
+      let initialVal: number | number[] = min;
 
       if (typeof initialValue === "string") {
         try {
