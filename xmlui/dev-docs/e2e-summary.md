@@ -1,6 +1,6 @@
 # XMLUI E2E Test Summary
 
-*Generated on: 2025-08-07 06:18:35 UTC*
+*Generated on: 2025-08-07 06:49:22 UTC*
 
 ## Summary Statistics
 
@@ -9,18 +9,18 @@
 - **Components without E2E Tests**: 31
 - **Test Coverage**: 69.0% of components have E2E tests
 
-- **Total E2E Tests Run**: 2345
-- **Total Passed**: 1823
+- **Total E2E Tests Run**: 2358
+- **Total Passed**: 1835
 - **Total Failed**: 2
-- **Total Skipped**: 520
-- **Pass Rate**: 77.7%
+- **Total Skipped**: 521
+- **Pass Rate**: 77.8%
 
 ## Component Test Details
 
 | Component Name | Tests Run | Passed | Failed | Skipped | Status |
 |----------------|-----------|--------|--------|---------|--------|
 | APICall | 46 | 37 | 0 | 9 | All Passed |
-| Accordion | 55 | 42 | 0 | 13 | All Passed |
+| Accordion | 56 | 42 | 0 | 14 | All Passed |
 | App | 13 | 6 | 0 | 7 | All Passed |
 | AppHeader | 12 | 10 | 0 | 2 | All Passed |
 | AppState | 14 | 14 | 0 | 0 | All Passed |
@@ -102,7 +102,7 @@
 | SpaceFiller | 9 | 9 | 0 | 0 | All Passed |
 | Spinner | 13 | 12 | 0 | 1 | All Passed |
 | Splitter | 19 | 0 | 0 | 19 | All Passed |
-| Stack | 35 | 35 | 0 | 0 | All Passed |
+| Stack | 47 | 47 | 0 | 0 | All Passed |
 | StickyBox | - | - | - | - | No E2E Tests |
 | SubMenuItem | - | - | - | - | No E2E Tests |
 | Switch | 92 | 92 | 0 | 0 | All Passed |

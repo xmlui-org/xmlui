@@ -174,7 +174,126 @@ export class AvatarDriver extends ComponentDriver {}
 
 // --- Splitter
 
-export class SplitterDriver extends ComponentDriver {}
+export class SplitterDriver extends ComponentDriver {
+  /**
+   * Gets the resizer element (non-floating)
+   */
+  async getResizer() {
+    // Look for the non-floating resizer element
+    const allResizerCandidates = this.locator.locator('[class*="resizer"]');
+    const resizerCount = await allResizerCandidates.count();
+    
+    for (let i = 0; i < resizerCount; i++) {
+      const candidate = allResizerCandidates.nth(i);
+      const className = await candidate.getAttribute('class');
+      // Look for resizer that doesn't contain "floating" in its class
+      if (className && className.includes('resizer') && !className.includes('floating')) {
+        return candidate;
+      }
+    }
+    
+    // Fallback: return first resizer element
+    return allResizerCandidates.first();
+  }
+
+  /**
+   * Gets the floating resizer element
+   */
+  async getFloatingResizer() {
+    // Look for the floating resizer element
+    const allResizerCandidates = this.locator.locator('[class*="resizer"]');
+    const resizerCount = await allResizerCandidates.count();
+    
+    for (let i = 0; i < resizerCount; i++) {
+      const candidate = allResizerCandidates.nth(i);
+      const className = await candidate.getAttribute('class');
+      // Look for resizer that contains "floating" in its class
+      if (className && className.includes('floating')) {
+        return candidate;
+      }
+    }
+    
+    // If no floating resizer found, return null locator
+    return this.locator.locator('[class*="floating"][class*="resizer"]').first();
+  }
+
+  /**
+   * Hovers near the resizer area to trigger floating resizer visibility
+   */
+  async hoverNearResizer() {
+    // Get the center of the splitter and hover there
+    const bounds = await this.locator.boundingBox();
+    if (bounds) {
+      await this.page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+      // Wait a bit for the hover effect to take place
+      await this.page.waitForTimeout(200);
+    }
+  }
+
+  /**
+   * Drags the resizer by the specified offset
+   * @param deltaX - Horizontal offset in pixels
+   * @param deltaY - Vertical offset in pixels
+   */
+  async dragResizer(deltaX: number, deltaY: number) {
+    // Try to get both types of resizers
+    const resizer = await this.getResizer();
+    const floatingResizer = await this.getFloatingResizer();
+    
+    // Determine which resizer to use based on visibility
+    let targetResizer = resizer;
+    
+    try {
+      const isResizerVisible = await resizer.isVisible();
+      const isFloatingResizerVisible = await floatingResizer.isVisible();
+      
+      if (!isResizerVisible && isFloatingResizerVisible) {
+        targetResizer = floatingResizer;
+      } else if (!isResizerVisible) {
+        // If neither is visible, try to hover to make floating resizer visible
+        await this.hoverNearResizer();
+        targetResizer = floatingResizer;
+      }
+    } catch (error) {
+      // If there's any error checking visibility, use the regular resizer
+      targetResizer = resizer;
+    }
+    
+    // Get the resizer bounds
+    const resizerBounds = await targetResizer.boundingBox();
+    if (!resizerBounds) {
+      throw new Error("Could not get resizer bounds for drag operation");
+    }
+
+    const startX = resizerBounds.x + resizerBounds.width / 2;
+    const startY = resizerBounds.y + resizerBounds.height / 2;
+    const endX = startX + deltaX;
+    const endY = startY + deltaY;
+
+    // Perform the drag operation
+    await this.page.mouse.move(startX, startY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(endX, endY, { steps: 5 });
+    await this.page.mouse.up();
+    
+    // Wait a bit for the component to update
+    await this.page.waitForTimeout(100);
+  }
+
+  /**
+   * Gets the primary panel element
+   */
+  async getPrimaryPanel() {
+    return this.locator.locator('[class*="primaryPanel"]').first();
+  }
+
+  /**
+   * Gets the secondary panel element
+   */
+  async getSecondaryPanel() {
+    return this.locator.locator('[class*="secondaryPanel"]').first();
+  }
+}
 
 // --- ExpandableItem
 
