@@ -22,11 +22,9 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
-  dValue,
 } from "../metadata-helpers";
 import { NumberBox } from "./NumberBoxNative";
 

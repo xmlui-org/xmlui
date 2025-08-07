@@ -131,8 +131,7 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
+  id = id || useId();
   const inputRef = useRef<HTMLInputElement>(null);
   
   // State to control password visibility

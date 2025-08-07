@@ -95,14 +95,10 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toBeFocused();
   });
 
-  test.skip(
-    "autoFocus focuses input on mount with label",
-    SKIP_REASON.XMLUI_BUG("Bug: Multiple IDs issued to same component"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<TextBox autoFocus="true" label="Auto-focused input" />`);
-      await expect(page.getByLabel("Auto-focused input")).toBeFocused();
-    },
-  );
+  test("autoFocus focuses input on mount with label", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextBox autoFocus="true" label="Auto-focused input" />`);
+    await expect(page.getByLabel("Auto-focused input")).toBeFocused();
+  });
 
   test("placeholder shows when input is empty", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox placeholder="Enter text here..." />`);
@@ -132,18 +128,14 @@ test.describe("Basic Functionality", () => {
     },
   );
 
-  test("can render startIcon", async ({ initTestBed, createTextBoxDriver }) => {
+  test("can render startIcon", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox startIcon="search" />`);
-    const driver = await createTextBoxDriver();
-    const icon = driver.component.locator("svg");
-    await expect(icon).toBeVisible();
+    await expect(page.getByRole("img")).toBeVisible();
   });
 
-  test("can render endIcon", async ({ initTestBed, createTextBoxDriver }) => {
+  test("can render endIcon", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox endIcon="search" />`);
-    const driver = await createTextBoxDriver();
-    const icon = driver.component.locator("svg");
-    await expect(icon).toBeVisible();
+    await expect(page.getByRole("img")).toBeVisible();
   });
 });
 
