@@ -135,6 +135,23 @@ These settings ensure tests fail quickly when conditions aren't met, providing r
 
 **Important**: Never manually show the HTML report or wait for Ctrl+C during test development. Use `--reporter=line` to get immediate console feedback without browser interference.
 
+### Development Testing Commands
+
+For comprehensive debugging and development, use these command combinations:
+
+```bash
+# Best practice during test development - single worker + line reporter
+npx playwright test ComponentName.spec.ts --workers=1 --reporter=line
+
+# Debug specific failing tests only
+npx playwright test ComponentName.spec.ts --grep "test name pattern" --reporter=line
+
+# Run specific test categories during development
+npx playwright test ComponentName.spec.ts --grep "Basic Functionality" --reporter=line
+```
+
+The line reporter provides detailed progress information and immediate feedback about test failures without opening browser windows or HTML reports, making it ideal for iterative test development.
+
 ### Event Handler Naming
 
 **ALWAYS use "on" prefix for event handlers:**
@@ -169,6 +186,59 @@ onExpandedChange = "testState = arguments[0]";
 
 most of the time (when the event handler does not need to access the event object),
 you can omit the arrow function and write the handler body directly.
+
+### XMLUI Script Limitations
+
+XMLUI scripts have important JavaScript syntax limitations that must be followed:
+
+**NO "new" operator support:**
+
+```typescript
+// ❌ INCORRECT - "new" operator not supported
+throw new Error("test error");
+const items = new Set([1, 2, 3]);
+const date = new Date();
+const regex = new RegExp("pattern");
+
+// ✅ CORRECT - Use alternatives
+throw "test error"; // String-based error throwing
+// Manual uniqueness check instead of Set
+const uniqueCheck = {};
+let allUnique = true;
+for (let i = 0; i < items.length; i++) {
+  if (uniqueCheck[items[i]]) {
+    allUnique = false;
+    break;
+  }
+  uniqueCheck[items[i]] = true;
+}
+// Use string literals for dates
+const dateStr = "2025-08-07";
+// Use string patterns instead of regex literals
+const pattern = "test";
+```
+
+### Non-Visual Component Testing
+
+For non-visual components (like Queue, DataStore), use Button click handlers to access APIs:
+
+```typescript
+// ✅ CORRECT - Access APIs through Button onClick
+const { testStateDriver } = await initTestBed(`
+  <Fragment>
+    <Queue id="testQueue" />
+    <Button onClick="testState = testQueue.enqueueItem('test')" />
+  </Fragment>
+`);
+
+// ❌ INCORRECT - Script tags don't provide API access
+const { testStateDriver } = await initTestBed(`
+  <Queue id="testQueue" />
+  <script>testState = testQueue.enqueueItem('test')</script>
+`);
+```
+
+**Important**: Non-visual components often require event handlers (like `onProcess`) to exhibit expected behavior. Without processing handlers, queue-like components may not retain items as expected.
 
 ### Template Properties
 
@@ -306,7 +376,7 @@ const cb = page.getByRole("checkbox", { disabled: true });
 
 ### Event testing
 
-Sometimes you need to test events. The easies was is to do something like this:
+Sometimes you need to test events. The easiest way is to do something like this:
 
 Don't worry about how the testState is actually obtained. Just know that inside an event handler, you can write javascript and access the `testState` variable, which you can make assertions against later by polling that value. Just make it obvious that testState is actually changed, so use an obvious name like 'changed', or if you need to test the handler multiple times, use a counter like `onDidChange="testState = testState == null ? 1 : testState + 1"` Test state is initialized to be null.
 
@@ -316,6 +386,39 @@ test("click event fires on click", async ({ initTestBed, page }) => {
 
   await page.getByRole("button").click();
   await expect.poll(testStateDriver.testState).toEqual("clicked");
+});
+```
+
+**Testing API Returns vs Component State**: For non-visual components, focus on testing API return values rather than internal component state, as the latter may not behave as expected without proper event handlers:
+
+```typescript
+// ✅ CORRECT - Test API return values
+test("enqueueItem returns valid ID", async ({ initTestBed, createButtonDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+    <Fragment>
+      <Queue id="testQueue" />
+      <Button onClick="testState = { id: testQueue.enqueueItem('test'), hasId: true }" />
+    </Fragment>
+  `);
+  
+  const buttonDriver = await createButtonDriver("button");
+  await buttonDriver.component.click();
+  
+  const result = await testStateDriver.testState();
+  expect(result.id).toBeTruthy();
+  expect(result.hasId).toBe(true);
+});
+
+// ❌ POTENTIALLY INCORRECT - Component state may not persist without handlers
+test("queue length increases", async ({ initTestBed, createButtonDriver }) => {
+  // Without onProcess handler, queue might not retain items
+  const { testStateDriver } = await initTestBed(`
+    <Fragment>
+      <Queue id="testQueue" />
+      <Button onClick="testQueue.enqueueItem('test'); testState = testQueue.getQueueLength()" />
+    </Fragment>
+  `);
+  // This test might fail if Queue doesn't retain items without processing
 });
 ```
 
