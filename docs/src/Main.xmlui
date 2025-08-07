@@ -60,6 +60,9 @@
                     label="User-defined Components"
                     to="/user-defined-components" />
                 <NavLink
+                    label="Refactoring"
+                    to="/refactoring" />
+                <NavLink
                     label="Build a HelloWorld Component"
                     to="/build-hello-world-component" />
                 <NavLink
@@ -281,6 +284,9 @@
             </Page>
             <Page url="/user-defined-components">
                 <DocumentPageNoTOC url="/pages/user-defined-components.md" />
+            </Page>
+            <Page url="/refactoring">
+                <DocumentPageNoTOC url="/pages/refactoring.md" />
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
