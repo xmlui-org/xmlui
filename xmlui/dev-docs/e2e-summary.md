@@ -1,6 +1,6 @@
 # XMLUI E2E Test Summary
 
-*Generated on: 2025-08-06 09:45:41 UTC*
+*Generated on: 2025-08-07 04:27:25 UTC*
 
 ## Summary Statistics
 
@@ -9,11 +9,11 @@
 - **Components without E2E Tests**: 34
 - **Test Coverage**: 66.0% of components have E2E tests
 
-- **Total E2E Tests Run**: 2278
-- **Total Passed**: 1763
+- **Total E2E Tests Run**: 2294
+- **Total Passed**: 1780
 - **Total Failed**: 2
-- **Total Skipped**: 513
-- **Pass Rate**: 77.4%
+- **Total Skipped**: 512
+- **Pass Rate**: 77.6%
 
 ## Component Test Details
 
@@ -109,10 +109,10 @@
 | TabItem | - | - | - | - | No E2E Tests |
 | Table | - | - | - | - | No E2E Tests |
 | TableOfContents | - | - | - | - | No E2E Tests |
-| Tabs | 20 | 18 | 0 | 2 | All Passed |
+| Tabs | 28 | 28 | 0 | 0 | All Passed |
 | Text | 110 | 109 | 0 | 1 | All Passed |
 | TextArea | 71 | 71 | 0 | 0 | All Passed |
-| TextBox | 77 | 74 | 0 | 3 | All Passed |
+| TextBox | 85 | 81 | 0 | 4 | All Passed |
 | Theme | 4 | 4 | 0 | 0 | All Passed |
 | ToneChangerButton | - | - | - | - | No E2E Tests |
 | ToneSwitch | - | - | - | - | No E2E Tests |
