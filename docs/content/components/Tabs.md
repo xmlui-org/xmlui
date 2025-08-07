@@ -47,61 +47,22 @@ You can create `TabItem` children dynamically:
 </App>
 ```
 
-## External TabItem identifiers [#external-tabitem-identifiers]
-
-TabItems can have an optional `id` prop that gets exposed in the `$header` context:
-
-```xmlui-pg copy display name="Example: External ID support" height="250px"
-<App>
-  <Tabs>
-    <TabItem label="Home" id="home-tab">
-      <property name="headerTemplate">
-        <Text>ID: {$header.id} | {$header.label}</Text>
-      </property>
-      Home content
-    </TabItem>
-    <TabItem label="Settings">
-      <property name="headerTemplate">
-        <Text>No ID | {$header.label}</Text>
-      </property>
-      Settings content
-    </TabItem>
-  </Tabs>
-</App>
-```
-
 ## Properties [#properties]
 
 ### `activeTab` [#activetab]
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.
 
-```xmlui-pg copy display name="Example: activeTab" height="200px"
-<App>
-  <Tabs activeTab="2">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
 ### `headerTemplate` [#headertemplate]
 
 This property declares the template for the clickable tab area.
 
-```xmlui-pg copy {3-8} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
 <App>
   <Tabs>
     <property name="headerTemplate">
-        <Icon name="chevronright" />
-        <Text color="green">Account {$header.index}</Text>
+      <Icon name="chevronright" />
+      <Text color="green">Account {$header.index}</Text>
     </property>
     <Items data="{[
         {id: 1, name: 'AcmeCorp'}, 
@@ -124,7 +85,7 @@ The `headerTemplate` property allows you to customize the appearance of tab head
 
 Individual tab items have an optional identifier, which is passed to the header template.
 
-```xmlui-pg copy {3-7} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -151,38 +112,6 @@ This property indicates the orientation of the component. In horizontal orientat
 
 Available values: `horizontal` **(default)**, `vertical`
 
-```xmlui-pg copy display name="Example: orientation horizontal" height="200px"
-<App>
-  <Tabs orientation="horizontal">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-```xmlui-pg copy name="Example: orientation vertical" height="220px"
-<App>
-  <Tabs orientation="vertical">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
 ## Events [#events]
 
 This component does not have any events.
@@ -194,24 +123,72 @@ This component does not have any events.
 This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.
 
 **Signature**: `next(): void`
+```xmlui-pg copy display name="Example: next()" /next/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.next()">Next Tab</Button>
+  </Fragment>
+</App>
+```
 
 ### `prev` [#prev]
 
 This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.
 
 **Signature**: `prev(): void`
+```xmlui-pg copy display name="Example: prev()" /prev/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.prev()">Previous Tab</Button>
+  </Fragment>
+</App>
+```
 
 ### `setActiveTabById` [#setactivetabbyid]
 
 This method sets the active tab by its ID.
 
 **Signature**: `setActiveTabById(id: string): void`
+```xmlui-pg copy display name="Example: setActiveTabById()" /setActiveTabById/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Home" id="home">Home Content</TabItem>
+      <TabItem label="Settings" id="settings">Settings Content</TabItem>
+      <TabItem label="Help" id="help">Help Content</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.setActiveTabById('settings')">Go to Settings (by ID)</Button>
+  </Fragment>
+</App>
+```
 
 ### `setActiveTabIndex` [#setactivetabindex]
 
 This method sets the active tab by index (0-based).
 
 **Signature**: `setActiveTabIndex(index: number): void`
+```xmlui-pg copy display name="Example: setActiveTabIndex()" /setActiveTabIndex/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.setActiveTabIndex(2)">Go to Tab 3 (by Index)</Button>
+  </Fragment>
+</App>
+```
 
 ## Styling [#styling]
 
