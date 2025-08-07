@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useId,
   useRef,
 } from "react";
 import classnames from "classnames";
@@ -123,6 +124,7 @@ export const NumberBox = forwardRef(function NumberBox(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  id = id || useId();
   // --- Ensure the provided value is a number or null
 
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
@@ -394,6 +396,7 @@ export const NumberBox = forwardRef(function NumberBox(
 
   return (
     <ItemWithLabel
+      id={id}
       ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
@@ -404,6 +407,8 @@ export const NumberBox = forwardRef(function NumberBox(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
+      isInputTemplateUsed={true}
     >
       <div
         className={classnames(styles.inputRoot, {
