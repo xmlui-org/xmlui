@@ -97,4 +97,9 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-Image | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Image | *none* | *none* |
