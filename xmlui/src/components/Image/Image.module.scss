@@ -12,6 +12,8 @@ $themeVars: ();
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border-radius: createThemeVar("borderRadius-Image");
+  border-color: createThemeVar("borderColor-Image");
 
   &.clickable {
     cursor: pointer;
