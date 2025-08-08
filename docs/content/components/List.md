@@ -1446,6 +1446,7 @@ This component does not have any events.
 This method scrolls the list to the bottom.
 
 **Signature**: `scrollToBottom(): void`
+
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
 ```xmlui-pg copy display name="Example: data API Call" height="400px"
@@ -1478,6 +1479,7 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
 This method scrolls the list to a specific item. The method accepts an item ID as a parameter.
 
 **Signature**: `scrollToId(id: string): void`
+
 - `id`: The ID of the item to scroll to.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
@@ -1487,6 +1489,7 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 This method scrolls the list to a specific index. The method accepts an index as a parameter.
 
 **Signature**: `scrollToIndex(index: number): void`
+
 - `index`: The index to scroll to.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
@@ -1496,6 +1499,7 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 This method scrolls the list to the top.
 
 **Signature**: `scrollToTop(): void`
+
 See the [`scrollToBottom`](#scrolltobottom) example.
 
 ## Styling [#styling]

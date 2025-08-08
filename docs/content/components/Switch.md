@@ -163,6 +163,7 @@ This event is triggered when the Switch has lost the focus.
 This API sets the value of the `Switch`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: boolean): void`
+
 - `value`: The new value to set. Can be either true (on) or false (off).
 
 ```xmlui-pg copy {10,13,15} display name="Example: value and setValue"

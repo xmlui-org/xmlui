@@ -128,6 +128,7 @@ This method sets the focus on the `TextBox` component.
 This API sets the value of the `TextBox`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: string): void`
+
 - `value`: The new value to set. If the value is empty, it will clear the input.
 
 ### `value` [#value]

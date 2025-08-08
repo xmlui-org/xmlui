@@ -124,6 +124,7 @@ This component does not have any events.
 This method updates the application state object bound to the `AppState` instance.
 
 **Signature**: `update(newState: Record<string, any>)`
+
 - `newState`: An object that specifies the new state value.
 
 If the argument is a hash object, it will be merged with the previous state value. Let's assume the previous state value was the following:

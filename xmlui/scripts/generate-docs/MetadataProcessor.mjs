@@ -293,7 +293,7 @@ function addApisSection(data, component) {
     buffer += getComponentDescription(api);
     buffer += "\n\n";
     if (api.signature) {
-      buffer += `**Signature**: \`${api.signature}\`\n`;
+      buffer += `**Signature**: \`${api.signature}\`\n\n`;
       if (api.parameters && Object.keys(api.parameters).length > 0) {
         Object.entries(api.parameters).forEach(([name, param]) => {
           buffer += `- \`${name}\`: ${param}\n`;

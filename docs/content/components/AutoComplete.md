@@ -173,6 +173,7 @@ This method focuses the AutoComplete component.
 This API allows you to set the value of the component. If the value is not valid, the component will not update its internal state.
 
 **Signature**: `setValue(value: any)`
+
 - `value`: The value to set.
 
 ### `value` [#value]

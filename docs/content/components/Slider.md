@@ -125,6 +125,7 @@ This method sets the focus on the slider component.
 This API sets the value of the `Slider`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: number | [number, number] | undefined): void`
+
 - `value`: The new value to set. Can be a single value or an array of values for range sliders.
 
 ### `value` [#value]

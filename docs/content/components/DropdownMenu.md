@@ -173,6 +173,7 @@ This event fires when the `DropdownMenu` component is opened.
 This method command closes the dropdown.
 
 **Signature**: `close(): void`
+
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
   <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
@@ -189,6 +190,7 @@ This method command closes the dropdown.
 This method command opens the dropdown.
 
 **Signature**: `open(): void`
+
 ```xmlui-pg copy {2} display name="Example: open" height="300px"
 <App>
   <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>

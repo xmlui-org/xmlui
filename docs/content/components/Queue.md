@@ -238,6 +238,7 @@ Click the button several times and see how the number of skipped items increment
 This method enqueues the item passed in the method parameter. The new item will be processed after the current queue items have been handled. The method retrieves the unique ID of the newly added item; this ID can be used later in other methods, such as `remove`.
 
 **Signature**: `enqueueItem(item: any): string`
+
 - `item`: The item to enqueue.
 
 The following example stores and displays this item when a new item is put into the queue:
@@ -261,6 +262,7 @@ The following example stores and displays this item when a new item is put into 
 This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`.
 
 **Signature**: `enqueueItems(items: any[]): string[]`
+
 - `items`: The array of items to enqueue.
 
 ### `getQueuedItems` [#getqueueditems]
@@ -268,6 +270,7 @@ This method enqueues the array of items passed in the method parameter. The new 
 You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items.
 
 **Signature**: `getQueuedItems(): any[]`
+
 This method returns the items currently in the queue with their entire context. The result of this method is a list of objects with these properties:
 
 - `item`: The queued item (as passed to the `enqueueItem` and `enqueueItems` methods)
@@ -289,6 +292,7 @@ This method retrieves the current queue length. The queue contains only those it
 This method removes an item from the queue using its unique ID.
 
 **Signature**: `remove(itemId: string): void`
+
 - `itemId`: The unique ID of the item to remove.
 
 The following example emulates a file-processing application. When a file is about to save (in the `process` event), the processing fails with files that deny overwrite. In such a case, the `processError` event handler asks the user to confirm the overwrite action. In case of confirmation, the queue uses the `remove` action to discard the faulty queue item and enqueues the file again with the `accept` behavior so that it won't fail next time.

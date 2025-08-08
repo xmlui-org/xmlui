@@ -123,6 +123,7 @@ This component does not have any events.
 This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.
 
 **Signature**: `next(): void`
+
 ```xmlui-pg copy display name="Example: next()" /next/ height="250px"
 <App>
   <Fragment>
@@ -141,6 +142,7 @@ This method selects the next tab. If the current tab is the last one, it wraps a
 This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.
 
 **Signature**: `prev(): void`
+
 ```xmlui-pg copy display name="Example: prev()" /prev/ height="250px"
 <App>
   <Fragment>
@@ -159,6 +161,7 @@ This method selects the previous tab. If the current tab is the first one, it wr
 This method sets the active tab by its ID.
 
 **Signature**: `setActiveTabById(id: string): void`
+
 ```xmlui-pg copy display name="Example: setActiveTabById()" /setActiveTabById/ height="250px"
 <App>
   <Fragment>
@@ -167,7 +170,9 @@ This method sets the active tab by its ID.
       <TabItem label="Settings" id="settings">Settings Content</TabItem>
       <TabItem label="Help" id="help">Help Content</TabItem>
     </Tabs>
-    <Button onClick="myTabs.setActiveTabById('settings')">Go to Settings (by ID)</Button>
+    <Button onClick="myTabs.setActiveTabById('settings')">
+      Go to Settings (by ID)
+    </Button>
   </Fragment>
 </App>
 ```
@@ -177,6 +182,7 @@ This method sets the active tab by its ID.
 This method sets the active tab by index (0-based).
 
 **Signature**: `setActiveTabIndex(index: number): void`
+
 ```xmlui-pg copy display name="Example: setActiveTabIndex()" /setActiveTabIndex/ height="250px"
 <App>
   <Fragment>
