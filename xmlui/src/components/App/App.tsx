@@ -96,6 +96,9 @@ export const AppMd = createMetadata({
     ready: {
       description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
     },
+    messageReceived: {
+      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -346,6 +349,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       layout: layoutType,
       loggedInUser: extractValue(node.props.loggedInUser),
       onReady: lookupEventHandler("ready"),
+      onMessageReceived: lookupEventHandler("messageReceived"),
       name: extractValue(node.props.name),
       logo: extractValue(node.props.logo),
       logoDark: extractValue(node.props["logo-dark"]),

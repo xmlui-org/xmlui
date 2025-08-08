@@ -215,3 +215,145 @@ test.describe("Edge Cases", () => {
     await expect(page.getByText("Footer Content")).toBeVisible();
   });
 });
+
+// =============================================================================
+// EVENT HANDLING TESTS
+// =============================================================================
+
+test.describe("Event Handling", () => {
+  test("ready event is triggered when App component finishes rendering", async ({
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        onReady="() => testState = 'app-ready'" 
+        testId="app"
+      />
+    `);
+
+    // Verify the ready event was fired
+    await expect.poll(testStateDriver.testState).toEqual("app-ready");
+  });
+
+  test("ready event is triggered for App with complex content", async ({
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        onReady="() => testState = 'complex-app-ready'" 
+        layout="horizontal"
+        testId="app"
+      >
+        <AppHeader>
+          <property name="logoTemplate">
+            <Text value="Test App" />
+          </property>
+        </AppHeader>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text value="Home Page" />
+          </Page>
+        </Pages>
+        <Footer>
+          <Text value="Footer Content" />
+        </Footer>
+      </App>
+    `);
+
+    // Verify the ready event was fired even with complex content
+    await expect.poll(testStateDriver.testState).toEqual("complex-app-ready");
+  });
+
+  test("ready event fires only once during component lifecycle", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        var.counter="{0}"
+        onReady="() => { counter = counter + 1; testState = counter; }" 
+        testId="app"
+      >
+        <Button 
+          testId="trigger-rerender" 
+          label="Re-render" 
+          onClick="counter = counter" 
+        />
+      </App>
+    `);
+
+    // Initial ready event should fire
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    // Trigger a re-render by clicking the button
+    await page.getByTestId("trigger-rerender").click();
+
+    // Counter should still be 1 (ready event doesn't fire again)
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("messageReceived event is triggered when window receives a message", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        onMessageReceived="(msg, ev) => testState = msg" 
+        testId="app"
+      />
+    `);
+
+    // Send a message to the window
+    await page.evaluate(() => {
+      window.postMessage("test-message", "*");
+    });
+
+    // Verify the event was received and handled
+    await expect.poll(testStateDriver.testState).toEqual("test-message");
+  });
+
+  test("messageReceived event receives both message data and event object", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        onMessageReceived="(msg, ev) => testState = { message: msg, eventType: ev.type, origin: ev.origin }" 
+        testId="app"
+      />
+    `);
+
+    // Send a message to the window
+    await page.evaluate(() => {
+      window.postMessage("event-test", "*");
+    });
+
+    // Verify both parameters are accessible
+    await expect.poll(testStateDriver.testState).toMatchObject({
+      message: "event-test",
+      eventType: "message",
+      origin: expect.any(String),
+    });
+  });
+
+  test("messageReceived event handles complex data objects", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App 
+        onMessageReceived="(msg, ev) => testState = msg" 
+        testId="app"
+      />
+    `);
+
+    // Send a complex object as message data
+    const testData = { action: "test", payload: { id: 123, name: "test-item" } };
+    await page.evaluate((data) => {
+      window.postMessage(data, "*");
+    }, testData);
+
+    // Verify the complex data is received correctly
+    await expect.poll(testStateDriver.testState).toEqual(testData);
+  });
+});

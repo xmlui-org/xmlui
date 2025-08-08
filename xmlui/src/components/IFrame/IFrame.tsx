@@ -53,6 +53,24 @@ export const IFrameMd = createMetadata({
       description: `This event is triggered when the ${COMP} content has finished loading.`,
     },
   },
+  apis: {
+    postMessage: {
+      description: "This method sends a message to the content window of the iframe.",
+      signature: "postMessage(message: any, targetOrigin?: string): void",
+      parameters: {
+        message: "The message to send to the iframe's content window.",
+        targetOrigin: "The origin to which the message should be sent. Defaults to '*'.",
+      },
+    },
+    getContentWindow: {
+      description: "This method returns the content window of the iframe element.",
+      signature: "getContentWindow(): Window | null",
+    },
+    getContentDocument: {
+      description: "This method returns the content document of the iframe element.",
+      signature: "getContentDocument(): Document | null",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`width-${COMP}`]: "100%",
@@ -65,7 +83,7 @@ export const IFrameMd = createMetadata({
 export const iframeComponentRenderer = createComponentRenderer(
   COMP,
   IFrameMd,
-  ({ node, extractValue, layoutCss, extractResourceUrl, lookupEventHandler }) => {
+  ({ node, extractValue, layoutCss, extractResourceUrl, lookupEventHandler, registerComponentApi }) => {
     return (
       <IFrame
         src={extractResourceUrl(node.props.src)}
@@ -76,6 +94,7 @@ export const iframeComponentRenderer = createComponentRenderer(
         sandbox={extractValue.asOptionalString(node.props.sandbox)}
         style={layoutCss}
         onLoad={lookupEventHandler("load")}
+        registerComponentApi={registerComponentApi}
       />
     );
   },

@@ -1,7 +1,8 @@
-import React, { type CSSProperties, forwardRef, memo } from "react";
+import React, { type CSSProperties, forwardRef, memo, useEffect, useImperativeHandle, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./IFrame.module.scss";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 type Props = {
   src?: string;
@@ -12,6 +13,7 @@ type Props = {
   sandbox?: string;
   style?: CSSProperties;
   className?: string;
+  registerComponentApi?: RegisterComponentApiFn;
 } & Pick<React.HTMLAttributes<HTMLIFrameElement>, "onLoad">;
 
 export const IFrame = memo(forwardRef(function IFrame(
@@ -25,14 +27,38 @@ export const IFrame = memo(forwardRef(function IFrame(
     style,
     className,
     onLoad,
+    registerComponentApi,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLIFrameElement>,
 ) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Expose the iframe element to parent via ref
+  useImperativeHandle(ref, () => iframeRef.current!, []);
+
+  // Register component APIs
+  useEffect(() => {
+    registerComponentApi?.({
+      postMessage: (message: any, targetOrigin: string = "*") => {
+        const contentWindow = iframeRef.current?.contentWindow;
+        if (contentWindow) {
+          contentWindow.postMessage(message, targetOrigin);
+        }
+      },
+      getContentWindow: () => {
+        return iframeRef.current?.contentWindow || null;
+      },
+      getContentDocument: () => {
+        return iframeRef.current?.contentDocument || null;
+      },
+    });
+  }, [registerComponentApi]);
+
   return (
     <iframe
       {...rest}
-      ref={ref}
+      ref={iframeRef}
       src={src}
       srcDoc={srcdoc}
       allow={allow}

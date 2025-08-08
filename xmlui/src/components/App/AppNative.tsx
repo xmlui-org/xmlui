@@ -43,6 +43,7 @@ type Props = {
   scrollWholePage: boolean;
   noScrollbarGutters?: boolean;
   onReady?: () => void;
+  onMessageReceived?: (data: any, event: MessageEvent) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -56,13 +57,14 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady"
+  "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady" | "onMessageReceived"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
-  defaultTone: "light",
-  defaultTheme: "xmlui",
+  defaultTone: undefined,
+  defaultTheme: undefined,
   onReady: noop,
+  onMessageReceived: noop,
 };
 
 export function App({
@@ -73,6 +75,7 @@ export function App({
   scrollWholePage = defaultProps.scrollWholePage,
   noScrollbarGutters = defaultProps.noScrollbarGutters,
   onReady = defaultProps.onReady,
+  onMessageReceived = defaultProps.onMessageReceived,
   header,
   navPanel,
   footer,
@@ -132,6 +135,18 @@ export function App({
   useEffect(() => {
     onReady();
   }, [onReady]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      onMessageReceived?.(event.data, event);
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [onMessageReceived]);
 
   // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
   // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
