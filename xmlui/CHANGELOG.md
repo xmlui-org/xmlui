@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.96
+
+### Patch Changes
+
+- 3196156: Add IFrame component (first prototype)
+- cfee78a: NumberBox tweaks: fixed missing padding theme var, fixed incorrect label association.
+- f51002a: fix: Tabs - descendant button warning
+- 3fa52d9: fix: Table sortBy now works as expected
+
 ## 0.9.95
 
 ### Patch Changes
