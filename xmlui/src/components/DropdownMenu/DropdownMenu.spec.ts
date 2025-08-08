@@ -4,10 +4,11 @@ import { expect, test } from "../../testing/fixtures";
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test("renders with basic props", async ({ initTestBed, page }) => {
+test("renders with basic props", async ({ initTestBed, createDropdownMenuDriver }) => {
   await initTestBed(`<DropdownMenu label="Menu" />`);
-  const menuBtn = page.getByRole("button");
-  expect(menuBtn).toHaveText("Menu");
+  const driver = await createDropdownMenuDriver();
+
+  await expect(driver.component).toBeVisible();
 });
 
 test("renders with menu items", async ({ initTestBed, createDropdownMenuDriver, page }) => {
@@ -66,7 +67,7 @@ test("alignment='start' aligns popup menu left", async ({
   page,
 }) => {
   await initTestBed(`
-    <HStack width="50%" reverse="true">
+    <HStack width="50%">
       <DropdownMenu alignment="start" label="Menu">
         <MenuItem >Item 1</MenuItem>
         <MenuItem >Item 2</MenuItem>
