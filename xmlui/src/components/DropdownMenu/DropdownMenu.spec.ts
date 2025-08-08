@@ -60,15 +60,49 @@ test("handles menu item clicks", async ({ initTestBed, createDropdownMenuDriver,
   await expect(page.getByRole("menuitem")).not.toBeVisible();
 });
 
-test.fixme(
-  "alignment='start' aligns menu item texts left",
-  async ({ initTestBed, createDropdownMenuDriver, page }) => {},
-);
+test("alignment='start' aligns popup menu left", async ({
+  initTestBed,
+  createDropdownMenuDriver,
+  page,
+}) => {
+  await initTestBed(`
+    <HStack width="50%" reverse="true">
+      <DropdownMenu alignment="start" label="Menu">
+        <MenuItem >Item 1</MenuItem>
+        <MenuItem >Item 2</MenuItem>
+      </DropdownMenu>
+    </HStack>
+  `);
+  const driver = await createDropdownMenuDriver();
 
-test.fixme(
-  "alignment='end' aligns menu item texts right",
-  async ({ initTestBed, createDropdownMenuDriver, page }) => {},
-);
+  await driver.open();
+  const { x: triggerX } = await driver.component.boundingBox();
+  const { x: menuX } = await page.getByRole("menu").boundingBox();
+  expect(menuX).toBeCloseTo(triggerX);
+});
+
+test("alignment='end' aligns popup menu right", async ({
+  initTestBed,
+  createDropdownMenuDriver,
+  page,
+}) => {
+  await initTestBed(`
+    <HStack width="50%" reverse="true">
+      <DropdownMenu alignment="end" label="Menu">
+        <MenuItem >Item 1</MenuItem>
+        <MenuItem >Item 2</MenuItem>
+      </DropdownMenu>
+    </HStack>
+  `);
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+  const { width: triggerWidth, x: triggerX } = await driver.component.boundingBox();
+  const { width: menuWidth, x: menuX } = await page.getByRole("menu").boundingBox();
+  const menuEndX = menuX + menuWidth;
+  const triggerEndX = triggerX + triggerWidth;
+  expect(menuEndX).toBeCloseTo(triggerEndX);
+});
 
 test("supports submenu functionality", async ({ initTestBed, createDropdownMenuDriver, page }) => {
   await initTestBed(`
