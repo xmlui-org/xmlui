@@ -115,3 +115,93 @@ IFrame supports these theme variables for consistent sizing:
 ```
 
 %-STYLE-END
+
+%-API-START postMessage
+
+```xmlui-pg copy display name="Example: postMessage" /postMessage/
+<App>
+  <VStack var.messageStatus="Ready to send" gap="$space-2">
+    <Button 
+      label="Send Message to IFrame" 
+      onClick="
+        myIframe.postMessage({type: 'greeting', text: 'Hello from parent!'}, '*');
+        messageStatus = 'Message sent!';
+      " />
+    <Card title="Status: {messageStatus}" />
+    <IFrame 
+      id="myIframe"
+      srcdoc="
+        <script>
+          window.addEventListener('message', (event) => \{
+            console.log('Received message:', event.data);
+            document.body.innerHTML = 
+              '<h1>Message: ' + JSON.stringify(event.data) + '</h1>';
+          });
+        </script>
+        <h1>Waiting for message...</h1>
+      "
+      width="100%" 
+      height="200px" />
+  </VStack>
+</App>
+```
+
+%-API-END
+
+%-API-START getContentWindow
+
+Get access to the iframe's content window object. Returns null if the content window is not accessible.
+
+```xmlui-pg copy display name="Example: getContentWindow" /getContentWindow/
+<App>
+  <VStack var.windowStatus="Not checked yet" gap="$space-2">
+    <Button 
+      label="Check Content Window" 
+      onClick="
+        const contentWindow = myIframe.getContentWindow();
+        windowStatus = contentWindow 
+          ? 'Content window is accessible' 
+          : 'Content window is not accessible';
+      " />
+    <Card title="Status: {windowStatus}" />
+    <IFrame 
+      id="myIframe"
+      src="https://example.com"
+      width="100%" 
+      height="200px" />
+  </VStack>
+</App>
+```
+
+%-API-END
+
+%-API-START getContentDocument
+
+Get access to the iframe's content document object. Returns null if the content document is not accessible.
+
+```xmlui-pg copy display name="Example: getContentDocument" /getContentDocument/
+<App>
+  <VStack var.iFrameTitle="<not queried yet>" >
+    <Button 
+      label="Get Document Title" 
+      onClick="
+        const contentDoc = myIframe.getContentDocument();
+        iFrameTitle = contentDoc 
+          ? contentDoc.title 
+          : 'Content document not accessible';
+      " />
+    <Card title="IFrame title: {iFrameTitle}" />
+    <IFrame 
+      id="myIframe"
+      srcdoc="
+        <html>
+          <head><title>My Awesome Document</title></head>
+          <body><h1>Awesome Content</h1></body>
+        </html>"
+      width="100%" 
+      height="200px" />
+  </VStack>
+</App>
+```
+
+%-API-END

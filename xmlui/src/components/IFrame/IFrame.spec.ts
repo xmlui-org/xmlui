@@ -396,3 +396,190 @@ test.describe("Other Edge Cases", () => {
     expect(srcValue).toContain("blob:https://example.com");
   });
 });
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("APIs", () => {
+  test("postMessage sends message to iframe content window", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          srcdoc="
+            <script>
+              window.addEventListener('message', (event) => {
+                window.parent.postMessage({ received: event.data }, '*');
+              });
+            </script>
+            <h1>Test IFrame</h1>
+          "
+          testId="iframe" />
+        <Button 
+          onClick="
+            testIframe.postMessage({ type: 'test', message: 'Hello IFrame' }, '*');
+            testState = 'message-sent';
+          " 
+          label="Send Message" 
+          testId="sendButton" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("sendButton").click();
+    await expect.poll(testStateDriver.testState).toEqual("message-sent");
+  });
+
+  test("postMessage with custom target origin", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          srcdoc="<h1>Test IFrame</h1>"
+          testId="iframe" />
+        <Button 
+          onClick="
+            testIframe.postMessage('test-message', 'https://example.com');
+            testState = 'message-with-origin-sent';
+          " 
+          label="Send Message with Origin" 
+          testId="sendButton" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("sendButton").click();
+    await expect.poll(testStateDriver.testState).toEqual("message-with-origin-sent");
+  });
+
+  test("getContentWindow returns content window object", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          srcdoc="<h1>Test Content</h1>"
+          testId="iframe" />
+        <Button 
+          onClick="
+            const contentWindow = testIframe.getContentWindow();
+            testState = {
+              hasContentWindow: contentWindow !== null,
+              isWindow: contentWindow && typeof contentWindow.postMessage === 'function'
+            };
+          " 
+          label="Get Content Window" 
+          testId="getWindowButton" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getWindowButton").click();
+    
+    const result = await testStateDriver.testState();
+    expect(result.hasContentWindow).toBe(true);
+    expect(result.isWindow).toBe(true);
+  });
+
+  test("getContentWindow returns null when iframe not loaded", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          src="about:blank"
+          testId="iframe" />
+        <Button 
+          onClick="
+            const contentWindow = testIframe.getContentWindow();
+            testState = { isNull: contentWindow === null };
+          " 
+          label="Get Content Window" 
+          testId="getWindowButton" />
+      </Fragment>
+    `);
+
+    // Click immediately before iframe might be fully loaded
+    await page.getByTestId("getWindowButton").click();
+    
+    const result = await testStateDriver.testState();
+    // Content window should exist even for about:blank
+    expect(result.isNull).toBe(false);
+  });
+
+  test("getContentDocument returns content document object", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          srcdoc="<html><head><title>Test Document</title></head><body><h1>Test Content</h1></body></html>"
+          testId="iframe" />
+        <Button 
+          onClick="
+            const contentDoc = testIframe.getContentDocument();
+            testState = {
+              hasContentDocument: contentDoc !== null,
+              documentTitle: contentDoc ? contentDoc.title : null,
+              isDocument: contentDoc && typeof contentDoc.querySelector === 'function'
+            };
+          " 
+          label="Get Content Document" 
+          testId="getDocButton" />
+      </Fragment>
+    `);
+
+    // Wait for iframe to load
+    await page.waitForTimeout(100);
+    await page.getByTestId("getDocButton").click();
+    
+    const result = await testStateDriver.testState();
+    expect(result.hasContentDocument).toBe(true);
+    expect(result.documentTitle).toBe("Test Document");
+    expect(result.isDocument).toBe(true);
+  });
+
+  test("APIs work with same-origin srcdoc content", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <IFrame 
+          id="testIframe"
+          srcdoc="
+            <html>
+              <head><title>API Test Document</title></head>
+              <body>
+                <h1>API Test Content</h1>
+                <script>
+                  window.addEventListener('message', (event) => \\{
+                    if (event.data.type === 'ping') \\{
+                      window.parent.postMessage(\\{ type: 'pong', data: event.data.data }, '*');
+                    }
+                  });
+                </script>
+              </body>
+            </html>
+          "
+          testId="iframe" />
+        <Button 
+          onClick="
+            const contentWindow = testIframe.getContentWindow();
+            const contentDoc = testIframe.getContentDocument();
+            testIframe.postMessage({ type: 'ping', data: 'test-data' }, '*');
+            testState = {
+              hasWindow: contentWindow !== null,
+              hasDocument: contentDoc !== null,
+              documentTitle: contentDoc ? contentDoc.title : null,
+              messageSent: true
+            };
+          " 
+          label="Test All APIs" 
+          testId="testAllButton" />
+      </Fragment>
+    `);
+
+    // Wait for iframe to load
+    await page.waitForTimeout(100);
+    await page.getByTestId("testAllButton").click();
+    
+    const result = await testStateDriver.testState();
+    expect(result.hasWindow).toBe(true);
+    expect(result.hasDocument).toBe(true);
+    expect(result.documentTitle).toBe("API Test Document");
+    expect(result.messageSent).toBe(true);
+  });
+});

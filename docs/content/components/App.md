@@ -9,15 +9,15 @@ The `App` component is the root container that defines your application's overal
 
 ## Properties [#properties]
 
-### `defaultTheme` (default: "xmlui") [#defaulttheme-default-xmlui]
+### `defaultTheme` [#defaulttheme]
 
 This property sets the app's default theme.
 
-### `defaultTone` (default: "light") [#defaulttone-default-light]
+### `defaultTone` [#defaulttone]
 
 This property sets the app's default tone ("light" or "dark").
 
-Available values: `light` **(default)**, `dark`
+Available values: `light`, `dark`
 
 ### `layout` [#layout]
 
@@ -364,6 +364,25 @@ The default value is `true`.
 
 ## Events [#events]
 
+### `messageReceived` [#messagereceived]
+
+This event fires when the `App` component receives a message from another window or iframe via the window.postMessage API.
+
+The event handler method has two parameters. The first is the message sent; the second is the entire native event object.
+
+```xmlui-pg copy display name="Example: messageReceived" /onMessageReceived/ /window.postMessage/
+<App 
+  var.message = "<none>" 
+  onMessageReceived="(msg, ev) => {
+    message = JSON.stringify(msg);
+    console.log('Message event received:', ev);
+  }">
+  <Button label="Send a message"
+    onClick="window.postMessage({type: 'message', messages:'Here you are!'})" />
+  <Text>Message received: {message}</Text>
+</App>
+```
+
 ### `ready` [#ready]
 
 This event fires when the `App` component finishes rendering on the page.
@@ -372,10 +391,10 @@ This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.
 
 ```xmlui-pg copy display name="Example: ready"
-  <App onReady="isAppReady = true">
-    <variable name="isAppReady" value="{false}"/>
-    <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
-  </App>
+<App onReady="isAppReady = true">
+  <variable name="isAppReady" value="{false}"/>
+  <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
+</App>
 ```
 
 ## Exposed Methods [#exposed-methods]
