@@ -108,6 +108,7 @@ This event fires when a request results in a success.
 This method triggers the invocation of the API. You can pass an arbitrary number of parameters to the method. In the `APICall` instance, you can access those with the `$param` and `$params` context values.
 
 **Signature**: `execute(...params: any[])`
+
 - `params`: An arbitrary number of parameters that can be used in the API call.
 
 ## Styling [#styling]

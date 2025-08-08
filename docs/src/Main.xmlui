@@ -117,6 +117,7 @@
                     <NavLink label="HSplitter" to="/components/HSplitter" />
                     <NavLink label="HStack" to="/components/HStack" />
                     <NavLink label="Heading" to="/components/Heading" />
+                    <NavLink label="IFrame" to="/components/IFrame" />
                     <NavLink label="Icon" to="/components/Icon" />
                     <NavLink label="Image" to="/components/Image" />
                     <NavLink label="Items" to="/components/Items" />

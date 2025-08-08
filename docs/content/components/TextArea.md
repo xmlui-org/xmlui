@@ -255,6 +255,7 @@ This event is triggered when the TextArea has lost the focus.
 This method sets the focus on the `TextArea` component.
 
 **Signature**: `focus(): void`
+
 ```xmlui-pg copy display name="Example: focus"
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
@@ -286,6 +287,7 @@ You can use this method to set the component's current value programmatically (`
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 **Signature**: `get value(): string | undefined`
+
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
 ```xmlui-pg copy display name="Example: value"

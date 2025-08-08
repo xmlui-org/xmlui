@@ -524,6 +524,7 @@ In the demo below, leave the field as is and submit the form or enter an input t
 This method adds a new item to the list held by the FormItem. The function has a single parameter, the data to add to the FormItem. The new item is appended to the end of the list.
 
 **Signature**: `addItem(data: any): void`
+
 - `data`: The data to add to the FormItem's list.
 
 ### `removeItem` [#removeitem]
@@ -531,6 +532,7 @@ This method adds a new item to the list held by the FormItem. The function has a
 Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove.
 
 **Signature**: `removeItem(index: number): void`
+
 - `index`: The index of the item to remove from the FormItem's list.
 
 ## Styling [#styling]

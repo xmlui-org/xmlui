@@ -161,7 +161,9 @@ Individual tab items have an optional identifier, which is passed to the header 
       <TabItem label="Settings" id="settings">Settings Content</TabItem>
       <TabItem label="Help" id="help">Help Content</TabItem>
     </Tabs>
-    <Button onClick="myTabs.setActiveTabById('settings')">Go to Settings (by ID)</Button>
+    <Button onClick="myTabs.setActiveTabById('settings')">
+      Go to Settings (by ID)
+    </Button>
   </Fragment>
 </App>
 ```

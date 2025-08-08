@@ -29,6 +29,7 @@ import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
 import { HoverCardMd } from "./HoverCard/HoverCard";
 import { IconMd } from "./Icon/Icon";
+import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
 import { LinkMd } from "./Link/Link";
@@ -348,6 +349,7 @@ export const collectedComponentMetadata = {
   H6: H6Md,
   HoverCard: HoverCardMd,
   Icon: IconMd,
+  IFrame: IFrameMd,
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,

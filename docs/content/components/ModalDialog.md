@@ -179,6 +179,7 @@ Open and close the dialog several times to test that it changes the counter.
 This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
 
 **Signature**: `close(): void`
+
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
 ### `open` [#open]
@@ -186,6 +187,7 @@ See the [\`With Imperative API\`](#with-imperative-api) subsection for an exampl
 This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$param` and `$params` context values.
 
 **Signature**: `open(...params: any[]): void`
+
 - `params`: An arbitrary number of parameters that can be used to pass data to the dialog.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
