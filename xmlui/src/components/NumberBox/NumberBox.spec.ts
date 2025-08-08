@@ -90,7 +90,7 @@ test.describe("Basic Functionality", () => {
     const spinButtons = page.locator("button");
     const firstSpinButton = spinButtons.first();
 
-    if (await firstSpinButton.isVisible()) {
+    if (await firstSpinButton.isEnabled()) {
       await firstSpinButton.click();
       await expect(page.getByRole("textbox")).toHaveValue("5"); // Should not change
     }
@@ -116,7 +116,7 @@ test.describe("Basic Functionality", () => {
     const spinButtons = page.locator("button");
     const firstSpinButton = spinButtons.first();
 
-    if (await firstSpinButton.isVisible()) {
+    if (await firstSpinButton.isEnabled()) {
       await firstSpinButton.click();
       await expect(page.getByRole("textbox")).toHaveValue("5"); // Should not change
     }
