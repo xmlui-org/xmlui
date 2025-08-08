@@ -328,8 +328,7 @@ test.describe("Features Needing Investigation", () => {
     }
   );
 
-  test.skip("sorting works correctly",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Sorting implementation needs investigation"),
+  test("sorting works correctly with descending order",
     async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table 
@@ -346,6 +345,28 @@ test.describe("Features Needing Investigation", () => {
       // Should be sorted reverse alphabetically: Spinach, Carrot, Banana, Apple
       await expect(cells.nth(0)).toHaveText("Spinach");
       await expect(cells.nth(1)).toHaveText("Carrot");
+    }
+  );
+
+    test("sorting works correctly with ascending order",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table 
+          data='{${JSON.stringify(sampleData)}}' 
+          sortBy="quantity" 
+          sortDirection="ascending" 
+          testId="table"
+        >
+          <Column bindTo="quantity" canSort="true"/>
+        </Table>
+      `);
+      
+      const cells = page.locator("td");
+      // Should be sorted in ascending order: 2, 3, 5, 10
+      await expect(cells.nth(0)).toHaveText("2");
+      await expect(cells.nth(1)).toHaveText("3");
+      await expect(cells.nth(2)).toHaveText("5");
+      await expect(cells.nth(3)).toHaveText("10");
     }
   );
 

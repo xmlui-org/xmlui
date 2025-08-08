@@ -190,7 +190,6 @@ export const Table = forwardRef(
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
-    const isSortControlled = sortBy !== undefined;
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -252,14 +251,14 @@ export const Table = forwardRef(
     }, [sortingDirection]);
 
     const sortedData = useMemo(() => {
-      if (!_sortBy || isSortControlled) {
+      if (!_sortBy) {
         return dataWithOrder;
       }
       return orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc");
-    }, [_sortBy, _sortingDirection, dataWithOrder, isSortControlled]);
+    }, [_sortBy, _sortingDirection, dataWithOrder]);
 
     const _updateSorting = useCallback(
-      async (accessorKey) => {
+      async (accessorKey: string) => {
         let newDirection: SortingDirection = "ascending";
         let newSortBy = accessorKey;
         // The current key is the same as the last -> the user clicked on the same header twice

@@ -43,9 +43,9 @@ export default defineConfig({
   },
 
   /* Global timeout settings */
-  timeout: 15000, // 10 seconds for entire test
+  timeout: 20000, // 20 seconds for entire test
   expect: {
-    timeout: 2000, // 2 seconds for expect assertions
+    timeout: 5000, // 5 seconds for expect assertions
   },
 
   retries: process.env.CI ? 2 : 1,

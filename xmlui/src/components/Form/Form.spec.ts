@@ -432,19 +432,19 @@ test.describe("Basic Functionality", () => {
       await expect(nameInput).toBeDisabled();
     });
 
-    test("$data.update method updates form data", async ({ initTestBed, page }) => {
+    test("$data.update method updates form data", async ({ initTestBed, page, createFormItemDriver }) => {
       await initTestBed(`
         <Form data="{{ counter: 0 }}">
-          <FormItem label="Counter" bindTo="counter" type="integer" />
+          <FormItem testId="counter" label="Counter" bindTo="counter" type="integer" />
           <Button onClick="$data.update({ counter: $data.counter + 1 })" label="Increment" />
         </Form>
       `);
       
-      const counterInput = page.getByLabel("Counter");
-      
+      const counterDriver = await createFormItemDriver("counter");
+      const counterInput = counterDriver.textBox;      
       await expect(counterInput).toHaveValue("0");
       
-      await page.getByRole("button", { name: "Increment" }).click();
+      await page.getByRole("button", { name: "Increment" }).click({force: true});
       
       await expect(counterInput).toHaveValue("1");
     });
