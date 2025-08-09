@@ -4,9 +4,7 @@ Helper tags provide alternative XML markup syntax for declaring variables, prope
 
 ## variable
 
-The `<variable>` tag declares variables as markup, providing an alternative to the `var.` attribute prefix syntax.
-
-Instead of using the `var.` attribute prefix:
+Use `<variable>` as an alternative to the `var.` attribute prefix syntax. Instead of this:
 
 ```xmlui
 <App var.count="{0}" var.message="Hello, World!">
@@ -15,7 +13,7 @@ Instead of using the `var.` attribute prefix:
 </App>
 ```
 
-You can use the `<variable>` tag:
+You can do this:
 
 ```xmlui
 <App>
@@ -28,7 +26,7 @@ You can use the `<variable>` tag:
 
 ## property
 
-The `<property>` tag sets component properties using nested markup, particularly useful for template properties that contain other components.
+Use `<property>` to declare properties with nested markup
 
 ```xmlui
 <Form data='{{ name: "", email: "" }}'>
@@ -89,7 +87,7 @@ Dropdown components can have rich option layouts:
 
 ## event
 
-The `<event>` tag declares event handlers as markup, providing an alternative to the `on` attribute prefix syntax and enabling the use of component-based handlers.
+Use `<event>` to declare event handlers as markup and enable the use of component-based handlers.
 
 Instead of using the `on` attribute prefix:
 
@@ -107,7 +105,7 @@ You can use the `<event>` tag:
 </Button>
 ```
 
-The `<event>` is necessary when using `<APICall>` as an event handler.
+`<event>` is necessary when using `<APICall>` as an event handler.
 
 ```xmlui
 <Button label="Save Data">
@@ -122,11 +120,36 @@ The `<event>` is necessary when using `<APICall>` as an event handler.
 </Button>
 ```
 
+## method
+
+Use `<method>` to export a method from a component.
+
+```xmlui
+<App>
+ <UsingInternalModal id="component"/>
+ <Button label="Open the internal dialog" onClick="component.openDialog()" />
+</App>
+
+
+Component name="UsingInternalModal">
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+
+  <H1>Using an Internal Modal Dialog</H1>
+
+  <method name="openDialog">
+    console.log('internal method called')
+    dialog.open();
+  </method>
+</Component>
+```
+
 ## script
 
-The `<script>` tag declares inline JavaScript code.
+Use `<script>` to declare inline JavaScript code.
 
-```xlmlui
+```xmlui
 <Component name="ImportProducts">
   <script>
     var parsedCsv = null;
