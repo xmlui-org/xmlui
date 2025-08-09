@@ -2,6 +2,28 @@
 
 These examples answer common questions of the form "How do I do SOMETHING with XMLUI?" The [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) provides two related tools. Agents can call `xmlui-list-howto` to list the entries here and `xmlui-search-howto` to search them.
 
+## Expose a method from a component
+```xmlui-pg
+---app display
+<App height="300px" >
+  <UsingInternalModal id="component"/>
+  <Button label="Open the internal dialog" onClick="component.openDialog()" />
+</App>
+---comp display
+<Component name="UsingInternalModal">
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+
+  <H1>Using an Internal Modal Dialog</H1>
+
+  <method name="openDialog">
+    console.log('internal method called')
+    dialog.open();
+  </method>
+</Component>
+```
+
 ## React to button click not keystrokes
 
 ```xmlui-pg noHeader
