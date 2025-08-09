@@ -35,7 +35,7 @@ Here's how you can define default values for properties.
 
 ## Events
 
-This `<IncButton>` component increments its value for every click, and notifies its environment by firing an event. The event's handler receives the current counter as an event parameter.
+The `<IncButton>` component increments its value for every click, and notifies its environment by firing an event. The event's handler receives the current counter as an event parameter.
 
 ```xmlui-pg noHeader
 ---app display
@@ -56,3 +56,27 @@ This `<IncButton>` component increments its value for every click, and notifies 
 </Component>
 ```
 
+## Methods
+
+The `<UsingInternalModal>` component exports the `open` method of the `ModalDialog` that it defines.
+
+```xmlui-pg noHeader
+---app display
+<App height="300px" >
+  <UsingInternalModal id="component"/>
+  <Button label="Open the internal dialog" onClick="component.openDialog()" />
+</App>
+---comp display
+<Component name="UsingInternalModal">
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+
+  <H1>Using an Internal Modal Dialog</H1>
+
+  <method name="openDialog">
+    console.log('internal method called')
+    dialog.open();
+  </method>
+</Component>
+```

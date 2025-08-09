@@ -46,7 +46,7 @@
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
                 <NavLink label="Markup" to="/markup" />
-                <NavLink label="Component Scoping" to="/scoping" />
+                <!-- <NavLink label="Component Scoping" to="/scoping" /> -->
                 <NavLink label="Scripting" to="/scripting" />
                 <NavLink label="Layout" to="/layout" />
                 <NavLink label="Working with Text" to="/working-with-text" />
