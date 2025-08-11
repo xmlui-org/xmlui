@@ -778,10 +778,6 @@ export class TextAreaDriver extends InputComponentDriver {
 // --- ProgressBar
 
 export class ProgressBarDriver extends ComponentDriver {
-  get wrapper() {
-    return this.component;
-  }
-
   get bar() {
     return this.component.locator("> div");
   }

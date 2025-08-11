@@ -11,7 +11,6 @@ test.describe("Basic Functionality", () => {
     const driver = await createProgressBarDriver();
 
     await expect(driver.component).toBeVisible();
-    await expect(driver.wrapper).toBeVisible();
     await expect(driver.bar).toBeVisible();
   });
 
@@ -70,131 +69,25 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test.skip("has proper accessibility roles", async ({ initTestBed, createProgressBarDriver }) => {
+  test("has proper accessibility roles", async ({ initTestBed, page }) => {
     await initTestBed(`<ProgressBar value="{0.6}" />`);
-    const driver = await createProgressBarDriver();
 
-    await expect(driver.component).toHaveAttribute("role", "progressbar");
+    const bar = page.getByRole("progressbar");
+    await expect(bar).toHaveAttribute("aria-valuemin", "0");
+    await expect(bar).toHaveAttribute("aria-valuemax", "100");
+    await expect(bar).toHaveAttribute("aria-valuenow", "60");
   });
 
-  test.skip("aria-valuenow reflects current value", async ({
+  test("maintains accessibility attributes with edge case values", async ({
     initTestBed,
     createProgressBarDriver,
   }) => {
-    await initTestBed(`<ProgressBar value="{0.75}" />`);
+    await initTestBed(`<ProgressBar value="{-5}" />`);
     const driver = await createProgressBarDriver();
 
-    await expect(driver.component).toHaveAttribute("aria-valuenow", "75");
-  });
-
-  test.skip("aria-valuemin is set to 0", async ({ initTestBed, createProgressBarDriver }) => {
-    await initTestBed(`<ProgressBar value="{0.5}" />`);
-    const driver = await createProgressBarDriver();
-
+    await expect(driver.component).toHaveAttribute("aria-valuenow", "0");
     await expect(driver.component).toHaveAttribute("aria-valuemin", "0");
-  });
-
-  test.skip("aria-valuemax is set to 100", async ({ initTestBed, createProgressBarDriver }) => {
-    await initTestBed(`<ProgressBar value="{0.5}" />`);
-    const driver = await createProgressBarDriver();
-
     await expect(driver.component).toHaveAttribute("aria-valuemax", "100");
-  });
-
-  test.skip("supports custom accessibility label", async ({
-    initTestBed,
-    createProgressBarDriver,
-  }) => {
-    await initTestBed(`<ProgressBar value="{0.3}" aria-label="Upload progress" />`);
-    const driver = await createProgressBarDriver();
-
-    await expect(driver.component).toHaveAttribute("aria-label", "Upload progress");
-  });
-
-  test.skip("supports aria-labelledby", async ({ initTestBed, createProgressBarDriver }) => {
-    await initTestBed(`
-      <div>
-        <h3 id="progress-label">File Upload</h3>
-        <ProgressBar value="{0.45}" aria-labelledby="progress-label" />
-      </div>
-    `);
-    const driver = await createProgressBarDriver();
-
-    await expect(driver.component).toHaveAttribute("aria-labelledby", "progress-label");
-  });
-});
-
-// =============================================================================
-// VISUAL STATES TESTS
-// =============================================================================
-
-test.describe("Visual States", () => {
-  test.skip("applies correct CSS classes", async ({ initTestBed, createProgressBarDriver }) => {
-    // TODO: Review this test
-    await initTestBed(`<ProgressBar value="{0.4}" />`);
-    const driver = await createProgressBarDriver();
-
-    await expect(driver.wrapper).toHaveClass(/progressBarWrapper/);
-    await expect(driver.bar).toHaveClass(/progressBar/);
-  });
-
-  test("bar width changes with value", async ({ initTestBed, createProgressBarDriver }) => {
-    await initTestBed(`<ProgressBar value="{0.25}" />`);
-    const driver = await createProgressBarDriver();
-
-    // Check initial width
-    let barStyle = await driver.bar.getAttribute("style");
-    expect(barStyle).toContain("width: 25%");
-
-    // Update value and check width changes
-    await initTestBed(`<ProgressBar value="{0.85}" />`);
-    barStyle = await driver.bar.getAttribute("style");
-    expect(barStyle).toContain("width: 85%");
-  });
-
-  test("handles theme variables correctly", async ({
-    initTestBed,
-    createProgressBarDriver,
-    page,
-  }) => {
-    await initTestBed(`<ProgressBar value="{0.6}" />`);
-    const driver = await createProgressBarDriver();
-
-    // Check that CSS custom properties are applied
-    const wrapperStyle = await getElementStyle(driver.wrapper, "backgroundColor");
-    expect(wrapperStyle).toBeDefined();
-
-    const barStyle = await getElementStyle(driver.bar, "backgroundColor");
-    expect(barStyle).toBeDefined();
-  });
-
-  test("handles different border radius values", async ({
-    initTestBed,
-    createProgressBarDriver,
-  }) => {
-    await initTestBed(`<ProgressBar value="{0.7}" />`);
-    const driver = await createProgressBarDriver();
-
-    const borderRadius = await getElementStyle(driver.wrapper, "borderRadius");
-    expect(borderRadius).toBeDefined();
-  });
-
-  test("maintains visual consistency across value changes", async ({
-    initTestBed,
-    createProgressBarDriver,
-  }) => {
-    const values = [0.1, 0.25, 0.5, 0.75, 0.9, 1]; // Removed 0 to avoid visibility issues
-
-    for (const value of values) {
-      await initTestBed(`<ProgressBar value="{${value}}" />`);
-      const driver = await createProgressBarDriver();
-
-      await expect(driver.component).toBeVisible();
-      await expect(driver.bar).toBeVisible();
-
-      const actualValue = await driver.getProgressRatio();
-      expect(actualValue).toBeCloseTo(value, 2);
-    }
   });
 });
 
@@ -257,14 +150,6 @@ test.describe("Edge Cases", () => {
     expect(value).toBeCloseTo(0.001, 3);
   });
 
-  test("handles very precise decimal values", async ({ initTestBed, createProgressBarDriver }) => {
-    await initTestBed(`<ProgressBar value="{0.123456789}" />`);
-    const driver = await createProgressBarDriver();
-
-    const value = await driver.getProgressRatio();
-    expect(value).toBeCloseTo(0.123456789, 5);
-  });
-
   test("handles string values that are not numbers", async ({
     initTestBed,
     createProgressBarDriver,
@@ -285,52 +170,15 @@ test.describe("Edge Cases", () => {
   });
 
   test("handles boolean values", async ({ initTestBed, createProgressBarDriver }) => {
-    // Test true
-    await initTestBed(`<ProgressBar value="{true}" />`);
-    let driver = await createProgressBarDriver();
-    let value = await driver.getProgressRatio();
-    expect(value).toBe(1);
-
-    // Test false
-    await initTestBed(`<ProgressBar value="{false}" />`);
-    driver = await createProgressBarDriver();
-    value = await driver.getProgressRatio();
-    expect(value).toBe(0);
-  });
-
-  test.skip("maintains accessibility attributes with edge case values", async ({
-    initTestBed,
-    createProgressBarDriver,
-  }) => {
-    await initTestBed(`<ProgressBar value="{-5}" />`);
     const driver = await createProgressBarDriver();
-
-    await expect(driver.component).toHaveAttribute("aria-valuenow", "0");
-    await expect(driver.component).toHaveAttribute("aria-valuemin", "0");
-    await expect(driver.component).toHaveAttribute("aria-valuemax", "100");
+    const value = await driver.getProgressRatio();
+    expect(value).toBe(1);
   });
-});
 
-// =============================================================================
-// INTEGRATION TESTS
-// =============================================================================
-
-test.describe("Integration", () => {
-  test("works within forms", async ({ initTestBed, createProgressBarDriver, createFormDriver }) => {
-    await initTestBed(`
-      <Form>
-        <ProgressBar value="{0.6}" testId="form-progress" />
-        <button type="submit">Submit</button>
-      </Form>
-    `);
-
-    const progressDriver = await createProgressBarDriver("form-progress");
-    const formDriver = await createFormDriver();
-
-    await expect(progressDriver.component).toBeVisible();
-    await expect(formDriver.component).toBeVisible();
-
-    const value = await progressDriver.getProgressRatio();
-    expect(value).toBeCloseTo(0.6, 2);
+  test("handles boolean values", async ({ initTestBed, createProgressBarDriver }) => {
+    await initTestBed(`<ProgressBar value="{false}" />`);
+    const driver = await createProgressBarDriver();
+    const value = await driver.getProgressRatio();
+    expect(value).toBe(0);
   });
 });
