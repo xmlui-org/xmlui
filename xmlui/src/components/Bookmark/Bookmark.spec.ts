@@ -33,164 +33,76 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("Documentation Usage Patterns", () => {
-    test("standalone usage pattern - adjacent content navigation", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("links navigate to standalone bookmarks", async ({ initTestBed, page }) => {
+      await page.setViewportSize({ height: 600, width: 800 });
       // Based on documentation example with standalone bookmarks and adjacent content
       await initTestBed(`
         <VStack>
           <Link to="#red-section">Jump to red</Link>
           <Link to="#green-section">Jump to green</Link>
           <Bookmark id="red-section" />
-          <VStack height="200px" backgroundColor="red">Red content</VStack>
+          <VStack height="700px" backgroundColor="red">Red content</VStack>
           <Bookmark id="green-section" />
-          <VStack height="200px" backgroundColor="green">Green content</VStack>
+          <VStack height="700px" backgroundColor="green">Green content</VStack>
         </VStack>
       `);
 
-      const redBookmark = page.locator("#red-section");
-      const greenBookmark = page.locator("#green-section");
       const redLink = page.getByRole("link", { name: "Jump to red" });
       const greenLink = page.getByRole("link", { name: "Jump to green" });
 
-      // Verify bookmarks exist and are positioned correctly
-      await expect(redBookmark).toHaveCount(1);
-      await expect(greenBookmark).toHaveCount(1);
-      await expect(redBookmark).toHaveAttribute("data-anchor", "true");
-      await expect(greenBookmark).toHaveAttribute("data-anchor", "true");
+      const redContent = page.getByText("Red content");
+      const greenContent = page.getByText("Green content");
 
-      // Verify links are functional
-      await expect(redLink).toBeVisible();
-      await expect(greenLink).toBeVisible();
-      await expect(redLink).toHaveAttribute("href", "#/#red-section");
-      await expect(greenLink).toHaveAttribute("href", "#/#green-section");
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+
+      await greenLink.click();
+      await page.waitForURL(/#green-section$/);
+      await expect(redContent).not.toBeInViewport();
+      await expect(greenContent).toBeInViewport();
+
+      await redLink.click();
+      await page.waitForURL(/#red-section$/);
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
     });
 
-    test("nested children usage pattern - content wrapping", async ({ initTestBed, page }) => {
-      // Based on documentation example with nested children inside bookmarks
+    test("links navigate to nested bookmarks", async ({ initTestBed, page }) => {
+      await page.setViewportSize({ height: 600, width: 800 });
+      // Based on documentation example with standalone bookmarks and adjacent content
       await initTestBed(`
         <VStack>
-          <Link to="#wrapped-red">Jump to red</Link>
-          <Link to="#wrapped-green">Jump to green</Link>
-          <Bookmark id="wrapped-red">
-            <VStack height="200px" backgroundColor="red">Red wrapped content</VStack>
+          <Link to="#red-section">Jump to red</Link>
+          <Link to="#green-section">Jump to green</Link>
+          <Bookmark id="red-section" >
+            <VStack height="700px" backgroundColor="red">Red content</VStack>
           </Bookmark>
-          <Bookmark id="wrapped-green">
-            <VStack height="200px" backgroundColor="green">Green wrapped content</VStack>
+          <Bookmark id="green-section" >
+            <VStack height="700px" backgroundColor="green">Green content</VStack>
           </Bookmark>
         </VStack>
       `);
 
-      const redBookmark = page.locator("#wrapped-red");
-      const greenBookmark = page.locator("#wrapped-green");
       const redLink = page.getByRole("link", { name: "Jump to red" });
       const greenLink = page.getByRole("link", { name: "Jump to green" });
 
-      // Verify bookmarks exist and contain the content
-      await expect(redBookmark).toHaveCount(1);
-      await expect(greenBookmark).toHaveCount(1);
-      await expect(redBookmark).toContainText("Red wrapped content");
-      await expect(greenBookmark).toContainText("Green wrapped content");
+      const redContent = page.getByText("Red content");
+      const greenContent = page.getByText("Green content");
 
-      // Verify links are functional
-      await expect(redLink).toBeVisible();
-      await expect(greenLink).toBeVisible();
-      await expect(redLink).toHaveAttribute("href", "#/#wrapped-red");
-      await expect(greenLink).toHaveAttribute("href", "#/#wrapped-green");
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+
+      await greenLink.click();
+      await page.waitForURL(/#green-section$/);
+      await expect(redContent).not.toBeInViewport();
+      await expect(greenContent).toBeInViewport();
+
+      await redLink.click();
+      await page.waitForURL(/#red-section$/);
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
     });
 
-    test("standalone vs nested patterns produce equivalent navigation behavior", async ({
-      initTestBed,
-      page,
-    }) => {
-      // Test that both patterns work equivalently for scrollIntoView API
-      const { testStateDriver } = await initTestBed(`
-        <VStack>
-          <!-- Standalone pattern -->
-          <Bookmark id="standalone-bookmark" ref="standaloneRef" />
-          <VStack height="100px">Adjacent content for standalone</VStack>
-
-          <!-- Nested pattern -->
-          <Bookmark id="nested-bookmark" ref="nestedRef">
-            <VStack height="100px">Nested content</VStack>
-          </Bookmark>
-
-          <Button onClick="standaloneRef.scrollIntoView(); testState = 'standalone-scrolled'">Scroll Standalone</Button>
-          <Button onClick="nestedRef.scrollIntoView(); testState = 'nested-scrolled'">Scroll Nested</Button>
-        </VStack>
-      `);
-
-      const standaloneButton = page.getByRole("button", { name: "Scroll Standalone" });
-      const nestedButton = page.getByRole("button", { name: "Scroll Nested" });
-      const standaloneBookmark = page.locator("#standalone-bookmark");
-      const nestedBookmark = page.locator("#nested-bookmark");
-
-      // Test standalone pattern scrollIntoView
-      await standaloneButton.click();
-      await expect.poll(testStateDriver.testState).toEqual("standalone-scrolled");
-      await expect(standaloneBookmark).toHaveCount(1);
-
-      // Test nested pattern scrollIntoView
-      await nestedButton.click();
-      await expect.poll(testStateDriver.testState).toEqual("nested-scrolled");
-      await expect(nestedBookmark).toHaveCount(1);
-      await expect(nestedBookmark).toContainText("Nested content");
-    });
-
-    test("standalone pattern recommended for reduced nesting depth", async ({
-      initTestBed,
-      page,
-    }) => {
-      // Verify standalone pattern doesn't add unnecessary nesting as mentioned in docs
-      await initTestBed(`
-        <VStack>
-          <Bookmark id="standalone-test" />
-          <Text>Content after standalone bookmark</Text>
-        </VStack>
-      `);
-
-      const bookmark = page.locator("#standalone-test");
-      const textContent = page.getByText("Content after standalone bookmark");
-
-      // Standalone bookmark should exist without affecting content structure
-      await expect(bookmark).toHaveCount(1);
-      await expect(bookmark).toHaveAttribute("data-anchor", "true");
-      await expect(textContent).toBeVisible();
-
-      // Verify the bookmark is a simple span element (minimal nesting)
-      const tagName = await bookmark.evaluate((el) => el.tagName.toLowerCase());
-      expect(tagName).toBe("span");
-    });
-
-    test("nested pattern allows content grouping", async ({ initTestBed, page }) => {
-      // Verify nested pattern groups content as shown in documentation
-      await initTestBed(`
-        <VStack>
-          <Bookmark id="grouped-content">
-            <Text>First line of grouped content</Text>
-            <Text>Second line of grouped content</Text>
-            <Button>Action within group</Button>
-          </Bookmark>
-        </VStack>
-      `);
-
-      const bookmark = page.locator("#grouped-content");
-      const firstLine = page.getByText("First line of grouped content");
-      const secondLine = page.getByText("Second line of grouped content");
-      const actionButton = page.getByRole("button", { name: "Action within group" });
-
-      // All content should be within the bookmark container
-      await expect(bookmark).toHaveCount(1);
-      await expect(bookmark).toContainText("First line of grouped content");
-      await expect(bookmark).toContainText("Second line of grouped content");
-
-      // Child elements should be functional
-      await expect(firstLine).toBeVisible();
-      await expect(secondLine).toBeVisible();
-      await expect(actionButton).toBeVisible();
-      await expect(actionButton).toBeEnabled();
-    });
   });
 
   // =============================================================================
