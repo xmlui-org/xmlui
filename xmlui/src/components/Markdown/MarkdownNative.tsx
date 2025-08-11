@@ -38,7 +38,6 @@ type MarkdownProps = {
   className?: string;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
-  className?: string;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -90,7 +89,6 @@ export const Markdown = memo(function Markdown({
   className,
   codeHighlighter,
   showHeadingAnchors,
-  className,
 }: MarkdownProps) {
   const imageInfo = useRef(new Map<string, boolean>());
   if (typeof children !== "string") {
