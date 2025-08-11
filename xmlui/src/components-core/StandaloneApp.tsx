@@ -1,3 +1,4 @@
+import type { ReactNode} from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
@@ -51,7 +52,7 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -63,6 +64,7 @@ const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 type StandaloneAppProps = {
   // --- The standalone app description (the engine renders this definition)
   appDef?: StandaloneAppDescription;
+  appGlobals?: Record<string, any>;
 
   // --- In E2E tests, we can decorate the components with test IDs
   decorateComponentsWithTestId?: boolean;
@@ -78,6 +80,7 @@ type StandaloneAppProps = {
 
   // --- If true, the app waits for the API interceptor to be ready
   waitForApiInterceptor?: boolean;
+  children?: ReactNode;
 };
 
 /**
@@ -91,11 +94,13 @@ type StandaloneAppProps = {
  */
 function StandaloneApp({
   appDef,
+  appGlobals: globals,
   decorateComponentsWithTestId,
   debugEnabled = false,
   runtime,
   extensionManager,
   waitForApiInterceptor = false,
+  children
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
@@ -122,8 +127,9 @@ function StandaloneApp({
     return {
       name: name,
       ...(appGlobals || {}),
+      ...(globals || {})
     }
-  }, [appGlobals, name]);
+  }, [appGlobals, globals, name]);
 
   let contributes = useMemo(()=>{
     return {
@@ -170,8 +176,7 @@ function StandaloneApp({
         resourceMap={resourceMap}
         sources={sources}
         extensionManager={extensionManager}
-        contributes={contributes}
-      />
+        contributes={contributes}>{children}</AppRoot>
     </ApiInterceptorProvider>
   );
 }

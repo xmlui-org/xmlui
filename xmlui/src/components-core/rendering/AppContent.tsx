@@ -1,13 +1,5 @@
 import type { ReactNode } from "react";
-import {
-  cloneElement,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { get } from "lodash-es";
 import toast from "react-hot-toast";
 
@@ -26,23 +18,22 @@ import {
 } from "../utils/hooks";
 import { getVarKey } from "../theming/themeVars";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
-import { EMPTY_OBJECT, noop } from "../constants";
+import { EMPTY_OBJECT } from "../constants";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 import { AppStateContext } from "../../components/App/AppStateContext";
-import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { AppContext } from "../AppContext";
-import { renderChild } from "./renderChild";
 import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
 import type { TrackContainerHeight } from "./AppWrapper";
 import { ThemeToneKeys } from "../theming/utils";
+import StandaloneComponent from "./StandaloneComponent";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -272,12 +263,12 @@ export function AppContent({
           // --- If element is in shadow DOM (string-based type checking)
           // --- Check constructor.name to avoid direct ShadowRoot type dependency
           // --- More precise than duck typing, works reliably across different environments
-          if (typeof ShadowRoot !== 'undefined' && rootNode instanceof ShadowRoot) {
+          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
             const el = (rootNode as any).getElementById(lastHash.current);
             if (!el) return;
             scrollAncestorsToView(el, scrollBehavior);
           } else {
-          // --- If element is in light DOM
+            // --- If element is in light DOM
             document
               .getElementById(lastHash.current)
               ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
@@ -366,7 +357,8 @@ export function AppContent({
       standalone,
       // String-based type checking: Use constructor.name to identify ShadowRoot
       // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
-      appIsInShadowDom: typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot,
+      appIsInShadowDom:
+        typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
 
       // --- Date-related
       ...dateFunctions,
@@ -463,27 +455,10 @@ export function AppContent({
     };
   }, [appState, registerAppState, update]);
 
-  const memoedVarsRef = useRef<MemoedVars>(new Map());
-  const renderedRoot = renderChild({
-    node: rootContainer,
-    state: EMPTY_OBJECT,
-    dispatch: noop,
-    appContext: undefined,
-    lookupAction: noop,
-    lookupSyncCallback: noop,
-    registerComponentApi: noop,
-    renderChild: noop,
-    statePartChanged: noop,
-    cleanup: noop,
-    memoedVarsRef,
-  });
-
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {!!children && isValidElement(renderedRoot)
-          ? cloneElement(renderedRoot, null, children)
-          : renderedRoot}
+        <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>
   );

@@ -51,6 +51,7 @@ import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { useEvent } from "./components-core/utils/misc";
 import { createMetadata, d } from "./components/metadata-helpers";
+import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
   ThemeDefinition,
@@ -108,4 +109,5 @@ export {
   useSearchContextContent,
   useAppLayoutContext,
   useEvent,
+  StandaloneComponent
 };
