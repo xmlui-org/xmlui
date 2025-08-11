@@ -1,10 +1,10 @@
 # StickyBox [#stickybox]
 
-The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
+`StickyBox` remains fixed at the top or bottom of the screen as the user scrolls.
 
 ## Properties [#properties]
 
-### `to (default: "top")` [#to-default-top]
+### `to` (default: "top") [#to-default-top]
 
 This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
 

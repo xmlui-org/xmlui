@@ -1,6 +1,12 @@
 # Avatar [#avatar]
 
-The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
+`Avatar` displays a user or entity's profile picture as a circular image, with automatic fallback to initials when no image is provided. It's commonly used in headers, user lists, comments, and anywhere you need to represent a person or organization.
+
+**Key features:**
+- **Automatic fallback**: Shows initials when no image URL is provided or image fails to load
+- **Multiple sizes**: From `xs` (extra small) to `lg` (large) to fit different contexts
+- **Clickable**: Supports click events for profile actions, modals, or navigation
+- **Accessible**: Automatically generates appropriate alt text from the name
 
 ## Properties [#properties]
 
@@ -14,7 +20,7 @@ This property sets the name value the Avatar uses to display initials. If neithe
 </App>
 ```
 
-### `size (default: "sm")` [#size-default-sm]
+### `size` (default: "sm") [#size-default-sm]
 
 This property defines the display size of the Avatar.
 
@@ -22,10 +28,10 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `xs` | Extra small button |
-| `sm` | Small button **(default)** |
-| `md` | Medium button |
-| `lg` | Large button |
+| `xs` | Extra small |
+| `sm` | Small **(default)** |
+| `md` | Medium |
+| `lg` | Large |
 
 ```xmlui-pg copy display name="Example: size"
 <App>
@@ -81,8 +87,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Avatar | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Avatar | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Avatar | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Avatar | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Avatar | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Avatar | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Avatar | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Avatar | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Avatar | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Avatar | *none* | *none* |
@@ -96,8 +102,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Avatar | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Avatar | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Avatar | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Avatar | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Avatar | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Avatar | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Avatar | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Avatar | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Avatar | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Avatar | *none* | *none* |

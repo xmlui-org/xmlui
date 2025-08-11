@@ -17,39 +17,38 @@ $backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
 $textColor-Footer: createThemeVar("textColor-#{$component}");
 $height-Footer: createThemeVar("height-#{$component}");
 $fontSize-Footer: createThemeVar("fontSize-#{$component}");
-$verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
+$verticalAlignment-Footer: createThemeVar("verticalAlignment-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
 $gap-Footer: createThemeVar("gap-#{$component}");
 $maxWidth-App: createThemeVar("maxWidth-App");
+$margin-Footer: createThemeVar("margin-#{$component}");
 
-@layer components {
-  .outerWrapper {
-    @include t.borderVars($themeVars, $component);
-    background-color: $backgroundColor-Footer;
-    height: $height-Footer;
-  }
+.outerWrapper{
+  @include t.borderVars($themeVars, $component);
+  background-color: $backgroundColor-Footer;
+  height: $height-Footer;
+}
 
-  .wrapper {
-    width: 100%;
-    display: flex;
-    min-height: 0;
-    height: 100%;
-    flex-direction: row;
-    gap: $gap-Footer;
-    @include t.paddingVars($themeVars, $component);
-    font-size: $fontSize-Footer;
-    align-items: $verticalAlign-Footer;
-    max-width: $maxWidth-content-Footer;
-    color: $textColor-Footer;
-    margin: 0 auto;
+.wrapper {
+  width: 100%;
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: row;
+  gap: $gap-Footer;
+  @include t.paddingVars($themeVars, $component);
+  font-size: $fontSize-Footer;
+  align-items: $verticalAlignment-Footer;
+  max-width: $maxWidth-content-Footer;
+  color: $textColor-Footer;
+  margin: $margin-Footer;
 
-    &.full {
-      max-width: $maxWidth-App;
-    }
+  &.full{
+    max-width: $maxWidth-App;
   }
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export {
-  themeVars: t.json-stringify($themeVars);
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

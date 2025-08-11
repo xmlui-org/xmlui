@@ -1,7 +1,9 @@
 %-DESC-START
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Essential features:**
+
+- **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
+- **Routing**: Built-in page routing via the [Pages](/components/Pages) component
 
 %-DESC-END
 
@@ -22,7 +24,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <List data="https://api.spacexdata.com/v3/history">
         <property name="itemTemplate">
@@ -43,7 +45,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal`
 
-```xmlui-pg copy name="Example: 'horizontal' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal' layout" height="350px"
 <App layout="horizontal">
   <AppHeader>
     <property name="logoTemplate">
@@ -55,7 +57,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -76,7 +78,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal-sticky`
 
-```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px"
 <App layout="horizontal-sticky">
   <AppHeader>
     <property name="logoTemplate">
@@ -88,7 +90,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -109,7 +111,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed`
 
-```xmlui-pg copy name="Example: 'condensed' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed' layout" height="350px"
 <App layout="condensed">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>
@@ -119,7 +121,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -140,7 +142,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed-sticky`
 
-```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px"
 <App layout="condensed-sticky">
   <property name="logoTemplate">
       <Heading level="h3" value="Example App"/>
@@ -150,7 +152,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -171,7 +173,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `vertical`
 
-```xmlui-pg copy name="Example: 'vertical' layout" height="300px" 
+```xmlui-pg copy name="Example: 'vertical' layout" height="300px"
 <App layout="vertical">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>
@@ -181,7 +183,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -212,7 +214,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -245,7 +247,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -264,8 +266,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
-
 %-PROP-END
 
 %-PROP-START scrollWholePage
@@ -278,7 +278,7 @@ The default value is `true`.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -303,7 +303,7 @@ Currently, there is no restriction on what the user data must look like.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="User name: {loggedInUser.name}" />
       <Text value="User token: {loggedInUser.token}" />
@@ -320,10 +320,29 @@ This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.
 
 ```xmlui-pg copy display name="Example: ready"
-  <App onReady="isAppReady = true">
-    <variable name="isAppReady" value="{false}"/>
-    <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
-  </App>
+<App onReady="isAppReady = true">
+  <variable name="isAppReady" value="{false}"/>
+  <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START messageReceived
+
+The event handler method has two parameters. The first is the message sent; the second is the entire native event object.
+
+```xmlui-pg copy display name="Example: messageReceived" /onMessageReceived/ /window.postMessage/
+<App 
+  var.message = "<none>" 
+  onMessageReceived="(msg, ev) => {
+    message = JSON.stringify(msg);
+    console.log('Message event received:', ev);
+  }">
+  <Button label="Send a message"
+    onClick="window.postMessage({type: 'message', messages:'Here you are!'})" />
+  <Text>Message received: {message}</Text>
+</App>
 ```
 
 %-EVENT-END

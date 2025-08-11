@@ -1,10 +1,10 @@
 # EmojiSelector [#emojiselector]
 
-The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.
+`EmojiSelector` enables users to browse, search and select emojis from their system's native emoji set.
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 

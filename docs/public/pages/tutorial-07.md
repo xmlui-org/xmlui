@@ -1,6 +1,6 @@
 # Invoices
 
-Here is the app's `Invoices` page, with a cached subset of data. To view the table full-width, and optionally make changes, use the <img src="/resources/pg-popout.svg" alt="" class="_htmlImage_1usjo_351" style="display: inline;"> icon to pop out to the full XMLUI playground.
+Here is the app's `Invoices` page, with a cached subset of data. To view the table full-width, and optionally make changes, use the ![](/resources/pg-popout.svg) icon to pop out to the full XMLUI playground.
 
 
 ```xmlui-pg
@@ -67,53 +67,46 @@ Here is the app's `Invoices` page, with a cached subset of data. To view the tab
 </Component>
 ```
 
-Here is the `Invoices` component. The `Create Invoice` button is disabled for this part of the demo.
+The `Create Invoice` button is disabled for this part of the demo.
 
-```xmlui /id="invoices"/ /url=/ /transformResult/ /ModalDialog id="detailsDialog"/ /InvoiceDetails/ /navigate/ /StatusBadge/ /id="detailsDialog"/ /data="{invoices}"/ /onClick="detailsDialog.open($item)"/ /Create Invoice/
+Here is the `Invoices` component.
+
+```xmlui /detailsDialog/
 <Component name="Invoices">
 
-    <DataSource
-        id="invoices"
-        url="/resources/files/invoices.json"
-        transformResult="{(data) => data.slice(0, 10)}"
-        method="GET"
-    />
+  <HStack>
+    <H1>Invoices</H1>
+    <SpaceFiller/>
+    <Button label="Create Invoice" onClick="navigate('/invoices/new')"/>
+  </HStack>
 
-    <Theme maxWidth-ModalDialog="50%">
-        <ModalDialog id="detailsDialog">
-            <InvoiceDetails details="{$params[0]}" />
-        </ModalDialog>
-    </Theme>
+  <Table data="/api/invoices">
+    <Column bindTo="invoice_number"/>
+    <Column bindTo="client"/>
+    <Column bindTo="issue_date"/>
+    <Column bindTo="due_date"/>
+    <Column bindTo="paid_date"/>
+    <Column bindTo="total">
+      ${$item.total}
+    </Column>
+    <Column bindTo="status">
+      <StatusBadge status="{$item.status}"/>
+    </Column>
+    <Column canSort="{false}" header="Details">
+      <Icon name="doc-outline" onClick="detailsDialog.open($item)"/>
+    </Column>
+  </Table>
 
-    <HStack>
-        <H1>Invoices</H1>
-        <SpaceFiller />
-        <Button enabled="false" label="Create Invoice" onClick="navigate('/invoices/new')" />
-    </HStack>
-
-    <Table data="{invoices}">
-        <Column canSort="true" bindTo="invoice_number" />
-        <Column canSort="true" bindTo="client" />
-        <Column canSort="true" bindTo="issue_date" />
-        <Column canSort="true" bindTo="due_date" />
-        <Column canSort="true" bindTo="paid_date" />
-        <Column canSort="true" header="total">
-            ${$item.total}
-        </Column>
-        <Column canSort="true" header="Status">
-            <StatusBadge enabled="{false}" status="{$item.status}" />
-        </Column>
-        <Column header="Details">
-            <Icon name="doc-outline" onClick="detailsDialog.open($item)" />
-        </Column>
-    </Table>
+  <ModalDialog id="detailsDialog" maxWidth="50%">
+    <InvoiceDetails details="{$param}"/>
+  </ModalDialog>
 
 </Component>
 ```
 
-The `id` attribute of the [DataSource](/components/DataSource) is set to `invoices` which matches the `data` attribute of the [Table](/components/Table). The `url` here refers to a static JSON file, normally it is the `/api/invoices` endpoint. The `transformResult` attribute reduces the sample data for our purposes here, normally it isn't used.
+## A ModalDialog
 
-The id attribute of the [ModalDialog](/components/ModalDialog) maps to the `onClick` handler of the `Details` column. That handler is also disabled for this part of the demo. We'll see later how, when clicked, it loads the `InvoiceDetails` component into a `ModalDialog`. Note that one way to set the `maxWidth-ModalDialog` is to wrap the `ModelDialog` in a [Theme](/components/Theme).
+The id attribute of the [ModalDialog](/components/ModalDialog) maps to the `onClick` handler of the `Details` column. We'll see later how, when clicked, it loads the `InvoiceDetails` component into a `ModalDialog`.
 
 When enabled, the `CreateInvoice` button uses the global function `navigate` to go to the page defined by the `CreateInvoice` component.
 

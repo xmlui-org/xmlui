@@ -19,46 +19,48 @@ $gap-avatar-Card: createThemeVar("gap-avatar-Card");
 $horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-Card");
 $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
 
-@layer components {
-  .wrapper {
-    @include t.borderVars($themeVars, $component);
-    @include t.paddingVars($themeVars, $component);
-    box-shadow: $boxShadow-Card;
-    background-color: $backgroundColor-Card;
+
+.wrapper {
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
+  box-shadow: $boxShadow-Card;
+  background-color: $backgroundColor-Card;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-Card;
+
+   .avatarWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: $verticalalAlignment-title-Card;
+    gap: $gap-avatar-Card;
+    min-width: 0;
+  }
+
+   .titleWrapper {
     display: flex;
     flex-direction: column;
-    gap: $gap-Card;
+    align-items: $horizontalAlignment-title-Card;
+    width: 100%;
+    gap: $gap-title-Card;
+    min-width: 0;
+  }
 
-    & .avatarWrapper {
-      display: flex;
-      flex-direction: row;
-      align-items: $verticalalAlignment-title-Card;
-      gap: $gap-avatar-Card;
-    }
+  &.horizontal {
+    flex-direction: row;
+    align-items: center;
+  }
 
-    & .titleWrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: $horizontalAlignment-title-Card;
-      width: 100%;
-      gap: $gap-title-Card;
-    }
+  &.vertical {  
+    flex-direction: column;
+  }
 
-    &.horizontal {
-      flex-direction: row;
-      align-items: center;
-    }
-
-    &.vertical {
-      flex-direction: column;
-    }
-
-    &.isClickable {
-      cursor: pointer;
-    }
+  &.isClickable {
+    cursor: pointer;
   }
 }
+
 // --- We export the theme variables to add them to the component renderer
-:export {
-  themeVars: t.json-stringify($themeVars);
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

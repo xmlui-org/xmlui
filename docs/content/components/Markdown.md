@@ -1,88 +1,57 @@
 # Markdown [#markdown]
 
-`Markdown` displays plain text styled using markdown syntax.
+`Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown).
 
-## Using Markdown [#using-markdown]
+**Key features:**
+- **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
+- **Dynamic content**: Use &#64;{} binding expressions to inject variables and function results
+- **File loading**: Load markdown content from external files using the `data` property
 
-The `Markdown` component allows you to specify its textual content in two ways:
-- You can leverage the `content` property. Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
-- You declare nested text.
+## Acquiring content [#acquiring-content]
 
-As whitespaces (such as spaces and line breaks) have significance in Markdown, you should wrap the text between the `<![CDATA[` and `]]>` XMLUI tags, which preserve all whitespaces.
+You can specify Markdown content in these ways.
 
-Indentation is also essential in Markdown. Start the markdown text in the first column as the following sample shows:
+### The content property [#the-content-property]
 
-```xmlui-pg copy display height="500px" name="Example: setting text"
-<App layout="horizontal-sticky">
-  <Markdown>
-    <![CDATA[
-# My Adventure in Markdown Land [#my-adventure-in-markdown-land]
+Render Markdown content that you calculate or get from other components.
 
-## The Beginning [#the-beginning]
+### The data property [#the-data-property]
 
-In the bustling city of Markdownville, I embarked on a journey to discover the 
-secrets of Markdown. My adventure started in the heart of the city, where the 
-first rule of Markdown was inscribed in stone:
+Render Markdown content from an URL.
 
-"To create a heading, add number signs (#) in front of a word or phrase.
-The number of number signs you use should correspond to the heading level."
+### Nested text [#nested-text]
 
-Headings give hierarchy to text but sometimes **emphasizing something with bold 
-is just enough**.
+Render Markdown content that you place directly in a Markdown component.
 
-If not bold, then simply *italic letters give visual diversity*.
+## Whitespace and special characters [#whitespace-and-special-characters]
 
-## Exploring Blockquotes [#exploring-blockquotes]
+Whitespace is significant in Markdown, for example headers using the `#` syntax must begin in column 1.
 
-As I journeyed further, I encountered blockquotes that spoke of the beauty of 
-simplicity:
+These special XML characters are significant too.
 
-> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between 
-> the paragraphs.
-> > Like so
-
-## The Power of Lists [#the-power-of-lists]
-
-I also discovered the power of lists, which were as versatile as the inhabitants 
-of Markdownville:
-
-- This is the first list item.
-- Here's the second list item.
-    - A subsection here would look great below the second list item.
-- And here's the third list item.
-
-I found that I can create ordered lists as well:
-
-1. The first item.
-2. The second item.
-3. Third item.
-
-## The Image [#the-image]
-
-Text is not the only thing I found through my journey. The power of images 
-materialized in front of me:
-
-![Colors image](/resources/images/components/markdown/colors.png)
-
-## Navigating with Hyperlinks [#navigating-with-hyperlinks]
-
-Hyperlinks, like signposts, marked other paths that branched off from the road 
-I was treading:
-- [Source of all truth](https://github.com/xmlui-com/xmlui)
-- [Back to where we started](https://ncrm.azurewebsites.net/)
-
-## The Horizontal Rule [#the-horizontal-rule]
-
-In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
-symbolizes the end of a section:
-
-***
-    ]]>
-  </Markdown>
-</App>
+```
+< (less than) - Must be escaped as &lt;
+> (greater than) - Must be escaped as &gt;
+& (ampersand) - Must be escaped as &amp;
+" (double quote) - Must be escaped as &quot; in attributes
+' (single quote/apostrophe) - Must be escaped as &apos; in attributes
 ```
 
-The `Markdown` component supports these syntax elements:
+You can use a CDATA section to avoid having to escape these characters individually.
+
+```
+<Markdown>
+  <![CDATA[
+  ]]>
+</Markdown>
+```
+
+Or, as we have done in this page, you can use a code fence (a block delimited by triple backtics) to preserve them.
+
+## Supported elements [#supported-elements]
+
+The `Markdown` component supports these basic elements.
+
 - Heading
 - Bold
 - Italic
@@ -94,25 +63,17 @@ The `Markdown` component supports these syntax elements:
 - Horizontal Rule
 - Link
 - Image
+- Table
 
-WIP elements:
-- Table (GFM syntax)
-- Tasklist (GFM syntax)
-- Footnote (GFM syntax)
-
-> **GFM** stands for Github Flavored Markdown
-
-These are also found in the **Basic Syntax** table of [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
-Note that further components may be added later,
-like elements from the [Github Flavored Markdown or GFM syntax](https://github.github.com/gfm/).
+See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
 
 ## Binding Expressions [#binding-expressions]
 
 Our `Markdown` component is capable of evaluating binding expressions just as other XMLUI components.
-Use the `@{}` syntax to wrap expressions that need to be evaluated.
+Use the &#64;{} syntax to wrap expressions that need to be evaluated.
 
-Empty `@{}` expressions are removed.
 Objects, functions and arrays will be stringified if you place them in `Markdown`.
+
 Function calls are executed and their return values inlined as strings into markdown.
 
 ```xmlui-pg copy {5-9} name="Example: binding expressions syntax"
@@ -138,21 +99,7 @@ This property sets the markdown content to display. Alternatively, you can nest 
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 
-```xmlui-pg copy display name="Example: content property"
-<App>
-  <VStack>
-    <Items data="{[
-      {id: 123, name: 'Peter Parker'},
-      {id: 234, name: 'Clark Kent'},
-      {id: 345, name: 'Bruce Wayne'}
-    ]}">
-      <Markdown content="{'## ' + $item.id + '\n*' + $item.name + '*' }"/>
-    </Items>
-  </VStack>
-</App>
-```
-
-### `removeIndents (default: true)` [#removeindents-default-true]
+### `removeIndents` (default: true) [#removeindents-default-true]
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 
@@ -164,17 +111,19 @@ This boolean property specifies whether leading indents should be removed from t
 
       ## The Beginning
 
-      In the bustling city of Markdownville, I embarked on a journey to 
-      discover the secrets of Markdown. My adventure started in the heart 
+      In the bustling city of Markdownville, I embarked on a journey to
+      discover the secrets of Markdown. My adventure started in the heart
       of the city, where the first rule of Markdown was inscribed in stone.
     ]]>
   </Markdown>
 </App>
 ```
 
-### `showHeadingAnchors (default: false)` [#showheadinganchors-default-false]
+### `showHeadingAnchors` [#showheadinganchors]
 
 This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.
+
+If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
 
 ## Events [#events]
 
@@ -186,163 +135,18 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-The component itself cannot be styled.
+The component itself cannot be styled, but the components that render the final text have customizable style variables.
 
-However, the components that are used render the final text, have customizable style variables.
-
-The components used to render the final styled text are either used as regular XMLUI components.
-See the links for styling details:
-[`Text`](./Text.mdx#styling)
-[`Heading`](./Heading.mdx#styling)
-[`Link`](./Link.mdx#styling)
-[`Image`](./Image.mdx#styling)
-[`Checkbox`](./Checkbox.mdx#styling)
-
-Or they are components specifically created and used in the Markdown component.
-
->[!INFO]
-> Components falling into this latter case are only available under the `Markdown` component. They cannot be instantiated in regular XMLUI.
-
-These markdown-specific components are the following:
-
-### Blockquote [#blockquote]
-
-A blockquote is a sentence or paragraph specially formatted to draw attention to the reader. You can use the following theme variables with blockquotes:
-
-- `accent-Blockquote`: sets the color of the strip running down on the left side of the block
-- `backgroundColor-Blockquote`: sets the background color
-- `margin-Blockquote`: sets the margin
-- `padding-Blockquote`: sets the padding
-- `borderRadius-Blockquote`: sets the radius of the border for the block
-- `boxShadow-Blockquote`: specifies the x offset, y offset, blur radius and color for the block shadow
-
-```xmlui-pg copy display name="Example: styling a horizontal rule" height="260px"
-<App>
-  <Theme
-    accent-Blockquote="transparent"
-    backgroundColor-Blockquote="rgba(27, 195, 50, 0.3)"
-    margin-Blockquote="8px"
-    padding-Blockquote="16px"
-    borderRadius-Blockquote="8px"
-    boxShadow-Blockquote="5px 10px 5px green"
-  >
-    <Markdown>
-      <![CDATA[
-> This text is in a blockquote.
-> > This one has an even bigger emphasis, since it is nested.
-> > > This one is nested even deeper.
-> Continue the original block.
-      ]]>
-    </Markdown>
-  </Theme>
-</App>
-```
-
-### HorizontalRule [#horizontalrule]
-
-This element visually separates content. The following theme variables influence how the rule looks like:
-
-- `borderColor-HorizontalRule`: changes the color
-- `borderStyle-HorizontalRule`: changes the border style to any [CSS border style](https://developer.mozilla.org/en-US/docs/Web/CSS/border-style), default is `solid`
-- `borderWidth-HorizontalRule`: changes how tall the rule should be, default is 1px
-
-```xmlui-pg copy display name="Example: styling a horizontal rule"
-<App>
-  <Theme 
-    borderColor-HorizontalRule="red"
-    borderWidth-HorizontalRule="8px"
-    borderStyle-HorizontalRule="dotted"
-  >
-    <Markdown>
-      <![CDATA[
-Section 1
-
----
-
-Section 2
-      ]]>
-    </Markdown>
-  </Theme>
-</App>
-```
-
->[!INFO]
-> The `HorizontalRule` component looks similar to the `ContentSeparator` component. They are not the same and are styled separately.
-
-### ListItem [#listitem]
-
-These are the supported theme variables in an ordered or unordered list:
-
-- `paddingLeft-ListItem`: determines how big the gap should be between the list item contents and the item marker
-
-```xmlui-pg copy display name="Example: styling a list item"
-<App>  
-  <Theme paddingLeft-ListItem="40px"> 
-    <Markdown>
-      <![CDATA[
-1. Get in the driver's seat and buckle up
-2. Insert the key into the ignition
-3. Put the gearstick in either the "P" or "N" position
-4. Twist the ignition key to start the car
-      ]]>
-    </Markdown>
-  </Theme>
-</App>
-```
-
-### OrderedList [#orderedlist]
-
-This element represents an ordered list with Arabic numbers as markers.
-Lists can be nested into one another; the counter will start anew if nested. Ordered lists support these theme variables:
-
-- `paddingLeft-OrderedList`: determines how much space the list should have from the left
-
-```xmlui-pg copy display name="Example: styling an ordered list"
-<App>
-  <Theme paddingLeft-OrderedList="80px">
-    <Markdown>
-      <![CDATA[
-1. Get in the driver's seat and buckle up
-2. Insert the key into the ignition
-3. Put the gearstick in either the "P" or "N" position
-4. Twist the ignition key to start the car
-    ]]>
-    </Markdown>
-  </Theme>
-</App>
-```
-
-### UnorderedList [#unorderedlist]
-
-This element represents an unordered list with marker symbols. Lists can be nested into one another; different levels of nested lists will have different markers. These are the theme variables unordered lists support:
-
-- `paddingLeft-UnorderedList`: determines how much space the list should have from the left
-
-```xmlui-pg copy display name="Example: styling an unordered list"
-<App>
-  <Theme paddingLeft-UnorderedList="80px">
-    <Markdown>
-      <![CDATA[
-- Get in the driver's seat and buckle up
-- Insert the key into the ignition
-- Put the gearstick in either the "P" or "N" position
-- Twist the ignition key to start the car
-- Know that cars may refuse to start for any number of reasons
-    - Consult your car's manual
-    - Take your car to a mechanic
-        - If all else fails, troubleshoot the car yourself
-      ]]>
-    </Markdown>
-  </Theme>
-</App>
-```
+[`Text`](/components/Text#styling)
+[`Heading`](/components/Heading#styling)
+[`Link`](/components/Link#styling)
+[`Image`](/components/Image#styling)
+[`Checkbox`](/components/Checkbox#styling)
 
 ### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| accentColor-Blockquote | $color-surface-500 | $color-surface-500 |
-| accentWidth-Blockquote | 3px | 3px |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition | $color-primary-100 | $color-primary-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-danger | $color-danger-100 | $color-danger-100 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Admonition-info | *none* | *none* |
@@ -370,10 +174,10 @@ This element represents an unordered list with marker symbols. Lists can be nest
 | [borderColor](../styles-and-themes/common-units/#color)-Admonition-warning | $color-warn-300 | $color-warn-300 |
 | [borderColor](../styles-and-themes/common-units/#color)-Blockquote | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-HorizontalRule | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Admonition | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Blockquote | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Admonition | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Blockquote | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Admonition | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Blockquote | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Admonition | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Blockquote | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Admonition | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Blockquote | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Admonition | *none* | *none* |
@@ -400,10 +204,10 @@ This element represents an unordered list with marker symbols. Lists can be nest
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Blockquote | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Admonition | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Blockquote | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Admonition | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Blockquote | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Admonition | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Blockquote | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Admonition | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Blockquote | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Admonition | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Blockquote | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Admonition | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Blockquote | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-HorizontalRule | *none* | *none* |
@@ -426,17 +230,17 @@ This element represents an unordered list with marker symbols. Lists can be nest
 | [borderWidth](../styles-and-themes/common-units/#size)-Admonition | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Blockquote | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-HorizontalRule | *none* | *none* |
-| direction-Text | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-accent-Blockquote | $color-surface-500 | $color-surface-500 |
+| [direction](../styles-and-themes/layout-props#direction)-Text | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-H1-markdown | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text | *none* | *none* |
-| fontVariant-Text | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-Text | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | *none* | *none* |
-| iconSize-Admonition | $space-5 | $space-5 |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| lineBreak-Text | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-Text | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Admonition | $space-7 | $space-7 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Blockquote | $space-7 | $space-7 |
@@ -479,18 +283,20 @@ This element represents an unordered list with marker symbols. Lists can be nest
 | [paddingTop](../styles-and-themes/common-units/#size)-Markdown | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Admonition | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Blockquote | *none* | *none* |
-| textAlign-Text | *none* | *none* |
-| textAlignLast-Text | *none* | *none* |
+| [size](../styles-and-themes/common-units/#size)-icon-Admonition | $space-5 | $space-5 |
+| [textAlign](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
 | [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text | *none* | *none* |
-| textIndent-Text | *none* | *none* |
-| textShadow-Text | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-Text | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-Text | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text | *none* | *none* |
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| wordBreak-Text | *none* | *none* |
-| wordSpacing-Text | *none* | *none* |
-| wordWrap-Text | *none* | *none* |
-| writingMode-Text | *none* | *none* |
+| [width](../styles-and-themes/common-units/#size)-accent-Blockquote | 3px | 3px |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-Text | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-Text | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-Text | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-Text | *none* | *none* |

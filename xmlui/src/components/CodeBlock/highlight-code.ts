@@ -4,16 +4,33 @@ const highlightRowsClass = "codeBlockHighlightRow";
 const highlightSubstringsClass = "codeBlockHighlightString";
 const highlightSubstringsEmphasisClass = "codeBlockHighlightStringEmphasis";
 
-/*
- * Encode string, returns base64 value
- * @Params: string
+/**
+ * Encode string to ASCII base64 value
  */
-export function encodeValue(value) {
+export function encodeToBase64(value: string | number | boolean | object | null) {
   if (!value) {
     return null;
   }
 
-  const valueToString = value.toString();
+  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
+
+  if (typeof window !== 'undefined') {
+    return window.btoa(valueToString);
+  }
+
+  const buff = Buffer.from(valueToString, 'ascii');
+  return buff.toString('base64');
+}
+
+/**
+ * Decode base64 value to string
+ */
+export function decodeFromBase64(value: string | number | boolean | object | null) {
+  if (!value) {
+    return null;
+  }
+
+  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
 
   if (typeof window !== "undefined") {
     return window.atob(valueToString);
@@ -36,84 +53,62 @@ export function parseMetaAndHighlightCode(
   codeHighlighter: CodeHighlighter,
   themeTone?: string,
 ): HighlighterResults | null {
-  const codeStr = mapTextContent(node);
-  const meta = extractMetaFromChildren(node, CodeHighlighterMetaKeysData, codeStr);
+  // parse
+  const rawCodeStr = getCodeStrFromNode(node);
+  const rawMeta = getCodeMetaFromNode(node, CodeHighlighterMetaKeysData);
+  // map
+  const codeStr = transformCodeLines(rawCodeStr);
+  const meta = extractMetaFromChildren(rawMeta, codeStr);
 
   const { language, ...restMeta } = meta;
   if (language && codeHighlighter.availableLangs.includes(language)) {
     // NOTE: Keep in mind, at this point, we are working with the markdown text
-    const htmlCodeStr = codeHighlighter.highlight(codeStr, language, restMeta, themeTone);
-    const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
-    const classNames = match ? match[1] : null;
+    try{
+      const htmlCodeStr = codeHighlighter.highlight(codeStr, language, restMeta, themeTone);
+      const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
+      const classNames = match ? match[1] : null;
 
-    // NOTE: Why remove the <pre>?
-    // Shiki appends <pre> tags to the highlighted code,
-    // so we would get <pre><pre><code>...</code></pre></pre>
-    let cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
+      // NOTE: Why remove the <pre>?
+      // Shiki appends <pre> tags to the highlighted code,
+      // so we would get <pre><pre><code>...</code></pre></pre>
+      let cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
 
-    const numberedRowClass = meta.rowNumbers ? "numbered" : "";
-    cleanedHtmlStr = cleanedHtmlStr.replaceAll(
-      /<span class="line"/g,
-      `<span class="line ${numberedRowClass}"`,
-    );
+      const numberedRowClass = meta.rowNumbers ? "numbered" : "";
+      cleanedHtmlStr = cleanedHtmlStr.replaceAll(
+        /<span class="line"/g,
+        `<span class="line ${numberedRowClass}"`,
+      );
 
-    return { classNames, cleanedHtmlStr, codeStr, meta };
+      return { classNames, cleanedHtmlStr, codeStr, meta };
+    } catch (e){
+      // this could happen in safari after the optimized build (some regexp issues, could be remix/vite/shiki related, TBD)
+      return {
+        meta,
+        codeStr,
+        cleanedHtmlStr: codeStr,
+        classNames: null
+      };
+    }
+
   }
   return null;
 }
 
-function mapTextContent(node: ReactNode): string {
+function getCodeStrFromNode(node: ReactNode) {
   if (typeof node === "string") {
-    return transformCodeLines(node);
+    return node;
   }
 
   if (isValidElement(node) && node.props && node.props.children) {
     if (Array.isArray(node.props.children)) {
-      return node.props.children.map(mapTextContent).join("");
+      return node.props.children.map(getCodeStrFromNode).join("");
     }
-    return mapTextContent(node.props.children);
+    return getCodeStrFromNode(node.props.children);
   }
   return "";
-
-  // ---
-
-  function transformCodeLines(node: string) {
-    const splitNode = node.split(/\r?\n/);
-    for (let i = 0; i < splitNode.length; i++) {
-      // Backslash before a codefence indicates an escaped codefence
-      // -> don't render the backslash
-      if (splitNode[i].startsWith("\\```")) {
-        splitNode[i] = splitNode[i].replace("\\```", "```");
-      }
-    }
-
-    // Remove empty lines from start and end
-    let startTrimIdx = 0;
-    let endTrimIdx = splitNode.length - 1;
-    for (let i = 0; i < splitNode.length; i++) {
-      if (splitNode[i].trim() !== "") {
-        startTrimIdx = i;
-        break;
-      }
-    }
-    for (let i = splitNode.length - 1; i >= 0; i--) {
-      if (splitNode[i].trim() !== "") {
-        endTrimIdx = i;
-        break;
-      }
-    }
-
-    splitNode.splice(0, startTrimIdx);
-    splitNode.splice(endTrimIdx + 1);
-    return splitNode.join("\n");
-  }
 }
 
-function extractMetaFromChildren(
-  node: ReactNode,
-  keys: string[],
-  code: string = "",
-): CodeHighlighterMeta {
+function getCodeMetaFromNode(node: ReactNode, keys: string[]) {
   if (!node) return {};
   if (typeof node === "string") return {};
   if (typeof node === "number") return {};
@@ -126,7 +121,7 @@ function extractMetaFromChildren(
     node.props.children &&
     typeof node.props.children === "string"
   ) {
-    const meta = Object.entries(node.props)
+    return Object.entries(node.props)
       .filter(([key, _]) => keys.includes(key))
       .reduce(
         (acc, [key, value]) => {
@@ -135,31 +130,69 @@ function extractMetaFromChildren(
         },
         {} as Record<string, any>,
       );
-
-    return {
-      [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
-      [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
-      [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
-      // NOTE: Row numbers are disabled for now, because applying the highlight class removes the "numbered" class
-      /* [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
-        meta[CodeHighlighterMetaKeys.rowNumbers.data],
-      ), */
-      [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
-        code.split("\n").length,
-        meta[CodeHighlighterMetaKeys.highlightRows.data],
-      ),
-      [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
-        code,
-        meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
-      ),
-      [CodeHighlighterMetaKeys.highlightSubstringsEmphasized.prop]: parseSubstringHighlights(
-        code,
-        meta[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data],
-        true,
-      ),
-    };
   }
   return {};
+}
+
+export function transformCodeLines(node: string) {
+  const splitNode = node.split(/\r?\n/);
+  for (let i = 0; i < splitNode.length; i++) {
+    // Backslash before a codefence indicates an escaped codefence
+    // -> don't render the backslash
+    if (splitNode[i].startsWith("\\```")) {
+      splitNode[i] = splitNode[i].replace("\\```", "```");
+    }
+  }
+
+  // Remove empty lines from start and end
+  let startTrimIdx = 0;
+  let endTrimIdx = splitNode.length - 1;
+  for (let i = 0; i < splitNode.length; i++) {
+    if (splitNode[i].trim() !== "") {
+      startTrimIdx = i;
+      break;
+    }
+  }
+  for (let i = splitNode.length - 1; i >= 0; i--) {
+    if (splitNode[i].trim() !== "") {
+      endTrimIdx = i;
+      break;
+    }
+  }
+
+  splitNode.splice(0, startTrimIdx);
+  splitNode.splice(endTrimIdx + 1);
+  return splitNode.join("\n");
+}
+
+export function extractMetaFromChildren(
+  meta: Record<string, any>,
+  code: string = "",
+): CodeHighlighterMeta {
+  if (!meta) return {};
+
+  return {
+    // NOTE: Row numbers are disabled for now, because applying the highlight class removes the "numbered" class
+    /* [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
+      meta[CodeHighlighterMetaKeys.rowNumbers.data],
+    ), */
+    [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
+    [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
+    [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
+    [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightRows.data],
+    ),
+    [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
+    ),
+    [CodeHighlighterMetaKeys.highlightSubstringsEmphasized.prop]: parseSubstringHighlights(
+      code,
+      meta[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data],
+      true,
+    ),
+  };
 }
 
 function parseBoolean(str?: string) {
@@ -168,40 +201,73 @@ function parseBoolean(str?: string) {
   return false;
 }
 
-function parseRowHighlights(codeLines: number, str?: string): ItemRowDecoration[] {
+function parseRowHighlights(code: string, str?: string): DecorationItem[] {
   if (!str) return [];
   if (str === "") return [];
+  const codeLines = code.split("\n");
   return str
     .split(",")
     .map((item) => {
       item = item.trim();
       const split = item.split("-");
-      let start = 0;
-      let end = 0;
+      let start = -1;
+      let end = -1;
 
       if (split.length === 0) return { start, end, properties: { class: highlightRowsClass } };
-      const val = parseAndRemoveIfInvalid(split[0]);
-      start = val - 1;
+      if (split.length > 2) return { start, end, properties: { class: highlightRowsClass } };
+      if (split[0] === "") return { start, end, properties: { class: highlightRowsClass } };
+      if (split[1] === "") return { start, end, properties: { class: highlightRowsClass } };
+      start = 0;
+      end = 0;
 
-      if (split.length === 1) {
-        end = val;
-      } else {
-        end = parseAndRemoveIfInvalid(split[1]);
+      // Start Index
+      const startIdx = validate(parse(split[0]));
+      start = getLineLengthIndex(startIdx);
+
+      // End Index
+      const endIdx = split.length === 1 ? startIdx : validate(parse(split[1]));
+      let endLineLength = 0;
+      if (endIdx >= 0 && codeLines[endIdx] !== undefined) {
+        endLineLength = codeLines[endIdx].length;
       }
+      end = getLineLengthIndex(endIdx) + endLineLength;
+
       return { start, end, properties: { class: highlightRowsClass } };
     })
     .filter((item) => {
-      if (item.start === -1 || item.end === -1) return false;
-      if (item.start > codeLines || item.end > codeLines) return false;
+      if (item.start <= -1 || item.end <= -1) return false;
+      if (item.start > code.length || item.end > code.length) return false;
       return true;
     });
 
-  function parseAndRemoveIfInvalid(value: string): number {
+  function parse(value: string): number {
     const parsed = parseInt(value, 10);
     if (Number.isNaN(parsed)) return -1;
-    if (parsed < 0) return -1;
-    if (parsed > codeLines) return -1;
     return parsed;
+  }
+
+  function validate(parsed: number): number {
+    // correct for 0-indexed array
+    parsed -= 1;
+    // check bounds
+    if (parsed < 0 || parsed >= codeLines.length) return -1;
+    return parsed;
+  }
+
+  function getLineLengthIndex(lineNumber: number) {
+    if (lineNumber < 0) return -1;
+    if (lineNumber === 0) return 0;
+
+    let count = 0;
+    let index = 0;
+    while (count < lineNumber && index !== -1) {
+      index = code.indexOf('\n', index);
+      if (index !== -1) {
+        index++; // Move past the '\n'
+        count++;
+      }
+    }
+    return (index !== -1) ? index : -1;
   }
 }
 
@@ -209,17 +275,17 @@ function parseSubstringHighlights(
   code: string,
   str?: string,
   emphasized = false,
-): ItemRowDecoration[] {
+): DecorationItem[] {
   if (!str) return [];
   if (!code) return [];
   return str
     .split(" ")
-    .map((item) => encodeValue(item))
+    .map((item) => decodeFromBase64(item))
     .filter((item) => item.trim() !== "")
     .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
 
   function findAllNonOverlappingSubstrings(str: string, code: string) {
-    const result: ItemRowDecoration[] = [];
+    const result: DecorationItem[] = [];
     let startIndex = 0;
     const searchLength = code.length;
 
@@ -268,11 +334,11 @@ export type CodeHighlighterMeta = {
   copy?: boolean;
   filename?: string;
   rowNumbers?: boolean;
-  highlightRows?: ItemRowDecoration[];
-  highlightSubstrings?: number[];
+  highlightRows?: DecorationItem[];
+  highlightSubstrings?: DecorationItem[];
 };
 
-type ItemRowDecoration = {
+type DecorationItem = {
   start: number;
   end: number;
   properties: { class?: string; style?: string };

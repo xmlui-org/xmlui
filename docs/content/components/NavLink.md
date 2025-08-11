@@ -1,6 +1,11 @@
 # NavLink [#navlink]
 
-The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link).
+`NavLink` creates interactive navigation items that connect users to different destinations within an app or external URLs. It automatically indicates active states, supports custom icons and labels, and can execute custom actions instead of navigation when needed.
+
+**Key features:**
+- **Custom actions**: Execute JavaScript code instead of navigation when using onClick handlers
+- **Visual customization**: Support for icons, labels, and completely custom nested content
+- **Accessibility support**: Proper focus management and keyboard navigation
 
 ## Using NavLink [#using-navlink]
 
@@ -36,7 +41,7 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
 
-```xmluipg copy {7} display name="Example: custom NavLink action" height="250px"
+```xmlui-pg copy {7} display name="Example: custom NavLink action" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -53,11 +58,11 @@ However, you can create a link that executes an explicit action responding to th
 
 ## Properties [#properties]
 
-### `active (default: false)` [#active-default-false]
+### `active` (default: false) [#active-default-false]
 
 This property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its [`displayActive`](#displayactive) property is set to `true`.
 
-### `displayActive (default: true)` [#displayactive-default-true]
+### `displayActive` (default: true) [#displayactive-default-true]
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
@@ -72,7 +77,7 @@ This Boolean property indicates if the active state of a link should have a visu
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -154,7 +159,7 @@ The following example opens the "About XMLUI" link in a new tab:
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" />
-    <NavLink label="About XMLUI" to="https://docs.xmlui.com/" target="_blank" />
+    <NavLink label="About XMLUI" to="https://docs.xmlui.org/" target="_blank" />
   </NavPanel>
   <Pages>
     <Page url="/">Home</Page>
@@ -237,8 +242,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavLink | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
@@ -253,8 +258,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavLink | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
@@ -293,7 +298,7 @@ This component does not expose any methods.
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | *none* | *none* |
 | [thickness](../styles-and-themes/common-units/#size)-indicator-NavLink | $space-0_5 | $space-0_5 |
-| wordWrap-NavLink | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-NavLink | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]
 

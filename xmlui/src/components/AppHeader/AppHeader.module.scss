@@ -15,7 +15,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 
 // --- Other
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
-$align-content-AppHeader: createThemeVar("align-content-#{$component}");
+$alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
 
 .header {
   position: relative;
@@ -53,7 +53,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   height: 100%;
   align-items: center;
   gap: var(--stack-gap-default);
-  justify-content: $align-content-AppHeader;
+  justify-content: $alignment-content-AppHeader;
 }
 
 .subNavPanelSlot{

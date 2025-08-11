@@ -74,14 +74,14 @@ $themeVarsTbody: ();
 $backgroundColor-HtmlTbody: createThemeVarTbody("backgroundColor-HtmlTbody");
 $textColor-HtmlTbody: createThemeVarTbody("textColor-HtmlTbody");
 $textAlign-HtmlTbody: createThemeVarTbody("textAlign-HtmlTbody");
-$verticalAlign-HtmlTbody: createThemeVarTbody("verticalAlign-HtmlTbody");
+$verticalAlignment-HtmlTbody: createThemeVarTbody("verticalAlignment-HtmlTbody");
 $textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 .htmlTbody {
   background-color: $backgroundColor-HtmlTbody;
   color: $textColor-HtmlTbody;
   text-align: $textAlign-HtmlTbody;
-  vertical-align: $verticalAlign-HtmlTbody;
+  vertical-align: $verticalAlignment-HtmlTbody;
   text-transform: $textTransform-HtmlTbody;
 }
 
@@ -184,7 +184,7 @@ $themeVarsTd: ();
 
 $backgroundColor-HtmlTd: createThemeVarTd("backgroundColor-HtmlTd");
 $text-align-HtmlTd: createThemeVarTd("text-align-HtmlTd");
-$verticalAlign-HtmlTd: createThemeVarTd("verticalAlign-HtmlTd");
+$verticalAlignment-HtmlTd: createThemeVarTd("verticalAlignment-HtmlTd");
 $fontSize-HtmlTd: createThemeVarTd("fontSize-HtmlTd");
 $fontWeight-HtmlTd: createThemeVarTd("fontWeight-HtmlTd");
 $themeVarsTd: t.composeBorderVars($themeVarsTd, "HtmlTd");
@@ -193,7 +193,7 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 .htmlTd {
   background-color: $backgroundColor-HtmlTd;
   text-align: $text-align-HtmlTd;
-  vertical-align: $verticalAlign-HtmlTd;
+  vertical-align: $verticalAlignment-HtmlTd;
   font-size: $fontSize-HtmlTd;
   font-weight: $fontWeight-HtmlTd;
   @include t.borderVars($themeVarsTd, "HtmlTd");

@@ -1,9 +1,10 @@
 # Slider
+
 The `Dashboard` page continues with a chart of daily revenue that uses a [Slider](/components/Slider) to control both ends of a date range.
 
 Here is a simplified version of that mechanism. Try using both slider handles to adjust the date range and corresponding total revenue.
 
-```xmlui-pg
+```xmlui-pg noHeader
 ---app display
 <App>
   <SliderDemo />
@@ -68,7 +69,6 @@ Here is a simplified version of that mechanism. Try using both slider handles to
       }"
       valueFormat="{ (value) => {
         const result = window.sliderValueToDate(value);
-        console.log('valueFormat result:', result);
         return result;
         }
       }"
@@ -117,13 +117,14 @@ Here's `SliderDemo`.
       }"
       valueFormat="{ (value) => {
         const result = window.sliderValueToDate(value);
-        console.log('valueFormat result:', result);
         return result;
         }
       }"
     />
 
-    <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
+    <Text>
+      Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}
+    </Text>
 
   </VStack>
 </Component>
@@ -133,3 +134,46 @@ When the handles move, the slider's `onDidChange` event updates `startDate` and 
 
 The slider's `valueFormat` property uses the same function to report the new `startDate` and `endDate`.
 
+## A custom Slider
+
+The Invoices app encapsulates this behavior in a custom component called `DateRangeSlider`.
+
+```xmlui /updateState/
+<Component name="DateRangeSlider">
+  <variable name="originalStartDate" value="{ $props.minDate }"/>
+  <variable name="maxEndDate" value="{ $props.maxDate }"/>
+  <variable name="startDate" value="{ originalStartDate }"/>
+  <variable name="endDate" value="{ maxEndDate }"/>
+  <variable
+    name="totalDays"
+    value="{ window.daysBetween(originalStartDate, maxEndDate)}"/>
+
+  <ChangeListener
+    listenTo="{slider.value}"
+    onDidChange="{() => {
+      // Update the start and end dates based on slider values
+      updateState({
+        value: {
+          startDate: window.sliderValueToDate(slider.value[0], originalStartDate),
+          endDate: window.sliderValueToDate(slider.value[1], originalStartDate)
+        }
+      });
+    }}"
+  />
+
+  <Slider
+    id="slider"
+    label="dateRange"
+    minValue="{0}"
+    maxValue="{ totalDays }"
+    initialValue="{ [0, totalDays] }"
+    step="10"
+    valueFormat="{ (value) => {
+      const date = window.sliderValueToDate(value, originalStartDate);
+      return date;
+    }}"
+  />
+</Component>
+```
+
+The `updateState` method, available in all components, is a merge operation that can set multiple variables.

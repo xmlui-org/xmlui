@@ -1,21 +1,26 @@
 # NumberBox [#numberbox]
 
-A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.
+`NumberBox` provides a specialized input field for numeric values with built-in validation, spinner buttons, and flexible formatting options. It supports both integer and floating-point numbers, handles empty states as null values, and integrates seamlessly with form validation.
 
-The `NumberBox` is an input control component and is often used in forms. See the [Using Forms](/learning/using-components/forms/) guide for details.
+**Key features:**
+- **Flexible numeric input**: Accepts integers, floating-point numbers, or empty values (stored as null)
+- **Input constraints**: Configure minimum/maximum values, integer-only mode, and positive-only restrictions
+- **Spinner buttons**: Built-in increment/decrement buttons with customizable step values and icons
+- **Visual adornments**: Add icons or text to the start and end of the input field
+- **Validation**: Built-in validation status indicators and form compatibility
+- **Smart paste handling**: Only accepts pasted content that results in valid numeric values
 
->[!INFO]
-> You can paste characters copied to the clipboard into a `NumberBox` only if the content with the pasted character results in a valid integer of float number (according to the `integersOnly` value). Otherwise, the paste operation is ignored.
+The `NumberBox` is often used in forms. See the [this guide](/forms) for details.
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -71,7 +76,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 This property defines the gap between the adornments and the input area.
 
-### `hasSpinBox (default: true)` [#hasspinbox-default-true]
+### `hasSpinBox` (default: true) [#hasspinbox-default-true]
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
 
@@ -94,7 +99,7 @@ The initial value displayed in the input field.
 </App>
 ```
 
-### `integersOnly (default: false)` [#integersonly-default-false]
+### `integersOnly` (default: false) [#integersonly-default-false]
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
@@ -109,11 +114,11 @@ This boolean property signs whether the input field accepts integers only (`true
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `NumberBox` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `NumberBox` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -174,7 +179,7 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -186,7 +191,7 @@ If true, the component's value cannot be modified with user interactions.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -238,7 +243,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `step (default: 1)` [#step-default-1]
+### `step` (default: 1) [#step-default-1]
 
 This prop governs how big the step when clicking on the spinner of the field.
 
@@ -252,7 +257,7 @@ Note that only integers are allowed to be entered.
 </App>
 ```
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -281,7 +286,7 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-### `zeroOrPositive (default: false)` [#zeroorpositive-default-false]
+### `zeroOrPositive` (default: false) [#zeroorpositive-default-false]
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 
@@ -341,11 +346,15 @@ This event is triggered when the `NumberBox` loses focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the NumberBox.
+This API focuses the input field of the `NumberBox`. You can use it to programmatically focus the field.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `NumberBox`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: number | undefined): void`
 
 You can use this method to set the component's current value programmatically.
 
@@ -368,7 +377,9 @@ You can use this method to set the component's current value programmatically.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API retrieves the current value of the `NumberBox`. You can use it to get the value programmatically.
+
+**Signature**: `get value(): number | undefined`
 
 You can query this read-only API property to get the input component's current value.
 
@@ -430,10 +441,18 @@ See an example in the `setValue` API method.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-warning--focus | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-warning--hover | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-NumberBox-default | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-NumberBox-error | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-NumberBox-success | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-NumberBox-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-NumberBox-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-NumberBox-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-NumberBox-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-NumberBox-warning | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-NumberBox-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-NumberBox-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-NumberBox-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-NumberBox-warning | *none* | *none* |
 | [gap](../styles-and-themes/common-units/#size)-adornment-NumberBox | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-NumberBox-default--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-NumberBox-error--focus | *none* | *none* |
@@ -451,10 +470,10 @@ See an example in the `setValue` API method.
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-warning--focus | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-NumberBox-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-NumberBox-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-NumberBox-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-NumberBox-warning | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-default | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-error | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-success | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default--focus | *none* | *none* |

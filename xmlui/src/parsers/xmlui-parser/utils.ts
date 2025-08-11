@@ -1,5 +1,5 @@
 import type { Node } from "./syntax-node";
-import { GetText } from "./parser";
+import type { GetText } from "./parser";
 import { SyntaxKind, getSyntaxKindStrRepr, isInnerNode } from "./syntax-kind";
 
 export function toDbgString(
@@ -24,7 +24,11 @@ export function toDbgString(
 }
 
 /** Disregards error nodes amongst the children of the 2 compared name node. (Those reported an error earlyer anyways)*/
-export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText: GetText): boolean {
+export function tagNameNodesWithoutErrorsMatch(
+  name1: Node,
+  name2: Node,
+  getText: GetText,
+): boolean {
   const children1 = name1.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
   const children2 = name2.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
 
@@ -41,27 +45,26 @@ export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText
 
 /** If the position is in-between two tokens, the chain to the token just before the cursor is provided as well*/
 export type FindTokenSuccess =
-{
-  chainAtPos: Node[];
+  | {
+      chainAtPos: Node[];
 
-  /** If the position is in-between two tokens, the chain to the token just before the position is provided. */
-  chainBeforePos: Node[];
+      /** If the position is in-between two tokens, the chain to the token just before the position is provided. */
+      chainBeforePos: Node[];
 
-  /**
-  * This field specifies the first index where
-  * `chainBeforePos` differs from chainAtPos
-  */
-  sharedParents: number;
-} |
-{
-  chainBeforePos: undefined;
-  chainAtPos: Node[];
-  sharedParents: undefined;
-};
+      /**
+       * This field specifies the first index where
+       * `chainBeforePos` differs from chainAtPos
+       */
+      sharedParents: number;
+    }
+  | {
+      chainBeforePos: undefined;
+      chainAtPos: Node[];
+      sharedParents: undefined;
+    };
 
 export function findTokenAtPos(node: Node, position: number): FindTokenSuccess | undefined {
   const chain: Node[] = [node];
-  let chainBeforePos: Node[];
   let sharedParents: number;
 
   if (node.start > position || position > node.end) {
@@ -71,7 +74,7 @@ export function findTokenAtPos(node: Node, position: number): FindTokenSuccess |
   const res: FindTokenSuccess = {
     chainAtPos: chain,
     chainBeforePos: undefined,
-    sharedParents: undefined
+    sharedParents: undefined,
   };
 
   while (node.children !== undefined && node.children.length > 0) {

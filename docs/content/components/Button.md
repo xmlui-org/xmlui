@@ -1,16 +1,20 @@
 # Button [#button]
 
-Button is an interactive element that triggers an action when clicked.
+`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.
 
-Use the `Button` component to trigger various actions.
+**Key features:**
+- **Visual hierarchy**: Choose from `solid`, `outlined`, or `ghost` variants to indicate importance
+- **Theme colors**: Use `primary`, `secondary`, or `attention` colors for different action types
+- **Icon support**: Add icons before or after text, or create icon-only buttons
+- **Form integration**: Automatically handles form submission when used in forms
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 Indicates if the button should receive focus when the page loads.
 
-### `contentPosition (default: "center")` [#contentposition-default-center]
+### `contentPosition` (default: "center") [#contentposition-default-center]
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
@@ -37,7 +41,7 @@ Available values:
 
 This optional value is used to provide an accessible name for the Button in the context of its usage.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
 
@@ -64,7 +68,7 @@ This string value denotes an icon name. The framework will render an icon if XML
 </App>
 ```
 
-### `iconPosition (default: "start")` [#iconposition-default-start]
+### `iconPosition` (default: "start") [#iconposition-default-start]
 
 This optional string determines the location of the icon in the Button.
 
@@ -115,7 +119,7 @@ This property is an optional string to set a label for the Button. If no label i
 </App>
 ```
 
-### `orientation (default: "horizontal")` [#orientation-default-horizontal]
+### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
 This property sets the main axis along which the nested components are rendered.
 
@@ -126,7 +130,7 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally **(default)** |
 | `vertical` | The component will fill the available space vertically |
 
-### `size (default: "sm")` [#size-default-sm]
+### `size` (default: "sm") [#size-default-sm]
 
 Sets the size of the button.
 
@@ -134,10 +138,10 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `xs` | Extra small button |
-| `sm` | Small button **(default)** |
-| `md` | Medium button |
-| `lg` | Large button |
+| `xs` | Extra small |
+| `sm` | Small **(default)** |
+| `md` | Medium |
+| `lg` | Large |
 
 ```xmlui-pg copy display name="Example: size"
 <App>
@@ -158,7 +162,7 @@ Available values:
 </App>
 ```
 
-### `themeColor (default: "primary")` [#themecolor-default-primary]
+### `themeColor` (default: "primary") [#themecolor-default-primary]
 
 Sets the button color scheme defined in the application theme.
 
@@ -180,7 +184,7 @@ Available values:
 </App>  
 ```
 
-### `type (default: "button")` [#type-default-button]
+### `type` (default: "button") [#type-default-button]
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
@@ -192,7 +196,7 @@ Available values:
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
 | `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
 
-### `variant (default: "solid")` [#variant-default-solid]
+### `variant` (default: "solid") [#variant-default-solid]
 
 The button variant determines the level of emphasis the button should possess.
 
@@ -263,7 +267,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```xmlui-pg copy display name="Example: Buttons with fixed width"
+```xmlui-pg copy name="Example: Buttons with fixed width"
 <App>
   <HStack>
     <Theme width-Button="120px">

@@ -1,6 +1,6 @@
 # ToneChangerButton [#tonechangerbutton]
 
-The `ToneChangerButton` component is a component that allows the user to change the tone of the app.
+`ToneChangerButton` enables the user to switch between light and dark modes.
 
 ```xmlui-pg {4} copy display name="Example: using ToneChangerButton"
 <App>
@@ -17,17 +17,19 @@ The `ToneChangerButton` component is a component that allows the user to change 
 
 ## Properties [#properties]
 
-### `darkToLightIcon (default: "darkToLight:ToneChangerButton")` [#darktolighticon-default-darktolight-tonechangerbutton]
+### `darkToLightIcon` (default: "darkToLight:ToneChangerButton") [#darktolighticon-default-darktolight-tonechangerbutton]
 
 The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the "icon.darkToLight:ToneChangerButton" declaration in the app configuration file.
 
-### `lightToDarkIcon (default: "lightToDark:ToneChangerButton")` [#lighttodarkicon-default-lighttodark-tonechangerbutton]
+### `lightToDarkIcon` (default: "lightToDark:ToneChangerButton") [#lighttodarkicon-default-lighttodark-tonechangerbutton]
 
 The icon displayed when the theme is in light mode and will switch to dark. You can change the default icon for all ToneChangerButton instances with the "icon.lightToDark:ToneChangerButton" declaration in the app configuration file.
 
 ## Events [#events]
 
-This component does not have any events.
+### `click` [#click]
+
+This event is triggered when the ToneChangerButton is clicked.
 
 ## Exposed Methods [#exposed-methods]
 

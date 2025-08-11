@@ -1,6 +1,6 @@
 # Redirect [#redirect]
 
-`Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app.
+`Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally.
 
 ## Using `Redirect` [#using-redirect]
 
@@ -39,7 +39,7 @@ The following app demonstrates two different patterns for using `Redirect`.
 
 ## Properties [#properties]
 
-### `to (default: "")` [#to-default-]
+### `to` (default: "") [#to-default-]
 
 This property defines the URL to which this component is about to redirect requests.
 

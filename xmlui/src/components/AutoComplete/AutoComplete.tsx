@@ -1,6 +1,5 @@
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
@@ -24,16 +23,21 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLabelBreak,
+  createMetadata,
+  d,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
+import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "AutoComplete";
 
 export const AutoCompleteMd = createMetadata({
-  description:
-    "This component is a dropdown with a list of options. According to the " +
-    "`multi` property, the user can select one or more items.",
   status: "experimental",
+  description:
+    "`AutoComplete` is a searchable dropdown input that allows users to type and " +
+    "filter through options, with support for single or multiple selections. Unlike " +
+    "a basic [`Select`](/components/Select), it provides type-ahead functionality " +
+    "and can allow users to create new options.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -80,7 +84,7 @@ export const AutoCompleteMd = createMetadata({
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
     ),
   },
@@ -90,11 +94,25 @@ export const AutoCompleteMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This method focuses the ${COMP} component.`,
+      signature: "focus()",
+    },
+    value: {
+      description:
+        "This API allows you to get or set the value of the component. If no value is set, " +
+        "it will retrieve `undefined`.",
+      signature: "get value(): any",
+    },
+    setValue: {
+      description:
+        "This API allows you to set the value of the component. If the value is not valid, " +
+        "the component will not update its internal state.",
+      signature: "setValue(value: any)",
+      parameters: {
+        value: "The value to set.",
+      },
+    },
   },
   contextVars: {
     $item: d(
@@ -163,11 +181,15 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         optionRenderer={
           node.props.optionTemplate
-            ? (item) => {
+            ? (item, val, inTrigger) => {
                 return (
                   <MemoizedItem
                     node={node.props.optionTemplate}
                     item={item}
+                    context={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
                     renderChild={renderChild}
                   />
                 );

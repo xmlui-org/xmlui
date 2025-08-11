@@ -1,16 +1,20 @@
 import { basename, extname, join } from "path";
 import { existsSync, writeFileSync } from "fs";
-import { unlink, readFile, writeFile, readdir } from "fs/promises";
+import { unlink, readFile, writeFile, readdir, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
-import { createTable, strBufferToLines, toHeadingPath } from "./utils.mjs";
+import { getSectionBeforeAndAfter, strBufferToLines, toHeadingPath } from "./utils.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
+import { 
+  FILE_EXTENSIONS, 
+  OUTPUT_FILES, 
+  ERROR_MESSAGES,
+  METADATA_SECTIONS
+} from "./constants.mjs";
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
-const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
-const DEFAULT_STATUS = "stable";
 
 export class DocsGenerator {
   metadata = [];
@@ -40,7 +44,6 @@ export class DocsGenerator {
         const displayName = compName;
         const componentFolder = compData.specializedFrom || compData.docFolder || compName;
         const descriptionRef = join(componentFolder, `${displayName}.md`);
-
         const extendedComponentData = {
           ...compData,
           displayName,
@@ -50,10 +53,10 @@ export class DocsGenerator {
         };
 
         const entries = addDescriptionRef(extendedComponentData, [
-          "props",
-          "events",
-          "apis",
-          "contextVars",
+          METADATA_SECTIONS.PROPS,
+          METADATA_SECTIONS.EVENTS,
+          METADATA_SECTIONS.API,
+          METADATA_SECTIONS.CONTEXT_VARS,
         ]);
         return { ...extendedComponentData, ...entries };
       });
@@ -72,18 +75,49 @@ export class DocsGenerator {
    */
   writeMetaSummary(metaFileContents, outputFolder) {
     try {
-      writeFileSync(join(outputFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+      writeFileSync(join(outputFolder, FILE_EXTENSIONS.METADATA), JSON.stringify(metaFileContents, null, 2));
     } catch (e) {
-      logger.error("Could not write _meta file: ", e?.message || "unknown error");
+      logger.error(ERROR_MESSAGES.WRITE_META_FILE_ERROR, e?.message || ERROR_MESSAGES.UNKNOWN_ERROR);
     }
   }
 
-  async exportMetadataToJson() {
+  async exportMetadataToJson(folderName, filename) {
     logger.info("Exporting metadata to JSON");
     try {
+      const outPath = join(FOLDERS.script, "metadata", folderName ?? "");
+      if (!existsSync(outPath)) {
+        await mkdir(outPath, { recursive: true });
+      }
       await writeFile(
-        join(FOLDERS.script, "metadata.json"),
+        join(outPath, `${filename ? `${filename}-` : ""}${OUTPUT_FILES.METADATA_JSON}`),
         JSON.stringify(this.metadata, null, 2),
+      );
+    } catch (error) {
+      processError(error);
+    }
+  }
+
+  /**
+   * Creates the metadata JSON for the landing page to link components to the documentation.
+   * @param {string} docsUrl docs site base URL
+   * @param {string} pathToEndpoint the path that leads to the component articles on the site
+   */
+  async createMetadataJsonForLanding(docsUrl, pathToEndpoint) {
+    logger.info("Creating metadata JSON for landing page");
+    try {
+      const dataForLanding = this.metadata.map((component) => ({
+        displayName: component.displayName,
+        description: component.description,
+        docFileLink: new URL(`${pathToEndpoint}/${component.displayName}`, docsUrl).href,
+      }));
+      const distMetaFolder = join(FOLDERS.xmluiDist, "metadata");
+      if (!existsSync(distMetaFolder)) {
+        await mkdir(distMetaFolder, { recursive: true });
+      }
+
+      await writeFile(
+        join(distMetaFolder, OUTPUT_FILES.LANDING_METADATA_JSON),
+        JSON.stringify(dataForLanding, null, 2),
       );
     } catch (error) {
       processError(error);
@@ -116,48 +150,11 @@ export class DocsGenerator {
     }
   }
 
-  /**
-   * Generates the component summary table and adds it to the provided file.
-   * The function looks for the summary section in the provided file and regenerates it if present,
-   * otherwise it appends one to the end of the file.
-   * @param {string} summarySectionName The section to look for and add the summary to
-   * @param {string?} summaryFileName The full path and name of the file to add the summary to
-   * @param {boolean?} hasRowNums Whether to add row numbers to the summary table
-   */
-  async generateComponentsSummary(summarySectionName, summaryFileName, hasRowNums) {
-    logger.info("Creating components summary");
-    try {
-      const outFile = summaryFileName || join(this.folders.outFolder, `_overview.md`);
-      if (!existsSync(outFile)) {
-        await writeFile(outFile, "");
-      }
-
-      const fileContents = await readFile(outFile, "utf8");
-
-      const table = createSummary(
-        this.metadata,
-        this.folders.sourceFolder,
-        this.folders.outFolder,
-        hasRowNums,
-      );
-      let { beforeSection, afterSection } = getSectionBeforeAndAfter(
-        fileContents,
-        summarySectionName,
-      );
-
-      beforeSection = beforeSection.length > 0 ? beforeSection + "\n\n" : beforeSection;
-      const summary = beforeSection + `${summarySectionName}\n\n` + table + "\n" + afterSection;
-      await writeFile(outFile, summary);
-    } catch (error) {
-      processError(error);
-    }
-  }
-
   async generatePermalinksForHeaders() {
     logger.info("Generating permalinks for file headings");
 
     const docFiles = existsSync(this.folders.outFolder)
-      ? (await readdir(this.folders.outFolder)).filter((file) => extname(file) === ".md")
+      ? (await readdir(this.folders.outFolder)).filter((file) => extname(file) === FILE_EXTENSIONS.MARKDOWN[0])
       : [];
 
     for (const file of docFiles) {
@@ -171,7 +168,7 @@ export class DocsGenerator {
 
   async generateArticleAndDownloadsLinks() {
     try {
-      const pagesMapFile = join(FOLDERS.docsMeta, "pages.js");
+      const pagesMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.PAGES_MAP);
       if (existsSync(pagesMapFile)) {
         await unlink(pagesMapFile);
         await writeFile(pagesMapFile, "");
@@ -180,7 +177,7 @@ export class DocsGenerator {
       logger.info("Generating link IDs for article headings");
       buildPagesMap(FOLDERS.pages, pagesMapFile);
 
-      const downloadsMapFile = join(FOLDERS.docsMeta, "downloads.js");
+      const downloadsMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.DOWNLOADS_MAP);
       if (existsSync(downloadsMapFile)) {
         await unlink(downloadsMapFile);
         await writeFile(downloadsMapFile, "");
@@ -194,65 +191,6 @@ export class DocsGenerator {
   }
 }
 
-/**
- * The summary file may contain further sections other than the summary table.
- * Thus, we only (re)generate the section that contains the summary table.
- * This is done by finding the heading for the start of the summary table section
- * and either the end of file or the next section heading.
- * @param {string} buffer the string containing the file contents
- * @param {string} sectionHeading The section to look for, has to have heading level as well
- */
-function getSectionBeforeAndAfter(buffer, sectionHeading) {
-  if (!sectionHeading) {
-    return { beforeSection: buffer, afterSection: "" };
-  }
-
-  const lines = strBufferToLines(buffer);
-  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
-
-  // Handle case where sectionHeading isn't found
-  if (sectionStartIdx === -1) {
-    return { beforeSection: buffer, afterSection: "" };
-  }
-
-  // Find the next heading after the section start
-  const afterLines = lines.slice(sectionStartIdx + 1);
-  const sectionEndIdx = afterLines.findIndex((line) => /^#+\s/.test(line));
-  const endIdx = sectionEndIdx === -1 ? afterLines.length : sectionEndIdx;
-
-  const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
-  const afterSection = afterLines.slice(0, endIdx).join("\n");
-
-  return { beforeSection, afterSection };
-}
-
-function createSummary(metadata, srcFolder, outFolder, hasRowNums = true) {
-  const headers = [
-    { value: "Component", style: "center" },
-    "Description",
-    //{ value: "Status", style: "center" },
-  ];
-  const rows = metadata
-    .sort((a, b) => a.displayName.localeCompare(b.displayName))
-    .filter((component) => {
-      const componentStatus = component.status ?? DEFAULT_STATUS;
-      return !ACCEPTED_STATUSES.includes(componentStatus) ? false : true;
-    })
-    .map((component) => {
-      const componentFilePath = join(outFolder, `${component.displayName}.md`);
-      const componentUrl = `./${basename(srcFolder)}/${component.displayName}`;
-      return [
-        existsSync(componentFilePath)
-          ? `[${component.displayName}](${componentUrl})`
-          : component.displayName,
-        component.description,
-        //component.status ?? DEFAULT_STATUS,
-      ];
-    });
-
-  return createTable({ headers, rows, rowNums: hasRowNums });
-}
-
 function addDescriptionRef(component, entries = []) {
   const result = {};
 
@@ -261,7 +199,7 @@ function addDescriptionRef(component, entries = []) {
       if (component[entry]) {
         result[entry] = Object.fromEntries(
           Object.entries(component[entry]).map(([k, v]) => {
-            v.descriptionRef = `${component.componentFolder}/${component.displayName}.md?${k}`;
+            v.descriptionRef = `${component.displayName}.md?${k}`;
             return [k, v];
           }),
         );

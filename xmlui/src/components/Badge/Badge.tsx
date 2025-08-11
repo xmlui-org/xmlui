@@ -1,6 +1,5 @@
 import styles from "./Badge.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
@@ -10,14 +9,17 @@ import {
   isBadgeColors,
   type BadgeColors,
 } from "./BadgeNative";
-import { dInternal } from "../metadata-helpers";
+import { createMetadata, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
 const COMP = "Badge";
 
 export const BadgeMd = createMetadata({
   status: "stable",
-  description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
+  description:
+    "`Badge` displays small text labels with colored backgrounds, commonly used for " +
+    "status indicators, categories, tags, and counts. It supports dynamic color " +
+    "mapping based on content values, useful for status systems and data categorization.",
   props: {
     value: {
       description:

@@ -1,7 +1,7 @@
 import type { Dispatch } from "react";
 import { createContext, useContext, useContextSelector } from "use-context-selector";
 
-import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type { ContainerAction } from "../../components-core/rendering/containers";
 import type { FormAction } from "../Form/formActions";
 import type { LabelPosition } from "../abstractions";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
@@ -99,6 +99,11 @@ export const FormContext = createContext<IFormContext>(undefined as unknown as I
 
 export function useFormContextPart<T = unknown>(selector: (value: IFormContext) => T) {
   return useContextSelector(FormContext, selector);
+}
+
+export function useIsInsideForm(){
+  const contextPart = useFormContextPart((value) => value?.dispatch);
+  return contextPart !== undefined;
 }
 
 export const formControlTypes = [

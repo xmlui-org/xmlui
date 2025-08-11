@@ -1,6 +1,11 @@
 # DropdownMenu [#dropdownmenu]
 
-This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
+`DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space.
+
+**Key features:**
+- **Hierarchical organization**: Supports nested submenus for complex menu structures
+- **Flexible triggers**: Customizable button trigger or use your own trigger component
+- **Progressive disclosure**: Reveals options on demand
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
@@ -23,7 +28,7 @@ Try this dropdown menu:
 
 ## Properties [#properties]
 
-### `alignment (default: "start")` [#alignment-default-start]
+### `alignment` (default: "start") [#alignment-default-start]
 
 This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
@@ -56,7 +61,7 @@ Available values are:
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -85,11 +90,11 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `triggerButtonIcon (default: "triggerButton:DropdownMenu")` [#triggerbuttonicon-default-triggerbutton-dropdownmenu]
+### `triggerButtonIcon` (default: "triggerButton:DropdownMenu") [#triggerbuttonicon-default-triggerbutton-dropdownmenu]
 
 This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the "icon.triggerButton:DropdownMenu" declaration in the app configuration file.
 
-### `triggerButtonIconPosition (default: "end")` [#triggerbuttoniconposition-default-end]
+### `triggerButtonIconPosition` (default: "end") [#triggerbuttoniconposition-default-end]
 
 This property defines the position of the icon on the trigger button.
 
@@ -100,7 +105,7 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
 
-### `triggerButtonThemeColor (default: "primary")` [#triggerbuttonthemecolor-default-primary]
+### `triggerButtonThemeColor` (default: "primary") [#triggerbuttonthemecolor-default-primary]
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -112,7 +117,7 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-### `triggerButtonVariant (default: "ghost")` [#triggerbuttonvariant-default-ghost]
+### `triggerButtonVariant` (default: "ghost") [#triggerbuttonvariant-default-ghost]
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -145,7 +150,7 @@ This property allows you to define a custom trigger instead of the default one p
 
 ### `willOpen` [#willopen]
 
-This event fires when the `DropdownMenu` component is opened.
+This event fires when the `DropdownMenu` component is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal.
 
 ```xmlui-pg copy {6} display name="Example: willOpen" height="240px"
 <App>
@@ -167,11 +172,31 @@ This event fires when the `DropdownMenu` component is opened.
 
 This method command closes the dropdown.
 
+**Signature**: `close(): void`
+
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
-  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
     <EmojiSelector
-      onSelect="(reaction) => { emojiDropDown.close(); }"
+      onSelect="(reaction) => { emojiDropdown.close(); }"
+      autoFocus="true"
+    />
+  </DropdownMenu>
+</App>
+```
+
+### `open` [#open]
+
+This method command opens the dropdown.
+
+**Signature**: `open(): void`
+
+```xmlui-pg copy {2} display name="Example: open" height="300px"
+<App>
+  <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
+    <EmojiSelector
+      onSelect="(reaction) => { emojiDropdown.close(); }"
       autoFocus="true"
     />
   </DropdownMenu>

@@ -1,6 +1,6 @@
 # Structure of an XMLUI app
 
-The [demo app](tbd) exhibits the typical structure of an XMLUI app.
+The [XMLUI Invoice demo app](https://github.com/xmlui-org/xmlui-invoice/releases) exhibits the typical structure of an XMLUI app.
 
 ```xmlui-tree
 <root>
@@ -29,14 +29,14 @@ The [demo app](tbd) exhibits the typical structure of an XMLUI app.
   xmlui-test-server
 ```
 
-> [!INFO] The `xmlui` folder contains the xmlui engine with a version number, specifically `0.9.23.js`. I recommend this practice in order to know when/whether to upgrade.
+> [!INFO] The `xmlui` folder contains the xmlui engine with a version number, specifically `0.9.23.js`. We recommend this practice in order to know when/whether to upgrade.
 
 
 | file| description |
 |---|---|
 | **`index.html`** | The default webpage to display |
 | **`Main.xmlui`** | The XMLUI app's entry point |
-| **`config.json`** | The XMLUI app's [configuration file](/resources#configuration-file) |
+| **`config.json`** | The XMLUI app's configuration file |
 | **`components`** | The folder with your custom components |
 | **`resources`** | The folder with static app resources |
 | **`themes`** | The folder with your custom themes |

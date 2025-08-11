@@ -1,14 +1,24 @@
 # Switch [#switch]
 
-The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.
+`Switch` enables users to toggle between two states: on and off.
+
+## Switch Values [#switch-values]
+
+The `initialValue` and `value` properties of the switch are transformed to a Boolean value to display the on (`true`) or off (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -30,11 +40,7 @@ it is `true` by default.
 </App>
 ```
 
-### `indeterminate (default: false)` [#indeterminate-default-false]
-
-The `true` value of this property signals that the component is in an _intedeterminate state_.
-
-### `initialValue (default: false)` [#initialvalue-default-false]
+### `initialValue` (default: false) [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
@@ -51,11 +57,11 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `Switch` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")` [#labelposition-default-end]
+### `labelPosition` (default: "end") [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -81,7 +87,7 @@ Available values:
 
 This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -94,11 +100,11 @@ If true, the value of the component cannot be modified.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -154,9 +160,13 @@ This event is triggered when the Switch has lost the focus.
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `Switch`. You can use it to programmatically change the value.
 
-```xmlui-pg copy {9,12,14} display name="Example: value and setValue"
+**Signature**: `setValue(value: boolean): void`
+
+- `value`: The new value to set. Can be either true (on) or false (off).
+
+```xmlui-pg copy {10,13,15} display name="Example: value and setValue"
 <App var.changes="">
   <Switch
     id="mySwitch"
@@ -178,7 +188,9 @@ You can use this method to set the component's current value programmatically (`
 
 ### `value` [#value]
 
-You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
+This property holds the current value of the Switch, which can be either "true" (on) or "false" (off).
+
+**Signature**: `get value():boolean`
 
 ## Styling [#styling]
 
@@ -195,11 +207,12 @@ You can query this read-only API property to query the component's current value
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
 | [backgroundColor](../styles-and-themes/common-units/#color)-indicator-checked-Switch | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-indicator-Switch | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-indicator-Switch | $color-surface-400 | $color-surface-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-0 | $color-surface-0 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-0 | $color-surface-0 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch-indicator--disabled | $backgroundColor-primary | $backgroundColor-primary |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |

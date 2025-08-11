@@ -4,7 +4,7 @@ import selectStyles from "./Select.module.scss";
 import { usePlayground } from "../hooks/usePlayground";
 import { contentChanged } from "../state/store";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
-import { CompoundComponentDef, ThemeDefinition, useTheme } from "xmlui";
+import { Button, CompoundComponentDef, Icon, ThemeDefinition, useTheme } from "xmlui";
 
 export const SelectItem = React.forwardRef(
   ({ children, className, ...props }: any, forwardedRef) => {
@@ -49,11 +49,13 @@ export const CodeSelector = () => {
       value={options.content}
       onValueChange={(value) => dispatch(contentChanged(value))}
     >
-      <RadixSelect.Trigger className={selectStyles.SelectTrigger} aria-label="component">
-        <RadixSelect.Value>{selectedValue}</RadixSelect.Value>
-        <RadixSelect.Icon className={selectStyles.SelectIcon}>
-          {open ? <HiChevronUp /> : <HiChevronDown />}
-        </RadixSelect.Icon>
+      <RadixSelect.Trigger aria-label="component">
+        <Button themeColor="primary" variant="ghost">
+          <RadixSelect.Value>{selectedValue}</RadixSelect.Value>
+          <RadixSelect.Icon className={selectStyles.SelectIcon}>
+            {open ? <Icon name="chevronup" /> : <Icon name="chevrondown" />}
+          </RadixSelect.Icon>
+        </Button>
       </RadixSelect.Trigger>
       <RadixSelect.Portal container={root}>
         <RadixSelect.Content

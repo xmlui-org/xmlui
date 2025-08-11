@@ -1,8 +1,9 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
+import { createMetadata, dClick } from "../metadata-helpers";
+import { noop } from "lodash-es";
 
 const COMP = "ToneChangerButton";
 const LIGHT_TO_DARK_ICON = "lightToDark:ToneChangerButton";
@@ -10,12 +11,13 @@ const DARK_TO_LIGHT_ICON = "darkToLight:ToneChangerButton";
 
 export const defaultProps = {
   lightToDarkIcon: LIGHT_TO_DARK_ICON,
-  darkToLightIcon: DARK_TO_LIGHT_ICON
+  darkToLightIcon: DARK_TO_LIGHT_ICON,
+  onClick: noop,
 };
 
 export const ToneChangerButtonMd = createMetadata({
-  status: "experimental",
-  description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
+  status: "stable",
+  description: "`ToneChangerButton` enables the user to switch between light and dark modes.",
   props: {
     lightToDarkIcon: {
       description:
@@ -32,11 +34,15 @@ export const ToneChangerButtonMd = createMetadata({
       defaultValue: defaultProps.darkToLightIcon,
     },
   },
+  events: {
+    click: dClick(COMP),
+  },
 });
 
 export function ToneChangerButton({
   lightToDarkIcon = defaultProps.lightToDarkIcon,
-  darkToLightIcon = defaultProps.darkToLightIcon
+  darkToLightIcon = defaultProps.darkToLightIcon,
+  onClick = defaultProps.onClick,
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
 
@@ -50,9 +56,15 @@ export function ToneChangerButton({
       variant="ghost"
       style={{ flexShrink: 0 }}
       icon={<Icon name={iconName} fallback={fallbackIcon} />}
-      onClick={() =>
-        activeThemeTone === "light" ? setActiveThemeTone("dark") : setActiveThemeTone("light")
-      }
+      onClick={() => {
+        if (activeThemeTone === "light") {
+          setActiveThemeTone("dark");
+          onClick?.("dark");
+        } else {
+          setActiveThemeTone("light");
+          onClick?.("light");
+        }
+      }}
     />
   );
 }
@@ -63,10 +75,13 @@ export function ToneChangerButton({
 export const toneChangerButtonComponentRenderer = createComponentRenderer(
   COMP,
   ToneChangerButtonMd,
-  ({ node, extractValue }) => {
-    return <ToneChangerButton
-      lightToDarkIcon={extractValue.asOptionalString(node.props.lightToDarkIcon)}
-      darkToLightIcon={extractValue.asOptionalString(node.props.darkToLightIcon)}
-    />;
+  ({ node, extractValue, lookupEventHandler }) => {
+    return (
+      <ToneChangerButton
+        onClick={lookupEventHandler("click")}
+        lightToDarkIcon={extractValue.asOptionalString(node.props.lightToDarkIcon)}
+        darkToLightIcon={extractValue.asOptionalString(node.props.darkToLightIcon)}
+      />
+    );
   },
 );

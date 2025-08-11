@@ -1,25 +1,29 @@
 import styles from "./Card.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick } from "../metadata-helpers";
+import { createMetadata, dClick } from "../metadata-helpers";
 import { orientationOptionMd } from "../abstractions";
 import { Card, defaultProps } from "./CardNative";
 
 const COMP = "Card";
 
 export const CardMd = createMetadata({
-  description: `The \`${COMP}\` component is a container for cohesive elements, often rendered visually as a card.`,
+  status: "stable",
+  description:
+    "`Card` is a versatile container that groups related content with a visual " +
+    "boundary, typically featuring background color, padding, borders, and rounded " +
+    "corners. It's ideal for organizing information, creating sections, and " +
+    "establishing visual hierarchy in your interface.",
   props: {
     avatarUrl: {
       description:
-        `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
+        `The url for an avarar image. If not specified, but [\`showAvatar\`](#showAvatar) is true, ${COMP} will show the ` +
         `first letters of the [\`title\`](#title).`,
       type: "string",
     },
     showAvatar: {
-      description: `Indicates whether the ${COMP} should be displayed`,
+      description: `Indicates whether the avatar should be displayed`,
       valueType: "boolean",
       defaultValue: defaultProps.showAvatar,
     },
@@ -67,7 +71,7 @@ export const CardMd = createMetadata({
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
     [`gap-${COMP}`]: "var(--stack-gap-default)",
-    [`gap-title-${COMP}`]: "$gap-normal",
+    [`gap-title-${COMP}`]: "$gap-none",
     [`gap-avatar-${COMP}`]: "$gap-normal",
     [`verticalAlignment-title-${COMP}`]: "center",
   },

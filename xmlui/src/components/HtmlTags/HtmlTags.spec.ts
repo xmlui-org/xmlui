@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
@@ -56,7 +57,7 @@ test("htmlTable width using themes", async ({ initTestBed, createHtmlTagDriver }
     },
   });
   const driver = await createHtmlTagDriver();
-  const compWidth = (await driver.getComponentBounds()).width;
+  const compWidth = (await getBounds(driver)).width;
 
   expect(compWidth).toEqual(width);
 });

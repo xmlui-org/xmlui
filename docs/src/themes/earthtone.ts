@@ -3,7 +3,7 @@ import type { ThemeDefinition } from "xmlui";
 export const EarthtoneTheme: ThemeDefinition = {
   name: "XMLUI Documentation Theme",
   id: "earthtone",
-  extends: "default",
+  extends: "docs-theme",
   themeVars: {
     "color-primary": "hsl(30, 50%, 30%)",
     "color-secondary": "hsl(120, 40%, 25%)",

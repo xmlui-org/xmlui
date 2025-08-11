@@ -1,39 +1,40 @@
-import type { ForwardedRef} from "react";
+import type { ForwardedRef } from "react";
 import { forwardRef, useEffect, useId } from "react";
 import { Content } from "@radix-ui/react-tabs";
 
 import styles from "../Tabs/Tabs.module.scss";
 
 import type { Tab } from "../abstractions";
-import { useTabContext } from "../Tabs/TabContext";
+import { useTabContext } from "./TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, style }: Tab,
+  { children, label, headerRenderer, style, id }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const id = useId();
+  const innerId = useId();
   const { register, unRegister, activeTabId } = useTabContext();
 
   useEffect(() => {
     register({
-      children,
       label,
-      id,
+      headerRenderer,
+      innerId,
+      id, // Store the external id (can be undefined)
     });
-  }, [id, children, label, register]);
+  }, [innerId, id, label, headerRenderer, register]);
 
   useEffect(() => {
     return () => {
-      unRegister(id);
+      unRegister(innerId);
     };
-  }, [id, unRegister]);
+  }, [innerId, unRegister]);
 
-  if (activeTabId !== id) return null;
+  if (activeTabId !== innerId) return null;
 
   return (
     <Content
-      key={id}
-      value={id}
+      key={innerId}
+      value={innerId}
       className={styles.tabsContent}
       ref={forwardedRef}
       style={style}

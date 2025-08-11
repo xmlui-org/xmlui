@@ -1,14 +1,17 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import Icon from "./IconNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Icon";
 
 export const IconMd = createMetadata({
-  status: "experimental",
-  description: `This component is the representation of an icon.`,
+  status: "stable",
+  description:
+    "`Icon` displays scalable vector icons from XMLUI's built-in icon registry " +
+    "using simple name references. Icons are commonly used in buttons, navigation " +
+    "elements, and status indicators.",
   props: {
     name: d(
       "This string property specifies the name of the icon to display. All icons have " +

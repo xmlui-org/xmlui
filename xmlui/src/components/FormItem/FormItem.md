@@ -1,6 +1,12 @@
 %-DESC-START
 
-You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
+**Key features:**
+- **Data binding**: Automatically syncs control values with form data using the `bindTo` property
+- **Validation**: Displays validation states and error messages for the associated input
+- **Flexible labeling**: Supports labels, helper text, and various label positioning options
+- **Layout management**: Handles consistent spacing and alignment of form elements
+
+See [this guide](/forms) for details.
 
 %-DESC-END
 

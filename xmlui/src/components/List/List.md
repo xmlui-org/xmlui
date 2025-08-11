@@ -1,5 +1,16 @@
 %-DESC-START
 
+**Key features:**
+- **Virtualization**: Renders only visible items for optimal performance with large datasets
+- **Advanced grouping**: Group data by any field with customizable headers and footers
+- **Built-in sorting**: Sort by any data field in ascending or descending order
+- **Visual formatting**: Pre-styled list appearance with borders, spacing, and layout
+- **Pagination support**: Handle large datasets with built-in pagination controls
+- **Empty state handling**: Customizable templates for when no data is available
+
+**List vs Items:**
+Use `List` for complex data presentation requiring performance optimization, grouping, sorting, or visual formatting. Use `Items` for simple data iteration without layout requirements.
+
 In the following examples all use the same list of data which looks like so:
 
 | Id   | Name    | Quantity | Unit   | Category   | Key  |
@@ -1149,7 +1160,7 @@ Note how the `List` on the right has different borders:
 
 Note how the groups in the right `List` are expanded by default:
 
-```xmlui {3, 10}
+```xmlui /groupsInitiallyExpanded/
 <App>
   <HStack gap="$space-2">
     <List data="{[...]}" 

@@ -27,6 +27,8 @@ import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNa
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
+import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
+import { LinkInfoContext } from "./LinkInfoContext";
 
 type Props = {
   children: ReactNode;
@@ -41,6 +43,7 @@ type Props = {
   scrollWholePage: boolean;
   noScrollbarGutters?: boolean;
   onReady?: () => void;
+  onMessageReceived?: (data: any, event: MessageEvent) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
@@ -52,12 +55,16 @@ type Props = {
   defaultTheme?: string;
 };
 
-export const defaultProps: Pick<Props, "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady"> = {
+export const defaultProps: Pick<
+  Props,
+  "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady" | "onMessageReceived"
+> = {
   scrollWholePage: true,
   noScrollbarGutters: false,
-  defaultTone: "light",
-  defaultTheme: "xmlui",
+  defaultTone: undefined,
+  defaultTheme: undefined,
   onReady: noop,
+  onMessageReceived: noop,
 };
 
 export function App({
@@ -68,6 +75,7 @@ export function App({
   scrollWholePage = defaultProps.scrollWholePage,
   noScrollbarGutters = defaultProps.noScrollbarGutters,
   onReady = defaultProps.onReady,
+  onMessageReceived = defaultProps.onMessageReceived,
   header,
   navPanel,
   footer,
@@ -90,7 +98,7 @@ export function App({
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll } = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
@@ -127,6 +135,18 @@ export function App({
   useEffect(() => {
     onReady();
   }, [onReady]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      onMessageReceived?.(event.data, event);
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [onMessageReceived]);
 
   // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
   // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
@@ -213,8 +233,14 @@ export function App({
   }, [forceRefreshAnchorScroll]);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
+
   const registerSubNavPanelSlot = useCallback((element) => {
     setSubNavPanelSlot(element);
+  }, []);
+
+  const [linkMap, setLinkMap] = useState<Map<string, NavHierarchyNode>>(new Map());
+  const registerLinkMap = useCallback((newLinkMap: Map<string, NavHierarchyNode>) => {
+    setLinkMap(newLinkMap);
   }, []);
 
   const layoutContextValue = useMemo<IAppLayoutContext>(() => {
@@ -238,6 +264,7 @@ export function App({
       logoContentDef,
       registerSubNavPanelSlot,
       subNavPanelSlot,
+      isNested: appGlobals?.isNested || false,
     };
   }, [
     hasRegisteredNavPanel,
@@ -253,7 +280,15 @@ export function App({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
+    appGlobals?.isNested,
   ]);
+
+  const linkInfoContextValue = useMemo(()=>{
+    return {
+      linkMap,
+      registerLinkMap
+    }
+  }, [linkMap, registerLinkMap]);
 
   useEffect(() => {
     if (navPanelVisible) {
@@ -453,14 +488,15 @@ export function App({
 
   // Memoize the rendered nav panel in drawer to prevent unnecessary re-renders
   const memoizedNavPanelInDrawer = useMemo(
-    () => renderChild && navPanelDef ? renderChild(navPanelDef, { inDrawer: true }) : null,
-    [renderChild, navPanelDef]
+    () => (renderChild && navPanelDef ? renderChild(navPanelDef, { inDrawer: true }) : null),
+    [renderChild, navPanelDef],
   );
 
   // Memoize the helmet component
   const memoizedHelmet = useMemo(
-    () => name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
-    [name]
+    () =>
+      name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
+    [name],
   );
 
   // Memoize the onOpenChange callback
@@ -468,20 +504,18 @@ export function App({
     setDrawerVisible(open);
   }, []);
 
-
-  
   return (
     <>
       {memoizedHelmet}
       <AppLayoutContext.Provider value={layoutContextValue}>
-        <SearchContextProvider>
-          <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
-            <SheetContent side={"left"}>
-              {memoizedNavPanelInDrawer}
-            </SheetContent>
-          </Sheet>
-          {content}
-        </SearchContextProvider>
+        <LinkInfoContext.Provider value={linkInfoContextValue}>
+          <SearchContextProvider>
+            <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
+              <SheetContent side={"left"}>{memoizedNavPanelInDrawer}</SheetContent>
+            </Sheet>
+            {content}
+          </SearchContextProvider>
+        </LinkInfoContext.Provider>
       </AppLayoutContext.Provider>
     </>
   );

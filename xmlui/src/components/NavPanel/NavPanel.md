@@ -1,8 +1,14 @@
-# NavPanel
+%-DESC-START
 
-`NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
+**Key features:**
 
-> **Note**: You can learn more details about using this component [here](../learning/app-component).
+- **Layout adaptation**: Automatically positions navigation horizontally or vertically based on App layout
+- **Navigation organization**: Contains NavLink and NavGroup components to build structured menus
+- **Logo integration**: Supports custom logo templates in vertical layouts via logoTemplate property
+- **Drawer mode**: Can optionally display navigation in a collapsible drawer interface
+- **Theme integration**: Inherits styling from the app's theme system for consistent appearance
+
+%-DESC-END
 
 %-PROP-START logoTemplate
 
@@ -18,7 +24,7 @@
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>

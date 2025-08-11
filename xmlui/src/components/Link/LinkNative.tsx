@@ -27,7 +27,6 @@ type Props = {
   disabled?: boolean;
   onClick?: () => void;
   style?: CSSProperties;
-  className?: string;
 } & Partial<
   Pick<
     HTMLAnchorElement,
@@ -53,7 +52,6 @@ export const LinkNative = forwardRef(function LinkNative(
     target,
     disabled = defaultProps.disabled,
     style,
-    className,
     ...anchorProps
   } = specifyTypes(props);
 
@@ -62,8 +60,7 @@ export const LinkNative = forwardRef(function LinkNative(
     return createUrlWithQueryParams(to);
   }, [to]) as To;
 
-  const Node = !to ? "div" : Link;
-
+  const Node = to ? Link : "div";
   return (
     <Node
       ref={forwardedRef as any}
@@ -75,7 +72,7 @@ export const LinkNative = forwardRef(function LinkNative(
         [styles.iconLink]: iconLink,
         [styles.active]: active,
         [styles.disabled]: disabled,
-      }, className)}
+      })}
       {...anchorProps}
     >
       {icon && (

@@ -19,6 +19,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "../../components-core/utils/hooks";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+import { useAppContext } from "../../components-core/AppContext";
 
 type FlowItemProps = {
   children: ReactNode;
@@ -51,6 +52,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   ref: any,
 ) {
   const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
+  const { mediaSize } = useAppContext();
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
     return () => {
@@ -88,13 +90,13 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
       //   },
       // ).cssProps || {}
     );
-  }, [_maxWidth, _minWidth, _width, activeTheme.themeVars]);
+  }, [_maxWidth, _minWidth, _width]);
 
   const resolvedWidth = useMemo(() => {
     if (width && typeof width === "string" && width.startsWith("var(")) {
       if (!resolvedCssVars[width]) {
         const varName = width.substring(4, width.length - 1);
-        const resolved = getComputedStyle(root!).getPropertyValue(varName);
+        const resolved = getComputedStyle(root || document.body).getPropertyValue(varName);
         resolvedCssVars[width] = resolved || _width;
       }
       return resolvedCssVars[width];
@@ -105,15 +107,37 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
   const isWidthPercentage = typeof resolvedWidth === "string" && resolvedWidth.endsWith("%");
 
   const _columnGap = normalizeCssValueForCalc(columnGap);
-  const isViewportPhone = useMediaQuery("(max-width: 420px)"); //TODO useContainerQuery
-  const isViewportTablet = useMediaQuery("(max-width: 800px)");
+
+  let responsiveWidth;
+  if(isWidthPercentage){
+    const percNumber = parseFloat(resolvedWidth);
+    if(mediaSize.sizeIndex <= 1){
+      let percentage = percNumber * 4;
+      if(percentage > 50){
+        responsiveWidth = `100%`
+      } else {
+        responsiveWidth = `min(${percentage}%, 100%)`
+      }
+    } else if(mediaSize.sizeIndex <= 2){
+      let percentage = percNumber * 3;
+      if(percentage >= 50 && percentage <= 75){
+        responsiveWidth = `50%`
+      } else if(percentage > 75){
+        responsiveWidth = `100%`
+      } else {
+        responsiveWidth = `min(${percentage}%, 100%)`
+      }
+    } else {
+      responsiveWidth = `min(${width}, 100%)`;
+    }
+  } else {
+    responsiveWidth = `min(calc(${width} + ${_columnGap}), 100%)`;
+  }
 
   const outerWrapperStyle: CSSProperties = {
     minWidth,
     maxWidth,
-    width: isWidthPercentage
-      ? `min(${width} * ${isViewportPhone ? "8" : isViewportTablet ? "4" : "1"}, 100%)`
-      : `min(calc(${width} + ${_columnGap}), 100%)`,
+    width: responsiveWidth,
     paddingBottom: rowGap,
     flex,
   };

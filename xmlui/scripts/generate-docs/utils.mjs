@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
+import { TABLE_CONFIG } from "./constants.mjs";
 
 /**
  * Creates a markdown table.
@@ -19,7 +20,7 @@ export function createTable({ headers = [], rows = [], rowNums = false }) {
   }
 
   if (rowNums) {
-    headers.unshift({ value: "Num", style: "center" });
+    headers.unshift(TABLE_CONFIG.DEFAULT_ROW_NUM_HEADER);
   }
 
   table +=
@@ -36,10 +37,10 @@ export function createTable({ headers = [], rows = [], rowNums = false }) {
     "| " +
     headers
       .map((h) => {
-        if (typeof h === "object" && h.style === "left") return ":---";
-        if (typeof h === "object" && h.style === "center") return ":---:";
-        if (typeof h === "object" && h.style === "right") return "---:";
-        return "---";
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.LEFT) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.LEFT;
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.CENTER) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.CENTER;
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.RIGHT) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.RIGHT;
+        return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.DEFAULT;
       })
       .join(" | ") +
     " |\n";
@@ -182,4 +183,41 @@ export function removeAdjacentNewlines(buffer) {
     prevWasNewline = isNewline;
   }
   return result;
+}
+
+/**
+ * The summary file may contain further sections other than the summary table.
+ * Thus, we only (re)generate the section that contains the summary table.
+ * This is done by finding the heading for the start of the summary table section
+ * and either the end of file or the next section heading.
+ * @param {string} buffer the string containing the file contents
+ * @param {string} sectionHeading The section to look for, has to have heading level as well
+ */
+export function getSectionBeforeAndAfter(buffer, sectionHeading) {
+  if (!sectionHeading) {
+    return { beforeSection: buffer, afterSection: "" };
+  }
+
+  const lines = strBufferToLines(buffer);
+  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
+
+  // If sectionHeading isn't found, return the buffer unchanged
+  if (sectionStartIdx === -1) {
+    return { beforeSection: buffer, afterSection: "" };
+  }
+
+  // Find the next heading after the section heading
+  let nextHeadingIdx = -1;
+  for (let i = sectionStartIdx + 1; i < lines.length; i++) {
+    if (/^#+\s/.test(lines[i])) {
+      nextHeadingIdx = i;
+      break;
+    }
+  }
+
+  // Remove lines after the section heading and before the next heading (or end of file)
+  const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
+  const afterSection = (nextHeadingIdx !== -1 ? lines.slice(nextHeadingIdx) : []).join("\n");
+
+  return { beforeSection, afterSection };
 }

@@ -1,5 +1,12 @@
 %-DESC-START
 
+**Key features:**
+- **Value and label separation**: Define what gets stored (value) separately from what users see (label)
+- **Automatic fallbacks**: Uses label as value or value as label when only one is provided
+- **Custom templates**: Support for rich content via optionTemplate property or child components
+- **State management**: Built-in enabled/disabled states for individual options
+- **Data integration**: Works seamlessly with Items components for dynamic option lists
+
 ## Using `Option`
 
 ### With `AutoComplete`

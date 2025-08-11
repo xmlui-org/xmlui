@@ -1,14 +1,16 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dDidChange } from "../metadata-helpers";
+import { createMetadata, dDidChange } from "../metadata-helpers";
 import { ChangeListener, defaultProps } from "./ChangeListenerNative";
 
 const COMP = "ChangeListener";
 
 export const ChangeListenerMd = createMetadata({
+  status: "stable",
   description:
-    `\`${COMP}\` is a functional component (it renders no UI) to trigger an action when a ` +
-    `particular value (component property, state, etc.) changes.`,
+    "`ChangeListener` is an invisible component that watches for changes in values " +
+    "and triggers actions in response. It's essential for creating reactive behavior " +
+    "when you need to respond to data changes, state updates, or component property " +
+    "modifications outside of normal event handlers.",
   props: {
     listenTo: {
       description:

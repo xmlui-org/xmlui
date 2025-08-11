@@ -1,8 +1,6 @@
 %-DESC-START
 
-The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
-
-To add new lines to the input field press `Shift` + `Enter`.
+It is often used in forms, see [this guide](/forms) for details.
 
 %-DESC-END
 
@@ -33,7 +31,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 %-PROP-START enterSubmits
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
-See [Using Forms](../learning/forms.mdx) for details.
+See [Using Forms](/forms) for details.
 
 ```xmlui-pg copy display name="Example: enterSubmits"
 <App>

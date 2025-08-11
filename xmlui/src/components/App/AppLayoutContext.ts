@@ -69,6 +69,7 @@ export interface IAppLayoutContext {
   subNavPanelSlot?: HTMLElement;
   scrollWholePage?: boolean;
   isFullVerticalWidth?: boolean;
+  isNested?: boolean;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

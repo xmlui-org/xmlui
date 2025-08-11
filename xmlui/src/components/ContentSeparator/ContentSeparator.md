@@ -1,3 +1,12 @@
+%-DESC-START
+
+**Key features:**
+- **Flexible orientation**: Create horizontal dividers (default) or vertical dividers between content
+- **Customizable sizing**: Control thickness with the `size` property
+- **Automatic spacing**: Takes full width/height of container unless size is specified
+
+%-DESC-END
+
 %-PROP-START orientation
 
 See the demo for an example under [`size`](#size).

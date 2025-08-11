@@ -1,10 +1,10 @@
 # RealTimeAdapter [#realtimeadapter]
 
-`RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling.
+`RealTimeAdapter` is a non-visual component that listens to real-time events.
 
 ## Properties [#properties]
 
-### `url (default: "")` [#url-default-]
+### `url` (default: "") [#url-default-]
 
 This property specifies the URL to use for long-polling.
 

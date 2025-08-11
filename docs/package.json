@@ -1,14 +1,18 @@
 {
   "name": "xmlui-docs",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.5",
   "scripts": {
-    "start": "xmlui start",
+    "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
-    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip"
+    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
+    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip",
+    "build-optimized": "npx xmlui-optimizer",
+    "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
   },
   "dependencies": {
     "shiki": "^3.3.0",
+    "@shikijs/langs": "3.4.2",
     "xmlui": "*",
     "xmlui-playground": "*",
     "xmlui-search": "*"
@@ -19,7 +23,9 @@
     ]
   },
   "devDependencies": {
+    "@octokit/rest": "^22.0.0",
     "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
     "strip-markdown": "6.0.0",
     "unified": "11.0.5"
   }

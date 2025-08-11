@@ -1,5 +1,355 @@
 # xmlui
 
+## 0.9.97
+
+### Patch Changes
+
+- f7e8019: Implement simple IFrame APIs
+
+## 0.9.96
+
+### Patch Changes
+
+- 3196156: Add IFrame component (first prototype)
+- cfee78a: NumberBox tweaks: fixed missing padding theme var, fixed incorrect label association.
+- f51002a: fix: Tabs - descendant button warning
+- 3fa52d9: fix: Table sortBy now works as expected
+
+## 0.9.95
+
+### Patch Changes
+
+- af6a7a0: fix: Tabs - fixed the inconsistency in the headerTemplate.
+- 69a2a8f: Fix the useEventHaddler hook
+- 29c68fe: fix: H1 ... H6 now ignores the level property
+
+## 0.9.94
+
+### Patch Changes
+
+- 1d9365c: feat: Tabs component - use headerTemplate instead of labelTemplate/tabTemplate
+
+## 0.9.93
+
+### Patch Changes
+
+- af17117: feat:add labelTemplate prop to TabItem component
+- 44da3d9: The transformation of Checkbox and Switch values (to Booleans) are now documented and tested
+- b7a6b9a: Fix formatHumanElapsedTime unit tests, make the local-independent
+- bc95844: improve: Select and AutoComplete components
+- 52d94a2: Fix the ComponentWrapper childrenAsTemplate issue
+- 6629ce5: New end-to-end tests reviewed
+- 0254471: Fixed the initialValue issue with TextArea
+- 3318cfb: feat: provide context in browser error reports
+
+## 0.9.92
+
+### Patch Changes
+
+- 347cda1: Review component e2e tests
+
+## 0.9.91
+
+### Patch Changes
+
+- 6a7d779: Review Slot implementation
+
+## 0.9.90
+
+### Patch Changes
+
+- 4b57f7e: Remove Spinner tests
+
+## 0.9.89
+
+### Patch Changes
+
+- 2968eb9: fix initialValue handling in selects in forms
+- 94f4eb5: safari regexp error workaround for optimized build, revert select inside form fix
+- 8364c03: add new TextBox and TextArea test cases
+
+## 0.9.88
+
+### Patch Changes
+
+- b79d7d8: Fix flaky Checkbox e2e tests
+
+## 0.9.87
+
+### Patch Changes
+
+- 33846c2: Fix ios regex failure
+
+## 0.9.86
+
+### Patch Changes
+
+- 48af60d: Temporarily suspend new checkbox e2e tests
+
+## 0.9.85
+
+### Patch Changes
+
+- ee8d6ad: Fix "required" validation issue with "integer" and "number" FormItem
+- 9ca7572: Extend the component API metadata with method signature and parameter descriptions
+- 6944d2f: Add a scrollIntoView method to Heading
+- c0c10e7: Added missing autoFocus feature and aria labels to Checkbox
+- cbe1ef2: Use grammar and syntax highlight files straight form the xmlui package, instead of duplicating them in every app.
+
+## 0.9.84
+
+### Patch Changes
+
+- c54abf3: update deps
+
+## 0.9.83
+
+### Patch Changes
+
+- 8e3d6a3: Prevent the xmlui-optimizer to raise error on ShadowRoot
+- 8644010: Add a scrollIntoView api to Bookmark
+
+## 0.9.82
+
+### Patch Changes
+
+- 3bc29ae: fix: account for events with components inside them (like APICall) in a way that more syntax highlighters understand. VSCode worked fine, Shiki did not.
+- 1101bf5: Fix a React warning in MarkdownNative (headingRef)
+- cd8db58: Fixed ModalDialog overlay and fullScreen in nested apps. Now dialogs defined in nested apps stay inside them.
+- 13beb58: Fixed ModalDialog context error when dialog is called from ApiCall or components using "confirm" in XMLUI code.
+- 79c1d8a: fix: allow the playground to use the same tone as its source
+
+## 0.9.81
+
+### Patch Changes
+
+- 59680b7: Allow configuring the initiallyShowCode flag in ComponentViewer
+
+## 0.9.80
+
+### Patch Changes
+
+- 4598566: NumberBox and FromItem type="number" accepts numeric string as initialValue
+- 14e6a7d: feat: add splitView to code inspection
+- cf05bd2: Fix non-fatal StandaloneApp.tsx issue
+
+## 0.9.79
+
+### Patch Changes
+
+- ad21a31: enhance treeshaking
+
+## 0.9.78
+
+### Patch Changes
+
+- 94a68f0: Toggle password visibility in PasswordInput
+- 94a68f0: Extend markdown to render compound headings with code spans and anchors
+- 163a45c: Add ToneSwitch with icon customization
+- 7ce528b: fix: BarChart - size management
+- c6eb9a8: Fixed scrolling to specific Bookmarks inside nested apps.
+
+## 0.9.77
+
+### Patch Changes
+
+- c867f38: Change split view startup animation
+
+## 0.9.76
+
+### Patch Changes
+
+- aa08a8c: introducing ApiInterceptor->useWorker: true/false
+- 15bf622: fix: add escaped \{ to textmate syntax, eliminate double extraction of props in FormItem causing bugs with escaped open curly brace being parsed as start of binding expression.
+- 5761868: improve: BarChart - add tick formatter for X and Y axes
+
+## 0.9.75
+
+### Patch Changes
+
+- c876be8: Turn docs deploy to standard routing
+
+## 0.9.74
+
+### Patch Changes
+
+- 0043c5d: NestedApp new prop: withSplashScreen
+
+## 0.9.73
+
+### Patch Changes
+
+- 88bf4f6: extend formatHumanElapsedTime with a short format flag
+- fef53db: Allow specifying href targets with the markdown link tag
+- 6167648: Fix the useMouseEventHandlers hook
+- b2f4483: Fix missing code fence display
+- e9040c6: Make the nested app's header smaller
+
+## 0.9.72
+
+### Patch Changes
+
+- 4ab3b8a: add omitH1 to TableOfContents
+- ac4a283: remove the AppWithCodeView component
+- 38454c9: fix ApiInterceptor race conditions (inside NestedApps)
+
+## 0.9.71
+
+### Patch Changes
+
+- 5774c53: fix ssr issues with Theme components
+
+## 0.9.70
+
+### Patch Changes
+
+- 1da7847: Adjust CodeBlock theme variables for dark tone
+
+## 0.9.69
+
+### Patch Changes
+
+- 9b36621: fix flaky Checkbox tests
+
+## 0.9.68
+
+### Patch Changes
+
+- 9b1f718: change: add back the logo and the buttons to the xmlui-pg split view
+- c79ced7: fix ssr hydration warn in AppWithCodeView
+- d030ac2: A few theme variable defaults updated
+- 21c4fd6: fix: mocked apis should work with multiple NestedApps
+
+## 0.9.67
+
+### Patch Changes
+
+- 51a5b05: Small changes in a few component's metadata representation
+- 9048af1: Remove the header logo and buttons from the AppWithCodeViewNative component
+- 94f0e66: Accounted for some bad inputs in code fences when highlighting rows & substrings
+- 3f0e6b0: fix memoization for tabs, pageInfo
+
+## 0.9.66
+
+### Patch Changes
+
+- eae8145: Fixed Switch indicator positioning
+- b6c64de: improve: charts - improved tick rendering
+- 459bd3c: improve: Logo - add inline, alt props
+- 96be435: feat: CodeBlock - add new themeVariables
+
+## 0.9.65
+
+### Patch Changes
+
+- c17fc0d: fix the NestedAppNative.tsx issue introduced in #1547
+
+## 0.9.64
+
+### Patch Changes
+
+- 5ad3ffc: Refactored the usage of theme variables in RadioGroup
+- da3c8bc: Add a "noHeader" option to the xmlui-pg codefence
+- 301cb39: Allow YAML (.yml) theme files in standalone apps
+- d5d3f4d: Fixed Bar- & LineChart sizing in the Table component
+
+## 0.9.63
+
+### Patch Changes
+
+- b9c0881: Fix: add a workaround to ListNative to avoid issues coming from undefined row values
+
+## 0.9.62
+
+### Patch Changes
+
+- 832f31d: fix: nestedApp fills the available space in AppWithCode component
+- 4f9ff06: Fix the build issue with FormSection
+
+## 0.9.61
+
+### Patch Changes
+
+- 4ef5f3f: This version does not contain any real changes; it's just for bumping the version number.
+
+## 0.9.60
+
+### Patch Changes
+
+- f37ed8c: Fine tune AppWithCodeView header
+- 736dbc8: improve: AppWithCode - center the XML/UI buttons
+- e2a6e1a: Add a popOutUrl="<url>" option to xmlui-pg to allow pop out to a custom playground location
+
+## 0.9.59
+
+### Patch Changes
+
+- 2a07157: Rename Pages property 'defaultRoute' to 'fallbackPath'
+- 97b3241: improve: expanding the styles of the components responsible for code display with new theme variables.
+- c4abb20: Fixed RadioGroup disabled and validation indicator states. Also fixed an issue where the checked indicator was not aligned to center if the RadioGroup Option was resized in some way.
+- f19720c: Added 0 min width to PieChart, Fixed focus error when one checkbox's state change depended on another
+- 66c2288: Fixed NavLink indentation in horizontal App layout, if in a nested NavGroup in the NavPanel
+- 2d27204: Fixed a number of color & visual state representations of the components: DatePicker, Switch, Select, TextBox, TextArea, NumberBox, AutoComplete
+
+## 0.9.58
+
+### Patch Changes
+
+- dc43275: Fixed Pie- & DonutChart height property.
+- f9562b5: make flowLayout auto-responsive behavior a bit smarter
+- 1af11af: fix: eliminating the duplication of toast messages
+- de570c2: Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.
+- 7d255a9: Changed open in new window button tooltip label for all occurrences.
+- 69a7a1f: Fixed NavLink label break if overflowing available space.
+- 873348c: new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage
+- 46bfe72: default style tweaks
+
+## 0.9.57
+
+### Patch Changes
+
+- 93a1e70: fix: NavPanel - use layoutCss
+
+## 0.9.56
+
+### Patch Changes
+
+- 9a3c3b6: feat: xmlui-devtools - start dialog animation from the click, use exit animation as well
+
+## 0.9.55
+
+### Patch Changes
+
+- d507ea8: Add AppWithCodeView component to display code and running app side-by-side
+
+## 0.9.54
+
+### Patch Changes
+
+- 2688a95: Change TreeDisplay theme variable defaults
+
+## 0.9.53
+
+### Patch Changes
+
+- c64fa25: Allow turning on/off heading anchors in appGlobals
+- 73c2c21: wip: code inspector buttons - label change, devtools - animation update
+
+## 0.9.52
+
+### Patch Changes
+
+- d079208: The Footer component no provides a themeable gap between its children.
+- 2a461d8: feat: NestedApp works with ApiInterceptor
+- ad6d81e: fix NestedApp apiUrl overwrite
+- f5b9f15: feat: xmlui-devtools - use it in a modal dialog
+- 88e4741: fix: Table columns do not allow (and indicate) sorting when bindTo is not set
+- 7af4b4e: change default borderColor
+- 851ae21: fix table styling
+- 7872ed0: Default theme variables changed for App, NestedApp, TableOfContents, and Text
+- bf00dce: enhance xmlui parser error tolerance, recovering from unclosed tags
+- 38180ce: merge xmlui-charts into core
+
 ## 0.9.51
 
 ### Patch Changes

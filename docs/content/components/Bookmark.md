@@ -71,11 +71,15 @@ You can try; this example works like the previous one:
 
 ## Properties [#properties]
 
-### `level (default: 1)` [#level-default-1]
+### `id` [#id]
+
+The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
+
+### `level` (default: 1) [#level-default-1]
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
 
-### `omitFromToc (default: false)` [#omitfromtoc-default-false]
+### `omitFromToc` (default: false) [#omitfromtoc-default-false]
 
 If true, this bookmark will be excluded from the table of contents.
 
@@ -83,17 +87,17 @@ If true, this bookmark will be excluded from the table of contents.
 
 Defines the text to display the bookmark in the table of contents. If this property is empty, the text falls back to the value of `id`.
 
-### `uid` [#uid]
-
-The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
-
 ## Events [#events]
 
 This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `scrollIntoView` [#scrollintoview]
+
+Scrolls the bookmark into view.
+
+**Signature**: `scrollIntoView()`
 
 ## Styling [#styling]
 

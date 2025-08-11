@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
@@ -16,7 +16,6 @@ import type {
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { usePrevious } from "../utils/hooks";
-import { is } from "immer/dist/internal";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 

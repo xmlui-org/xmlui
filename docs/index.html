@@ -12,10 +12,39 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/index.ts"></script>
+  <script type="text/javascript">
+    window.transformStops = function(stops) {
 
-  <script>
+      return stops.map(function(stop) {
+
+        // Helper to extract a value from additionalProperties by key
+        function getProp(key) {
+          if (!stop.additionalProperties) return '';
+          var propObj = stop.additionalProperties.find(function(p) { return p.key === key; });
+          return propObj ? propObj.value : '';
+        }
+
+        return {
+          name: stop.commonName,
+          zone: getProp('Zone'),
+          wifi: getProp('WiFi'),
+          toilets: getProp('Toilets'),
+          // A comma-separated list of line names that serve this stop
+          lines: stop.lines
+            ? stop.lines.map(function(line) { return line.name; }).join(', ')
+            : ''
+        };
+
+      });
+    }
+
+    window.getComponentsList = function(items) {
+      const onlyComponents = items.filter(item => item.name === 'components');
+      return onlyComponents;
+    }
+
+
     window.sliderValueToDate = function (value) {
-      console.log('sliderValueToDate', value)
       // Convert a slider value (representing days from start date) to an actual date string
       // value: number of days offset from startDate
       // returns: date string in YYYY-MM-DD format
@@ -33,7 +62,6 @@
       const day = String(resultDate.getDate()).padStart(2, '0');
 
       const result = `${year}-${month}-${day}`;
-      console.log('sliderValueToDate', result)
       return result
     }
 
@@ -169,6 +197,57 @@
 
       return results;
     }
+
+    window.handleHelloClick = function(event) {
+      console.log('Hello World clicked!', event);
+      alert('Button clicked!');
+    };
+
+    window.handleHelloReset = function(event) {
+      console.log('Hello World reset!', event);
+      alert('Counter was reset!');
+    };
+
+    // Enhanced debugLog function for index.html
+    window.debugLog = function(data, label) {
+      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+      console.group(`🐛 ${label || 'Debug'} (${timestamp})`);
+
+      // Check if it's likely a Proxy object
+      const isProxy = data && typeof data === 'object' &&
+        (data.constructor?.name === 'Object' &&
+          data.toString?.() === '[object Object]');
+
+      console.log('Is Proxy:', isProxy);
+      console.log('Raw:', data);
+
+      // Show unwrapped data for objects
+      if (typeof data === 'object' && data !== null) {
+        try {
+          const unwrapped = JSON.parse(JSON.stringify(data));
+          console.log('Unwrapped:', unwrapped);
+          console.log('Keys:', Object.keys(data));
+        } catch (e) {
+          console.log('Could not unwrap:', e.message);
+        }
+      }
+
+      console.groupEnd();
+      return data;
+    };
+
+    window.transformPeople = function(data) {
+      console.log(data);
+      const items = data.data.items;
+      const itemMap = {
+        A: 'Austin',
+        B: 'Boston'
+      };
+      return items.map(item => ({
+        ...item,
+        city: itemMap[item.group]
+      }));
+    };
 
   </script>
 </body>

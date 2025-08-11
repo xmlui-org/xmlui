@@ -1,4 +1,5 @@
-import { CSSProperties, ReactNode, useContext, useMemo } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import classnames from "classnames";
 
@@ -10,7 +11,7 @@ import styles from "./Pages.module.scss";
 
 // Default props for Pages component
 export const defaultProps = {
-  defaultRoute: "/"
+  fallbackPath: "/",
 };
 
 // --- We need this component to make sure all the child routes are wrapped in a
@@ -21,7 +22,7 @@ type RouteWrapperProps = {
   layoutContext?: LayoutContext;
   style?: CSSProperties;
   uid?: string;
-}
+};
 
 export function RouteWrapper({
   childRoute = EMPTY_ARRAY,
@@ -77,14 +78,19 @@ export function RouteWrapper({
 type PageComponentDef = ComponentDef<typeof PageMd>;
 
 type PagesProps = {
-  defaultRoute?: string;
+  fallbackPath?: string;
   node?: ComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   children?: ReactNode;
 };
 
-export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
+export function Pages({
+  node,
+  renderChild,
+  extractValue,
+  fallbackPath = defaultProps.fallbackPath,
+}: PagesProps) {
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
   node.children?.forEach((child) => {
@@ -102,7 +108,7 @@ export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesPr
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        {!!defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
+        {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace  />} />}
       </Routes>
       {renderChild(restChildren)}
     </>

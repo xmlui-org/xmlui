@@ -1,9 +1,10 @@
 import styles from "./Slider.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -26,10 +27,12 @@ import { Slider, defaultProps } from "./SliderNative";
 const COMP = "Slider";
 
 export const SliderMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
-    `The \`${COMP}\` component allows you to select a numeric value ` +
-    `between a range specified by minimum and maximum values.`,
+    "`Slider` provides an interactive control for selecting numeric values within " +
+    "a defined range, supporting both single value selection and range selection with " +
+    "multiple thumbs. It offers precise control through customizable steps and visual " +
+    "feedback with formatted value display.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),
@@ -87,9 +90,21 @@ export const SliderMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This method sets the focus on the slider component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): number | [number, number] | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: number | [number, number] | undefined): void",
+      parameters: {
+        value: "The new value to set. Can be a single value or an array of values for range sliders.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -99,9 +114,10 @@ export const SliderMd = createMetadata({
     [`borderStyle-thumb-${COMP}`]: "solid",
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
-    [`boxShadow-thumb-${COMP}`]: "$boxShadow-md",
-    [`boxShadow-thumb-${COMP}--hover`]: "$boxShadow-lg",
-    [`boxShadow-thumb-${COMP}--focus`]: "$boxShadow-xl",
+    [`backgroundColor-thumb-${COMP}--hover`]: "$color-primary",
+    [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
+    [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
+    [`boxShadow-thumb-${COMP}--active`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`borderRadius-${COMP}-default`]: "$borderRadius",
     [`borderColor-${COMP}-default`]: "transparent",
     [`borderWidth-${COMP}-default`]: "0",

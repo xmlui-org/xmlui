@@ -32,7 +32,8 @@ export interface TokenLocation {
 }
 
 // Token types available for parsing
-export const enum TokenType {
+// Using declare enum to make this a type-only declaration
+export declare enum TokenType {
   Eof = -1,
   Ws = -2,
   BlockComment = -3,

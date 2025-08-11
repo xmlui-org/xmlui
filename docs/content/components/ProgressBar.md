@@ -1,10 +1,16 @@
 # ProgressBar [#progressbar]
 
-A `ProgressBar` component visually represents the progress of a task or process.
+`ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete).
+
+**Key features:**
+- **Percentage visualization**: Displays progress as a filled portion of a horizontal bar
+- **Flexible value handling**: Accepts values from 0 to 1, with automatic bounds handling for out-of-range values
+- **Extensive theming**: Customizable background color, indicator color, thickness, and border radius
+- **Responsive design**: Adapts to container width while maintaining consistent height
 
 ## Properties [#properties]
 
-### `value (default: 0)` [#value-default-0]
+### `value` (default: 0) [#value-default-0]
 
 This property defines the progress value with a number between 0 and 1.
 

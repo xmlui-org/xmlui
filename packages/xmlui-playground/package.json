@@ -1,6 +1,6 @@
 {
   "name": "xmlui-playground",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "sideEffects": false,
   "scripts": {
     "start": "xmlui start",
@@ -17,9 +17,7 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "react-icons": "^5.5.0",
-    "xmlui-devtools": "*",
-    "xmlui-animations": "*",
-    "xmlui-pdf": "*"
+    "xmlui-devtools": "*"
   },
   "devDependencies": {
     "xmlui": "*"

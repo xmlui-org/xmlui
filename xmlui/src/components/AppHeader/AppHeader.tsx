@@ -1,18 +1,20 @@
 import styles from "./AppHeader.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
 import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
 
 const COMP = "AppHeader";
 
 export const AppHeaderMd = createMetadata({
-  status: "experimental",
-  description: `\`${COMP}\` is a placeholder within \`App\` to define a custom application header.`,
+  status: "stable",
+  description:
+    "`AppHeader` defines the top navigation bar of your application within the " +
+    "[`App`](/components/App) component. It automatically handles logo placement, " +
+    "application title, and user profile areas with built-in responsive behavior.",
   props: {
     profileMenuTemplate: dComponent(
       `This property makes the profile menu slot of the \`${COMP}\` component customizable.`,
@@ -64,7 +66,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
     const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
     return (
       <AppContextAwareAppHeader
-        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))} // NOTE: if this a component template, why is the default true?
+        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
         title={extractValue(node.props.title)}
         showLogo={extractValue.asOptionalBoolean(node.props.showLogo)}
         titleContent={

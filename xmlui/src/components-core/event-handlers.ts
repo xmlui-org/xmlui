@@ -7,7 +7,7 @@ import { EMPTY_OBJECT } from "./constants";
  * This hook sets up the mouse event handlers for the component
  * @param lookupEvent Function to lookup the event handler
  * @param shouldSkip Indicates if the event handlers should be skipped
- * @returns 
+ * @returns
  */
 export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldSkip: boolean) {
   // *** Because we use nested React hooks, we cannot use an early return
@@ -34,15 +34,18 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
     lookupEvent: LookupEventHandlerFn<TMd>,
     shouldSkip: boolean,
   ) {
-  // *** Because we use nested React hooks, we cannot use an early return
-  // *** when shouldSkip is true.
-  const onEvent = shouldSkip
+    // *** Because we use nested React hooks, we cannot use an early return
+    // *** when shouldSkip is true.
+    const onEvent = shouldSkip
       ? undefined
       : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
     const eventHandler: EventHandler<any> = useCallback(
       (event) => {
+        // If the event handler is not defined, we do nothing
         if (onEvent) {
-          event.stopPropagation();
+          if (typeof event.stopPropagation === "function") {
+            event?.stopPropagation();
+          }
           onEvent(event);
         }
       },

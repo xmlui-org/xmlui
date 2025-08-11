@@ -4,7 +4,7 @@ import {
   ArrowExpressionStatement,
   ExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 import { buildProxy } from "../../../src/components-core/rendering/buildProxy";

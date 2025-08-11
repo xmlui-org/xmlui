@@ -71,6 +71,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
 
   useEffect(() => {
     registerComponentApi?.({
+      open: () => setOpen(true),
       close: () => setOpen(false),
     });
   }, [registerComponentApi]);

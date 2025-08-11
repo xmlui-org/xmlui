@@ -36,6 +36,7 @@ import type { NavGroupMd } from "./NavGroup";
 import { useLocation } from "@remix-run/react";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
+import { getAppLayoutOrientation } from "../App/AppNative";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
@@ -87,6 +88,8 @@ export const NavGroup = forwardRef(function NavGroup(
   const { level } = useContext(NavGroupContext);
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
+  const layoutIsVertical =
+    !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
 
   let inline =
     appLayoutContext?.layout === "vertical" ||
@@ -100,6 +103,7 @@ export const NavGroup = forwardRef(function NavGroup(
   const navGroupContextValue = useMemo(() => {
     return {
       level: level + 1,
+      layoutIsVertical,
       iconHorizontalCollapsed: iconHorizontalCollapsed ?? defaultProps.iconHorizontalCollapsed,
       iconHorizontalExpanded: iconHorizontalExpanded ?? defaultProps.iconHorizontalExpanded,
       iconVerticalCollapsed: iconVerticalCollapsed ?? defaultProps.iconVerticalCollapsed,
@@ -111,6 +115,7 @@ export const NavGroup = forwardRef(function NavGroup(
     iconVerticalCollapsed,
     iconVerticalExpanded,
     level,
+    layoutIsVertical,
   ]);
 
   return (
@@ -166,7 +171,8 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   }: ExpandableNavGroupProps,
   ref,
 ) {
-  const { level, iconVerticalCollapsed, iconVerticalExpanded } = useContext(NavGroupContext);
+  const { level, iconVerticalCollapsed, iconVerticalExpanded, layoutIsVertical } =
+    useContext(NavGroupContext);
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const groupContentInnerRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
@@ -181,7 +187,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   const toggleStyle = {
     ...style,
-    "--nav-link-level": level,
+    "--nav-link-level": layoutIsVertical ? level : 0,
   };
 
   return (

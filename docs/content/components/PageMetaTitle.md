@@ -1,10 +1,17 @@
 # PageMetaTitle [#pagemetatitle]
 
-A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab.
+`PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles.
+
+**Key features:**
+- **Dynamic title updates**: Change browser tab title based on current page or content
+- **App name override**: Supersedes the `App`s name property when present
+- **Flexible placement**: Can be positioned anywhere in the component tree
+- **Binding support**: Accepts dynamic values and expressions for context-aware titles
+- **SEO enhancement**: Improves search engine optimization with descriptive page titles
 
 ## Properties [#properties]
 
-### `value (default: "XMLUI Application")` [#value-default-xmlui-application]
+### `value` (default: "XMLUI Application") [#value-default-xmlui-application]
 
 This property sets the page's title to display in the browser tab.
 

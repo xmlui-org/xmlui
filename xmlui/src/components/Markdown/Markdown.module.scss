@@ -15,8 +15,8 @@ $backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
 
 $themeVars: t.composePaddingVars($themeVars, "Blockquote");
 $themeVars: t.composeBorderVars($themeVars, "Blockquote");
-$accentColor-Blockquote: createThemeVar("accentColor-Blockquote");
-$accentWidth-Blockquote: createThemeVar("accentWidth-Blockquote");
+$color-accent-Blockquote: createThemeVar("color-accent-Blockquote");
+$width-accent-Blockquote: createThemeVar("width-accent-Blockquote");
 $backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
 $paddingLeft-Blockquote: createThemeVar("paddingLeft-Blockquote");
 $borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
@@ -27,7 +27,7 @@ $themeVars: t.composePaddingVars($themeVars, "Admonition");
 $themeVars: t.composeBorderVars($themeVars, "Admonition");
 $backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
 $borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
-$iconSize-Admonition: createThemeVar("iconSize-Admonition");
+$size-icon-Admonition: createThemeVar("size-icon-Admonition");
 $marginTop-Admonition: createThemeVar("marginTop-Admonition");
 $marginBottom-Admonition: createThemeVar("marginBottom-Admonition");
 $marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
@@ -35,173 +35,226 @@ $marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
 $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
-@layer components {
-  .markdownContent {
-    padding-top: $paddingTop-MarkDown;
-    padding-bottom: $paddingBottom-MarkDown;
-    background-color: $backgroundColor-MarkDown;
-    min-width: 0;
-    width: 100%;
-    @include t.textVars($themeVars, "Text");
+.markdownContent {
+  padding-top: $paddingTop-MarkDown;
+  padding-bottom: $paddingBottom-MarkDown;
+  background-color: $backgroundColor-MarkDown;
+  min-width: 0;
+  width: 100%;
+  @include t.textVars($themeVars, "Text");
 
-    // --- Additional Heading styles
-    h1 {
-      margin-top: createThemeVar("marginTop-H1-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H1-markdown") !important;
-      font-size: createThemeVar("fontSize-H1-markdown") !important;
-    }
+  // --- Additional Heading styles
+  h1 {
+    margin-top: createThemeVar("marginTop-H1-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H1-markdown") !important;
+    font-size: createThemeVar("fontSize-H1-markdown") !important;
+  }
 
-    h2 {
-      margin-top: createThemeVar("marginTop-H2-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H2-markdown") !important;
-    }
+  h2 {
+    margin-top: createThemeVar("marginTop-H2-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H2-markdown") !important;
+  }
 
-    h3 {
-      margin-top: createThemeVar("marginTop-H3-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H3-markdown") !important;
-    }
+  h3 {
+    margin-top: createThemeVar("marginTop-H3-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H3-markdown") !important;
+  }
 
-    h4 {
-      margin-top: createThemeVar("marginTop-H4-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H4-markdown") !important;
-    }
+  h4 {
+    margin-top: createThemeVar("marginTop-H4-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H4-markdown") !important;
+  }
 
-    h5 {
-      margin-top: createThemeVar("marginTop-H5-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H5-markdown") !important;
-    }
+  h5 {
+    margin-top: createThemeVar("marginTop-H5-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H5-markdown") !important;
+  }
 
-    h6 {
-      margin-top: createThemeVar("marginTop-H6-markdown") !important;
-      margin-bottom: createThemeVar("marginBottom-H6-markdown") !important;
-    }
+  h6 {
+    margin-top: createThemeVar("marginTop-H6-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H6-markdown") !important;
+  }
 
-    // --- Image
-    .block {
+  // --- Image
+  .block {
       margin-top: createThemeVar("marginTop-Image-markdown");
       margin-bottom: createThemeVar("marginBottom-Image-markdown");
       margin-left: createThemeVar("marginLeft-Image-markdown");
       margin-right: createThemeVar("marginRight-Image-markdown");
+  }
+
+  // --- Blockquote
+
+  .blockquote {
+    position: relative;
+    margin-top: $marginTop-Blockquote;
+    margin-bottom: $marginBottom-Blockquote;
+    background-color: $backgroundColor-Blockquote;
+
+    &::before {
+      background-color: $color-accent-Blockquote;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      content: "";
+      height: 100%;
+      width: $width-accent-Blockquote;
     }
+  }
 
-    // --- Blockquote
+  .blockquoteContainer {
+    @include t.borderVars($themeVars, "Blockquote");
+    @include t.paddingVars($themeVars, "Blockquote");
+  }
 
-    .blockquote {
-      position: relative;
-      margin-top: $marginTop-Blockquote;
-      margin-bottom: $marginBottom-Blockquote;
-      background-color: $backgroundColor-Blockquote;
+  .admonitionBlockquote {
+    margin-top: $marginTop-Admonition;
+    margin-bottom: $marginBottom-Admonition;
+    background-color: $backgroundColor-Admonition;
+    border-radius: $borderRadius-Admonition;
+    @include t.borderVars($themeVars, "Admonition");
+    @include t.paddingVars($themeVars, "Admonition");
 
-      &::before {
-        background-color: $accentColor-Blockquote;
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: block;
-        content: "";
-        height: 100%;
-        width: $accentWidth-Blockquote;
-      }
+    &.info {
+      background-color: createThemeVar("backgroundColor-Admonition-info");
+      border-color: createThemeVar("borderColor-Admonition-info");
     }
-
-    .blockquoteContainer {
-      @include t.borderVars($themeVars, "Blockquote");
-      @include t.paddingVars($themeVars, "Blockquote");
+    &.warning {
+      background-color: createThemeVar("backgroundColor-Admonition-warning");
+      border-color: createThemeVar("borderColor-Admonition-warning");
     }
-
-    .admonitionBlockquote {
-      margin-top: $marginTop-Admonition;
-      margin-bottom: $marginBottom-Admonition;
-      background-color: $backgroundColor-Admonition;
-      border-radius: $borderRadius-Admonition;
-      @include t.borderVars($themeVars, "Admonition");
-      @include t.paddingVars($themeVars, "Admonition");
-
-      &.info {
-        background-color: createThemeVar("backgroundColor-Admonition-info");
-        border-color: createThemeVar("borderColor-Admonition-info");
-      }
-      &.warning {
-        background-color: createThemeVar("backgroundColor-Admonition-warning");
-        border-color: createThemeVar("borderColor-Admonition-warning");
-      }
-      &.danger {
-        background-color: createThemeVar("backgroundColor-Admonition-danger");
-        border-color: createThemeVar("borderColor-Admonition-danger");
-      }
-      &.note {
-        background-color: createThemeVar("backgroundColor-Admonition-note");
-        border-color: createThemeVar("borderColor-Admonition-note");
-      }
-      &.tip {
-        background-color: createThemeVar("backgroundColor-Admonition-tip");
-        border-color: createThemeVar("borderColor-Admonition-tip");
-      }
+    &.danger {
+      background-color: createThemeVar("backgroundColor-Admonition-danger");
+      border-color: createThemeVar("borderColor-Admonition-danger");
     }
-
-    .admonitionContainer {
-      padding: 0.5rem;
-      display: flex;
-      align-items: flex-start;
+    &.note {
+      background-color: createThemeVar("backgroundColor-Admonition-note");
+      border-color: createThemeVar("borderColor-Admonition-note");
     }
-
-    .admonitionIcon {
-      font-size: $iconSize-Admonition;
-      line-height: 1;
+    &.tip {
+      background-color: createThemeVar("backgroundColor-Admonition-tip");
+      border-color: createThemeVar("borderColor-Admonition-tip");
     }
+  }
 
+  .admonitionContainer {
+    padding: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .admonitionIcon {
+    font-size: $size-icon-Admonition;
+    line-height: 1;
+  }
+
+  .admonitionContent {
+    margin-left: $marginLeft-Admonition-content;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admonitionBlockquote {
     .admonitionContent {
-      margin-left: $marginLeft-Admonition-content;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .admonitionBlockquote {
-      .admonitionContent {
-        [class*="text_"][class*="markdown_"],
-        ul,
-        ol {
-          margin-top: 0;
-          margin-bottom: 0;
-        }
+      [class*="text_"][class*="markdown_"],
+      ul,
+      ol {
+        margin-top: 0;
+        margin-bottom: 0;
       }
     }
+  }
 
-    .horizontalRule {
-      border-top-color: createThemeVar("borderColor-HorizontalRule");
-      border-top-style: createThemeVar("borderStyle-HorizontalRule");
-      border-top-width: createThemeVar("borderWidth-HorizontalRule");
+  .horizontalRule {
+    border-top-color: createThemeVar("borderColor-HorizontalRule");
+    border-top-style: createThemeVar("borderStyle-HorizontalRule");
+    border-top-width: createThemeVar("borderWidth-HorizontalRule");
+  }
+
+  li:has(> input[type="checkbox"]),
+  li:has(> input[type="checkbox"]) {
+    display: flex;
+    align-items: flex-start;
+
+    > input[type="checkbox"] {
+      margin-right: 8px;
+      margin-top: 4px;
+      flex-shrink: 0;
     }
+  }
 
-    li:has(> input[type="checkbox"]),
-    li:has(> input[type="checkbox"]) {
-      display: flex;
-      align-items: flex-start;
+  // First element should have no top margin
+  > *:first-child {
+    margin-top: 0;
+  }
 
-      > input[type="checkbox"] {
-        margin-right: 8px;
-        margin-top: 4px;
-        flex-shrink: 0;
-      }
+  // Last element should have no bottom margin
+  > *:last-child {
+    margin-bottom: 0;
+  }
+
+  // --- Table
+  .tableScrollContainer {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  // --- Details adornment
+  .detailsAdornment {
+    margin-top: $marginTop-Admonition;
+    margin-bottom: $marginBottom-Admonition;
+    border-radius: $borderRadius-Admonition;
+    background-color: $backgroundColor-Admonition;
+    @include t.borderVars($themeVars, "Admonition");
+    
+    // Override ExpandableItem styles for better integration
+    :global(.summary) {
+      padding: 0.5rem 1rem;
+      font-weight: 600; // Make summary text bold
     }
-
-    // First element should have no top margin
-    > *:first-child {
-      margin-top: 0;
-    }
-
-    // Last element should have no bottom margin
-    > *:last-child {
-      margin-bottom: 0;
-    }
-
-    // --- Table
-    .tableScrollContainer {
-      overflow-x: auto;
-      width: 100%;
+    
+    :global(.content) {
+      padding: 0 1rem 0.5rem 1rem;
     }
   }
 }
+
+// --- UnorderedList
+/*
+
+$paddingLeft-UnorderedList: createThemeVar("paddingLeft-UnorderedList");
+
+// the basic <ul> and <ol> styles are the same in tabler.io too
+.unorderedList {
+  list-style-type: revert;
+  list-style-position: outside;
+  padding-left: $paddingLeft-UnorderedList;
+}
+
+// --- OrderedList
+$paddingLeft-OrderedList: createThemeVar("paddingLeft-OrderedList");
+
+// the basic <ul> and <ol> styles are the same in tabler.io too
+.orderedList {
+  list-style-type: revert;
+  list-style-position: outside;
+  padding-left: $paddingLeft-OrderedList;
+}
+
+// --- ListItem
+
+$paddingLeft-ListItem: createThemeVar("paddingLeft-ListItem");
+$color-marker-ListItem: createThemeVar("color-marker-ListItem");
+
+.listItem {
+  padding-left: $paddingLeft-ListItem;
+}
+
+.listItem::marker {
+  color: $color-marker-ListItem;
+}
+*/
 
 // --- We export the theme variables to add them to the component renderer
 :export {

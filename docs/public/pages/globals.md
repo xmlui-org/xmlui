@@ -166,6 +166,14 @@ function formatDateWithoutYear(date: string | Date): string;
 
 This function formats the specified value's date part (without year) into a local date string (according to the machine's local settings).
 
+### `formatHumanElapsedTime`
+
+```ts
+function formatHumanElapsedTime(date: string | Date): string;
+```
+
+This function formats a date into a human-readable elapsed time string. It returns strings like "now", "12 seconds ago", "3 minutes ago", "2 hours ago", "yesterday", "3 days ago", "2 weeks ago", "6 months ago", "1 year ago" based on how much time has passed since the given date.
+
 ### `formatTime`
 
 ```ts

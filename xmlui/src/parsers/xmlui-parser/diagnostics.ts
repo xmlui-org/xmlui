@@ -27,6 +27,9 @@ export enum ErrCodes {
   expTagNameAfterNamespace = "U014",
   expCloseStartWithName = "U015",
   expAttrNameAfterNamespace = "U016",
+  unexpectedCloseTag = "U017",
+  expTagNameAfterCloseStart = "U019",
+  expAttrNameBeforeEq = "U020",
   invalidChar = "W001",
   untermStr = "W002",
   untermComment = "W007",
@@ -35,12 +38,17 @@ export enum ErrCodes {
 }
 
 export const DIAGS = {
-  expCloseStartWithName: function(openTagName: string){
+  unexpectedCloseTag: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.unexpectedCloseTag,
+    message: "Read '</', but there's no opening tag to close.",
+  },
+  expCloseStartWithName: function (openTagName: string) {
     return {
       category: DiagnosticCategory.Error,
       code: ErrCodes.expCloseStartWithName,
       message: `Opened tag has no closing pair. Expected to see '</${openTagName}>'.`,
-    }
+    };
   },
   expCloseStart: {
     category: DiagnosticCategory.Error,
@@ -110,19 +118,36 @@ export const DIAGS = {
     code: ErrCodes.expAttrName,
     message: `An attribute name expected.`,
   },
-  expAttrNameAfterNamespace: {
-    category: DiagnosticCategory.Error,
-    code: ErrCodes.expAttrNameAfterNamespace,
-    message: `An attribute name expected after a namespaces.`,
+  expAttrNameAfterNamespace: function (namespaceName: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.expAttrNameAfterNamespace,
+      message: `An attribute name expected after namespace '${namespaceName}'.`,
+    };
   },
-  expTagNameAfterNamespace: {
+  expTagNameAfterNamespace: function (namespaceName: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.expTagNameAfterNamespace,
+      message: `A tag name expected after namespace '${namespaceName}'.`,
+    };
+  },
+  expTagNameAfterCloseStart: {
     category: DiagnosticCategory.Error,
-    code: ErrCodes.expTagNameAfterNamespace,
-    message: `A tag name expected after a namespaces.`,
-  }
+    code: ErrCodes.expTagNameAfterCloseStart,
+    message: "Expected tag name after '</'.",
+  },
+  expAttrNameBeforeEq: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expAttrNameBeforeEq,
+    message: "Expected attribute name before '='.",
+  },
 } as const;
 
-export function diagnosticCategoryName(d: { category: DiagnosticCategory }, lowerCase = true): string {
+export function diagnosticCategoryName(
+  d: { category: DiagnosticCategory },
+  lowerCase = true,
+): string {
   const name = DiagnosticCategory[d.category];
   return lowerCase ? name.toLowerCase() : name;
 }
@@ -156,7 +181,6 @@ export const Diag_Unterminated_Script = {
   category: DiagnosticCategory.Error,
   message: "Unterminated script section",
 } as const;
-
 
 export type ScannerDiagnosticMessage =
   | typeof Diag_Invalid_Character

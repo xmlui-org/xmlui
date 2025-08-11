@@ -4,11 +4,10 @@ import produce from "immer";
 import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -21,9 +20,9 @@ import type { RendererContext } from "../../abstractions/RendererDefs";
 const COMP = "Table";
 
 export const TableMd = createMetadata({
+  status: "stable",
   description:
-    `\`${COMP}\` is a component that displays cells organized into rows and columns. The \`${COMP}\` ` +
-    `component is virtualized so it only renders visible cells.`,
+    "`Table` presents structured data for viewing, sorting, selection, and interaction.",
   props: {
     items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +
@@ -131,18 +130,32 @@ export const TableMd = createMetadata({
     ),
   },
   apis: {
-    clearSelection: d("This method clears the list of currently selected table rows."),
-    getSelectedItems: d(`This method returns the list of currently selected table rows items.`),
-    getSelectedIds: d(`This method returns the list of currently selected table rows IDs.`),
-    selectAll: d(
-      `This method selects all the rows in the table. This method has no effect if the ` +
+    clearSelection: {
+      description: `This method clears the list of currently selected table rows.`,
+      signature: "clearSelection(): void",
+    },
+    getSelectedItems: {
+      description: `This method returns the list of currently selected table rows items.`,
+      signature: "getSelectedItems(): Array<TableRowItem>",
+    },
+    getSelectedIds: {
+      description: `This method returns the list of currently selected table rows IDs.`,
+      signature: "getSelectedIds(): Array<string>",
+    },
+    selectAll: {
+      description: `This method selects all the rows in the table. This method has no effect if the ` +
         `rowsSelectable property is set to \`false\`.`,
-    ),
-    selectId: d(
-      `This method selects the row with the specified ID. This method has no effect if the ` +
+      signature: "selectAll(): void",
+    },
+    selectId: {
+      description: `This method selects the row with the specified ID. This method has no effect if the ` +
         `\`rowsSelectable\` property is set to \`false\`. The method argument can be a ` +
         `single id or an array of them.`,
-    ),
+      signature: "selectId(id: string | Array<string>): void",
+      parameters: {
+        id: `The ID of the row to select, or an array of IDs to select multiple rows.`,
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -332,7 +345,7 @@ export const tableComponentRenderer = createComponentRenderer(
       <TableWithColumns
         node={node}
         extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler}
+        lookupEventHandler={lookupEventHandler as any}
         lookupSyncCallback={lookupSyncCallback}
         layoutCss={layoutCss}
         renderChild={renderChild}

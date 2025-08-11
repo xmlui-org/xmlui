@@ -1,5 +1,34 @@
-import type { ComponentPropertyMetadata } from "../abstractions/ComponentDefs";
+import type {
+  ComponentMetadata,
+  ComponentPropertyMetadata,
+  IsValidFunction,
+  PropertyValueDescription,
+  PropertyValueType,
+} from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
+import { defaultProps } from "./FormItem/ItemWithLabel";
+
+export function createMetadata<
+  TProps extends Record<string, ComponentPropertyMetadata>,
+  TEvents extends Record<string, ComponentPropertyMetadata>,
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+>(
+  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>,
+): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
+  return metadata;
+}
+
+export function d(
+  description: string,
+  availableValues?: readonly PropertyValueDescription[],
+  valueType?: PropertyValueType,
+  defaultValue?: any,
+  isValid?: IsValidFunction<any>,
+  isRequired?: boolean,
+): ComponentPropertyMetadata {
+  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
+}
 
 export function dInternal(description?: string): ComponentPropertyMetadata {
   return {
@@ -69,10 +98,10 @@ export function dLabelWidth(comp: string): ComponentPropertyMetadata {
 export function dLabelBreak(comp: string): ComponentPropertyMetadata {
   return {
     description:
-      `This boolean value indicates if the \`${comp}\` label can be split into multiple ` +
+      `This boolean value indicates whether the \`${comp}\` label can be split into multiple ` +
       `lines if it would overflow the available label width.`,
     valueType: "boolean",
-    defaultValue: false,
+    defaultValue: defaultProps.labelBreak,
   };
 }
 
@@ -239,8 +268,6 @@ export function dValue(): ComponentPropertyMetadata {
       `retrieve \`undefined\`.`,
   };
 }
-
-`You can query the component's value. If no value is set, it will retrieve \`undefined\`.`;
 
 export function dDidOpen(comp: string): ComponentPropertyMetadata {
   return {

@@ -15,7 +15,7 @@ import {
   type PostfixOpExpression,
   type PrefixOpExpression,
   type UnaryExpression,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 

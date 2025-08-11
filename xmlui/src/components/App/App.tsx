@@ -1,13 +1,14 @@
 import styles from "./App.module.scss";
 import drawerStyles from "./Sheet.module.scss";
 
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App, defaultProps } from "./AppNative";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
@@ -29,9 +30,9 @@ const COMP = "App";
 export const AppMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component provides a UI frame for XMLUI apps. According to predefined (and ` +
-    `run-time configurable) structure templates, \`${COMP}\` allows you to display your ` +
-    `preferred layout.`,
+    "The `App` component is the root container that defines your application's overall " +
+    "structure and layout. It provides a complete UI framework with built-in navigation, " +
+    "header, footer, and content areas that work together seamlessly.",
   props: {
     layout: {
       description:
@@ -92,7 +93,12 @@ export const AppMd = createMetadata({
     },
   },
   events: {
-    ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
+    ready: {
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
+    },
+    messageReceived: {
+      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
@@ -109,7 +115,7 @@ export const AppMd = createMetadata({
       "with one of the vertical layouts.",
   },
   defaultThemeVars: {
-    "maxWidth-Drawer": "20rem",
+    "maxWidth-Drawer": "100%",
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
@@ -343,6 +349,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       layout: layoutType,
       loggedInUser: extractValue(node.props.loggedInUser),
       onReady: lookupEventHandler("ready"),
+      onMessageReceived: lookupEventHandler("messageReceived"),
       name: extractValue(node.props.name),
       logo: extractValue(node.props.logo),
       logoDark: extractValue(node.props["logo-dark"]),
@@ -389,13 +396,18 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
   );
 }
 
-const HIDDEN_STYLE = {
+const HIDDEN_STYLE: CSSProperties = {
+  position: "absolute",
+  top: "-9999px",
   display: "none",
+};
+
+const indexerContextValue = {
+  indexing: true,
 };
 
 function SearchIndexCollector({ Pages, renderChild }) {
   const appContext = useAppContext();
-  const indexerContextValue = useMemo(() => ({ indexing: true }), []);
   const setIndexing = useSearchContextSetIndexing();
 
   const [isClient, setIsClient] = useState(false);

@@ -1,6 +1,6 @@
 import Color from "color";
 
-import { HVar, parseHVar } from "../theming/hvar";
+import { type HVar, parseHVar } from "../theming/hvar";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
 import { toCssVar } from "./layout-resolver";
 
@@ -99,8 +99,10 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   const ret: Record<string, string> = {};
   ret[`fontSize-large`] = `${1.5 * baseNum}${baseUnit}`;
   ret[`fontSize-medium`] = `${1.25 * baseNum}${baseUnit}`;
+  ret[`fontSize-semimedium`] = `${1.125 * baseNum}${baseUnit}`;
   ret[`fontSize-normal`] = base;
   ret[`fontSize-small`] = `${0.875 * baseNum}${baseUnit}`;
+  ret[`fontSize-code`] = `${0.85 * baseNum}${baseUnit}`;
   ret[`fontSize-smaller`] = `${0.75 * baseNum}${baseUnit}`;
   ret[`fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
 
@@ -735,7 +737,7 @@ function generateBaseTonesForColor(
       color200 = baseColor.lightness(baseL + lightStep * 3);
       color300 = baseColor.lightness(baseL + lightStep * 2);
       color400 = baseColor.lightness(baseL + lightStep * 1);
-      color500 = baseColor;
+      color500 = baseColor.lightness(baseL);
       color600 = baseColor.lightness(baseL - darkStep * 1);
       color700 = baseColor.lightness(baseL - darkStep * 2);
       color800 = baseColor.lightness(baseL - darkStep * 3);

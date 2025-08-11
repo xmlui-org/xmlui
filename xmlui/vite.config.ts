@@ -30,6 +30,7 @@ export default ({ mode }) => {
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
           VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
           VITE_USED_COMPONENTS_Tree: "false",
+          VITE_USED_COMPONENTS_TableEditor: "false",
           // VITE_USED_COMPONENTS_Charts: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
           VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
@@ -58,7 +59,13 @@ export default ({ mode }) => {
           xmlui: path.resolve("src", "index.ts"),
           "xmlui-parser": path.resolve("src", "parsers", "xmlui-parser", "index.ts"),
           "language-server": path.resolve("src", "language-server", "server.ts"),
-          "language-server-web-worker": path.resolve("src", "language-server", "server-web-worker.ts"),
+          "language-server-web-worker": path.resolve(
+            "src",
+            "language-server",
+            "server-web-worker.ts",
+          ),
+          "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
+          "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
         },
         formats: ["es"],
       };

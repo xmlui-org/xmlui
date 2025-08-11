@@ -1,10 +1,12 @@
 # AutoComplete [#autocomplete]
 
-This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items.
+`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.
 
-The component provides context values with which you can access some internal properties:
-
-- `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
+**Key features:**
+- **Type-ahead filtering**: Users can type to narrow down options in real-time
+- **Multi-select support**: Set `multi="true"` to allow selecting multiple items
+- **Custom option creation**: Enable `creatable="true"` to let users add new options
+- **Rich customization**: Use `optionTemplate` to create complex option layouts
 
 ## Using AutoComplete [#using-autocomplete]
 
@@ -18,13 +20,17 @@ The component provides context values with which you can access some internal pr
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
+
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `creatable (default: false)` [#creatable-default-false]
+### `creatable` (default: false) [#creatable-default-false]
 
 This property allows the user to create new items that are not present in the list of options.
 
@@ -46,7 +52,7 @@ This property defines the template to display when the list of options is empty.
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -58,9 +64,9 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` [#labelposition]
 
@@ -83,7 +89,7 @@ This property sets the width of the `AutoComplete` component's label. If not def
 
 This property sets the maximum length of the input it accepts.
 
-### `multi (default: false)` [#multi-default-false]
+### `multi` (default: false) [#multi-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -107,7 +113,7 @@ This property enables the customization of list items. To access the attributes 
 <App>
   <AutoComplete multi="true">
     <property name="optionTemplate">
-      <Text textAlign="center" color="purple">{console.log($item), $item.label}</Text>
+      <Text textAlign="center" color="red">{$item.label}</Text>
     </property>
     <Option value="1" label="Bruce Wayne" />
     <Option value="2" label="Clark Kent" />
@@ -120,15 +126,15 @@ This property enables the customization of list items. To access the attributes 
 
 An optional placeholder text that is visible in the input field when its empty.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -158,15 +164,23 @@ This event is triggered when the AutoComplete has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the AutoComplete.
+This method focuses the AutoComplete component.
+
+**Signature**: `focus()`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API allows you to set the value of the component. If the value is not valid, the component will not update its internal state.
+
+**Signature**: `setValue(value: any)`
+
+- `value`: The value to set.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API allows you to get or set the value of the component. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 
@@ -210,8 +224,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-AutoComplete | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
@@ -230,8 +244,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [color](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-AutoComplete | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete-default | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete-error | *none* | *none* |
@@ -267,6 +281,10 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-warning | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-warning | *none* | *none* |
 | [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
 | [outlineColor](../styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |

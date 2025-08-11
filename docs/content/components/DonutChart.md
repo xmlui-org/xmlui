@@ -1,6 +1,6 @@
 # DonutChart [#donutchart]
 
-Represents a derivative of the pie chart that is a donut chart.
+A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly.
 
 ## Properties [#properties]
 
@@ -8,11 +8,11 @@ Represents a derivative of the pie chart that is a donut chart.
 
 The data to be displayed in the chart. Needs to be an array of objects.
 
-### `dataKeys` [#datakeys]
+### `dataKey` [#datakey]
 
-This property specifies the keys in the data objects that should be used for rendering the bars.
+This property specifies the key in the data objects that will be used to render the chart.
 
-### `innerRadius (default: 60)` [#innerradius-default-60]
+### `innerRadius` (default: 60) [#innerradius-default-60]
 
 Sets the inner radius of the donut chart.
 
@@ -20,15 +20,15 @@ Sets the inner radius of the donut chart.
 
 Specifies the key in the data objects that will be used to label the different data series.
 
-### `showLabel (default: true)` [#showlabel-default-true]
+### `showLabel` (default: true) [#showlabel-default-true]
 
 Toggles whether to show labels (`true`) or not (`false`).
 
-### `showLabelList (default: false)` [#showlabellist-default-false]
+### `showLabelList` (default: false) [#showlabellist-default-false]
 
 Whether to show labels in a list (`true`) or not (`false`).
 
-### `showLegend (default: false)` [#showlegend-default-false]
+### `showLegend` (default: false) [#showlegend-default-false]
 
 Whether to show a legend (`true`) or not (`false`).
 

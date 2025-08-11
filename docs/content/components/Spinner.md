@@ -1,6 +1,6 @@
 # Spinner [#spinner]
 
-The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
+`Spinner` is an animated indicator that represents an action in progress with no deterministic progress value.
 
 While it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.
 
@@ -17,7 +17,7 @@ While it is visible, the action is yet to be completed; on completion, the UI lo
 
 ## Properties [#properties]
 
-### `delay (default: 400)` [#delay-default-400]
+### `delay` (default: 400) [#delay-default-400]
 
 The delay in milliseconds before the spinner is displayed.
 
@@ -36,7 +36,7 @@ Use the buttons to toggle between the two `Spinners`.
 </App>
 ```
 
-### `fullScreen (default: false)` [#fullscreen-default-false]
+### `fullScreen` (default: false) [#fullscreen-default-false]
 
 If set to `true`, the component will be rendered in a full screen container.
 

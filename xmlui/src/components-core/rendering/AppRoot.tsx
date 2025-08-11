@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
@@ -54,8 +54,11 @@ export function AppRoot({
   extensionManager,
   children,
   projectCompilation,
+  isNested = false,
+  onInit,
 }: AppWrapperProps & {
   extensionManager?: StandaloneExtensionManager;
+  isNested?: boolean;
 }) {
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
@@ -87,6 +90,12 @@ export function AppRoot({
   // --- Start with an error-free state
   resetErrors();
 
+  // --- Add isNested to global props so it can be accessed throughout the app
+  const enhancedGlobalProps = useMemo(() => ({
+    ...globalProps,
+    isNested,
+  }), [globalProps, isNested]);
+
   // --- Render the app providing a component registry (in which the engine finds a
   // --- component definition by its name). Ensure the app has a context for debugging.
   return (
@@ -105,11 +114,12 @@ export function AppRoot({
             debugEnabled={debugEnabled}
             defaultTheme={defaultTheme}
             defaultTone={defaultTone}
-            globalProps={globalProps}
+            globalProps={enhancedGlobalProps}
             standalone={standalone}
             trackContainerHeight={trackContainerHeight}
             previewMode={previewMode}
             sources={sources}
+            onInit={onInit}
           >
             {children}
           </AppWrapper>

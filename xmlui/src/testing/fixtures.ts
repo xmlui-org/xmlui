@@ -1,16 +1,15 @@
 /* eslint react-hooks/rules-of-hooks: 0 */
 // The above exception is needed since it fires a false-positive
-// for the "use" function of the playwright test framework
+// for the "use" function coming from the playwright test framework
 import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
-import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import {
-  type ComponentDriver,
   type ComponentDriverParams,
-  type HtmlTagDriver,
+  type ComponentDriver,
   AccordionDriver,
   AppFooterDriver,
   AppHeaderDriver,
@@ -18,10 +17,12 @@ import {
   BadgeDriver,
   ButtonDriver,
   CardDriver,
+  ContentSeparatorDriver,
   FormDriver,
   FormItemDriver,
   HeadingDriver,
   HStackDriver,
+  HtmlTagDriver,
   IconDriver,
   ItemsDriver,
   LinkDriver,
@@ -33,6 +34,7 @@ import {
   NoResultDriver,
   NumberBoxDriver,
   OptionDriver,
+  ProgressBarDriver,
   RadioGroupDriver,
   RangeDriver,
   SelectDriver,
@@ -46,11 +48,23 @@ import {
   ValidationDisplayDriver,
   ValidationSummaryDriver,
   VStackDriver,
-  DatePickerDriver, AutoCompleteDriver
+  DatePickerDriver,
+  AutoCompleteDriver,
+  CodeBlockDriver,
+  CheckboxDriver,
+  DropdownMenuDriver,
+  ExpandableItemDriver,
+  FileInputDriver,
+  FileUploadDropZoneDriver,
+  LabelDriver,
+  BackdropDriver,
+  SpinnerDriver,
 } from "./ComponentDrivers";
-import { initComponent } from "./component-test-helpers";
+import { parseComponentIfNecessary } from "./component-test-helpers";
 
 export { expect } from "./assertions";
+
+const isCI = process?.env?.CI === "true";
 
 // -----------------------------------------------------------------
 // --- Utility
@@ -61,9 +75,9 @@ export { expect } from "./assertions";
 async function getOnlyFirstLocator(page: Page, testId: string) {
   const locators = page.getByTestId(testId);
   if ((await locators.count()) > 1) {
-    console.error(
-      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
-    );
+    // console.error(
+    //   `More than one element found with testId: ${testId}! Ignoring all but the first.`,
+    // );
     return locators.first();
   }
   return locators;
@@ -71,12 +85,28 @@ async function getOnlyFirstLocator(page: Page, testId: string) {
 
 class Clipboard {
   private page: Page;
+  private content: string = "";
 
   constructor(page: Page) {
     this.page = page;
   }
 
-  async getContent() {
+  init() {
+    return () => {
+      window.navigator.clipboard.readText = async () => this.content;
+      window.navigator.clipboard.read = async () => [new ClipboardItem({ "text/plain": this.content })];
+      window.navigator.clipboard.writeText = async (text) => { this.content = text };
+      window.navigator.clipboard.write = async (items) => {
+        for (const item of items) {
+          if (item.types.includes("text/plain")) {
+            this.content = await item.getType("text/plain").then((blob) => blob.text());
+          }
+        }
+      };
+    }
+  }
+
+  async read() {
     const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
     return handle.jsonValue();
   }
@@ -90,18 +120,33 @@ class Clipboard {
   }
 
   /**
-   * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver
+   * Copies the text from the given locator to the clipboard.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Select the text.
+   * 3. Copy the text to the clipboard. (ControlOrMeta+C)
+   *
+   * @param locator - a Locator to focus and copy from
    */
-  async copyFrom(driver: ComponentDriver) {
-    await driver.focus();
-    await driver.dblclick();
-    await this.page.keyboard.press("Control+c");
+  async copy(locator: Locator) {
+    await locator.focus();
+    await locator.selectText();
+    await this.page.keyboard.press("ControlOrMeta+C");
   }
 
-  async pasteTo(driver: ComponentDriver) {
-    await driver.focus();
-    await this.page.keyboard.press("Control+v");
+  /**
+   * Pastes the text from the clipboard to the given locator.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Paste the text from the clipboard. (ControlOrMeta+V)
+   *
+   * @param locator - a Locator to focus and paste to
+   */
+  async paste(locator: Locator) {
+    await locator.focus();
+    await this.page.keyboard.press("ControlOrMeta+V");
   }
 }
 
@@ -125,8 +170,9 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
 
-type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
+type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint" | "components"> & {
   testThemeVars?: Record<string, string>;
+  components?: string[];
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -154,19 +200,59 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       }
       const entryPoint = component as ComponentDef;
 
+      const components = description?.components?.map((c) => {
+        const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
+        if (erroneousCompoundComponentName) {
+          throw new Error(
+            `Error parsing component "${erroneousCompoundComponentName}": ${errors.join("\n")}`,
+          );
+        }
+        return component as CompoundComponentDef;
+      });
+
       if (source !== "" && entryPoint.children) {
         const sourceBaseComponent = entryPoint.children[0];
-        if (!sourceBaseComponent.testId) {
+        const isCompoundComponentRoot =
+          components &&
+          components?.length > 0 &&
+          components?.map((c) => c.name).includes(sourceBaseComponent.type);
+
+        if (!isCompoundComponentRoot && !sourceBaseComponent.testId) {
           sourceBaseComponent.testId = baseComponentTestId;
+        } else if (
+          isCompoundComponentRoot &&
+          sourceBaseComponent.children?.length === 1 &&
+          !sourceBaseComponent.children?.[0].testId
+        ) {
+          // If the source is a compound component, we need to set the testId on the first & only child
+          sourceBaseComponent.children[0].testId = baseComponentTestId;
         }
       }
-
       const themedDescription = mapThemeRelatedVars(description);
-      await initComponent(page, { ...themedDescription, entryPoint });
+
+      const _appDescription: StandaloneAppDescription = {
+        name: "test bed app",
+        ...themedDescription,
+        components,
+        entryPoint,
+      };
+
+      const clipboard = new Clipboard(page);
+      // --- Mock the clipboard API if in CI
+      if (isCI) {
+        await page.addInitScript(clipboard.init);
+      }
+
+      await page.addInitScript((app) => {
+        // @ts-ignore
+        window.TEST_ENV = app;
+      }, _appDescription);
       const { width, height } = page.viewportSize();
+      await page.goto("/");
+
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
-        clipboard: new Clipboard(page),
+        clipboard,
         width: width ?? 0,
         height: height ?? 0,
       };
@@ -195,6 +281,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createButtonDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(ButtonDriver, testIdOrLocator);
+    });
+  },
+  createBackdropDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(BackdropDriver, testIdOrLocator);
+    });
+  },
+  createContentSeparatorDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ContentSeparatorDriver, testIdOrLocator);
     });
   },
   createAvatarDriver: async ({ createDriver }, use) => {
@@ -252,6 +348,21 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DatePickerDriver, testIdOrLocator);
     });
   },
+  createExpandableItemDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ExpandableItemDriver, testIdOrLocator);
+    });
+  },
+  createFileInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileInputDriver, testIdOrLocator);
+    });
+  },
+  createFileUploadDropZoneDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FileUploadDropZoneDriver, testIdOrLocator);
+    });
+  },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
@@ -280,6 +391,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createTextAreaDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(TextAreaDriver, testIdOrLocator);
+    });
+  },
+  createProgressBarDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ProgressBarDriver, testIdOrLocator);
     });
   },
   createListDriver: async ({ createDriver }, use) => {
@@ -374,7 +490,32 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
   createHtmlTagDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
-      return createDriver(OptionDriver, testIdOrLocator);
+      return createDriver(HtmlTagDriver, testIdOrLocator);
+    });
+  },
+  createCodeBlockDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(CodeBlockDriver, testIdOrLocator);
+    });
+  },
+  createCheckboxDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(CheckboxDriver, testIdOrLocator);
+    });
+  },
+  createLabelDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(LabelDriver, testIdOrLocator);
+    });
+  },
+  createSpinnerDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SpinnerDriver, testIdOrLocator);
+    });
+  },
+  createDropdownMenuDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
 });
@@ -402,6 +543,8 @@ type TestDriverExtenderProps = {
     testIdOrLocator?: string | Locator,
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
+  createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
+  createContentSeparatorDriver: ComponentDriverMethod<ContentSeparatorDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;
   createFormItemDriver: ComponentDriverMethod<FormItemDriver>;
@@ -413,12 +556,16 @@ type TestDriverExtenderProps = {
   createSliderDriver: ComponentDriverMethod<SliderDriver>;
   createRangeDriver: ComponentDriverMethod<RangeDriver>;
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
+  createExpandableItemDriver: ComponentDriverMethod<ExpandableItemDriver>;
+  createFileInputDriver: ComponentDriverMethod<FileInputDriver>;
+  createFileUploadDropZoneDriver: ComponentDriverMethod<FileUploadDropZoneDriver>;
   createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
   createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;
   createTextBoxDriver: ComponentDriverMethod<TextBoxDriver>;
   createTextAreaDriver: ComponentDriverMethod<TextAreaDriver>;
+  createProgressBarDriver: ComponentDriverMethod<ProgressBarDriver>;
   createListDriver: ComponentDriverMethod<ListDriver>;
   createTextDriver: ComponentDriverMethod<TextDriver>;
   createHeadingDriver: ComponentDriverMethod<HeadingDriver>;
@@ -438,4 +585,9 @@ type TestDriverExtenderProps = {
   createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
   createOptionDriver: ComponentDriverMethod<OptionDriver>;
   createHtmlTagDriver: ComponentDriverMethod<HtmlTagDriver>;
+  createCodeBlockDriver: ComponentDriverMethod<CodeBlockDriver>;
+  createCheckboxDriver: ComponentDriverMethod<CheckboxDriver>;
+  createLabelDriver: ComponentDriverMethod<LabelDriver>;
+  createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
+  createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
 };

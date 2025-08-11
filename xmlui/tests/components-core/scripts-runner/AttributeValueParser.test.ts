@@ -1,7 +1,7 @@
 import { assert, describe, expect, it } from "vitest";
 
 import { parseAttributeValue } from "../../../src/components-core/script-runner/AttributeValueParser";
-import { Identifier, T_IDENTIFIER } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { Identifier, T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Attribute value parsing", () => {
   it("Empty value", () => {

@@ -1,8 +1,8 @@
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "DonutChart";
 
@@ -12,20 +12,21 @@ const defaultPropsDonut = {
 };
 
 export const DonutChartMd = createMetadata({
-  description: "Represents a derivative of the pie chart that is a donut chart.",
   status: "experimental",
+  description: "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
+    "Note that the height of the component or its parent needs to be set explicitly.",
   props: {
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",
     },
-    dataKeys: {
-      description:
-        "This property specifies the keys in the data objects that should be used for rendering the bars.",
-      valueType: "string",
-    },
     nameKey: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
+      valueType: "string",
+    },
+    dataKey: {
+      description:
+        "This property specifies the key in the data objects that will be used to render the chart.",
       valueType: "string",
     },
     showLabel: {
@@ -58,7 +59,7 @@ export const DonutChartMd = createMetadata({
 export const donutChartComponentRenderer = createComponentRenderer(
   COMP,
   DonutChartMd,
-  ({ extractValue, node, className, renderChild }: any) => {
+  ({ extractValue, node, layoutCss, renderChild }) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(
@@ -70,7 +71,7 @@ export const donutChartComponentRenderer = createComponentRenderer(
           defaultPropsDonut.innerRadius,
         )}
         data={extractValue(node.props?.data)}
-        className={className}
+        style={layoutCss}
         showLabel={extractValue.asOptionalBoolean(
           node.props?.showLabel,
           defaultPropsDonut.showLabel,

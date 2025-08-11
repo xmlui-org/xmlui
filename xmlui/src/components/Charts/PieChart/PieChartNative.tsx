@@ -7,30 +7,27 @@ import {
   Tooltip,
   Legend as RLegend,
 } from "recharts";
-import { PieSectorDataItem } from "recharts/types/polar/Pie";
+import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
-import { useTheme } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { useTheme } from "../../../components-core/theming/ThemeContext";
 
 export type PieChartProps = {
   data: any[];
   dataKey: string;
   nameKey: string;
   style?: CSSProperties;
-  className?: string;
   showLabel?: boolean;
   showLabelList?: boolean;
   labelListPosition?: LabelPosition;
   innerRadius?: number;
   children?: ReactNode;
   showLegend?: boolean;
-  width?: string | number;
-  height?: string | number;
   outerRadius?: string | number;
 };
 
@@ -115,19 +112,15 @@ export function PieChart({
   dataKey,
   nameKey,
   style,
-  className,
   showLabel = defaultProps.showLabel,
   showLabelList = defaultProps.showLabelList,
   labelListPosition = defaultProps.labelListPosition,
   innerRadius = defaultProps.innerRadius,
   children,
-  width = "100%",
-  height = "100%",
   outerRadius = "60%",
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
   const { getThemeVar } = useTheme();
-
   const colorValues = useMemo(() => {
     return [
       getThemeVar("color-primary-500"),
@@ -182,36 +175,45 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} className={className} width={width} height={height}>
-        <RPieChart>
-          <Tooltip content={<TooltipContent />} />
-          <Pie
-            data={chartData}
-            dataKey={dataKey}
-            nameKey={nameKey}
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
-            paddingAngle={1}
-            activeShape={renderActiveShape}
-            label={showLabel ? renderCustomizedLabel : false}
-            labelLine={showLabel}
-          >
-            {chartContextValue.labelList
-              ? chartContextValue.labelList
-              : showLabelList && (
-                  <LabelList
-                    position={labelListPosition}
-                    dataKey={nameKey}
-                    className={styles.labelList}
-                    stroke="none"
-                    fill="currentColor"
-                    fontSize={12}
-                  />
-                )}
-          </Pie>
-          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
-        </RPieChart>
-      </ResponsiveContainer>
+      <div
+        style={{
+          flexGrow: 1,
+          minHeight: 0,
+          width: style.width || "100%",
+          height: style.height || "100%",
+        }}
+      >
+        <ResponsiveContainer style={style} width="100%" height="100%" minWidth={0}>
+          <RPieChart>
+            <Tooltip content={<TooltipContent />} />
+            <Pie
+              data={chartData}
+              dataKey={dataKey}
+              nameKey={nameKey}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
+              paddingAngle={1}
+              activeShape={renderActiveShape}
+              label={showLabel ? renderCustomizedLabel : false}
+              labelLine={showLabel}
+            >
+              {chartContextValue.labelList
+                ? chartContextValue.labelList
+                : showLabelList && (
+                    <LabelList
+                      position={labelListPosition}
+                      dataKey={nameKey}
+                      className={styles.labelList}
+                      stroke="none"
+                      fill="currentColor"
+                      fontSize={12}
+                    />
+                  )}
+            </Pie>
+            {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
+          </RPieChart>
+        </ResponsiveContainer>
+      </div>
     </ChartProvider>
   );
 }

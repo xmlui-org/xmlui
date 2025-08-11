@@ -1,6 +1,6 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
-import type { Node } from "./syntax-node";
+import { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
@@ -202,7 +202,7 @@ export function nodeToComponentDef(
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
     }
-    if(codeBehind){
+    if (codeBehind) {
       component.codeBehind = codeBehind.value;
     }
 
@@ -1185,14 +1185,18 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
   if (childrenListIdx === undefined || childrenListIdx === -1) {
     return node;
   }
-  return {
-    ...node,
-    children: [
-      ...node.children!.slice(0, childrenListIdx),
-      { ...node.children![childrenListIdx], children: newChildren },
-      ...node.children!.slice(childrenListIdx),
-    ],
-  };
+  const contentListChild = node.children![childrenListIdx];
+  return new Node(node.kind, node.pos ?? 0, node.end ?? 0, node.triviaBefore, [
+    ...node.children!.slice(0, childrenListIdx),
+    new Node(
+      contentListChild.kind,
+      contentListChild.pos ?? 0,
+      contentListChild.end ?? 0,
+      undefined,
+      newChildren,
+    ),
+    ...node.children!.slice(childrenListIdx),
+  ]);
 }
 
 function desugarKeyOnlyAttrs(attrs: Node[]) {
@@ -1250,9 +1254,6 @@ function addToNamespaces(
     return reportError("T025", nsKey);
   }
   compNamespaces.set(nsKey, nsValue);
-
-  comp.namespaces ??= {};
-  comp.namespaces[nsKey] = nsValue;
 }
 
 function getTopLvlElement(node: Node, getText: GetText): Node {
@@ -1308,8 +1309,8 @@ function getNamespaceResolvedComponentName(
 }
 
 /**
-* @param name - The name of the event in camelCase, with "on" prefix.
-*/
+ * @param name - The name of the event in camelCase, with "on" prefix.
+ */
 export function stripOnPrefix(name: string) {
   return name[2].toLowerCase() + name.substring(3);
 }

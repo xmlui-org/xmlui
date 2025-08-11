@@ -1,18 +1,16 @@
 # TextArea [#textarea]
 
-`TextArea` is a component that provides a multiline text input area.
+`TextArea` provides a multiline text input area.
 
-The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
-
-To add new lines to the input field press `Shift` + `Enter`.
+It is often used in forms, see [this guide](/forms) for details.
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `autoSize (default: false)` [#autosize-default-false]
+### `autoSize` (default: false) [#autosize-default-false]
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
@@ -26,7 +24,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -36,12 +34,12 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `enterSubmits (default: true)` [#entersubmits-default-true]
+### `enterSubmits` (default: true) [#entersubmits-default-true]
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
-See [Using Forms](../learning/forms.mdx) for details.
+See [Using Forms](/forms) for details.
 
 ```xmlui-pg copy display name="Example: enterSubmits"
 <App>
@@ -54,7 +52,7 @@ See [Using Forms](../learning/forms.mdx) for details.
 </App>
 ```
 
-### `escResets (default: false)` [#escresets-default-false]
+### `escResets` (default: false) [#escresets-default-false]
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
@@ -74,11 +72,11 @@ The initial value displayed in the input field.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `TextArea` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `TextArea` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -139,7 +137,7 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -149,7 +147,7 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -179,7 +177,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 </App>
 ```
 
-### `rows (default: 2)` [#rows-default-2]
+### `rows` (default: 2) [#rows-default-2]
 
 Specifies the number of rows the component initially has.
 
@@ -191,7 +189,7 @@ Specifies the number of rows the component initially has.
 </App>
 ```
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -254,7 +252,9 @@ This event is triggered when the TextArea has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the TextArea.
+This method sets the focus on the `TextArea` component.
+
+**Signature**: `focus(): void`
 
 ```xmlui-pg copy display name="Example: focus"
 <App>
@@ -285,6 +285,8 @@ You can use this method to set the component's current value programmatically (`
 ### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): string | undefined`
 
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
@@ -351,10 +353,6 @@ In the example below, typing in the `TextArea` will also display the length of t
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning--focus | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Textarea-warning--hover | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-default | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-error | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-success | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-placeholder-Textarea-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Textarea-success | *none* | *none* |
@@ -383,6 +381,10 @@ In the example below, typing in the `TextArea` will also display the length of t
 | [padding](../styles-and-themes/common-units/#size)-Textarea-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Textarea-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Textarea-warning | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-error | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-success | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Textarea-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Textarea-default--focus | *none* | *none* |

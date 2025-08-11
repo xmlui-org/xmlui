@@ -4,7 +4,7 @@ The `Backdrop` component is a semi-transparent overlay that appears on top of it
 
 ```xmlui-pg copy display name="Example: using Backdrop"
 <App>
-  <Backdrop opacity="0.2">
+  <Backdrop opacity="0.6">
     <Image 
       src="/resources/images/components/image/breakfast.jpg" 
       fit="cover" width="400px" />
@@ -19,11 +19,11 @@ The `Backdrop` component is a semi-transparent overlay that appears on top of it
 
 ## Properties [#properties]
 
-### `backgroundColor (default: "black")` [#backgroundcolor-default-black]
+### `backgroundColor` [#backgroundcolor]
 
 The background color of the backdrop.
 
-### `opacity (default: "0.1")` [#opacity-default-0-1]
+### `opacity` [#opacity]
 
 The opacity of the backdrop.
 
@@ -41,4 +41,9 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Backdrop | black | black |
+| [opacity](../styles-and-themes/common-units/#opacity)-Backdrop | 0.1 | 0.1 |

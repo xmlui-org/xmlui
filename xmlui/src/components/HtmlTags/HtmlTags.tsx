@@ -1,4 +1,18 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+/**
+ * @deprecated HTML Tag Components are temporary and will be removed from the framework.
+ * 
+ * DEPRECATION NOTICE:
+ * All HTML tag wrapper components in this file are scheduled for removal in a future version.
+ * These components were created as temporary solutions and should not be used in new development.
+ * 
+ * Migration Path:
+ * - Replace with native HTML elements or dedicated XMLUI components
+ * - Use semantic HTML directly for better performance and maintainability
+ * - Consider existing XMLUI components (Button, Link, Text, Heading, etc.) for common use cases
+ * 
+ * Timeline: These components will be removed in the next major version release.
+ */
+
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -6,9 +20,10 @@ import { LinkNative } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
+import { createMetadata, d } from "../metadata-helpers";
 
 export const HtmlAMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `a` tag.",
   isHtmlTag: true,
   props: {
@@ -42,7 +57,7 @@ export const htmlATagRenderer = createComponentRenderer(
 );
 
 export const HtmlAbbrMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `abbr` tag.",
   isHtmlTag: true,
 });
@@ -62,7 +77,7 @@ export const htmlAbbrTagRenderer = createComponentRenderer(
 );
 
 export const HtmlAddressMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `address` tag.",
   isHtmlTag: true,
 });
@@ -82,7 +97,7 @@ export const htmlAddressTagRenderer = createComponentRenderer(
 );
 
 export const HtmlAreaMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `area` tag.",
   isHtmlTag: true,
   props: {
@@ -114,7 +129,7 @@ export const htmlAreaTagRenderer = createComponentRenderer(
 );
 
 export const HtmlArticleMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `article` tag.",
   isHtmlTag: true,
 });
@@ -134,7 +149,7 @@ export const htmlArticleTagRenderer = createComponentRenderer(
 );
 
 export const HtmlAsideMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `aside` tag.",
   isHtmlTag: true,
 });
@@ -154,7 +169,7 @@ export const htmlAsideTagRenderer = createComponentRenderer(
 );
 
 export const HtmlAudioMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `audio` tag.",
   isHtmlTag: true,
   props: {
@@ -198,7 +213,7 @@ export const htmlAudioTagRenderer = createComponentRenderer(
 );
 
 export const HtmlBMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `b` tag.",
   isHtmlTag: true,
 });
@@ -218,7 +233,7 @@ export const htmlBTagRenderer = createComponentRenderer(
 );
 
 export const HtmlBdiMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `bdi` tag.",
   isHtmlTag: true,
 });
@@ -238,7 +253,7 @@ export const htmlBdiTagRenderer = createComponentRenderer(
 );
 
 export const HtmlBdoMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `bdo` tag.",
   isHtmlTag: true,
   props: {
@@ -261,7 +276,7 @@ export const htmlBdoTagRenderer = createComponentRenderer(
 );
 
 export const HtmlBlockquoteMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `blockquote` tag.",
   isHtmlTag: true,
   props: {
@@ -284,7 +299,7 @@ export const htmlBlockquoteTagRenderer = createComponentRenderer(
 );
 
 export const HtmlBrMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `br` tag.",
   isHtmlTag: true,
 });
@@ -304,7 +319,7 @@ export const htmlBrTagRenderer = createComponentRenderer(
 );
 
 export const HtmlButtonMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `button` tag.",
   isHtmlTag: true,
   props: {
@@ -352,7 +367,7 @@ export const htmlButtonTagRenderer = createComponentRenderer(
 );
 
 export const HtmlCanvasMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `canvas` tag.",
   isHtmlTag: true,
   props: {
@@ -377,7 +392,7 @@ export const htmlCanvasTagRenderer = createComponentRenderer(
 );
 
 export const HtmlCaptionMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `caption` tag.",
   isHtmlTag: true,
 });
@@ -397,7 +412,7 @@ export const htmlCaptionTagRenderer = createComponentRenderer(
 );
 
 export const HtmlCiteMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `cite` tag.",
   isHtmlTag: true,
 });
@@ -417,7 +432,7 @@ export const htmlCiteTagRenderer = createComponentRenderer(
 );
 
 export const HtmlCodeMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `code` tag.",
   isHtmlTag: true,
 });
@@ -437,7 +452,7 @@ export const htmlCodeTagRenderer = createComponentRenderer(
 );
 
 export const HtmlColMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `col` tag.",
   isHtmlTag: true,
   props: {
@@ -461,7 +476,7 @@ export const htmlColTagRenderer = createComponentRenderer(
 );
 
 export const HtmlColgroupMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `colgroup` tag.",
   isHtmlTag: true,
   props: {
@@ -485,7 +500,7 @@ export const htmlColgroupTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDataMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `data` tag.",
   isHtmlTag: true,
   props: {
@@ -508,7 +523,7 @@ export const htmlDataTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDatalistMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `datalist` tag.",
   isHtmlTag: true,
 });
@@ -528,7 +543,7 @@ export const htmlDatalistTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDdMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `dd` tag.",
   isHtmlTag: true,
 });
@@ -548,7 +563,7 @@ export const htmlDdTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDelMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `del` tag.",
   isHtmlTag: true,
   props: {
@@ -572,7 +587,7 @@ export const htmlDelTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDetailsMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `details` tag.",
   isHtmlTag: true,
   props: {
@@ -601,7 +616,7 @@ export const htmlDetailsTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDfnMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `dfn` tag.",
   isHtmlTag: true,
 });
@@ -621,7 +636,7 @@ export const htmlDfnTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDialogMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `dialog` tag.",
   isHtmlTag: true,
   props: {
@@ -645,7 +660,7 @@ export const htmlDialogTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDivMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `div` tag.",
   isHtmlTag: true,
 });
@@ -665,7 +680,7 @@ export const htmlDivTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDlMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `dl` tag.",
   isHtmlTag: true,
 });
@@ -685,7 +700,7 @@ export const htmlDlTagRenderer = createComponentRenderer(
 );
 
 export const HtmlDtMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `dt` tag.",
   isHtmlTag: true,
 });
@@ -705,7 +720,7 @@ export const htmlDtTagRenderer = createComponentRenderer(
 );
 
 export const HtmlEMMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `em` tag.",
   isHtmlTag: true,
 });
@@ -725,7 +740,7 @@ export const htmlEMTagRenderer = createComponentRenderer(
 );
 
 export const HtmlEmbedMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `embed` tag.",
   isHtmlTag: true,
   props: {
@@ -752,7 +767,7 @@ export const htmlEmbedTagRenderer = createComponentRenderer(
 );
 
 export const HtmlFieldsetMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `fieldset` tag.",
   isHtmlTag: true,
   props: {
@@ -778,7 +793,7 @@ export const htmlFieldsetTagRenderer = createComponentRenderer(
 );
 
 export const HtmlFigcaptionMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `figcaption` tag.",
   isHtmlTag: true,
 });
@@ -798,7 +813,7 @@ export const htmlFigcaptionTagRenderer = createComponentRenderer(
 );
 
 export const HtmlFigureMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `figure` tag.",
   isHtmlTag: true,
 });
@@ -818,7 +833,7 @@ export const htmlFigureTagRenderer = createComponentRenderer(
 );
 
 export const HtmlFooterMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `footer` tag.",
   isHtmlTag: true,
 });
@@ -838,7 +853,7 @@ export const htmlFooterTagRenderer = createComponentRenderer(
 );
 
 export const HtmlFormMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `form` tag.",
   isHtmlTag: true,
   props: {
@@ -871,7 +886,7 @@ export const htmlFormTagRenderer = createComponentRenderer(
 );
 
 export const HtmlH1Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h1` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -896,7 +911,7 @@ export const htmlH1TagRenderer = createComponentRenderer(
 );
 
 export const HtmlH2Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h2` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -921,7 +936,7 @@ export const htmlH2TagRenderer = createComponentRenderer(
 );
 
 export const HtmlH3Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h3` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -946,7 +961,7 @@ export const htmlH3TagRenderer = createComponentRenderer(
 );
 
 export const HtmlH4Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h4` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -971,7 +986,7 @@ export const htmlH4TagRenderer = createComponentRenderer(
 );
 
 export const HtmlH5Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h5` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -996,7 +1011,7 @@ export const htmlH5TagRenderer = createComponentRenderer(
 );
 
 export const HtmlH6Md = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `h6` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
@@ -1021,7 +1036,7 @@ export const htmlH6TagRenderer = createComponentRenderer(
 );
 
 export const HtmlHeaderMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `header` tag.",
   isHtmlTag: true,
 });
@@ -1041,7 +1056,7 @@ export const htmlHeaderTagRenderer = createComponentRenderer(
 );
 
 export const HtmlHrMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `hr` tag.",
   isHtmlTag: true,
 });
@@ -1061,7 +1076,7 @@ export const htmlHrTagRenderer = createComponentRenderer(
 );
 
 export const HtmlIMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `i` tag.",
   isHtmlTag: true,
 });
@@ -1081,7 +1096,7 @@ export const htmlITagRenderer = createComponentRenderer(
 );
 
 export const HtmlIframeMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `iframe` tag.",
   isHtmlTag: true,
   props: {
@@ -1115,7 +1130,7 @@ export const htmlIframeTagRenderer = createComponentRenderer(
 );
 
 export const HtmlImgMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `img` tag.",
   isHtmlTag: true,
   props: {
@@ -1146,7 +1161,7 @@ export const htmlImgTagRenderer = createComponentRenderer(
 );
 
 export const HtmlInputMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `input` tag.",
   isHtmlTag: true,
   props: {
@@ -1206,7 +1221,7 @@ export const htmlInputTagRenderer = createComponentRenderer(
 );
 
 export const HtmlInsMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `ins` tag.",
   isHtmlTag: true,
   props: {
@@ -1230,7 +1245,7 @@ export const htmlInsTagRenderer = createComponentRenderer(
 );
 
 export const HtmlKbdMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `kbd` tag.",
   isHtmlTag: true,
 });
@@ -1250,7 +1265,7 @@ export const htmlKbdTagRenderer = createComponentRenderer(
 );
 
 export const HtmlLabelMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `label` tag.",
   isHtmlTag: true,
   props: {
@@ -1273,7 +1288,7 @@ export const htmlLabelTagRenderer = createComponentRenderer(
 );
 
 export const HtmlLegendMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `legend` tag.",
   isHtmlTag: true,
 });
@@ -1293,7 +1308,7 @@ export const htmlLegendTagRenderer = createComponentRenderer(
 );
 
 export const HtmlLiMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `li` tag.",
   isHtmlTag: true,
   props: {
@@ -1321,7 +1336,7 @@ export const htmlLiTagRenderer = createComponentRenderer(
 );
 
 export const HtmlMainMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `main` tag.",
   isHtmlTag: true,
 });
@@ -1341,7 +1356,7 @@ export const htmlMainTagRenderer = createComponentRenderer(
 );
 
 export const HtmlMapMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `map` tag.",
   isHtmlTag: true,
   props: {
@@ -1364,7 +1379,7 @@ export const htmlMapTagRenderer = createComponentRenderer(
 );
 
 export const HtmlMarkMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `mark` tag.",
   isHtmlTag: true,
 });
@@ -1384,7 +1399,7 @@ export const htmlMarkTagRenderer = createComponentRenderer(
 );
 
 export const HtmlMenuMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `menu` tag.",
   isHtmlTag: true,
   props: {
@@ -1407,7 +1422,7 @@ export const htmlMenuTagRenderer = createComponentRenderer(
 );
 
 export const HtmlMeterMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `meter` tag.",
   isHtmlTag: true,
   props: {
@@ -1436,7 +1451,7 @@ export const htmlMeterTagRenderer = createComponentRenderer(
 );
 
 export const HtmlNavMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `nav` tag.",
   isHtmlTag: true,
 });
@@ -1456,7 +1471,7 @@ export const htmlNavTagRenderer = createComponentRenderer(
 );
 
 export const HtmlObjectMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `object` tag.",
   isHtmlTag: true,
   props: {
@@ -1484,7 +1499,7 @@ export const htmlObjectTagRenderer = createComponentRenderer(
 );
 
 export const HtmlOlMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `ol` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
@@ -1509,7 +1524,7 @@ export const htmlOlTagRenderer = createComponentRenderer(
 );
 
 export const HtmlOptgroupMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `optgroup` tag.",
   isHtmlTag: true,
   props: {
@@ -1534,7 +1549,7 @@ export const htmlOptgroupTagRenderer = createComponentRenderer(
 );
 
 export const HtmlOptionMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `option` tag.",
   isHtmlTag: true,
   props: {
@@ -1566,7 +1581,7 @@ export const htmlOptionTagRenderer = createComponentRenderer(
 );
 
 export const HtmlOutputMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `output` tag.",
   isHtmlTag: true,
   props: {
@@ -1591,7 +1606,7 @@ export const htmlOutputTagRenderer = createComponentRenderer(
 );
 
 export const HtmlPMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `p` tag.",
   isHtmlTag: true,
 });
@@ -1611,7 +1626,7 @@ export const htmlPTagRenderer = createComponentRenderer(
 );
 
 export const HtmlParamMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `param` tag.",
   isHtmlTag: true,
   props: {
@@ -1635,7 +1650,7 @@ export const htmlParamTagRenderer = createComponentRenderer(
 );
 
 export const HtmlPictureMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `picture` tag.",
   isHtmlTag: true,
 });
@@ -1655,7 +1670,7 @@ export const htmlPictureTagRenderer = createComponentRenderer(
 );
 
 export const HtmlPreMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `pre` tag.",
   isHtmlTag: true,
 });
@@ -1675,7 +1690,7 @@ export const htmlPreTagRenderer = createComponentRenderer(
 );
 
 export const HtmlProgressMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `progress` tag.",
   isHtmlTag: true,
   props: {
@@ -1700,7 +1715,7 @@ export const htmlProgressTagRenderer = createComponentRenderer(
 );
 
 export const HtmlQMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `q` tag.",
   isHtmlTag: true,
   props: {
@@ -1723,7 +1738,7 @@ export const htmlQTagRenderer = createComponentRenderer(
 );
 
 export const HtmlRpMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `rp` tag.",
   isHtmlTag: true,
 });
@@ -1743,7 +1758,7 @@ export const htmlRpTagRenderer = createComponentRenderer(
 );
 
 export const HtmlRtMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `rt` tag.",
   isHtmlTag: true,
 });
@@ -1763,7 +1778,7 @@ export const htmlRtTagRenderer = createComponentRenderer(
 );
 
 export const HtmlRubyMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `ruby` tag.",
   isHtmlTag: true,
 });
@@ -1783,7 +1798,7 @@ export const htmlRubyTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `s` tag.",
   isHtmlTag: true,
 });
@@ -1803,7 +1818,7 @@ export const htmlSTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSampMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `samp` tag.",
   isHtmlTag: true,
 });
@@ -1823,7 +1838,7 @@ export const htmlSampTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSectionMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `section` tag.",
   isHtmlTag: true,
 });
@@ -1843,7 +1858,7 @@ export const htmlSectionTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSelectMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `select` tag.",
   isHtmlTag: true,
   props: {
@@ -1887,7 +1902,7 @@ export const htmlSelectTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSmallMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `small` tag.",
   isHtmlTag: true,
 });
@@ -1907,7 +1922,7 @@ export const htmlSmallTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSourceMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `source` tag.",
   isHtmlTag: true,
   props: {
@@ -1935,7 +1950,7 @@ export const htmlSourceTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSpanMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `span` tag.",
   isHtmlTag: true,
 });
@@ -1955,7 +1970,7 @@ export const htmlSpanTagRenderer = createComponentRenderer(
 );
 
 export const HtmlStrongMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `strong` tag.",
   isHtmlTag: true,
 });
@@ -1975,7 +1990,7 @@ export const htmlStrongTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSubMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `sub` tag.",
   isHtmlTag: true,
 });
@@ -1995,7 +2010,7 @@ export const htmlSubTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSummaryMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `summary` tag.",
   isHtmlTag: true,
 });
@@ -2015,7 +2030,7 @@ export const htmlSummaryTagRenderer = createComponentRenderer(
 );
 
 export const HtmlSupMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `sup` tag.",
   isHtmlTag: true,
 });
@@ -2035,7 +2050,7 @@ export const htmlSupTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTableMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `table` tag.",
   isHtmlTag: true,
   props: {
@@ -2072,7 +2087,7 @@ export const htmlTableTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTbodyMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `tbody` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTbody),
@@ -2093,7 +2108,7 @@ export const htmlTbodyTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTdMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `td` tag.",
   isHtmlTag: true,
   props: {
@@ -2129,7 +2144,7 @@ export const htmlTdTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTemplateMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `template` tag.",
   isHtmlTag: true,
 });
@@ -2149,7 +2164,7 @@ export const htmlTemplateTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTextareaMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `textarea` tag.",
   isHtmlTag: true,
   props: {
@@ -2200,7 +2215,7 @@ export const htmlTextareaTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTfootMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `tfoot` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTfoot),
@@ -2221,7 +2236,7 @@ export const htmlTfootTagRenderer = createComponentRenderer(
 );
 
 export const HtmlThMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `th` tag.",
   isHtmlTag: true,
   props: {
@@ -2258,7 +2273,7 @@ export const htmlThTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTheadMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `thead` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsThead),
@@ -2284,7 +2299,7 @@ export const htmlTheadTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTimeMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `time` tag.",
   isHtmlTag: true,
   props: {
@@ -2307,7 +2322,7 @@ export const htmlTimeTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTrMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `tr` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTr),
@@ -2333,7 +2348,7 @@ export const htmlTrTagRenderer = createComponentRenderer(
 );
 
 export const HtmlTrackMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `track` tag.",
   isHtmlTag: true,
   props: {
@@ -2362,7 +2377,7 @@ export const htmlTrackTagRenderer = createComponentRenderer(
 );
 
 export const HtmlUMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `u` tag.",
   isHtmlTag: true,
 });
@@ -2382,7 +2397,7 @@ export const htmlUTagRenderer = createComponentRenderer(
 );
 
 export const HtmlUlMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `ul` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
@@ -2407,7 +2422,7 @@ export const htmlUlTagRenderer = createComponentRenderer(
 );
 
 export const HtmlVarMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `var` tag.",
   isHtmlTag: true,
 });
@@ -2427,7 +2442,7 @@ export const htmlVarTagRenderer = createComponentRenderer(
 );
 
 export const HtmlVideoMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `video` tag.",
   isHtmlTag: true,
   props: {
@@ -2480,7 +2495,7 @@ export const htmlVideoTagRenderer = createComponentRenderer(
 );
 
 export const HtmlWbrMd = createMetadata({
-  status: "experimental",
+  status: "deprecated",
   description: "This component renders an HTML `wbr` tag.",
   isHtmlTag: true,
 });

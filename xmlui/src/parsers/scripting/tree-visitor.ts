@@ -45,7 +45,7 @@ import {
   T_REACTIVE_VAR_DECLARATION,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_SWITCH_CASE,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "../../components-core/script-runner/ScriptingSourceTree";
 
 const unreachable = (_x: never) => {};
 

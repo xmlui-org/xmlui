@@ -1,16 +1,17 @@
 import styles from "./FileUploadDropZone.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";
 
 export const FileUploadDropZoneMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component allows users to upload files to a web application by dragging ` +
-    `and dropping files from their local file system onto a designated area within the UI.`,
+    "`FileUploadDropZone` enables users to upload files by dragging and dropping " +
+    "files from their local file system onto a designated area within the UI.",
   props: {
     text: {
       description:

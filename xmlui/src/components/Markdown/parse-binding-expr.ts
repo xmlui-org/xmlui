@@ -1,5 +1,5 @@
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { T_ARROW_EXPRESSION } from "../../components-core/script-runner/ScriptingSourceTree";
 
 /**
  * Finds and evaluates given binding expressions in markdown text.
@@ -11,7 +11,6 @@ import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSource
 export function parseBindingExpression(text: string, extractValue: ValueExtractor) {
   // Remove empty @{} expressions first
   text = text.replaceAll(/(?<!\\)\@\{\s*\}/g, "");
-
   // The (?<!\\) is a "negative lookbehind" in regex that ensures that
   // if escaping the @{...} expression like this: \@{...}, we don't match it
   const regex = /(?<!\\)\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;

@@ -1,5 +1,4 @@
 `VStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation.
-See also: [HStack](./HStack.mdx), [CHStack](./CHStack.mdx), [CVStack](./CVStack.mdx).
 
 ```xmlui-pg copy display name="Example: VStack"
 <App>

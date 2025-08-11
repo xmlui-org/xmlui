@@ -190,7 +190,6 @@ export const Table = forwardRef(
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
-    const isSortControlled = sortBy !== undefined;
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -225,6 +224,7 @@ export const Table = forwardRef(
       visibleItems,
       rowsSelectable,
       enableMultiRowSelection,
+      rowDisabledPredicate,
       onSelectionDidChange,
     });
 
@@ -251,14 +251,14 @@ export const Table = forwardRef(
     }, [sortingDirection]);
 
     const sortedData = useMemo(() => {
-      if (!_sortBy || isSortControlled) {
+      if (!_sortBy) {
         return dataWithOrder;
       }
       return orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc");
-    }, [_sortBy, _sortingDirection, dataWithOrder, isSortControlled]);
+    }, [_sortBy, _sortingDirection, dataWithOrder]);
 
     const _updateSorting = useCallback(
-      async (accessorKey) => {
+      async (accessorKey: string) => {
         let newDirection: SortingDirection = "ascending";
         let newSortBy = accessorKey;
         // The current key is the same as the last -> the user clicked on the same header twice
@@ -373,8 +373,11 @@ export const Table = forwardRef(
                 }),
                 value: table.getIsAllRowsSelected(),
                 indeterminate: table.getIsSomeRowsSelected(),
-                onDidChange: (checked: any) => {
-                  checkAllRows(checked);
+                onDidChange: () => {
+                  const allSelected = table
+                    .getRowModel()
+                    .rows.every((row) => rowDisabledPredicate(row.original) || row.getIsSelected());
+                  checkAllRows(!allSelected);
                 },
               }}
             />
@@ -746,9 +749,9 @@ export const Table = forwardRef(
                             {cellRenderer
                               ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
                               : (flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              ) as ReactNode)}
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                ) as ReactNode)}
                           </div>
                         </td>
                       );

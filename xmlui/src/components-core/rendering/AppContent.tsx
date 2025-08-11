@@ -1,19 +1,11 @@
 import type { ReactNode } from "react";
-import {
-  cloneElement,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { get } from "lodash-es";
 import toast from "react-hot-toast";
 
 import { version } from "../../../package.json";
 
-import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useThemes } from "../theming/ThemeContext";
@@ -26,23 +18,22 @@ import {
 } from "../utils/hooks";
 import { getVarKey } from "../theming/themeVars";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
-import { EMPTY_OBJECT, noop } from "../constants";
+import { EMPTY_OBJECT } from "../constants";
 import type { IAppStateContext } from "../../components/App/AppStateContext";
 import { AppStateContext } from "../../components/App/AppStateContext";
-import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { AppContext } from "../AppContext";
-import { renderChild } from "./renderChild";
-import type { GlobalProps} from "./AppRoot";
+import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
-import { ThemeToneKeys } from "../../abstractions/ThemingDefs";
 import type { TrackContainerHeight } from "./AppWrapper";
+import { ThemeToneKeys } from "../theming/utils";
+import StandaloneComponent from "./StandaloneComponent";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -54,7 +45,12 @@ type AppContentProps = {
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
   children?: ReactNode;
+  onInit?: () => void;
 };
+
+function safeGetComputedStyle(root?: HTMLElement) {
+  return getComputedStyle(root || document.body);
+}
 
 /**
  *  This component wraps the entire app into a container with these particular
@@ -74,6 +70,7 @@ export function AppContent({
   decorateComponentsWithTestId,
   debugEnabled,
   children,
+  onInit,
 }: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
@@ -145,8 +142,8 @@ export function AppContent({
         if (observer?.current) {
           observer.current.unobserve(root);
         }
-        if(trackContainerHeight === "auto"){
-          root.style.setProperty("--containerHeight", 'auto');
+        if (trackContainerHeight === "auto") {
+          root.style.setProperty("--containerHeight", "auto");
         } else {
           observer.current = new ResizeObserver((entries) => {
             root.style.setProperty("--containerHeight", entries[0].contentRect.height + "px");
@@ -167,21 +164,21 @@ export function AppContent({
   // --- Whenever the application root DOM object or the active theme changes, we sync
   // --- with the theme variable values (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
-    const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-phone"));
+    const mwPhone = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-phone"));
     setMaxWidthPhone(mwPhone);
     setMaxWidthPhoneLower(createLowerDimensionValue(mwPhone));
-    const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(
+    const mwLandscapePhone = safeGetComputedStyle(root).getPropertyValue(
       getVarKey("maxWidth-landscape-phone"),
     );
     setMaxWidthLandscapePhone(mwLandscapePhone);
     setMaxWidthLandscapePhoneLower(createLowerDimensionValue(mwLandscapePhone));
-    const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-tablet"));
+    const mwTablet = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
-    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-desktop"));
+    const mwDesktop = safeGetComputedStyle(root).getPropertyValue(getVarKey("maxWidth-desktop"));
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
-    const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
+    const mwLargeDesktop = safeGetComputedStyle(root).getPropertyValue(
       getVarKey("maxWidth-large-desktop"),
     );
     setMaxWidthLargeDesktop(mwLargeDesktop);
@@ -202,8 +199,8 @@ export function AppContent({
   const isViewportLargeDesktop = useMediaQuery(
     `(min-width: ${maxWidthDesktop}) and (max-width: ${maxWidthLargeDesktopLower})`,
   );
-  let vpSize: MediaBreakpointType = "xs";
-  let vpSizeIndex = 0;
+  let vpSize;
+  let vpSizeIndex;
   const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
   if (isViewportXlDesktop) {
     vpSize = "xxl";
@@ -220,6 +217,9 @@ export function AppContent({
   } else if (isViewportLandscapePhone) {
     vpSize = "sm";
     vpSizeIndex = 1;
+  } else if (isViewportPhone) {
+    vpSize = "xs";
+    vpSizeIndex = 0;
   }
 
   // --- Collect information about the current environment
@@ -230,6 +230,20 @@ export function AppContent({
   const location = useLocation();
   const lastHash = useRef("");
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
+
+  useEffect(() => {
+    onInit?.();
+  }, [onInit]);
+
+  // useEffect(()=>{
+  //   if(isWindowFocused){
+  //     if ("serviceWorker" in navigator) {
+  //       // Manually Activate the MSW again
+  //       // console.log("REACTIVATE MSW");
+  //       navigator.serviceWorker.controller?.postMessage("MOCK_ACTIVATE");
+  //     }
+  //   }
+  // }, [isWindowFocused]);
 
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
@@ -242,14 +256,27 @@ export function AppContent({
     if (lastHash.current !== hash) {
       lastHash.current = hash;
       if (!location.state?.preventHashScroll) {
+        const rootNode = root?.getRootNode();
+        const scrollBehavior = "instant";
         requestAnimationFrame(() => {
-          document
-            .getElementById(lastHash.current)
-            ?.scrollIntoView({ behavior: "instant", block: "start" });
+          if (!rootNode) return;
+          // --- If element is in shadow DOM (string-based type checking)
+          // --- Check constructor.name to avoid direct ShadowRoot type dependency
+          // --- More precise than duck typing, works reliably across different environments
+          if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+            const el = (rootNode as any).getElementById(lastHash.current);
+            if (!el) return;
+            scrollAncestorsToView(el, scrollBehavior);
+          } else {
+            // --- If element is in light DOM
+            document
+              .getElementById(lastHash.current)
+              ?.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+          }
         });
       }
     }
-  }, [location, scrollForceRefresh]);
+  }, [location, scrollForceRefresh, root]);
 
   const forceRefreshAnchorScroll = useCallback(() => {
     lastHash.current = "";
@@ -328,6 +355,10 @@ export function AppContent({
       mediaSize,
       queryClient,
       standalone,
+      // String-based type checking: Use constructor.name to identify ShadowRoot
+      // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+      appIsInShadowDom:
+        typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot,
 
       // --- Date-related
       ...dateFunctions,
@@ -392,6 +423,7 @@ export function AppContent({
     embed,
     apiInterceptorContext,
     forceRefreshAnchorScroll,
+    root,
   ]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
@@ -423,27 +455,10 @@ export function AppContent({
     };
   }, [appState, registerAppState, update]);
 
-  const memoedVarsRef = useRef<MemoedVars>(new Map());
-  const renderedRoot = renderChild({
-    node: rootContainer,
-    state: EMPTY_OBJECT,
-    dispatch: noop,
-    appContext: undefined,
-    lookupAction: noop,
-    lookupSyncCallback: noop,
-    registerComponentApi: noop,
-    renderChild: noop,
-    statePartChanged: noop,
-    cleanup: noop,
-    memoedVarsRef,
-  });
-
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {(!!children && isValidElement(renderedRoot))
-          ? cloneElement(renderedRoot, null, children)
-          : renderedRoot}
+        <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
@@ -452,4 +467,55 @@ export function AppContent({
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
+}
+
+/**
+ * Scrolls all ancestors of the specified element into view up to the first shadow root the element is in.
+ * @param target The element to scroll to, can be in the light or shadow DOM
+ * @param scrollBehavior The scroll behavior
+ */
+function scrollAncestorsToView(target: HTMLElement, scrollBehavior?: ScrollBehavior) {
+  const scrollables = getScrollableAncestors(target);
+  // It's important to start from the outermost and work inwards.
+  scrollables.reverse().forEach((container) => {
+    // Compute the position of target relative to container
+    const targetRect = target.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Scroll so that the target is visible in this container
+    if (targetRect.top < containerRect.top || targetRect.bottom > containerRect.bottom) {
+      // Only scroll vertically, add more logic for horizontal if needed
+      const offset = targetRect.top - containerRect.top + container.scrollTop;
+      container.scrollTo({ top: offset, behavior: scrollBehavior });
+    }
+    // Optionally handle horizontal scrolling similarly
+  });
+
+  function getScrollableAncestors(el: HTMLElement) {
+    const scrollables: HTMLElement[] = [];
+    let current = el;
+
+    while (current) {
+      let parent = current.parentElement;
+      // If no parentElement, might be in shadow DOM
+      if (!parent && current.getRootNode) {
+        break;
+        // NOTE: Disregard shadow DOM, because we will scroll everything otherwise
+        /* const root = current.getRootNode();
+        if (root && root instanceof ShadowRoot && root.host) {
+          parent = root.host as (HTMLElement | null);
+        } */
+      }
+      if (!parent) break;
+
+      // Check if this parent is scrollable
+      const style = getComputedStyle(parent);
+      if (/(auto|scroll|overlay)/.test(style.overflow + style.overflowY + style.overflowX)) {
+        scrollables.push(parent);
+      }
+      current = parent;
+    }
+
+    return scrollables;
+  }
 }

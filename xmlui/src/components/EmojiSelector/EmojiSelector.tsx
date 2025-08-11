@@ -1,16 +1,16 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { dAutoFocus } from "../metadata-helpers";
-import { EmojiSelector, defaultProps } from "./EmojiSelectorNative";
+import { createMetadata, d, dAutoFocus } from "../metadata-helpers";
+import { EmojiSelector } from "./EmojiSelectorNative";
+import { defaultProps } from "./DefaultProps";
 
 const COMP = "EmojiSelector";
 
 export const EmojiSelectorMd = createMetadata({
   status: "experimental",
-  description: 
-    `The \`${COMP}\` component provides users with a graphical interface to browse, search and ` + 
-    `select emojis to insert into text fields, messages, or other forms of communication.`,
+  description:
+    "`EmojiSelector` enables users to browse, search and select emojis from " +
+    "their system's native emoji set.",
   props: {
     autoFocus: {
       ...dAutoFocus(),

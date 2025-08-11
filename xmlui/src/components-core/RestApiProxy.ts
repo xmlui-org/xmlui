@@ -6,12 +6,13 @@ import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEv
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   type ArrowExpressionStatement,
-} from "../abstractions/scripting/ScriptingSourceTree";
+} from "./script-runner/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
+import type { ApiInterceptor } from "./interception/ApiInterceptor";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -55,7 +56,7 @@ function isAxiosResponse(response: AxiosResponse | Response): response is AxiosR
   return "data" in response;
 }
 
-async function parseResponseJson(response: AxiosResponse | Response) {
+async function parseResponseJson(response: AxiosResponse | Response, logError = false) {
   let resp: any;
   if (isAxiosResponse(response)) {
     resp = response.data;
@@ -66,7 +67,9 @@ async function parseResponseJson(response: AxiosResponse | Response) {
       try {
         resp = await response.clone().text();
       } catch (e) {
-        console.error("Failed to parse response as text or JSON", response.body);
+        if (logError) {
+          console.error("Failed to parse response as text or JSON", response.body);
+        }
       }
     }
   }
@@ -110,11 +113,13 @@ function appendFormFieldValue(
 export default class RestApiProxy {
   private config: RestAPIAdapterPropsV2;
   private appContext?: AppContextObject;
+  public apiInstance?: ApiInterceptor;
 
-  constructor(appContext?: AppContextObject) {
+  constructor(appContext?: AppContextObject, apiInstance?: ApiInterceptor) {
     const conf = appContext?.appGlobals || { apiUrl: "" };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
+    this.apiInstance = apiInstance;
 
     // const xsrfToken = readCookie("XSRF-TOKEN");
     const xsrfHeaders =
@@ -123,7 +128,7 @@ export default class RestApiProxy {
       //     "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
       //   }
       // :
-        {};
+      {};
     this.config = {
       apiUrl,
       errorResponseTransform,
@@ -371,7 +376,7 @@ export default class RestApiProxy {
     headers?: Record<string, string>;
     payloadType?: "form" | "multipart-form" | "json";
     onUploadProgress?: OnProgressFn;
-    parseResponse?: (response: Response | AxiosResponse) => any;
+    parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
     transactionId: string;
     resolveBindingExpressions: boolean;
   }) => {
@@ -414,18 +419,22 @@ export default class RestApiProxy {
       signal: abortSignal,
       body: requestBody,
     };
+    let url = this.generateFullApiUrl(relativePath, queryParams);
     if (onUploadProgress) {
       console.log("Falling back to axios. Reason: onUploadProgress specified");
       const axios = (await import("axios")).default;
       try {
         const response = await axios.request({
-          url: this.generateFullApiUrl(relativePath, queryParams),
+          url: url,
           method: options.method,
           headers: aggregatedHeaders,
           data: options.body,
           onUploadProgress,
         });
-        return await parseResponse(response);
+        return await parseResponse(
+          response,
+          this.appContext?.appGlobals?.logRestApiErrors ?? false,
+        );
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           throw await this.raiseError(error.response);
@@ -434,17 +443,25 @@ export default class RestApiProxy {
         }
       }
     } else {
-      const response = await fetch(this.generateFullApiUrl(relativePath, queryParams), options);
+      let response;
+      if(this.apiInstance && this.apiInstance.hasMockForRequest(url, options)){
+        response = await this.apiInstance.executeMockedFetch(url, options);
+      } else {
+        response = await fetch(url, options);
+      }
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }
-      const parsedResponse = await parseResponse(response.clone());
+      const parsedResponse = await parseResponse(
+        response.clone(),
+        this.appContext?.appGlobals?.logRestApiErrors ?? false,
+      );
       return parsedResponse;
     }
   };
 
-  private tryParseResponse = async (response: Response | AxiosResponse) => {
-    return await parseResponseJson(response);
+  private tryParseResponse = async (response: Response | AxiosResponse, logError = false) => {
+    return await parseResponseJson(response, logError);
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {

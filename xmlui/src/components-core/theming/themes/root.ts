@@ -1,5 +1,5 @@
 
-import { ThemeDefinition } from "../../../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 import { palette } from "./palette";
 
 const {
@@ -210,9 +210,10 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-larger": "2.15rem",
     "fontSize-large": "1.5rem",
     "fontSize-medium": "1.25rem",
+    "fontSize-semimedium": "1.125rem",
     "fontSize-normal": "1rem",
     "fontSize-small": "0.875rem",
-    "fontSize-code": "0.75rem",
+    "fontSize-code": "0.85rem",
     "fontSize-smaller": "0.75rem",
     "fontSize-tiny": "0.625rem",
 
@@ -275,6 +276,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Input is an abstract component, so we define its default theme variables here
     "backgroundColor-Input-default": $colorSurface0,
+    "backgroundColor-Input-success": $colorSurface0,
+    "backgroundColor-Input-warning": $colorSurface0,
+    "backgroundColor-Input-error": $colorSurface0,
+
     "borderColor-Input-default": $colorSurface200,
     "borderColor-Input-default--hover": $colorSurface600,
     "borderColor-Input-default--focus": $colorSurface600,

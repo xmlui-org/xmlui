@@ -1,6 +1,6 @@
 # LineChart [#linechart]
 
-Represents a line chart component.
+`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.
 
 ## Properties [#properties]
 
@@ -12,11 +12,11 @@ The data to be displayed in the line chart.It needs to be an array of objects, w
 
 This property specifies the keys in the data objects that should be used for rendering the lines.
 
-### `hideTooltip (default: false)` [#hidetooltip-default-false]
+### `hideTooltip` (default: false) [#hidetooltip-default-false]
 
 Determines whether the tooltip should be hidden.If set to (`true`), no tooltip will be shown when hovering over data points.
 
-### `hideX (default: false)` [#hidex-default-false]
+### `hideX` (default: false) [#hidex-default-false]
 
 Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
@@ -40,7 +40,7 @@ The top margin of the chart
 
 The key in the data objects used for labeling different data series.
 
-### `showLegend (default: false)` [#showlegend-default-false]
+### `showLegend` (default: false) [#showlegend-default-false]
 
 Determines whether the legend should be displayed.
 

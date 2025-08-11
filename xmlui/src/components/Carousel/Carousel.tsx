@@ -1,9 +1,8 @@
 import styles from "./Carousel.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dDidChange } from "../metadata-helpers";
+import { createMetadata, d, dDidChange } from "../metadata-helpers";
 import { CarouselComponent, defaultProps } from "./CarouselNative";
 import { orientationOptionMd } from "../abstractions";
 
@@ -81,13 +80,29 @@ export const CarouselMd = createMetadata({
     displayDidChange: dDidChange(COMP),
   },
   apis: {
-    canScrollPrev: d(
-      "This method returns `true` if the carousel can scroll to the previous slide.",
-    ),
-    canScrollNext: d("This method returns `true` if the carousel can scroll to the next slide."),
-    scrollTo: d("This method scrolls the carousel to the specified slide index."),
-    scrollPrev: d("This method scrolls the carousel to the previous slide."),
-    scrollNext: d("This method scrolls the carousel to the next slide."),
+    canScrollPrev: {
+      description: `This method returns \`true\` if the carousel can scroll to the previous slide.`,
+      signature: "canScrollPrev(): boolean",
+    },
+    canScrollNext: {
+      description: `This method returns \`true\` if the carousel can scroll to the next slide.`,
+      signature: "canScrollNext(): boolean",
+    },
+    scrollTo: {
+      description: `This method scrolls the carousel to the specified slide index.`,
+      signature: "scrollTo(index: number): void",
+      parameters: {
+        index: "The index of the slide to scroll to.",
+      },
+    },
+    scrollPrev: {
+      signature: "scrollPrev(): void",
+      description: "This method scrolls the carousel to the previous slide.",
+    },
+    scrollNext: {
+      signature: "scrollNext(): void",
+      description: "This method scrolls the carousel to the next slide.",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {

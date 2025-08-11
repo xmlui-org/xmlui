@@ -629,7 +629,7 @@ XMLUI declares these default color shade sets:
 ### Default Background Colors
 
 - `backgroundColor`: The default background color for all components
-- `backgroundColor-primary`: The background color used by components that build on the secondary color
+- `backgroundColor-primary`: The background color used by components that build on the primary color
 - `backgroundColor-secondary`: The background color used by components that build on the secondary color
 - `backgroundColor-attention`: The background color used by components that build on the attention color
 - `backgroundColor--disabled`: The background color representing the disabled state of a component
@@ -859,7 +859,7 @@ The `fontWeight` theme variables allow you to set your themes' normal font weigh
 
 XMLUI defines a few stock shadow resources:
 
-```xmlui-pg name="Shadows" height="260px"
+```xmlui-pg name="Shadows" height="320px"
 <App>
   <HStack padding="1.5rem" gap="1.5rem">
     <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow" >

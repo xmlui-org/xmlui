@@ -1,14 +1,19 @@
 # Slider [#slider]
 
-The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.
+`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
+
+**Key features:**
+- **Range selection**: Single value or dual-thumb range selection with configurable minimum separation
+- **Step control**: Precise incremental selection with customizable step values
+- **Value formatting**: Custom display formatting for current values and visual feedback
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -20,11 +25,11 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `Slider` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `Slider` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -41,15 +46,15 @@ Available values:
 
 This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `maxValue (default: 10)` [#maxvalue-default-10]
+### `maxValue` (default: 10) [#maxvalue-default-10]
 
 This property specifies the maximum value of the allowed input range.
 
-### `minStepsBetweenThumbs (default: 1)` [#minstepsbetweenthumbs-default-1]
+### `minStepsBetweenThumbs` (default: 1) [#minstepsbetweenthumbs-default-1]
 
 This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.
 
-### `minValue (default: 0)` [#minvalue-default-0]
+### `minValue` (default: 0) [#minvalue-default-0]
 
 This property specifies the minimum value of the allowed input range.
 
@@ -57,19 +62,19 @@ This property specifies the minimum value of the allowed input range.
 
 This optional property allows you to apply custom styles to the range element of the slider.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `showValues (default: true)` [#showvalues-default-true]
+### `showValues` (default: true) [#showvalues-default-true]
 
 This property controls whether the slider shows the current values of the thumbs.
 
-### `step (default: 1)` [#step-default-1]
+### `step` (default: 1) [#step-default-1]
 
 This property defines the increment value for the slider, determining the allowed intervals between selectable values.
 
@@ -77,7 +82,7 @@ This property defines the increment value for the slider, determining the allowe
 
 This optional property allows you to apply custom styles to the thumb elements of the slider.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -89,7 +94,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-### `valueFormat (default: "(value) => value.toString()")` [#valueformat-default-value-value-tostring]
+### `valueFormat` (default: "(value) => value.toString()") [#valueformat-default-value-value-tostring]
 
 This property allows you to customize how the values are displayed.
 
@@ -111,15 +116,23 @@ This event is triggered when the Slider has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the Slider.
+This method sets the focus on the slider component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `Slider`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: number | [number, number] | undefined): void`
+
+- `value`: The new value to set. Can be a single value or an array of values for range sliders.
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API retrieves the current value of the `Slider`. You can use it to get the value programmatically.
+
+**Signature**: `get value(): number | [number, number] | undefined`
 
 ## Styling [#styling]
 

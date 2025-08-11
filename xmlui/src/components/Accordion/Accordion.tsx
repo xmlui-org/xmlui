@@ -1,9 +1,9 @@
 import styles from "./Accordion.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dCollapse,
   dDidChange,
   dExpand,
@@ -62,17 +62,29 @@ export const AccordionMd = createMetadata({
     displayDidChange: dDidChange(COMP),
   },
   apis: {
-    expanded: dExpanded(COMP),
-    expand: dExpand(COMP),
-    collapse: dCollapse(COMP),
-    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
+    expanded: {
+      description: `This method returns \`true\` if the accordion is expanded, and \`false\` if it is collapsed.`,
+      signature: "get expanded(): boolean",
+    },
+    expand: {
+      description: `This method expands the accordion, making its content visible.`,
+      signature: "expand()",
+    },
+    collapse: {
+      description: `This method collapses the accordion, hiding its content.`,
+      signature: "collapse()",
+    },
+    toggle: {
+      description: `This method toggles the state of the ${COMP} between expanded and collapsed.`,
+      signature: "toggle()",
+    },
     focus: dFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingHorizontal-header-${COMP}`]: "$space-3",
     [`paddingVertical-header-${COMP}`]: "$space-3",
-    [`verticalAlign-header-${COMP}`]: "center",
+    [`verticalAlignment-header-${COMP}`]: "center",
     [`fontSize-header-${COMP}`]: "$fontSize-normal",
     [`fontWeight-header-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-header-${COMP}`]: "$fontFamily",

@@ -1,6 +1,12 @@
 %-DESC-START
 
-You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
+**Key features:**
+- **Automatic data binding**: Form controls automatically sync with form data using `bindTo` properties
+- **Built-in validation**: Validates individual fields and overall form state before submission
+- **Context sharing**: Provides `$data` and other context values accessible to all nested components
+- **Submission handling**: Manages form submission workflow and prevents invalid submissions
+
+See [this guide](/forms) for details.
 
 %-DESC-END
 
@@ -24,8 +30,8 @@ The following sample demonstrates enabling a field according to another's curren
 
 The following example demonstrates using it:
 
-```xmlui-pg copy {10-19} display name="Example: buttonRowTemplate"
----app copy display
+```xmlui-pg copy display name="Example: buttonRowTemplate"
+---app copy display {10-19}
 <App>
   <Form id="searchForm" padding="0.5rem"
     data="{{ search: 'Seattle', caseSensitive: false }}"

@@ -90,7 +90,7 @@ export function removeNullProperties(obj: any): void {
 // ts typings from here: https://stackoverflow.com/questions/73101114/react-hock-useevent-typescript
 type callbackType = (...args: Array<any>) => any;
 
-interface useEventOverload {
+export interface UseEventOverload {
   <TF extends callbackType>(callback: TF): TF;
 
   <TF extends callbackType>(callback: TF): any;
@@ -106,7 +106,7 @@ interface useEventOverload {
 //
 // Also, you should avoid calling the returned function during rendering
 // since the values captured by it are going to lag behind.
-export const useEvent: useEventOverload = (callback) => {
+export const useEvent: UseEventOverload = (callback) => {
   const callbackRef = useRef(callback);
 
   useInsertionEffect(() => {

@@ -1,5 +1,27 @@
 # xmlui-playground
 
+## 0.1.7
+
+### Patch Changes
+
+- 79c1d8a: fix: allow the playground to use the same tone as its source
+
+## 0.1.6
+
+### Patch Changes
+
+- 7d255a9: Changed open in new window button tooltip label for all occurrences.
+- Updated dependencies [7d255a9]
+  - xmlui-devtools@0.1.18
+
+## 0.1.5
+
+### Patch Changes
+
+- 2a461d8: NestedApp works with ApiInterceptor
+- Updated dependencies [f5b9f15]
+  - xmlui-devtools@0.1.12
+
 ## 0.1.4
 
 ### Patch Changes

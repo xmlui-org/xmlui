@@ -1,18 +1,21 @@
 import styles from "./Tabs.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../components-core/renderers";
 
 import { MemoizedItem } from "../container-helpers";
-import { dComponent } from "../metadata-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
+import { createMetadata, d, dComponent } from "../metadata-helpers";
 
 const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
   status: "experimental",
-  description: `The \`${COMP}\` component provides a tabbed layout where each tab has a clickable label and content.`,
+  description:
+    "`Tabs` enables users to switch among content panels using clickable tab headers. " +
+    "It provides an efficient way to present multiple related sections in a single " +
+    "interface area, with each tab containing distinct content defined by " +
+    "[TabItem](/components/TabItem) components.",
   props: {
     activeTab: d(
       `This property indicates the index of the active tab. The indexing starts from 0, ` +
@@ -27,10 +30,27 @@ export const TabsMd = createMetadata({
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
-    tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),
+    headerTemplate: {
+      ...dComponent(`This property declares the template for the clickable tab area.`),
+    },
   },
   apis: {
-    next: d(`This method selects the next tab.`),
+    next: {
+      description: `This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.`,
+      signature: "next(): void",
+    },
+    prev: {
+      description: `This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.`,
+      signature: "prev(): void",
+    },
+    setActiveTabIndex: {
+      description: `This method sets the active tab by index (0-based).`,
+      signature: "setActiveTabIndex(index: number): void",
+    },
+    setActiveTabById: {
+      description: `This method sets the active tab by its ID.`,
+      signature: "setActiveTabById(id: string): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -50,16 +70,20 @@ export const TabsMd = createMetadata({
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, className, registerComponentApi }) => {
+  ({ extractValue, node, renderChild, layoutCss, registerComponentApi }) => {
     return (
       <Tabs
-        className={className}
-        tabRenderer={
-          !!node?.props?.tabTemplate
+        id={node?.uid}
+        style={layoutCss}
+        headerRenderer={
+          node?.props?.headerTemplate
             ? (item) => (
                 <MemoizedItem
-                  node={node.props.tabTemplate! as any}
-                  item={item}
+                  node={node.props.headerTemplate! as any}
+                  itemKey="$header"
+                  contextVars={{
+                    $header: item,
+                  }}
                   renderChild={renderChild}
                 />
               )

@@ -1,6 +1,23 @@
 # DataSource [#datasource]
 
-The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
+`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data.
+
+**Key characteristics:**
+- **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready
+- **Built-in caching**: Prevents unnecessary requests and provides instant data access
+- **Polling support**: Automatically refetch data at specified intervals
+- **Data transformation**: Process and filter responses before components use the data
+
+## Preventing the `DataSource` from Executing [#preventing-the-datasource-from-executing]
+
+Prevent the `DataSource` from executing until the specified condition in the `when` attribute is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
 
 ## Structural Sharing [#structural-sharing]
 
@@ -47,7 +64,7 @@ This property customizes the message displayed in a toast when the API invocatio
 
 Set request headers. Pass an object whose keys are header names and values are header values.
 
-### `id (required)` [#id-required]
+### `id` (required) [#id-required]
 
 Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.
 
@@ -55,7 +72,7 @@ Set the ID used by other components to access the retrieved data in the `value`p
 
 Set the message to display when the data fetch is in progress. If the property value is not set, no progress message is displayed.
 
-### `method (default: "get")` [#method-default-get]
+### `method` (default: "get") [#method-default-get]
 
 Set the HTTP method.
 
@@ -133,7 +150,7 @@ This `resultSelector` builds an array of the `properties` objects.
 ```xmlui copy
 <DataSource
   id="contacts"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   resultSelector="results.map(item => item.properties )"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
 ```
@@ -165,7 +182,7 @@ This `resultSelector` filters the array of the `properties` objects to include o
 <DataSource
   id="contacts"
   resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
   />
 ````
@@ -182,7 +199,7 @@ This `Table` uses the filtered array.
 </Table>
 ```
 
-### `structuralSharing (default: "true")` [#structuralsharing-default-true]
+### `structuralSharing` (default: "true") [#structuralsharing-default-true]
 
 This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
@@ -190,7 +207,7 @@ This property allows structural sharing. When turned on, `DataSource` will keep 
 
 Set an optional function to perform a final transformation of the response data. If this value is not set, the result is not transformed.
 
-### `url (required)` [#url-required]
+### `url` (required) [#url-required]
 
 Set the URL.
 
@@ -210,21 +227,31 @@ The component triggers this event when the fetch operation has been completed an
 
 This property indicates if the data is being fetched.
 
+**Signature**: `get inProgress(): boolean`
+
 ### `isRefetching` [#isrefetching]
 
 This property indicates if the data is being re-fetched.
+
+**Signature**: `get isRefetching(): boolean`
 
 ### `loaded` [#loaded]
 
 This property indicates if the data has been loaded.
 
+**Signature**: `get loaded(): boolean`
+
 ### `refetch` [#refetch]
 
 This method requests the re-fetch of the data.
 
+**Signature**: `refetch(): void`
+
 ### `value` [#value]
 
 This property retrieves the data queried from the source after optional transformations.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 

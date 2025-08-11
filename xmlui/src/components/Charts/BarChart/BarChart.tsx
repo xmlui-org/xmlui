@@ -1,14 +1,16 @@
 import { BarChart, defaultProps } from "./BarChartNative";
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "BarChart";
 
 export const BarChartMd = createMetadata({
-  description:
-    `The \`${COMP}\` component represents a bar chart.` +
-    `Accepts a \`LabelLst\` component as a child to parametrize display labels.`,
   status: "experimental",
+  description:
+    "`BarChart` displays data as horizontal or vertical bars, supporting both grouped " +
+    "and stacked layouts. It's ideal for comparing values across categories, showing " +
+    "revenue trends, or displaying any quantitative data over time or categories.",
+  docFolder: "Charts/BarChart",
   props: {
     data: {
       description:
@@ -45,32 +47,35 @@ export const BarChartMd = createMetadata({
     },
     hideX: {
       description:
-        "Determines whether the X-axis should be hidden. If set to \`true\`, the axis will not be rendered.",
+        "Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.",
       valueType: "boolean",
       defaultValue: defaultProps.hideX,
     },
     hideY: {
       description:
-        "Determines whether the Y-axis should be hidden. If set to \`true\`, the axis will not be rendered.",
+        "Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.",
       valueType: "boolean",
       defaultValue: defaultProps.hideY,
     },
     hideTickX: {
       description:
-        "Controls the visibility of the X-axis ticks. If set to \`true\`, tick labels on the X-axis will be hidden.",
+        "Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTickX,
     },
     hideTickY: {
       description:
-        "Controls the visibility of the Y-axis ticks. If set to \`true\`, tick labels on the Y-axis will be hidden.",
+        "Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTickY,
     },
-    tickFormatter: {
-      description:
-        "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
-      defaultValue: JSON.stringify(defaultProps.tickFormatter),
+    tickFormatterX: {
+      description: "A function that formats the tick labels on the X-axis. ",
+      defaultValue: JSON.stringify(defaultProps.tickFormatterX),
+    },
+    tickFormatterY: {
+      description: "A function that formats the tick labels on the Y-axis. ",
+      defaultValue: JSON.stringify(defaultProps.tickFormatterY),
     },
     showLegend: {
       description: "Determines whether the legend should be displayed.",
@@ -83,11 +88,12 @@ export const BarChartMd = createMetadata({
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
     return (
       <BarChart
-        className={className}
-        tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
+        style={layoutCss}
+        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
+        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.layout)}
         nameKey={extractValue(node.props?.nameKey)}

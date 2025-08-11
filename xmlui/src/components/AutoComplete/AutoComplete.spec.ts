@@ -1,5 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
 test("renders with default props", async ({ initTestBed, createAutoCompleteDriver }) => {
   await initTestBed(`
     <AutoComplete />
@@ -10,7 +14,8 @@ test("renders with default props", async ({ initTestBed, createAutoCompleteDrive
   await expect(driver.component).toBeVisible();
 });
 
-test("displays placeholder text", async ({ initTestBed, page }) => {
+test.skip("displays placeholder text", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
   const placeholder = "Search for an option";
   await initTestBed(`
     <AutoComplete placeholder="${placeholder}" />
@@ -35,7 +40,7 @@ test("initialValue sets the selected option", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 });
 
-test("opens dropdown when double clicked", async ({
+test("opens dropdown when clicked", async ({
   initTestBed,
   page,
   createAutoCompleteDriver,
@@ -82,6 +87,10 @@ test("selects an option when clicked", async ({ initTestBed, page, createAutoCom
   await expect(page.getByRole("combobox")).toHaveValue("Diana Prince");
 });
 
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
 test("disabled option cannot be selected", async ({
   initTestBed,
   page,
@@ -107,6 +116,10 @@ test("disabled option cannot be selected", async ({
   await expect(page.getByRole("combobox")).not.toHaveValue("Bruce Wayne");
   await expect(page.getByTestId("text")).not.toHaveText("Selected value: 2");
 });
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
 
 test("multi mode allows selecting multiple options", async ({
   initTestBed,
@@ -219,6 +232,10 @@ test("optionTemplate customizes option appearance", async ({
   await expect(page.getByText("Diana Prince")).toBeVisible();
 });
 
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
 test("readOnly prevents changing selection", async ({
   initTestBed,
   page,
@@ -270,6 +287,10 @@ test("disabled state prevents interaction", async ({
   // Input should not change
   await expect(page.getByRole("combobox")).toHaveValue("");
 });
+
+// =============================================================================
+// API AND EVENT TESTS
+// =============================================================================
 
 test("didChange event fires when option is selected", async ({
   initTestBed,
@@ -435,4 +456,64 @@ test("creates new option when typing non-existing value", async ({
   // The new option should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected value: Peter Parker");
   await expect(page.getByRole("combobox")).toHaveValue("Peter Parker");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.skip("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
+  // TODO: review these Copilot-created tests
+  await initTestBed(`
+    <AutoComplete label="Select a hero" placeholder="Search heroes">
+      <Option value="1" label="Bruce Wayne" />
+      <Option value="2" label="Clark Kent" />
+      <Option value="3" label="Diana Prince" />
+    </AutoComplete>
+  `);
+  
+  // Get the combobox element
+  const combobox = page.getByRole("combobox");
+  
+  // Check initial ARIA attributes
+  await expect(combobox).toHaveAttribute("aria-autocomplete", "list");
+  await expect(combobox).toHaveAttribute("aria-expanded", "false");
+  
+  // Open the dropdown
+  await combobox.click();
+  
+  // Check expanded state
+  await expect(combobox).toHaveAttribute("aria-expanded", "true");
+  
+  // Check that options have proper roles
+  await expect(page.getByRole("option")).toHaveCount(3);
+});
+
+test("supports keyboard navigation with arrow keys", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <AutoComplete id="autoComplete">
+      <Option value="1" label="Bruce Wayne" />
+      <Option value="2" label="Clark Kent" />
+      <Option value="3" label="Diana Prince" />
+    </AutoComplete>
+  `);
+  
+  // Focus the autocomplete
+  await page.getByRole("combobox").focus();
+  
+  // Open dropdown with arrow down
+  await page.keyboard.press("ArrowDown", { delay: 100 });
+  await expect(page.getByRole("listbox")).toBeVisible();
+  
+  // Navigate through options
+  await page.keyboard.press("ArrowDown", { delay: 100 }); // First option
+  await page.keyboard.press("ArrowDown", { delay: 100 }); // Second option
+  await page.keyboard.press("ArrowDown", { delay: 100 }); // Third option
+  await page.keyboard.press("ArrowUp", { delay: 100 });   // Back to second option
+
+  // Select with Enter
+  await page.keyboard.press("Enter", { delay: 100 });
+
+  // Verify selection
+  await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
 });

@@ -1,5 +1,10 @@
 %-DESC-START
 
+**Key features:**
+- **Hierarchical organization**: Supports nested submenus for complex menu structures
+- **Flexible triggers**: Customizable button trigger or use your own trigger component
+- **Progressive disclosure**: Reveals options on demand
+
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
 ```xmlui-pg copy display name="Example: Using DropdownMenu" height="240px"
@@ -110,9 +115,25 @@ Available values are:
 
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
-  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
     <EmojiSelector
-      onSelect="(reaction) => { emojiDropDown.close(); }"
+      onSelect="(reaction) => { emojiDropdown.close(); }"
+      autoFocus="true"
+    />
+  </DropdownMenu>
+</App>
+```
+
+%-API-END
+
+%-API-START open
+
+```xmlui-pg copy {2} display name="Example: open" height="300px"
+<App>
+  <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>
+  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
+    <EmojiSelector
+      onSelect="(reaction) => { emojiDropdown.close(); }"
       autoFocus="true"
     />
   </DropdownMenu>

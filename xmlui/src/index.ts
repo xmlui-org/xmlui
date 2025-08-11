@@ -10,7 +10,6 @@ import type {
   ComponentMetadata,
   CompoundComponentDef,
 } from "./abstractions/ComponentDefs";
-import { createMetadata, d } from "./abstractions/ComponentDefs";
 import { AppRoot } from "./components-core/rendering/AppRoot";
 import { createComponentRenderer } from "./components-core/renderers";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
@@ -19,7 +18,7 @@ import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { Stack } from "./components/Stack/StackNative";
 import { Button } from "./components/Button/ButtonNative";
 import { Splitter } from "./components/Splitter/SplitterNative";
-import { useTheme } from "./components-core/theming/ThemeContext";
+import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
@@ -52,6 +51,9 @@ import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
+import { useEvent } from "./components-core/utils/misc";
+import { createMetadata, d } from "./components/metadata-helpers";
+import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
   ThemeDefinition,
@@ -96,6 +98,7 @@ export {
   xmlUiMarkupToComponent,
   ApiInterceptorProvider,
   Spinner,
+  useThemes,
   builtInThemes,
   XmlUiHelper,
   Text,
@@ -109,4 +112,6 @@ export {
   useAppLayoutContext,
   StyleProvider,
   StyleRegistry,
+  useEvent,
+  StandaloneComponent
 };

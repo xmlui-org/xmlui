@@ -3,6 +3,7 @@ import {
   type ForwardedRef,
   forwardRef,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -17,22 +18,23 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   style?: CSSProperties;
-  className?: string;
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
+  omitH1?: boolean;
 };
 
 export const defaultProps = {
   smoothScrolling: false,
   maxHeadingLevel: 6,
+  omitH1: false,
 };
 
 export const TableOfContents = forwardRef(function TableOfContents(
   {
     style,
-    className,
     smoothScrolling = defaultProps.smoothScrolling,
     maxHeadingLevel = defaultProps.maxHeadingLevel,
+    omitH1 = defaultProps.omitH1,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -72,10 +74,10 @@ export const TableOfContents = forwardRef(function TableOfContents(
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={classnames(styles.nav, className)} ref={ref} style={style}>
+    <div className={styles.nav} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => {
-          if (value.level <= maxHeadingLevel) {
+          if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
             return (
               <li
                 key={value.id}

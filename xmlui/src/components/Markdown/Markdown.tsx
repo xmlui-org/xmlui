@@ -1,6 +1,5 @@
 import styles from "./Markdown.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
@@ -15,11 +14,16 @@ import {
   observePlaygroundPattern,
   observeTreeDisplay,
 } from "./utils";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Markdown";
 
 export const MarkdownMd = createMetadata({
-  description: `\`${COMP}\` displays plain text styled using markdown syntax.`,
+  status: "stable",
+  description:
+    "`Markdown` renders formatted text using markdown syntax. Use " +
+    "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
+    "when you need [rich formatting](/working-with-markdown).",
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d(
@@ -46,7 +50,6 @@ export const MarkdownMd = createMetadata({
         "displayed. If set to `true`, heading anchors will be displayed on hover " +
         "next to headings.",
       valueType: "boolean",
-      defaultValue: defaultProps.showHeadingAnchors,
     },
   },
 
@@ -58,7 +61,7 @@ export const MarkdownMd = createMetadata({
     "backgroundColor-Admonition-danger": "$color-danger-100",
     "borderColor-Admonition-danger": "$color-danger-300",
     "borderRadius-Admonition": "$space-2",
-    "iconSize-Admonition": "$space-5",
+    "size-icon-Admonition": "$space-5",
     "paddingLeft-Admonition": "$space-2",
     "paddingRight-Admonition": "$space-6",
     "paddingTop-Admonition": "$space-3",
@@ -73,8 +76,8 @@ export const MarkdownMd = createMetadata({
     "paddingTop-Blockquote": "$space-3",
     "paddingBottom-Blockquote": "$space-2_5",
     "backgroundColor-Blockquote": "$color-surface-100",
-    "accentWidth-Blockquote": "3px",
-    "accentColor-Blockquote": "$color-surface-500",
+    "width-accent-Blockquote": "3px",
+    "color-accent-Blockquote": "$color-surface-500",
 
     "marginTop-HtmlLi": "$space-2_5",
     "marginBottom-HtmlLi": "$space-2_5",
@@ -126,7 +129,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
-        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors, false)}
+        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
       >
         {renderedChildren}
       </TransformedMarkdown>

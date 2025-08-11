@@ -1,11 +1,13 @@
 # Select [#select]
 
-Provides a dropdown with a list of options to choose from.
+`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.
 
-The component provides context values with which you can access some internal properties:
-
-- `$item`: This property represents the value of an item in the dropdown list.
-- `$itemContext`: This property provides a `removeItem` method to delete the particular value from the selection.
+**Key features:**
+- **Flexible selection modes**: Single selection by default, with optional multi-select capability
+- **Option containers**: Uses Option components to define selectable items with separate values and labels
+- **Search functionality**: Optional filtering to quickly find options in large lists
+- **Custom templates**: Configurable option display, value presentation, and empty state templates
+- **Dynamic options**: Supports both static [Option](/components/Option) children and dynamic lists via [Items](/components/Items).
 
 ## Using `Select` [#using-select]
 
@@ -35,9 +37,14 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$item`: Represents the current option's data (label and value properties)
+- `$itemContext`: Provides utility methods like `removeItem()` for multi-select scenarios
+
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -87,7 +94,7 @@ Click on the second field to see the custom empty list indicator.
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -96,14 +103,6 @@ This boolean property value indicates whether the component responds to user eve
   <Select enabled="false" />
 </App>
 ```
-
-### `inProgress (default: false)` [#inprogress-default-false]
-
-This property indicates whether the component is in progress. It can be used to show a loading message.
-
-### `inProgressNotificationMessage (default: "")` [#inprogressnotificationmessage-default-]
-
-This property indicates the message to display when the component is in progress.
 
 ### `initialValue` [#initialvalue]
 
@@ -119,15 +118,23 @@ This property sets the component's initial value.
 </App>
 ```
 
+### `inProgress` (default: false) [#inprogress-default-false]
+
+This property indicates whether the component is in progress. It can be used to show a loading message.
+
+### `inProgressNotificationMessage` (default: "") [#inprogressnotificationmessage-default-]
+
+This property indicates the message to display when the component is in progress.
+
 ### `label` [#label]
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: false) [#labelbreak-default-false]
 
-This boolean value indicates if the `Select` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `Select` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -144,7 +151,7 @@ Available values:
 
 This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `multiSelect (default: false)` [#multiselect-default-false]
+### `multiSelect` (default: false) [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -211,7 +218,7 @@ This property allows replacing the default template to display an option in the 
 </App>
 ```
 
-### `placeholder (default: "")` [#placeholder-default-]
+### `placeholder` (default: "") [#placeholder-default-]
 
 An optional placeholder text that is visible in the input field when its empty.
 
@@ -225,19 +232,19 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable (default: false)` [#searchable-default-false]
+### `searchable` (default: false) [#searchable-default-false]
 
 This property enables the search functionality in the dropdown list.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -332,7 +339,9 @@ This event is triggered when the Select has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the Select.
+This method focuses the `Select` component. You can use it to programmatically focus the component.
+
+**Signature**: `focus(): void`
 
 ```xmlui-pg copy display name="Example: focus()" height="260px"
 <App>
@@ -349,9 +358,15 @@ This method sets the focus on the Select.
 
 This method resets the component to its initial value, or clears the selection if no initial value was provided.
 
+**Signature**: `reset(): void`
+
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This API sets the value of the `Select`. You can use it to programmatically change the value.
+
+**Signature**: `setValue(value: string | string[] | undefined): void`
+
+- `value`: The new value to set. Can be a single value or an array of values for multi-select.
 
 ```xmlui-pg copy display name="Example: setValue()" height="260px"
 <App>
@@ -373,7 +388,9 @@ You can use this method to set the component's current value programmatically (`
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This API retrieves the current value of the `Select`. You can use it to get the value programmatically.
+
+**Signature**: `get value(): string | string[] | undefined`
 
 ## Styling [#styling]
 
@@ -403,7 +420,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
-| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-default--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-error | *none* | *none* |
@@ -438,6 +456,10 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning--hover | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
@@ -445,7 +467,6 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
-| [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | *none* | *none* |

@@ -29,6 +29,7 @@ import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
 import { HoverCardMd } from "./HoverCard/HoverCard";
 import { IconMd } from "./Icon/Icon";
+import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
 import { LinkMd } from "./Link/Link";
@@ -64,7 +65,7 @@ import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
 import { AccordionMd } from "./Accordion/Accordion";
 import { TabItemMd } from "./Tabs/TabItem";
-import { FragmentMd } from "../components-core/Fragment";
+import { FragmentMd } from "./Fragment/Fragment";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
@@ -72,6 +73,7 @@ import { FormSectionMd } from "./FormSection/FormSection";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
+import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
@@ -181,13 +183,24 @@ import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
-import { XmlUiCyanThemeDefinition, XmlUiGrayThemeDefinition, XmlUiGreenThemeDefinition, XmlUiOrangeThemeDefinition, XmlUiPurpleThemeDefinition, XmlUiRedThemeDefinition, XmlUiThemeDefinition } from "../components-core/theming/themes/xmlui";
+import {
+  XmlUiCyanThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiRedThemeDefinition,
+  XmlUiThemeDefinition,
+} from "../components-core/theming/themes/xmlui";
 import { BarChartMd } from "./Charts/BarChart/BarChart";
 import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
 import { LabelListMd } from "./Charts/LabelList/LabelList";
 import { LegendMd } from "./Charts/Legend/Legend";
 import { LineChartMd } from "./Charts/LineChart/LineChart";
 import { PieChartMd } from "./Charts/PieChart/PieChart";
+import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
+import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
+import { SlotMd } from "./Slot/Slot";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -319,6 +332,7 @@ export const collectedComponentMetadata = {
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   EmojiSelector: EmojiSelectorMd,
+  ExpandableItem: ExpandableItemMd,
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
   FlowLayout: FlowLayoutMd,
@@ -335,6 +349,7 @@ export const collectedComponentMetadata = {
   H6: H6Md,
   HoverCard: HoverCardMd,
   Icon: IconMd,
+  IFrame: IFrameMd,
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,
@@ -361,6 +376,7 @@ export const collectedComponentMetadata = {
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
   Slider: SliderMd,
+  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
@@ -383,13 +399,14 @@ export const collectedComponentMetadata = {
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
   ToneChangerButton: ToneChangerButtonMd,
+  ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
   BarChart: BarChartMd,
   DonutChart: DonutChartMd,
   LabelList: LabelListMd,
   Legend: LegendMd,
   LineChart: LineChartMd,
-  PieChart: PieChartMd
+  PieChart: PieChartMd,
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {
@@ -401,4 +418,4 @@ export const collectedThemes: Record<string, ThemeDefinition> = {
   xmluiPurple: XmlUiPurpleThemeDefinition,
   xmluiCyan: XmlUiCyanThemeDefinition,
   xmluiRed: XmlUiRedThemeDefinition,
-}
+};

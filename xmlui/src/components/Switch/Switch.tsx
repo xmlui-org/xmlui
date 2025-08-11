@@ -1,9 +1,9 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -27,12 +27,9 @@ import { defaultProps, Toggle } from "../Toggle/Toggle";
 const COMP = "Switch";
 
 export const SwitchMd = createMetadata({
-  description:
-    `The \`${COMP}\` component is a user interface element that allows users to toggle between two states: ` +
-    `on and off. It consists of a small rectangular or circular button that can be moved left or right to ` +
-    `change its state.`,
+  status: "stable",
+  description: "`Switch` enables users to toggle between two states: on and off.",
   props: {
-    indeterminate: dIndeterminate(defaultProps.indeterminate),
     label: dLabel(),
     labelPosition: dLabelPosition("end"),
     labelWidth: dLabelWidth(COMP),
@@ -54,8 +51,19 @@ export const SwitchMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    value: dValueApi(),
-    setValue: dSetValueApi(),
+    value: {
+      description:
+        `This property holds the current value of the ${COMP}, which can be either ` +
+        `"true" (on) or "false" (off).`,
+      signature: "get value():boolean",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: boolean): void",
+      parameters: {
+        value: "The new value to set. Can be either true (on) or false (off).",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -66,14 +74,19 @@ export const SwitchMd = createMetadata({
     [`backgroundColor-checked-${COMP}-warning`]: `$borderColor-${COMP}-warning`,
     [`borderColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
     [`backgroundColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
-    [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-${COMP}`]: "$color-surface-0",
     [`borderColor-${COMP}`]: "$color-surface-200",
     [`borderWidth-${COMP}`]: "1px",
-    [`backgroundColor-indicator-${COMP}`]: "$color-surface-200",
+    [`backgroundColor-indicator-${COMP}`]: "$color-surface-400",
+    [`backgroundColor-${COMP}-indicator--disabled`]: "$backgroundColor-primary",
     [`backgroundColor-indicator-checked-${COMP}`]: "$backgroundColor-primary",
     [`borderColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
+
+    dark: {
+      [`backgroundColor-indicator-${COMP}`]: "$color-surface-500",
+    },
   },
 });
 
@@ -101,6 +114,7 @@ export const switchComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}

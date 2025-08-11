@@ -1,14 +1,15 @@
 import styles from "./NestedApp.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { defaultProps } from "./defaultProps";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "NestedApp";
 
 export const NestedAppMd = createMetadata({
+  status: "stable",
   description: `The ${COMP} component allows you to nest an entire xmlui app into another one.
 `,
   props: {
@@ -36,54 +37,64 @@ export const NestedAppMd = createMetadata({
         "This property defines the active tone for the nested app. " +
         "If not set, the default tone is used.",
     },
-    title: {
-      description: "The optional title of the nested app. If not set, no title is displayed.",
-    },
     height: {
-      description: "The height of the nested app. If not set, the height is determined automatically.",
-    },
-    allowPlaygroundPopup: {
       description:
-        "This property defines whether the nested app can be opened in the xmlui playground.",
-      valueType: "boolean",
-      defaultValue: defaultProps.allowPlaygroundPopup,
-    },
-    withFrame: {
-      description: "This property defines whether the nested app should be displayed with a frame.",
-      valueType: "boolean",
-      defaultValue: defaultProps.withFrame,
+        "The height of the nested app. If not set, the height is determined automatically.",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`marginTop-${COMP}`]: "$space-3",
     [`marginBottom-${COMP}`]: "$space-3",
-    [`padding-${COMP}`]: "$space-4",
-    [`paddingTop-${COMP}`]: "$space-2",
-    [`border-${COMP}`]: "1px solid $color-surface-100",
-    [`borderRadius-${COMP}`]: "$space-4",
+    [`padding-${COMP}`]: "0",
+    [`paddingTop-${COMP}`]: "0",
+    [`border-${COMP}`]: "0.5px solid $borderColor",
+    [`borderRadius-${COMP}`]: "$space-2",
     [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
-    [`gap-frame-${COMP}`]: "$space-4",
+    [`gap-frame-${COMP}`]: "0",
     [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
-    [`boxShadow-${COMP}`]: "$boxShadow-md",
+    [`boxShadow-${COMP}`]: "0px 0px 32px 0px rgba(0, 0, 0, 0.05)",
+    [`backgroundColor-viewControls-${COMP}`]: "$color-primary-100",
+    [`borderRadius-viewControls-${COMP}`]: "5px",
+    [`padding-viewControls-${COMP}`]: "$space-0_5",
+    [`borderBottom-header-${COMP}`]: "0.5px solid $borderColor",
+    [`color-loadingText-${COMP}`]: "$color-surface-600",
+    // --- Split view styles
+    [`padding-button-splitView-${COMP}`]: "1px 6px",
+    [`width-button-splitView-${COMP}`]: "60px",
+    [`height-button-splitView-${COMP}`]: "19px",
+    [`width-logo-splitView-${COMP}`]: "1.5rem",
+    [`height-logo-splitView-${COMP}`]: "2rem",
+    [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-0",
+    [`color-button-splitView-${COMP}`]: "$color-surface-600",
+    [`color-button-splitView-${COMP}--active`]: "$color-primary",
+    [`width-controls-${COMP}`]: "80px",
+    [`backgroundColor-code-splitView-${COMP}`]: "$color-surface-0",
+    [`borderRadius-button-splitView-${COMP}`]: "$space-1",
+    [`borderColor-button-splitView-${COMP}`]: "transparent",
+    dark: {
+      [`backgroundColor-frame-${COMP}`]: "$color-surface-50",
+      [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-200",
+      [`color-button-splitView-${COMP}`]: "$color-surface-500",
+      [`color-button-splitView-${COMP}--active`]: "$color-surface-1",
+    },
   },
 });
 
 export const nestedAppComponentRenderer = createComponentRenderer(
   COMP,
   NestedAppMd,
-  ({ node, extractValue }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <IndexAwareNestedApp
         app={node.props?.app}
+        style={layoutCss}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}
         config={extractValue(node.props?.config)}
         activeTheme={extractValue(node.props?.activeTheme)}
         activeTone={extractValue(node.props?.activeTone)}
-        title={extractValue(node.props?.title)}
         height={extractValue(node.props?.height)}
-        allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
       />
     );
   },

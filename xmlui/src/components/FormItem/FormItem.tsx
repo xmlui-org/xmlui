@@ -1,8 +1,8 @@
 import styles from "./FormItem.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useMemo } from "react";
 import {
   defaultValidationMode,
   formControlTypesMd,
@@ -11,7 +11,10 @@ import {
   type FormItemValidations,
 } from "../Form/FormContext";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
+  dComponent,
   dEnabled,
   dInitialValue,
   dLabel,
@@ -31,11 +34,13 @@ const filteredValidationSeverityValues = validationSeverityValues.filter(
 );
 
 export const FormItemMd = createMetadata({
-  status: "experimental",
+  status: "stable",
+  allowArbitraryProps: true,
   description:
-    `A \`${COMP}\` component represents a single input element within a \`Form\`. The value within ` +
-    `the \`${COMP}\` may be associated with a particular property within the encapsulating \`Form\` ` +
-    `component's data.`,
+    "`FormItem` wraps individual input controls within a `Form`, providing data " +
+    "binding, validation, labeling, and layout functionality. It connects form " +
+    "controls to the parent form's data model and handles validation feedback " +
+    "automatically.",
   props: {
     bindTo: {
       description:
@@ -175,9 +180,7 @@ export const FormItemMd = createMetadata({
       availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
-    inputTemplate: {
-      description: "This property is used to define a custom input template.",
-    },
+    inputTemplate: dComponent("This property is used to define a custom input template."),
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
       valueType: "string",
@@ -188,28 +191,29 @@ export const FormItemMd = createMetadata({
     validate: d(`This event is used to define a custom validation function.`),
   },
   apis: {
-    addItem: d(
-      "Adds a new item to the `FormItem` data where the particular form item holds " +
-        "a list. The function has a single parameter, the data to add to the `FormItem`. " +
-        "The new item is appended to the end of the list.",
-    ),
-    removeItem: d(
-      "Removes the item specified by its index from the list held by the FormItem. " +
+    addItem: {
+      description:
+        "This method adds a new item to the list held by the FormItem. The function has a single " +
+        "parameter, the data to add to the FormItem. The new item is appended to the end of the list.",
+      signature: "addItem(data: any): void",
+      parameters: {
+        data: "The data to add to the FormItem's list.",
+      },
+    },
+    removeItem: {
+      description:
+        "Removes the item specified by its index from the list held by the FormItem. " +
         "The function has a single argument, the index to remove.",
-    ),
+      signature: "removeItem(index: number): void",
+      parameters: {
+        index: "The index of the item to remove from the FormItem's list.",
+      },
+    },
   },
   contextVars: {
-    $value: d(
-      `The context variable represents the current value of the \`${COMP}\`. It can be used in ` +
-        `expressions and code snippets within the \`${COMP}\` instance.`,
-    ),
-    $setValue: d(
-      `This function can be invoked to set the \`${COMP}\` instance's value. The function has a ` +
-        `single argument, the new value to set.`,
-    ),
-    $validationResult: d(
-      `This variable represents the result of the latest validation of the \`${COMP}\` instance.`,
-    ),
+    $value: d("Current value of the FormItem, accessible in expressions and code snippets"),
+    $setValue: d("Function to set the FormItem's value programmatically"),
+    $validationResult: d("Current validation state and error messages for this field"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -267,26 +271,6 @@ export const formItemComponentRenderer = createComponentRenderer(
       ...rest
     } = node.props;
 
-    //extractValue works as a memoization mechanism too (if there's nothing to resolve, it won't produce a new object every time)
-    const resolvedValidationPropsAndEvents: FormItemValidations = extractValue({
-      required: extractValue.asOptionalBoolean(required),
-      requiredInvalidMessage: extractValue.asOptionalString(requiredInvalidMessage),
-      minLength: extractValue.asOptionalNumber(minLength),
-      maxLength: extractValue.asOptionalNumber(maxLength),
-      lengthInvalidMessage: extractValue.asOptionalString(lengthInvalidMessage),
-      lengthInvalidSeverity: parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity)),
-      minValue: extractValue.asOptionalNumber(minValue),
-      maxValue: extractValue.asOptionalNumber(maxValue),
-      rangeInvalidMessage: extractValue.asOptionalString(rangeInvalidMessage),
-      rangeInvalidSeverity: parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity)),
-      pattern: extractValue.asOptionalString(pattern),
-      patternInvalidMessage: extractValue.asOptionalString(patternInvalidMessage),
-      patternInvalidSeverity: parseSeverity(extractValue.asOptionalString(patternInvalidSeverity)),
-      regex: extractValue.asOptionalString(regex),
-      regexInvalidMessage: extractValue.asOptionalString(regexInvalidMessage),
-      regexInvalidSeverity: parseSeverity(extractValue.asOptionalString(regexInvalidSeverity)),
-    });
-
     const nonLayoutCssProps = !layoutCss
       ? rest
       : Object.fromEntries(
@@ -302,6 +286,26 @@ export const formItemComponentRenderer = createComponentRenderer(
 
     return (
       <FormItem
+        // --- validation props
+        required={extractValue.asOptionalBoolean(required)}
+        requiredInvalidMessage={extractValue.asOptionalString(requiredInvalidMessage)}
+        minLength={extractValue.asOptionalNumber(minLength)}
+        maxLength={extractValue.asOptionalNumber(maxLength)}
+        lengthInvalidMessage={extractValue.asOptionalString(lengthInvalidMessage)}
+        lengthInvalidSeverity={parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity))}
+        minValue={extractValue.asOptionalNumber(minValue)}
+        maxValue={extractValue.asOptionalNumber(maxValue)}
+        rangeInvalidMessage={extractValue.asOptionalString(rangeInvalidMessage)}
+        rangeInvalidSeverity={parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity))}
+        pattern={extractValue.asOptionalString(pattern)}
+        patternInvalidMessage={extractValue.asOptionalString(patternInvalidMessage)}
+        patternInvalidSeverity={parseSeverity(
+          extractValue.asOptionalString(patternInvalidSeverity),
+        )}
+        regex={extractValue.asOptionalString(regex)}
+        regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
+        regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
+        //  ----
         style={layoutCss}
         layoutContext={layoutContext}
         labelBreak={extractValue.asOptionalBoolean(labelBreak)}
@@ -312,7 +316,6 @@ export const formItemComponentRenderer = createComponentRenderer(
         label={extractValue.asOptionalString(label)}
         labelPosition={extractValue.asOptionalString(labelPosition)}
         type={isCustomFormItem ? "custom" : formItemType}
-        validations={resolvedValidationPropsAndEvents}
         onValidate={lookupEventHandler("validate")}
         customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
         validationMode={extractValue.asOptionalString(validationMode)}

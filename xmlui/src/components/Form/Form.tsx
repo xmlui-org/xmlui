@@ -1,19 +1,20 @@
 import styles from "./Form.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dComponent, dEnabled, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd } from "../abstractions";
 import { FormWithContextVar, defaultProps } from "./FormNative";
 
 const COMP = "Form";
 
 export const FormMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
-    `A \`${COMP}\` is a fundamental component that displays user interfaces that allow users to input ` +
-    `(or change) data and submit it to the app (a server) for further processing.`,
+    "`Form` provides a structured container for collecting and validating user " +
+    "input, with built-in data binding, validation, and submission handling. It " +
+    "automatically manages form state and provides context for nested form controls " +
+    "to work together.",
   props: {
     buttonRowTemplate: dComponent(
       `This property allows defining a custom component to display the buttons at the bottom of the form.`,
@@ -83,6 +84,9 @@ export const FormMd = createMetadata({
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
     },
+    inProgressNotificationMessage: d("This property sets the message to display when the form is being submitted."),
+    completedNotificationMessage: d("This property sets the message to display when the form is submitted successfully."),
+    errorNotificationMessage: d("This property sets the message to display when the form submission fails."),
     enabled: dEnabled(),
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
@@ -91,6 +95,7 @@ export const FormMd = createMetadata({
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
     ),
+    success: d("The form infrastructure fires this event when the form is submitted successfully."),
     cancel: d(`The form infrastructure fires this event when the form is canceled.`),
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
@@ -102,11 +107,18 @@ export const FormMd = createMetadata({
     ),
   },
   apis: {
-    reset: d(`Call this event to reset the form to its initial state.`),
-    update: d(
-      "You can pass a data object to update the form data. The properties in the passed data " +
+    reset: {
+      description: "This method resets the form to its initial state, clearing all user input.",
+      signature: "reset(): void",
+    },
+    update: {
+      description: "You can pass a data object to update the form data. The properties in the passed data " +
         "object are updated to their values accordingly. Other form properties remain intact.",
-    ),
+      signature: "update(data: Record<string, any>): void",
+      parameters: {
+        data: "An object containing the form data to update.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

@@ -1,10 +1,18 @@
 # NavPanel [#navpanel]
 
-`NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
+`NavPanel` defines the navigation structure within an App, serving as a container for NavLink and NavGroup components that create your application's primary navigation menu. Its appearance and behavior automatically adapt based on the App's layout configuration.
+
+**Key features:**
+
+- **Layout adaptation**: Automatically positions navigation horizontally or vertically based on App layout
+- **Navigation organization**: Contains NavLink and NavGroup components to build structured menus
+- **Logo integration**: Supports custom logo templates in vertical layouts via logoTemplate property
+- **Drawer mode**: Can optionally display navigation in a collapsible drawer interface
+- **Theme integration**: Inherits styling from the app's theme system for consistent appearance
 
 ## Properties [#properties]
 
-### `inDrawer (default: false)` [#indrawer-default-false]
+### `inDrawer` (default: false) [#indrawer-default-false]
 
 This property determines if the navigation panel is displayed in a drawer.
 
@@ -24,7 +32,7 @@ This property defines the logo template to display in the navigation panel with 
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>
@@ -50,14 +58,15 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel-horizontal | $backgroundColor-AppHeader | $backgroundColor-AppHeader |
 | [border](../styles-and-themes/common-units/#border)-NavPanel | 0px solid $borderColor | 0px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavPanel | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
@@ -70,8 +79,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavPanel | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
@@ -84,7 +93,7 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
-| horizontalAlignment-logo-NavPanel | center | center |
+| [horizontalAlignment](../styles-and-themes/common-units/#alignment)-logo-NavPanel | center | center |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |

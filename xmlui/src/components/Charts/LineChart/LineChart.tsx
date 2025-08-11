@@ -1,12 +1,16 @@
-import { createMetadata, d } from "../../../abstractions/ComponentDefs";
 import { defaultProps, LineChart } from "./LineChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata, d } from "../../metadata-helpers";
 
 const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
-  description: "Represents a line chart component.",
   status: "experimental",
+  description:
+    "`LineChart` displays data as connected points over a continuous axis, ideal " +
+    "for showing trends, changes over time, or relationships between variables. " +
+    "Use it time series data, progress tracking, and comparing multiple data " +
+    "series on the same scale.",
   props: {
     data: {
       description:

@@ -1,72 +1,21 @@
 @use "xmlui/themes.scss" as themes;
 
-.wrapper {
-  z-index: 9999;
-  overflow: hidden;
-  box-shadow: 0 2px 6px 0 rgba(58, 57, 68, 0.4);
+.xmluiEditor {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.editorContainer {
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  border: 1px solid themes.$borderColor;
-}
-
-.actions {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: column;
-  background-color: themes.$backgroundColor;
-}
-
-.tabItems {
   display: flex;
   flex-direction: row;
-}
-
-.sideButtons {
-  display: flex;
-}
-
-.sideButton {
-  padding: 2px
-}
-
-.menuItem {
-  width: 240px;
-  display: flex;
-  justify-content: space-between;
-  padding: 4px;
-  align-items: center;
-  background-color: themes.$backgroundColor-secondary;
-  box-shadow: themes.$boxShadow-md;
-}
-
-.list {
-  padding: .2rem;
-  display: flex;
-  flex: 0 0 auto;
-  justify-content: space-between;
-  color: themes.$textColor-primary;
-  background-color: themes.$backgroundColor-secondary;
-  border-bottom: 1px solid themes.$borderColor;
-
-}
-
-.menu {
-  position: relative;
-  z-index: 9999;
-  padding: themes.$space-1_5;
-}
-
-.content {
-  flex: 1;
-  position: relative;
-  overflow: auto;
+  height: 100%;
+  width: 100%;
 
   .copyButton {
     z-index: 9999;
@@ -90,19 +39,3 @@
   }
 }
 
-.xmluiEditor {
-  height: 100%;
-  width: 100%;
-}
-
-.console {
-  padding: themes.$space-1_5;
-  background-color: themes.$backgroundColor;
-  color: themes.$textColor-primary;
-  flex: 1;
-}
-
-.timestamp {
-  color: themes.$textColor-secondary;
-  font-size: themes.$fontSize-normal;
-}

@@ -1,12 +1,19 @@
 # MenuItem [#menuitem]
 
-This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.
+`MenuItem` represents individual clickable items within dropdown menus and other menu components. Each menu item can display text, icons, and respond to clicks with either navigation or custom actions, making it the building block for interactive menu systems.
 
-See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
+**Key features:**
+- **Action handling**: Support both navigation (`to` property) and custom click handlers
+- **Visual feedback**: Built-in active, hover, and disabled states for clear user interaction
+- **Icon support**: Optional icons with flexible positioning (start or end)
+- **Menu integration**: Designed to work seamlessly within `DropdownMenu` and `SubMenuItem` hierarchies
+
+**Usage pattern:**
+Always used within menu containers like `DropdownMenu`. Use `to` for navigation or `onClick` for custom actions. For complex menu structures, combine with `MenuSeparator` and `SubMenuItem` components.
 
 ## Properties [#properties]
 
-### `active (default: false)` [#active-default-false]
+### `active` (default: false) [#active-default-false]
 
 This property indicates if the specified menu item is active.
 
@@ -20,7 +27,7 @@ This property indicates if the specified menu item is active.
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -38,7 +45,7 @@ This property names an optional icon to display with the menu item. You can use 
 </App>
 ```
 
-### `iconPosition (default: "start")` [#iconposition-default-start]
+### `iconPosition` (default: "start") [#iconposition-default-start]
 
 This property allows you to determine the position of the icon displayed in the menu item.
 

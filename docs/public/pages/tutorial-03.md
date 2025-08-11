@@ -2,7 +2,7 @@
 
 Let's explore a subset of the app's navigation.
 
-```xmlui-pg
+```xmlui-pg noHeader
 ---app copy display
 <App
   name="XMLUI Invoice"
@@ -26,7 +26,7 @@ Let's explore a subset of the app's navigation.
 
   </Pages>
 
-<Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
 
 </App>
 ---comp display
@@ -39,9 +39,11 @@ Let's explore a subset of the app's navigation.
 </Component>
 ```
 
-That's `vertical`, here's `horizontal`.
+## Horizontal
 
-```xmlui-pg
+We've seen `vertical`, here's `horizontal`.
+
+```xmlui-pg  noHeader
 ---app
 <App
   name="XMLUI Invoice"
@@ -65,7 +67,7 @@ That's `vertical`, here's `horizontal`.
 
   </Pages>
 
-<Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+<Footer>Built with XMLUI <ToneSwitch /> </Footer>
 
 </App>
 ---comp

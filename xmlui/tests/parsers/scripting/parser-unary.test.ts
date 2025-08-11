@@ -12,7 +12,7 @@ import {
   T_SEQUENCE_EXPRESSION,
   T_UNARY_EXPRESSION,
   UnaryExpression,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - unary expressions", () => {
   const unaryCases = [

@@ -1,6 +1,13 @@
 # Option [#option]
 
-`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.
+`Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components.
+
+**Key features:**
+- **Value and label separation**: Define what gets stored (value) separately from what users see (label)
+- **Automatic fallbacks**: Uses label as value or value as label when only one is provided
+- **Custom templates**: Support for rich content via optionTemplate property or child components
+- **State management**: Built-in enabled/disabled states for individual options
+- **Data integration**: Works seamlessly with Items components for dynamic option lists
 
 ## Using `Option` [#using-option]
 
@@ -30,29 +37,9 @@
 </App>
 ```
 
-## Use children as Content Template [#use-children-as-content-template]
-
-The [optionTemplate](#optiontemplate) property can be replaced by setting the item template component directly as the Option's child.
-In the following example, the two Option are functionally the same:
-
-```xmlui copy
-<App>
-  <!-- This is the same -->
-  <Option>
-    <property name="optionTemplate">
-      <Text>Template</Text>
-    </property>
-  </Option>
-  <!-- As this -->
-  <Option>
-    <Text>Template</Text>
-  </Option>
-</App>
-```
-
 ## Properties [#properties]
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property indicates whether the option is enabled or disabled.
 
@@ -74,10 +61,6 @@ This property defines the text to display for the option. If `label` is not defi
   </Select>
 </App>
 ```
-
-### `optionTemplate` [#optiontemplate]
-
-This property is used to define a custom option template
 
 ### `value` [#value]
 

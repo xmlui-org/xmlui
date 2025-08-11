@@ -1,6 +1,14 @@
 # Table [#table]
 
-`Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
+`Table` presents structured data for viewing, sorting, selection, and interaction.
+
+**Key features:**
+- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Virtualization**: Only renders visible rows for smooth performance with large datasets
+- **Row selection**: Support single or multi-row selection for bulk operations
+- **Pagination**: Built-in pagination controls for managing large datasets
+
+Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
 
 In the following sections the examples use data with the structure outlined below:
 
@@ -30,11 +38,11 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties [#properties]
 
-### `alwaysShowSelectionHeader (default: false)` [#alwaysshowselectionheader-default-false]
+### `alwaysShowSelectionHeader` (default: false) [#alwaysshowselectionheader-default-false]
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -126,7 +134,7 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
-### `enableMultiRowSelection (default: true)` [#enablemultirowselection-default-true]
+### `enableMultiRowSelection` (default: true) [#enablemultirowselection-default-true]
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -213,7 +221,7 @@ By default, the value of this property is `true`.
 
 This optional property is used to specify the height of the table header.
 
-It accepts common [size values](./appearance/common-units.mdx#size-values).
+It accepts common [size values](/styles-and-themes/common-units#size-values).
 
 ```xmlui copy /headerHeight="60px"/
 <App>
@@ -285,7 +293,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 </App>
 ```
 
-### `hideHeader (default: false)` [#hideheader-default-false]
+### `hideHeader` (default: false) [#hideheader-default-false]
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -595,7 +603,7 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
-### `isPaginated (default: false)` [#ispaginated-default-false]
+### `isPaginated` (default: false) [#ispaginated-default-false]
 
 This property adds pagination controls to the `Table`.
 
@@ -685,7 +693,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
 </App>
 ```
 
-### `noBottomBorder (default: false)` [#nobottomborder-default-false]
+### `noBottomBorder` (default: false) [#nobottomborder-default-false]
 
 This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.
 
@@ -1178,7 +1186,7 @@ Click on any of the column headers to trigger a new sorting:
 
 This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.
 
-Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
+Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
 ```xmlui copy {4}
 <App var.sortedBy="">
@@ -1346,6 +1354,8 @@ clicking that column header still does not sort because `willSort` prevents it:
 
 This method clears the list of currently selected table rows.
 
+**Signature**: `clearSelection(): void`
+
 ```xmlui copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
 <App>
   <HStack>
@@ -1435,11 +1445,15 @@ This method clears the list of currently selected table rows.
 
 This method returns the list of currently selected table rows IDs.
 
+**Signature**: `getSelectedIds(): Array<string>`
+
 (See the [example](#clearselection) at the `clearSelection` method)
 
 ### `getSelectedItems` [#getselecteditems]
 
 This method returns the list of currently selected table rows items.
+
+**Signature**: `getSelectedItems(): Array<TableRowItem>`
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
@@ -1447,11 +1461,17 @@ This method returns the list of currently selected table rows items.
 
 This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`.
 
+**Signature**: `selectAll(): void`
+
 (See the [example](#clearselection) at the `clearSelection` method)
 
 ### `selectId` [#selectid]
 
 This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them.
+
+**Signature**: `selectId(id: string | Array<string>): void`
+
+- `id`: The ID of the row to select, or an array of IDs to select multiple rows.
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
@@ -1476,8 +1496,8 @@ This method selects the row with the specified ID. This method has no effect if 
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-cell-Table | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
@@ -1490,8 +1510,8 @@ This method selects the row with the specified ID. This method has no effect if 
 | [color](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-cell-Table | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |

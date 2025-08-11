@@ -1,18 +1,24 @@
 # FormItem [#formitem]
 
-A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
+`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Data binding**: Automatically syncs control values with form data using the `bindTo` property
+- **Validation**: Displays validation states and error messages for the associated input
+- **Flexible labeling**: Supports labels, helper text, and various label positioning options
+- **Layout management**: Handles consistent spacing and alignment of form elements
 
-- `$setValue`: This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set.
-- `$validationResult`: This variable represents the result of the latest validation of the `FormItem` instance.
-- `$value`: The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
+See [this guide](/forms) for details.
 
-You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
+**Context variables available during execution:**
+
+- `$setValue`: Function to set the FormItem's value programmatically
+- `$validationResult`: Current validation state and error messages for this field
+- `$value`: Current value of the FormItem, accessible in expressions and code snippets
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -33,7 +39,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 </App>
 ```
 
-### `customValidationsDebounce (default: 0)` [#customvalidationsdebounce-default-0]
+### `customValidationsDebounce` (default: 0) [#customvalidationsdebounce-default-0]
 
 This optional number prop determines the time interval between two runs of a custom validation.
 
@@ -57,7 +63,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 </App>
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -70,7 +76,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `gap (default: "0")` [#gap-default-0]
+### `gap` (default: "0") [#gap-default-0]
 
 This property defines the gap between the adornments and the input area.
 
@@ -103,11 +109,11 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
-### `labelBreak (default: true)` [#labelbreak-default-true]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
 This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -155,7 +161,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 </App>
 ```
 
-### `lengthInvalidSeverity (default: "error")` [#lengthinvalidseverity-default-error]
+### `lengthInvalidSeverity` (default: "error") [#lengthinvalidseverity-default-error]
 
 This property sets the severity level of the length validation.
 
@@ -294,7 +300,7 @@ In the demo below, enter anything that does not look like an email and click out
 </App>
 ```
 
-### `patternInvalidSeverity (default: "error")` [#patterninvalidseverity-default-error]
+### `patternInvalidSeverity` (default: "error") [#patterninvalidseverity-default-error]
 
 This property sets the severity level of the pattern validation.
 
@@ -336,7 +342,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `rangeInvalidSeverity (default: "error")` [#rangeinvalidseverity-default-error]
+### `rangeInvalidSeverity` (default: "error") [#rangeinvalidseverity-default-error]
 
 This property sets the severity level of the value range validation.
 
@@ -395,7 +401,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 </App>
 ```
 
-### `regexInvalidSeverity (default: "error")` [#regexinvalidseverity-default-error]
+### `regexInvalidSeverity` (default: "error") [#regexinvalidseverity-default-error]
 
 This property sets the severity level of regular expression validation.
 
@@ -415,7 +421,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -450,7 +456,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 </App>
 ```
 
-### `type (default: "text")` [#type-default-text]
+### `type` (default: "text") [#type-default-text]
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
 
@@ -479,7 +485,7 @@ Available values:
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 
-### `validationMode (default: "errorLate")` [#validationmode-default-errorlate]
+### `validationMode` (default: "errorLate") [#validationmode-default-errorlate]
 
 This property sets what kind of validation mode or strategy to employ for a particular input field.
 
@@ -515,11 +521,19 @@ In the demo below, leave the field as is and submit the form or enter an input t
 
 ### `addItem` [#additem]
 
-Adds a new item to the `FormItem` data where the particular form item holds a list. The function has a single parameter, the data to add to the `FormItem`. The new item is appended to the end of the list.
+This method adds a new item to the list held by the FormItem. The function has a single parameter, the data to add to the FormItem. The new item is appended to the end of the list.
+
+**Signature**: `addItem(data: any): void`
+
+- `data`: The data to add to the FormItem's list.
 
 ### `removeItem` [#removeitem]
 
 Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove.
+
+**Signature**: `removeItem(index: number): void`
+
+- `index`: The index of the item to remove from the FormItem's list.
 
 ## Styling [#styling]
 

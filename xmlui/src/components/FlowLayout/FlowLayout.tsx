@@ -1,18 +1,19 @@
 import styles from "./FlowLayout.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "FlowLayout";
 
 export const FlowLayoutMd = createMetadata({
+  status: "stable",
   description:
-    "This layout component is used to position content in rows with an auto wrapping feature: if " +
-    "the length of the items exceed the available space the layout will wrap into a new line.",
+    "`FlowLayout` positions content in rows with automatic wrapping. When items " +
+    "exceed the available horizontal space, they automatically wrap to a new line.",
   props: {
     gap: {
       description:

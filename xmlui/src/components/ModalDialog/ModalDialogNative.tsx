@@ -1,6 +1,6 @@
 import React, {
-  CSSProperties,
-  ReactNode,
+  type CSSProperties,
+  type ReactNode,
   useContext,
   useEffect,
   useMemo,
@@ -34,7 +34,6 @@ type OnOpen = (...args: any[]) => void;
 type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
-  className?: string;
   onClose?: OnClose;
   onOpen?: OnOpen;
   children?: ReactNode;
@@ -76,6 +75,7 @@ export const ModalDialogFrame = React.forwardRef(
     ) : null;
   },
 );
+ModalDialogFrame.displayName = "ModalDialogFrame";
 
 const ModalStateContext = React.createContext(null);
 
@@ -125,7 +125,6 @@ export const ModalDialog = React.forwardRef(
     {
       children,
       style,
-      className,
       isInitiallyOpen,
       fullScreen = defaultProps.fullScreen,
       title,
@@ -136,6 +135,12 @@ export const ModalDialog = React.forwardRef(
     ref,
   ) => {
     const { root } = useTheme();
+    // NOTE: at this point, we can't use useAppContext here,
+    // since the ModalDialog context provider (via ConfirmationModalContextProvider) is mounted outside of the AppContext,
+    // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
+    // String-based type checking: Use constructor.name to identify ShadowRoot
+    // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+    const isDialogRootInShadowDom = typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot;
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
@@ -170,7 +175,7 @@ export const ModalDialog = React.forwardRef(
         unRegisterForm: (id: string) => {
           registeredForms.current.delete(id);
         },
-        amITheSingleForm: (id) => {
+        amITheSingleForm: (id: string) => {
           return registeredForms.current.size === 1 && registeredForms.current.has(id);
         },
         requestClose: () => {
@@ -183,55 +188,77 @@ export const ModalDialog = React.forwardRef(
       return null;
     }
 
+    const Content = (
+      <Dialog.Content
+        className={classnames(styles.content)}
+        onPointerDownOutside={(event) => {
+          if (
+            event.target instanceof Element &&
+            event.target.closest("._debug-inspect-button") !== null
+          ) {
+            //we prevent the auto modal close on clicking the inspect button
+            event.preventDefault();
+          }
+        }}
+        ref={composedRef}
+        style={{ ...style, gap: undefined }}
+      >
+        {!!title && (
+          <Dialog.Title style={{ marginTop: 0 }}>
+            <header id="dialogTitle" className={styles.dialogTitle}>
+              {title}
+            </header>
+          </Dialog.Title>
+        )}
+        <div className={styles.innerContent} style={{ gap: style?.gap }}>
+          <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
+            {children}
+          </ModalVisibilityContext.Provider>
+        </div>
+        {closeButtonVisible && (
+          <Dialog.Close asChild={true}>
+            <Button
+              variant={"ghost"}
+              themeColor={"secondary"}
+              className={styles.closeButton}
+              aria-label="Close"
+              icon={<Icon name={"close"} size={"sm"} />}
+              orientation={"vertical"}
+            />
+          </Dialog.Close>
+        )}
+      </Dialog.Content>
+    );
+
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
         <Dialog.Portal container={root}>
-          {!fullScreen && <div className={styles.overlayBg} />}
-          <Dialog.Overlay
-            className={classnames(styles.overlay, {
-              [styles.fullScreen]: fullScreen,
-            })}
-          >
-            <Dialog.Content
-              className={classnames(styles.content, className)}
-              onPointerDownOutside={(event) => {
-                if (
-                  event.target instanceof Element &&
-                  event.target.closest("._debug-inspect-button") !== null
-                ) {
-                  //we prevent the auto modal close on clicking the inspect button
-                  event.preventDefault();
-                }
-              }}
-              ref={composedRef}
-              style={{ ...style, gap: undefined }}
+          {isDialogRootInShadowDom && (
+            /*
+              In the Shadow DOM we can omit the Dialog.Overlay,
+              since we get the same result & the main content outside remains scrollable.
+            */
+            <div
+              className={classnames(styles.overlayBg, styles.nested, {
+                [styles.fullScreen]: fullScreen,
+              })}
             >
-              {!!title && (
-                <Dialog.Title style={{ marginTop: 0 }}>
-                  <header id="dialogTitle" className={styles.dialogTitle}>
-                    {title}
-                  </header>
-                </Dialog.Title>
-              )}
-              <div className={styles.innerContent} style={{ gap: style?.gap }}>
-                <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-                  {children}
-                </ModalVisibilityContext.Provider>
-              </div>
-              {closeButtonVisible && (
-                <Dialog.Close asChild={true}>
-                  <Button
-                    variant={"ghost"}
-                    themeColor={"secondary"}
-                    className={styles.closeButton}
-                    aria-label="Close"
-                    icon={<Icon name={"close"} size={"sm"} />}
-                    orientation={"vertical"}
-                  />
-                </Dialog.Close>
-              )}
-            </Dialog.Content>
-          </Dialog.Overlay>
+              {Content}
+            </div>
+          )}
+          {!isDialogRootInShadowDom && (
+            <>
+              <div className={classnames(styles.overlayBg)} />
+              {/* This Overlay is responsible for the focus capture & scroll-lock */}
+              <Dialog.Overlay
+                className={classnames(styles.overlay, {
+                  [styles.fullScreen]: fullScreen,
+                })}
+              >
+                {Content}
+              </Dialog.Overlay>
+            </>
+          )}
         </Dialog.Portal>
       </Dialog.Root>
     );

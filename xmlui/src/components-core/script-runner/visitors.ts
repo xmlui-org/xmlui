@@ -6,7 +6,7 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { getIdentifierScope } from "./eval-tree-common";
 import {
@@ -45,7 +45,7 @@ import {
   T_UNARY_EXPRESSION,
   T_VAR_DECLARATION,
   T_WHILE_STATEMENT,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 

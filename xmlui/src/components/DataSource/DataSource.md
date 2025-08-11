@@ -1,5 +1,23 @@
 %-DESC-START
 
+**Key characteristics:**
+- **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready
+- **Built-in caching**: Prevents unnecessary requests and provides instant data access
+- **Polling support**: Automatically refetch data at specified intervals
+- **Data transformation**: Process and filter responses before components use the data
+
+## Preventing the `DataSource` from Executing
+
+Prevent the `DataSource` from executing until the specified condition in the `when` attribute is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
+
+
 ## Structural Sharing
 
 `DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
@@ -88,7 +106,7 @@ This `resultSelector` builds an array of the `properties` objects.
 ```xmlui copy
 <DataSource
   id="contacts"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   resultSelector="results.map(item => item.properties )"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
 ```
@@ -120,7 +138,7 @@ This `resultSelector` filters the array of the `properties` objects to include o
 <DataSource
   id="contacts"
   resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
-  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
   />
 ````

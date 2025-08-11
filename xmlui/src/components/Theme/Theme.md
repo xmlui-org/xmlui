@@ -1,10 +1,13 @@
 %-DESC-START
 
-You can change the tone or even specify individual theme variables and change the appearance of nested contents in a theme.
-It is also possible to nest multiple `Theme` components to define multiple theming contexts.
-Contexts follow a specificity rule.
+**Key features:**
+- **No CSS required**: Change component appearance using theme variables instead of custom stylesheets
+- **Brand consistency**: Maintain design system compliance while allowing contextual variations
+- **Scoped styling**: Apply theme changes only to nested components without affecting the global design
+- **Variable overrides**: Modify colors, spacing, typography, and other design variables declaratively
+- **Nested contexts**: Stack multiple `Theme` components for granular control with automatic specificity rules
 
-Learn more about styling theming and theming context in [Themes and Styles Overview](../learning/themes/overview/#style-scopes).
+See [this guide](/themes-intro) and [these references](/styles-and-themes/layout-props) for details.
 
 ## Using `Theme`
 
@@ -54,9 +57,9 @@ and sets several theme variables to style the `ProgressBar` component:
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
-  <Theme themeId="solid">
+  <Theme themeId="xmlui-red">
     <VStack backgroundColor="$backgroundColor-primary">
-      <H3>Use the 'solid' theme:</H3>
+      <H3>Use the 'xmlui-red' theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>

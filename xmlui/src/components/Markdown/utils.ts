@@ -2,14 +2,21 @@ export type SegmentProps = {
   display?: boolean;
   copy?: boolean;
   noPopup?: boolean;
+  noFrame?: boolean;
+  noHeader?: boolean;
+  splitView?: boolean;
+  initiallyShowCode?: boolean;
   highlights?: (number | [number, number])[];
   filename?: string;
   name?: string;
   height?: string;
+  popOutUrl?: string;
   content?: string;
   order?: number;
   patterns?: string[];
   borderedPatterns?: string[];
+  withSplashScreen?: boolean;
+  immediate?: boolean;
 };
 
 export type PlaygroundPattern = {
@@ -74,6 +81,36 @@ export function parseSegmentProps(input: string): SegmentProps {
     segment.noPopup = true;
   }
 
+  // --- Match the "noFrame" flag
+  if (/\bnoFrame\b/.test(input)) {
+    segment.noFrame = true;
+  }
+
+  // --- Match the "immediate" flag
+  if (/\bimmediate\b/.test(input)) {
+    segment.immediate = true;
+  }
+
+  // --- Match the "withSplashScreen" flag
+  if (/\bwithSplashScreen\b/.test(input)) {
+    segment.withSplashScreen = true;
+  }
+  
+  // --- Match the "noHeader" flag
+  if (/\bnoHeader\b/.test(input)) {
+    segment.noHeader = true;
+  }
+
+  // --- Match the "splitView" flag
+  if (/\bsplitView\b/.test(input)) {
+    segment.splitView = true;
+  }
+
+  // --- Match the "initiallyShowCode" flag
+  if (/\binitiallyShowCode\b/.test(input)) {
+    segment.initiallyShowCode = true;
+  }
+
   // Match the "highlights" pattern
   const highlightsMatch = input.match(/\{([^\}]+)\}/);
   if (highlightsMatch) {
@@ -105,21 +142,27 @@ export function parseSegmentProps(input: string): SegmentProps {
     segment.height = heightMatch[1];
   }
 
+  // Match the "popOutUrl" property
+  const popOutUrlMatch = input.match(/\bpopOutUrl="([^"]+)"/);
+  if (popOutUrlMatch) {
+    segment.popOutUrl = popOutUrlMatch[1];
+  }
+
   // Match patterns enclosed in /pattern/ format
   const patternMatches = input.match(/\/([^\/]+)\//g);
   if (patternMatches) {
-    segment.patterns = patternMatches.map(pattern => 
+    segment.patterns = patternMatches.map((pattern) =>
       // Remove the surrounding slashes
-      pattern.substring(1, pattern.length - 1)
+      pattern.substring(1, pattern.length - 1),
     );
   }
 
   // Match bordered patterns enclosed in !/pattern/ format
   const borderedPatternMatches = input.match(/!\/(.[^\/]+)\//g);
   if (borderedPatternMatches) {
-    segment.borderedPatterns = borderedPatternMatches.map(pattern => 
+    segment.borderedPatterns = borderedPatternMatches.map((pattern) =>
       // Remove the leading !/ and trailing /
-      pattern.substring(2, pattern.length - 1)
+      pattern.substring(2, pattern.length - 1),
     );
   }
 
@@ -247,7 +290,16 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Assemble the final markdown content
   let markdownContent = "";
-  const pgContent: any = { noPopup: pattern.default?.noPopup };
+  const pgContent: any = {
+    noPopup: pattern.default?.noPopup,
+    noFrame: pattern.default?.noFrame,
+    noHeader: pattern.default?.noHeader,
+    splitView: pattern.default?.splitView,
+    initiallyShowCode: pattern.default?.initiallyShowCode,
+    popOutUrl: pattern.default?.popOutUrl,
+    immediate: pattern.default?.immediate,
+    withSplashScreen: pattern.default?.withSplashScreen,
+  };
 
   // --- Extract optional playground attributes
   if (pattern.default.height) {
@@ -255,6 +307,9 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
   }
   if (pattern.default.name) {
     pgContent.name = pattern.default.name;
+  }
+  if (pattern.default.popOutUrl) {
+    pgContent.popOutUrl = pattern.default.popOutUrl;
   }
 
   // --- Iterate through segments
@@ -294,7 +349,8 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     let segmentAttrs =
       `${segment.copy ? "copy" : ""} ` +
       `${segment.filename ? `filename="${segment.filename}"` : ""} ` +
-      `${segment.name ? `name="${segment.name}"` : ""}`;
+      `${segment.name ? `name="${segment.name}"` : ""} ` +
+      `${segment.popOutUrl ? `popOutUrl="${segment.popOutUrl}"` : ""}`;
     if (segment.highlights && segment.highlights.length > 0) {
       const highlights = segment.highlights
         .map((highlight) =>
@@ -343,10 +399,15 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Convert the JSON representation of pgContent to a base64 string
   const jsonString = JSON.stringify(pgContent);
-  const base64String = btoa(jsonString);
-  markdownContent += '<samp data-pg-content="' + base64String + '"></samp>\n\n';
-
-  return markdownContent;
+  const base64ContentString = btoa(jsonString);
+  const base64MarkdownString = btoa(markdownContent);
+  return (
+    '<samp data-pg-content="' +
+    base64ContentString +
+    '" data-pg-markdown="' +
+    base64MarkdownString +
+    '"></samp>\n\n'
+  );
 }
 
 export function observeTreeDisplay(content: string): [number, number, string] | null {

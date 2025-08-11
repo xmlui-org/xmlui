@@ -1,12 +1,6 @@
-%-IMPORT-START
-
-import xmluiLogo from "./doc-resources/xmlui-logo.svg";
-
-%-IMPORT-END
-
 %-DESC-START
 
-You can learn more about using logos in application layouts in the [App Component](/learning/using-components/app-component/) article.
+Most apps use `logo="path/to/logo.svg"` on the App component rather than using `<Logo>` directly. Use this component when you need custom logo positioning or want to combine logos with other elements in a `logoTemplate`.
 
 ## Using Logo
 
@@ -44,7 +38,7 @@ It also uses the `Logo` component within the template definition:
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <CHStack>
         (Sample content)

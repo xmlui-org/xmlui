@@ -1,18 +1,20 @@
 import styles from "./Link.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
 
 const COMP = "Link";
 
 export const LinkMd = createMetadata({
+  status: "stable",
   description:
-    `A \`${COMP}\` component represents a navigation target within the app or a ` +
-    `reference to an external web URL.`,
+    "`Link` creates clickable navigation elements for internal app routes or " +
+    "external URLs. You can use the `label` and `icon` properties for simple text " +
+    "links, or embed custom components like buttons, cards, or complex layouts " +
+    "for rich interactive link presentations.",
   props: {
     to: d(
       "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
@@ -31,7 +33,9 @@ export const LinkMd = createMetadata({
       type: "string",
     },
     label: dLabel(),
-    icon: d(`This property allows you to add an optional icon (specify the icon's name) to the link.`),
+    icon: d(
+      `This property allows you to add an optional icon (specify the icon's name) to the link.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
@@ -41,11 +45,11 @@ export const LinkMd = createMetadata({
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
     [`textColor-${COMP}`]: "$color-primary-500",
-    [`textDecorationColor-${COMP}`]: "$color-primary-500",
+    [`textDecorationColor-${COMP}`]: `textDecorationColor-${COMP}`,
     [`textColor-${COMP}--hover`]: `$color-primary-400`,
-    [`textDecorationColor-${COMP}--hover`]: "$color-primary-400",
+    [`textDecorationColor-${COMP}--hover`]: `textColor-${COMP}--hover`,
     [`textColor-${COMP}--active`]: "$color-primary-400",
-    [`textDecorationColor-${COMP}--active`]: "$color-primary-400",
+    [`textDecorationColor-${COMP}--active`]: `textColor-${COMP}--active`,
     [`textColor-${COMP}--hover--active`]: `$textColor-${COMP}--active`,
     [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`textDecorationLine-${COMP}`]: "underline",
@@ -58,6 +62,11 @@ export const LinkMd = createMetadata({
     [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-icon-${COMP}`]: "$space-0_5",
+    dark: {
+      [`textColor-${COMP}`]: "$color-primary-600",
+      [`textColor-${COMP}--hover`]: `$color-primary-500`,
+      [`textColor-${COMP}--active`]: "$color-primary-500",
+    }
   },
 });
 

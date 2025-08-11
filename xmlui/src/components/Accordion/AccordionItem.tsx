@@ -1,6 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { MemoizedItem } from "../../components/container-helpers";
 import {
   AccordionItemComponent,
@@ -10,24 +9,23 @@ import {
 const COMP = "AccordionItem";
 
 export const AccordionItemMd = createMetadata({
+  status: "in progress",
   description:
     `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
     `${COMP} instances from which the user can select.`,
   props: {
-    header: d(
-      "This property declares the text used in the component's header. If not provided, the header will be empty.",
-      null,
-      "string",
-    ),
+    header: {
+      description: "This property declares the text used in the component's header. If not provided, the header will be empty.",
+      valueType: "string"
+    },
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
     ),
-    initiallyExpanded: d(
-      `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
-      null,
-      "boolean",
-      defaultProps.initiallyExpanded,
-    ),
+    initiallyExpanded: {
+      description: `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
+      valueType: "boolean",
+      defaultValue: defaultProps.initiallyExpanded
+    },
   },
 });
 

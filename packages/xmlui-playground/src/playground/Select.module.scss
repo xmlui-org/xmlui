@@ -1,47 +1,5 @@
 @use "xmlui/themes.scss" as themes;
 
-.SelectTrigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  padding: 0 15px;
-  font-size: 1rem;
-  line-height: 1;
-  height: 35px;
-  gap: 5px;
-  background-color: transparent;
-  --tw-text-opacity: 1;
-  color: rgba(17,24,39,var(--tw-text-opacity));
-}
-
-:is(html[class~=dark] .SelectTrigger) {
-  --tw-text-opacity: 1;
-  color: rgba(249,250,251,var(--tw-text-opacity));
-}
-.SelectTrigger:hover {
-  background-color: rgba(243,244,246,var(--tw-bg-opacity));
-}
-
-:is(html[class~=dark] .SelectTrigger:hover)  {
-  --tw-text-opacity: 1;
-  color: rgba(249,250,251,var(--tw-text-opacity));
-  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/.05);
-}
-
-.SelectTrigger:focus {
-  box-shadow: none;
-}
-
-.SelectIcon {
-  color: rgba(17,24,39,var(--tw-text-opacity));
-}
-
-:is(html[class~=dark] .SelectIcon) {
-  --tw-text-opacity: 1;
-  color: rgba(249,250,251,var(--tw-text-opacity));
-}
-
 .RadixMenuContent {
   display: flex;
   flex-direction: column;

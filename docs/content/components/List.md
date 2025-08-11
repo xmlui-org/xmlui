@@ -1,13 +1,17 @@
 # List [#list]
 
-The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.
+`List` is a high-performance, virtualized container for rendering large datasets with built-in grouping, sorting, and visual formatting. It only renders visible items in the viewport, making it ideal for displaying thousands of records while maintaining smooth scrolling performance.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Virtualization**: Renders only visible items for optimal performance with large datasets
+- **Advanced grouping**: Group data by any field with customizable headers and footers
+- **Built-in sorting**: Sort by any data field in ascending or descending order
+- **Visual formatting**: Pre-styled list appearance with borders, spacing, and layout
+- **Pagination support**: Handle large datasets with built-in pagination controls
+- **Empty state handling**: Customizable templates for when no data is available
 
-- `$isFirst`: This boolean value indicates if the component renders its first item.
-- `$isLast`: This boolean value indicates if the component renders its last item.
-- `$item`: This property represents the value of an item in the data list.
-- `$itemIndex`: This integer value represents the current row index (zero-based) while rendering children.
+**List vs Items:**
+Use `List` for complex data presentation requiring performance optimization, grouping, sorting, or visual formatting. Use `Items` for simple data iteration without layout requirements.
 
 In the following examples all use the same list of data which looks like so:
 
@@ -21,6 +25,14 @@ In the following examples all use the same list of data which looks like so:
 | 5    | Cheese  | 200      | grams  | diary      | 0    |
 
 The data is provided as JSON.
+
+**Context variables available during execution:**
+
+- `$group`: Group information when using `groupBy` (available in group templates)
+- `$isFirst`: Boolean indicating if this is the first item
+- `$isLast`: Boolean indicating if this is the last item
+- `$item`: Current data item being rendered
+- `$itemIndex`: Zero-based index of current item
 
 ## Use children as Content Template [#use-children-as-content-template]
 
@@ -125,7 +137,7 @@ This property is an array of group names that the `List` will display. If not se
 </App>
 ```
 
-### `borderCollapse (default: true)` [#bordercollapse-default-true]
+### `borderCollapse` (default: true) [#bordercollapse-default-true]
 
 Collapse items borders
 
@@ -731,13 +743,13 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 </App>
 ```
 
-### `groupsInitiallyExpanded (default: true)` [#groupsinitiallyexpanded-default-true]
+### `groupsInitiallyExpanded` (default: true) [#groupsinitiallyexpanded-default-true]
 
 This Boolean property defines whether the list groups are initially expanded.
 
 Note how the groups in the right `List` are expanded by default:
 
-```xmlui {3, 10}
+```xmlui /groupsInitiallyExpanded/
 <App>
   <HStack gap="$space-2">
     <List data="{[...]}" 
@@ -885,7 +897,7 @@ Note how the groups in the right `List` are expanded by default:
 </App>
 ```
 
-### `hideEmptyGroups (default: true)` [#hideemptygroups-default-true]
+### `hideEmptyGroups` (default: true) [#hideemptygroups-default-true]
 
 This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
@@ -1043,7 +1055,7 @@ Note how the `meats` category is not displayed in the right `List`:
 </App>
 ```
 
-### `idKey (default: "id")` [#idkey-default-id]
+### `idKey` (default: "id") [#idkey-default-id]
 
 Denotes which attribute of an item acts as the ID or key of the item
 
@@ -1356,7 +1368,7 @@ It contains the following boolean attributes:
 | `isFetchingPrevPage` | _TBD_                                |
 | `isFetchingNextPage` | _TBD_                                |
 
-### `scrollAnchor (default: "top")` [#scrollanchor-default-top]
+### `scrollAnchor` (default: "top") [#scrollanchor-default-top]
 
 This property pins the scroll position to a specified location of the list. Available values are shown below.
 
@@ -1433,6 +1445,8 @@ This component does not have any events.
 
 This method scrolls the list to the bottom.
 
+**Signature**: `scrollToBottom(): void`
+
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
 ```xmlui-pg copy display name="Example: data API Call" height="400px"
@@ -1464,17 +1478,27 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
 
 This method scrolls the list to a specific item. The method accepts an item ID as a parameter.
 
+**Signature**: `scrollToId(id: string): void`
+
+- `id`: The ID of the item to scroll to.
+
 See the [`scrollToBottom`](#scrolltobottom) example.
 
 ### `scrollToIndex` [#scrolltoindex]
 
 This method scrolls the list to a specific index. The method accepts an index as a parameter.
 
+**Signature**: `scrollToIndex(index: number): void`
+
+- `index`: The index to scroll to.
+
 See the [`scrollToBottom`](#scrolltobottom) example.
 
 ### `scrollToTop` [#scrolltotop]
 
 This method scrolls the list to the top.
+
+**Signature**: `scrollToTop(): void`
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 

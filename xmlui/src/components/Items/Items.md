@@ -1,13 +1,10 @@
-# Items [#component-items]
+%-DESC-START
 
-The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
-
-The component provides context values with which you can access some internal properties:
-
-- `$isFirst`: This boolean value indicates if the component renders its first item.
-- `$isLast`: This boolean value indicates if the component renders its last item.
-- `$item`: This value represents the current iteration item while the component renders its children.
-- `$itemIndex`: This integer value represents the current iteration index (zero-based) while rendering children.
+**Key features:**
+- **Simple iteration**: Maps data arrays to components using `$item`, `$itemIndex`, `$isFirst`, and `$isLast` context
+- **Layout agnostic**: No built-in styling or container—children determine the visual presentation
+- **Reverse ordering**: Optional `reverse` property to display data in opposite order
+- **Performance**: Lightweight alternative to `List` when you don't need virtualization or grouping
 
 >[!INFO]
 > `Items` is not a container! It does not wrap its items into a container; it merely renders its children.
@@ -53,39 +50,9 @@ You can use also API bindings to display data:
 </App>
 ```
 
-## Use children as Content Template
+%-DESC-END
 
-The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the Items's child.
-In the following example, the two Items are functionally the same:
-
-```xmlui copy
-<App>
-  <!-- This is the same -->
-  <Items>
-    <property name="itemTemplate">
-      <Text>Template</Text>
-    </property>
-  </Items>
-  <!-- As this -->
-  <Items>
-    <Text>Template</Text>
-  </Items>
-</App>
-```
-
-## Properties
-
-### `data`
-
-This property contains the list of data items (obtained from a data source) this component renders.
-
-### `itemTemplate`
-
-The component template to display a single item
-
-### `reverse`
-
-This property reverses the order in which data is mapped to template components.
+%-PROP-START reverse
 
 ```xmlui-pg copy {4} display name="Example: reverse"
 <App>
@@ -103,16 +70,12 @@ This property reverses the order in which data is mapped to template components.
 </App>
 ```
 
-## Events
+%-PROP-END
 
-This component does not have any events.
-
-## Exposed Methods
-
-This component does not expose any methods.
-
-## Styling
+%-STYLE-START
 
 The `Items` component does not support styling.
 You should style the container component that wraps `Items`.
 You can also style the individual items via specifying a template component.
+
+%-STYLE-END

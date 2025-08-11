@@ -3,38 +3,661 @@ import { labelPositionValues } from "../abstractions";
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-// --- Smoke
+// Test data constants
+const errorDisplayInterceptor: ApiInterceptorDefinition = {
+  initialize: `
+    $state.items = {
+      [10]: { name: "Smith", id: 10 }
+    };
+    $state.currentId = 10;
+  `,
+  operations: {
+    "no-validation-error": {
+      url: "/no-validation-error",
+      method: "post",
+      handler: `return true;`,
+    },
+    "general-validation-error": {
+      url: "/general-validation-error",
+      method: "post",
+      handler: `
+        throw Errors.HttpError(404,
+          {
+            message: "General error message from the backend",
+            issues: [
+              { message: "Error for the whole form", severity: "error" },
+              { message: "Warning for the whole form", severity: "warning" },
+            ]
+          }
+        );
+      `,
+    },
+    "field-validation-error": {
+      url: "/field-validation-error",
+      method: "post",
+      handler: `
+        throw Errors.HttpError(404,
+          {
+            message: "Field error message from the backend",
+            issues: [
+              { field: "test", message: "Display warning", severity: "warning" },
+            ]
+          }
+        );
+      `,
+    },
+  },
+};
 
-test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("renders component", async ({ initTestBed, createFormDriver }) => {
-    await initTestBed(`<Form />`);
-    await expect((await createFormDriver()).component).toBeAttached();
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.describe("Basic Functionality", () => {
+  test("component renders with default props", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(`<Form testId="form"/>`);
+    const driver = await createFormDriver("form");
+    await expect(driver.component).toBeVisible();
   });
 
-  test("mock service responds", async ({ initTestBed, createFormDriver }) => {
-    await initTestBed(
-      `
-      <Form submitUrl="/test" />`,
-      {
+  test("component renders with form items", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
+    
+    await expect(page.getByText("Name")).toBeVisible();
+    await expect(page.getByText("Email")).toBeVisible();
+  });
+
+  test("component renders save and cancel buttons by default", async ({ initTestBed, page }) => {
+    await initTestBed(`<Form/>`);
+    
+    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+  });
+
+  test("component renders custom button labels", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form cancelLabel="Go Back" saveLabel="Submit"/>
+    `);
+    
+    await expect(page.getByRole("button", { name: "Go Back" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
+  });
+
+  test("component swaps cancel and save button positions", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form swapCancelAndSave="true"/>
+    `);
+    
+    const buttons = page.getByRole("button");
+    await expect(buttons.first()).toHaveText("Save");
+    await expect(buttons.last()).toHaveText("Cancel");
+  });
+
+  // =============================================================================
+  // DATA PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("data property", () => {
+    test("sets initial form data", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+      await initTestBed(`
+        <Form data="{{ name: 'John', age: 30 }}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <FormItem label="Age" bindTo="age" type="integer" testId="ageField" />
+        </Form>
+      `);
+      
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      const ageDriver = await createFormItemDriver("ageField");
+      const ageInput = await createTextBoxDriver(ageDriver.input);
+      
+      await expect(nameInput.field).toHaveValue("John");
+      await expect(ageInput.field).toHaveValue("30");
+    });
+
+    test("handles null data gracefully", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(`<Form data="{null}" testId="form"/>`);
+      const driver = await createFormDriver("form");
+      await expect(driver.component).toBeVisible();
+    });
+
+    test("handles undefined data gracefully", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(`<Form data="{undefined}" testId="form"/>`);
+      const driver = await createFormDriver("form");
+      await expect(driver.component).toBeVisible();
+    });
+
+    test("handles empty object data", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(`<Form data="{{}}" testId="form"/>`);
+      const driver = await createFormDriver("form");
+      await expect(driver.component).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // ITEM LABEL POSITION TESTS
+  // =============================================================================
+
+  test.describe("itemLabelPosition property", () => {
+    labelPositionValues.forEach((position) => {
+      test(`sets item label position to ${position}`, async ({ initTestBed, createFormItemDriver }) => {
+        await initTestBed(`
+          <Form itemLabelPosition="${position}">
+            <FormItem label="Test Label" bindTo="test" testId="testField" />
+          </Form>
+        `);
+        
+        const driver = await createFormItemDriver("testField");
+        await expect(driver.label).toBeVisible();
+      });
+    });
+
+    test("handles invalid itemLabelPosition gracefully", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(`<Form itemLabelPosition="invalid" testId="form"/>`);
+      const driver = await createFormDriver("form");
+      await expect(driver.component).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // ITEM LABEL WIDTH TESTS
+  // =============================================================================
+
+  test.describe("itemLabelWidth property", () => {
+    test("sets custom label width", async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+        <Form itemLabelWidth="200px">
+          <FormItem label="Test Label" bindTo="test" testId="testField" />
+        </Form>
+      `);
+      
+      const driver = await createFormItemDriver("testField");
+      await expect(driver.label).toBeVisible();
+    });
+
+    test("handles numeric label width", async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+        <Form itemLabelWidth="150">
+          <FormItem label="Test Label" bindTo="test" testId="testField" />
+        </Form>
+      `);
+      
+      const driver = await createFormItemDriver("testField");
+      await expect(driver.label).toBeVisible();
+    });
+
+    test("handles invalid label width gracefully", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(`<Form itemLabelWidth="invalid" testId="form"/>`);
+      const driver = await createFormDriver("form");
+      await expect(driver.component).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // ITEM LABEL BREAK TESTS
+  // =============================================================================
+
+  test.describe("itemLabelBreak property", () => {
+    test("enables label line breaking", async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+        <Form itemLabelBreak="true">
+          <FormItem label="Very Long Label That Should Break" bindTo="test" testId="testField" />
+        </Form>
+      `);
+      
+      const driver = await createFormItemDriver("testField");
+      await expect(driver.label).toBeVisible();
+    });
+
+    test("disables label line breaking", async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+        <Form itemLabelBreak="false">
+          <FormItem label="Very Long Label That Should Not Break" bindTo="test" testId="testField" />
+        </Form>
+      `);
+      
+      const driver = await createFormItemDriver("testField");
+      await expect(driver.label).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // ENABLED PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("enabled property", () => {
+    test("disables save button when enabled is false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form enabled="false">
+          <FormItem label="Test" bindTo="test" />
+        </Form>
+      `);
+      
+      const saveButton = page.getByRole("button", { name: "Save" });
+      await expect(saveButton).toBeDisabled();
+    });
+
+    test("enables form when enabled is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form enabled="true">
+          <FormItem label="Test" bindTo="test" />
+        </Form>
+      `);
+      
+      const saveButton = page.getByRole("button", { name: "Save" });
+      const cancelButton = page.getByRole("button", { name: "Cancel" });
+      
+      await expect(saveButton).toBeEnabled();
+      await expect(cancelButton).toBeEnabled();
+    });
+  });
+
+  // =============================================================================
+  // BUTTON ROW TEMPLATE TESTS
+  // =============================================================================
+
+  test.describe("buttonRowTemplate property", () => {
+    test("supports custom button row template", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Form>
+          <FormItem label="Test" bindTo="test" />
+          <property name="buttonRowTemplate">
+            <Button label="Custom Save" type="submit" />
+            <Button label="Custom Cancel" type="button" />
+          </property>
+        </Form>
+      `);
+      
+      await expect(page.getByRole("button", { name: "Custom Save" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Custom Cancel" })).toBeVisible();
+    });
+  });
+
+  // =============================================================================
+  // EVENT TESTS
+  // =============================================================================
+
+  test.describe("Events", () => {
+    test("onSubmit event fires with form data", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form data="{{ name: 'John', email: 'john@example.com' }}" onSubmit="data => testState = data">
+          <FormItem label="Name" bindTo="name" />
+          <FormItem label="Email" bindTo="email" />
+        </Form>
+      `);
+      
+      await page.getByRole("button", { name: "Save" }).click();
+      
+      await expect.poll(testStateDriver.testState).toEqual({
+        name: "John",
+        email: "john@example.com"
+      });
+    });
+
+    test("onCancel event fires when cancel button clicked", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form onCancel="testState = 'cancelled'">
+          <FormItem label="Test" bindTo="test" />
+        </Form>
+      `);
+      
+      await page.getByRole("button", { name: "Cancel" }).click();
+      
+      await expect.poll(testStateDriver.testState).toEqual("cancelled");
+    });
+
+    test.skip("onSuccess event fires on successful submission", async ({ initTestBed, page }) => {
+      // This test requires a working API submission flow
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          submitUrl="/test-success"
+          onSuccess="testState = 'success'"
+          data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `, {
         apiInterceptor: {
           operations: {
-            test: {
-              url: "/test",
+            testSuccess: {
+              url: "/test-success",
               method: "post",
-              handler: `return true;`,
+              handler: `return { success: true };`,
             },
           },
         },
-      },
-    );
-    const driver = await createFormDriver();
-    await driver.submitForm();
+      });
+      
+      await page.getByRole("button", { name: "Save" }).click();
+      
+      await expect.poll(testStateDriver.testState).toEqual("success");
+    });
 
-    const request = await driver.getSubmitResponse("/test");
-    expect(request.ok()).toEqual(true);
+    test("onReset event fires when form is reset", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form 
+          id="testForm"
+          onReset="testState = 'reset'"
+          data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+          <Button onClick="testForm.reset()" label="Reset Form" />
+        </Form>
+      `);
+      
+      await page.getByRole("button", { name: "Reset Form" }).click();
+      
+      await expect.poll(testStateDriver.testState).toEqual("reset");
+    });
   });
 
-  // --- data
+  // =============================================================================
+  // API TESTS  
+  // =============================================================================
+
+  test.describe("APIs", () => {
+    test("update method updates form data", async ({ initTestBed, page, createFormItemDriver, createTextBoxDriver }) => {
+      await initTestBed(`
+        <Form 
+          id="testForm"
+          data="{{ name: 'Original', age: 25 }}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <FormItem label="Age" bindTo="age" type="integer" testId="ageField" />
+          <Button onClick="testForm.update({ name: 'Updated', age: 30 })" label="Update" />
+        </Form>
+      `);
+      
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      const ageDriver = await createFormItemDriver("ageField");
+      const ageInput = await createTextBoxDriver(ageDriver.input);
+      
+      await expect(nameInput.field).toHaveValue("Original");
+      await expect(ageInput.field).toHaveValue("25");
+      
+      await page.getByRole("button", { name: "Update" }).click();
+      
+      await expect(nameInput.field).toHaveValue("Updated");
+      await expect(ageInput.field).toHaveValue("30");
+    });
+
+    test("reset method resets form to initial state", async ({ initTestBed, page, createFormItemDriver, createTextBoxDriver }) => {
+      await initTestBed(`
+        <Form 
+          id="testForm"
+          data="{{ name: 'Initial' }}">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <Button onClick="testForm.reset()" label="Reset" />
+        </Form>
+      `);
+      
+      const nameDriver = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameDriver.input);
+      
+      // Change the input value
+      await nameInput.field.fill("Changed");
+      await expect(nameInput.field).toHaveValue("Changed");
+      
+      // Reset the form
+      await page.getByRole("button", { name: "Reset" }).click();
+      
+      await expect(nameInput.field).toHaveValue("Initial");
+    });
+  });
+
+  // =============================================================================
+  // CONTEXT VARIABLE TESTS
+  // =============================================================================
+
+  test.describe("Context Variables", () => {
+    test.skip("$data context variable provides access to form data", async ({ initTestBed, page }) => {
+      // This test needs specific FormItem behavior that may vary
+      await initTestBed(`
+        <Form data="{{ isEnabled: true, name: 'Joe' }}">
+          <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+          <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
+        </Form>
+      `);
+      
+      const enableSwitch = page.getByRole("switch", { name: "Enable name" });
+      const nameInput = page.getByRole("textbox", { name: "Name" });
+      
+      await expect(nameInput).toBeEnabled();
+      
+      await enableSwitch.click();
+      
+      await expect(nameInput).toBeDisabled();
+    });
+
+    test("$data.update method updates form data", async ({ initTestBed, page, createFormItemDriver }) => {
+      await initTestBed(`
+        <Form data="{{ counter: 0 }}">
+          <FormItem testId="counter" label="Counter" bindTo="counter" type="integer" />
+          <Button onClick="$data.update({ counter: $data.counter + 1 })" label="Increment" />
+        </Form>
+      `);
+      
+      const counterDriver = await createFormItemDriver("counter");
+      const counterInput = counterDriver.textBox;      
+      await expect(counterInput).toHaveValue("0");
+      
+      await page.getByRole("button", { name: "Increment" }).click({force: true});
+      
+      await expect(counterInput).toHaveValue("1");
+    });
+  });
+
+  // =============================================================================
+  // SUBMIT URL AND METHOD TESTS
+  // =============================================================================
+
+  test.describe("Submit URL and Method", () => {
+    test("submits to custom URL with POST method", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(
+        `<Form submitUrl="/custom-endpoint" data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+         </Form>`,
+        {
+          apiInterceptor: {
+            operations: {
+              customEndpoint: {
+                url: "/custom-endpoint",
+                method: "post",
+                handler: `return { success: true };`,
+              },
+            },
+          },
+        },
+      );
+      
+      const driver = await createFormDriver();
+      await driver.submitForm();
+
+      const response = await driver.getSubmitResponse("/custom-endpoint");
+      expect(response.ok()).toEqual(true);
+    });
+
+    test("uses PUT method for existing data", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(
+        `<Form submitUrl="/entities/1" data="{{ id: 1, name: 'Existing' }}">
+          <FormItem label="Name" bindTo="name" />
+         </Form>`,
+        {
+          apiInterceptor: {
+            operations: {
+              updateEntity: {
+                url: "/entities/1",
+                method: "put",
+                handler: `return { success: true };`,
+              },
+            },
+          },
+        },
+      );
+      
+      const driver = await createFormDriver();
+      await driver.submitForm();
+
+      const response = await driver.getSubmitResponse("/entities/1");
+      expect(response.ok()).toEqual(true);
+    });
+
+    test("uses custom submit method", async ({ initTestBed, createFormDriver }) => {
+      await initTestBed(
+        `<Form submitUrl="/custom" submitMethod="put" data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+         </Form>`,
+        {
+          apiInterceptor: {
+            operations: {
+              putCustom: {
+                url: "/custom",
+                method: "put",
+                handler: `return { success: true };`,
+              },
+            },
+          },
+        },
+      );
+      
+      const driver = await createFormDriver();
+      await driver.submitForm();
+
+      const response = await driver.getSubmitResponse("/custom");
+      expect(response.ok()).toEqual(true);
+    });
+  });
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.describe("Accessibility", () => {
+  test("form has correct semantic role", async ({ initTestBed, page }) => {
+    await initTestBed(`<Form/>`);
+    await expect(page.locator("form")).toBeVisible();
+  });
+
+  test("form items are properly associated with labels", async ({ initTestBed, createFormItemDriver }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Full Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+    
+    const driver = await createFormItemDriver("nameField");
+    await expect(driver.label).toBeVisible();
+    await expect(driver.label).toHaveText("Full Name");
+  });
+
+  test("form submission is keyboard accessible", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = 'submitted via keyboard'">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+    `);
+    
+    const submitButton = page.getByRole("button", { name: "Save" });
+    await submitButton.focus();
+    await page.keyboard.press("Enter");
+    
+    await expect.poll(testStateDriver.testState).toEqual("submitted via keyboard");
+  });
+
+  test("form cancel is keyboard accessible", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onCancel="testState = 'cancelled via keyboard'">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+    `);
+    
+    const cancelButton = page.getByRole("button", { name: "Cancel" });
+    await cancelButton.focus();
+    await page.keyboard.press("Enter");
+    
+    await expect.poll(testStateDriver.testState).toEqual("cancelled via keyboard");
+  });
+
+  test("disabled form buttons are properly disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form enabled="false">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+    `);
+    
+    const saveButton = page.getByRole("button", { name: "Save" });
+    await expect(saveButton).toBeDisabled();
+  });
+});
+
+// =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("applies custom gap theme variable", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(`<Form testId="form"/>`, {
+      testThemeVars: {
+        "gap-Form": "2rem",
+      },
+    });
+    
+    const driver = await createFormDriver("form");
+    await expect(driver.component).toHaveCSS("gap", "32px");
+  });
+
+  test("applies custom button row gap theme variable", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(`<Form testId="form"/>`, {
+      testThemeVars: {
+        "gap-buttonRow-Form": "1rem",
+      },
+    });
+    
+    const driver = await createFormDriver("form");
+    await expect(driver.component).toBeVisible();
+  });
+
+  test.skip("applies validation display theme variables", async ({ initTestBed, page }) => {
+    // This test requires validation system to trigger error display
+    await initTestBed(`
+      <Form>
+        <FormItem label="Email" bindTo="email" type="email" required="true" />
+      </Form>
+    `, {
+      testThemeVars: {
+        "backgroundColor-ValidationDisplay-error": "rgb(255, 0, 0)",
+        "textColor-ValidationDisplay-error": "rgb(255, 255, 255)",
+      },
+    });
+    
+    // Trigger validation by submitting with empty required field
+    await page.getByRole("button", { name: "Save" }).click();
+    
+    const validationMessage = page.locator("[data-validation-severity='error']");
+    await expect(validationMessage).toBeVisible();
+  });
+});
+
+// =============================================================================
+// EDGE CASES TESTS
+// =============================================================================
+
+test.describe("Edge Cases", () => {
+  test("handles form without any form items", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(`<Form testId="form"/>`);
+    const driver = await createFormDriver("form");
+    await expect(driver.component).toBeVisible();
+  });
+
+  test("handles malformed data input gracefully", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(`<Form data="{invalidJson}" testId="form"/>`);
+    const driver = await createFormDriver("form");
+    await expect(driver.component).toBeVisible();
+  });
 
   test("Form does not render if data receives malformed input", async ({
     initTestBed,
@@ -43,6 +666,210 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await initTestBed(`<Form data="{}" />`);
     await expect((await createFormDriver()).component).not.toBeAttached();
   });
+
+  test("handles deeply nested data structure", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+    await initTestBed(`
+      <Form data="{{ user: { profile: { name: 'John' } } }}">
+        <FormItem label="Name" bindTo="user.profile.name" testId="nameField" />
+      </Form>
+    `);
+    
+    const driver = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(driver.input);
+    await expect(input.field).toHaveValue("John");
+  });
+
+  test("handles form with validation errors", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Email" bindTo="email" type="email" required="true" />
+      </Form>
+    `);
+    
+    // Try to submit form without filling required field
+    await page.getByRole("button", { name: "Save" }).click();
+    
+    // Validation should prevent submission and show error
+    const form = page.locator("form");
+    await expect(form).toBeVisible();
+  });
+
+  test("handles rapid form submissions", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = (testState || 0) + 1">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+    `);
+    
+    const submitButton = page.getByRole("button", { name: "Save" });
+    
+    // Click submit button multiple times rapidly
+    await submitButton.click();
+    await submitButton.click();
+    await submitButton.click();
+    
+    // Should only submit once or handle gracefully
+    await expect.poll(testStateDriver.testState).toBeGreaterThanOrEqual(1);
+  });
+
+  test("handles null and undefined in nested data", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+    await initTestBed(`
+      <Form data="{{ user: null, settings: undefined, name: 'Test' }}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+    
+    const driver = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(driver.input);
+    await expect(input.field).toHaveValue("Test");
+  });
+
+  test("handles form with empty string properties", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form 
+        cancelLabel=""
+        saveLabel=""
+        data="{{ name: '' }}">
+        <FormItem label="Name" bindTo="name" />
+      </Form>
+    `);
+    
+    // Form should still be visible
+    const form = page.locator("form");
+    await expect(form).toBeVisible();
+  });
+
+  test("handles special characters in form data", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+    await initTestBed(`
+      <Form data="{{ name: 'José María', description: 'Test & symbols' }}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+        <FormItem label="Description" bindTo="description" testId="descField" />
+      </Form>
+    `);
+    
+    const nameDriver = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameDriver.input);
+    const descDriver = await createFormItemDriver("descField");
+    const descInput = await createTextBoxDriver(descDriver.input);
+    
+    await expect(nameInput.field).toHaveValue("José María");
+    await expect(descInput.field).toHaveValue("Test & symbols");
+  });
+
+  test("user cannot submit with clientside errors present", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = true">
+        <FormItem bindTo="name" required="true" />
+      </Form>
+    `);
+    const driver = await createFormDriver();
+
+    // The onSubmit event should have been triggered if not for the client error of an empty required field
+    await driver.submitForm("click");
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+
+  test("can submit with invisible required field", async ({
+    initTestBed,
+    createFormDriver,
+    createFormItemDriver,
+    createTextBoxDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="testState = true">
+        <FormItem testId="select" bindTo="authenticationType"
+          type="select" label="Authentication Type:" initialValue="{0}">
+          <Option value="{0}" label="Password" />
+          <Option value="{1}" label="Public Key" />
+        </FormItem>
+        <FormItem label="name1" testId="name1" bindTo="name1"
+          required="true" when="{$data.authenticationType == 0}"/>
+        <FormItem label="name2" testId="name2" bindTo="name2"
+          required="true" when="{$data.authenticationType == 1}"/>
+      </Form>
+    `);
+    const formDriver = await createFormDriver();
+    const selectDriver = await createFormItemDriver("select");
+    const textfieldElement = (await createFormItemDriver("name2")).input;
+    const textfieldDriver = await createTextBoxDriver(textfieldElement);
+
+    await selectDriver.component.click();
+    await page.getByLabel("Public Key").click();
+    await textfieldDriver.field.fill("John");
+    await formDriver.submitForm();
+
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
+  test("conditional fields keep the state", async ({
+    initTestBed,
+    createFormItemDriver,
+    createOptionDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="select" bindTo="authenticationType"
+          type="radioGroup" label="Authentication Type:" initialValue="{0}">
+          <Option value="{0}" label="Password" testId="password"/>
+          <Option value="{1}" label="Public Key" testId="publicKey" />
+        </FormItem>
+        <FormItem label="name1" testId="name1" bindTo="name1"
+          required="true" when="{$data.authenticationType == 0}"/>
+        <FormItem label="name2" testId="name2" bindTo="name2"
+          required="true" when="{$data.authenticationType == 1}"/>
+      </Form>
+    `);
+    const option1Driver = await createFormItemDriver("password");
+    const option2Driver = await createOptionDriver("publicKey");
+    const textfield1Element = (await createFormItemDriver("name1")).input;
+    const textfield1Driver = await createTextBoxDriver(textfield1Element);
+    
+    // Fill in first field
+    await textfield1Driver.field.fill("Test Value");
+    await expect(textfield1Driver.field).toHaveValue("Test Value");
+    
+    // Switch to second option
+    await option2Driver.component.click();
+    
+    // Switch back to first option
+    await option1Driver.component.click();
+    
+    // Field should retain its value
+    await expect(textfield1Driver.field).toHaveValue("Test Value");
+  });
+});
+
+// =============================================================================
+// ORIGINAL TEST SUITE (LEGACY TESTS)  
+// =============================================================================
+
+test("mock service responds", async ({ initTestBed, createFormDriver }) => {
+  await initTestBed(
+    `
+    <Form submitUrl="/test" />`,
+    {
+      apiInterceptor: {
+        operations: {
+          test: {
+            url: "/test",
+            method: "post",
+            handler: `return true;`,
+          },
+        },
+      },
+    },
+  );
+  const driver = await createFormDriver();
+  await driver.submitForm();
+
+  const request = await driver.getSubmitResponse("/test");
+  expect(request.ok()).toEqual(true);
+});
 
   // --- $data
 
@@ -124,9 +951,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     initTestBed,
     createFormDriver,
     createButtonDriver,
-    createFormItemDriver
+    createFormItemDriver,
   }) => {
-    const {testStateDriver} = await initTestBed(`
+    const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data" testId="form">
         <FormItem testId="formItem" type="items" bindTo="arrayItems" id="arrayItems">
             <FormItem bindTo="name" testId="text{$itemIndex}"/>
@@ -141,17 +968,17 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const driver = await createFormDriver("form");
     await driver.submitForm();
     await expect.poll(testStateDriver.testState).toStrictEqual({
-      arrayItems: [{name: "John"}, {name: "Peter"}],
+      arrayItems: [{ name: "John" }, { name: "Peter" }],
     });
   });
 
   test(`submit with type 'items', empty bindTo`, async ({
-                                            initTestBed,
-                                            createFormDriver,
-                                            createButtonDriver,
-                                            createFormItemDriver
-                                          }) => {
-    const {testStateDriver} = await initTestBed(`
+    initTestBed,
+    createFormDriver,
+    createButtonDriver,
+    createFormItemDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
       <Form onSubmit="data => testState = data" testId="form">
         <FormItem testId="formItem" type="items" bindTo="arrayItems" id="arrayItems">
             <FormItem testId="text{$itemIndex}" bindTo=""/>
@@ -168,9 +995,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect.poll(testStateDriver.testState).toStrictEqual({
       arrayItems: ["John", "Peter"],
     });
-  })
-});
-
+  });
 
 // --- Testing
 
@@ -512,51 +1337,6 @@ test.skip(
 
 // --- backend validation summary
 
-const errorDisplayInterceptor: ApiInterceptorDefinition = {
-  initialize: `
-    $state.items = {
-      [10]: { name: "Smith", id: 10 }
-    };
-    $state.currentId = 10;
-  `,
-  operations: {
-    "no-validation-error": {
-      url: "/no-validation-error",
-      method: "post",
-      handler: `return true;`,
-    },
-    "general-validation-error": {
-      url: "/general-validation-error",
-      method: "post",
-      handler: `
-        throw Errors.HttpError(404,
-          {
-            message: "General error message from the backend",
-            issues: [
-              { message: "Error for the whole form", severity: "error" },
-              { message: "Warning for the whole form", severity: "warning" },
-            ]
-          }
-        );
-      `,
-    },
-    "field-validation-error": {
-      url: "/field-validation-error",
-      method: "post",
-      handler: `
-        throw Errors.HttpError(404,
-          {
-            message: "Field error message from the backend",
-            issues: [
-              { field: "test", message: "Display warning", severity: "warning" },
-            ]
-          }
-        );
-      `,
-    },
-  },
-};
-
 test("submitting with errors shows validation summary", async ({
   initTestBed,
   createFormDriver,
@@ -851,7 +1631,7 @@ test("can submit with invisible required field", async ({
   createFormDriver,
   createFormItemDriver,
   createTextBoxDriver,
-  page
+  page,
 }) => {
   const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
@@ -861,9 +1641,9 @@ test("can submit with invisible required field", async ({
         <Option value="{1}" label="Public Key" />
       </FormItem>
       <FormItem label="name1" testId="name1" bindTo="name1"
-        required="true" when="{$data.authenticationType === 0}"/>
+        required="true" when="{$data.authenticationType == 0}"/>
       <FormItem label="name2" testId="name2" bindTo="name2"
-        required="true" when="{$data.authenticationType === 1}"/>
+        required="true" when="{$data.authenticationType == 1}"/>
     </Form>
   `);
   const formDriver = await createFormDriver();
@@ -893,9 +1673,9 @@ test("conditional fields keep the state", async ({
         <Option value="{1}" label="Public Key" testId="publicKey" />
       </FormItem>
       <FormItem label="name1" testId="name1" bindTo="name1"
-        required="true" when="{$data.authenticationType === 0}"/>
+        required="true" when="{$data.authenticationType == 0}"/>
       <FormItem label="name2" testId="name2" bindTo="name2"
-        required="true" when="{$data.authenticationType === 1}"/>
+        required="true" when="{$data.authenticationType == 1}"/>
     </Form>
   `);
   const option1Driver = await createFormItemDriver("password");

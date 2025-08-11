@@ -1,11 +1,13 @@
 # ModalDialog [#modaldialog]
 
-The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.
+`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.
 
-The component provides context values with which you can access some internal properties:
-
-- `$param`: This value represents the first parameters passed to the `open()` method to display the modal dialog.
-- `$params`: This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
+**Key features:**
+- **Overlay presentation**: Appears above existing content with backdrop dimming
+- **Programmatic control**: Open and close via exposed methods like `open()` and `close()`
+- **Parameter passing**: Accept data when opened for dynamic dialog content
+- **Focus management**: Automatically handles focus trapping and accessibility
+- **Form integration**: When containing Form components, automatically closes on form submission or cancellation (unless overridden)
 
 ## Using the Component [#using-the-component]
 
@@ -24,12 +26,12 @@ It also lends to itself that these events can be triggered programmatically from
 Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api)
 operations of the component in the `onClick` event handlers.
 
-```xmlui-pg copy display name="Example: imperative API" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
-  <Button label="Open Dialog" onClick="dialog.open()" />
+```xmlui-pg copy display name="Example: imperative API" height="220px"
+<App>
   <ModalDialog id="dialog" title="Example Dialog">
     <Button label="Close Dialog" onClick="dialog.close()" />
   </ModalDialog>
+  <Button label="Open Dialog" onClick="dialog.open()" />
 </App>
 ```
 
@@ -43,9 +45,9 @@ The `when` property accepts a primitive boolean or a binding expression resolvin
 Using the `when` property in a `ModalDialog` dialog component is commonly used with deep linking:
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
-```xmlui-pg
----app copy display name="Example: when" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: when"
+<App>
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
   <ModalDialog 
@@ -61,10 +63,10 @@ Setting the `when` property is the most straightforward way for deep-linked moda
 
 ### The `ModalDialog` as a Container [#the-modaldialog-as-a-container]
 
-The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
+The `ModalDialog` component is also a container such as the [`Card`](/components/Card), that it also accepts child components.
 
-```xmlui-pg copy {3-8} display name="Example: children" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg copy {3-8} display name="Example: children" height="340px"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
     <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
@@ -78,15 +80,20 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 >[!INFO]
 > When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
 
+**Context variables available during execution:**
+
+- `$param`: First parameter passed to the `open()` method
+- `$params`: Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)
+
 ## Properties [#properties]
 
-### `closeButtonVisible (default: true)` [#closebuttonvisible-default-true]
+### `closeButtonVisible` (default: true) [#closebuttonvisible-default-true]
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
-```xmlui-pg
----app copy display name="Example: closeButtonVisible" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: closeButtonVisible"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
 </App>
@@ -94,13 +101,13 @@ Shows (`true`) or hides (`false`) the visibility of the close button on the dial
 Click outside the dialog to close it.
 ```
 
-### `fullScreen (default: false)` [#fullscreen-default-false]
+### `fullScreen` (default: false) [#fullscreen-default-false]
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 
-```xmlui-pg
----app copy display name="Example: fullScreen" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: fullScreen"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
 </App>
@@ -112,8 +119,8 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 Provides a prestyled heading to display the intent of the dialog.
 
-```xmlui-pg copy {3} display name="Example: title" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg copy {3} display name="Example: title" height="220px"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Title" />
 </App>
@@ -127,9 +134,9 @@ This event is fired when the close button is pressed or the user clicks outside 
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```xmlui-pg
----app copy {6-8} display name="Example: open/close events" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy {6-8} display name="Example: open/close events"
+<App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"
@@ -149,9 +156,9 @@ This event is fired when the `ModalDialog` is opened either via a `when` or an i
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```xmlui
----app copy {6-8} display name="Example: open/close events" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy {6-8} display name="Example: open/close events"
+<App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"
@@ -171,11 +178,17 @@ Open and close the dialog several times to test that it changes the counter.
 
 This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
 
+**Signature**: `close(): void`
+
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
 ### `open` [#open]
 
-This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$paramq` and `$params` context values.
+This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$param` and `$params` context values.
+
+**Signature**: `open(...params: any[]): void`
+
+- `params`: An arbitrary number of parameters that can be used to pass data to the dialog.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 

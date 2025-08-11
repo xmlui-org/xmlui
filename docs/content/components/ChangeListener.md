@@ -1,6 +1,12 @@
 # ChangeListener [#changelistener]
 
-`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes.
+`ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers.
+
+**Key features:**
+- **Value monitoring**: Watches any expression, variable, or component property for changes
+- **Throttling support**: Prevents excessive triggering with `throttleWaitInMs` for rapid changes
+- **Previous/new values**: Access both old and new values in the change handler
+- **Reactive patterns**: Coordinates between components or triggers side effects
 
 ## Properties [#properties]
 
@@ -20,7 +26,7 @@ The following sample demonstrates using this property. Every time the user click
 </App>
 ```
 
-### `throttleWaitInMs (default: 0)` [#throttlewaitinms-default-0]
+### `throttleWaitInMs` (default: 0) [#throttlewaitinms-default-0]
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 

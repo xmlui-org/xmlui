@@ -1,9 +1,11 @@
 # AppState [#appstate]
 
->[!WARNING]
-> This component does not show up on the UI; it merely helps implement UI logic.
+`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.
 
-AppState is a functional component (without a visible user interface) that helps store and manage the app's state.
+**Key advantages over variables:**
+- **Global accessibility**: Any component can access the state by referencing the same `bucket`
+- **Automatic reactivity**: UI updates automatically when state changes, no manual prop passing required
+- **Cross-component coordination**: Perfect for user sessions, UI preferences, loading states, and shared data
 
 ## Using AppState [#using-appstate]
 
@@ -103,7 +105,7 @@ If you want to run the sample with explicit state buckets (for example, with the
 
 ## Properties [#properties]
 
-### `bucket (default: "default")` [#bucket-default-default]
+### `bucket` (default: "default") [#bucket-default-default]
 
 This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.
 
@@ -119,9 +121,11 @@ This component does not have any events.
 
 ### `update` [#update]
 
-This method updates the application state object bound to the `AppState` instance. The function's single argument is an object that specifies the new state value.
+This method updates the application state object bound to the `AppState` instance.
 
-This method updates the application state object bound to the `AppState` instance. The function's single argument is an object that specifies the new state value.
+**Signature**: `update(newState: Record<string, any>)`
+
+- `newState`: An object that specifies the new state value.
 
 If the argument is a hash object, it will be merged with the previous state value. Let's assume the previous state value was the following:
 

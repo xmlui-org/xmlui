@@ -1,9 +1,3 @@
-%-DESC-START
-
-See the \`FlowLayout\` reference documentation for details on sizing children.
-
-%-DESC-END
-
 %-PROP-START columnGap
 
 ```xmlui-pg copy display name="Example: columnGap"

@@ -12,14 +12,10 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-NavLink: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-NavLink--hover: createThemeVar("backgroundColor-#{$component}--hover");
-$backgroundColor-NavLink--hover--active: createThemeVar(
-  "backgroundColor-#{$component}--hover--active"
-);
+$backgroundColor-NavLink--hover--active: createThemeVar("backgroundColor-#{$component}--hover--active");
 $backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}--active");
 $backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
-$backgroundColor-NavLink--pressed--active: createThemeVar(
-  "backgroundColor-#{$component}--pressed--active"
-);
+$backgroundColor-NavLink--pressed--active: createThemeVar("backgroundColor-#{$component}--pressed--active");
 $fontSize-NavLink: createThemeVar("fontSize-#{$component}");
 $wordWrap-NavLink: createThemeVar("wordWrap-#{$component}");
 $textColor-NavLink: createThemeVar("textColor-#{$component}");
@@ -40,168 +36,167 @@ $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--
 $color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
 $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
 
-$transition:
-  color 0.1s,
-  background-color 0.1s;
+$transition: color 0.1s, background-color 0.1s;
 
-@layer components {
-  .content {
-    --nav-link-level: 0;
-    &.base {
-      &::before {
-        content: "";
-        width: calc(var(--nav-link-level) * 1em);
-        display: block;
-      }
-      @include t.borderVars($themeVars, $component);
-      @include t.paddingVars($themeVars, $component);
-      outline: inherit;
-      text-decoration: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      font-size: $fontSize-NavLink;
-      font-weight: $fontWeight-NavLink;
-      font-family: $fontFamily-NavLink;
-      word-wrap: $wordWrap-NavLink;
-      position: relative;
-      transition: $transition;
-      color: $textColor-NavLink;
-      background-color: $backgroundColor-NavLink;
+.content {
+  --nav-link-level: 0;
+  &.base {
+    &::before{
+      content: "";
+      width: calc(var(--nav-link-level) * 1em);
+      display: block;
       flex-shrink: 0;
-      white-space: nowrap;
+    }
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    outline: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: $fontSize-NavLink;
+    font-weight: $fontWeight-NavLink;
+    font-family: $fontFamily-NavLink;
+    word-wrap: $wordWrap-NavLink;
+    position: relative;
+    transition: $transition;
+    color: $textColor-NavLink;
+    background-color: $backgroundColor-NavLink;
+    flex-shrink: 0;
+    white-space: nowrap;
 
-      .icon {
-        color: $color-icon-NavLink;
+    .icon {
+      color: $color-icon-NavLink;
+    }
+
+    * {
+      color: $textColor-NavLink;
+    }
+
+    &.includeHoverIndicator {
+      &:after {
+        transition: $transition;
+        position: absolute;
+        left: 0.1em;
+        right: 0.1em;
+        bottom: 0;
+        height: $thickness-indicator-NavLink;
+        border-radius: $borderRadius-indicator-NavLink;
+        content: "";
       }
+    }
 
+    &:hover,
+    &:focus-visible {
+      color: $textColor-NavLink--hover;
+      background-color: $backgroundColor-NavLink--hover;
       * {
-        color: $textColor-NavLink;
-      }
-
-      &.includeHoverIndicator {
-        &:after {
-          transition: $transition;
-          position: absolute;
-          left: 0.1em;
-          right: 0.1em;
-          bottom: 0;
-          height: $thickness-indicator-NavLink;
-          border-radius: $borderRadius-indicator-NavLink;
-          content: "";
-        }
-      }
-
-      &:hover,
-      &:focus-visible {
         color: $textColor-NavLink--hover;
-        background-color: $backgroundColor-NavLink--hover;
-        * {
-          color: $textColor-NavLink--hover;
-        }
-        &:after {
-          background-color: $color-indicator-NavLink--hover;
-        }
       }
-
-      &:focus-visible {
-        outline-width: createThemeVar("outlineWidth-#{$component}--focus");
-        outline-color: createThemeVar("outlineColor-#{$component}--focus");
-        outline-style: createThemeVar("outlineStyle-#{$component}--focus");
-        outline-offset: createThemeVar("outlineOffset-#{$component}--focus");
+      &:after {
+        background-color: $color-indicator-NavLink--hover;
       }
+    }
 
-      &[role="menuitem"] {
-        //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
-        outline: none;
-        &:not(:hover):focus-visible {
-          outline-width: createThemeVar("outlineWidth-#{$component}--focus");
-          outline-color: createThemeVar("outlineColor-#{$component}--focus");
-          outline-style: createThemeVar("outlineStyle-#{$component}--focus");
-          outline-offset: createThemeVar("outlineOffset-#{$component}--focus");
-        }
+
+    &:focus-visible{
+      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
+    }
+
+    &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
+      outline: none;
+      &:not(:hover):focus-visible{
+        outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
       }
+    }
 
-      &:active.displayActive {
+    &:active.displayActive {
+      color: $textColor-NavLink--pressed;
+      background-color: $backgroundColor-NavLink--pressed;
+      font-weight: $fontWeight-NavLink--pressed;
+      * {
+        font-weight: $fontWeight-NavLink--pressed;
         color: $textColor-NavLink--pressed;
-        background-color: $backgroundColor-NavLink--pressed;
+      }
+      &:after {
+        background-color: $color-indicator-NavLink--pressed;
+      }
+    }
+
+    &.navItemActive {
+      color: $textColor-NavLink--active;
+      background-color: $backgroundColor-NavLink--active;
+      font-weight: $fontWeight-NavLink--active;
+      * {
+        font-weight: $fontWeight-NavLink--active;
+        color: $textColor-NavLink--active;
+      }
+      & > * {
+        z-index: 1;
+      }
+      &:hover {
+        color: $textColor-NavLink--hover--active;
+        background-color: $backgroundColor-NavLink--hover--active;
+        * {
+          color: $textColor-NavLink--hover--active;
+        }
+      }
+      &:after {
+        z-index: 0;
+        background-color: $color-indicator-NavLink--active;
+      }
+
+      &:active {
+        color: $textColor-NavLink--pressed--active;
+        background-color: $backgroundColor-NavLink--pressed--active;
         font-weight: $fontWeight-NavLink--pressed;
         * {
           font-weight: $fontWeight-NavLink--pressed;
-          color: $textColor-NavLink--pressed;
+          color: $textColor-NavLink--pressed--active;
         }
         &:after {
           background-color: $color-indicator-NavLink--pressed;
         }
       }
+    }
 
-      &.navItemActive {
-        color: $textColor-NavLink--active;
-        background-color: $backgroundColor-NavLink--active;
-        font-weight: $fontWeight-NavLink--active;
-        * {
-          font-weight: $fontWeight-NavLink--active;
-          color: $textColor-NavLink--active;
-        }
-        & > * {
-          z-index: 1;
-        }
-        &:hover {
-          color: $textColor-NavLink--hover--active;
-          background-color: $backgroundColor-NavLink--hover--active;
-          * {
-            color: $textColor-NavLink--hover--active;
-          }
-        }
-        &:after {
-          z-index: 0;
-          background-color: $color-indicator-NavLink--active;
-        }
+    &.disabled {
+      cursor: not-allowed;
+      color: t.$textColor--disabled;
+    }
 
-        &:active {
-          color: $textColor-NavLink--pressed--active;
-          background-color: $backgroundColor-NavLink--pressed--active;
-          font-weight: $fontWeight-NavLink--pressed;
-          * {
-            font-weight: $fontWeight-NavLink--pressed;
-            color: $textColor-NavLink--pressed--active;
-          }
-          &:after {
-            background-color: $color-indicator-NavLink--pressed;
-          }
-        }
-      }
-
-      &.disabled {
-        cursor: not-allowed;
-        color: t.$textColor--disabled;
-      }
-
-      &.vertical {
-        &:after {
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: auto;
-          width: $thickness-indicator-NavLink;
-          height: auto;
-          border-radius: $borderRadius-indicator-NavLink;
-        }
-      }
-
-      &.indented {
-        padding-left: 2.4em;
-        flex-shrink: 0;
+    &.vertical {
+      &:after {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: auto;
+        width: $thickness-indicator-NavLink;
+        height: auto;
+        border-radius: $borderRadius-indicator-NavLink;
       }
     }
-  }
 
-  .innerContent {
-    display: flex;
-    align-items: center;
-    gap: t.$space-2;
-    flex: 1;
+    &.indented {
+      padding-left: 2.4em;
+      flex-shrink: 0;
+    }
   }
+}
+
+.innerContent{
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  flex: 1;
+  white-space: break-spaces;
+  overflow-wrap: anywhere;
 }
 
 // --- We export the theme variables to add them to the component renderer

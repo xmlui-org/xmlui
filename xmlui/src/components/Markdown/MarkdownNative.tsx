@@ -10,7 +10,6 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LinkNative } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
-import { IndexAwareNestedApp } from "../NestedApp/NestedAppNative";
 import {
   type CodeHighlighter,
   isCodeHighlighter,
@@ -24,11 +23,12 @@ import Icon from "../Icon/IconNative";
 import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
+import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
+import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 
 // Default props for the Markdown component
 export const defaultProps = {
   removeIndents: true,
-  showHeadingAnchors: false,
 };
 
 type MarkdownProps = {
@@ -38,19 +38,20 @@ type MarkdownProps = {
   className?: string;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
+  className?: string;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
   // TEMP: After ironing out theming for syntax highlighting, this should be removed
   const { activeThemeTone } = useTheme();
-  const { appGlobals } = useAppContext();
+  const appContext = useAppContext();
 
   let _codeHighlighter = null;
   if (codeHighlighter) {
     _codeHighlighter = codeHighlighter;
   } else {
-    _codeHighlighter = isCodeHighlighter(appGlobals.codeHighlighter)
-      ? appGlobals.codeHighlighter
+    _codeHighlighter = isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)
+      ? appContext?.appGlobals?.codeHighlighter
       : null;
   }
 
@@ -88,14 +89,15 @@ export const Markdown = memo(function Markdown({
   style,
   className,
   codeHighlighter,
-  showHeadingAnchors = defaultProps.showHeadingAnchors,
+  showHeadingAnchors,
+  className,
 }: MarkdownProps) {
+  const imageInfo = useRef(new Map<string, boolean>());
   if (typeof children !== "string") {
     return null;
   }
   children = removeIndents ? removeTextIndents(children) : children;
 
-  const imageInfo = useRef(new Map<string, boolean>());
   const getImageKey = (node: any) =>
     `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
 
@@ -287,10 +289,15 @@ export const Markdown = memo(function Markdown({
 
             // --- Extract the optional target
             if (typeof children === "string") {
-              const match = children.match(/^(.*)\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
+              // Match a non-escaped pipe followed by target specification
+              const match = children.match(/^((?:[^|]|\\\|)*[^\\])\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
               if (match) {
-                label = match[1].trim();
+                // Unescape any escaped pipes in the label
+                label = match[1].trim().replace(/\\\|/g, '|');
                 target = match[2];
+              } else {
+                // If no target specification, unescape any escaped pipes in the whole text
+                label = children.replace(/\\\|/g, '|');
               }
             }
 
@@ -339,36 +346,30 @@ export const Markdown = memo(function Markdown({
             return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
           },
           samp({ ...props }) {
-            const nestedProps = props as any;
+            const markdownContentBase64 = props?.["data-pg-markdown"];
+            const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
             const dataContentBase64 = props?.["data-pg-content"];
-            if (dataContentBase64 !== undefined) {
-              const jsonContent = atob(dataContentBase64);
-              const appProps = JSON.parse(jsonContent);
-              return (
-                <IndexAwareNestedApp
-                  app={appProps.app}
-                  config={appProps.config}
-                  components={appProps.components}
-                  api={appProps.api}
-                  activeTheme={appProps.activeTheme}
-                  activeTone={appProps.activeTone}
-                  title={appProps.name}
-                  height={appProps.height}
-                  allowPlaygroundPopup={!appProps.noPopup}
-                />
-              );
-            }
+            const jsonContent = atob(dataContentBase64);
+            const appProps = JSON.parse(jsonContent);
             return (
-              <IndexAwareNestedApp
-                app={nestedProps.app}
-                config={nestedProps.config}
-                components={nestedProps.components}
-                api={nestedProps.api}
-                activeTheme={nestedProps.activeTheme}
-                activeTone={nestedProps.activeTone}
-                title={nestedProps.title}
-                height={nestedProps.height}
-                allowPlaygroundPopup={true}
+              <NestedAppAndCodeViewNative
+                markdown={markdownContent}
+                app={appProps.app}
+                config={appProps.config}
+                components={appProps.components}
+                api={appProps.api}
+                activeTheme={appProps.activeTheme}
+                activeTone={appProps.activeTone}
+                title={appProps.name}
+                height={appProps.height}
+                allowPlaygroundPopup={!appProps.noPopup}
+                withFrame={appProps.noFrame ? false : true}
+                noHeader={appProps.noHeader ?? false}
+                splitView={appProps.splitView ?? false}
+                initiallyShowCode={appProps.initiallyShowCode ?? false}
+                popOutUrl={appProps.popOutUrl}
+                immediate={appProps.immediate}
+                withSplashScreen={appProps.withSplashScreen}
               />
             );
           },
@@ -376,7 +377,7 @@ export const Markdown = memo(function Markdown({
             const treeContentBase64 = props?.["data-tree-content"];
             if (treeContentBase64 !== undefined) {
               const content = atob(treeContentBase64);
-              return <TreeDisplay content={content} itemHeight={24} />;
+              return <TreeDisplay content={content} />;
             }
             return null;
           },
@@ -417,22 +418,14 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
   // Extract all text content
   const allText: string = React.Children.toArray(children).map(extractTextContent).join("");
 
-  // Check for admonition pattern
+  // Check for adornment pattern
   const match = allText.match(/\[!([A-Z]+)\]/);
-  const isAdmonition = !!match;
+  const isAdornment = !!match;
 
-  if (isAdmonition && match && match[1]) {
+  if (isAdornment && match && match[1]) {
     const type = match[1].toLowerCase();
 
-    const iconMap: Record<string, React.ReactNode> = {
-      info: <Icon name="admonition_info" />,
-      warning: <Icon name="admonition_warning" />,
-      danger: <Icon name="admonition_danger" />,
-      note: <Icon name="admonition_note" />,
-      tip: <Icon name="admonition_tip" />,
-    };
-
-    // Process children to remove the admonition marker
+    // Process children to remove the adornment marker
     const processNode = (node: React.ReactNode): React.ReactNode => {
       if (typeof node === "string") {
         return node.replace(/\[!([A-Z]+)\]\s*/, "");
@@ -462,7 +455,58 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     const processedChildren = React.Children.map(children, processNode);
 
-    // Render admonition blockquote with the updated structure
+    // Handle [!DETAILS] or [!SDETAILS] adornment
+    if (type === "details" || type === "sdetails") {
+      // Extract summary from the original text
+      const originalText = allText;
+      const detailsMatch = originalText.match(/\[!(S?DETAILS)\](.*?)(?:\n|$)/);
+      const summaryText = detailsMatch && detailsMatch[2] ? detailsMatch[2].trim() : "Details";
+      const withSwitch = type === "sdetails";
+
+      // Create separate content children without the summary line
+      // We need to find the first Text element and remove the summary from it
+      let contentWithoutSummary = [];
+      let foundFirstTextElement = false;
+
+      React.Children.forEach(processedChildren, (child, index) => {
+        // Process the first text element to remove the summary line
+        if (!foundFirstTextElement && React.isValidElement(child) && child.props?.children) {
+          foundFirstTextElement = true;
+
+          // Get the child's text content
+          const childText = extractTextContent(child.props.children);
+
+          // Skip the first line which contains the summary
+          const lines = childText.split("\n");
+          if (lines.length > 1) {
+            // Create modified element with remaining content
+            const remainingContent = lines.slice(1).join("\n");
+            if (remainingContent.trim()) {
+              contentWithoutSummary.push(React.cloneElement(child, child.props, remainingContent));
+            }
+          }
+        } else {
+          // Keep all other elements unchanged
+          contentWithoutSummary.push(child);
+        }
+      });
+
+      return (
+        <ExpandableItem summary={summaryText} withSwitch={withSwitch}>
+          {contentWithoutSummary}
+        </ExpandableItem>
+      );
+    }
+
+    const iconMap: Record<string, React.ReactNode> = {
+      info: <Icon name="admonition_info" />,
+      warning: <Icon name="admonition_warning" />,
+      danger: <Icon name="admonition_danger" />,
+      note: <Icon name="admonition_note" />,
+      tip: <Icon name="admonition_tip" />,
+    };
+
+    // Render adornment blockquote with the updated structure
     return (
       <blockquote
         className={classnames(styles.admonitionBlockquote, {
@@ -492,54 +536,138 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 };
 
 type LinkAwareHeadingProps = {
+  level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   children: React.ReactNode;
-  level: string;
   showHeadingAnchors?: boolean;
 };
 
-function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
-  let headingLabel: React.ReactNode = "";
-  let anchorId = "";
-  if (!children) return <></>;
+function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): React.ReactNode {
+  if (!suffix) {
+    return node;
+  }
 
-  if (typeof children === "string") {
-    [headingLabel, anchorId] = getCustomAnchor(children);
-    // At this point, the anchorId might still be empty
-  } else if (Array.isArray(children)) {
-    if (children.length === 0) return <></>;
-    if (children.length === 1) {
-      headingLabel = children[0];
-    } else {
-      headingLabel = children.slice(0, -1);
-      const last = children[children.length - 1];
+  if (typeof node === "string") {
+    if (node.endsWith(suffix)) {
+      const result = node.slice(0, -suffix.length);
+      return result || null;
+    }
+    return node;
+  }
 
-      // Check for explicit anchor at the end
-      if (typeof last === "string") {
-        const match = last.trim().match(/^\[#([^\]]+)\]$/);
-        if (match && match.length > 0) {
-          anchorId = match[1];
-        }
+  if (Array.isArray(node)) {
+    const newChildren = [...node];
+    let suffixRemaining = suffix;
+
+    for (let i = newChildren.length - 1; i >= 0 && suffixRemaining.length > 0; i--) {
+      const child = newChildren[i];
+      const childText = getHeadingText(child);
+
+      if (suffixRemaining.endsWith(childText)) {
+        newChildren[i] = null;
+        suffixRemaining = suffixRemaining.slice(0, -childText.length);
+      } else {
+        newChildren[i] = removeSuffixFromReactNodes(child, suffixRemaining);
+        // After this call, the suffix should have been removed from the child, so we are done.
+        suffixRemaining = "";
       }
     }
-  } else {
-    // Provided children are not a string or array but still valid React elements
-    // if it contains text, use it as the heading label
-    const headingContent = extractTextNodes(children);
-    if (!headingContent) return <></>;
-    headingLabel = children;
+
+    return newChildren.filter(Boolean);
   }
 
-  // Generate implicit anchor if not provided
-  if (!anchorId) {
-    anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
+  if (React.isValidElement(node) && node.props.children) {
+    const newChildren = removeSuffixFromReactNodes(node.props.children, suffix);
+    return React.cloneElement(node, { ...node.props, children: newChildren });
   }
+
+  return node;
+}
+
+const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
+  const { appGlobals } = useAppContext();
+
+  // --- Extract the optional anchor
+  let anchor: string | undefined = undefined;
+  let label: React.ReactNode = children;
+
+  const textContent = getHeadingText(children);
+  const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
+
+  if (match) {
+    anchor = match[2];
+    const anchorText = `[#${anchor}]`;
+    label = removeSuffixFromReactNodes(children, anchorText);
+  }
+
+  const headingId = anchor ?? getHeadingId(children);
 
   return (
-    <Heading level={level} id={anchorId} showAnchor={showHeadingAnchors}>
-      {headingLabel}
+    <Heading
+      level={level}
+      id={headingId}
+      className={styles.linkAwareHeading}
+    >
+      {label}
+      {showHeadingAnchors && (
+        <a
+          href={`#${headingId}`}
+          className={styles.headingLink}
+          onClick={(e) => {
+            e.preventDefault();
+            appGlobals.events?.emit("scroll-to-anchor", { anchor: headingId });
+          }}
+        >
+          <Icon name="link" />
+        </a>
+      )}
     </Heading>
   );
+};
+
+function getHeadingId(children: React.ReactNode): string {
+  const text = getHeadingText(children);
+  return text
+    .toLowerCase()
+    .replace(/[^\w]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
+
+function getHeadingText(children: React.ReactNode): string {
+  if (typeof children === "string") {
+    return children;
+  }
+  if (Array.isArray(children)) {
+    return children.map(getHeadingText).join("");
+  }
+  if (React.isValidElement(children) && children.props.children) {
+    return getHeadingText(children.props.children);
+  }
+  return "";
+}
+
+const getLabelContent = (node: React.ReactNode, labelText: string): React.ReactNode => {
+  if (typeof node === "string") {
+    return labelText.includes(node) ? node : null;
+  }
+  if (Array.isArray(node)) {
+    const children = node.map((n) => getLabelContent(n, labelText)).filter(Boolean);
+    return children.length > 0 ? children : null;
+  }
+  if (React.isValidElement(node)) {
+    const nodeText = getHeadingText(node);
+    if (labelText.trim() === nodeText.trim()) {
+      return node;
+    }
+    if (labelText.includes(nodeText)) {
+      return node;
+    }
+    const newChildren = getLabelContent(node.props.children, labelText);
+    if (newChildren) {
+      return React.cloneElement(node, node.props, newChildren);
+    }
+  }
+  return null;
+};
 
 // --- Helper functions
 

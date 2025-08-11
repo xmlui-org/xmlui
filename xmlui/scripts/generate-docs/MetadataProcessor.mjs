@@ -11,44 +11,22 @@ import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, LOGGER_LEVELS, processError, ErrorWithSeverity } from "./logger.mjs";
 import { createTable, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
+import { iterateObjectEntries, processComponentSection } from "./pattern-utilities.mjs";
+import {
+  METADATA_SECTIONS,
+  DIRECTIVE_CONFIG,
+  SECTION_DISPLAY_NAMES,
+  SECTION_REFERENCE_KEYS,
+  COMMON_TABLE_HEADERS,
+  FILE_EXTENSIONS,
+} from "./constants.mjs";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 
-const IMPORTS = "imports";
-const DESCRIPTION = "description";
-const CONTEXT_VARS = "contextVars";
-const PROPS = "props";
-const API = "api";
-const EVENTS = "events";
-const STYLES = "styles";
-
-// This indicates the starting symbol of a directive
-const DIRECTIVE_INDICATOR = "%-";
-
-// Defines the IDs of the sections in the source file
-// Ex: %-PROP-START
-const SECTION_DIRECTIVE_MAP = Object.freeze({
-  imports: "IMPORT",
-  description: "DESC",
-  props: "PROP",
-  events: "EVENT",
-  styles: "STYLE",
-  api: "API",
-  contextVars: "CONTEXT_VAR",
-});
-
 // These constants denote which attribute contains the inline component description
 // and which contains the reference to the source markdown file
-const SECTION_DESCRIPTION = "description";
-const SECTION_DESCRIPTION_REF = "descriptionRef";
-
-const sectionNames = {
-  props: "Properties",
-  events: "Events",
-  styles: "Styling",
-  api: "Exposed Methods",
-  contextVars: "Context Values",
-};
+const SECTION_DESCRIPTION = SECTION_REFERENCE_KEYS.DESCRIPTION;
+const SECTION_DESCRIPTION_REF = SECTION_REFERENCE_KEYS.DESCRIPTION_REF;
 
 export class MetadataProcessor {
   constructor(metadata, importsToInject, { sourceFolder, outFolder, examplesFolder }) {
@@ -65,7 +43,7 @@ export class MetadataProcessor {
   processDocfiles() {
     // Check for docs already in the output folder
     const docFiles = existsSync(this.outFolder)
-      ? readdirSync(this.outFolder).filter((file) => extname(file) === ".md")
+      ? readdirSync(this.outFolder).filter((file) => extname(file) === FILE_EXTENSIONS.MARKDOWN[0])
       : [];
     let componentNames = docFiles.map((file) => basename(file, extname(file)));
 
@@ -139,7 +117,31 @@ export class MetadataProcessor {
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
-      result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
+      result += combineDescriptionAndDescriptionRef(
+        fileData,
+        component,
+        METADATA_SECTIONS.DESCRIPTION,
+      );
+
+      // Add context variables if they exist
+      if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
+        result += "\n\n**Context variables available during execution:**";
+        result += "\n\n";
+
+        // Use pattern utility for processing context variables
+        processComponentSection(
+          component.contextVars,
+          (contextVarName, contextVar) => {
+            if (contextVar.description) {
+              result += `- \`${contextVarName}\`: ${contextVar.description}\n`;
+            }
+          },
+          {
+            filter: (name, contextVar) => !contextVar.isInternal && contextVar.description,
+          },
+        );
+      }
+
       result += "\n\n";
 
       result += addChildrenTemplateSection(component);
@@ -178,7 +180,7 @@ function addImportsSection(data, component, sourceFolder, outFolder, examplesFol
   const buffer = getSection(
     data,
     component[SECTION_DESCRIPTION_REF],
-    IMPORTS,
+    METADATA_SECTIONS.IMPORTS,
     importPathTransformer,
   );
   return { buffer, copyFilePaths };
@@ -252,27 +254,25 @@ function addImportsSection(data, component, sourceFolder, outFolder, examplesFol
 
 function addPropsSection(data, component) {
   logger.info(`Processing ${component.displayName} props`);
-  let buffer = `## ${sectionNames.props}\n\n`;
+  let buffer = `## ${SECTION_DISPLAY_NAMES.props}\n\n`;
 
   if (!component.props || Object.keys(component.props ?? {}).length === 0) {
     return buffer + "This component does not have any properties.";
   }
-  Object.entries(component.props)
-    .sort()
-    .forEach(([propName, prop]) => {
-      if (prop.isInternal) return;
-      // prop is component
-      const isRequired = prop.isRequired === true ? "(required)" : "";
-      const defaultValue =
-        prop.defaultValue !== undefined
-          ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
-          : "";
-      const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-      buffer += `### \`${propName}${propModifier}\`\n\n`;
 
-      buffer += combineDescriptionAndDescriptionRef(data, prop, PROPS);
-      buffer += "\n\n";
-    });
+  // Use pattern utility for processing props
+  processComponentSection(component.props, (propName, prop) => {
+    const isRequired = prop.isRequired === true ? "(required)" : "";
+    const defaultValue =
+      prop.defaultValue !== undefined
+        ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
+        : "";
+    const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
+    buffer += `### \`${propName}\`${propModifier}\n\n`;
+
+    buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
@@ -281,19 +281,29 @@ function addPropsSection(data, component) {
 
 function addApisSection(data, component) {
   logger.info(`Processing ${component.displayName} APIs`);
-  let buffer = `## ${sectionNames.api}\n\n`;
+  let buffer = `## ${SECTION_DISPLAY_NAMES.apis}\n\n`;
 
   if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
     return buffer + "This component does not expose any methods.";
   }
-  Object.entries(component.apis)
-    .sort()
-    .forEach(([apiName, api]) => {
-      if (api.isInternal) return;
-      buffer += `### \`${apiName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(data, api, API);
-      buffer += "\n\n";
-    });
+
+  // Use pattern utility for processing APIs
+  processComponentSection(component.apis, (apiName, api) => {
+    buffer += `### \`${apiName}\`\n\n`;
+    buffer += getComponentDescription(api);
+    buffer += "\n\n";
+    if (api.signature) {
+      buffer += `**Signature**: \`${api.signature}\`\n\n`;
+      if (api.parameters && Object.keys(api.parameters).length > 0) {
+        Object.entries(api.parameters).forEach(([name, param]) => {
+          buffer += `- \`${name}\`: ${param}\n`;
+        });
+        buffer += `\n`;
+      }
+    }
+    buffer += getComponentDescriptionRef(data, api, METADATA_SECTIONS.API);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
@@ -302,19 +312,18 @@ function addApisSection(data, component) {
 
 function addEventsSection(data, component) {
   logger.info(`Processing ${component.displayName} events`);
-  let buffer = `## ${sectionNames.events}\n\n`;
+  let buffer = `## ${SECTION_DISPLAY_NAMES.events}\n\n`;
 
   if (!component.events || Object.keys(component.events ?? {}).length === 0) {
     return buffer + "This component does not have any events.";
   }
-  Object.entries(component.events)
-    .sort()
-    .forEach(([eventName, event]) => {
-      if (event.isInternal) return;
-      buffer += `### \`${eventName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(data, event, EVENTS);
-      buffer += "\n\n";
-    });
+
+  // Use pattern utility for processing events
+  processComponentSection(component.events, (eventName, event) => {
+    buffer += `### \`${eventName}\`\n\n`;
+    buffer += combineDescriptionAndDescriptionRef(data, event, METADATA_SECTIONS.EVENTS);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
@@ -324,8 +333,8 @@ function addEventsSection(data, component) {
 function addStylesSection(data, component) {
   logger.info(`Processing ${component.displayName} styles`);
 
-  let buffer = `## ${sectionNames.styles}\n\n`;
-  const fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], STYLES);
+  let buffer = `## ${SECTION_DISPLAY_NAMES.styles}\n\n`;
+  const fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], METADATA_SECTIONS.STYLES);
   const varsTable = listThemeVars(component);
 
   let hasStylesSection = false;
@@ -345,6 +354,25 @@ function addStylesSection(data, component) {
   return buffer;
 }
 
+function getComponentDescription(component) {
+  let descriptionBuffer = "";
+
+  if (component[SECTION_DESCRIPTION]) {
+    descriptionBuffer = component[SECTION_DESCRIPTION];
+  }
+
+  return descriptionBuffer;
+}
+
+function getComponentDescriptionRef(data, component, sectionId) {
+  let fileBuffer = "";
+  if (component.hasOwnProperty(SECTION_DESCRIPTION_REF) && component[SECTION_DESCRIPTION_REF]) {
+    fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], sectionId);
+  }
+
+  return fileBuffer;
+}
+
 function combineDescriptionAndDescriptionRef(
   data,
   component,
@@ -358,23 +386,7 @@ function combineDescriptionAndDescriptionRef(
     descriptionBuffer = component[SECTION_DESCRIPTION];
   }
 
-  if (sectionId === DESCRIPTION) {
-    if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
-      descriptionBuffer +=
-        "\n\nThe component provides context values with which you can access some internal properties:";
-      descriptionBuffer += "\n\n";
-      Object.entries(component.contextVars)
-        .sort()
-        .forEach(([contextVarName, contextVar]) => {
-          if (contextVar.isInternal || !contextVar.description) return;
-          descriptionBuffer += `- \`${contextVarName}\`: ${contextVar.description}\n`;
-        });
-    } else {
-      descriptionBuffer += "\n\n";
-    }
-  }
-
-  if (sectionId === PROPS) {
+  if (sectionId === METADATA_SECTIONS.PROPS) {
     const availableValuesBuffer = addAvailableValues(component);
     if (availableValuesBuffer) {
       descriptionBuffer += "\n\n" + availableValuesBuffer;
@@ -436,15 +448,15 @@ function getSection(data, sectionRef, sectionId, transformer = (contents) => con
         LOGGER_LEVELS.warning,
       );
     }
-    const sectionHeader = SECTION_DIRECTIVE_MAP[sectionId];
+    const sectionHeader = DIRECTIVE_CONFIG.SECTION_MAP[sectionId];
     if (!sectionHeader) {
       throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, LOGGER_LEVELS.warning);
     }
 
-    const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${
+    const startDirective = `${DIRECTIVE_CONFIG.INDICATOR}${sectionHeader}-START${
       sectionName ? ` ${sectionName}` : ""
     }`;
-    const endDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-END`;
+    const endDirective = `${DIRECTIVE_CONFIG.INDICATOR}${sectionHeader}-END`;
     const contents = resolveSection(data, startDirective, endDirective);
 
     return transformer(contents);
@@ -454,19 +466,20 @@ function getSection(data, sectionRef, sectionId, transformer = (contents) => con
 }
 
 function acceptSection(sectionId, sectionName) {
-  if (sectionId.PROPS && !sectionName) return false;
-  if (sectionId.EVENTS && !sectionName) return false;
+  if (sectionId === METADATA_SECTIONS.PROPS && !sectionName) return false;
+  if (sectionId === METADATA_SECTIONS.EVENTS && !sectionName) return false;
   return true;
 }
 
 function resolveSection(data, startDirective, endDirective) {
   startDirective = startDirective.replaceAll("$", "\\$");
-  const match = data.match(new RegExp(`${startDirective}([\\s\\S]*?${endDirective})`, "i"));
+  endDirective = endDirective.replaceAll("$", "\\$");
+  const match = data.match(new RegExp(`${startDirective}([\\s\\S]*?)${endDirective}`, "i"));
   if (!match || match?.length === 0) {
     return "";
   }
 
-  let section = match[1].substring(0, match[1].indexOf(endDirective));
+  let section = match[1];
   let sectionLines = strBufferToLines(section);
 
   // Replace this with a function that handles META directives
@@ -483,7 +496,7 @@ function trimSection(sectionLines) {
 
 function stripMetaDirectives(sectionLines) {
   let buffer = sectionLines;
-  const metaStart = `${DIRECTIVE_INDICATOR}META`;
+  const metaStart = `${DIRECTIVE_CONFIG.INDICATOR}META`;
 
   buffer.forEach((line) => {
     if (line.startsWith(metaStart)) {
@@ -503,7 +516,7 @@ function findParent(metadata, component) {
 function addParentLinkLine(parentName, componentDocsFolder) {
   // TODO: Insert component link
   const result = parentName
-    ? `This component is inherited from [${parentName}](${componentDocsFolder}/${parentName})`
+    ? `This component is inherited from [${parentName}](/${componentDocsFolder}/${parentName})`
     : "";
   return result ? `${result}\n\n` : "";
 }
@@ -521,7 +534,7 @@ function addSiblingLinkLine(siblings = [], componentDocsFolder) {
     siblings?.length > 0
       ? `See also: ${siblings
           .map((sibling) => {
-            return `[${sibling.displayName}](${componentDocsFolder}/${sibling.displayName})`;
+            return `[${sibling.displayName}](/${componentDocsFolder}/${sibling.displayName})`;
           })
           .join(", ")}`
       : "";
@@ -608,10 +621,11 @@ function appendArticleId(articleId) {
 }
 
 function addNonVisualDisclaimer(isNonVisual) {
-  return isNonVisual
-    ? ">[!WARNING]\n> This component does not show up on the UI; " +
-        "it merely helps implement UI logic.\n\n"
-    : "";
+  return ""; // Temporarily disabled
+  // return isNonVisual
+  //   ? ">[!WARNING]\n> This component does not show up on the UI; " +
+  //       "it merely helps implement UI logic.\n\n"
+  //   : "";
 }
 
 function addDefaultValue(component) {
@@ -646,7 +660,7 @@ function addAvailableValues(component) {
       .join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
-      headers: ["Value", "Description"],
+      headers: COMMON_TABLE_HEADERS.VALUE_DESCRIPTION,
       rows: component.availableValues.map((v) => [
         `\`${v.value}\``,
         `${v.description}${appendDefaultIndicator(v.value)}`,
@@ -687,7 +701,10 @@ function listThemeVars(component) {
       return partAValue.localeCompare(partBValue);
     })
     // --- Only list theme vars that contain the component name
-    .filter((themeVar) => !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1)
+    .filter(
+      (themeVar) =>
+        !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1,
+    )
     .map((themeVar) => {
       const parts = themeVar.split(":");
       if (parts.length > 1) {
@@ -767,7 +784,7 @@ function addThemeVarDescriptions(component) {
   let buffer = "\n\n### Variable Explanations\n\n";
 
   buffer += createTable({
-    headers: ["Theme Variable", "Description"],
+    headers: COMMON_TABLE_HEADERS.THEME_VARIABLE_DESCRIPTION,
     rows: Object.entries(component.themeVarDescriptions).map(([themeVar, description]) => [
       `**\`${themeVar}\`**`,
       description,
@@ -832,6 +849,13 @@ const themeKeywordLinks = {
   marginRight: "[marginRight](../styles-and-themes/common-units/#size)",
   textDecorationLine: "[textDecorationLine](../styles-and-themes/common-units/#textDecoration)",
   lineHeight: "[lineHeight](../styles-and-themes/common-units/#size)",
+  borderEndEndRadius: "[borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderEndStartRadius:
+    "[borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderStartEndRadius:
+    "[borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)",
+  borderStartStartRadius:
+    "[borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)",
   borderRadius: "[borderRadius](../styles-and-themes/common-units/#border-rounding)",
   borderHorizontal: "[borderHorizontal](../styles-and-themes/common-units/#border)",
   borderVertical: "[borderHorizontal](../styles-and-themes/common-units/#border)",
@@ -841,8 +865,11 @@ const themeKeywordLinks = {
   borderTop: "[borderTop](../styles-and-themes/common-units/#border)",
   borderBottom: "[borderBottom](../styles-and-themes/common-units/#border)",
   boxShadow: "[boxShadow](../styles-and-themes/common-units/#boxShadow)",
+  direction: "[direction](../styles-and-themes/layout-props#direction)",
   gap: "[gap](../styles-and-themes/common-units/#size)",
-  verticalAlign: "[verticalAlign](../styles-and-themes/common-units/#alignment)",
+  horizontalAlignment: "[horizontalAlignment](../styles-and-themes/common-units/#alignment)",
+  verticalAlignment: "[verticalAlignment](../styles-and-themes/common-units/#alignment)",
+  alignment: "[alignment](../styles-and-themes/common-units/#alignment)",
   fontFamily: "[fontFamily](../styles-and-themes/common-units/#fontFamily)",
   fontStretch: "[fontStretch](../styles-and-themes/common-units/#fontStretch)",
   fontStyle: "[fontStyle](../styles-and-themes/common-units/#fontStyle)",
@@ -859,4 +886,15 @@ const themeKeywordLinks = {
   textUnderlineOffset: "[textUnderlineOffset](../styles-and-themes/common-units/#size)",
   opacity: "[opacity](../styles-and-themes/common-units/#opacity)",
   cursor: "[cursor](../styles-and-themes/common-units/#cursor)",
+  fontVariant: "[fontVariant](../styles-and-themes/common-units/#font-variant)",
+  lineBreak: "[lineBreak](../styles-and-themes/common-units/#line-break)",
+  textAlign: "[textAlign](../styles-and-themes/common-units/#text-align)",
+  textAlignLast: "[textAlignLast](../styles-and-themes/common-units/#text-align)",
+  textIndent: "[textIndent](../styles-and-themes/common-units/#text-indent)",
+  textShadow: "[textShadow](../styles-and-themes/common-units/#text-shadow)",
+  wordBreak: "[wordBreak](../styles-and-themes/common-units/#word-break)",
+  wordSpacing: "[wordSpacing](../styles-and-themes/common-units/#word-spacing)",
+  wordWrap: "[wordWrap](../styles-and-themes/common-units/#word-wrap)",
+  writingMode: "[writingMode](../styles-and-themes/common-units/#writing-mode)",
+  transition: "[transition](../styles-and-themes/common-units/#transition)",
 };

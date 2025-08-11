@@ -47,6 +47,7 @@ export const Card = forwardRef(function Card(
 ) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
+    maxLines: 1
   };
   return (
     <div
@@ -70,7 +71,7 @@ export const Card = forwardRef(function Card(
             {linkTo ? (
               title ? (
                 <LinkNative to={linkTo + ""}>
-                  <Heading {...titleProps}>{title}</Heading>
+                  <Heading {...titleProps} >{title}</Heading>
                 </LinkNative>
               ) : null
             ) : title ? (
@@ -78,7 +79,7 @@ export const Card = forwardRef(function Card(
             ) : null}
             {subtitle !== undefined && (
               <>
-                <Text variant="small">{subtitle}</Text>
+                <Text variant="secondary">{subtitle}</Text>
               </>
             )}
           </div>

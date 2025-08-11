@@ -25,7 +25,7 @@ storybook-static
 *.sln
 *.sw?
 
-scripts/generate-docs/metadata.json
+scripts/generate-docs/**/*metadata.json
 /test-results/
 /playwright-report/
 /blob-report/

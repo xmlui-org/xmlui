@@ -2,7 +2,7 @@ import { describe, expect, it, assert } from "vitest";
 
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { ArrowExpressionStatement, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT, T_EXPRESSION_STATEMENT } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { ArrowExpressionStatement, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT, T_EXPRESSION_STATEMENT } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Process statements (exp)", () => {
   it("Event with arrow function", async () => {

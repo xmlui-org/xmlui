@@ -20,25 +20,35 @@ An attribute may also be a JavaScript expression — enclosed in curly braces `{
 
 An expression can hold a JSON list.
 
-```xmlui-pg copy name="A JSON list" display
-<Items data="{ [ 'Bakerloo', 'Central', 'Circle'] }" >
+```xmlui-pg copy name="A JSON list" display /['Bakerloo', 'Central', 'Circle']/
+<Items data="{ ['Bakerloo', 'Central', 'Circle'] }" >
   <Text>{ $item }</Text>
 </Items>
 ```
 
 Or a complex JSON object, in which case you'll write an outer set of curly braces to introduce the expression and an inner set to define an object like this form's `data` property.
 
-```xmlui-pg copy name="A complex JSON object" display
+```xmlui-pg copy name="A complex JSON object" display /{ station: "Brixton", wifi: true, toilets: false }/
 <App>
   <Form id="searchForm" padding="0.5rem"
-    data='{{ station: "Brixton", wifi: true, toilets: false }}'
+    data='{ { station: "Brixton", wifi: true, toilets: false } }'
     onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
   >
     <Text>Search for station amenities</Text>
-    <HStack>
+    <HStack verticalAlignment="center" >
       <FormItem bindTo="station" />
-      <FormItem type="checkbox" label="wifi" bindTo="wifi" />
-      <FormItem type="checkbox" label="toilets" bindTo="toilets" />
+      <FormItem 
+        type="checkbox" 
+        label="wifi" 
+        bindTo="wifi" 
+        labelPosition="start" 
+      />
+      <FormItem 
+        type="checkbox" 
+        label="toilets" 
+        bindTo="toilets" 
+        labelPosition="start" 
+      />
     </HStack>
     <property name="buttonRowTemplate">
         <Button type="submit" icon="search" label="Search"/>
@@ -112,11 +122,10 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
 
 ```xmlui-pg copy name="Declare an event handler using the <event> tag" display
 <App var.count="{0}" >
-  <Button label="Click to increment the count">
+  <Button label="Click me! Click count = {count}">
     <event name="click">
       { count++ }
     </event>
-    <Text>Click count = {count}</Text>
   </Button>
 </App>
 ```

@@ -1,17 +1,20 @@
 # Stack [#stack]
 
-`Stack` is a layout container displaying children in a horizontal or vertical stack.
+`Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants.
 
-The Stack component is the primary and most versatile building block for laying out content. It can display its children horizontally or vertically, and it is possible to align its children easily along the horizontal and vertical axes.
+**Key features:**
+- **Dynamic orientation**: Switch between horizontal and vertical layouts programmatically
+- **Comprehensive alignment**: Precise control over both horizontal and vertical child positioning
+- **Flexible spacing**: Configurable gaps between elements with theme-aware sizing
+- **Content wrapping**: Automatic wrapping when space constraints require it
+- **Order control**: Reverse child element order with the reverse property
+- **Foundation for variants**: Powers HStack, VStack, CHStack, and CVStack specialized components
 
-See also: [HStack](./HStack), [VStack](./VStack), [CHStack](./CHStack), [CVStack](./CVStack).
-
->[!INFO]
-> You can learn about the semantics and usage of layout container, including `Stack`, [here](/learning/layout-components).
+For common scenarios, consider the specialized variants: [HStack](/components/HStack) (horizontal), [VStack](/components/VStack) (vertical), [CHStack](/components/CHStack) (centered horizontal), and [CVStack](/components/CVStack) (centered vertical).
 
 ## Properties [#properties]
 
-### `gap (default: "$gap-normal")` [#gap-default-gap-normal]
+### `gap` (default: "$gap-normal") [#gap-default-gap-normal]
 
 Optional size value indicating the gap between child elements.
 
@@ -36,7 +39,7 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 </App>
 ```
 
-### `horizontalAlignment (default: "start")` [#horizontalalignment-default-start]
+### `horizontalAlignment` (default: "start") [#horizontalalignment-default-start]
 
 Manages the horizontal content alignment for each child element in the Stack.
 
@@ -53,13 +56,13 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `orientation (default: "vertical")` [#orientation-default-vertical]
+### `orientation` (default: "vertical") [#orientation-default-vertical]
 
 An optional property that governs the Stack's orientation (whether the Stack lays out its children in a row or a column).
 
 Available values: `horizontal`, `vertical` **(default)**
 
-### `reverse (default: false)` [#reverse-default-false]
+### `reverse` (default: false) [#reverse-default-false]
 
 Optional boolean property to reverse the order of child elements.
 
@@ -82,7 +85,7 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
-### `verticalAlignment (default: "start")` [#verticalalignment-default-start]
+### `verticalAlignment` (default: "start") [#verticalalignment-default-start]
 
 Manages the vertical content alignment for each child element in the Stack.
 
@@ -96,7 +99,7 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-### `wrapContent (default: false)` [#wrapcontent-default-false]
+### `wrapContent` (default: false) [#wrapcontent-default-false]
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works only with horizontal orientations.
 

@@ -1,6 +1,10 @@
 %-DESC-START
 
-Use the `Button` component to trigger various actions.
+**Key features:**
+- **Visual hierarchy**: Choose from `solid`, `outlined`, or `ghost` variants to indicate importance
+- **Theme colors**: Use `primary`, `secondary`, or `attention` colors for different action types
+- **Icon support**: Add icons before or after text, or create icon-only buttons
+- **Form integration**: Automatically handles form submission when used in forms
 
 %-DESC-END
 
@@ -188,7 +192,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```xmlui-pg copy display name="Example: Buttons with fixed width"
+```xmlui-pg copy name="Example: Buttons with fixed width"
 <App>
   <HStack>
     <Theme width-Button="120px">

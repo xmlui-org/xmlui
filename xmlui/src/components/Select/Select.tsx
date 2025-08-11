@@ -1,6 +1,5 @@
 import styles from "../Select/Select.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
@@ -23,6 +22,8 @@ import {
   dLabelBreak,
   dValue,
   dComponent,
+  createMetadata,
+  d,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectNative";
@@ -31,8 +32,12 @@ import { SelectItemText } from "@radix-ui/react-select";
 const COMP = "Select";
 
 export const SelectMd = createMetadata({
-  description: "Provides a dropdown with a list of options to choose from.",
-  status: "experimental",
+  status: "stable",
+  description:
+    "`Select` provides a dropdown interface for choosing from a list of options, " +
+    "supporting both single and multiple selection modes. It offers extensive " +
+    "customization capabilities including search functionality, custom templates, " +
+    "and comprehensive form integration.",
   props: {
     placeholder: {
       ...dPlaceholder(),
@@ -79,7 +84,7 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
     ),
-    emptyListTemplate: d(
+    emptyListTemplate: dComponent(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),
@@ -106,18 +111,30 @@ export const SelectMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    setValue: dSetValueApi(),
-    value: dValue(),
-    reset: d(
-      `This method resets the component to its initial value, or clears the selection if no initial value was provided.`,
-    ),
+    focus: {
+      description: `This method focuses the \`${COMP}\` component. You can use it to programmatically focus the component.`,
+      signature: "focus(): void",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: string | string[] | undefined): void",
+      parameters: {
+        value:
+          "The new value to set. Can be a single value or an array of values for multi-select.",
+      },
+    },
+    value: {
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
+      signature: "get value(): string | string[] | undefined",
+    },
+    reset: {
+      description: `This method resets the component to its initial value, or clears the selection if no initial value was provided.`,
+      signature: "reset(): void",
+    },
   },
   contextVars: {
-    $item: d(`This property represents the value of an item in the dropdown list.`),
-    $itemContext: d(
-      `This property provides a \`removeItem\` method to delete the particular value from the selection.`,
-    ),
+    $item: d("Represents the current option's data (label and value properties)"),
+    $itemContext: d("Provides utility methods like `removeItem()` for multi-select scenarios"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -126,7 +143,6 @@ export const SelectMd = createMetadata({
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
     [`borderColor-menu-${COMP}`]: "$borderColor",
-    [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`paddingHorizontal-${COMP}-badge`]: "$space-1",
@@ -142,6 +158,8 @@ export const SelectMd = createMetadata({
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
+    // Default borderColor-Input--disabled is too light so the disabled component is barely visible
+    [`borderColor-${COMP}--disabled`]: "initial",
   },
 });
 
@@ -189,42 +207,6 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionLabelRenderer={
-          node.props.optionLabelTemplate
-            ? (item) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionLabelTemplate}
-                    item={item}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        optionRenderer={
-          node.props.optionTemplate
-            ? (item, val, inTrigger) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionTemplate}
-                    item={item}
-                    contextVars={{
-                      $selectedValue: val,
-                      $inTrigger: inTrigger,
-                    }}
-                    renderChild={(...args) =>
-                      multiSelect || searchable ? (
-                        renderChild(...args)
-                      ) : (
-                        <SelectItemText>{renderChild(...args)}</SelectItemText>
-                      )
-                    }
-                  />
-                );
-              }
-            : undefined
-        }
         valueRenderer={
           node.props.valueTemplate
             ? (item, removeItem) => {
@@ -239,6 +221,29 @@ export const selectComponentRenderer = createComponentRenderer(
                   />
                 );
               }
+            : undefined
+        }
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item, val, inTrigger) => {
+              return (
+                <MemoizedItem
+                  node={node.props.optionTemplate}
+                  item={item}
+                  contextVars={{
+                    $selectedValue: val,
+                    $inTrigger: inTrigger,
+                  }}
+                  renderChild={(...args) =>
+                    multiSelect || searchable ? (
+                      renderChild(...args)
+                    ) : (
+                      <SelectItemText>{renderChild(...args)}</SelectItemText>
+                    )
+                  }
+                />
+              );
+            }
             : undefined
         }
       >

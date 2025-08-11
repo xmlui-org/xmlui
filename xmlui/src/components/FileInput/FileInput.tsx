@@ -1,9 +1,10 @@
 import styles from "./FileInput.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -28,10 +29,12 @@ const COMP = "FileInput";
 const DEFAULT_ICON = "browse:FileInput";
 
 export const FileInputMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` is a user interface component that allows users to select files from their ` +
-    `device's file system for upload (or processing its content otherwise).`,
-  status: "experimental",
+    "`FileInput` enables users to select files from their device's file system for " +
+    "upload or processing. It combines a text field displaying selected files with " +
+    "a customizable button that opens the system file browser. Use it for forms, " +
+    "media uploads, and document processing workflows.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -48,14 +51,13 @@ export const FileInputMd = createMetadata({
     buttonLabel: d(`This property is an optional string to set a label for the button part.`),
     buttonIcon: d(
       `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
-      `instances with the "icon.browse:FileInput" declaration in the app configuration file.`
+        `instances with the "icon.browse:FileInput" declaration in the app configuration file.`,
     ),
     buttonIconPosition: d(
       `This optional string determines the location of the button icon.`,
       iconPositionNames,
       "string",
-      "start"
-
+      "start",
     ),
     acceptsFileType: d(
       `An optional list of file types the input controls accepts provided as a string array.`,
@@ -66,7 +68,7 @@ export const FileInputMd = createMetadata({
           `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
           `in the browser menu after clicking the input field button.`,
         null,
-        "boolean"
+        "boolean",
       ),
       defaultValue: defaultProps.multiple,
     },
@@ -75,15 +77,15 @@ export const FileInputMd = createMetadata({
         `This boolean property indicates whether the component allows selecting directories (\`true\`) ` +
           `or files only (\`false\`).`,
         null,
-        "boolean"
+        "boolean",
       ),
       defaultValue: defaultProps.directory,
     },
     buttonPosition: {
-      ...d(
-        `This property determines the position of the button relative to the input field.`,
-        ["start", "end"]
-      ),
+      ...d(`This property determines the position of the button relative to the input field.`, [
+        "start",
+        "end",
+      ]),
       defaultValue: defaultProps.buttonPosition,
     },
     buttonSize: d("The size of the button (small, medium, large)", sizeMd),
@@ -100,16 +102,25 @@ export const FileInputMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    value: d(
-      `By setting an ID for the component, you can refer to the value of the field if set. ` +
-        `If no value is set, the value will be undefined.`,
-    ),
-    setValue: d(
-      `(**NOT IMPLEMENTED YET**) You can use this method to set the component's ` +
-        `current value programmatically.`,
-    ),
-    focus: dFocus(COMP),
-    open: d(`This API command triggers the file browsing dialog to open.`),
+    value: {
+      description: "This property holds the current value of the component, which is an array of files.",
+      signature: "get value(): File[]",
+    },
+    setValue: {
+      description: "This method sets the current value of the component.",
+      signature: "setValue(files: File[]): void",
+      parameters: {
+        files: "An array of File objects to set as the current value of the component.",
+      },
+    },
+    focus: {
+      description: "This API command focuses the input field of the component.",
+      signature: "focus(): void",
+    },
+    open: {
+      description: "This API command triggers the file browsing dialog to open.",
+      signature: "open(): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

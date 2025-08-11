@@ -1,15 +1,15 @@
 import styles from "./CodeBlock.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { CodeBlock, defaultProps } from "./CodeBlockNative";
+import { CodeBlock } from "./CodeBlockNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "CodeBlock";
 
 export const CodeBlockMd = createMetadata({
+  status: "stable",
   description: `The \`${COMP}\` component displays code with optional syntax highlighting and meta information.`,
-  status: "in progress",
   props: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -19,9 +19,13 @@ export const CodeBlockMd = createMetadata({
     "marginBottom-CodeBlock": "$space-5",
     "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-200 r g b / 0.25)",
     "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-200 r g b / 0.5)",
-    "borderRadius-CodeBlock": "$space-2",
 
     "borderColor-CodeBlock-highlightString-emphasis": "$color-attention",
+    "border-CodeBlock": "0.5px solid $borderColor",
+    "borderRadius-CodeBlock": "$space-2",
+    "height-CodeBlock": "fit-content",
+    "paddingVertical-content-CodeBlock": "0",
+    "paddingHorizontal-content-CodeBlock": "0",
 
     dark: {
       "backgroundColor-CodeBlock-header": "$color-surface-200",

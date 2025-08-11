@@ -5,16 +5,16 @@
   "private": true,
   "workspaces": [
     "./xmlui",
-    "./tests",
     "./docs",
     "./tools/create-app",
     "./tools/vscode",
-    "./packages/*"
+    "./packages/*",
+    "./xmlui-temp-build"
   ],
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.5"
   },
   "packageManager": "npm@10.9.2",
   "scripts": {
@@ -28,6 +28,7 @@
     "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke",
     "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
     "build-extensions": "turbo run build:extension",
-    "build-docs": "turbo run build:xmlui-all build:docs"
+    "build-docs": "turbo run build:docs",
+    "watch-docs-content": "turbo watch generate-docs-summaries"
   }
 }

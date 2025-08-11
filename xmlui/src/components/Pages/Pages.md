@@ -1,8 +1,10 @@
 %-DESC-START
 
-See the [\`Page\` docs](/components/Page) for a short description.
+**Key features:**
 
-Examples for both components can be found here.
+- **Route coordination**: Automatically displays the correct Page based on current URL and navigation
+- **Default route handling**: Sets the initial page shown when the application loads
+- **Client-side routing**: Manages navigation without page refreshes or server requests
 
 ### Using the Pages and Page components
 
@@ -30,15 +32,15 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 %-DESC-END
 
-%-PROP-START defaultRoute
+%-PROP-START fallbackPath
 
-```xmlui-pg copy {6-13} display name="Example: defaultRoute" height="150px"
+```xmlui-pg copy {6-13} display name="Example: fallbackPath" height="150px"
 <App>
   <NavPanel>
     <NavLink label="Not Home" to="/not-home" icon="trash"/>
     <NavLink label="Home" to="/home" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/home">
+  <Pages fallbackPath="/home">
     <Page url="/not-home">
       <Text>This is not home...</Text>
     </Page>

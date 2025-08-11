@@ -8,7 +8,8 @@ export const EditorMd = createMetadata({
   status: "experimental",
   props: {
   },
-  themeVars: parseScssVar({}),
+  themeVars: parseScssVar({
+  }),
   defaultThemeVars: {},
 });
 

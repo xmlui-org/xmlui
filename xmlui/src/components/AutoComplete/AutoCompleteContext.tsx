@@ -2,26 +2,27 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 
 import type { Option } from "../abstractions";
+import type { SingleValueType } from "../Select/SelectNative";
 
 type AutoCompleteContextValue = {
   multi?: boolean;
   value: string | string[] | null;
   onChange?: (selectedValue: string) => void;
-  optionRenderer: (option: Option) => ReactNode;
   inputValue: string;
   options: Set<Option>;
   open?: boolean;
   setOpen?: (open: boolean) => void;
+  optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => ReactNode;
 };
 
 export const AutoCompleteContext = createContext<AutoCompleteContextValue>({
   value: null,
   onChange: (selectedValue: string) => {},
-  optionRenderer: (option: Option) => <div>{option.label}</div>,
   inputValue: "",
   options: new Set<Option>(),
   open: false,
   setOpen: (open: boolean) => {},
+  optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => null,
 });
 
 export function useAutoComplete() {

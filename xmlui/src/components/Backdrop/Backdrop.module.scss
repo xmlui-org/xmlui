@@ -7,29 +7,34 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-@layer components {
-  .backdropContainer {
-    position: relative;
-    display: inline-block;
-  }
+$backgroundColor-Backdrop: createThemeVar("backgroundColor-Backdrop");
+$opacity-Backdrop: createThemeVar("opacity-Backdrop");
 
-  .backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
+.backdropContainer {
+  position: relative;
+  display: inline-block;
 }
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $backgroundColor-Backdrop;
+  opacity: $opacity-Backdrop;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: t.json-stringify($themeVars);
-}
+    themeVars: t.json-stringify($themeVars);
+  }
+  

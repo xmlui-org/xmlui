@@ -3,6 +3,7 @@ import React, {
   type ForwardedRef,
   forwardRef,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -18,6 +19,8 @@ import { TableOfContentsContext } from "../../components-core/TableOfContentsCon
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
 import { Link } from "@remix-run/react";
+import { useAppContext } from "../../components-core/AppContext";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export type HeadingProps = {
   uid?: string;
@@ -31,6 +34,7 @@ export type HeadingProps = {
   title?: string;
   className?: string;
   showAnchor?: boolean;
+  registerComponentApi?: RegisterComponentApiFn;
   [furtherProps: string]: any;
 };
 
@@ -59,6 +63,7 @@ export const Heading = forwardRef(function Heading(
     className,
     omitFromToc = defaultProps.omitFromToc,
     showAnchor,
+    registerComponentApi,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
@@ -70,8 +75,28 @@ export const Heading = forwardRef(function Heading(
 
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
+  const appContext = useAppContext();
+  if (showAnchor === undefined) {
+    showAnchor = appContext?.appGlobals?.showHeadingAnchors ?? false;
+  }
 
   const ref = forwardedRef ? composeRefs(elementRef, forwardedRef) : elementRef;
+
+  const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
+    if (elementRef.current) {
+      elementRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        ...options,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      scrollIntoView,
+    });
+  }, [registerComponentApi, scrollIntoView]);
 
   useEffect(() => {
     if (elementRef.current) {

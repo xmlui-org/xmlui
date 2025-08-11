@@ -12,109 +12,107 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $borderRadius: createThemeVar("borderRadius-#{$component}");
 
-@layer components {
-  .root {
-    overflow: hidden;
-    width: 100%;
-    //box-shadow: 0 2px 10px var(--black-a4);
-    @include t.borderVars($themeVars, $component);
-    @include t.paddingVars($themeVars, $component);
+.root {
+  overflow: hidden;
+  width: 100%;
+  //box-shadow: 0 2px 10px var(--black-a4);
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
+}
+
+.item {
+  overflow: hidden;
+  margin-top: 1px;
+  box-sizing: border-box;
+
+  &:first-child {
+    margin-top: 0;
+    border-top-left-radius: $borderRadius;
+    border-top-right-radius: $borderRadius;
   }
 
-  .item {
-    overflow: hidden;
-    margin-top: 1px;
-    box-sizing: border-box;
-
-    &:first-child {
-      margin-top: 0;
-      border-top-left-radius: $borderRadius;
-      border-top-right-radius: $borderRadius;
-    }
-
-    &:last-child {
-      border-bottom-left-radius: $borderRadius;
-      border-bottom-right-radius: $borderRadius;
-    }
-
-    &:focus-within {
-      position: relative;
-      z-index: 1;
-    }
+  &:last-child {
+    border-bottom-left-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
   }
 
-  .header {
-    display: flex;
-    margin: 0;
-  }
-
-  .trigger {
-    font-family: inherit;
-    flex: 1;
-    display: inline-flex;
-    align-items: createThemeVar("verticalAlign-header-#{$component}");
-    justify-content: space-between;
-    line-height: 1;
-    box-sizing: border-box;
-    font-size: createThemeVar("fontSize-header-#{$component}");
-    font-weight: createThemeVar("fontWeight-header-#{$component}");
-    font-style: createThemeVar("fontStyle-header-#{$component}");
-    padding: createThemeVar("paddingVertical-header-#{$component}")
-      createThemeVar("paddingHorizontal-header-#{$component}");
-    background-color: createThemeVar("backgroundColor-header-#{$component}");
-    color: createThemeVar("color-header-#{$component}");
-
-    &:hover {
-      background-color: createThemeVar("backgroundColor-header-#{$component}-hover");
-    }
-
-    &.triggerStart {
-      flex-direction: row-reverse;
-    }
-  }
-
-  .contentWrapper {
-    overflow: hidden;
-    color: createThemeVar("color-content-#{$component}");
-    background-color: createThemeVar("backgroundColor-content-#{$component}");
-
-    &[data-state="open"] {
-      animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
-    }
-
-    &[data-state="closed"] {
-      animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
-    }
-  }
-
-  .content {
-    padding: t.$space-2;
-  }
-
-  .chevron {
-    width: createThemeVar("width-icon-#{$component}");
-    height: createThemeVar("height-icon-#{$component}");
-    color: createThemeVar("color-icon-#{$component}");
-  }
-
-  @keyframes slideDown {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--radix-accordion-content-height);
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      height: var(--radix-accordion-content-height);
-    }
-    to {
-      height: 0;
-    }
+  &:focus-within {
+    position: relative;
+    z-index: 1;
   }
 }
+
+.header {
+  display: flex;
+  margin: 0;
+}
+
+.trigger {
+  font-family: inherit;
+  flex: 1;
+  display: inline-flex;
+  align-items: createThemeVar("verticalAlignment-header-#{$component}");
+  justify-content: space-between;
+  line-height: 1;
+  box-sizing: border-box;
+  font-size: createThemeVar("fontSize-header-#{$component}");
+  font-weight: createThemeVar("fontWeight-header-#{$component}");
+  font-style: createThemeVar("fontStyle-header-#{$component}");
+  padding: createThemeVar("paddingVertical-header-#{$component}") createThemeVar("paddingHorizontal-header-#{$component}");
+  background-color: createThemeVar("backgroundColor-header-#{$component}");
+  color: createThemeVar("color-header-#{$component}");
+
+  &:hover {
+    background-color: createThemeVar("backgroundColor-header-#{$component}-hover");
+  }
+
+  &.triggerStart {
+    flex-direction: row-reverse;
+  }
+}
+
+.contentWrapper {
+  overflow: hidden;
+  color: createThemeVar("color-content-#{$component}");
+  background-color: createThemeVar("backgroundColor-content-#{$component}");
+
+  &[data-state='open'] {
+    animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  }
+
+  &[data-state='closed'] {
+    animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  }
+}
+
+.content {
+  padding: t.$space-2;
+}
+
+.chevron {
+  width: createThemeVar("width-icon-#{$component}");
+  height: createThemeVar("height-icon-#{$component}");
+  color: createThemeVar("color-icon-#{$component}");
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {

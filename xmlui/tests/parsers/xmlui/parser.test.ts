@@ -5,82 +5,6 @@ import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
 describe("Xmlui parser", () => {
-  it("only close node start", () => {
-    const { node, getText, errors } = parseSource("</");
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.expTagOpen);
-  });
-
-  it("unexpected char", () => {
-    const { node, getText, errors } = parseSource("<A #/>");
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.invalidChar);
-    expect(errors[0].pos).toEqual(3);
-    expect(errors[0].end).toEqual(4);
-  });
-
-  it("unterminated comment", () => {
-    const { node, getText, errors } = parseSource("<Stack><!--</Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermComment);
-
-    expect(childElements.children!.length).toEqual(1);
-    expect(child0.kind).toEqual(SyntaxKind.ErrorNode);
-  });
-
-  it("unterminated string", () => {
-    const { node, getText, errors } = parseSource("<Stack> ' </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
-
-    expect(childElements.children!.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermStr);
-  });
-
-  it("unterminated CData", () => {
-    const { node, getText, errors } = parseSource("<Stack> <![CDATA[hi there </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-
-    expect(childElements.children!.length).toEqual(2);
-    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermCData);
-  });
-
-  it("bare unterminated CData", () => {
-    const { node, getText, errors } = parseSource("<![CDATA[hi there");
-
-    //The end of file token is the '+1'
-    expect(node.children!.length).toEqual(2 + 1);
-    expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
-    expect(errors[0].code).toEqual(ErrCodes.untermCData);
-  });
-
-  it("unterminated script", () => {
-    const { node, getText, errors } = parseSource("<Stack> <script>hi there </Stack>");
-    const rootElem = node.children![0];
-    const childElements = rootElem.children[3];
-
-    expect(childElements.children!.length).toEqual(2);
-    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
-
-    expect(errors.length).toEqual(1);
-    expect(errors[0].code).toEqual(ErrCodes.untermScript);
-  });
-
   it("Single node works #1", () => {
     const { node, getText } = parseSource("<Stack />");
     const rootElem = node.children![0];
@@ -317,29 +241,30 @@ describe("Xmlui parser", () => {
     expect(child0.kind).toEqual(SyntaxKind.TextNode);
     expect(getText(child0)).equal("  hello\r\n\rbello  ");
   });
-
-  it("Uppercase attribute results in error", () => {
-    const { errors } = parseSource("<Stack A='1' />");
-    expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
-  });
-
-  it("<> regression #1", () => {
-    const { errors } = parseSource("<>");
-    expect(errors[0].code).toBe(ErrCodes.expTagName);
-  });
-
-  it("<> regression #2", () => {
-    const { errors } = parseSource("<Text >");
-    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
-  });
 });
 
-describe("Xmlui parser - expected errors", () => {
-  it("has invalid char after component name", () => {
-    const { node, getText, errors } = parseSource(`<Stack ;></Stack>`);
+describe("Xmlui parser - expected scanner errors", () => {
+  it("unexpected char", () => {
+    const src = "<A #/>";
+    const { node, getText, errors } = parseSource(src);
 
-    expect(errors).toHaveLength(1)
-    expect(errors[0].code).toEqual(ErrCodes.invalidChar)
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(err.pos).toEqual(3);
+    expect(err.end).toEqual(4);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<A #/>");
+  });
+
+  it("has invalid char after component name", () => {
+    const src = `<Stack ;></Stack>`;
+    const { node, getText, errors } = parseSource(src);
+
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;></Stack>");
+
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
@@ -348,6 +273,146 @@ describe("Xmlui parser - expected errors", () => {
     expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
     expect(nameId.kind).toEqual(SyntaxKind.Identifier);
     expect(getText(nameId)).equal("Stack");
+  });
+
+  it("unterminated comment", () => {
+    const src = "<Stack><!--</Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+    const child0 = childElements.children[0];
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermComment);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack><!--</Stack>");
+
+    expect(childElements.children!.length).toEqual(1);
+    expect(child0.kind).toEqual(SyntaxKind.ErrorNode);
+  });
+
+  it("unterminated string", () => {
+    const src = "<Stack> ' </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+    const child0 = childElements.children[0];
+
+    expect(childElements.children!.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermStr);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack> ' </Stack>");
+  });
+
+  it("unterminated CData", () => {
+    const src = "<Stack> <![CDATA[hi there </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+
+    expect(childElements.children!.length).toEqual(2);
+    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      "<Stack> <![CDATA[hi there </Stack>",
+    );
+  });
+
+  it("bare unterminated CData", () => {
+    const src = "<![CDATA[hi there";
+    const { node, getText, errors } = parseSource(src);
+
+    //The end of file token is the '+1'
+    expect(node.children!.length).toEqual(2 + 1);
+    expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermCData);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<![CDATA[hi there");
+  });
+
+  it("unterminated script", () => {
+    const src = "<Stack> <script>hi there </Stack>";
+    const { node, getText, errors } = parseSource(src);
+    const rootElem = node.children![0];
+    const childElements = rootElem.children[3];
+
+    expect(childElements.children!.length).toEqual(2);
+    expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(childElements.children![1].kind).toEqual(SyntaxKind.TextNode);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.untermScript);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      "<Stack> <script>hi there </Stack>",
+    );
+  });
+
+  it("multi-line scanner error - first line", () => {
+    const src = `<Stack ;>
+    <Button>Hello</Button>
+</Stack>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Stack ;>");
+  });
+
+  it("multi-line scanner error - middle line", () => {
+    const src = `<Stack>
+    <Button ;>Hello</Button>
+</Stack>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("    <Button ;>Hello</Button>");
+  });
+
+  it("multi-line scanner error - CRLF line endings", () => {
+    const src = "<Stack>\r\n<Button ;>Hello</Button>\r\n</Stack>";
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.invalidChar);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<Button ;>Hello</Button>");
+  });
+});
+
+describe("Xmlui parser - expected parser errors", () => {
+  it("only close node start", () => {
+    const src = "</";
+    const { node, getText, errors } = parseSource(src);
+
+    expect(errors.length).toEqual(1);
+    const err = errors[0];
+    expect(err.code).toEqual(ErrCodes.unexpectedCloseTag);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("</");
+  });
+
+  it("Uppercase attribute results in error", () => {
+    const { errors } = parseSource("<Stack A='1' />");
+    expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
+  });
+
+  it("no name for tag", () => {
+    const src = "<>";
+    const { errors } = parseSource(src);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual("<>");
+  });
+
+  it("no closing with known name", () => {
+    const { errors } = parseSource("<Text >");
+    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
   });
 
   it("Unmatched tag names", () => {
@@ -366,7 +431,6 @@ describe("Xmlui parser - expected errors", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expTagName);
   });
-
 
   it("bad tokens in tag name and attrs result in only the 1st error", () => {
     const { errors } = parseSource("<: name= >");
@@ -390,21 +454,21 @@ describe("Xmlui parser - expected errors", () => {
     const tagB = tagAList.children[0];
     const tagACloseStart = tagA.children[4];
 
-    expect(tagA.kind).toEqual(SyntaxKind.ElementNode)
-    expect(tagAList.kind).toEqual(SyntaxKind.ContentListNode)
-    expect(tagB.kind).toEqual(SyntaxKind.ElementNode)
-    expect(tagB.children).toHaveLength(2)
-    expect(tagACloseStart.kind).toEqual(SyntaxKind.CloseNodeStart)
-
+    expect(tagA.kind).toEqual(SyntaxKind.ElementNode);
+    expect(tagAList.kind).toEqual(SyntaxKind.ContentListNode);
+    expect(tagB.kind).toEqual(SyntaxKind.ElementNode);
+    expect(tagB.children).toHaveLength(2);
+    expect(tagACloseStart.kind).toEqual(SyntaxKind.CloseNodeStart);
   });
 
   it("missing /> before < results in 1 error", () => {
     const { errors } = parseSource(
-`<A>
+      `<A>
   <B
   <C></C>
   <D />
-</A>`);
+</A>`,
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
   });
@@ -413,7 +477,7 @@ describe("Xmlui parser - expected errors", () => {
     const { errors } = parseSource("<A enabled enabled/>");
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.duplAttr);
-  })
+  });
 
   it("duplicate attributes with namespace", () => {
     const { errors } = parseSource("<A ns:enabled ns:enabled/>");
@@ -423,10 +487,62 @@ describe("Xmlui parser - expected errors", () => {
 
   it("namespace without attribute name", () => {
     const { errors } = parseSource("<A ns:='hi' enabled/>");
-    console.log(errors)
+    console.log(errors);
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
-  })
+  });
+
+  it("multi-line unexpected close tag", () => {
+    const src = `<Stack>
+    <Button>Hello</Button>
+</Stack>
+</UnexpectedTag>`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.unexpectedCloseTag);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`</Stack>
+</UnexpectedTag>`);
+  });
+
+  it("multi-line tag name mismatch", () => {
+    const src = `
+<Stack>
+    <Button>Hello</Button>
+</NotStack>
+`;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`    <Button>Hello</Button>
+</NotStack>
+`);
+  });
+
+  it("multi-line context CRLF", () => {
+    const src = `\r\n<Stack>\r\n<Button>Hello</NOTBUTTON>\r\n</Stack>
+  `;
+    const { errors } = parseSource(src);
+    expect(errors).toHaveLength(1);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.tagNameMismatch);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(
+      `<Stack>\r\n<Button>Hello</NOTBUTTON>\r\n</Stack>`,
+    );
+  });
+
+  it("multi-line expected tag name", () => {
+    const src = `<Stack>
+<>
+</Stack>`;
+    const { errors } = parseSource(src);
+    const err = errors[0];
+    expect(err.code).toBe(ErrCodes.expTagName);
+    expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`<Stack>
+<>
+</Stack>`);
+  });
 });
 
 describe("Xmlui parser - child nodes", () => {

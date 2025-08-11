@@ -1,6 +1,14 @@
 # NavGroup [#navgroup]
 
-The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI.
+`NavGroup` creates collapsible containers for organizing related navigation items into hierarchical menu structures. It groups `NavLink` components and other `NavGroup` components, providing expandable submenus with customizable icons and states.
+
+**Key features:**
+
+- **Hierarchical organization**: Creates nested menu structures by containing NavLinks and other NavGroups
+- **Expand/collapse behavior**: Users can toggle visibility of grouped navigation items
+- **Customizable icons**: Different icons for expanded/collapsed states and layout orientations
+- **Flexible placement**: Works within NavPanel for app navigation or standalone for custom menus
+- **Initial state control**: Configure whether groups start expanded or collapsed
 
 ## Using `NavGroup` [#using-navgroup]
 
@@ -22,7 +30,7 @@ The primary use of a `NavGroup` is to create an application menu with submenus, 
       <NavLink label="Page Other" to="/page/Other"/>
     </NavGroup>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       Home
     </Page>
@@ -58,6 +66,7 @@ You do not have to use `NavGroup` within `NavPanel`; you can nest it into other 
 ### Custom Icons [#custom-icons]
 
 You can also provide custom icons for a specific NavGroup component via it's respective property:
+
 - [iconHorizontalCollapsed](#iconHorizontalCollapsed)
 - [iconHorizontalExpanded](#iconHorizontalExpanded)
 - [iconVerticalCollapsed](#iconVerticalCollapsed)
@@ -82,7 +91,7 @@ See the following for an example of all variants:
 
 ## Properties [#properties]
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -110,25 +119,25 @@ Look at this example:
 </App>
 ```
 
-### `iconHorizontalCollapsed (default: "chevronright")` [#iconhorizontalcollapsed-default-chevronright]
+### `iconHorizontalCollapsed` (default: "chevronright") [#iconhorizontalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconHorizontalExpanded (default: "chevronright")` [#iconhorizontalexpanded-default-chevronright]
+### `iconHorizontalExpanded` (default: "chevronright") [#iconhorizontalexpanded-default-chevronright]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronright")` [#iconverticalcollapsed-default-chevronright]
+### `iconVerticalCollapsed` (default: "chevronright") [#iconverticalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalExpanded (default: "chevrondown")` [#iconverticalexpanded-default-chevrondown]
+### `iconVerticalExpanded` (default: "chevrondown") [#iconverticalexpanded-default-chevrondown]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 

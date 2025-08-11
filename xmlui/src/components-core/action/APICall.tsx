@@ -257,7 +257,7 @@ type APICall = {
 } & ApiOperationDef;
 
 export async function callApi(
-  { state, appContext, lookupAction, getCurrentState }: ActionExecutionContext,
+  { state, appContext, lookupAction, getCurrentState, apiInstance }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
@@ -346,7 +346,7 @@ export async function callApi(
     const _onProgress = lookupAction(onProgress, uid, {
       eventName: "progress",
     });
-    const result = await new RestApiProxy(appContext).execute({
+    const result = await new RestApiProxy(appContext, apiInstance).execute({
       operation,
       params: stateContext,
       transactionId: clientTxId,

@@ -49,8 +49,9 @@ export const MemoizedItem = memo(
         },
         children: Array.isArray(node) ? node : [node],
       } as ContainerWrapperDef;
-    }, [context, item, node, shallowMemoedContextVars]);
+    }, [context, item, node, shallowMemoedContextVars, itemKey, contextKey]);
 
     return <>{renderChild(nodeWithItem, layoutContext)}</>;
   },
 );
+MemoizedItem.displayName = "MemoizedItem";

@@ -5,13 +5,14 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import { asyncWait } from "../utils/misc";
 import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
+import { createMetadata, d } from "../../components/metadata-helpers";
 
 type MockLoaderProps = {
   loader: MockLoaderDef;
@@ -56,6 +57,7 @@ function MockLoader({
 }
 
 export const MockLoaderMd = createMetadata({
+  status: "stable",
   description: "A loader that simulates a delay and returns a predefined response",
   props: {
     waitTime: d("The time to wait before returning the response"),

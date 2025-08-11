@@ -1,14 +1,15 @@
 import styles from "./Text.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Text";
 
 export const TextMd = createMetadata({
+  status: "stable",
   description:
     `The \`${COMP}\` component displays textual information in a number of optional ` +
     `styles and variants.`,
@@ -77,9 +78,9 @@ export const TextMd = createMetadata({
     [`fontFamily-${COMP}-sample`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-sample`]: "$fontSize-small",
     [`fontSize-${COMP}-sup`]: "$fontSize-smaller",
-    [`verticalAlign-${COMP}-sup`]: "super",
+    [`verticalAlignment-${COMP}-sup`]: "super",
     [`fontSize-${COMP}-sub`]: "$fontSize-smaller",
-    [`verticalAlign-${COMP}-sub`]: "sub",
+    [`verticalAlignment-${COMP}-sub`]: "sub",
     [`fontStyle-${COMP}-var`]: "italic",
     [`fontStyle-${COMP}-em`]: "italic",
     [`fontFamily-${COMP}-mono`]: "$fontFamily-monospace",
@@ -90,8 +91,8 @@ export const TextMd = createMetadata({
     [`letterSpacing-${COMP}-caption`]: "0.05rem",
     [`fontSize-${COMP}-placeholder`]: "$fontSize-smaller",
     [`fontFamily-${COMP}-codefence`]: "$fontFamily-monospace",
-    [`paddingHorizontal-${COMP}-codefence`]: "$space-3",
-    [`paddingVertical-${COMP}-codefence`]: "$space-2",
+    [`paddingHorizontal-${COMP}-codefence`]: "$space-4",
+    [`paddingVertical-${COMP}-codefence`]: "$space-3",
     [`paddingVertical-${COMP}-paragraph`]: "$space-1",
     [`fontSize-${COMP}-subheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-subheading`]: "$fontWeight-bold",
@@ -105,6 +106,8 @@ export const TextMd = createMetadata({
 
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-6",
+    [`fontSize-${COMP}-markdown`]: `fontSize-${COMP}`,
+    [`fontWeight-${COMP}-markdown`]: `fontWeight-${COMP}`,
 
     [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
     [`borderColor-${COMP}-code`]: "$color-surface-100",

@@ -12,19 +12,14 @@ type Props = {
   backgroundColor?: string;
 };
 
-export const defaultProps: Pick<Props, "backgroundColor" | "opacity"> = {
-  backgroundColor: "black",
-  opacity: "0.1",
-};
-
 export const Backdrop = forwardRef(function Backdrop(
   {
     style,
     className,
     children,
     overlayTemplate,
-    backgroundColor = defaultProps.backgroundColor,
-    opacity = defaultProps.opacity,
+    backgroundColor,
+    opacity,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {

@@ -1,3 +1,13 @@
+%-DESC-START
+
+**Key features:**
+- **Value monitoring**: Watches any expression, variable, or component property for changes
+- **Throttling support**: Prevents excessive triggering with `throttleWaitInMs` for rapid changes
+- **Previous/new values**: Access both old and new values in the change handler
+- **Reactive patterns**: Coordinates between components or triggers side effects
+
+%-DESC-END
+
 %-PROP-START listenTo
 
 The following sample demonstrates using this property. Every time the user clicks the button, a counter is incremented. The `ChangeListener` component watches the counter's value. Whenever it changes, the component fires the `didChange` event, which stores whether the new counter value is even into the `isEven` variable.

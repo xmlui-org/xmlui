@@ -48,7 +48,7 @@ $componentName: "Textarea";
   }
 
   &::placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
     font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
   }
 }

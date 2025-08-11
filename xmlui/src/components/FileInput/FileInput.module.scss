@@ -10,33 +10,46 @@ $themeVars: ();
 // --- The FileInput component uses a TextBox and a Button. We do not allow separately customize the
 // --- FileInput theme, only through the TextBox and Button themes.
 
-@layer components {
-  .container {
-    gap: t.$space-2;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+.container {
+  gap: t.$space-2;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.buttonStart {
+  flex-direction: row-reverse;
+}
+
+.buttonEnd {
+  flex-direction: row;
+}
+
+.textBoxWrapper {
+  width: 100%;
+  border-radius: t.$borderRadius;
+  min-height: fit-content;
+
+  &:focus-within {
+    border-radius: createThemeVar("Input:borderRadius-FileInput--focus");
+    border-color: createThemeVar("Input:borderColor-FileInput--focus");
+    background-color: createThemeVar("Input:backgroundColor-FileInput--focus");
+    box-shadow: createThemeVar("Input:boxShadow-FileInput--focus");
+    color: createThemeVar("Input:textColor-FileInput--focus");
   }
 
-  .buttonStart {
-    flex-direction: row-reverse;
+  &:has(.input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-FileInput--focus");
+    outline-color: createThemeVar("Input:outlineColor-FileInput--focus");
+    outline-style: createThemeVar("Input:outlineStyle-FileInput--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-FileInput--focus");
   }
+}
 
-  .buttonEnd {
-    flex-direction: row;
-  }
-
-  .textBoxWrapper {
-    width: 100%;
-    border-radius: t.$borderRadius;
-    min-height: fit-content;
-  }
-
-  .button {
-    flex-shrink: 0;
-  }
+.button {
+  flex-shrink: 0;
 }
 
 // --- We export the theme variables to add them to the component renderer

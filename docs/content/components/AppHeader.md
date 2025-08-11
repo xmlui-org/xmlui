@@ -1,9 +1,12 @@
 # AppHeader [#appheader]
 
-`AppHeader` is a placeholder within `App` to define a custom application header.
+`AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior.
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Key features:**
+
+- **Logo customization**: Use `logoTemplate` to create rich logo designs beyond simple images
+- **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
+- **Layout integration**: Automatically positioned and styled based on your App's `layout` property
 
 ## Properties [#properties]
 
@@ -14,21 +17,21 @@ This property defines the template to use for the logo. With this property, you 
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui-pg copy display {2-8} name="Example: logoTemplate" height="150px"
+```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="150px"
 <App>
   <AppHeader>
   <property name="logoTemplate">
-      <H3>
-        <Icon name="drive" />
-        DriveDiag
-      </H3>
+    <H3>
+      <Icon name="drive" />
+      DriveDiag
+    </H3>
   </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>
@@ -60,7 +63,7 @@ It accepts component definitions.
 </App>
 ```
 
-### `showLogo (default: true)` [#showlogo-default-true]
+### `showLogo` (default: true) [#showlogo-default-true]
 
 Show the logo in the header
 
@@ -86,7 +89,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| align-content-AppHeader | *none* | *none* |
+| [alignment](../styles-and-themes/common-units/#alignment)-content-AppHeader | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | $color-surface-raised | $color-surface-raised |
 | [border](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | 1px solid $borderColor | 1px solid $borderColor |
@@ -94,8 +97,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-AppHeader | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-AppHeader | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
@@ -109,8 +112,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-AppHeader | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |

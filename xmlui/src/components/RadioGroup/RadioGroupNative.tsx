@@ -1,7 +1,7 @@
 import React, {
   createContext,
   type CSSProperties,
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   useCallback,
   useContext,
@@ -20,6 +20,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { UnwrappedRadioItem } from "./RadioItemNative";
 
 export const defaultProps = {
   value: "",
@@ -29,11 +30,14 @@ export const defaultProps = {
   required: false,
 };
 
-const RadioGroupValidationStatusContext = createContext<{
+const RadioGroupStatusContext = createContext<{
   value?: string;
+  setValue?: (value: string) => void;
   status: ValidationStatus;
+  enabled?: boolean;
 }>({
   status: "none",
+  enabled: defaultProps.enabled,
 });
 
 type RadioGroupProps = {
@@ -127,8 +131,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
   }, [/* focus, */ registerComponentApi, setValue]);
 
   const contextValue = useMemo(() => {
-    return { value, status: validationStatus };
-  }, [value, validationStatus]);
+    return { value, setValue: updateValue, status: validationStatus, enabled };
+  }, [value, updateValue, validationStatus, enabled]);
 
   return (
     <ItemWithLabel
@@ -145,7 +149,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
       className={className}
     >
       <OptionTypeProvider Component={RadioGroupOption}>
-        <RadioGroupValidationStatusContext.Provider value={contextValue}>
+        <RadioGroupStatusContext.Provider value={contextValue}>
           <InnerRadioGroup.Root
             id={id}
             onBlur={handleOnBlur}
@@ -160,28 +164,11 @@ export const RadioGroup = forwardRef(function RadioGroup(
           >
             {children}
           </InnerRadioGroup.Root>
-        </RadioGroupValidationStatusContext.Provider>
+        </RadioGroupStatusContext.Provider>
       </OptionTypeProvider>
     </ItemWithLabel>
   );
 });
-
-export function useRadioGroupValue() {
-  const context = useContext(RadioGroupValidationStatusContext);
-
-  if (!context) {
-    throw new Error("useRadioGroupValue must be used within a RadioGroup");
-  }
-
-  const { value } = context;
-
-  const isChecked = useCallback((optionValue: string) => value === optionValue, [value]);
-
-  return {
-    value,
-    isChecked,
-  };
-}
 
 export const RadioGroupOption = ({
   value,
@@ -191,47 +178,44 @@ export const RadioGroupOption = ({
   style,
 }: Option) => {
   const id = useId();
-  const validationContext = useContext(RadioGroupValidationStatusContext);
-  const { isChecked } = useRadioGroupValue();
+  const radioGroupContext = useContext(RadioGroupStatusContext);
 
   const statusStyles = useMemo(
     () => ({
-      [styles.disabled]: !enabled,
-      [styles.error]: value === validationContext.value && validationContext.status === "error",
-      [styles.warning]: value === validationContext.value && validationContext.status === "warning",
-      [styles.valid]: value === validationContext.value && validationContext.status === "valid",
+      [styles.disabled]: radioGroupContext.enabled === false ? true : !enabled,
+      [styles.error]: value === radioGroupContext.value && radioGroupContext.status === "error",
+      [styles.warning]: value === radioGroupContext.value && radioGroupContext.status === "warning",
+      [styles.valid]: value === radioGroupContext.value && radioGroupContext.status === "valid",
     }),
-    [enabled, validationContext.status, validationContext.value, value],
+    [enabled, radioGroupContext, value],
   );
 
   const item = useMemo(
     () => (
       <>
-        <InnerRadioGroup.Item
-          className={classnames(styles.radioOption, statusStyles, {
-            [styles.checked]: isChecked(value),
-          })}
-          value={value}
-          disabled={!enabled}
+        <UnwrappedRadioItem
           id={id}
-        >
-          <InnerRadioGroup.Indicator className={classnames(styles.indicator, statusStyles)} />
-        </InnerRadioGroup.Item>
+          value={value}
+          checked={value === radioGroupContext.value}
+          disabled={!enabled}
+          statusStyles={statusStyles}
+        />
         <label htmlFor={id} className={classnames(styles.label, statusStyles)}>
           {label ?? value}
         </label>
       </>
     ),
-    [enabled, id, label, statusStyles, value],
+    [enabled, id, label, statusStyles, value, radioGroupContext],
   );
 
   return (
     <div key={id} className={styles.radioOptionContainer} style={style}>
-      {optionRenderer ? (
+      {!!optionRenderer ? (
         <label className={styles.optionLabel}>
           <div className={styles.itemContainer}>{item}</div>
           {optionRenderer({
-            $checked: value === validationContext.value,
+            $checked: value === radioGroupContext.value,
+            $setChecked: radioGroupContext.setValue,
           })}
         </label>
       ) : (

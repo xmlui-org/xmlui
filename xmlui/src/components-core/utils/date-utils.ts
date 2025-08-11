@@ -74,3 +74,115 @@ export function isDateYesterday (date: string | Date) {
 export function isDateTomorrow (date: string | Date) {
   return isTomorrow(new Date(date));
 }
+
+/**
+ * Formats a date into a human-readable elapsed time string.
+ * Returns strings like "now", "12 seconds ago", "3 hours ago", "today", "yesterday", "3 weeks ago", etc.
+ * 
+ * @param date The date to format
+ * @param shortFormat When true, uses abbreviated time units (e.g. "s" instead of "seconds")
+ * @returns A human-readable elapsed time string
+ */
+export function formatHumanElapsedTime(date: string | Date, shortFormat = false): string {
+  const now = new Date();
+  const inputDate = new Date(date);
+  
+  // Calculate time difference in milliseconds
+  const diffMs = now.getTime() - inputDate.getTime();
+  
+  // Handle future dates
+  if (diffMs < 0) {
+    return formatDate(date);
+  }
+  
+  // Convert to seconds, minutes, hours, days, weeks
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
+  const diffMonths = Math.floor(diffDays / 30);
+  const diffYears = Math.floor(diffDays / 365);
+  
+  // Define unit formats based on shortFormat parameter
+  const units = {
+    second: {
+      singular: shortFormat ? 's' : 'second',
+      plural: shortFormat ? 's' : 'seconds'
+    },
+    minute: {
+      singular: shortFormat ? 'min' : 'minute',
+      plural: shortFormat ? 'min' : 'minutes'
+    },
+    hour: {
+      singular: shortFormat ? 'hr' : 'hour',
+      plural: shortFormat ? 'hrs' : 'hours'
+    },
+    day: {
+      singular: shortFormat ? 'd' : 'day',
+      plural: shortFormat ? 'd' : 'days'
+    },
+    week: {
+      singular: shortFormat ? 'wk' : 'week',
+      plural: shortFormat ? 'wks' : 'weeks'
+    },
+    month: {
+      singular: shortFormat ? 'mo' : 'month',
+      plural: shortFormat ? 'mos' : 'months'
+    },
+    year: {
+      singular: shortFormat ? 'y' : 'year',
+      plural: shortFormat ? 'yrs' : 'years'
+    }
+  };
+  
+  // Just now (within 10 seconds)
+  if (diffSeconds < 10) {
+    return "now";
+  }
+  
+  // Seconds ago (up to 1 minute)
+  if (diffSeconds < 60) {
+    const unit = diffSeconds === 1 ? units.second.singular : units.second.plural;
+    return `${diffSeconds} ${unit} ago`;
+  }
+  
+  // Minutes ago (up to 1 hour)
+  if (diffMinutes < 60) {
+    const unit = diffMinutes === 1 ? units.minute.singular : units.minute.plural;
+    return `${diffMinutes} ${unit} ago`;
+  }
+  
+  // Hours ago (up to today)
+  if (isToday(inputDate)) {
+    const unit = diffHours === 1 ? units.hour.singular : units.hour.plural;
+    return `${diffHours} ${unit} ago`;
+  }
+  
+  // Yesterday
+  if (isYesterday(inputDate)) {
+    return "yesterday";
+  }
+  
+  // Days ago (up to 1 week)
+  if (diffDays < 7) {
+    const unit = diffDays === 1 ? units.day.singular : units.day.plural;
+    return `${diffDays} ${unit} ago`;
+  }
+  
+  // Weeks ago (up to 4 weeks / 1 month)
+  if (diffWeeks < 4) {
+    const unit = diffWeeks === 1 ? units.week.singular : units.week.plural;
+    return `${diffWeeks} ${unit} ago`;
+  }
+  
+  // Months ago (up to 12 months / 1 year)
+  if (diffMonths < 12) {
+    const unit = diffMonths === 1 ? units.month.singular : units.month.plural;
+    return `${diffMonths} ${unit} ago`;
+  }
+  
+  // Years ago
+  const unit = diffYears === 1 ? units.year.singular : units.year.plural;
+  return `${diffYears} ${unit} ago`;
+}

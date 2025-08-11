@@ -1,8 +1,8 @@
 # VSplitter [#vsplitter]
 
-This component is inherited from [Splitter](components/Splitter)
+This component is inherited from [Splitter](/components/Splitter)
 
-See also: [HSplitter](components/HSplitter)
+See also: [HSplitter](/components/HSplitter)
 
 `VSplitter` is a specialized, shorthand version for the regular `Splitter` component with a vertical orientation.
 

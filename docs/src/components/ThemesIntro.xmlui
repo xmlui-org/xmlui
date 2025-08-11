@@ -1,23 +1,27 @@
 <Component name="ThemesIntro">
-    <DocumentPage hideToc="true">
-        <H1>
-            Themes
-        </H1>
-        <Markdown>
-            <![CDATA[
-We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). We are using a custom theme called `earthtone`. Use the dropdown to switch to the default theme. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
-]]>
-        </Markdown>
-        <HStack>
-            <Select id="pickTheme" width="30%" initialValue="default" onDidChange="{ (newTheme) => setTheme(newTheme) }">
-                <Option value="earthtone" label="earthtone"/>
-                <Option value="default" label="xmlui"/>
-            </Select>
-            <ToneChangerButton/>
-        </HStack>
-        <Markdown>
-            <![CDATA[
-You've now switched the settings for [thousands of theme variables](/xmlui-theme). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
+  <DocumentPageNoTOC>
+    <Markdown>
+      <![CDATA[
+# Themes
+
+We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). You can use the dropdown to switch from the default theme (`xmlui`) to one called `earthtone`. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
+      ]]>
+    </Markdown>
+    <HStack verticalAlignment="center">
+      <Select
+        id="pickTheme"
+        width="30%"
+        initialValue="docs-theme"
+        onDidChange="{ (newTheme) => setTheme(newTheme) }"
+      >
+        <Option value="earthtone" label="earthtone"/>
+        <Option value="docs-theme" label="xmlui"/>
+      </Select>
+      <ToneSwitch/>
+    </HStack>
+    <Markdown>
+      <![CDATA[
+You've now switched the settings for [thousands of theme variables](/styles-and-themes/theme-variable-defaults). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
 
 ```text
 color-primary
@@ -34,13 +38,12 @@ When it renders a button, XMLUI works up the chain from the most specific settin
 - **Primary** draws attention to important elements and actions
 - **Secondary** provides visual support without competing with primary elements
 ]]>
-        </Markdown>
-        <Markdown>
-            <![CDATA[
-
+    </Markdown>
+    <Markdown>
+      <![CDATA[
 Here's a simple example to show how the cascade of specificity works. If we override `textColor-primary` it applies to both `Text` and `Markdown`.
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <Theme textColor-primary="red">
   <Text>This is Text</Text>
   <Markdown>This is Markdown</Markdown>
@@ -49,7 +52,7 @@ Here's a simple example to show how the cascade of specificity works. If we over
 
 But we can target `Markdown` for different treatment with a more specific theme variable.
 
-```xmlui-pg display
+```xmlui-pg display noHeader
 <Theme
   textColor-primary="red"
   textColor-Text-markdown="blue"
@@ -75,38 +78,34 @@ On [this page](/palettes) you can see the complete set of roles and explore how 
 ```
 
 To see how our `TubeStops` component looks with `earthtone` vs the default, we can wrap two instances of it using the [Theme](/components/Theme) component. Here we use only the default settings for both themes.
-]]>
-        </Markdown>
-        <HStack>
-            <Stack width="*">
-                <Theme themeId="earthtone">
-                    <Card>
-                        <Badge variant="pill">
-                            earthtone
-                        </Badge>
-                        <TubeStops line="waterloo-city"/>
-                    </Card>
-                </Theme>
-            </Stack>
-            <Stack width="*">
-                <Theme themeId="default">
-                    <Card>
-                        <Badge variant="pill">
-                            xmlui
-                        </Badge>
-                        <TubeStops line="waterloo-city"/>
-                    </Card>
-                </Theme>
-            </Stack>
-        </HStack>
+      ]]>
+    </Markdown>
+    <HStack>
+      <Stack width="*">
+        <Theme themeId="earthtone">
+          <Card>
+            <Badge variant="pill">earthtone</Badge>
+            <TubeStops line="waterloo-city"/>
+          </Card>
+        </Theme>
+      </Stack>
+      <Stack width="*">
+        <Theme themeId="xmlui">
+          <Card>
+            <Badge variant="pill">xmlui</Badge>
+            <TubeStops line="waterloo-city"/>
+          </Card>
+        </Theme>
+      </Stack>
+    </HStack>
 
-        Here we vary the settings as shown.
+    Here we vary the settings as shown.
 
-        <HStack>
-            <Theme fontSize-Text="smaller">
-                <Stack width="*" height="100%">
-                    <Markdown>
-                        <![CDATA[
+    <HStack>
+      <Theme fontSize-Text="smaller">
+        <Stack width="*" height="100%">
+          <Markdown>
+            <![CDATA[
 ```xmlui
 <Theme
   themeId="earthtone"
@@ -120,11 +119,11 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
 >
 ```
             ]]>
-                    </Markdown>
-                </Stack>
-                <Stack width="*" height="100%">
-                    <Markdown>
-                        <![CDATA[
+          </Markdown>
+        </Stack>
+        <Stack width="*" height="100%">
+          <Markdown>
+            <![CDATA[
 ```xmlui
 <Theme
   themeId="xmlui"
@@ -138,52 +137,48 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
 >
 ```
             ]]>
-                    </Markdown>
-                </Stack>
-                </Theme>
-            </HStack>
+          </Markdown>
+        </Stack>
+      </Theme>
+    </HStack>
 
-            <HStack>
-             <Stack width="*" height="100%">
-                <Theme
-                    themeId="earthtone"
-                    backgroundColor-Card="$color-secondary-100"
-                    fontFamily="serif"
-                    border-Badge="2px solid black"
-                    textColor-Badge="black"
-                    backgroundColor-Badge="yellow"
-                    fontWeight-Badge="normal"
-                    fontSize-Badge="larger">
-                    <Card>
-                        <Badge variant="pill">
-                            earthtone
-                        </Badge>
-                        <TubeStops line="waterloo-city"/>
-                    </Card>
-                </Theme>
-            </Stack>
-            <Stack width="*" height="100%">
-                <Theme
-                    themeId="xmlui"
-                    backgroundColor-Card="$color-danger-200"
-                    fontFamily="monaco"
-                    border-Badge="none"
-                    textColor-Badge="$color-warning-900"
-                    backgroundColor-Badge="$color-secondary-300"
-                    fontWeight-Badge="bold"
-                    fontSize-Badge="18pt">
-                    <Card>
-                        <Badge variant="pill">
-                            xmlui
-                        </Badge>
-                        <TubeStops line="waterloo-city"/>
-                    </Card>
-                </Theme>
-            </Stack>
-        </HStack>
+    <HStack>
+      <Stack width="*" height="100%">
+        <Theme
+          themeId="earthtone"
+          backgroundColor-Card="$color-secondary-100"
+          fontFamily="serif"
+          border-Badge="2px solid black"
+          textColor-Badge="black"
+          backgroundColor-Badge="yellow"
+          fontWeight-Badge="normal"
+          fontSize-Badge="larger">
+          <Card>
+            <Badge variant="pill">earthtone</Badge>
+            <TubeStops line="waterloo-city"/>
+          </Card>
+        </Theme>
+      </Stack>
+      <Stack width="*" height="100%">
+        <Theme
+          themeId="xmlui"
+          backgroundColor-Card="$color-danger-200"
+          fontFamily="monaco"
+          border-Badge="none"
+          textColor-Badge="$color-warning-900"
+          backgroundColor-Badge="$color-secondary-300"
+          fontWeight-Badge="bold"
+          fontSize-Badge="18pt">
+          <Card>
+            <Badge variant="pill">xmlui</Badge>
+            <TubeStops line="waterloo-city"/>
+          </Card>
+        </Theme>
+      </Stack>
+    </HStack>
 
     <Text>
        It's easy to make a mess by varying these settings but you will rarely need to touch them. A designer of a custom theme might want to, but even then the defaults will handle almost every situation. And remember: you can create an entire new theme from just a handful of reference colors.
     </Text>
-    </DocumentPage>
+  </DocumentPageNoTOC>
 </Component>

@@ -1,7 +1,7 @@
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { ColorPicker, defaultProps } from "./ColorPickerNative";
 import {
+  createMetadata,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -25,8 +25,9 @@ import styles from "./ColorPicker.module.scss";
 const COMP = "ColorPicker";
 
 export const ColorPickerMd = createMetadata({
+  status: "stable",
   description:
-    "This component allows the user to select a color with the browser's default color picker control.",
+    "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),
@@ -45,9 +46,21 @@ export const ColorPickerMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: dValue(),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `Focus the ${COMP} component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `This method returns the current value of the ${COMP}.`,
+      signature: "get value(): string",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: string): void",
+      parameters: {
+        value: "The new value to set for the color picker.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

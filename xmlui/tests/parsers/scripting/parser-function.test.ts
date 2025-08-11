@@ -11,7 +11,7 @@ import {
   T_FUNCTION_DECLARATION,
   T_IDENTIFIER,
   T_SPREAD_EXPRESSION,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - function declarations", () => {
   it("No param", () => {

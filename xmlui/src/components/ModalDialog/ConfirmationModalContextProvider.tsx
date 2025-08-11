@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-import { ButtonVariant, ButtonThemeColor } from "../abstractions";
+import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
@@ -83,12 +83,16 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
   );
 
   const handleOk = useCallback((value: any) => {
-    resolver.current && resolver.current(value);
+    if (resolver.current) {
+      resolver.current(value);
+    }
     setShowConfirmationModal(false);
   }, []);
 
   const handleCancel = useCallback(() => {
-    resolver.current && resolver.current(false);
+    if (resolver.current) {
+      resolver.current(false);
+    }
     setShowConfirmationModal(false);
   }, []);
 

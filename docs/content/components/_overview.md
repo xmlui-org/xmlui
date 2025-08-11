@@ -1,96 +1,99 @@
 # Components Overview [#components-overview]
 
-| Num | Component | Description |
-| :---: | :---: | --- |
-| 1 | [APICall](./components/APICall) | `APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend. |
-| 2 | [App](./components/App) | The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout. |
-| 3 | [AppHeader](./components/AppHeader) | `AppHeader` is a placeholder within `App` to define a custom application header. |
-| 4 | [AppState](./components/AppState) | AppState is a functional component (without a visible user interface) that helps store and manage the app's state. |
-| 5 | [AutoComplete](./components/AutoComplete) | This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items. |
-| 6 | [Avatar](./components/Avatar) | The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials. |
-| 7 | [Backdrop](./components/Backdrop) | The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it. |
-| 8 | [Badge](./components/Badge) | The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color. |
-| 9 | [BarChart](./components/BarChart) | The `BarChart` component represents a bar chart.Accepts a `LabelLst` component as a child to parametrize display labels. |
-| 10 | [Bookmark](./components/Bookmark) | As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location. |
-| 11 | [Breakout](./components/Breakout) | The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width. |
-| 12 | [Button](./components/Button) | Button is an interactive element that triggers an action when clicked. |
-| 13 | [Card](./components/Card) | The `Card` component is a container for cohesive elements, often rendered visually as a card. |
-| 14 | [ChangeListener](./components/ChangeListener) | `ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes. |
-| 15 | [Checkbox](./components/Checkbox) | The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it. |
-| 16 | [CHStack](./components/CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
-| 17 | [ColorPicker](./components/ColorPicker) | This component allows the user to select a color with the browser's default color picker control. |
-| 18 | [Column](./components/Column) | The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings. |
-| 19 | [ContentSeparator](./components/ContentSeparator) | A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization. |
-| 20 | [CVStack](./components/CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
-| 21 | [DataSource](./components/DataSource) | The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component. |
-| 22 | [DatePicker](./components/DatePicker) | A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display. |
-| 23 | [DonutChart](./components/DonutChart) | Represents a derivative of the pie chart that is a donut chart. |
-| 24 | [DropdownMenu](./components/DropdownMenu) | This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items. |
-| 25 | [EmojiSelector](./components/EmojiSelector) | The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication. |
-| 26 | [FileInput](./components/FileInput) | The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise). |
-| 27 | [FileUploadDropZone](./components/FileUploadDropZone) | The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI. |
-| 28 | [FlowLayout](./components/FlowLayout) | This layout component is used to position content in rows with an auto wrapping feature: if the length of the items exceed the available space the layout will wrap into a new line. |
-| 29 | [Footer](./components/Footer) | The `Footer` is a component that acts as a placeholder within `App`. |
-| 30 | [Form](./components/Form) | A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing. |
-| 31 | [FormItem](./components/FormItem) | A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data. |
-| 32 | [FormSection](./components/FormSection) | The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component. |
-| 33 | [Fragment](./components/Fragment) | The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed. |
-| 34 | [H1](./components/H1) | Represents a heading level 1 text |
-| 35 | [H2](./components/H2) | Represents a heading level 2 text |
-| 36 | [H3](./components/H3) | Represents a heading level 3 text |
-| 37 | [H4](./components/H4) | Represents a heading level 4 text |
-| 38 | [H5](./components/H5) | Represents a heading level 5 text |
-| 39 | [H6](./components/H6) | Represents a heading level 6 text |
-| 40 | [Heading](./components/Heading) | Represents a heading text |
-| 41 | [HSplitter](./components/HSplitter) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. |
-| 42 | [HStack](./components/HStack) | This component represents a stack rendering its contents horizontally. |
-| 43 | [Icon](./components/Icon) | This component is the representation of an icon. |
-| 44 | [Image](./components/Image) | The `Image` component represents or depicts an object, scene, idea, or other concept with a picture. |
-| 45 | [Items](./components/Items) | The `Items` component maps sequential data items into component instances, representing each data item as a particular component. |
-| 46 | [LabelList](./components/LabelList) | Label list component for a chart component. |
-| 47 | [Legend](./components/Legend) | Legend component to be displayed in a chart component. |
-| 48 | [LineChart](./components/LineChart) | Represents a line chart component. |
-| 49 | [Link](./components/Link) | A `Link` component represents a navigation target within the app or a reference to an external web URL. |
-| 50 | [List](./components/List) | The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport. |
-| 51 | [Logo](./components/Logo) | The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate). |
-| 52 | [Markdown](./components/Markdown) | `Markdown` displays plain text styled using markdown syntax. |
-| 53 | [MenuItem](./components/MenuItem) | This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. |
-| 54 | [MenuSeparator](./components/MenuSeparator) | This component displays a separator line between menu items. |
-| 55 | [ModalDialog](./components/ModalDialog) | The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action. |
-| 56 | [NavGroup](./components/NavGroup) | The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI. |
-| 57 | [NavLink](./components/NavLink) | The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link). |
-| 58 | [NavPanel](./components/NavPanel) | `NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure. |
-| 59 | [NoResult](./components/NoResult) | `NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items. |
-| 60 | [NumberBox](./components/NumberBox) | A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`. |
-| 61 | [Option](./components/Option) | `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select. |
-| 62 | [Page](./components/Page) | The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page. |
-| 63 | [PageMetaTitle](./components/PageMetaTitle) | A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab. |
-| 64 | [Pages](./components/Pages) | The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App). |
-| 65 | [PasswordInput](./components/PasswordInput) | The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords. |
-| 66 | [PieChart](./components/PieChart) | Represents a pie chart component. |
-| 67 | [ProgressBar](./components/ProgressBar) | A `ProgressBar` component visually represents the progress of a task or process. |
-| 68 | [Queue](./components/Queue) | The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order. |
-| 69 | [RadioGroup](./components/RadioGroup) | The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time. |
-| 70 | [RealTimeAdapter](./components/RealTimeAdapter) | `RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling. |
-| 71 | [Redirect](./components/Redirect) | `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app. |
-| 72 | [Select](./components/Select) | Provides a dropdown with a list of options to choose from. |
-| 73 | [Slider](./components/Slider) | The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values. |
-| 74 | [SpaceFiller](./components/SpaceFiller) | The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. |
-| 75 | [Spinner](./components/Spinner) | The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value. |
-| 76 | [Splitter](./components/Splitter) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. |
-| 77 | [Stack](./components/Stack) | `Stack` is a layout container displaying children in a horizontal or vertical stack. |
-| 78 | [StickyBox](./components/StickyBox) | The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls. |
-| 79 | [SubMenuItem](./components/SubMenuItem) | This component represents a nested menu item within another menu or menu item. |
-| 80 | [Switch](./components/Switch) | The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state. |
-| 81 | [TabItem](./components/TabItem) | `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select. |
-| 82 | [Table](./components/Table) | `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells. |
-| 83 | [TableOfContents](./components/TableOfContents) | The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position. |
-| 84 | [Tabs](./components/Tabs) | The `Tabs` component provides a tabbed layout where each tab has a clickable label and content. |
-| 85 | [Text](./components/Text) | The `Text` component displays textual information in a number of optional styles and variants. |
-| 86 | [TextArea](./components/TextArea) | `TextArea` is a component that provides a multiline text input area. |
-| 87 | [TextBox](./components/TextBox) | The `TextBox` is an input component that allows users to input and edit textual data. |
-| 88 | [Theme](./components/Theme) | The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context. |
-| 89 | [ToneChangerButton](./components/ToneChangerButton) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. |
-| 90 | [VSplitter](./components/VSplitter) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. |
-| 91 | [VStack](./components/VStack) | This component represents a stack rendering its contents vertically. |
-
+| Component | Description |
+| :---: | --- |
+| [APICall](./APICall) | `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks. |
+| [App](./App) | The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly. |
+| [AppHeader](./AppHeader) | `AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior. |
+| [AppState](./AppState) | `AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling. |
+| [AutoComplete](./AutoComplete) | `AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options. |
+| [Avatar](./Avatar) | `Avatar` displays a user or entity's profile picture as a circular image, with automatic fallback to initials when no image is provided. It's commonly used in headers, user lists, comments, and anywhere you need to represent a person or organization. |
+| [Backdrop](./Backdrop) | The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it. |
+| [Badge](./Badge) | `Badge` displays small text labels with colored backgrounds, commonly used for status indicators, categories, tags, and counts. It supports dynamic color mapping based on content values, useful for status systems and data categorization. |
+| [BarChart](./BarChart) | `BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories. |
+| [Bookmark](./Bookmark) | As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location. |
+| [Breakout](./Breakout) | The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width. |
+| [Button](./Button) | `Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels. |
+| [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
+| [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
+| [Card](./Card) | `Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface. |
+| [ChangeListener](./ChangeListener) | `ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers. |
+| [Checkbox](./Checkbox) | `Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions. |
+| [ColorPicker](./ColorPicker) | `ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values. |
+| [Column](./Column) | `Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content. |
+| [ContentSeparator](./ContentSeparator) | `ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections. |
+| [DataSource](./DataSource) | `DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data. |
+| [DatePicker](./DatePicker) | `DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction. |
+| [DonutChart](./DonutChart) | A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly. |
+| [DropdownMenu](./DropdownMenu) | `DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space. |
+| [EmojiSelector](./EmojiSelector) | `EmojiSelector` enables users to browse, search and select emojis from their system's native emoji set. |
+| [ExpandableItem](./ExpandableItem) | `ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses. |
+| [FileInput](./FileInput) | `FileInput` enables users to select files from their device's file system for upload or processing. It combines a text field displaying selected files with a customizable button that opens the system file browser. Use it for forms, media uploads, and document processing workflows. |
+| [FileUploadDropZone](./FileUploadDropZone) | `FileUploadDropZone` enables users to upload files by dragging and dropping files from their local file system onto a designated area within the UI. |
+| [FlowLayout](./FlowLayout) | `FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line. |
+| [Footer](./Footer) | `Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles. |
+| [Form](./Form) | `Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together. |
+| [FormItem](./FormItem) | `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. |
+| [FormSection](./FormSection) | `FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout). |
+| [Fragment](./Fragment) | `Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components. |
+| [H1](./H1) | Represents a heading level 1 text |
+| [H2](./H2) | Represents a heading level 2 text |
+| [H3](./H3) | Represents a heading level 3 text |
+| [H4](./H4) | Represents a heading level 4 text |
+| [H5](./H5) | Represents a heading level 5 text |
+| [H6](./H6) | Represents a heading level 6 text |
+| [HSplitter](./HSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
+| [HStack](./HStack) | This component represents a stack rendering its contents horizontally. |
+| [Heading](./Heading) | `Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents). |
+| [IFrame](./IFrame) | `IFrame` embeds external content from another HTML document into the current page. It provides security controls through sandbox and allow attributes, and supports features like fullscreen display and referrer policy configuration. |
+| [Icon](./Icon) | `Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references. Icons are commonly used in buttons, navigation elements, and status indicators. |
+| [Image](./Image) | `Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions. |
+| [Items](./Items) | `Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration. |
+| [LabelList](./LabelList) | `LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance. |
+| [Legend](./Legend) | `Legend` provides a standalone legend for chart components when you need custom positioning or styling beyond the chart's built-in `showLegend` property. Most charts can display legends automatically, but this component offers precise control over legend placement and alignment. |
+| [LineChart](./LineChart) | `LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale. |
+| [Link](./Link) | `Link` creates clickable navigation elements for internal app routes or external URLs. You can use the `label` and `icon` properties for simple text links, or embed custom components like buttons, cards, or complex layouts for rich interactive link presentations. |
+| [List](./List) | `List` is a high-performance, virtualized container for rendering large datasets with built-in grouping, sorting, and visual formatting. It only renders visible items in the viewport, making it ideal for displaying thousands of records while maintaining smooth scrolling performance. |
+| [Logo](./Logo) | `Logo` displays your application's brand symbol by automatically loading logo images defined in the app manifest. While logos are typically configured using App-level properties (`logo`, `logo-dark`), this component provides direct control when you need custom logo placement or templating. |
+| [Markdown](./Markdown) | `Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown). |
+| [MenuItem](./MenuItem) | `MenuItem` represents individual clickable items within dropdown menus and other menu components. Each menu item can display text, icons, and respond to clicks with either navigation or custom actions, making it the building block for interactive menu systems. |
+| [MenuSeparator](./MenuSeparator) | `MenuSeparator` displays a separator line between menu items to group related menu options within `DropdownMenu`. |
+| [ModalDialog](./ModalDialog) | `ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content. |
+| [NavGroup](./NavGroup) | `NavGroup` creates collapsible containers for organizing related navigation items into hierarchical menu structures. It groups `NavLink` components and other `NavGroup` components, providing expandable submenus with customizable icons and states. |
+| [NavLink](./NavLink) | `NavLink` creates interactive navigation items that connect users to different destinations within an app or external URLs. It automatically indicates active states, supports custom icons and labels, and can execute custom actions instead of navigation when needed. |
+| [NavPanel](./NavPanel) | `NavPanel` defines the navigation structure within an App, serving as a container for NavLink and NavGroup components that create your application's primary navigation menu. Its appearance and behavior automatically adapt based on the App's layout configuration. |
+| [NoResult](./NoResult) | `NoResult` displays a visual indication that a query or search returned nothing. |
+| [NumberBox](./NumberBox) | `NumberBox` provides a specialized input field for numeric values with built-in validation, spinner buttons, and flexible formatting options. It supports both integer and floating-point numbers, handles empty states as null values, and integrates seamlessly with form validation. |
+| [Option](./Option) | `Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components. |
+| [Page](./Page) | `Page` defines route endpoints within an application, mapping specific URL patterns to content that displays when users navigate to those routes. Each Page represents a distinct view or screen in your single-page application's routing system. |
+| [PageMetaTitle](./PageMetaTitle) | `PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles. |
+| [Pages](./Pages) | `Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL. |
+| [PasswordInput](./PasswordInput) | `Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords. |
+| [PieChart](./PieChart) | `PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly. |
+| [ProgressBar](./ProgressBar) | `ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete). |
+| [Queue](./Queue) | `Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display. |
+| [RadioGroup](./RadioGroup) | `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group. |
+| [RealTimeAdapter](./RealTimeAdapter) | `RealTimeAdapter` is a non-visual component that listens to real-time events. |
+| [Redirect](./Redirect) | `Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally. |
+| [Select](./Select) | `Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration. |
+| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display. |
+| [Slot](./Slot) | Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered. |
+| [SpaceFiller](./SpaceFiller) | `SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used. |
+| [Spinner](./Spinner) | `Spinner` is an animated indicator that represents an action in progress with no deterministic progress value. |
+| [Splitter](./Splitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
+| [Stack](./Stack) | `Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants. |
+| [StickyBox](./StickyBox) | `StickyBox` remains fixed at the top or bottom of the screen as the user scrolls. |
+| [SubMenuItem](./SubMenuItem) | `SubMenuItem` creates hierarchical menu structures by acting as both a menu item and a container for nested menu items. When clicked or hovered, it reveals a submenu containing additional [MenuItem](/components/MenuItem), [MenuSeparator](/components/MenuSeparator), or other [SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level navigation and action organization. |
+| [Switch](./Switch) | `Switch` enables users to toggle between two states: on and off. |
+| [TabItem](./TabItem) | `TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, providing both the tab header label and the content that displays when the tab is selected. As a non-visual structural component, it serves as a container that organizes content into distinct, switchable sections. |
+| [Table](./Table) | `Table` presents structured data for viewing, sorting, selection, and interaction. |
+| [TableOfContents](./TableOfContents) | `TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. |
+| [Tabs](./Tabs) | `Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components. |
+| [Text](./Text) | The `Text` component displays textual information in a number of optional styles and variants. |
+| [TextArea](./TextArea) | `TextArea` provides a multiline text input area. |
+| [TextBox](./TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
+| [Theme](./Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
+| [ToneChangerButton](./ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
+| [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
+| [VSplitter](./VSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
+| [VStack](./VStack) | This component represents a stack rendering its contents vertically. |

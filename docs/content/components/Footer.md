@@ -1,9 +1,6 @@
 # Footer [#footer]
 
-The `Footer` is a component that acts as a placeholder within `App`.
-
->[!INFO]
-> Learn more about using this component [here](../learning/app-component).
+`Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles.
 
 ## Properties [#properties]
 
@@ -30,8 +27,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Footer | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Footer | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
@@ -44,8 +41,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Footer | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Footer | 1px solid $borderColor | 1px solid $borderColor |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
@@ -59,6 +56,7 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Footer | $fontSize-small | $fontSize-small |
 | [gap](../styles-and-themes/common-units/#size)-Footer | $space-normal | $space-normal |
 | [height](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
+| [margin](../styles-and-themes/common-units/#size)-Footer | 0 auto | 0 auto |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-Footer | $maxWidth-content | $maxWidth-content |
 | [padding](../styles-and-themes/common-units/#size)-Footer | $space-2 $space-4 | $space-2 $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
@@ -68,4 +66,4 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Footer | $textColor-secondary | $textColor-secondary |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Footer | center | center |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Footer | center | center |

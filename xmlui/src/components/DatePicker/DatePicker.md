@@ -1,3 +1,13 @@
+%-DESC-START
+
+**Key features:**
+- **Flexible modes**: Single date selection (default) or date range selection
+- **Format customization**: Support for various date formats (MM/dd/yyyy, yyyy-MM-dd, etc.)
+- **Date restrictions**: Set minimum/maximum dates and disable specific dates
+- **Localization options**: Configure first day of week and show week numbers
+
+%-DESC-END
+
 %-API-START setValue
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
@@ -6,7 +16,7 @@
     id="picker"
     readOnly="true"
   />
-  <HStack">
+  <HStack>
     <Button
       label="Add Text"
       onClick="picker.setValue('05/25/2024')" />

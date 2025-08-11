@@ -1,10 +1,15 @@
 # ContentSeparator [#contentseparator]
 
-A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization.
+`ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections.
+
+**Key features:**
+- **Flexible orientation**: Create horizontal dividers (default) or vertical dividers between content
+- **Customizable sizing**: Control thickness with the `size` property
+- **Automatic spacing**: Takes full width/height of container unless size is specified
 
 ## Properties [#properties]
 
-### `orientation (default: "horizontal")` [#orientation-default-horizontal]
+### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
 Sets the main axis of the component
 

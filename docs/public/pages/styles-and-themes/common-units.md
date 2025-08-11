@@ -37,10 +37,10 @@ When you specify multiple radii, the first value determines the horizontal round
 ```xmlui-pg name="Border rounding"
 <App>
 <FlowLayout gap="8" padding="8">
-  <CVStack width="25%" height="64px" border="solid 4px #202020" borderRadius="20px"><Text value="20px" /></CVStack>
-  <CVStack width="25%" height="64px" border="solid 4px #202020" borderRadius="20px 40px"><Text value="20px 40px" /></CVStack>
-  <CVStack width="25%" height="64px" border="solid 4px #202020" borderRadius="25% 20px"><Text value="25% 20px" /></CVStack>
-  <CVStack width="25%" height="64px" border="solid 4px #202020" borderRadius="50%"><Text value="50%" /></CVStack>
+  <CVStack width="25%" height="64px" border="solid 4px $color-surface-800" borderRadius="20px"><Text value="20px" /></CVStack>
+  <CVStack width="25%" height="64px" border="solid 4px $color-surface-800" borderRadius="20px 40px"><Text value="20px 40px" /></CVStack>
+  <CVStack width="25%" height="64px" border="solid 4px $color-surface-800" borderRadius="25% 20px"><Text value="25% 20px" /></CVStack>
+  <CVStack width="25%" height="64px" border="solid 4px $color-surface-800" borderRadius="50%"><Text value="50%" /></CVStack>
 </FlowLayout>
 </App>
 ```
@@ -63,14 +63,14 @@ The engine supports these border style values:
 ```xmlui-pg name="Border styles"
 <App>
   <FlowLayout>
-    <CVStack width="25%" height="64px" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
-    <CVStack width="25%" height="64px" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
-    <CVStack width="25%" height="64px" border="double 8px #202020"><Text value="double" /></CVStack>
-    <CVStack width="25%" height="64px" border="groove 8px #202020"><Text value="groove" /></CVStack>
-    <CVStack width="25%" height="64px" border="inset 8px #202020"><Text value="inset" /></CVStack>
-    <CVStack width="25%" height="64px" border="outset 8px #202020"><Text value="outset" /></CVStack>
-    <CVStack width="25%" height="64px" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
-    <CVStack width="25%" height="64px" border="solid 8px #202020"><Text value="solid" /></CVStack>
+    <CVStack width="25%" height="64px" border="dashed 8px $color-surface-800"><Text value="dashed" /></CVStack>
+    <CVStack width="25%" height="64px" border="dotted 8px $color-surface-800"><Text value="dotted" /></CVStack>
+    <CVStack width="25%" height="64px" border="double 8px $color-surface-800"><Text value="double" /></CVStack>
+    <CVStack width="25%" height="64px" border="groove 8px $color-surface-800"><Text value="groove" /></CVStack>
+    <CVStack width="25%" height="64px" border="inset 8px $color-surface-800"><Text value="inset" /></CVStack>
+    <CVStack width="25%" height="64px" border="outset 8px $color-surface-800"><Text value="outset" /></CVStack>
+    <CVStack width="25%" height="64px" border="ridge 8px $color-surface-800"><Text value="ridge" /></CVStack>
+    <CVStack width="25%" height="64px" border="solid 8px $color-surface-800"><Text value="solid" /></CVStack>
   </FlowLayout>
 </App>
 ```
@@ -108,8 +108,8 @@ The engine accepts several color value types:
     </HStack>
     <H3>"'rgba' function"</H3>
     <HStack>
-      <CVStack width="32%" height="36px" backgroundColor="rgba(106, 90, 205, .5)"><Text value="rgb(106, 90, 205, .5)" /></CVStack>
-      <CVStack width="32%" height="36px" backgroundColor="rgba(80%, 40%, 20%, 80%)"><Text value="rgb(80%, 40%, 20%, 80%)" /></CVStack>
+      <CVStack width="32%" height="36px" backgroundColor="rgba(106, 90, 205, .5)"><Text value="rgba(106, 90, 205, .5)" /></CVStack>
+      <CVStack width="32%" height="36px" backgroundColor="rgba(80%, 40%, 20%, 80%)"><Text value="rgba(80%, 40%, 20%, 80%)" /></CVStack>
       <CVStack width="32%" height="36px" backgroundColor="rgba(70, 130, 180, 1)"><Text value="rgba(70, 130, 180, 1)" /></CVStack>
     </HStack>
     <H3>"'hsl' function"</H3>
@@ -167,15 +167,15 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 
 ### Drag and Drop
 
-| Value         | Description                                                                                                                                                                              |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `alias`       | An alias or shortcut is to be created.                                                                                                                                                   |
-| `copy`        | Something is to be copied.                                                                                                                                                               |
-| `move`        | Something is to be moved.                                                                                                                                                                |
+| Value         | Description                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| `alias`       | An alias or shortcut is to be created.                                                                        |
+| `copy`        | Something is to be copied.                                                                                    |
+| `move`        | Something is to be moved.                                                                                     |
 | `no‑drop`     | An item may not be dropped at the current location. On Windows and macOS, no-drop is the same as not-allowed. |
-| `not‑allowed` | The requested action will not be carried out.                                                                                                                                            |
-| `grab`        | Something can be grabbed (dragged to be moved).                                                                                                                                          |
-| `grabbing`    | Something is being grabbed (dragged to be moved).                                                                                                                                        |
+| `not‑allowed` | The requested action will not be carried out.                                                                 |
+| `grab`        | Something can be grabbed (dragged to be moved).                                                               |
+| `grabbing`    | Something is being grabbed (dragged to be moved).                                                             |
 
 ### Resizing and Scrolling
 
@@ -199,52 +199,52 @@ Move the mouse over the rectangles in the following example to check what the cu
 ```xmlui-pg name="Cursor values"
 <App>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="auto" border="solid 1px #202020">auto</CVStack>
-    <CVStack width="20%" height="36px" cursor="default" border="solid 1px  #202020">default</CVStack>
-    <CVStack width="20%" height="36px" cursor="none" border="solid 1px  #202020">none</CVStack>
+    <CVStack width="20%" height="36px" cursor="auto" border="solid 1px $color-surface-800">auto</CVStack>
+    <CVStack width="20%" height="36px" cursor="default" border="solid 1px  $color-surface-800">default</CVStack>
+    <CVStack width="20%" height="36px" cursor="none" border="solid 1px  $color-surface-800">none</CVStack>
   </FlowLayout>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="context-menu" border="solid 1px #202020">context-menu</CVStack>
-    <CVStack width="20%" height="36px" cursor="help" border="solid 1px #202020">help</CVStack>
-    <CVStack width="20%" height="36px" cursor="pointer" border="solid 1px #202020">pointer</CVStack>
-    <CVStack width="20%" height="36px" cursor="progress" border="solid 1px #202020">progress</CVStack>
-    <CVStack width="20%" height="36px" cursor="wait" border="solid 1px #202020">wait</CVStack>
+    <CVStack width="20%" height="36px" cursor="context-menu" border="solid 1px $color-surface-800">context-menu</CVStack>
+    <CVStack width="20%" height="36px" cursor="help" border="solid 1px $color-surface-800">help</CVStack>
+    <CVStack width="20%" height="36px" cursor="pointer" border="solid 1px $color-surface-800">pointer</CVStack>
+    <CVStack width="20%" height="36px" cursor="progress" border="solid 1px $color-surface-800">progress</CVStack>
+    <CVStack width="20%" height="36px" cursor="wait" border="solid 1px $color-surface-800">wait</CVStack>
   </FlowLayout>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="cell" border="solid 1px #202020">cell</CVStack>
-    <CVStack width="20%" height="36px" cursor="crosshair" border="solid 1px #202020">crosshair</CVStack>
-    <CVStack width="20%" height="36px" cursor="text" border="solid 1px #202020">text</CVStack>
-    <CVStack width="20%" height="36px" cursor="vertical-text" border="solid 1px #202020">vertical-text</CVStack>
+    <CVStack width="20%" height="36px" cursor="cell" border="solid 1px $color-surface-800">cell</CVStack>
+    <CVStack width="20%" height="36px" cursor="crosshair" border="solid 1px $color-surface-800">crosshair</CVStack>
+    <CVStack width="20%" height="36px" cursor="text" border="solid 1px $color-surface-800">text</CVStack>
+    <CVStack width="20%" height="36px" cursor="vertical-text" border="solid 1px $color-surface-800">vertical-text</CVStack>
   </FlowLayout>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="alias" border="solid 1px #202020">alias</CVStack>
-    <CVStack width="20%" height="36px" cursor="copy" border="solid 1px #202020">copy</CVStack>
-    <CVStack width="20%" height="36px" cursor="move" border="solid 1px #202020">move</CVStack>
-    <CVStack width="20%" height="36px" cursor="no-drop" border="solid 1px #202020">no-drop</CVStack>
-    <CVStack width="20%" height="36px" cursor="not-allowed" border="solid 1px #202020">not-allowed</CVStack>
-    <CVStack width="20%" height="36px" cursor="grab" border="solid 1px #202020">grab</CVStack>
-    <CVStack width="20%" height="36px" cursor="grabbing" border="solid 1px #202020">grabbing</CVStack>
+    <CVStack width="20%" height="36px" cursor="alias" border="solid 1px $color-surface-800">alias</CVStack>
+    <CVStack width="20%" height="36px" cursor="copy" border="solid 1px $color-surface-800">copy</CVStack>
+    <CVStack width="20%" height="36px" cursor="move" border="solid 1px $color-surface-800">move</CVStack>
+    <CVStack width="20%" height="36px" cursor="no-drop" border="solid 1px $color-surface-800">no-drop</CVStack>
+    <CVStack width="20%" height="36px" cursor="not-allowed" border="solid 1px $color-surface-800">not-allowed</CVStack>
+    <CVStack width="20%" height="36px" cursor="grab" border="solid 1px $color-surface-800">grab</CVStack>
+    <CVStack width="20%" height="36px" cursor="grabbing" border="solid 1px $color-surface-800">grabbing</CVStack>
   </FlowLayout>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="alt-scroll" border="solid 1px #202020">all-scroll</CVStack>
-    <CVStack width="20%" height="36px" cursor="col-resize" border="solid 1px #202020">col-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="row-resize" border="solid 1px #202020">row-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="n-resize" border="solid 1px #202020">n-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="e-resize" border="solid 1px #202020">e-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="s-resize" border="solid 1px #202020">s-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="w-resize" border="solid 1px #202020">w-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="ne-resize" border="solid 1px #202020">ne-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="nw-resize" border="solid 1px #202020">nw-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="se-resize" border="solid 1px #202020">se-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="sw-resize" border="solid 1px #202020">sw-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="ew-resize" border="solid 1px #202020">ew-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="ns-resize" border="solid 1px #202020">ns-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="nesw-resize" border="solid 1px #202020">nesw-resize</CVStack>
-    <CVStack width="20%" height="36px" cursor="nwse-resize" border="solid 1px #202020">nwse-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="alt-scroll" border="solid 1px $color-surface-800">all-scroll</CVStack>
+    <CVStack width="20%" height="36px" cursor="col-resize" border="solid 1px $color-surface-800">col-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="row-resize" border="solid 1px $color-surface-800">row-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="n-resize" border="solid 1px $color-surface-800">n-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="e-resize" border="solid 1px $color-surface-800">e-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="s-resize" border="solid 1px $color-surface-800">s-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="w-resize" border="solid 1px $color-surface-800">w-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="ne-resize" border="solid 1px $color-surface-800">ne-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="nw-resize" border="solid 1px $color-surface-800">nw-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="se-resize" border="solid 1px $color-surface-800">se-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="sw-resize" border="solid 1px $color-surface-800">sw-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="ew-resize" border="solid 1px $color-surface-800">ew-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="ns-resize" border="solid 1px $color-surface-800">ns-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="nesw-resize" border="solid 1px $color-surface-800">nesw-resize</CVStack>
+    <CVStack width="20%" height="36px" cursor="nwse-resize" border="solid 1px $color-surface-800">nwse-resize</CVStack>
   </FlowLayout>
   <FlowLayout>
-    <CVStack width="20%" height="36px" cursor="zoom-in" border="solid 1px #202020">zoom-in</CVStack>
-    <CVStack width="20%" height="36px" cursor="zoom-out" border="solid 1px #202020">zoom-out</CVStack>
+    <CVStack width="20%" height="36px" cursor="zoom-in" border="solid 1px $color-surface-800">zoom-in</CVStack>
+    <CVStack width="20%" height="36px" cursor="zoom-out" border="solid 1px $color-surface-800">zoom-out</CVStack>
   </FlowLayout>
 </App>
 ```
@@ -369,35 +369,35 @@ When you prefix the shadow value with `inset`, it changes the shadow from an out
 
 ```xmlui-pg name="Shadow Values" height="360px"
 <FlowLayout gap="24">
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="12px 12px 5px orangered" >
     <Text>12px 12px 5px orangered</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="inset 12px 12px 5px #808080" >
     <Text>inset 12px 12px 5px orangered</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="16px 8px green" >
     <Text>16px 8px green</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="-8px -6px green" >
     <Text>"inset 12px 12px 5px orangered"</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="16px 8px 12px blue" >
     <Text>16px 8px 12px blue</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="16px 8px 8px 4px blue" >
     <Text>16px 8px 8px 4px blue</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="12px 12px 5px orangered, inset 8px 6px green" >
     <Text>12px 12px 5px orangered, inset 8px 6px green</Text>
   </Stack>
-  <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+  <Stack margin="16px" padding="16px" width="80%" border="2px solid $color-surface-800"
     boxShadow="8px 4px 2px blue, -8px -6px green" >
     <Text>12px 12px 5px blue, -8px -6px green</Text>
   </Stack>
@@ -438,6 +438,48 @@ UI Engine uses these units with the CSS semantics:
 | `%`    | The percentage value is relative to the parent container's viewport size offered for the particular child element.                                                                                  |
 | `*`    | Start sizing: The size weight used when calculating the dimension of the particular child element. The base of the calculation is the remaining space size in the parent's viewport.                |
 
+## Alignment Values [#alignment]
+
+Properties such as `verticalAlignment` and `horizontalAlignment` set the alignment of content in a layout component vertically or horizontally.
+
+| Value    | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `start`  | Horizontal: `left` if direction is left-to-right and `right` if direction is right-to-left. Vertical: at the `top`.    |
+| `end`    | Horizontal: `right` if direction is left-to-right and `left` if direction is right-to-left. Vertical: at the `bottom`. |
+| `center` | The contents are centered within the container.                                                                        |
+
+```xmlui-pg name="Horizontal Alignment Values"
+<VStack gap="8px" marginVertical="8px" paddingVertical="8px" width="600px" margin="auto">
+  <HStack horizontalAlignment="start" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </HStack>
+
+  <HStack horizontalAlignment="end" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </HStack>
+
+  <HStack horizontalAlignment="center" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </HStack>
+</VStack>
+```
+
+```xmlui-pg name="Vertical Alignment Values"
+<HStack gap="8px" marginVertical="8px" paddingHorizontal="30px" width="600px" height="120px" margin="auto">
+  <VStack verticalAlignment="start" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </VStack>
+
+  <VStack verticalAlignment="end" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </VStack>
+
+  <VStack verticalAlignment="center" backgroundColor="$color-surface-200">
+    <Stack backgroundColor="red" height="36px" width="36px" />
+  </VStack>
+</HStack>
+```
+
 ## Text Alignment Values [#text-align]
 
 This value sets the horizontal alignment of the inline-rendered content (e.g., text) inside its block-rendered parent.
@@ -451,13 +493,13 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
 | `center`  | The inline contents are centered within the line box.                                                                                                               |
 | `justify` | The inline contents are justified. Text should be spaced to line up its left and right edges to the left and right edges of the line box, except for the last line. |
 
-```xmlui-pg name="Text Alignment Values"
-  <VStack gap="8px" marginVertical="8px" paddingVertical="8px" width="600px" margin="auto" backgroundColor="#eee">
-    <Text textAlign="left">This is a long text with several words (left)</Text>
-    <Text textAlign="right">This is a long text with several words (right)</Text>
-    <Text textAlign="center">This is a long text with several words (center)</Text>
-    <Text textAlign="justify">This is a long, long,long, long, long, long, long, very long text with several words that do not fit into a single line (justify). Last line is not justified.</Text>
-  </VStack>
+```xmlui-pg name="Alignment Values"
+<VStack gap="8px" marginVertical="8px" paddingVertical="8px" width="600px" margin="auto">
+  <Text textAlign="left">This is a long text with several words (left)</Text>
+  <Text textAlign="right">This is a long text with several words (right)</Text>
+  <Text textAlign="center">This is a long text with several words (center)</Text>
+  <Text textAlign="justify">This is a long, long,long, long, long, long, long, very long text with several words that do not fit into a single line (justify). Last line is not justified.</Text>
+</VStack>
 ```
 
 ## Text Decoration Values [#text-decoration]
@@ -488,7 +530,7 @@ You can use these style values:
 | `dashed` | Draws a dashed line. |
 | `wavy`   | Draws a wavy line.   |
 
-```xmlui-pg name="Text Decoration Values" height="240px"
+```xmlui-pg name="Text Decoration Values" height="265px"
 <VStack margin="8px" gap="8px">
   <Text textDecoration="underline">underline</Text>
   <Text textDecoration="red wavy underline">red wavy underline</Text>
@@ -557,3 +599,212 @@ The value of the `zoom` property controls the magnification level of a component
   </HStack>
 </App>
 ```
+
+## Font Variant Values [#font-variant]
+
+This value controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as small caps), ligatures, and more.
+
+| Value        | Description                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `normal`     | Specifies a normal font face; none of the features below are activated.                               |
+| `small-caps` | Specifies a font that is specifically designed with capital letters at the size of lowercase letters. |
+
+```xmlui-pg name="Font variant values"
+<App>
+  <FlowLayout gap="16px">
+    <Text fontSize="18px" fontVariant="normal">This text uses normal font variant</Text>
+    <Text fontSize="18px" fontVariant="small-caps">This text uses small-caps font variant</Text>
+  </FlowLayout>
+</App>
+```
+
+## Line Break Values [#line-break]
+
+This value determines how line breaking works for languages that use a text wrapping system other than the standard space-based approach.
+
+| Value      | Description                                                                   |
+| ---------- | ----------------------------------------------------------------------------- |
+| `auto`     | Uses the default line break rule.                                             |
+| `loose`    | Relaxes the line-breaking rules, allowing more opportunities for a break.     |
+| `normal`   | Uses standard line break rules.                                               |
+| `strict`   | Tightens the line-breaking rules, reducing the number of break opportunities. |
+| `anywhere` | Allows a line break to be inserted between any character.                     |
+
+## Text Shadow Values [#text-shadow]
+
+This value adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
+
+A shadow is described by:
+
+- Horizontal offset (required)
+- Vertical offset (required)
+- Blur radius (optional)
+- Color (optional)
+
+```xmlui-pg name="Text shadow examples"
+<App>
+  <VStack gap="16px">
+    <Text fontSize="20px" textShadow="2px 2px">Simple shadow (black)</Text>
+    <Text fontSize="20px" textShadow="2px 2px 5px red">Shadow with blur</Text>
+    <Text fontSize="20px" textShadow="2px 2px blue, 4px 4px 10px red">Multiple shadows</Text>
+    <Text fontSize="20px" color="white" textShadow="1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue">Glow effect</Text>
+  </VStack>
+</App>
+```
+
+## Text Indent Values [#text-indent]
+
+This value specifies the amount of indentation (empty space) that should be left before the first line of the text content of a block element.
+
+```xmlui-pg name="Text indent examples"
+<App>
+  <VStack gap="16px" width="100%">
+    <Text textIndent="0px">This paragraph has <Text variant="strong">no text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="30px">This paragraph has a <Text variant="strong">30px text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="10%">This paragraph has a <Text variant="strong">10% text indent</Text>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+  </VStack>
+</App>
+```
+
+## Word Break Values [#word-break]
+
+This value specifies how words should break when reaching the end of a line.
+
+| Value        | Description                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `normal`     | Uses default line break rules.                                                                        |
+| `break-all`  | May break between any two characters to prevent overflow.                                             |
+| `keep-all`   | Prevents breaks for Chinese, Japanese, and Korean (CJK) text. Non-CJK text behavior is set to normal. |
+| `break-word` | Allows unbreakable words to be broken at arbitrary points if there are no acceptable break points.    |
+
+```xmlui-pg name="Word break examples"
+<App>
+  <FlowLayout gap="16px">
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: normal</Text>
+      <Text wordBreak="normal">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: break-all</Text>
+      <Text wordBreak="break-all">This is a very long text with a verylongwordthatbreaks anywhere</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: keep-all</Text>
+      <Text wordBreak="keep-all">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: break-word</Text>
+      <Text wordBreak="break-word">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Word Spacing Values [#word-spacing]
+
+This value sets the length of white space between words and between tags. Positive values increase the space between words, while negative values bring them closer together.
+
+```xmlui-pg name="Word spacing examples"
+<App>
+  <VStack gap="16px">
+    <Text wordSpacing="normal">This text has <Text variant="strong">normal</Text> word spacing.</Text>
+    <Text wordSpacing="5px">This text has <Text variant="strong">5px</Text> word spacing.</Text>
+    <Text wordSpacing="10px">This text has <Text variant="strong">10px</Text> word spacing.</Text>
+    <Text wordSpacing="-2px">This text has <Text variant="strong">-2px</Text> word spacing.</Text>
+  </VStack>
+</App>
+```
+
+## Word Wrap Values [#word-wrap]
+
+This value determines whether the browser should break lines within words when they would otherwise overflow the container.
+
+| Value        | Description                                                                           |
+| ------------ | ------------------------------------------------------------------------------------- |
+| `normal`     | Lines may only break at normal break points (such as spaces between words).           |
+| `break-word` | To prevent overflow, an otherwise unbreakable word may be broken at arbitrary points. |
+| `anywhere`   | To prevent overflow, the browser may break between any two characters.                |
+
+```xmlui-pg name="Word wrap examples"
+<App>
+  <FlowLayout gap="16px">
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: normal</Text>
+      <Text wordWrap="normal">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: break-word</Text>
+      <Text wordWrap="break-word">This is a very long text with a verylongwordthatbreaks when needed</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: anywhere</Text>
+      <Text wordWrap="anywhere">This is a very long text with a verylongwordthatbreaks when needed</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Writing Mode Values [#writing-mode]
+
+This value sets whether lines of text are laid out horizontally or vertically, as well as the direction in which blocks progress.
+
+| Value           | Description                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `horizontal-tb` | Content flows horizontally from left to right, vertically from top to bottom.                 |
+| `vertical-rl`   | Content flows vertically from top to bottom, horizontally from right to left.                 |
+| `vertical-lr`   | Content flows vertically from top to bottom, horizontally from left to right.                 |
+| `sideways-rl`   | Content flows vertically from top to bottom and all glyphs are set sideways toward the right. |
+| `sideways-lr`   | Content flows vertically from top to bottom and all glyphs are set sideways toward the left.  |
+
+```xmlui-pg name="Writing mode examples"
+<App>
+  <FlowLayout gap="24px">
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>horizontal-tb</Text>
+      <Text writingMode="horizontal-tb">Horizontal writing mode</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>vertical-rl</Text>
+      <Text writingMode="vertical-rl">Vertical 1</Text>
+      <Text writingMode="vertical-rl">Vertical 2</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>vertical-lr</Text>
+      <Text writingMode="vertical-lr">Vertical 1</Text>
+      <Text writingMode="vertical-lr">Vertical 2</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>sideways-rl</Text>
+      <Text writingMode="sideways-rl">Vertical 1</Text>
+      <Text writingMode="sideways-rl">Vertical 2</Text>
+    </VStack>
+    <VStack width="100px" height="200px" border="1px solid gray" padding="8px">
+      <Text>sideways-lr</Text>
+      <Text writingMode="sideways-lr">Vertical 1</Text>
+      <Text writingMode="sideways-lr">Vertical 2</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Transition Values [#transition]
+
+This value specifies the CSS property to animate, the duration of the transition effect, the timing function, and the delay before the transition starts. It creates smooth animations between property value changes.
+
+A transition value can include up to four parts (in any order):
+
+- **Property name**: Specifies the CSS property to transition (e.g., `opacity`, `color`, `width`)
+- **Duration**: How long the transition takes (e.g., `0.5s`, `300ms`)
+- **Timing function**: How the transition progresses over time (e.g., `ease`, `linear`)
+- **Delay**: How long to wait before starting the transition (e.g., `0s`, `200ms`)
+
+You can specify multiple transitions by separating them with commas.
+
+| Timing Function Values  | Description                                                             |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `ease`                  | Starts slow, becomes fast, then ends slowly. This is the default value. |
+| `linear`                | Same speed from start to end.                                           |
+| `ease-in`               | Starts slowly and accelerates.                                          |
+| `ease-out`              | Starts quickly and decelerates.                                         |
+| `ease-in-out`           | Starts slowly, speeds up in the middle, and ends slowly.                |
+| `cubic-bezier(n,n,n,n)` | Define your own timing function with four values.                       |

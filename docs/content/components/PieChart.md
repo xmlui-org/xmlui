@@ -1,6 +1,15 @@
 # PieChart [#piechart]
 
-Represents a pie chart component.
+`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly.
+
+**Key features:**
+- **Proportional visualization**: Displays data segments as slices of a complete circle
+- **Flexible labeling**: Configurable label positions both inside and outside chart segments
+- **Data binding**: Connects to array data with specified keys for values and labels
+- **Label list display**: Optional legend-style list showing all segments and values
+- **Customizable sizing**: Configurable dimensions and outer radius for different layouts
+
+For a variation with a hollow center, see [DonutChart](/components/DonutChart).
 
 ## Properties [#properties]
 
@@ -8,15 +17,11 @@ Represents a pie chart component.
 
 The data to be displayed in the chart. Needs to be an array of objects.
 
-### `dataKeys` [#datakeys]
+### `dataKey` [#datakey]
 
-This property specifies the keys in the data objects that should be used for rendering the bars.
+This property specifies the key in the data objects that will be used to render the chart.
 
-### `height` [#height]
-
-The height of the chart
-
-### `labelListPosition (default: "inside")` [#labellistposition-default-inside]
+### `labelListPosition` (default: "inside") [#labellistposition-default-inside]
 
 The position of the label list.
 
@@ -30,17 +35,17 @@ Specifies the key in the data objects that will be used to label the different d
 
 The outer radius of the pie chart, can be a number or a string (e.g., '100%').
 
-### `showLabel (default: true)` [#showlabel-default-true]
+### `showLabel` (default: true) [#showlabel-default-true]
 
 Toggles whether to show labels (`true`) or not (`false`).
 
-### `showLabelList (default: false)` [#showlabellist-default-false]
+### `showLabelList` (default: false) [#showlabellist-default-false]
 
 Whether to show labels in a list (`true`) or not (`false`).
 
-### `width` [#width]
+### `showLegend` (default: false) [#showlegend-default-false]
 
-The width of the chart
+Toggles whether to show legend (`true`) or not (`false`).
 
 ## Events [#events]
 

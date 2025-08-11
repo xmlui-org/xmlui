@@ -1,31 +1,31 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
 import { Text } from "../Text/TextNative";
-import classnames from "classnames";
-import { type CodeHighlighterMeta, CodeHighlighterMetaKeys } from "./highlight-code";
+import { type CodeHighlighterMeta, CodeHighlighterMetaKeys, encodeToBase64 } from "./highlight-code";
 import { Button } from "../Button/ButtonNative";
 import Icon from "../Icon/IconNative";
 import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import type { CSSProperties } from "react";
+import classnames from "classnames";
 
 type CodeBlockProps = {
   children?: React.ReactNode;
   textToCopy?: string;
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;
-  className?: string;
 };
 
 export const defaultProps = {
   // No default props needed for this component currently
 };
 
-export function CodeBlock({ children, meta, textToCopy, style, className }: CodeBlockProps) {
+export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
+  // 'global-codeBlock' class is there so we could apply styles if this codeblock is used inside a splitView nested app
   if (!meta) {
     return (
-      <div className={classnames(styles.codeBlock, className)} style={style}>
+      <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
         <div className={styles.codeBlockContent}>
           {children}
         </div>
@@ -33,7 +33,7 @@ export function CodeBlock({ children, meta, textToCopy, style, className }: Code
     );
   }
   return (
-    <div className={styles.codeBlock} style={style}>
+    <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
           <Text variant="em">{meta.filename}</Text>
@@ -41,7 +41,7 @@ export function CodeBlock({ children, meta, textToCopy, style, className }: Code
       )}
       <div className={styles.codeBlockContent}>
         {children}
-        <div className={styles.codeBlockCopyButton}>
+        {meta.copy !== false && <div className={styles.codeBlockCopyButton}>
           <Button
             variant="ghost"
             size="xs"
@@ -53,7 +53,7 @@ export function CodeBlock({ children, meta, textToCopy, style, className }: Code
               toast.success("Code copied!");
             }}
           ></Button>
-        </div>
+        </div>}
       </div>
     </div>
   );
@@ -63,33 +63,6 @@ interface CodeNode extends Node {
   lang: string | null;
   meta: string | null;
 }
-
-/*
- * Check if global object window is defined
- */
-export function isBrowser() {
-  return typeof window !== 'undefined';
-}
-
-/*
- * Decode base64 value, returns string
- * @Params: string
- */
-export function decodeValue(value) {
-  if (!value) {
-    return null;
-  }
-
-  const valueToString = value.toString();
-
-  if (isBrowser()) {
-    return window.btoa(valueToString);
-  }
-
-  const buff = Buffer.from(valueToString, 'ascii');
-  return buff.toString('base64');
-}
-
 
 export function markdownCodeBlockParser() {
   return function transformer(tree: Node) {
@@ -130,7 +103,7 @@ export function markdownCodeBlockParser() {
         }
         if (item.startsWith("/") && item.endsWith("/")) {
           const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstrings.data];
-          const newItemBase64 = decodeValue(item.substring(1, item.length - 1));
+          const newItemBase64 = encodeToBase64(item.substring(1, item.length - 1));
 
           if (!unparsedSubstrings) {
             acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = newItemBase64;
@@ -141,7 +114,7 @@ export function markdownCodeBlockParser() {
         }
         if (item.startsWith("!/") && item.endsWith("/")) {
           const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
-          const newItemBase64 = decodeValue(item.substring(2, item.length - 1));
+          const newItemBase64 = encodeToBase64(item.substring(2, item.length - 1));
 
           if (!unparsedSubstrings) {
             acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] = newItemBase64;

@@ -1,16 +1,17 @@
 import styles from "./Spinner.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Spinner, defaultProps } from "./SpinnerNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Spinner";
 
 export const SpinnerMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component is an animated indicator that represents a particular action ` +
-    `in progress without a deterministic progress value.`,
+    "`Spinner` is an animated indicator that represents an action in progress " +
+    "with no deterministic progress value.",
   props: {
     delay: {
       description: `The delay in milliseconds before the spinner is displayed.`,

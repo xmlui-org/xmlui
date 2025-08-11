@@ -1,17 +1,22 @@
 # Column [#column]
 
-The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
+`Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Data binding**: Use `bindTo` to automatically display object properties
+- **Component embedding**: Place any component inside `Column`: `Button`, `Text`, `Icon`, etc.
+- **Interactive behavior**: Enable/disable sorting and column resizing
+- **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
+- **Column pinning**: Pin columns to left or right edges for sticky behavior
 
-- `$cell`: The value of the cell being rendered.
-- `$colIndex`: The index of the column being rendered.
-- `$item`: The data item being rendered.
-- `$itemIndex`: The index of the data item being rendered.
-- `$row`: The data item being rendered (the same as `$item`).
-- `$rowIndex`: The index of the data item being rendered (the same as `$itemIndex`).
+**Context variables available during execution:**
 
-Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
+- `$cell`: The specific cell value for this column
+- `$colIndex`: Zero-based column index
+- `$item`: The complete data row object being rendered
+- `$itemIndex`: Zero-based row index
+- `$row`: The complete data row object being rendered (the same as `$item`).
+- `$rowIndex`: Zero-based row index (the same as `$itemIndex`).
 
 ## Properties [#properties]
 
@@ -85,11 +90,11 @@ Indicates the name of the current row item's property, the value of which to lay
 </App>
 ```
 
-### `canResize (default: true)` [#canresize-default-true]
+### `canResize` (default: true) [#canresize-default-true]
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
-### `canSort (default: true)` [#cansort-default-true]
+### `canSort` (default: true) [#cansort-default-true]
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.
 
@@ -424,4 +429,4 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-Styling is done via the [`Table` component](./Table.mdx).
+Styling is done via the [`Table` component](/components/Table).

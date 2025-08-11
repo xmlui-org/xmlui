@@ -1,14 +1,20 @@
 # DatePicker [#datepicker]
 
-A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.
+`DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction.
+
+**Key features:**
+- **Flexible modes**: Single date selection (default) or date range selection
+- **Format customization**: Support for various date formats (MM/dd/yyyy, yyyy-MM-dd, etc.)
+- **Date restrictions**: Set minimum/maximum dates and disable specific dates
+- **Localization options**: Configure first day of week and show week numbers
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dateFormat (default: "MM/dd/yyyy")` [#dateformat-default-mm-dd-yyyy]
+### `dateFormat` (default: "MM/dd/yyyy") [#dateformat-default-mm-dd-yyyy]
 
 The format of the date displayed in the input field
 
@@ -46,7 +52,7 @@ An optional array of dates that are disabled
 </App>  
 ```
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -74,7 +80,7 @@ This property sets the component's initial value.
 </App>  
 ```
 
-### `inline (default: false)` [#inline-default-false]
+### `inline` (default: false) [#inline-default-false]
 
 Whether to display the datepicker inline
 
@@ -82,11 +88,11 @@ Whether to display the datepicker inline
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -123,7 +129,7 @@ The optional start date of the selectable date range. If not defined, the range 
 </App>
 ```
 
-### `mode (default: "single")` [#mode-default-single]
+### `mode` (default: "single") [#mode-default-single]
 
 The mode of the datepicker (single or range)
 
@@ -146,11 +152,11 @@ An optional placeholder text that is visible in the input field when its empty.
 </App>  
 ```
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `showWeekNumber (default: false)` [#showweeknumber-default-false]
+### `showWeekNumber` (default: false) [#showweeknumber-default-false]
 
 Whether to show the week number in the calendar
 
@@ -168,7 +174,7 @@ This property sets an optional icon to appear at the start (left side when the l
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -195,7 +201,7 @@ Available values:
 </App>
 ```
 
-### `weekStartsOn (default: 0)` [#weekstartson-default-0]
+### `weekStartsOn` (default: 0) [#weekstartson-default-0]
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 
@@ -267,11 +273,17 @@ This event is triggered when the DatePicker has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the DatePicker.
+Focus the DatePicker component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This method sets the current value of the DatePicker.
+
+**Signature**: `set value(value: any): void`
+
+- `value`: The new value to set for the date picker.
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
 <App>
@@ -279,7 +291,7 @@ You can use this method to set the component's current value programmatically (`
     id="picker"
     readOnly="true"
   />
-  <HStack">
+  <HStack>
     <Button
       label="Add Text"
       onClick="picker.setValue('05/25/2024')" />
@@ -293,6 +305,8 @@ You can use this method to set the component's current value programmatically (`
 ### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): any`
 
 ## Styling [#styling]
 
@@ -350,7 +364,15 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-warning--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DatePicker-warning | *none* | *none* |
 | [minHeight](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-default--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-error--focus | *none* | *none* |
@@ -372,10 +394,6 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-error | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-success | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default--hover | *none* | *none* |

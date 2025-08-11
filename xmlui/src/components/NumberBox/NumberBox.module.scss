@@ -16,6 +16,7 @@ $componentName: "NumberBox";
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
+  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
@@ -49,89 +50,87 @@ $componentName: "NumberBox";
   .input {
     &::placeholder {
       color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
+      font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
     }
   }
   .adornment {
-    color: createThemeVar("Input:textColor-adornment-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
   }
 }
 
-@layer components {
-  .inputRoot {
-    display: flex;
-    align-items: center;
-    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
-    padding: t.$space-2;
+.inputRoot {
+  display: flex;
+  align-items: center;
+  gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  transition: background-color ease-in 0.1s;
+  overflow: hidden;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+  &.warning {
+    @include variant("warning");
+  }
+  &.valid {
+    @include variant("success");
+  }
+
+  &:has(.input:is(:disabled)) {
+    cursor: not-allowed;
+    background-color: createThemeVar("Input:backgroundColor-NumberBox--disabled");
+    color: createThemeVar("Input:textColor-NumberBox--disabled");
+    border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
+  }
+
+  .input {
+    font-size: inherit;
+    color: inherit;
+    border: 0;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
     width: 100%;
-    border-style: solid;
-    border-width: 1px;
-    transition: background-color ease-in 0.1s;
-    overflow: hidden;
+    cursor: inherit;
 
-    @include variant("default");
-
-    &.error {
-      @include variant("error");
+    /* Remove default spinners */
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
-    &.warning {
-      @include variant("warning");
-    }
-    &.valid {
-      @include variant("success");
-    }
-
-    &:has(.input:is(:disabled)) {
-      cursor: not-allowed;
-      background-color: createThemeVar("Input:backgroundColor-NumberBox--disabled");
-      color: createThemeVar("Input:textColor-NumberBox--disabled");
-      border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
-    }
-
-    .input {
-      font-size: inherit;
-      color: inherit;
-      border: 0;
-      outline: none;
-      background-color: transparent;
-      padding: 0;
-      width: 100%;
-      cursor: inherit;
-
-      /* Remove default spinners */
-      /* Chrome, Safari, Edge, Opera */
-      &::-webkit-outer-spin-button,
-      &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-      /* Firefox */
-      -webkit-appearance: textfield;
-      -moz-appearance: textfield;
-      appearance: textfield;
-    }
-
-    .spinnerBox {
-      display: flex;
-      flex-direction: column;
-      height: 0;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .spinnerButton {
-      padding: 0 !important;
-      width: t.$space-6;
-      border: none;
-
-      // &:hover {
-      //   background-color: transparent !important;
-      // }
-    }
+    /* Firefox */
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 
-  .readOnly {
-    cursor: text;
+  .spinnerBox {
+    display: flex;
+    flex-direction: column;
+    height: 0;
+    align-items: center;
+    justify-content: center;
   }
+
+  .spinnerButton {
+    padding: 0 !important;
+    width: t.$space-6;
+    border: none;
+
+    // &:hover {
+    //   background-color: transparent !important;
+    // }
+  }
+}
+
+.readOnly {
+  cursor: text;
 }
 
 // --- We export the theme variables to add them to the component renderer

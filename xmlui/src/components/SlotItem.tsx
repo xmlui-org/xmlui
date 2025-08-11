@@ -42,3 +42,4 @@ export const SlotItem = memo(
     return <>{renderChild(nodeWithItem, layoutContext)}</>;
   },
 );
+SlotItem.displayName = "SlotItem";

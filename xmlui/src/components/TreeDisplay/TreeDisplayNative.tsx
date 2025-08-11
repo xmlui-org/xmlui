@@ -20,7 +20,7 @@ type Props = {
 
 export const defaultProps: Pick<Props, "content" | "itemHeight"> = {
   content: "",
-  itemHeight: 24
+  itemHeight: 20
 };
 
 // Parse the indented text into a tree structure

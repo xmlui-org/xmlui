@@ -25,6 +25,7 @@
   "DonutChart": "DonutChart",
   "DropdownMenu": "DropdownMenu",
   "EmojiSelector": "EmojiSelector",
+  "ExpandableItem": "ExpandableItem",
   "FileInput": "FileInput",
   "FileUploadDropZone": "FileUploadDropZone",
   "FlowLayout": "FlowLayout",
@@ -42,6 +43,7 @@
   "HSplitter": "HSplitter",
   "HStack": "HStack",
   "Heading": "Heading",
+  "IFrame": "IFrame",
   "Icon": "Icon",
   "Image": "Image",
   "Items": "Items",
@@ -73,6 +75,7 @@
   "Redirect": "Redirect",
   "Select": "Select",
   "Slider": "Slider",
+  "Slot": "Slot",
   "SpaceFiller": "SpaceFiller",
   "Spinner": "Spinner",
   "Splitter": "Splitter",
@@ -89,6 +92,7 @@
   "TextBox": "TextBox",
   "Theme": "Theme",
   "ToneChangerButton": "ToneChangerButton",
+  "ToneSwitch": "ToneSwitch",
   "VSplitter": "VSplitter",
   "VStack": "VStack"
 }

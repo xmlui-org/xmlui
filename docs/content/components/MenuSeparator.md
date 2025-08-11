@@ -1,6 +1,6 @@
 # MenuSeparator [#menuseparator]
 
-This component displays a separator line between menu items.
+`MenuSeparator` displays a separator line between menu items to group related menu options within `DropdownMenu`.
 
 ## Properties [#properties]
 

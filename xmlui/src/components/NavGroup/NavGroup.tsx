@@ -1,19 +1,21 @@
 import styles from "./NavGroup.module.scss";
 import navLinkStyles from "../NavLink/NavLink.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Icon } from "../Icon/IconNative";
-import { dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { defaultProps, NavGroup } from "./NavGroupNative";
 
 const COMP = "NavGroup";
 
 export const NavGroupMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component is a container for grouping related navigation targets ` +
-    `(\`NavLink\` components). It can be displayed as a submenu in the App's UI.`,
+    "`NavGroup` creates collapsible containers for organizing related navigation " +
+    "items into hierarchical menu structures. It groups `NavLink` components and " +
+    "other `NavGroup` components, providing expandable submenus with customizable " +
+    "icons and states.",
   props: {
     label: dLabel(),
     initiallyExpanded: d(

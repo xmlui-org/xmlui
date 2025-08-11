@@ -1,6 +1,6 @@
 # Fragment [#fragment]
 
-The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed.
+`Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components.
 
 ## Properties [#properties]
 

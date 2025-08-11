@@ -1,10 +1,12 @@
 # Pages [#pages]
 
-The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).
+`Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL.
 
-See the [\`Page\` docs](/components/Page) for a short description.
+**Key features:**
 
-Examples for both components can be found here.
+- **Route coordination**: Automatically displays the correct Page based on current URL and navigation
+- **Default route handling**: Sets the initial page shown when the application loads
+- **Client-side routing**: Manages navigation without page refreshes or server requests
 
 ### Using the Pages and Page components [#using-the-pages-and-page-components]
 
@@ -32,17 +34,17 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 ## Properties [#properties]
 
-### `defaultRoute (default: "/")` [#defaultroute-default-]
+### `fallbackPath` (default: "/") [#fallbackpath-default-]
 
-The default route when displaying the app
+The fallback path when the current URL does not match any of the paths of the pages.
 
-```xmlui-pg copy {6-13} display name="Example: defaultRoute" height="150px"
+```xmlui-pg copy {6-13} display name="Example: fallbackPath" height="150px"
 <App>
   <NavPanel>
     <NavLink label="Not Home" to="/not-home" icon="trash"/>
     <NavLink label="Home" to="/home" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/home">
+  <Pages fallbackPath="/home">
     <Page url="/not-home">
       <Text>This is not home...</Text>
     </Page>

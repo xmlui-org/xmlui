@@ -1,7 +1,10 @@
 %-DESC-START
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Key features:**
+
+- **Logo customization**: Use `logoTemplate` to create rich logo designs beyond simple images
+- **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
+- **Layout integration**: Automatically positioned and styled based on your App's `layout` property
 
 %-DESC-END
 
@@ -10,21 +13,21 @@
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui-pg copy display {2-8} name="Example: logoTemplate" height="150px"
+```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="150px"
 <App>
   <AppHeader>
   <property name="logoTemplate">
-      <H3>
-        <Icon name="drive" />
-        DriveDiag
-      </H3>
+    <H3>
+      <Icon name="drive" />
+      DriveDiag
+    </H3>
   </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>

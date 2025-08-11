@@ -1,5 +1,10 @@
 %-DESC-START
 
+**Key features:**
+- **Custom actions**: Execute JavaScript code instead of navigation when using onClick handlers
+- **Visual customization**: Support for icons, labels, and completely custom nested content
+- **Accessibility support**: Proper focus management and keyboard navigation
+
 ## Using NavLink
 
 ### `NavLink` Appearance
@@ -34,7 +39,7 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
 
-```xmluipg copy {7} display name="Example: custom NavLink action" height="250px"
+```xmlui-pg copy {7} display name="Example: custom NavLink action" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -157,7 +162,7 @@ The following example opens the "About XMLUI" link in a new tab:
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" />
-    <NavLink label="About XMLUI" to="https://docs.xmlui.com/" target="_blank" />
+    <NavLink label="About XMLUI" to="https://docs.xmlui.org/" target="_blank" />
   </NavPanel>
   <Pages>
     <Page url="/">Home</Page>

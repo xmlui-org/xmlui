@@ -15,33 +15,34 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 $themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
 
-@layer components {
-  .badge {
-    @include t.paddingVars($themeVars, $component);
-    @include t.borderVars($themeVars, $component);
-    @include t.textVars($themeVars, $component);
-    display: inline-block;
-    width: fit-content;
-    vertical-align: top;
-    min-width: fit-content;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-  }
-
-  .pill {
-    @include t.paddingVars($themeVars, "#{$component}-pill");
-    @include t.borderVars($themeVars, "#{$component}-pill");
-    @include t.textVars($themeVars, "#{$component}-pill");
-    display: inline-block;
-    width: fit-content;
-    vertical-align: top;
-    min-width: fit-content;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-radius: 9999px;
-  }
+.badge {
+  @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
+  @include t.textVars($themeVars, $component);
+  display: inline-block;
+  width: fit-content;
+  height: fit-content;
+  vertical-align: top;
+  min-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
 }
+
+.pill {
+  @include t.paddingVars($themeVars, "#{$component}-pill");
+  @include t.borderVars($themeVars, "#{$component}-pill");
+  @include t.textVars($themeVars, "#{$component}-pill");
+  display: inline-block;
+  width: fit-content;
+  height: fit-content;
+  vertical-align: top;
+  min-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 9999px;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);

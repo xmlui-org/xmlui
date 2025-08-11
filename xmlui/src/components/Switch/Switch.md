@@ -1,3 +1,17 @@
+%-DESC-START
+
+## Switch Values
+
+The `initialValue` and `value` properties of the switch are transformed to a Boolean value to display the on (`true`) or off (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
+
+%-DESC-END
+
 %-PROP-START enabled
 
 This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
@@ -61,7 +75,7 @@ If true, the value of the component cannot be modified.
 
 %-API-START setValue
 
-```xmlui-pg copy {9,12,14} display name="Example: value and setValue"
+```xmlui-pg copy {10,13,15} display name="Example: value and setValue"
 <App var.changes="">
   <Switch
     id="mySwitch"

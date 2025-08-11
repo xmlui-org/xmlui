@@ -14,7 +14,7 @@ function TestBed() {
   if (!window.TEST_ENV || !window.TEST_ENV) {
     return <div>Missing test env</div>;
   }
-  return <StandaloneApp appDef={window.TEST_ENV} decorateComponentsWithTestId={true}/>;
+  return <StandaloneApp appDef={window.TEST_ENV} decorateComponentsWithTestId={true} waitForApiInterceptor={true}/>;
 }
 
 export default TestBed;

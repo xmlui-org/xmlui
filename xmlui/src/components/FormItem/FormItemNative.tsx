@@ -51,6 +51,7 @@ import { HelperText } from "./HelperText";
 import { NumberBox2 } from "../NumberBox/NumberBox2Native";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -64,11 +65,9 @@ type Props = {
   labelPosition?: LabelPosition;
   autoFocus?: boolean;
   enabled?: boolean;
-  required?: boolean;
   label?: string;
   labelWidth?: string;
   labelBreak?: boolean;
-  validations: FormItemValidations;
   onValidate?: ValidateEventHandler;
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
@@ -78,7 +77,7 @@ type Props = {
   inputRenderer?: any;
   itemIndex?: number;
   gap?: string;
-};
+} & FormItemValidations;
 
 export const defaultProps: Pick<
   Props,
@@ -125,6 +124,24 @@ function ArrayLikeFormItem({
 }
 
 export const FormItem = memo(function FormItem({
+  // --- validation props
+  required,
+  requiredInvalidMessage,
+  minLength,
+  maxLength,
+  lengthInvalidMessage,
+  lengthInvalidSeverity,
+  minValue,
+  maxValue,
+  rangeInvalidMessage,
+  rangeInvalidSeverity,
+  pattern,
+  patternInvalidMessage,
+  patternInvalidSeverity,
+  regex,
+  regexInvalidMessage,
+  regexInvalidSeverity,
+  // ---
   style,
   bindTo,
   type = defaultProps.type,
@@ -134,7 +151,6 @@ export const FormItem = memo(function FormItem({
   labelWidth,
   labelBreak = defaultProps.labelBreak,
   children,
-  validations,
   onValidate,
   customValidationsDebounce = defaultProps.customValidationsDebounce,
   validationMode,
@@ -146,6 +162,24 @@ export const FormItem = memo(function FormItem({
   gap,
   ...rest
 }: Props) {
+  const validations: FormItemValidations = useShallowCompareMemoize({
+    required,
+    requiredInvalidMessage,
+    minLength,
+    maxLength,
+    lengthInvalidMessage,
+    lengthInvalidSeverity,
+    minValue,
+    maxValue,
+    rangeInvalidMessage,
+    rangeInvalidSeverity,
+    pattern,
+    patternInvalidMessage,
+    patternInvalidSeverity,
+    regex,
+    regexInvalidMessage,
+    regexInvalidSeverity,
+  });
   const defaultId = useId();
   const { parentFormItemId } = useContext(FormItemContext);
   const formItemId = useMemo(() => {
@@ -282,6 +316,7 @@ export const FormItem = memo(function FormItem({
       formControl = (
         <NumberBox
           {...rest}
+          initialValue={initialValue}
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
@@ -304,6 +339,7 @@ export const FormItem = memo(function FormItem({
       formControl = (
         <NumberBox2
           {...rest}
+          initialValue={initialValue}
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}

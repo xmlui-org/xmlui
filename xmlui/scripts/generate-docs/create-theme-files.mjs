@@ -1,105 +1,106 @@
 import { join, dirname } from "path";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
+import { ERROR_HANDLING, ERROR_MESSAGES } from "./constants.mjs";
+import { handleFatalError, validateDependencies } from "./error-handling.mjs";
+import { createScopedLogger } from "./logging-standards.mjs";
+import { pathResolver } from "./configuration-management.mjs";
+import { 
+  processComponentThemeVars, 
+  iterateObjectEntries,
+  writeFileWithLogging 
+} from "./pattern-utilities.mjs";
 
-const OUTPUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../dist/themes");
+const OUTPUT_DIR = pathResolver.getOutputPaths().themes;
+const logger = createScopedLogger("ThemeGenerator");
 
-// --- Create the output folder
-if (!existsSync(OUTPUT_DIR)) {
-  mkdirSync(OUTPUT_DIR, { recursive: true });
+/**
+ * Counts the number of theme variables, excluding those that start with "---"
+ * @param {Object} themeVars - The theme variables object
+ * @returns {number} - The count of non-separator theme variables
+ */
+function countThemeVars(themeVars) {
+  if (!themeVars || typeof themeVars !== 'object') {
+    return 0;
+  }
+  
+  return Object.keys(themeVars).filter(key => !key.startsWith("---")).length;
 }
 
-if (collectedThemes === undefined) {
-  console.log("No theme information found. Please run the metadata build first.");
-  process.exit(1);
-}
-const rootTheme = collectedThemes.root;
-
-// --- Extract theme variable information from components
-let themeVarsData = {};
-let light = {};
-let dark = {};
-
-if (collectedComponentMetadata === undefined) {
-  console.log("No component metadata found. Please run the metadata build first.");
-  process.exit(1);
-}
-
-// --- Obtain theme variables from components
-Object.keys(collectedComponentMetadata)
-  //.toSorted() <- Not supported in Node versions under 20
-  .slice().sort()
-  .forEach((key) => {
-    const component = collectedComponentMetadata[key];
-    const { themeVars, defaultThemeVars } = component;
-
-    console.log(`Processing component: ${key}`);
-
-    if (themeVars) {
-      // --- Component-speciifc theme variables
-
-      // --- Get the theme variable keys
-      const themeVarKeys = [...Object.keys(themeVars), ...Object.keys(defaultThemeVars ?? {})];
-      const themeVarKeysWithoutTones = themeVarKeys.filter(
-        (key) => ["light", "dark"].indexOf(key) === -1,
-      );
-
-      // --- Iterate through the component-specific theme variables
-      let compThemeVars = {};
-      themeVarKeysWithoutTones.forEach((themeVarKey) => {
-        // --- Get the theme variable values
-        compThemeVars[themeVarKey] = defaultThemeVars?.[themeVarKey] ?? null;
-      });
-      themeVarsData = {...themeVarsData, ...compThemeVars};
-      
-      // --- Iterate through the component-specific light theme variables
-      let compLight = {};
-      const lightKeys = [...Object.keys(defaultThemeVars?.light ?? {})];
-      lightKeys.forEach((themeVarKey) => {
-        // --- Get the theme variable values
-        compLight[themeVarKey] = defaultThemeVars?.light?.[themeVarKey] ?? null;
-      });
-      light = {...light, ...compLight};
-
-      // --- Iterate through the component-specific dark theme variables
-      let compDark = {};
-      const darkKeys = [...Object.keys(defaultThemeVars?.dark ?? {})];
-      darkKeys.forEach((themeVarKey) => {
-        // --- Get the theme variable values
-        compDark[themeVarKey] = defaultThemeVars?.dark?.[themeVarKey] ?? null;
-      });
-      dark = {...dark, ...compDark};
+async function generateThemeFiles() {
+  logger.operationStart("theme file generation");
+  
+  try {
+    // --- Create the output folder
+    if (!existsSync(OUTPUT_DIR)) {
+      mkdirSync(OUTPUT_DIR, { recursive: true });
     }
-  });
 
-themeVarsData.light = light;
-themeVarsData.dark = dark;
+    // Validate required dependencies
+    validateDependencies({
+      THEME_INFO: collectedThemes,
+      COMPONENT_METADATA: collectedComponentMetadata
+    });
 
-Object.entries(collectedThemes).forEach(([themeName, themeData]) => {
-  // --- No output for the abstract root theme
-  if (themeName === "root") return;
+    const rootTheme = collectedThemes.root;
 
-  const themePath = join(OUTPUT_DIR, `${themeName}.json`);
-  const themeContent = JSON.stringify(
-    {
-      ...themeData,
-      themeVars: {
+    // Extract theme variable information from components using utility
+    const themeVarsData = processComponentThemeVars(collectedComponentMetadata, logger);
+
+    // Write theme files with error handling
+    let totalThemeVars = 0;
+    let exportedThemeCount = 0;
+    
+    await iterateObjectEntries(collectedThemes, async (themeName, themeData) => {
+      // Skip the abstract root theme
+      if (themeName === "root") return;
+
+      // Prepare the complete theme vars object
+      const completeThemeVars = {
         "--- App-bound root theme variables": "",
         ...rootTheme.themeVars,
         "--- App-bound theme-specific variables": "",
         ...themeData.themeVars,
         "--- Component-bound theme variables": "",
-        ...themeVarsData,
+        ...themeVarsData.base,
         light: { ...themeData.themeVars.light, ...themeVarsData.light },
         dark: { ...themeData.themeVars.dark, ...themeVarsData.dark },
-      },
-    },
-    null,
-    2,
-  );
+      };
 
-  console.log(`Writing theme file: ${themePath}`);
+      // Count theme vars (excluding separators)
+      const themeVarCount = countThemeVars(completeThemeVars);
+      totalThemeVars += themeVarCount;
+      exportedThemeCount++;
+      
+      const themePath = join(OUTPUT_DIR, `${themeName}.json`);
+      const themeContent = JSON.stringify(
+        {
+          ...themeData,
+          themeVars: completeThemeVars,
+        },
+        null,
+        2,
+      );
 
-  writeFileSync(themePath, themeContent);
-});
+      await writeFileWithLogging(themePath, themeContent, logger);
+      
+      logger.info(`Theme '${themeName}' exported with ${themeVarCount} theme variables`);
+    }, { async: true });
+    
+    // Display summary of all exported themes
+    if (exportedThemeCount > 0) {
+      logger.info(`\n=== Theme Export Summary ===`);
+      logger.info(`Exported ${exportedThemeCount} theme files with a total of ${totalThemeVars} theme variables`);
+      logger.info(`Average of ${Math.round(totalThemeVars / exportedThemeCount)} theme variables per theme file`);
+    }
+
+    logger.operationComplete("theme file generation");
+    
+  } catch (error) {
+    handleFatalError(error, ERROR_HANDLING.EXIT_CODES.GENERAL_ERROR, "theme file generation");
+  }
+}
+
+// Execute the main function
+generateThemeFiles();

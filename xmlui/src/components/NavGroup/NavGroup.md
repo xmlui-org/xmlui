@@ -1,5 +1,13 @@
 %-DESC-START
 
+**Key features:**
+
+- **Hierarchical organization**: Creates nested menu structures by containing NavLinks and other NavGroups
+- **Expand/collapse behavior**: Users can toggle visibility of grouped navigation items
+- **Customizable icons**: Different icons for expanded/collapsed states and layout orientations
+- **Flexible placement**: Works within NavPanel for app navigation or standalone for custom menus
+- **Initial state control**: Configure whether groups start expanded or collapsed
+
 ## Using `NavGroup`
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
@@ -20,7 +28,7 @@ The primary use of a `NavGroup` is to create an application menu with submenus, 
       <NavLink label="Page Other" to="/page/Other"/>
     </NavGroup>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       Home
     </Page>
@@ -56,6 +64,7 @@ You do not have to use `NavGroup` within `NavPanel`; you can nest it into other 
 ### Custom Icons
 
 You can also provide custom icons for a specific NavGroup component via it's respective property:
+
 - [iconHorizontalCollapsed](#iconHorizontalCollapsed)
 - [iconHorizontalExpanded](#iconHorizontalExpanded)
 - [iconVerticalCollapsed](#iconVerticalCollapsed)

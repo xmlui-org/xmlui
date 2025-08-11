@@ -1,5 +1,13 @@
 %-DESC-START
 
+**Key features:**
+- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Virtualization**: Only renders visible rows for smooth performance with large datasets
+- **Row selection**: Support single or multi-row selection for bulk operations
+- **Pagination**: Built-in pagination controls for managing large datasets
+
+Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
+
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |
@@ -201,7 +209,7 @@ By default, the value of this property is `true`.
 
 %-PROP-START headerHeight
 
-It accepts common [size values](./appearance/common-units.mdx#size-values).
+It accepts common [size values](/styles-and-themes/common-units#size-values).
 
 ```xmlui copy /headerHeight="60px"/
 <App>
@@ -1159,7 +1167,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 
 %-EVENT-START sortingDidChange
 
-Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
+Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
 ```xmlui copy {4}
 <App var.sortedBy="">

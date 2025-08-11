@@ -1,11 +1,11 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dAutoFocus,
-  dClick,
+  dComponent,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -19,39 +19,43 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValueApi,
 } from "../../components/metadata-helpers";
-import { defaultProps, Toggle } from "../Toggle/Toggle";
+import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
 import { MemoizedItem } from "../container-helpers";
+
+export const defaultProps = {
+  ...toggleDefaultProps,
+  labelPosition: "end",
+};
 
 const COMP = "Checkbox";
 
 export const CheckboxMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component allows users to make binary choices, typically between checked or ` +
-    `unchecked. It consists of a small box that can be toggled on or off by clicking on it.`,
+    "`Checkbox` allows users to make binary choices with a clickable box that shows " +
+    "checked/unchecked states. It's essential for settings, preferences, multi-select " +
+    "lists, and accepting terms or conditions.",
   props: {
-    indeterminate: dIndeterminate(defaultProps.indeterminate),
+    indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
     label: dLabel(),
-    labelPosition: dLabelPosition("end"),
+    labelPosition: dLabelPosition(defaultProps.labelPosition),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     required: dRequired(),
-    initialValue: dInitialValue(defaultProps.initialValue),
+    initialValue: dInitialValue(toggleDefaultProps.initialValue),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(),
-    validationStatus: dValidationStatus(defaultProps.validationStatus),
+    validationStatus: dValidationStatus(toggleDefaultProps.validationStatus),
     description: dInternal(
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-    inputTemplate: {
-      description: "This property is used to define a custom checkbox input template",
-    },
+    inputTemplate: dComponent(
+      "This property is used to define a custom checkbox input template"
+    ),
   },
   childrenAsTemplate: "inputTemplate",
   events: {
@@ -60,8 +64,17 @@ export const CheckboxMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    value: dValueApi(),
-    setValue: dSetValueApi(),
+    value: {
+      description: `This method returns the current value of the ${COMP}.`,
+      signature: "get value(): boolean",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: boolean): void",
+      parameters: {
+        value: "The new value to set for the checkbox.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -128,6 +141,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(node.props.required)}
         indeterminate={extractValue.asOptionalBoolean(node.props.indeterminate)}
         registerComponentApi={registerComponentApi}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
       />
     );
   },

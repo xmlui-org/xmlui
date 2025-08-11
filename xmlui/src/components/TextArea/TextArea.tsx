@@ -1,9 +1,11 @@
 import styles from "./TextArea.module.scss";
 
-import { createMetadata, d, type PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import { type PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -34,8 +36,8 @@ export const resizeOptionsMd: PropertyValueDescription[] = [
 ];
 
 export const TextAreaMd = createMetadata({
-  status: "experimental",
-  description: `\`${COMP}\` is a component that provides a multiline text input area.`,
+  status: "stable",
+  description: "`TextArea` provides a multiline text input area.",
   props: {
     enterSubmits: {
       description:
@@ -96,10 +98,14 @@ export const TextAreaMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
+    focus: {
+      description: `This method sets the focus on the \`${COMP}\` component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): string | undefined",
+    },
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -117,12 +123,10 @@ export const textAreaComponentRenderer = createComponentRenderer(
     registerComponentApi,
     lookupEventHandler,
   }) => {
-    const initialValue = extractValue(node.props.initialValue);
     return (
       <TextArea
-        key={`${node.uid}-${initialValue}`}
         value={state?.value}
-        initialValue={initialValue}
+        initialValue={extractValue(node.props.initialValue)}
         updateState={updateState}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}

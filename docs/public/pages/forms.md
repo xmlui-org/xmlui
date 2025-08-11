@@ -25,7 +25,7 @@ This example demonstrates the core elements: [Form](/components/Form) and [FormI
 
 ## Form Layouts
 
-You can any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
+You can use any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
 
 ```xmlui-pg display
 <App>
@@ -96,24 +96,7 @@ Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equ
 
 ## FormItem
 
-`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The `type` property of a `FormItem` specifies what input component to render.
-
-| type     | description |
-| --------------- | ----------- |
-| `checkbox`      | A checkbox representing a boolean value. |
-| `combobox`      | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
-| `datePicker`    | An input to select dates. |
-| `file`          | An input to select a file or folder from the local machine. |
-| `integer`       | An input for integer values. |
-| `multiCombobox` | Lets the user select multiple items from a filterable dropdown list. Use the input field to filter the list. |
-| `multiSelect`   | Lets the user select multiple items from a dropdown list. |
-| `number`        | An input for numeric values (integer or floating-point). |
-| `radioGroup`    | A group of radio buttons (only one can be selected). |
-| `select`        | Lets the user select an item from a dropdown list. |
-| `switch`        | A switch component to toggle a boolean value. |
-| `text`          | A textbox to enter text.  This is the default if no type is specified. |
-| `textarea`      | A multiline textbox to enter text. |
-
+`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The [`type`](/components/FormItem#type-default-text) property of a `FormItem` specifies what input component to render.
 
 ### Checkbox
 
@@ -158,7 +141,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[DatePicker component doc](/components/DatePicker)
+[File component doc](/components/FileInput)
 
 ### Integer
 
@@ -172,6 +155,8 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
+[NumberBox component doc](/components/NumberBox)
+
 ### Number
 
 ```xmlui-pg display
@@ -183,6 +168,8 @@ Use `file` to select one or multiple files.
   </Form>
 </App>
 ```
+
+[NumberBox component doc](/components/NumberBox)
 
 ### RadioGroup
 
@@ -240,7 +227,7 @@ Use `file` to select one or multiple files.
 [Switch component doc](/components/Switch)
 
 
-### Text
+### TextBox
 
 ```xmlui-pg display
 <App>
@@ -252,7 +239,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[Text component doc](/components/Text)
+[TextBox component doc](/components/TextBox)
 
 ### TextArea
 
@@ -292,11 +279,9 @@ You can create a custom input component that uses the XMLUI forms infrastructure
 
 `$value` represents the current value of the component. `$setValue` changes the value.
 
-
 ## Provide data
 
 You can define a `Form`s data structure and initial values directly.
-
 
 ```xmlui copy
 <Form data="{{ name: 'Joe', age: 43 }}" />
@@ -343,7 +328,7 @@ Other components in the form can reference the form's data too. Here the `Text` 
 
 You can drill into `$data` to reference nested fields.
 
-```xmlui-pg display
+```xmlui-pg display {9}
 <App>
   <Form
     data="{{
@@ -387,18 +372,6 @@ Try submitting with fewer than 10 characters.
 
 Try entering more than 11 characters.
 
-If you don't want to limit the number of characters, but instead mark longer text as invalid, set `syncToValidation` to `false`.
-
-
-```xmlui-pg
-<App>
-  <Form data="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
-  </Form>
-</App>
-```
-
-
 ### `minValue`
 
 ```xmlui-pg display
@@ -422,7 +395,7 @@ Try entering a number smaller than 32.
 </App>
 ```
 
-Try entering a larger smaller than 32.
+Try entering a number larger than 32.
 
 ### `pattern`
 
@@ -443,7 +416,7 @@ Evaluate predefined regex patterns: "email", "url", or "phone".
 ```
 
 
-See the [pattern property](/components/FormItem) of `FormItem`.
+See the [pattern property](/components/FormItem#pattern) of `FormItem`.
 
 ### `regex`
 
@@ -465,7 +438,8 @@ You can use multiple validations.
 ```xmlui-pg display
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
-    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
+    <FormItem bindTo="site" minLength="10" maxLength="30"
+      pattern="url" label="Multiple Validations" />
   </Form>
 </App>
 ```
@@ -542,7 +516,7 @@ The `onSubmit` accepts either a block of code or function. When you use a functi
 </App>
 ```
 
-To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` context variable. A `Toast` popup reports success or error.
+To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` [context variable](/context-variables). A `Toast` popup reports success or error.
 
 ```xmlui
 <App>

@@ -1,11 +1,10 @@
 # VStack [#vstack]
 
-This component is inherited from [Stack](components/Stack)
+This component is inherited from [Stack](/components/Stack)
 
-See also: [CHStack](components/CHStack), [CVStack](components/CVStack), [HStack](components/HStack)
+See also: [CHStack](/components/CHStack), [CVStack](/components/CVStack), [HStack](/components/HStack)
 
 `VStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation.
-See also: [HStack](./HStack.mdx), [CHStack](./CHStack.mdx), [CVStack](./CVStack.mdx).
 
 ```xmlui-pg copy display name="Example: VStack"
 <App>

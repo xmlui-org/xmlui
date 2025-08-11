@@ -1,8 +1,15 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import type { ExpressionStatement, Identifier, Statement} from "../../../src/abstractions/scripting/ScriptingSourceTree";
-import { T_EXPRESSION_STATEMENT, T_IDENTIFIER } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import type {
+  ExpressionStatement,
+  Identifier,
+  Statement,
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import {
+  T_EXPRESSION_STATEMENT,
+  T_IDENTIFIER,
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Xmlui transform - child elements", () => {
   it("Comments ignored, whitespace collapsed", () => {
@@ -135,7 +142,9 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("var with name/value attr works #1", () => {
-      const cd = transformSource("<Stack><variable name='myVar' value='123'/></Stack>") as ComponentDef;
+      const cd = transformSource(
+        "<Stack><variable name='myVar' value='123'/></Stack>",
+      ) as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).equal("123");
     });
@@ -153,7 +162,9 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("var with name and text works #1", () => {
-      const cd = transformSource("<Stack><variable name='myVar'>123</variable></Stack>") as ComponentDef;
+      const cd = transformSource(
+        "<Stack><variable name='myVar'>123</variable></Stack>",
+      ) as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).equal("123");
     });
@@ -1177,18 +1188,6 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("namespaces and componet names", () => {
-    it("xmlns namespace applied to component", () => {
-      const cd = transformSource(
-        `<App xmlns:TestNamespace="component-ns:Test.Components" />`,
-      ) as ComponentDef;
-      expect(cd.namespaces.TestNamespace).toEqual("Test.Components");
-    });
-
-    it("xmlns namespace 'component-ns' is optional", () => {
-      const cd = transformSource(`<App xmlns:TestNamespace="Test.Components" />`) as ComponentDef;
-      expect(cd.namespaces.TestNamespace).toEqual("Test.Components");
-    });
-
     it("namespace resolved in children", () => {
       const cd = transformSource(`
         <App xmlns:TestNamespace="Test.Components" >
@@ -1237,7 +1236,7 @@ describe("Xmlui transform - child elements", () => {
       const cd = transformSource(
         `<Component name="ABC" xmlns:Ns="Test-value"><Ns:DataGrid /></Component>`,
       ) as CompoundComponentDef;
-      expect((cd.component).type).equal("Test-value.DataGrid");
+      expect(cd.component.type).equal("Test-value.DataGrid");
     });
 
     it("namespace resolves deeper within in compound component", () => {
@@ -1248,7 +1247,7 @@ describe("Xmlui transform - child elements", () => {
           </Stack>
         </Component>
         `) as CompoundComponentDef;
-      expect((cd.component).children[0].type).equal("XMLUIExtensions.Pdf");
+      expect(cd.component.children[0].type).equal("XMLUIExtensions.Pdf");
     });
 
     it("accepts component name with '-' and '.'", () => {

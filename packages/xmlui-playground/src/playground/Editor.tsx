@@ -28,7 +28,7 @@ export const Editor = () => {
   return (
     <XMLUIEditor
       readOnly={false}
-      activeThemeTone={"light"}
+      activeThemeTone={options.activeTone}
       saveViewState={true}
       key={"app"}
       onChange={updateValue}

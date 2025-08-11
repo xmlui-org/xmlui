@@ -1,15 +1,16 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
-import { dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
 import { Items, defaultProps } from "./ItemsNative";
 
 const COMP = "Items";
 
 export const ItemsMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component maps sequential data items into component instances, representing ` +
-    `each data item as a particular component.`,
+    "`Items` renders data arrays without built-in layout or styling, providing " +
+    "a lightweight alternative to `List`. Unlike `List`, it provides no " +
+    "virtualization, grouping, or visual formatting — just pure data iteration.",
   props: {
     items: dInternal(`This property contains the list of data items this component renders.`),
     data: d(
@@ -25,14 +26,12 @@ export const ItemsMd = createMetadata({
   },
   childrenAsTemplate: "itemTemplate",
   contextVars: {
-    $item: dComponent(
-      "This value represents the current iteration item while the component renders its children.",
-    ),
+    $item: dComponent("Current data item being rendered"),
     $itemIndex: dComponent(
-      "This integer value represents the current iteration index (zero-based) while rendering children.",
+      "Zero-based index of current item",
     ),
-    $isFirst: dComponent("This boolean value indicates if the component renders its first item."),
-    $isLast: dComponent("This boolean value indicates if the component renders its last item."),
+    $isFirst: dComponent("Boolean indicating if this is the first item"),
+    $isLast: dComponent("Boolean indicating if this is the last item"),
   },
   opaque: true,
 });

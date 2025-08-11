@@ -1,16 +1,15 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { ThemeTone } from "../../abstractions/ThemingDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../metadata-helpers";
 import { Theme, defaultProps } from "./ThemeNative";
 
 const COMP = "Theme";
 
 export const ThemeMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component provides a way to define a particular theming context for ` +
-    `its nested components. The XMLUI framework uses \`${COMP}\` to define the default ` +
-    `theming context for all of its child components. Theme variables and theme settings ` +
-    `only work in this context.`,
+    "`Theme` creates styling contexts to customize the appearance of nested " +
+    "components without using CSS.",
   allowArbitraryProps: true,
   props: {
     themeId: d(`This property specifies which theme to use by setting the theme's id.`),
@@ -20,7 +19,12 @@ export const ThemeMd = createMetadata({
       valueType: "string",
       defaultValue: "light",
     },
-    root: d(`This property indicates whether the component is at the root of the application.`, undefined, "boolean", defaultProps.root ),
+    root: d(
+      `This property indicates whether the component is at the root of the application.`,
+      undefined,
+      "boolean",
+      defaultProps.root,
+    ),
   },
   opaque: true,
 });

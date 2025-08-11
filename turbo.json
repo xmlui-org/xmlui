@@ -1,6 +1,8 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "globalEnv": ["CI"],
+  "ui": "tui",
+  "envMode": "loose",
   "tasks": {
     "build:bin": {
       "outputs": ["dist/scripts/**"]
@@ -41,35 +43,43 @@
       ],
       "outputs": ["dist/**"]
     },
+    "gen:releases": {
+      "env": ["GITHUB_TOKEN", "DOCS_XMLUI_MAX_RELEASES_LENGTH"],
+      "outputs": ["public/resources/files/releases.json"]
+    },
+    "generate-docs": {
+      "outputs": ["scripts/generate-docs/metadata/**", "$TURBO_ROOT$/docs/content/**"],
+      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
+      "dependsOn": ["build:xmlui-metadata"]
+    },
+    "generate-docs-summaries": {
+      "outputs": ["$TURBO_ROOT$/docs/content/**"],
+      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
+      "dependsOn": ["generate-docs"]
+    },
     "build:docs": {
-      "dependsOn": ["^build:extension", "^build:xmlui"],
+      "dependsOn": ["^build:extension", "^build:xmlui", "gen:releases", "generate-docs-summaries"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
-      "dependsOn": [
-        "build:extension"
-      ],
+      "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "build:test-bed": {
-      "dependsOn": [
-        "build:extension"
-      ],
+      "dependsOn": ["build:extension"],
       "outputs": ["dist/**"]
     },
-    "test:unit": {
-      "outputs": []
-    },
+    "test:unit": {},
     "test:e2e-smoke": {
       "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
     "test:e2e-non-smoke": {
-      "dependsOn": ["test:e2e-smoke"],
+      "dependsOn": ["build:test-bed", "build:xmlui-test-bed", "test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
     },
     "test:xmlui-all": {
-      "dependsOn": ["test:unit", "test:e2e-smoke", "test:e2e-non-smoke"],
+      "dependsOn": ["test:unit", "test:e2e-non-smoke"],
       "outputs": ["playwright-report/**"]
     },
     "test:xmlui-smoke": {

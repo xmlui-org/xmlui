@@ -1,9 +1,9 @@
 import styles from "./RadioGroup.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -25,10 +25,12 @@ const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;
 
 export const RadioGroupMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` input component is a group of radio buttons ` +
-    `([\`RadioGroupOption\`](./RadioGroupOption.mdx) components) that allow users to select ` +
-    `only one option from the group at a time.`,
+    "`RadioGroup` creates a mutually exclusive selection interface where users can " +
+    "choose only one option from a group of radio buttons. It manages the selection " +
+    "state and ensures that selecting one option automatically deselects all others in " +
+    "the group.",
   props: {
     initialValue: {
       ...dInitialValue(),
@@ -66,20 +68,22 @@ export const RadioGroupMd = createMetadata({
   defaultThemeVars: {
     [`gap-${RGOption}`]: "$space-1_5",
     [`borderWidth-${RGOption}`]: "1px",
-    [`backgroundColor-checked-${RGOption}-indicator`]: `$backgroundColor-primary`,
-    [`backgroundColor-checked-${RGOption}--disabled]`]: `$borderColor-${RGOption}--disabled`,
-    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
-    [`fontSize-${RGOption}`]: "$fontSize-small",
-    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
-    [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
-    [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
+    [`borderWidth-${RGOption}-validation`]: `2px`,
+
     [`borderColor-${RGOption}-default`]: "$color-surface-500",
+    [`borderColor-checked-${RGOption}`]: "$color-primary-500",
     [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
     [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
+    [`borderColor-${RGOption}-error`]: `$borderColor-Input-default--error`,
+    [`borderColor-${RGOption}-warning`]: `$borderColor-Input-default--warning`,
+    [`borderColor-${RGOption}-success`]: `$borderColor-Input-default--success`,
+
+    [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
+    [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
+    [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
+    
+    [`fontSize-${RGOption}`]: "$fontSize-small",
+    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
   },
 });
 

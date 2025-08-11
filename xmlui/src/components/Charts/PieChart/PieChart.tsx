@@ -1,27 +1,32 @@
 import { defaultProps, PieChart } from "./PieChartNative";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
-import { createMetadata, d } from "../../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import type { LabelPosition } from "recharts/types/component/Label";
+import { createMetadata, d } from "../../metadata-helpers";
 
 const COMP = "PieChart";
 
 export const PieChartMd = createMetadata({
-  description: "Represents a pie chart component.",
   status: "experimental",
+  description:
+    "`PieChart` visualizes proportional data as circular segments; each slice " +
+    "represents a percentage of the whole. Note that the height of the component or " +
+    "its parent needs to be set explicitly.",
+  docFolder: "Charts/PieChart",
   props: {
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",
     },
-    dataKeys: {
-      description:
-        "This property specifies the keys in the data objects that should be used for rendering the bars.",
-      valueType: "string",
-    },
     nameKey: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
+      valueType: "string",
+    },
+    dataKey: {
+      description:
+        "This property specifies the key in the data objects that will be used to render the chart.",
       valueType: "string",
     },
     showLabel: {
@@ -40,9 +45,14 @@ export const PieChartMd = createMetadata({
       defaultValue: defaultProps.labelListPosition,
       availableValues: LabelPositionValues,
     },
-    width: d("The width of the chart"),
-    height: d("The height of the chart"),
-    outerRadius: d("The outer radius of the pie chart, can be a number or a string (e.g., '100%')."),
+    outerRadius: d(
+      "The outer radius of the pie chart, can be a number or a string (e.g., '100%').",
+    ),
+    showLegend: {
+      description: "Toggles whether to show legend (\`true\`) or not (\`false\`).",
+      valueType: "boolean",
+      defaultValue: defaultProps.showLegend,
+    }
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -53,13 +63,13 @@ export const PieChartMd = createMetadata({
 export const pieChartComponentRenderer = createComponentRenderer(
   COMP,
   PieChartMd,
-  ({ extractValue, node, className, renderChild }: any) => {
+  ({ extractValue, node, layoutCss, renderChild }) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(node.props?.showLabelList)}
-        labelListPosition={extractValue.asOptionalString(node.props?.labelListPosition)}
+        labelListPosition={extractValue.asOptionalString(node.props?.labelListPosition) as LabelPosition}
         data={extractValue(node.props?.data)}
-        className={className}
+        style={layoutCss}
         showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         dataKey={extractValue(node.props?.dataKey)}

@@ -1,12 +1,12 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../metadata-helpers";
 import { RealTimeAdapter, defaultProps } from "./RealTimeAdapterNative";
 
 const COMP = "RealTimeAdapter";
 
 export const RealTimeAdapterMd = createMetadata({
   status: "experimental",
-  description: `\`${COMP}\` is a non-visual component that listens to real-time events through long-polling.`,
+  description: "`RealTimeAdapter` is a non-visual component that listens to real-time events.",
   props: {
     url: {
       description: `This property specifies the URL to use for long-polling.`,

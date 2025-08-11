@@ -1,23 +1,28 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../metadata-helpers";
 import { AppState, defaultProps } from "./AppStateNative";
 
 const COMP = "AppState";
 
 export const AppStateMd = createMetadata({
+  status: "stable",
   description:
-    `${COMP} is a functional component (without a visible user interface) that helps ` +
-    `store and manage the app's state.`,
+    "`AppState` is an invisible component that provides global state management " +
+    "across your entire application. Unlike component variables that are scoped " +
+    "locally, AppState allows any component to access and update shared state " +
+    "without prop drilling.",
   props: {
     bucket: {
-      description: `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
+      description:
+        `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
         `Multiple \`${COMP}\` instances with the same bucket will share the same state object: any ` +
         `of them updating the state will cause the other instances to view the new, updated state.`,
       valueType: "string",
       defaultValue: defaultProps.bucket,
     },
     initialValue: {
-      description: `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
+      description:
+        `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
         `component instances for the same bucket with their \`initialValue\` set, it may result ` +
         `in faulty app logic. When xmlui instantiates an \`${COMP}\` with an explicit initial ` +
         `value, that value is immediately set. Multiple initial values may result in ` +
@@ -25,10 +30,14 @@ export const AppStateMd = createMetadata({
     },
   },
   apis: {
-    update: d(
-      "This method updates the application state object bound to the `AppState` instance. The " +
-        "function's single argument is an object that specifies the new state value.",
-    ),
+    update: {
+      signature: "update(newState: Record<string, any>)",
+      description:
+        "This method updates the application state object bound to the `AppState` instance.",
+      parameters: {
+        newState: "An object that specifies the new state value.",
+      },
+    },
   },
   nonVisual: true,
 });

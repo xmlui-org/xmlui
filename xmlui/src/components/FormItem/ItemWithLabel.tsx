@@ -27,6 +27,9 @@ type ItemWithLabelProps = {
   isInputTemplateUsed?: boolean;
   validationResult?: ReactNode;
 };
+export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
+  labelBreak: true,
+};
 
 const numberRegex = /^[0-9]+$/;
 
@@ -37,7 +40,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     style,
     className,
     label,
-    labelBreak = true,
+    labelBreak = defaultProps.labelBreak,
     labelWidth,
     enabled = true,
     required = false,
@@ -83,7 +86,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         {label && (
           <label
             htmlFor={inputId}
-            onClick={() => document.getElementById(inputId).focus()}
+            onClick={() => document.getElementById(inputId)?.focus()}
             style={{
               ...labelStyle,
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,

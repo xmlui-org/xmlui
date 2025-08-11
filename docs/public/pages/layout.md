@@ -95,7 +95,7 @@ Each component has a default strategy for determining the dimensions (height and
 
 Components can align their children in the viewport both vertically and horizontally.
 
-```xmlui-pg display name="Example: alignment"
+```xmlui-pg display name="Example: alignment" /horizontalAlignment/ /verticalAlignment/
 <App>
   <HStack>
     <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">
@@ -112,7 +112,6 @@ Components can align their children in the viewport both vertically and horizont
 </App>
 ```
 
-
 The component with the red border aligns its children vertically to the start and horizontally to the end. The green-bordered component aligns its children vertically to the center and horizontally to the start.
 
 ## Layout containers
@@ -128,7 +127,7 @@ XMLUI uses only two fundamental layout containers, `Stack`, and `FlowLayout`. Al
 
 ## Dimension units
 
-To control a child's dimensions explicitly, instead of as determined by its content, you can set one or more of these [properties](/styles-and-themes/layout-props):  `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` using several kinds of values.
+To explicitly control a child's dimensions, instead of it being determined by its content, you can set one or more of these [properties](/styles-and-themes/layout-props): `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` using several kinds of values.
 
 - **No value**. The layout container determines the default size of the child element according to its strategy.
 - **Container-independent size value**. All sizes except percentage (`%`) and star sizes (`*`) belong to this category. The container respects the child's requested size.
@@ -137,7 +136,7 @@ To control a child's dimensions explicitly, instead of as determined by its cont
 
 ## Gaps
 
-The fundamental layout containers apply a default gap to ensuring that children have some space between them.
+The fundamental layout containers apply a default gap ensuring that children have some space between them.
 
 ```xmlui-pg copy display name="Example: default gaps"
 <App>
@@ -292,13 +291,10 @@ You can assign the `horizontal` or `vertical` values to the `Stack` component's 
 
 > [!INFO]
 > Use `Stack` when the `orientation` property can vary as the result of an expression. If the orientation is static, use `VStack` (equivalent to `<Stack orientation="vertical">`) or `HStack` (`<Stack orientation="horizontal">`).
-</Callout>
 
-## Alignment
+### Alignment
 
-The `horizontalAlignment` and `verticalAlignment` properties govern alignment within a stack, using values like `start`, `end`, and `center`. See the full list of values [here](/styles-and-themes/common-units#text-alignment-values)
-</Callout>
-
+The `horizontalAlignment` and `verticalAlignment` properties govern alignment within a stack, using values like `start`, `end`, and `center`. See the full list of values [here](/styles-and-themes/common-units#alignment)
 
 This markup aligns the children of an `HStack` horizontally in the center:
 
@@ -329,7 +325,6 @@ This markup aligns the children of an `HStack` vertically in the center:
   <Stack backgroundColor="blue" height="48px" width="36px" />
 </HStack>
 ```
-
 
 ## VStack
 
@@ -376,7 +371,6 @@ Such a configuration will not cause overflow.
 ## HStack
 
 An `HStack` component displays each of its children in a single row. If a child has no explicit (or component-specific) width, the `HStack` fits the component width to its content. `HStack` sets the child components' heights to the stack's viewport height.
-</Callout>
 
 ```xmlui-pg copy display name="Example: rendering children in a HStack"
 <HStack>
@@ -384,7 +378,6 @@ An `HStack` component displays each of its children in a single row. If a child 
   <Button>I'm a button</Button>
 </HStack>
 ```
-
 
 The `H2` component has no explicit size, so it's stretched to the viewport width (as the background color indicates). Though `Button` has no explicit size, it has a component-specific one (according to its content), so it is not stretched.
 
@@ -492,7 +485,7 @@ When you use an `HStack` with percentage sizing and the sum width of children is
 
 `FlowLayout` caps the size of items exceeding the available width. Here the red box is too wide but `FlowLayout` trims it back to 100% width.
 
-```xmlui-pg copy /width="1000000px"/ name="Example: FlowLayout with size capping"
+```xmlui-pg copy display /width="1000000px"/ name="Example: FlowLayout with size capping"
 <FlowLayout>
   <Stack backgroundColor="red" height="36px" width="1000000px" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -535,8 +528,8 @@ Here's a horizontal splitter that sets some constraints on the size of the prima
 ```xmlui-pg copy display height="200px" name="Example: Splitter"
 <HSplitter
   height="100%"
-  minPrimarySize="10%"
-  maxPrimarySize="90%">
+  minPrimarySize="15%"
+  maxPrimarySize="85%">
   <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>
   <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>
 </HSplitter>

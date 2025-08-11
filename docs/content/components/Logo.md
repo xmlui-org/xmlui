@@ -1,10 +1,8 @@
-import xmluiLogo from  "../../component-samples/Logo/xmlui-logo.svg";
-
 # Logo [#logo]
 
-The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate).
+`Logo` displays your application's brand symbol by automatically loading logo images defined in the app manifest. While logos are typically configured using App-level properties (`logo`, `logo-dark`), this component provides direct control when you need custom logo placement or templating.
 
-You can learn more about using logos in application layouts in the [App Component](/learning/using-components/app-component/) article.
+Most apps use `logo="path/to/logo.svg"` on the App component rather than using `<Logo>` directly. Use this component when you need custom logo positioning or want to combine logos with other elements in a `logoTemplate`.
 
 ## Using Logo [#using-logo]
 
@@ -42,7 +40,7 @@ It also uses the `Logo` component within the template definition:
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <CHStack>
         (Sample content)
@@ -56,9 +54,13 @@ The markup displays the app's logo:
 
 ## Properties [#properties]
 
-### `alt (default: "Logo")` [#alt-default-logo]
+### `alt` (default: "Logo") [#alt-default-logo]
 
 Alternative text for the logo image for accessibility.
+
+### `inline` (default: false) [#inline-default-false]
+
+When set to true, the image will be displayed as an inline element instead of a block element.
 
 ## Events [#events]
 

@@ -1,7 +1,7 @@
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
-import { dInternal } from "../../components/metadata-helpers";
+import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
 import { APICallNative, defaultProps } from "./APICallNative";
 
@@ -29,9 +29,12 @@ export interface ApiActionComponent extends ComponentDef {
 }
 
 export const APICallMd = createMetadata({
+  status: "stable",
   description:
-    `\`${COMP}\` is used to mutate (create, update or delete) some data on the backend. It ` +
-    `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
+    "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
+    "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
+    "automatically execute - you must trigger it manually with the `execute()` method, " +
+    "typically from form submissions or button clicks.",
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
@@ -54,10 +57,9 @@ export const APICallMd = createMetadata({
     },
     body: {
       description:
-        "This optional property sets the request body. The object you pass here will be serialized to " +
-        "JSON when sending the request. Use the \`rawBody\` property to send another request " +
-        "body using its native format. When you define \`body\` and \`rawBody\`, the latest " +
-        "one prevails.",
+        "This optional property sets the request body. Use to pass an object that will be " +
+        "serialized as a JSON string. If you have an object that is already serialized as " +
+        "a JSON string, use `rawBody` instead.",
       valueType: "string",
     },
     queryParams: {
@@ -116,35 +118,48 @@ export const APICallMd = createMetadata({
     getOptimisticValue: dInternal(),
   },
   events: {
-    beforeRequest: d(
-      "This event fires before the request is sent. Returning an explicit boolean" +
+    beforeRequest: {
+      description:
+        "This event fires before the request is sent. Returning an explicit boolean" +
         "\`false\` value will prevent the request from being sent.",
-    ),
-    success: d("This event fires when a request results in a success."),
-    /**
-     * This event fires when a request results in an error.
-     * @descriptionRef
-     */
-    error: d("This event fires when a request results in an error."),
+    },
+    success: {
+      description: "This event fires when a request results in a success.",
+    },
+    // This event fires when a request results in an error.
+    error: {
+      description: "This event fires when a request results in an error.",
+    },
     progress: dInternal(),
   },
   contextVars: {
-    $param: d(
-      "This value represents the first parameters passed to the \`execute()\` method to " +
-        "display the modal dialog.",
-    ),
-    $params: d(
-      "This value represents the array of parameters passed to the \`execute()\` method. " +
-        "You can use \`$params[0]\` to access the first and \`$params[1]\` to access the " +
-        "second (and so on) parameters. \`$param\` is the same as \`$params[0]\`.",
-    ),
+    $param: {
+      description: "The first parameter passed to `execute()` method",
+    },
+    $params: {
+      description:
+        "Array of all parameters passed to `execute()` method (access with " +
+        "`$params[0]`, `$params[1]`, etc.)",
+    },
+    $result: {
+      description:
+        "Response data (available in `completedNotificationMessage` and `success` event)",
+    },
+    $error: {
+      description: "Error details (available in `errorNotificationMessage` and `error` event)",
+    },
   },
   apis: {
-    execute: d(
-      "This method triggers the invocation of the API. You can pass an arbitrary " +
+    execute: {
+      description:
+        "This method triggers the invocation of the API. You can pass an arbitrary " +
         "number of parameters to the method. In the \`APICall\` instance, you can " +
         "access those with the \`$param\` and \`$params\` context values.",
-    ),
+      signature: "execute(...params: any[])",
+      parameters: {
+        params: "An arbitrary number of parameters that can be used in the API call.",
+      },
+    },
   },
 });
 

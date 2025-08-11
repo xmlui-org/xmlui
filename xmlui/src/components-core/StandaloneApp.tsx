@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import type { ReactNode} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
+import yaml from "js-yaml";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
 import type {
@@ -8,7 +10,6 @@ import type {
   ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
-import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
 
 import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
@@ -51,7 +52,7 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import React from "react";
+import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -63,6 +64,7 @@ const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 type StandaloneAppProps = {
   // --- The standalone app description (the engine renders this definition)
   appDef?: StandaloneAppDescription;
+  appGlobals?: Record<string, any>;
 
   // --- In E2E tests, we can decorate the components with test IDs
   decorateComponentsWithTestId?: boolean;
@@ -75,6 +77,10 @@ type StandaloneAppProps = {
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
+
+  // --- If true, the app waits for the API interceptor to be ready
+  waitForApiInterceptor?: boolean;
+  children?: ReactNode;
 };
 
 /**
@@ -88,10 +94,13 @@ type StandaloneAppProps = {
  */
 function StandaloneApp({
   appDef,
+  appGlobals: globals,
   decorateComponentsWithTestId,
   debugEnabled = false,
   runtime,
   extensionManager,
+  waitForApiInterceptor = false,
+  children
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
@@ -99,11 +108,6 @@ function StandaloneApp({
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
 
   usePrintVersionNumber(standaloneApp);
-
-  if (!standaloneApp) {
-    // --- Problems found, the standalone app cannot run
-    return null;
-  }
 
   const {
     apiInterceptor,
@@ -117,7 +121,27 @@ function StandaloneApp({
     components,
     themes,
     sources,
-  } = standaloneApp;
+  } = standaloneApp || {};
+
+  const globalProps = useMemo(()=>{
+    return {
+      name: name,
+      ...(appGlobals || {}),
+      ...(globals || {})
+    }
+  }, [appGlobals, globals, name]);
+
+  let contributes = useMemo(()=>{
+    return {
+      compoundComponents: components,
+      themes,
+    }
+  }, [components, themes]);
+
+  if (!standaloneApp) {
+    // --- Problems found, the standalone app cannot run
+    return null;
+  }
 
   // --- The app may use a mocked API already defined in `window.XMLUI_MOCK_API`
   // --- or within the standalone app's definition, in `apiInterceptor`.
@@ -136,33 +160,24 @@ function StandaloneApp({
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
-    <React.StrictMode>
-      <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
-        <AppRoot
-          projectCompilation={projectCompilation}
-          decorateComponentsWithTestId={shouldDecorateWithTestId}
-          node={entryPoint!}
-          standalone={true}
-          debugEnabled={debugEnabled}
-          // @ts-ignore
-          routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-          globalProps={{
-            name: name,
-            ...(appGlobals || {}),
-          }}
-          defaultTheme={defaultTheme}
-          defaultTone={defaultTone as ThemeTone}
-          resources={resources}
-          resourceMap={resourceMap}
-          sources={sources}
-          extensionManager={extensionManager}
-          contributes={{
-            compoundComponents: components,
-            themes,
-          }}
-        />
-      </ApiInterceptorProvider>
-    </React.StrictMode>
+    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting} waitForApiInterceptor={waitForApiInterceptor}>
+      <AppRoot
+        projectCompilation={projectCompilation}
+        decorateComponentsWithTestId={shouldDecorateWithTestId}
+        node={entryPoint!}
+        standalone={true}
+        debugEnabled={debugEnabled}
+        // @ts-ignore
+        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+        globalProps={globalProps}
+        defaultTheme={defaultTheme}
+        defaultTone={defaultTone as ThemeTone}
+        resources={resources}
+        resourceMap={resourceMap}
+        sources={sources}
+        extensionManager={extensionManager}
+        contributes={contributes}>{children}</AppRoot>
+    </ApiInterceptorProvider>
   );
 }
 
@@ -472,16 +487,68 @@ function mergeAppDefWithRuntime(
   };
 }
 
-
 function resolvePath(basePath: string, relativePath: string) {
   // Create a base URL. The 'http://dummy.com' is just a placeholder.
-  const baseUrl = new URL(basePath, 'http://dummy.com');
+  const baseUrl = new URL(basePath, "http://dummy.com");
 
   // Create a new URL by resolving the relative path against the base URL.
   const resolvedUrl = new URL(relativePath, baseUrl);
 
   // Return the pathname, removing the leading slash.
   return resolvedUrl.pathname.substring(1);
+}
+
+/**
+ * Helper function to load theme files with support for both JSON and YAML formats.
+ * First tries to load as JSON, if that fails, attempts to load as YAML.
+ * @param url The URL to fetch the theme from
+ * @returns A Promise resolving to the parsed theme definition
+ */
+async function loadThemeFile(url: string): Promise<ThemeDefinition> {
+  // First try to load as JSON
+  try {
+    const response = await fetchWithoutCache(url);
+    if (!response.ok) {
+      // If the JSON file doesn't exist, try YAML immediately
+      throw new Error(`Failed to fetch ${url}`);
+    }
+
+    // Get the content as text first
+    const text = await response.text();
+
+    // Try to parse as JSON
+    try {
+      return JSON.parse(text);
+    } catch (jsonParseError) {
+      // If JSON parsing fails, it might be a YAML file with a .json extension
+      // or we need to try the .yml version
+      console.warn(`Failed to parse ${url} as JSON, attempting YAML parsing.`);
+      try {
+        return yaml.load(text) as ThemeDefinition;
+      } catch (yamlParseError) {
+        // If both JSON and YAML parsing fail for this file, try the .yml version
+        throw jsonParseError;
+      }
+    }
+  } catch (jsonError) {
+    // If JSON file loading fails, try YAML
+    const yamlUrl = url.replace(/\.json$/, ".yml");
+    try {
+      const response = await fetchWithoutCache(yamlUrl);
+      if (!response.ok) throw new Error(`Failed to fetch ${yamlUrl}`);
+      const text = await response.text();
+      return yaml.load(text) as ThemeDefinition;
+    } catch (yamlError) {
+      console.error(
+        `Failed to load theme file: ${url} (JSON error:`,
+        jsonError,
+        "YAML error:",
+        yamlError,
+        ")",
+      );
+      throw new Error(`Failed to load theme file ${url} in either JSON or YAML format`);
+    }
+  }
 }
 
 /**
@@ -573,7 +640,7 @@ function useStandalone(
 
         const themePromises: Promise<ThemeDefinition>[] = [];
         config.themes?.forEach((theme) => {
-          themePromises.push(fetchWithoutCache(theme).then((value) => value.json()));
+          themePromises.push(loadThemeFile(theme));
         });
         const themes = await Promise.all(themePromises);
 
@@ -629,16 +696,12 @@ function useStandalone(
       let themePromises: Promise<ThemeDefinition>[];
       if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
         // --- Special case, we have only a single "defaultTheme" in the configuration
-        const fetchDefaultTheme = fetchWithoutCache(`themes/${config?.defaultTheme}.json`).then(
-          (value) => value.json(),
-        ) as Promise<ThemeDefinition>;
+        const fetchDefaultTheme = loadThemeFile(`themes/${config?.defaultTheme}.json`);
         themePromises = [fetchDefaultTheme];
       } else {
         // --- In any other case, we fetch all themes defined in the configuration
         themePromises = config?.themes?.map((themePath) => {
-          return fetchWithoutCache(themePath).then((value) =>
-            value.json(),
-          ) as Promise<ThemeDefinition>;
+          return loadThemeFile(themePath);
         });
       }
       // --- Fetch component files according to the configuration
@@ -652,12 +715,11 @@ function useStandalone(
       });
 
       // --- Let the promises resolve
-      const [loadedEntryPoint, loadedComponents, themes] =
-        await Promise.all([
-          entryPointPromise,
-          Promise.all(componentPromises || []),
-          Promise.all(themePromises || []),
-        ]);
+      const [loadedEntryPoint, loadedComponents, themes] = await Promise.all([
+        entryPointPromise,
+        Promise.all(componentPromises || []),
+        Promise.all(themePromises || []),
+      ]);
 
       // --- Collect the elements of the standalone app (and potential errors)
       const errorComponents: ComponentDef[] = [];
@@ -668,21 +730,25 @@ function useStandalone(
       }
 
       let loadedEntryPointCodeBehind = null;
-      if(loadedEntryPoint.component.props?.codeBehind !== undefined){
+      if (loadedEntryPoint.component.props?.codeBehind !== undefined) {
         // --- We have a code-behind file for the main component
-        loadedEntryPointCodeBehind = await  new Promise(async (resolve) => {
+        loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
           try {
-            const resp = await fetchWithoutCache(resolvePath(MAIN_FILE, loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE));
+            const resp = await fetchWithoutCache(
+              resolvePath(
+                MAIN_FILE,
+                loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE,
+              ),
+            );
             const codeBehind = await parseCodeBehindResponse(resp);
             resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
           } catch (e) {
             resolve(null);
           }
-        }) as any;
+        })) as any;
         if (loadedEntryPointCodeBehind.hasError) {
           errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
         }
-
       }
 
       // --- Check if any of the components have markup errors
@@ -744,9 +810,7 @@ function useStandalone(
           !builtInThemes.find((theme) => theme.id === defaultTheme) &&
           !themes.find((theme) => theme.id === defaultTheme)
         ) {
-          themes.push(
-            await fetchWithoutCache(`themes/${defaultTheme}.json`).then((value) => value.json()),
-          );
+          themes.push(await loadThemeFile(`themes/${defaultTheme}.json`));
         }
       }
 
@@ -808,12 +872,19 @@ function useStandalone(
             };
 
             let componentCodeBehind = null;
-            if("codeBehind" in compWrapper.component && compWrapper.component?.codeBehind !== undefined){
+            if (
+              "codeBehind" in compWrapper.component &&
+              compWrapper.component?.codeBehind !== undefined
+            ) {
               // --- Promises for the component code-behind files
-              componentCodeBehind =  await new Promise(async (resolve) => {
+              componentCodeBehind = (await new Promise(async (resolve) => {
                 try {
                   const codeBehind = await fetchWithoutCache(
-                    resolvePath(`components/${componentPath}`, (compWrapper.component as CompoundComponentDef)?.codeBehind || `${componentPath}.${codeBehindFileExtension}`),
+                    resolvePath(
+                      `components/${componentPath}`,
+                      (compWrapper.component as CompoundComponentDef)?.codeBehind ||
+                        `${componentPath}.${codeBehindFileExtension}`,
+                    ),
                   );
                   const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
                   if (codeBehindWrapper.hasError) {
@@ -827,13 +898,12 @@ function useStandalone(
                 } catch {
                   resolve(null);
                 }
-              }) as Promise<CompoundComponentDef | ParsedResponse>;
+              })) as Promise<CompoundComponentDef | ParsedResponse>;
 
               if (componentCodeBehind && "src" in componentCodeBehind) {
                 compCompilation.codeBehindSource = componentCodeBehind.src;
               }
             }
-
 
             resolvedRuntime.projectCompilation.components.push(compCompilation);
 
@@ -1069,6 +1139,9 @@ function discoverDirectComponentDependenciesHelp(
   registry: ComponentRegistry,
   deps: Set<string>,
 ): Set<string> {
+  if (!component) {
+    return deps;
+  }
   const compName = component.type;
   if (!registry.hasComponent(compName)) {
     deps.add(compName);

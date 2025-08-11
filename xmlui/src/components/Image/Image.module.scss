@@ -7,20 +7,20 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-@layer components {
-  .img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: createThemeVar("borderRadius-Image");
+  border-color: createThemeVar("borderColor-Image");
 
-    &.clickable {
-      cursor: pointer;
-    }
+  &.clickable {
+    cursor: pointer;
   }
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export {
-  themeVars: t.json-stringify($themeVars);
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

@@ -1,15 +1,19 @@
 import styles from "./LabelListNative.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "LabelList";
 
 export const LabelListMd = createMetadata({
-  description: "Label list component for a chart component.",
   status: "experimental",
+  description:
+    "`LabelList` adds custom data labels to chart components when automatic " +
+    "labeling isn't sufficient. It's a specialized component for advanced chart " +
+    "customization scenarios where you need precise control over label positioning " +
+    "and appearance.",
   props: {
     key: {
       description: "The key that needs to be matched to the data series.",

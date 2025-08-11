@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
@@ -15,9 +15,11 @@ import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./InspectorButton.module.scss";
-import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ProjectCompilation } from "../abstractions/scripting/Compilation";
-import { PiFileCode } from "react-icons/pi";
+import { InspectorDialog } from "./devtools/InspectorDialog";
+import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
+import { XmlUiHelper } from "../parsers/xmlui-parser";
+import { useAppContext } from "./AppContext";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -26,17 +28,15 @@ interface IInspectorContext {
   attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
-  devToolsSize?: number;
-  setDevToolsSize: (size: number) => void;
-  devToolsSide?: "bottom" | "left" | "right";
-  setDevToolsSide: (side: "bottom" | "left" | "right") => void;
   devToolsEnabled?: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  isOpen: boolean;
   inspectedNode: any;
   projectCompilation: ProjectCompilation | undefined;
   setInspectMode: (inspectMode: (prev: any) => boolean) => void;
   inspectMode: boolean;
   mockApi: any;
+  clickPosition: { x: number; y: number };
 }
 
 // --- The context object that is used to store the inspector information.
@@ -53,18 +53,14 @@ export function InspectorProvider({
   projectCompilation?: ProjectCompilation;
   mockApi?: any;
 }) {
-  const { root } = useTheme();
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
   const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
   const [showCode, setShowCode] = useState(false);
-  const [devToolsSize, setDevToolsSize] = useState(0);
-  const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
   const [inspectMode, setInspectMode] = useState(false);
-
-  const componentRegistry = useComponentRegistry();
-
-  const devToolsEntry = componentRegistry.lookupComponentRenderer("XMLUIDevtools.DevTools");
-
+  const [clickPosition, setClickPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const contextValue: IInspectorContext = useMemo(() => {
     return {
       sources,
@@ -101,22 +97,20 @@ export function InspectorProvider({
       },
       inspectedNode,
       setIsOpen: setShowCode,
-      devToolsSize,
-      setDevToolsSize,
-      devToolsSide,
-      setDevToolsSide,
+      isOpen: showCode,
       devToolsEnabled: showCode,
       projectCompilation: projectCompilation,
       setInspectMode,
       inspectMode,
       mockApi,
+      clickPosition,
     };
   }, [
-    devToolsSide,
-    devToolsSize,
     sources,
     inspectedNode,
     showCode,
+    clickPosition,
+    setShowCode,
     projectCompilation,
     inspectMode,
     mockApi,
@@ -126,16 +120,13 @@ export function InspectorProvider({
     <InspectorContext.Provider value={contextValue}>
       {children}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
-        showCode &&
-        inspectedNode !== null &&
-        createPortal(devToolsEntry?.renderer({} as any), root)}
-      {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {
           return (
             <InspectButton
               inspectedNode={inspectedNode}
               setShowCode={setShowCode}
+              setClickPosition={setClickPosition}
               key={item.inspectId + +"-" + item.key}
               inspectId={item.inspectId}
               node={item.node}
@@ -155,6 +146,7 @@ function InspectButton({
   setInspectedNode,
   setShowCode,
   inspectMode,
+  setClickPosition,
 }: {
   inspectId: string;
   node: ComponentDef;
@@ -162,6 +154,7 @@ function InspectButton({
   setInspectedNode: (node: any) => void;
   setShowCode: (show: any) => void;
   inspectMode: boolean;
+  setClickPosition?: (position: { x: number; y: number }) => void;
 }) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
@@ -280,30 +273,34 @@ function InspectButton({
         : visible &&
           !!root &&
           createPortal(
-              <Button
-                variant={"ghost"}
-                className={classnames(styles.wrapper, "_debug-inspect-button")}
-                ref={(el) => setPopperElement(el)}
-                style={{ ...popperStyles.popper, padding: 0 }}
-                {...attributes.popper}
-                onMouseEnter={() => {
-                  hoverRef.current = true;
-                  if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                  }
-                }}
-                onMouseLeave={() => {
-                  hoverRef.current = false;
-                  setVisible(false);
-                }}
-                onClick={() => {
-                  setInspectedNode(node);
-                  setShowCode(true);
-                }}
-              >
-                <PiFileCode className={styles.inspectIcon}/>
-              </Button>,
+            <Button
+              variant={"outlined"}
+              className={classnames(styles.wrapper, "_debug-inspect-button")}
+              ref={(el) => setPopperElement(el)}
+              style={{ ...popperStyles.popper, padding: 0 }}
+              {...attributes.popper}
+              onMouseEnter={() => {
+                hoverRef.current = true;
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = null;
+                }
+              }}
+              onMouseLeave={() => {
+                hoverRef.current = false;
+                setVisible(false);
+              }}
+              onClick={() => {
+                setInspectedNode(node);
+                setShowCode(true);
+                setClickPosition({
+                  x: popperElement?.getBoundingClientRect().left || 0,
+                  y: popperElement?.getBoundingClientRect().top || 0,
+                });
+              }}
+            >
+              Show code
+            </Button>,
             root,
           )}
     </>
@@ -313,17 +310,19 @@ function InspectButton({
 export function useDevTools() {
   const context = useContext(InspectorContext);
 
+  if (!context) {
+    throw new Error("useDevTools must be used within an InspectorProvider");
+  }
+
   return {
-    projectCompilation: context?.projectCompilation,
-    inspectedNode: context?.inspectedNode,
-    sources: context?.sources,
-    setIsOpen: context?.setIsOpen,
-    devToolsSize: context?.devToolsSize,
-    setDevToolsSize: context?.setDevToolsSize,
-    devToolsSide: context?.devToolsSide,
-    setDevToolsSide: context?.setDevToolsSide,
-    devToolsEnabled: context?.devToolsEnabled,
-    mockApi: context?.mockApi,
+    projectCompilation: context.projectCompilation,
+    inspectedNode: context.inspectedNode,
+    sources: context.sources,
+    isOpen: context.isOpen,
+    setIsOpen: context.setIsOpen,
+    devToolsEnabled: context.devToolsEnabled,
+    mockApi: context.mockApi,
+    clickPosition: context.clickPosition,
   };
 }
 

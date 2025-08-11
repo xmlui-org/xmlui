@@ -1,6 +1,6 @@
 # ColorPicker [#colorpicker]
 
-This component allows the user to select a color with the browser's default color picker control.
+`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.
 
 ## Using `ColorPicker` [#using-colorpicker]
 
@@ -15,11 +15,11 @@ This component allows you to edit or select a color using RGB, HSL, or CSS HEX n
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -42,11 +42,11 @@ This property sets the component's initial value.
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` (default: "top") [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -63,7 +63,7 @@ Available values:
 
 This property sets the width of the `ColorPicker` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -73,11 +73,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -115,11 +115,17 @@ This event is triggered when the ColorPicker has lost the focus.
 
 ### `focus` [#focus]
 
-This method sets the focus on the ColorPicker.
+Focus the ColorPicker component.
+
+**Signature**: `focus(): void`
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This method sets the current value of the ColorPicker.
+
+**Signature**: `set value(value: string): void`
+
+- `value`: The new value to set for the color picker.
 
 ```xmlui-pg copy display name="Example: setValue"
 <App>
@@ -145,7 +151,9 @@ You can use this method to set the component's current value programmatically (`
 
 ### `value` [#value]
 
-You can query the component's value. If no value is set, it will retrieve `undefined`.
+This method returns the current value of the ColorPicker.
+
+**Signature**: `get value(): string`
 
 ## Styling [#styling]
 

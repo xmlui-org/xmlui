@@ -13,7 +13,6 @@ import { ThemeContext, useTheme, useThemes } from "../../components-core/theming
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
-import { useDevTools } from "../../components-core/InspectorContext";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
 import { useStyles } from "../../components-core/theming/StyleContext";
@@ -57,7 +56,9 @@ export function Theme({
   const currentTheme: ThemeDefinition = useMemo(() => {
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
     if (!themeToExtend) {
-      throw new Error("Theme not found");
+      throw new Error(
+        `Theme not found: requested="${id}", available=[${themes.map((t) => t.id).join(", ")}]`,
+      );
     }
     const foundTheme = {
       ...themeToExtend,
@@ -160,18 +161,6 @@ export function Theme({
     getThemeVar,
   ]);
 
-  const { devToolsSize, devToolsSide, devToolsEnabled } = useDevTools();
-
-  const inspectStyle = useMemo(() => {
-    return devToolsEnabled
-      ? {
-          paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
-          paddingLeft: devToolsSide === "left" ? devToolsSize : 0,
-          paddingRight: devToolsSide === "right" ? devToolsSize : 0,
-        }
-      : {};
-  }, [devToolsEnabled, devToolsSide, devToolsSize]);
-
   const { indexing } = useIndexerContext();
   if (indexing) {
     return children;
@@ -187,7 +176,6 @@ export function Theme({
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
         <div
-          style={inspectStyle}
           id={"_ui-engine-theme-root"}
           className={classnames(styles.baseRootComponent, className)}
           ref={(el) => {

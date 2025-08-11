@@ -1,4 +1,4 @@
-import type { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
 
 /**

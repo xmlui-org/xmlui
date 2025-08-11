@@ -4,8 +4,7 @@ import type { RequestHandler } from "msw";
 import { http } from "msw";
 import { isArray } from "lodash-es";
 
-import { ApiInterceptor } from "./ApiInterceptor";
-import type { ApiInterceptorDefinition } from "./abstractions";
+import type { ApiInterceptor } from "./ApiInterceptor";
 
 // Create handlers for the specified API interceptor
 function createHandlers(api: ApiInterceptor) {
@@ -32,17 +31,15 @@ function createHandlers(api: ApiInterceptor) {
 
 // Create the worker for the ApiInterceptorProvider
 export const createApiInterceptorWorker = async (
-  apiInterceptorDefinition: ApiInterceptorDefinition,
-  apiWorker: SetupWorker | null,
+  apiInstance: ApiInterceptor,
+  parentWorker?: SetupWorker,
 ) => {
-  const apiInstance = new ApiInterceptor(apiInterceptorDefinition);
-  await apiInstance.initialize();
   const handlers = createHandlers(apiInstance);
-  let worker = apiWorker;
-  if (!worker) {
+  let worker = parentWorker;
+  if(!parentWorker){
     worker = setupWorker();
   }
   // https://github.com/mswjs/msw/issues/2495
-  worker.use(...handlers as any);
+  worker.use(...(handlers as any));
   return worker;
 };

@@ -4,26 +4,26 @@ import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
+import scss from "@shikijs/langs/scss";
+// @ts-ignore
+import css from "@shikijs/langs/css";
+// @ts-ignore
 import json from "@shikijs/langs/json";
 
 // @ts-ignore
 import html from "@shikijs/langs/html";
 
+import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/textmate";
 
-import xmluiGrammar from "./syntax/grammar.tmLanguage.json";
-import xmluiThemeLight from "./syntax/textMate/xmlui-light.json";
-import xmluiThemeDark from "./syntax/textMate/xmlui-dark.json";
-
-
-import {unified} from 'unified'
-import remarkParse from 'remark-parse'
-import remarkStringify from 'remark-stringify'
-import stripMarkdown from 'strip-markdown'
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import stripMarkdown from "strip-markdown";
 
 export function markdownToPlainText(markdown: string): string {
   const processor = unified()
     .use(remarkParse)
-    .use(stripMarkdown, {keep: ['code']})
+    .use(stripMarkdown, { keep: ["code"] })
     .use(remarkStringify);
 
   const file = processor.processSync(markdown);
@@ -32,13 +32,13 @@ export function markdownToPlainText(markdown: string): string {
 
   // NEW: Remove admonition tags like [!WARNING] or \[!NOTE]
   // This looks for an optional backslash, then "[!", any word, and "]"
-  cleanedText = cleanedText.replace(/\\?\[!\w+\]\s*/g, '');
+  cleanedText = cleanedText.replace(/\\?\[!\w+\]\s*/g, "");
   // 1. Remove the anchor-like tags, e.g., "\[#button]"
-  cleanedText = cleanedText.replace(/\s*\\\[#.*?\]/g, '');
+  cleanedText = cleanedText.replace(/\s*\\\[#.*?\]/g, "");
 
   // 2. Process each line individually to reformat tables
-  const lines = cleanedText.split('\n');
-  const reformattedLines = lines.map(line => {
+  const lines = cleanedText.split("\n");
+  const reformattedLines = lines.map((line) => {
     const trimmedLine = line.trim();
 
     // Check if the line is a table separator like "| --- | --- |"
@@ -46,18 +46,17 @@ export function markdownToPlainText(markdown: string): string {
       return null; // Mark this line for removal
     }
     // Check if the line is a table row (starts and ends with '|')
-    if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
+    if (trimmedLine.startsWith("|") && trimmedLine.endsWith("|")) {
       // Remove leading/trailing pipes, then split into cells
       return trimmedLine
         .slice(1, -1)
-        .split('|')
-        .map(cell => cell.trim()) // Trim whitespace from each cell
-        .join(' - '); // Join cells with a more readable separator
+        .split("|")
+        .map((cell) => cell.trim()) // Trim whitespace from each cell
+        .join(" - "); // Join cells with a more readable separator
     }
 
-
     // filter code block header/footers
-    if(trimmedLine.startsWith('```') || trimmedLine.startsWith('---')){
+    if (trimmedLine.startsWith("```") || trimmedLine.startsWith("---")) {
       return null;
     }
     // If it's not a table line, return it as is
@@ -65,10 +64,10 @@ export function markdownToPlainText(markdown: string): string {
   });
 
   // 3. Filter out the removed separator lines and join back into a string
-  cleanedText = reformattedLines.filter(line => line !== null).join('\n');
+  cleanedText = reformattedLines.filter((line) => line !== null).join("\n");
 
   // 4. Consolidate multiple consecutive newlines into a maximum of two
-  cleanedText = cleanedText.replace(/(\r\n|\n){3,}/g, '\n\n');
+  cleanedText = cleanedText.replace(/(\r\n|\n){3,}/g, "\n\n");
 
   // 5. Trim any leading or trailing whitespace from the final result
   return cleanedText.trim();
@@ -91,7 +90,9 @@ const navPanelContent: any[] = [];
 Object.keys(contentRuntime).map((filePath) => {
   const urlFragment = filePath.substring("/content/".length).replace(".mdx", "").replace(".md", "");
   content[omitIndexFromPath(urlFragment)] = contentRuntime[filePath].default;
-  plainTextContent[omitIndexFromPath(urlFragment)] = markdownToPlainText(contentRuntime[filePath].default);
+  plainTextContent[omitIndexFromPath(urlFragment)] = markdownToPlainText(
+    contentRuntime[filePath].default,
+  );
   navPanelContent.push(urlFragment);
 });
 
@@ -108,7 +109,7 @@ Object.keys(pagesRuntime).map((filePath) => {
 
 const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
-  langs: [js, json, html, xmluiGrammar],
+  langs: [js, json, html, xmluiGrammar, css, scss],
   // @ts-ignore
   themes: [xmluiThemeLight, xmluiThemeDark],
   engine: createJavaScriptRegexEngine(),
@@ -129,9 +130,8 @@ function highlight(
   const highlightedRows: DecorationItem[] =
     meta?.highlightRows?.map((row: DecorationItem) => {
       return {
-        // line and character are 0-indexed
-        start: { line: row.start, character: 0 },
-        end: { line: row.end, character: 0 },
+        start: row.start,
+        end: row.end,
         properties: row.properties,
       };
     }) ?? [];
@@ -140,7 +140,6 @@ function highlight(
     [...(meta?.highlightSubstringsEmphasized ?? []), ...(meta?.highlightSubstrings ?? [])]?.map(
       (str: DecorationItem) => {
         return {
-          // line and character are 0-indexed
           start: str.start,
           end: str.end,
           properties: str.properties,
@@ -259,16 +258,19 @@ function buildTreeFromPathsAndMeta(
 
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
 const App: StandaloneAppDescription = {
-  name: "XMLUI docs",
-  defaultTheme: "default",
+  name: "XMLUI Docs",
+  defaultTheme: "docs-theme",
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
     favicon: "/resources/favicon.ico",
+    "icon.github": "/resources/github.svg",
     "font.Inter":
       "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   appGlobals: {
+    useHashBasedRouting: false,
+    showHeadingAnchors: true,
     searchIndexEnabled: true,
     navPanelContent: groupedNavPanelContent,
     content,
@@ -278,7 +280,8 @@ const App: StandaloneAppDescription = {
       highlight,
     },
     prefetchedContent,
-    lintSeverity: 'skip', // Turn off xmlui linting
+    lintSeverity: "skip", // Turn off xmlui linting
+    popOutUrl: "/#/playground",
   },
 };
 

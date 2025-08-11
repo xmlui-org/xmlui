@@ -1,21 +1,21 @@
 import styles from "./List.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
 
 const COMP = "List";
 
 export const ListMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
-    `The \`${COMP}\` component is a robust layout container that renders associated data items ` +
-    `as a list of components. \`${COMP}\` is virtualized; it renders only items that are visible ` +
-    `in the viewport.`,
+    "`List` is a high-performance, virtualized container for rendering large " +
+    "datasets with built-in grouping, sorting, and visual formatting. It only " +
+    "renders visible items in the viewport, making it ideal for displaying " +
+    "thousands of records while maintaining smooth scrolling performance.",
   props: {
     data: d(
       `The component receives data via this property. The \`data\` property is a list of items ` +
@@ -103,22 +103,35 @@ export const ListMd = createMetadata({
   },
   childrenAsTemplate: "itemTemplate",
   apis: {
-    scrollToTop: d("This method scrolls the list to the top."),
-    scrollToBottom: d("This method scrolls the list to the bottom."),
-    scrollToIndex: d(
-      "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
-    ),
-    scrollToId: d(
-      "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
-    ),
+    scrollToTop: {
+      description: "This method scrolls the list to the top.",
+      signature: "scrollToTop(): void",
+    },
+    scrollToBottom: {
+      description: "This method scrolls the list to the bottom.",
+      signature: "scrollToBottom(): void",
+    },
+    scrollToIndex: {
+      description: "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
+      signature: "scrollToIndex(index: number): void",
+      parameters: {
+        index: "The index to scroll to.",
+      },
+    },
+    scrollToId: {
+      description: "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
+      signature: "scrollToId(id: string): void",
+      parameters: {
+        id: "The ID of the item to scroll to.",
+      },
+    },
   },
   contextVars: {
-    $item: d(`This property represents the value of an item in the data list.`),
-    $itemIndex: dComponent(
-      "This integer value represents the current row index (zero-based) while rendering children.",
-    ),
-    $isFirst: dComponent("This boolean value indicates if the component renders its first item."),
-    $isLast: dComponent("This boolean value indicates if the component renders its last item."),
+    $item: d("Current data item being rendered"),
+    $itemIndex: dComponent("Zero-based index of current item"),
+    $isFirst: dComponent("Boolean indicating if this is the first item"),
+    $isLast: dComponent("Boolean indicating if this is the last item"),
+    $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

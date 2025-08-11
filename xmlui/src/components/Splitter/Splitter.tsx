@@ -3,22 +3,24 @@ import type React from "react";
 import styles from "./Splitter.module.scss";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ValueExtractor, LookupEventHandlerFn } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
-import { dComponent } from "../metadata-helpers";
+import { createMetadata, d, dComponent } from "../metadata-helpers";
 import { Splitter, defaultProps } from "./SplitterNative";
 
 const COMP = "Splitter";
 
 const baseSplitterMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component divides a container (such as a window, panel, pane, etc.) ` +
-    `into two resizable sections.`,
+    "`Splitter` component divides a container into two resizable sections. These " +
+    "are are identified by their names: primary and secondary. They have a " +
+    "draggable bar between them.",
   props: {
     swapped: {
       description:

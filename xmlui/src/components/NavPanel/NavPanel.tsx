@@ -1,15 +1,20 @@
 import styles from "./NavPanel.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dComponent } from "../metadata-helpers";
-import { NavPanel, defaultProps } from "./NavPanelNative";
+import { createMetadata, dComponent } from "../metadata-helpers";
+import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
+import { useMemo } from "react";
 
 const COMP = "NavPanel";
 
 export const NavPanelMd = createMetadata({
-  description: `\`${COMP}\` is a placeholder within \`App\` to define the app's navigation (menu) structure.`,
+  status: "stable",
+  description:
+    "`NavPanel` defines the navigation structure within an App, serving as a container " +
+    "for NavLink and NavGroup components that create your application's primary " +
+    "navigation menu. Its appearance and behavior automatically adapt based on the " +
+    "App's layout configuration.",
   props: {
     logoTemplate: dComponent(
       `This property defines the logo template to display in the navigation panel with the ` +
@@ -36,21 +41,43 @@ export const NavPanelMd = createMetadata({
   },
 });
 
+function NavPanelWithBuiltNavHierarchy({
+  node,
+  renderChild,
+  layoutCss,
+  layoutContext,
+  extractValue,
+}) {
+  const navLinks = useMemo(() => {
+    return buildNavHierarchy(node.children, extractValue, undefined, []);
+  }, [extractValue, node.children]);
+
+  return (
+    <NavPanel
+      style={layoutCss}
+      logoContent={renderChild(node.props.logoTemplate)}
+      className={layoutContext?.themeClassName}
+      inDrawer={layoutContext?.inDrawer}
+      renderChild={renderChild}
+      navLinks={navLinks}
+    >
+      {renderChild(node.children)}
+    </NavPanel>
+  );
+}
+
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
-  ({ node, renderChild, layoutCss, className, layoutContext }) => {
-    // TODO: How do we merge the `className` with the `layoutContext.themeClassName`?
+  ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
     return (
-      <NavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate)}
-        className={layoutContext?.themeClassName}
-        inDrawer={layoutContext?.inDrawer}
+      <NavPanelWithBuiltNavHierarchy
+        node={node}
         renderChild={renderChild}
-      >
-        {renderChild(node.children)}
-      </NavPanel>
+        layoutCss={layoutCss}
+        layoutContext={layoutContext}
+        extractValue={extractValue}
+      />
     );
   },
 );

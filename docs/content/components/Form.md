@@ -1,12 +1,18 @@
 # Form [#form]
 
-A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.
+`Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Automatic data binding**: Form controls automatically sync with form data using `bindTo` properties
+- **Built-in validation**: Validates individual fields and overall form state before submission
+- **Context sharing**: Provides `$data` and other context values accessible to all nested components
+- **Submission handling**: Manages form submission workflow and prevents invalid submissions
+
+See [this guide](/forms) for details.
+
+**Context variables available during execution:**
 
 - `$data`: This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances. `$data` also provides an `update` method as a shortcut to the Form's exposed `update` method.
-
-You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
 
 ## Properties [#properties]
 
@@ -16,8 +22,8 @@ This property allows defining a custom component to display the buttons at the b
 
 The following example demonstrates using it:
 
-```xmlui-pg copy {10-19} display name="Example: buttonRowTemplate"
----app copy display
+```xmlui-pg copy display name="Example: buttonRowTemplate"
+---app copy display {10-19}
 <App>
   <Form id="searchForm" padding="0.5rem"
     data="{{ search: 'Seattle', caseSensitive: false }}"
@@ -43,23 +49,35 @@ The following example demonstrates using it:
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
 
-### `cancelLabel (default: "Cancel")` [#cancellabel-default-cancel]
+### `cancelLabel` (default: "Cancel") [#cancellabel-default-cancel]
 
 This property defines the label of the Cancel button.
+
+### `completedNotificationMessage` [#completednotificationmessage]
+
+This property sets the message to display when the form is submitted successfully.
 
 ### `data` [#data]
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `itemLabelBreak (default: true)` [#itemlabelbreak-default-true]
+### `errorNotificationMessage` [#errornotificationmessage]
+
+This property sets the message to display when the form submission fails.
+
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+
+This property sets the message to display when the form is being submitted.
+
+### `itemLabelBreak` (default: true) [#itemlabelbreak-default-true]
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
-### `itemLabelPosition (default: "top")` [#itemlabelposition-default-top]
+### `itemLabelPosition` (default: "top") [#itemlabelposition-default-top]
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
 
@@ -76,15 +94,15 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.
 
-### `keepModalOpenOnSubmit (default: false)` [#keepmodalopenonsubmit-default-false]
+### `keepModalOpenOnSubmit` (default: false) [#keepmodalopenonsubmit-default-false]
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel (default: "Saving...")` [#saveinprogresslabel-default-saving-]
+### `saveInProgressLabel` (default: "Saving...") [#saveinprogresslabel-default-saving-]
 
 This property defines the label of the Save button to display during the form data submit (save) operation.
 
-### `saveLabel (default: "Save")` [#savelabel-default-save]
+### `saveLabel` (default: "Save") [#savelabel-default-save]
 
 This property defines the label of the Save button.
 
@@ -96,7 +114,7 @@ This property sets the HTTP method to use when submitting the form data. If not 
 
 URL to submit the form data.
 
-### `swapCancelAndSave (default: false)` [#swapcancelandsave-default-false]
+### `swapCancelAndSave` (default: false) [#swapcancelandsave-default-false]
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 
@@ -128,15 +146,25 @@ The form infrastructure fires this event when the form is submitted. The event a
 </App>  
 ```
 
+### `success` [#success]
+
+The form infrastructure fires this event when the form is submitted successfully.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `reset` [#reset]
 
-Call this event to reset the form to its initial state.
+This method resets the form to its initial state, clearing all user input.
+
+**Signature**: `reset(): void`
 
 ### `update` [#update]
 
 You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.
+
+**Signature**: `update(data: Record<string, any>): void`
+
+- `data`: An object containing the form data to update.
 
 This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly. 
 

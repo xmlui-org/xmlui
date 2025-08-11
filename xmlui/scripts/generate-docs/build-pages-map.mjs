@@ -7,10 +7,15 @@ import {
   toNormalizedUpperCase,
   traverseDirectory,
 } from "./utils.mjs";
-import { logger } from "./logger.mjs";
+import { createScopedLogger } from "./logging-standards.mjs";
+import { 
+  generateExportStatements, 
+  processDuplicatesWithLogging 
+} from "./pattern-utilities.mjs";
+import { PAGES_MAP_CONFIG } from "./constants.mjs";
 
-const pathCutoff = "pages";
-const includedFileExtensions = [".mdx", ".md"];
+const pathCutoff = PAGES_MAP_CONFIG.PATH_CUTOFF;
+const includedFileExtensions = PAGES_MAP_CONFIG.INCLUDED_FILE_EXTENSIONS;
 
 /**
  * Creates a file containing link constant variables to components/articles in the pages folder.
@@ -18,6 +23,8 @@ const includedFileExtensions = [".mdx", ".md"];
  * @param {string} outFilePathAndName The path and name of the output file (use UNIX delimiters)
  */
 export function buildPagesMap(pagesFolder, outFilePathAndName) {
+  const logger = createScopedLogger("PagesMapBuilder");
+  logger.operationStart("building pages map");
   const pages = [];
   traverseDirectory({ name: "", path: pagesFolder }, (item, _) => {
     /**
@@ -40,17 +47,12 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
   });
 
   const { filtered: filteredPages, duplicates } = gatherAndRemoveDuplicates(pages);
-  if (duplicates.length) {
-    logger.warning(`Duplicate entries found when collecting article IDs and paths:`);
-    duplicates.forEach((item) => {
-      logger.warning(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
-    });
-  }
+  
+  // Process duplicates with standardized logging
+  processDuplicatesWithLogging(duplicates, logger, "article IDs and paths");
 
-  const pagesStr = filteredPages.reduce((acc, curr) => {
-    acc += `export const ${curr.id} = "${curr.path}";\n`;
-    return acc;
-  }, "");
+  // Generate export statements using utility
+  const pagesStr = generateExportStatements(filteredPages);
 
   writeFileSync(outFilePathAndName, pagesStr);
 }

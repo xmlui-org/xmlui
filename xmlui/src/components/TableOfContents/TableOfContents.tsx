@@ -1,20 +1,19 @@
 import styles from "./TableOfContents.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
 
 export const TableOfContentsMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
-    `The \`${COMP}\` component collects headings and bookmarks within the current page ` +
-    `and displays them in a tree representing their hierarchy. When you select an item ` +
-    `in this tree, the component navigates the page to the selected position.`,
+    "`TableOfContents` component collects [Heading](/components/Heading) and " +
+    "[Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",
   props: {
     smoothScrolling: {
       description:
@@ -31,6 +30,13 @@ export const TableOfContentsMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.maxHeadingLevel,
     },
+    omitH1: {
+      description:
+        "If true, the `H1` heading is not included in the table of contents. " +
+        "This is useful when the `H1` is used for the page title and you want to avoid duplication.",
+      valueType: "boolean",
+      defaultValue: false,
+    }
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -76,6 +82,7 @@ export const tableOfContentsRenderer = createComponentRenderer(
         className={className}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
+        omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
       />
     );
   },

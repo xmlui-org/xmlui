@@ -1,5 +1,12 @@
 %-DESC-START
 
+**Key features:**
+- **Overlay presentation**: Appears above existing content with backdrop dimming
+- **Programmatic control**: Open and close via exposed methods like `open()` and `close()`
+- **Parameter passing**: Accept data when opened for dynamic dialog content
+- **Focus management**: Automatically handles focus trapping and accessibility
+- **Form integration**: When containing Form components, automatically closes on form submission or cancellation (unless overridden)
+
 ## Using the Component
 
 >[!INFO]
@@ -17,12 +24,12 @@ It also lends to itself that these events can be triggered programmatically from
 Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api)
 operations of the component in the `onClick` event handlers.
 
-```xmlui-pg copy display name="Example: imperative API" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
-  <Button label="Open Dialog" onClick="dialog.open()" />
+```xmlui-pg copy display name="Example: imperative API" height="220px"
+<App>
   <ModalDialog id="dialog" title="Example Dialog">
     <Button label="Close Dialog" onClick="dialog.close()" />
   </ModalDialog>
+  <Button label="Open Dialog" onClick="dialog.open()" />
 </App>
 ```
 
@@ -36,9 +43,9 @@ The `when` property accepts a primitive boolean or a binding expression resolvin
 Using the `when` property in a `ModalDialog` dialog component is commonly used with deep linking:
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
-```xmlui-pg
----app copy display name="Example: when" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: when"
+<App>
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
   <ModalDialog 
@@ -54,10 +61,10 @@ Setting the `when` property is the most straightforward way for deep-linked moda
 
 ### The `ModalDialog` as a Container
 
-The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
+The `ModalDialog` component is also a container such as the [`Card`](/components/Card), that it also accepts child components.
 
-```xmlui-pg copy {3-8} display name="Example: children" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg copy {3-8} display name="Example: children" height="340px"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
     <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
@@ -75,9 +82,9 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 
 %-PROP-START fullScreen
 
-```xmlui-pg
----app copy display name="Example: fullScreen" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: fullScreen"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
 </App>
@@ -89,8 +96,8 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 %-PROP-START title
 
-```xmlui-pg copy {3} display name="Example: title" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg copy {3} display name="Example: title" height="220px"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Title" />
 </App>
@@ -100,9 +107,9 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 %-PROP-START closeButtonVisible
 
-```xmlui-pg
----app copy display name="Example: closeButtonVisible" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy display name="Example: closeButtonVisible"
+<App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
 </App>
@@ -116,9 +123,9 @@ Click outside the dialog to close it.
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```xmlui-pg
----app copy {6-8} display name="Example: open/close events" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy {6-8} display name="Example: open/close events"
+<App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"
@@ -138,9 +145,9 @@ Open and close the dialog several times to test that it changes the counter.
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```xmlui
----app copy {6-8} display name="Example: open/close events" height="120px"
-<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+```xmlui-pg height="220px"
+---app copy {6-8} display name="Example: open/close events"
+<App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"

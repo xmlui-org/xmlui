@@ -1,16 +1,17 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata } from "../metadata-helpers";
 import { Bookmark, defaultProps } from "./BookmarkNative";
 
 const COMP = "Bookmark";
 
 export const BookmarkMd = createMetadata({
+  status: "stable",
   description:
     "As its name suggests, this component places a bookmark into its parent component's view. The " +
     "component has an \`id\` that you can use in links to navigate (scroll to) the bookmark's location.",
   opaque: true,
   props: {
-    uid: {
+    id: {
       description:
         "The unique identifier of the bookmark. You can use this identifier in links " +
         "to navigate to this component's location. If this identifier is not set, you cannot " +
@@ -34,6 +35,12 @@ export const BookmarkMd = createMetadata({
       description: "If true, this bookmark will be excluded from the table of contents.",
       valueType: "boolean",
       defaultValue: defaultProps.omitFromToc,
+    },
+  },
+  apis: {
+    scrollIntoView: {
+      signature: "scrollIntoView()",
+      description: "Scrolls the bookmark into view.",
     },
   },
 });

@@ -44,20 +44,13 @@ These things are optional. XMLUI's mission is to ensure what you build looks goo
 ## AppState
 
 ```xmlui
-<AppState
-  id="currentUser"
-  bucket="userState"
-  initialValue="{
-     {
-        username: 'demouser',
-        display_name: 'Demo User',
-        avatar_url: '/resources/demouser.png'
-      }
-  }"
-/>
+  <AppState
+    id="settings"
+    bucket="settingsState"
+  />
 ```
 
-[AppState](/components/AppState) is a blackboard where components can post and read data. In our demo it defines a data structure for the logged-in user.
+[AppState](/components/AppState) is a blackboard where components can post and read data. In our demo it defines a data structure for the app settings.
 
 ## AppHeader
 
@@ -153,12 +146,16 @@ Each [Page](/components/Pages) is a container that binds to a route and holds XM
 
 ## Footer
 
-```xmlui-pg display name="Try clicking the ToneChanger"
+```xmlui-pg display name="Try clicking the ToneSwitch"
 <App>
-  <Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+  <Footer>
+    Built with XMLUI
+    <SpaceFiller />
+    <ToneSwitch />
+  </Footer>
 </App>
 ```
 
-Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneChangerButton](/components/ToneChangerButton).
+Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneSwitch](/components/ToneSwitch).
 
 

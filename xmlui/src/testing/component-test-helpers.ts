@@ -1,15 +1,10 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 
-import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
-import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
+import { type ParserResult, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import chroma, { type Color } from "chroma-js";
-
-type EntryPoint = string | ComponentDef;
-type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
-  entryPoint?: EntryPoint;
-};
+import { ComponentDriver } from "./ComponentDrivers";
 
 export type ThemeTestDesc = {
   themeVar: string;
@@ -34,82 +29,39 @@ export async function getComponentTagName(locator: Locator) {
   return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
-function parseComponentIfNecessary(entryPoint: ComponentDef<any> | CompoundComponentDef | string) {
-  if (typeof entryPoint === "string") {
-    return xmlUiMarkupToComponent(entryPoint).component;
+export function parseComponentIfNecessary(
+  rawComponent: ComponentDef<any> | CompoundComponentDef | string,
+): ParserResult {
+  if (typeof rawComponent === "string") {
+    return xmlUiMarkupToComponent(rawComponent);
   }
-  return entryPoint;
-}
-
-export async function initComponent(page: Page, appDescription: UnparsedAppDescription) {
-  const { entryPoint } = appDescription;
-
-  const _appDescription: StandaloneAppDescription = {
-    name: "test bed app",
-    ...appDescription,
-    entryPoint: parseComponentIfNecessary(entryPoint),
+  return {
+    component: rawComponent,
+    errors: [],
+    erroneousCompoundComponentName: undefined,
   };
-
-  await page.addInitScript((app) => {
-    // @ts-ignore
-    window.TEST_ENV = app;
-  }, _appDescription);
-  await page.goto("/");
 }
 
 /**
- * @param percentage a percenage value as a string, like "40%"
- * @param scalarOf100Percent The value to multiply the percentage by
+ * Scales a value by a percentage, using NumericCSS for parsing and clarity.
+ * @param scalarOf100Percent The value representing 100%.
+ * @param percentage A percentage string in the format "NN%", e.g., "40%". Must end with '%'.
+ * @returns The scaled value.
  */
-export function scalePercentBy(scalarOf100Percent: number, percentage: string) {
-  if (!percentage.endsWith("%")) {
-    throw new Error("argument doesn't end with % sign");
+export function scaleByPercent(scalarOf100Percent: number, percentage: string) {
+  const parsed = parseAsNumericCss(percentage);
+  if (parsed.unit !== "%") {
+    throw new Error(`Expected percentage unit (%), got: ${parsed.unit}`);
   }
-  const percentageNum = Number(percentage.slice(0, -1));
-  return (scalarOf100Percent / 100) * percentageNum;
+  return (scalarOf100Percent / 100) * parsed.value;
 }
 
 export async function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
 }
 
-export async function getFullRectangle(locator: Locator) {
-  const boundingRect = await locator.evaluate((element) => element.getBoundingClientRect());
-
-  const margins = await getElementStyles(locator, [
-    "margin-left",
-    "margin-right",
-    "margin-top",
-    "margin-bottom",
-  ]);
-  const marginLeft = parseFloat(margins["margin-left"]);
-  const marginRight = parseFloat(margins["margin-right"]);
-  const marginTop = parseFloat(margins["margin-top"]);
-  const marginBottom = parseFloat(margins["margin-bottom"]);
-
-  const width = boundingRect.width + marginLeft + marginRight;
-  const height = boundingRect.height + marginTop + marginBottom;
-  const left = boundingRect.left - marginLeft;
-  const right = boundingRect.right + marginRight;
-  const top = boundingRect.top - marginTop;
-  const bottom = boundingRect.bottom + marginBottom;
-  return { width, height, left, right, top, bottom };
-}
-
-export async function isElementOverflown(locator: Locator, direction: "x" | "y" | "both" = "both") {
-  const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
-    element.clientWidth,
-    element.clientHeight,
-    element.scrollWidth,
-    element.scrollHeight,
-  ]);
-  if (direction === "x") return scrollWidth > width;
-  if (direction === "y") return scrollHeight > height;
-  return scrollWidth > width && scrollHeight > height;
-}
-
-export async function getElementStyle(locator: Locator, style: string) {
-  return locator.evaluate(
+export async function getElementStyle(specifier: Locator, style: string) {
+  return specifier.evaluate(
     (element, style) => window.getComputedStyle(element).getPropertyValue(style),
     style,
   );
@@ -132,10 +84,140 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   );
 }
 
-export async function getStyle(page: Page, testId: string, style: string) {
-  const locator = page.getByTestId(testId);
-  return await getElementStyle(locator, style);
+export async function isIndeterminate(specifier: ComponentDriver | Locator) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  return specifier.evaluate((el: HTMLInputElement) => el.indeterminate);
 }
+
+export async function overflows(locator: Locator, direction: "x" | "y" | "both" = "both") {
+  const [width, height, scrollWidth, scrollHeight] = await locator.evaluate((element) => [
+    element.clientWidth,
+    element.clientHeight,
+    element.scrollWidth,
+    element.scrollHeight,
+  ]);
+  if (direction === "x") return scrollWidth > width;
+  if (direction === "y") return scrollHeight > height;
+  return scrollWidth > width && scrollHeight > height;
+}
+
+// ----------------------------------
+// ComponentDriver style helpers
+// ----------------------------------
+
+export async function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  style = Array.isArray(style) ? style : [style];
+  return specifier.evaluate(
+    (element, styles) =>
+      Object.fromEntries(
+        styles.map((styleName) => [
+          styleName
+            .trim()
+            .split("-")
+            .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
+            .join(""),
+          window.getComputedStyle(element).getPropertyValue(styleName),
+        ]),
+      ),
+    style,
+  );
+}
+
+export async function getPseudoStyles(
+  specifier: ComponentDriver | Locator,
+  pseudoElement: string,
+  style: string | string[],
+) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  style = Array.isArray(style) ? style : [style];
+  return specifier.evaluate(
+    (element, obj) =>
+      Object.fromEntries(
+        obj.style.map((styleName) => [
+          styleName
+            .trim()
+            .split("-")
+            .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
+            .join(""),
+          window.getComputedStyle(element, obj.pseudoElement).getPropertyValue(styleName),
+        ]),
+      ),
+    { style, pseudoElement },
+  );
+}
+
+export async function getHtmlAttributes(
+  specifier: ComponentDriver | Locator,
+  attributes: string | string[],
+): Promise<{ [k: string]: string }> {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  attributes = Array.isArray(attributes) ? attributes : [attributes];
+
+  const mapped = await Promise.all(
+    attributes.map(async (attr) => {
+      return [attr, await specifier.getAttribute(attr)];
+    }),
+  );
+  return Object.fromEntries(mapped);
+}
+
+export async function getPaddings(specifier: ComponentDriver | Locator) {
+  const paddings = mapObject(
+    await getStyles(specifier, ["padding-left", "padding-right", "padding-top", "padding-bottom"]),
+    parseAsNumericCss,
+  );
+  return {
+    left: paddings.paddingLeft,
+    right: paddings.paddingRight,
+    top: paddings.paddingTop,
+    bottom: paddings.paddingBottom,
+  };
+}
+
+export async function getBorders(specifier: ComponentDriver | Locator) {
+  const borders = mapObject(
+    await getStyles(specifier, ["border-left", "border-right", "border-top", "border-bottom"]),
+    parseAsCssBorder,
+  );
+  return {
+    left: borders.borderLeft,
+    right: borders.borderRight,
+    top: borders.borderTop,
+    bottom: borders.borderBottom,
+  };
+}
+
+export async function getMargins(specifier: ComponentDriver | Locator) {
+  return getStyles(specifier, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
+}
+
+/**
+ * Retrieves the bounding rectangle of the component including **margins** and **padding**
+ * added to the dimensions.
+ */
+export async function getBounds(specifier: ComponentDriver | Locator) {
+  if (specifier instanceof ComponentDriver) specifier = specifier.component;
+  const boundingRect = await specifier.evaluate((element) => element.getBoundingClientRect());
+  const m = mapObject(await getMargins(specifier), parseFloat);
+
+  const width = boundingRect.width + m.marginLeft + m.marginRight;
+  const height = boundingRect.height + m.marginTop + m.marginBottom;
+  const left = boundingRect.left - m.marginLeft;
+  const right = boundingRect.right + m.marginRight;
+  const top = boundingRect.top - m.marginTop;
+  const bottom = boundingRect.bottom + m.marginBottom;
+
+  return {
+    width,
+    height,
+    left,
+    right,
+    top,
+    bottom,
+  };
+}
+
 /**
  * Provides annotations for skipped tests and the ability to specify a reason.
  * Use it via the SKIP_REASON exported variable.
@@ -172,6 +254,10 @@ class TestSkipReason {
 
   TEST_INFRA_NOT_IMPLEMENTED(description?: string) {
     return this.addAnnotation("test infra not implemented", description);
+  }
+
+  REFACTOR(description?: string) {
+    return this.addAnnotation("refactor", description);
   }
 
   // Need to specify a reason here!
@@ -218,7 +304,7 @@ export function parseAsCssBorder(str: string) {
     throw new Error(`Too many border widths provided in ${str}`);
   }
 
-  const color = parts.filter(p => chroma.valid(p));
+  const color = parts.filter((p) => chroma.valid(p));
   if (color.length > 1) {
     throw new Error(`Too many border colors provided in ${str}`);
   }
@@ -229,19 +315,18 @@ export function parseAsCssBorder(str: string) {
     color: chroma(color[0]),
   };
   return result;
-
 }
 
 export interface NumericCSS {
   value: number;
   unit: CSSUnit;
-};
+}
 
 const numericCSSRegex = /^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/;
 
 export function isNumericCSS(str: any): str is NumericCSS {
   const parts = str.match(numericCSSRegex);
-  
+
   if (!parts) return false;
   if (parts.length < 3) return false;
   if (isNaN(parseFloat(parts[1]))) return false;

@@ -1,16 +1,14 @@
 # Splitter [#splitter]
 
-The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
-
-These sections are identified by their names: primary and secondary. They have a draggable bar between them.
+`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.
 
 Most properties of the component focus on the primary section (e.g. sizing).
 
-See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
+See also: [HSplitter](/components/HSplitter), [VSplitter](/components/VSplitter).
 
 ## Properties [#properties]
 
-### `floating (default: false)` [#floating-default-false]
+### `floating` (default: false) [#floating-default-false]
 
 Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
@@ -23,7 +21,7 @@ Toggles whether the resizer is visible (`false`) or not (`true`) when not hovere
 </App>
 ```
 
-### `initialPrimarySize (default: "50%")` [#initialprimarysize-default-50-]
+### `initialPrimarySize` (default: "50%") [#initialprimarysize-default-50-]
 
 This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
 
@@ -36,7 +34,7 @@ This optional number property sets the initial size of the primary section. The 
 </App>
 ```
 
-### `maxPrimarySize (default: "100%")` [#maxprimarysize-default-100-]
+### `maxPrimarySize` (default: "100%") [#maxprimarysize-default-100-]
 
 This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
 
@@ -49,7 +47,7 @@ This property sets the maximum size the primary section can have. The unit of th
 </App>
 ```
 
-### `minPrimarySize (default: "0%")` [#minprimarysize-default-0-]
+### `minPrimarySize` (default: "0%") [#minprimarysize-default-0-]
 
 This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
 
@@ -62,7 +60,7 @@ This property sets the minimum size the primary section can have. The unit of th
 </App>
 ```
 
-### `orientation (default: "vertical")` [#orientation-default-vertical]
+### `orientation` (default: "vertical") [#orientation-default-vertical]
 
 Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).
 
@@ -93,7 +91,7 @@ The divider can be customized using XMLUI components via this property.
 </App>
 ```
 
-### `swapped (default: false)` [#swapped-default-false]
+### `swapped` (default: false) [#swapped-default-false]
 
 This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
 

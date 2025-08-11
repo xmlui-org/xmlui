@@ -1,17 +1,18 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
-import { dInternal } from "../metadata-helpers";
+import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
 
 const PAGE = "Page";
 
 export const PageMd = createMetadata({
   status: "stable",
-  docFolder: PAGE,
+  docFolder: "Pages",
   description:
-    `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +
-    `to a particular URL that is associated with the page.`,
+    "`Page` defines route endpoints within an application, mapping specific URL " +
+    "patterns to content that displays when users navigate to those routes. Each " +
+    "Page represents a distinct view or screen in your single-page application's " +
+    "routing system.",
   props: {
     //TODO illesg rename to path
     url: d(
@@ -45,13 +46,14 @@ export const pageRenderer = createComponentRenderer(
 const COMP = "Pages";
 
 export const PagesMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component is used as a container for [\`Page\`](/components/Page) components ` +
-    `within an [\`App\`](/components/App).`,
+    "`Pages` serves as the routing coordinator within an [App](/components/App), " +
+    "managing which [Page](/components/Page)  displays based on the current URL.",
   props: {
-    defaultRoute: {
-      description: `The default route when displaying the app`,
-      defaultValue: defaultProps.defaultRoute,
+    fallbackPath: {
+      description: `The fallback path when the current URL does not match any of the paths of the pages.`,
+      defaultValue: defaultProps.fallbackPath,
     },
   },
 });
@@ -62,7 +64,7 @@ export const pagesRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild }) => {
     return (
       <Pages
-        defaultRoute={extractValue(node.props.defaultRoute)}
+        fallbackPath={extractValue(node.props.fallbackPath)}
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}

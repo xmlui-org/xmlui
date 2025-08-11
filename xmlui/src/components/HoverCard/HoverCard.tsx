@@ -1,6 +1,5 @@
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dComponent } from "../metadata-helpers";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import { HoverCardComponent } from "./HovercardNative";
 
 const COMP = "HoverCard";

@@ -467,7 +467,9 @@ export const ListNative = forwardRef(function DynamicHeightList(
       scrollToId,
     });
   }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop]);
-  const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
+  // REVIEW: I changed this code line because in the build version rows[index] was undefined
+  // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
+  const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
 
   const rowCount = rows?.length ?? 0;
 
@@ -518,8 +520,16 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 count={rowCount}
               >
                 {(rowIndex) => {
-                  const row = rows[rowIndex];
-                  const key = row[idKey];
+                  // REVIEW: I changed this code line because in the build version rows[rowIndex] 
+                  // was undefined
+                  // const row = rows[rowIndex];
+                  // const key = row[idKey];
+                  const row = rows?.[rowIndex];
+                  const key = row?.[idKey];
+                  if (!row) {
+                    return <Fragment key={rowIndex}/>;
+                  }
+                  // --- End change
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (

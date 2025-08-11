@@ -29,7 +29,7 @@ We've seen that the `Invoices` [Table](/components/Table) includes a `Details` [
 
 The `ModalDialog` wraps an `InvoiceDetails` component which displays an invoice and enables editing. Click the `Details` icon to open the viewer/editor.
 
-```xmlui-pg
+```xmlui-pg noHeader height="500px"
 ---app
 <App>
   <Table gap="0" data="{[window.sampleInvoice]}">
@@ -141,46 +141,34 @@ The `ModalDialog` wraps an `InvoiceDetails` component which displays an invoice 
 
 Here's the `InvoiceDetails` component.
 
-```xmlui /variable/ /$props.details/ /<Table/ /[details]/ /<FormItem/ /type="select"/ /enabled=/ /Actions.navigate/ /<event name="submit" / /APICall/
+```xmlui
 <Component name="InvoiceDetails">
-
-    <variable name="details" value="{$props.details}" />
-
-    <Form>
-
-        <Table width="100%" data="{[details]}">
-            <Column canSort="{false}" bindTo="invoice_number" />
-            <Column canSort="{false}" bindTo="client" />
-            <Column canSort="{false}" bindTo="issue_date" />
-            <Column canSort="{false}" bindTo="due_date" />
-            <Column canSort="{false}" header="Status">
-                <StatusBadge status="{$item.status}" />
-            </Column>
-        </Table>
-
-
-        <VStack>
-            <Text>Notes:</Text>
-            <FormItem bindTo="notes" initialValue="{details.notes}" />
-        </VStack>
-
-        <VStack>
-            <Text>Status:</Text>
-            <FormItem
-              type="select"
-              bindTo="status"
-              initialValue="{details.status}"
-              enabled="{details.status !== 'paid'}"
-            >
-                <Option label="sent"  value="sent" />
-                <Option label="paid"  value="paid" />
-                <Option label="draft" value="draft" />
-                <Option value="{$item.name}" label="{$item.name}" />
-            </FormItem>
-        </VStack>
-
-
-        <Table width="100%" data="{JSON.parse(details.items)}">
+    <Table width="100%" data="{[$props.details]}">
+        <Column canSort="{false}" bindTo="invoice_number" />
+        <Column canSort="{false}" bindTo="client" />
+        <Column canSort="{false}" bindTo="issue_date" />
+        <Column canSort="{false}" bindTo="due_date" />
+        <Column canSort="{false}" header="Status">
+            <StatusBadge status="{$item.status}" />
+        </Column>
+    </Table>
+    <Form submitUrl="/api/invoices/{$props.details.invoice_number}"
+          submitMethod="PUT"
+    >
+        <FormItem
+           label="Notes"
+           bindTo="notes"
+           initialValue="{window.coalesce($props.details.notes)}" />
+        <FormItem label="Status" bindTo="status"
+          initialValue="{$props.details.status}"
+          type="select"
+          enabled="{$props.details.status !== 'paid'}"
+        >
+            <Option label="sent"  value="sent" />
+            <Option label="paid"  value="paid" />
+            <Option label="draft" value="draft" />
+        </FormItem>
+        <Table data="{JSON.parse($props.details.items)}">
             <Column bindTo="name" />
             <Column bindTo="quantity" />
             <Column bindTo="total">
@@ -190,30 +178,9 @@ Here's the `InvoiceDetails` component.
                 ${$item.price}
             </Column>
         </Table>
-
-        <event name="submit">
-            <APICall
-                url="/api/invoices/{details.invoice_number}"
-                method="POST"
-                inProgressNotificationMessage="Updating invoice..."
-                completedNotificationMessage="Invoice updated successfully"
-                body="{
-                    {
-                    number: details.invoice_number,
-                    status: $param.status,
-                    notes: $param.notes
-                    }
-                  }"
-                  onSuccess="Actions.navigate('/invoices')"
-            />
-        </event>
-
     </Form>
-
 </Component>
 ```
-
-The variable declaration is optional, it's just a way to avoid writing `$props.details` more than once.
 
 There are two `Table`s. The first has only one row to report the top-level details. Since `$props.details` is an object, not an array, we wrap it in square brackets (`[ ]`) to provide the array that `Table` expects.
 

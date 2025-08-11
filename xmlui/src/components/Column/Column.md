@@ -1,6 +1,11 @@
 %-DESC-START
 
-Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
+**Key features:**
+- **Data binding**: Use `bindTo` to automatically display object properties
+- **Component embedding**: Place any component inside `Column`: `Button`, `Text`, `Icon`, etc.
+- **Interactive behavior**: Enable/disable sorting and column resizing
+- **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
+- **Column pinning**: Pin columns to left or right edges for sticky behavior
 
 %-DESC-END
 
@@ -391,6 +396,6 @@ Check what happens when you resize table columns:
 
 %-STYLE-START
 
-Styling is done via the [`Table` component](./Table.mdx).
+Styling is done via the [`Table` component](/components/Table).
 
 %-STYLE-END

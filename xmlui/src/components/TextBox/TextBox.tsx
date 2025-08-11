@@ -3,10 +3,12 @@ import styles from "./TextBox.module.scss";
 import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -34,8 +36,10 @@ import { TextBox, defaultProps } from "./TextBoxNative";
 const COMP = "TextBox";
 
 export const TextBoxMd = createMetadata({
-  status: "experimental",
-  description: `The \`${COMP}\` is an input component that allows users to input and edit textual data.`,
+  status: "stable",
+  description:
+    "`TextBox` captures user text input for forms, search fields, and data entry " +
+    "with support for validation, icons, and formatting hints.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {
@@ -67,6 +71,23 @@ export const TextBoxMd = createMetadata({
         "This property defines the gap between the adornments and the input area. If not " +
         "set, the gap declared by the current theme is used.",
     },
+    showPasswordToggle: {
+      description:
+        "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+      defaultValue: false,
+    },
+    passwordVisibleIcon: {
+      description:
+        "The icon to display when the password is visible (when showPasswordToggle is true).",
+      valueType: "string",
+      defaultValue: "eye",
+    },
+    passwordHiddenIcon: {
+      description:
+        "The icon to display when the password is hidden (when showPasswordToggle is true).",
+      valueType: "string",
+      defaultValue: "eye-off",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -74,11 +95,21 @@ export const TextBoxMd = createMetadata({
     didChange: dDidChange(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `This method sets the focus on the \`${COMP}\` component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): string | undefined",
+    },
+    setValue: {
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
+      signature: "setValue(value: string): void",
+      parameters: {
+        value: "The new value to set. If the value is empty, it will clear the input.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -96,13 +127,14 @@ export const TextBoxMd = createMetadata({
     "borderColor-Input-error": "$borderColor-Input-default--error",
     "borderColor-Input-warning": "$borderColor-Input-default--warning",
     "borderColor-Input-success": "$borderColor-Input-default--success",
-    "color-placeholder-Input": "$textColor-subtitle",
+    "textColor-placeholder-Input": "$textColor-subtitle",
     "color-adornment-Input": "$textColor-subtitle",
 
     "outlineColor-Input--focus": "$outlineColor--focus",
     "outlineWidth-Input--focus": "$outlineWidth--focus",
     "outlineStyle-Input--focus": "$outlineStyle--focus",
     "outlineOffset-Input--focus": "$outlineOffset--focus",
+    "color-passwordToggle-Input": "$textColor-subtitle",
 
     light: {
       // --- No light-specific theme vars
@@ -157,6 +189,9 @@ function renderTextBox(
       labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
       labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       required={extractValue.asOptionalBoolean(node.props.required)}
+      showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
+      passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
+      passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
     />
   );
 }
@@ -188,8 +223,8 @@ export const textBoxComponentRenderer = createComponentRenderer(
 export const PasswordMd = createMetadata({
   ...TextBoxMd,
   description:
-    "The \`Password\` component is a specialized version of the \`TextBox\` component that " +
-    "allows users to input and edit passwords.",
+    "`Password` is a specialized [TextBox](/components/TextBox) that enables users " +
+    "to input and edit passwords.",
 });
 
 export const passwordInputComponentRenderer = createComponentRenderer(

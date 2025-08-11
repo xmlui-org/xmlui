@@ -1,9 +1,8 @@
 import styles from "./NavLink.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick, dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { NavLink, defaultProps } from "./NavLinkNative";
 import { LinkTargetMd } from "../abstractions";
@@ -11,9 +10,12 @@ import { LinkTargetMd } from "../abstractions";
 const COMP = "NavLink";
 
 export const NavLinkMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component defines a navigation target (app navigation menu item) within ` +
-    `the app; it is associated with a particular in-app navigation target (or an external link).`,
+    "`NavLink` creates interactive navigation items that connect users to different " +
+    "destinations within an app or external URLs. It automatically indicates active " +
+    "states, supports custom icons and labels, and can execute custom actions instead " +
+    "of navigation when needed.",
   props: {
     to: d(`This property defines the URL of the link.`),
     enabled: dEnabled(),
@@ -54,7 +56,8 @@ export const NavLinkMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
-    [`color-indicator-${COMP}`]: "Provides the following states: `--hover`, `--active`, `--pressed`",
+    [`color-indicator-${COMP}`]:
+      "Provides the following states: `--hover`, `--active`, `--pressed`",
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",

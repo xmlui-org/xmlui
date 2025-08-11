@@ -1,9 +1,9 @@
 import styles from "./TreeDisplay.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "TreeDisplay";
 
@@ -28,15 +28,17 @@ export const TreeDisplayMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$color-primary-50",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-CodeBlock",
     [`borderRadius-${COMP}`]: "8px",
     [`padding-${COMP}`]: "$space-4",
     [`paddingLeft-${COMP}`]: "$space-2",
-    [`fontSize-${COMP}`]: "$fontSize-default",
+    [`fontSize-${COMP}`]: "$fontSize-code",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily-monospace",
     [`color-${COMP}`]: "$textColor-primary",
-    [`color-connect-${COMP}`]: "$color-surface-200", 
+    [`color-connect-${COMP}`]: "$color-surface-200",
+    [`boxShadow-${COMP}`]: "none",
+    [`border-${COMP}`]: "0.5px solid $borderColor",
   },
 });
 

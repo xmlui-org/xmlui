@@ -1,5 +1,11 @@
 %-DESC-START
 
+**Key features:**
+- **Type-ahead filtering**: Users can type to narrow down options in real-time
+- **Multi-select support**: Set `multi="true"` to allow selecting multiple items
+- **Custom option creation**: Enable `creatable="true"` to let users add new options
+- **Rich customization**: Use `optionTemplate` to create complex option layouts
+
 ## Using AutoComplete
 
 ```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"
@@ -50,7 +56,7 @@
 <App>
   <AutoComplete multi="true">
     <property name="optionTemplate">
-      <Text textAlign="center" color="purple">{console.log($item), $item.label}</Text>
+      <Text textAlign="center" color="red">{$item.label}</Text>
     </property>
     <Option value="1" label="Bruce Wayne" />
     <Option value="2" label="Clark Kent" />

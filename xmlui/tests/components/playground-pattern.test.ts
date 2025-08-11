@@ -1,4 +1,4 @@
-import { assert, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   convertPlaygroundPatternToMarkdown,
   observePlaygroundPattern,
@@ -321,7 +321,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result.app).toBeDefined();
-    expect(result.app.copy).toBeUndefined;
+    expect(result.app.copy).toBeUndefined();
     expect(result.app.display).toBe(true);
     expect(result.app.highlights).toBeUndefined();
     expect(result.app.filename).toBeUndefined();
@@ -1047,7 +1047,9 @@ describe("Playground pattern parsing", () => {
     const result = convertPlaygroundPatternToMarkdown(content);
 
     // --- Assert
-    expect(result).toBe(`<samp data-pg-content="${base64}"></samp>\n\n`);
+    expect(result).toBe(
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown=""></samp>\n\n`,
+    );
   });
 
   it("Convert default app #2", () => {
@@ -1061,13 +1063,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1083,13 +1079,7 @@ describe("Playground pattern parsing", () => {
     const result = convertPlaygroundPatternToMarkdown(content);
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui copy
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgY29weQo8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+CmBgYAoK"></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1107,7 +1097,9 @@ describe("Playground pattern parsing", () => {
     const result = convertPlaygroundPatternToMarkdown(content);
 
     // --- Assert
-    expect(result).toBe(`<samp data-pg-content="${base64}"></samp>\n\n`);
+    expect(result).toBe(
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown=""></samp>\n\n`,
+    );
   });
 
   it("Convert explicit app #2", () => {
@@ -1122,13 +1114,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1145,13 +1131,7 @@ describe("Playground pattern parsing", () => {
     const result = convertPlaygroundPatternToMarkdown(content);
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui copy
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgY29weQo8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+CmBgYAoK"></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1173,13 +1153,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1202,17 +1176,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1237,21 +1201,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiIsIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1276,17 +1226,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdLCJjb25maWciOiJ7IGFwaVVybDogXCIvYXBpXCIgfVxuIn0=" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1312,21 +1252,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-\`\`\`json 
-{ apiUrl: "/api" }
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdLCJjb25maWciOiJ7IGFwaVVybDogXCIvYXBpXCIgfVxuIn0=" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgpgYGBqc29uIAp7IGFwaVVybDogIi9hcGkiIH0KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1354,17 +1280,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdLCJjb25maWciOiJ7IGFwaVVybDogXCIvYXBpXCIgfVxuIiwiYXBpIjoieyBvcGVyYXRpb246IFwiL3NvbWVcIiB9XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1393,17 +1309,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdLCJjb25maWciOiJ7IGFwaVVybDogXCIvYXBpXCIgfVxuIiwiYXBpIjoieyBvcGVyYXRpb246IFwiL3NvbWVcIiB9XG4ifQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgpgYGB4bWx1aSAKPENvbXBvbmVudCBuYW1lPSJNeUNvbXBvbmVudCIgLz4KYGBgCgo="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1430,19 +1336,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-**This is a description #1**.
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgoqKlRoaXMgaXMgYSBkZXNjcmlwdGlvbiAjMSoqLgoKYGBgeG1sdWkgCjxDb21wb25lbnQgbmFtZT0iTXlDb21wb25lbnQiIC8+CmBgYAoK"></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1469,21 +1363,7 @@ describe("Playground pattern parsing", () => {
 
     // --- Assert
     expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-**This is a description #1**.
-
-\`\`\`xmlui 
-<Component name="MyComponent" />
-\`\`\`
-
-**This is a description #2**.
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
+      `<samp data-pg-content="eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgoqKlRoaXMgaXMgYSBkZXNjcmlwdGlvbiAjMSoqLgoKYGBgeG1sdWkgCjxDb21wb25lbnQgbmFtZT0iTXlDb21wb25lbnQiIC8+CmBgYAoKKipUaGlzIGlzIGEgZGVzY3JpcHRpb24gIzIqKi4KCg=="></samp>\n\n`,
     );
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
@@ -1501,15 +1381,7 @@ describe("Playground pattern parsing", () => {
     const result = convertPlaygroundPatternToMarkdown(content);
 
     // --- Assert
-    expect(result).toBe(
-      `\`\`\`xmlui 
-<Button>Click me</Button>
-\`\`\`
-
-<samp data-pg-content="${base64}"></samp>
-
-`,
-    );
+    expect(result).toBe(`<samp data-pg-content="eyJoZWlnaHQiOiIzMDBweCIsImFwcCI6IjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj5cbiJ9" data-pg-markdown="YGBgeG1sdWkgCjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj4KYGBgCgo="></samp>\n\n`);
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
       height: "300px",

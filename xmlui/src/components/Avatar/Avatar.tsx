@@ -1,15 +1,20 @@
 import styles from "./Avatar.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Avatar";
 
 export const AvatarMd = createMetadata({
-  description: `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
+  status: "stable",
+  description:
+    "`Avatar` displays a user or entity's profile picture as a circular image, " +
+    "with automatic fallback to initials when no image is provided. It's commonly " +
+    "used in headers, user lists, comments, and anywhere you need to represent a " +
+    "person or organization.",
   props: {
     size: {
       description: `This property defines the display size of the ${COMP}.`,

@@ -1,10 +1,10 @@
 # Routing and Links
 
-XMLUI implements client-side routing with URLs bound to UI views. You can use two different  routing mechanisms: *hash* and *standard*. Both store the current location in the browser's address bar and work with the browser's history stack. However, they differ in the URLs they send to the backend server.
+XMLUI implements client-side routing with URLs bound to UI views. You can use two different  routing mechanisms: **hash** and **standard**. Both store the current location in the browser's address bar and work with the browser's history stack. However, they differ in the URLs they send to the backend server.
 
 ## Hash routing (default)
 
-If you don't have complete control over the server, you may not be able to configure it to retrieve the `index.html` file as a single-page app requires. Hash routing solves this issue. If your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`).
+If you don't have complete control over the server, you may not be able to configure it to retrieve the `index.html` file as a single-page app requires. Hash routing solves this issue. If your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`.
 
 The server receives only the part of the URL (`myComp.com/accountapp`) that precedes the hash mark. The client-side routing mechanism uses the remainder to navigate within the app.
 
@@ -57,6 +57,73 @@ http {
 ```
 
 
+## Serving from a subdirectory with proxy
+
+If you need to serve your XMLUI app from a subdirectory path (e.g., `/myapp/`) while proxying to a running XMLUI server, you can use this nginx configuration. This approach works with both hash-based and standard routing.
+
+### Nginx configuration
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+
+    location /myapp/ {
+        rewrite ^/myapp(/.*)$ $1 break;
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_intercept_errors on;
+        error_page 404 = /myapp/;
+    }
+}
+```
+
+### Base path configuration
+
+You'll need to configure the base path in your `index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+        window.__PUBLIC_PATH = '/myapp'
+    </script>
+    <script src="xmlui/0.9.23.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+### How it works
+
+This configuration:
+- Rewrites incoming `/myapp/...` requests to remove the prefix before proxying
+- Proxies requests to your XMLUI server running on port 8080
+- Redirects 404 errors back to `/myapp/` to enable SPA fallback behavior
+- Works with both routing modes: Hash-based routing rarely triggers 404s, while standard routing uses the 404 redirect for client-side navigation
+
+### Routing mode compatibility
+
+This subdirectory deployment works with both routing configurations:
+
+**Hash-based routing** (`useHashBasedRouting: true` - default):
+- URLs: `example.com/myapp/#/contacts`
+- Server sees: `example.com/myapp/`
+- Behavior: Serves app normally from base path
+
+**Standard routing** (`useHashBasedRouting: false` in config.json):
+- URLs: `example.com/myapp/contacts`
+- Server sees: `example.com/myapp/contacts`
+- Behavior: 404s redirect to `/myapp/` which loads the app, then client-side routing takes over
+
 ## Links
 
 XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
@@ -82,13 +149,13 @@ XMLUI uses the specified links as absolute links (starting with a slash) or rela
 </App>
 ```
 
-Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
+Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As the `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
 
 ## Dynamic route segments
 
 You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
-```xmlui-pg display
+```xmlui-pg display copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -138,7 +205,7 @@ You can use parameter placeholders in the URLs as part of the route. These place
 
 When the app visits a particular target in its available routes, the `NavLink` component matching with the visited route is marked as active, and it gets a visual indication (a blueish left border), like in this example:
 
-```xmlui-pg display name="Active links"
+```xmlui-pg copy display name="Active links"
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -160,7 +227,7 @@ When you start the app, the route is "/" (by default) and matches the Home page'
 
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
-```xmlui-pg copy {4-5}
+```xmlui-pg copy display {4-5}
 <App display layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -181,5 +248,4 @@ As a `NavLink` activity is based on matching, multiple active links may exist si
 Query parameters are not considered to be part of the route. So, in this sample, the Winter report and Summer report match the same route, "/report." If you select any of them, both links are marked active:
 
 The semantic meaning of routes is analogous to routes used at the backend. When you send two requests with the same routes but different query parameters, they will reach the same backend endpoint. Of course, that endpoint may consider the query parameters, process them, and respond differently. However, this differentiation is not in the routing but in the processing mechanism.
-
 

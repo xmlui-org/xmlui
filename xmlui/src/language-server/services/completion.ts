@@ -1,12 +1,24 @@
 import type { MarkupContent, CompletionItem } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
-import { FindTokenSuccess, findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils";
+import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
-import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
-import { addOnPrefix, type AttributeKind, type ComponentMetadataCollection, type MetadataProvider, type TaggedAttribute } from "./common/metadata-utils";
+import {
+  compNameForTagNameNode,
+  findTagNameNodeInStack,
+  insideClosingTag,
+  pathToNodeInAscendands,
+} from "./common/syntax-node-utilities";
+import {
+  addOnPrefix,
+  type AttributeKind,
+  type ComponentMetadataCollection,
+  type MetadataProvider,
+  type TaggedAttribute,
+} from "./common/metadata-utils";
+import { d } from "../../testing/infrastructure/dist/internal/chunks/index._m-k4_XL";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -23,7 +35,7 @@ type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Om
 type XmluiCompletionData = {
   metadataAccessInfo: {
     componentName: string;
-    attribute?: TaggedAttribute
+    attribute?: TaggedAttribute;
   };
 };
 
@@ -45,15 +57,16 @@ export function handleCompletionResolve({
     if (!componentMeta) {
       return null;
     }
-    if (attribute){
+    if (attribute) {
       const attributeMetadata = componentMeta.getAttrForKind(attribute);
-      item.documentation = markupContent(docGen.generateAttrDescription(attribute.name, attributeMetadata));
+      item.documentation = markupContent(
+        docGen.generateAttrDescription(attribute.name, attributeMetadata),
+      );
     } else {
       item.documentation = markupContent(
         docGen.generateCompNameDescription(componentName, componentMeta.getMetadata()),
       );
     }
-
   }
   return item;
 }
@@ -84,19 +97,22 @@ export function handleCompletion(
       return allComponentNames(metaByComp);
     case SyntaxKind.CloseNodeStart:
       //TODO: this can be substituted for an function that finds the first ElementNode up the tree
-      const closestElementNodeSuspect = chainBeforePos.at(-2) ?? chainAtPos.at(sharedParents - 1)
-      if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode){
+      const closestElementNodeSuspect = chainBeforePos.at(-2) ?? chainAtPos.at(sharedParents - 1);
+      if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
         return matchingTagName(closestElementNodeSuspect, metaByComp, getText);
       } else {
-        return allComponentNames(metaByComp)
+        return allComponentNames(metaByComp);
       }
     case SyntaxKind.Identifier:
-
-      const pathToElementNode = pathToNodeInAscendands(chainBeforePos, (n) => n.kind === SyntaxKind.ElementNode);
+      const pathToElementNode = pathToNodeInAscendands(
+        chainBeforePos,
+        (n) => n.kind === SyntaxKind.ElementNode,
+      );
       const parentOfnodeBefore = chainBeforePos.at(-2);
-      const completeCompName = parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end
-      if (completeCompName){
-        if (pathToElementNode && insideClosingTag(pathToElementNode)){
+      const completeCompName =
+        parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end;
+      if (completeCompName) {
+        if (pathToElementNode && insideClosingTag(pathToElementNode)) {
           const elementNode = pathToElementNode.at(-1);
           return matchingTagName(elementNode, metaByComp, getText);
         }
@@ -113,11 +129,11 @@ export function handleCompletion(
 
   if (completeForProp) {
     const tagNameNode = findTagNameNodeInStack(chainBeforePos);
-    if (!tagNameNode){
+    if (!tagNameNode) {
       return null;
     }
     const compName = compNameForTagNameNode(tagNameNode, getText);
-    if (!compName){
+    if (!compName) {
       return null;
     }
     return completionForNewAttr(compName, metaByComp);
@@ -130,10 +146,10 @@ function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {
 }
 
 /**
-*
-* @param elementNode has to point to a ElementNode
-* @returns
-*/
+ *
+ * @param elementNode has to point to a ElementNode
+ * @returns
+ */
 function matchingTagName(
   elementNode: Node,
   metaByComp: MetadataProvider,
@@ -176,13 +192,16 @@ function handleCompletionInsideToken(
   switch (parent.kind) {
     case SyntaxKind.TagNameNode: {
       const tagNameNodeParent = chainAtPos.at(-3);
-      const tagNameNodeIdx = tagNameNodeParent.children!.findIndex(c => c === parent);
-      if(tagNameNodeIdx <= 0) {
+      const tagNameNodeIdx = tagNameNodeParent.children!.findIndex((c) => c === parent);
+      if (tagNameNodeIdx <= 0) {
         return null;
       }
       const previousNode = tagNameNodeParent.children![tagNameNodeIdx - 1];
-      if (previousNode.kind === SyntaxKind.CloseNodeStart && tagNameNodeParent.kind === SyntaxKind.ElementNode){
-        return matchingTagName(tagNameNodeParent, metaByComp, getText)
+      if (
+        previousNode.kind === SyntaxKind.CloseNodeStart &&
+        tagNameNodeParent.kind === SyntaxKind.ElementNode
+      ) {
+        return matchingTagName(tagNameNodeParent, metaByComp, getText);
       }
       return allComponentNames(metaByComp);
     }
@@ -208,31 +227,39 @@ function completionForNewAttr(
   return metadata.getAllAttributes().map(completionItemFromAttr);
 }
 
-function attrKindToCompletionItemKind(attrKind: AttributeKind){
-  switch (attrKind){
+function attrKindToCompletionItemKind(attrKind: AttributeKind) {
+  switch (attrKind) {
     case "api":
-      return CompletionItemKind.Function
+      return CompletionItemKind.Function;
     case "event":
-      return CompletionItemKind.Event
-    case "implicit":
+      return CompletionItemKind.Event;
     case "layout":
+      return CompletionItemKind.Unit;
     case "prop":
-      return CompletionItemKind.Property
+    case "implicit":
+      return CompletionItemKind.Property;
+    default:
+      const _exhaustiveCheck: never = attrKind;
+      return _exhaustiveCheck;
   }
 }
 
-function attributeCompletionItem(componentName: string, attribute: TaggedAttribute): XmluiCompletionItem {
-  const label = attribute.kind === "event" ? addOnPrefix(attribute.name): attribute.name;
+function attributeCompletionItem(
+  componentName: string,
+  attribute: TaggedAttribute,
+): XmluiCompletionItem {
+  const label = attribute.kind === "event" ? addOnPrefix(attribute.name) : attribute.name;
   return {
     label,
     kind: attrKindToCompletionItemKind(attribute.kind),
+    sortText: attributeDisplayOrder(attribute.kind) + label,
     data: {
       metadataAccessInfo: {
         componentName,
-        attribute
-      }
-    }
-  }
+        attribute,
+      },
+    },
+  };
 }
 
 function componentCompletionItem(componentName: string): XmluiCompletionItem {
@@ -242,9 +269,9 @@ function componentCompletionItem(componentName: string): XmluiCompletionItem {
     data: {
       metadataAccessInfo: {
         componentName,
-      }
-    }
-  }
+      },
+    },
+  };
 }
 
 function markupContent(content: string): MarkupContent {
@@ -252,4 +279,20 @@ function markupContent(content: string): MarkupContent {
     kind: MarkupKind.Markdown,
     value: content,
   };
+}
+function attributeDisplayOrder(kind: AttributeKind): string {
+  switch (kind) {
+    case "api":
+    case "prop":
+    case "implicit":
+    case "event":
+      return "0";
+
+    case "layout":
+      return "1";
+    default: {
+      const _exhaustiveCheck: never = kind;
+      return _exhaustiveCheck;
+    }
+  }
 }

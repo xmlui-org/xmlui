@@ -11,9 +11,10 @@ import {
   isDateYesterday,
   isoDateString,
   smartFormatDate,
-  smartFormatDateTime
+  smartFormatDateTime,
+  formatHumanElapsedTime
 } from "../utils/date-utils";
-import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
+import { differenceInMinutes, isSameDay, isThisYear } from "date-fns";
 
 export const dateFunctions = {
   isoDateString,
@@ -32,4 +33,5 @@ export const dateFunctions = {
   differenceInMinutes,
   isSameDay,
   isThisYear,
+  formatHumanElapsedTime
 };

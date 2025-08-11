@@ -1,4 +1,4 @@
-import { delay, HttpResponse } from "msw";
+import { delay, HttpResponse, matchRequestUrl } from "msw";
 import type { PathParams, StrictRequest } from "msw";
 import { isObject } from "lodash-es";
 
@@ -88,8 +88,10 @@ async function initDb(apiDef: ApiInterceptorDefinition) {
 // An API interceptor implementation
 export class ApiInterceptor {
   private backend: Backend | null = null;
+  // public id = crypto.randomUUID();
 
-  constructor(private readonly apiDef: ApiInterceptorDefinition) {}
+  constructor(private readonly apiDef: ApiInterceptorDefinition) {
+  }
 
   public async initialize() {
     // --- Transfer the handlers of API operations to the backend implementation
@@ -118,7 +120,7 @@ export class ApiInterceptor {
   // Use the "msw" package to execute the interceptor operation
   async executeOperation(
     operationId: string,
-    req: StrictRequest<any>,
+    req: StrictRequest<any> | null,
     cookies: Record<string, string | Array<string>>,
     params: PathParams<string>,
   ) {
@@ -162,7 +164,11 @@ export class ApiInterceptor {
     );
 
     //artificial delay for http requests
-    await delay();
+    if (this.apiDef.artificialDelay === undefined) {
+      await delay("real");
+    } else if (this.apiDef.artificialDelay !== 0) {
+      await delay(this.apiDef.artificialDelay);
+    }
     const cookieService = new CookieService();
     const headerService = new HeaderService();
     try {
@@ -229,4 +235,53 @@ export class ApiInterceptor {
       queryParams: convertRequestParamPart(params.queryParams, operation.queryParamTypes),
     };
   }
+
+  hasMockForRequest(url: string, options: RequestInit) {
+    return this.getMockForRequest(url, options) !== undefined;
+  }
+
+  private getMockForRequest(url: string, options: RequestInit) {
+    return Object.entries(this.getOperations()).find(([operationId, operationDef]) => {
+      if (
+        matchRequestUrl(new URL(url, window.location.href), `${this.getApiUrl()}${operationDef.url}`, `${window.location.href}`).matches &&
+        (options.method || "get").toLowerCase() === operationDef.method.toLowerCase()
+      ) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  async executeMockedFetch(url: string, options: RequestInit) {
+    const mockForRequest = this.getMockForRequest(url, options);
+    if(!mockForRequest) {
+      throw new Error(`No mock found for request: ${url} with options: ${JSON.stringify(options)}`);
+    }
+    const [operationId, operationDef] = mockForRequest;
+    const match = matchRequestUrl(new URL(url, window.location.href), `${this.getApiUrl()}${operationDef.url}`, `${window.location.href}`);
+    return this.executeOperation(operationId, new Request(url, options), getCookiesAsObject(), match.params as PathParams);
+  }
+}
+
+function getCookiesAsObject() {
+  // 1. Get the cookie string
+  const cookieString = document.cookie;
+
+  // 2. Handle the case of no cookies
+  if (cookieString === "") {
+    return {};
+  }
+
+  // 3. Split into individual "key=value" pairs
+  const cookiePairs = cookieString.split('; ');
+
+  // 4. Use reduce to build the final object
+  const cookieObject = cookiePairs.reduce((acc, currentPair) => {
+    const [key, value] = currentPair.split('=');
+    // Decode the key and value to handle special characters
+    acc[decodeURIComponent(key)] = decodeURIComponent(value);
+    return acc;
+  }, {});
+
+  return cookieObject;
 }

@@ -38,10 +38,11 @@ $componentName: "DatePicker";
 
   .placeholder {
     color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-#{$variantName}");
   }
 
   .adornment {
-    color: createThemeVar("Input:textColor-adornment-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
   }
 }
 

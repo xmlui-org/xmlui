@@ -5,7 +5,7 @@ import {
   T_ARROW_EXPRESSION,
   T_ARROW_EXPRESSION_STATEMENT,
   T_EXPRESSION_STATEMENT,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 

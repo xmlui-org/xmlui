@@ -1,32 +1,37 @@
 import {
-  MutableRefObject,
-  RefObject,
-  memo,
   forwardRef,
-  useState,
-  useRef,
+  memo,
+  MutableRefObject,
+  ReactNode,
+  RefObject,
+  useCallback,
   useMemo,
   useReducer,
-  useCallback, ReactNode
+  useRef,
+  useState,
 } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import memoizeOne from "memoize-one";
-import { useParams, useSearchParams } from "@remix-run/react";
+import { useLocation, useParams, useSearchParams } from "@remix-run/react";
 
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "../abstractions/containers";
-import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { ContainerActionKind } from "./containers";
+import {
+  CodeDeclaration,
+  ModuleErrors,
+  T_ARROW_EXPRESSION,
+} from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
 import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
-import { useShallowCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
+import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { Container } from "./Container";
 import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
 import { useAppContext } from "../AppContext";
@@ -35,11 +40,12 @@ import { evalBinding } from "../script-runner/eval-tree-sync";
 import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
 import {
+  ComponentApi,
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
-  ComponentApi,
   StatePartChangedFn,
 } from "./ContainerWrapper";
+import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -213,7 +219,7 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars
+              localVars: resolvedLocalVars,
             },
           });
         } else {
@@ -244,7 +250,10 @@ export const StateContainer = memo(
           isImplicit={isImplicit}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</Container>
+          {...rest}
+        >
+          {children}
+        </Container>
       </ErrorBoundary>
     );
   }),
@@ -253,6 +262,12 @@ export const StateContainer = memo(
 const useRoutingParams = () => {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
+  const location = useLocation();
+  const linkInfoContext = useLinkInfoContext();
+  const linkInfo = useMemo(() => {
+    return linkInfoContext?.linkMap?.get(location.pathname) || EMPTY_OBJECT;
+  }, [linkInfoContext?.linkMap, location.pathname]);
+
   const queryParamsMap = useMemo(() => {
     const result: Record<string, any> = {};
     for (const [key, value] of Array.from(queryParams.entries())) {
@@ -263,10 +278,12 @@ const useRoutingParams = () => {
 
   return useMemo(() => {
     return {
+      $pathname: location.pathname,
       $routeParams: routeParams,
       $queryParams: queryParamsMap,
+      $linkInfo: linkInfo,
     };
-  }, [queryParamsMap, routeParams]);
+  }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
 };
 
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
@@ -314,7 +331,10 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       if (ret[key] === undefined) {
         ret[key] = value;
       } else {
-        if ((isPlainObject(ret[key]) && isPlainObject(value)) || (Array.isArray(ret[key]) && Array.isArray(value))) {
+        if (
+          (isPlainObject(ret[key]) && isPlainObject(value)) ||
+          (Array.isArray(ret[key]) && Array.isArray(value))
+        ) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {
           ret[key] = value;

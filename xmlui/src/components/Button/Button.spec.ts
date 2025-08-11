@@ -1,4 +1,9 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
+import {
+  getBorders,
+  getBounds,
+  getPaddings,
+  SKIP_REASON,
+} from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import {
   alignmentOptionValues,
@@ -8,7 +13,6 @@ import {
   type IconPosition,
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
-
 
 // --- Smoke
 
@@ -124,7 +128,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
               [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_STYLE,
             },
           });
-          
+
           const driver = await createButtonDriver();
           await expect(driver.component).toHaveCSS("border-color", EXPECTED_BORDER_COLOR);
           await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
@@ -148,7 +152,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     });
   });
 
-  /* 
+  /*
   ["disabled", "hover", "active", "focused"].forEach((state) => {
     test.skip(
       `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
@@ -212,7 +216,10 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createButtonDriver()).component).toHaveText("label");
   });
 
-  test("icon, label, contextualLabel button uses label", async ({ initTestBed, createButtonDriver }) => {
+  test("icon, label, contextualLabel button uses label", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     await initTestBed(`<Button icon="test" label="label" contextualLabel="contextLabel" />`, {
       resources: {
         "icon.test": "resources/bell.svg",
@@ -354,10 +361,10 @@ const iconPositionCases: {
 
 // This is a helper function to calculate the icon position
 async function iconPositionCalculation(buttonDriver: ComponentDriver, iconDriver: ComponentDriver) {
-  const buttonBounds = await buttonDriver.getComponentBounds();
-  const buttonPadding = await buttonDriver.getPaddings();
-  const buttonBorders = await buttonDriver.getBorders();
-  const { left: iconLeft, right: iconRight } = await iconDriver.getComponentBounds();
+  const buttonBounds = await getBounds(buttonDriver);
+  const buttonPadding = await getPaddings(buttonDriver);
+  const buttonBorders = await getBorders(buttonDriver);
+  const { left: iconLeft, right: iconRight } = await getBounds(iconDriver);
   const buttonContentLeft =
     buttonBounds.left + buttonBorders.left.width.value + buttonPadding.left.value;
   const buttonContentRight =
@@ -584,4 +591,3 @@ test("can render correct icon", async ({ createDriver }) => {
   await expect(driver.buttonIcon).toBeVisible();
 });
 */
-

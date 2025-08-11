@@ -5,13 +5,14 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import { removeNullProperties } from "../utils/misc";
 import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
+import { createMetadata, d } from "../../components/metadata-helpers";
 
 /**
  * Properties of the API loader component
@@ -75,6 +76,7 @@ function ApiLoader({
 }
 
 const ApiLoaderMd = createMetadata({
+  status: "stable",
   description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
     url: d("URL segment to use in the GET request"),

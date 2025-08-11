@@ -1,9 +1,10 @@
 import styles from "./DatePicker.module.scss";
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -37,7 +38,10 @@ const COMP = "DatePicker";
 export const DatePickerMd = createMetadata({
   status: "experimental",
   description:
-    "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
+    "`DatePicker` provides an interactive calendar interface for selecting single dates " +
+    "or date ranges, with customizable formatting and validation options. It displays " +
+    "a text input that opens a calendar popup when clicked, offering both keyboard and " +
+    "mouse interaction.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -133,11 +137,21 @@ export const DatePickerMd = createMetadata({
     lostFocus: dLostFocus(COMP),
   },
   apis: {
-    focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
-    setValue: dSetValueApi(),
+    focus: {
+      description: `Focus the ${COMP} component.`,
+      signature: "focus(): void",
+    },
+    value: {
+      description: `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+      signature: "get value(): any",
+    },
+    setValue: {
+      description: `This method sets the current value of the ${COMP}.`,
+      signature: "set value(value: any): void",
+      parameters: {
+        value: "The new value to set for the date picker.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

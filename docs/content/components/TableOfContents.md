@@ -1,14 +1,18 @@
 # TableOfContents [#tableofcontents]
 
-The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.
+`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.
 
 ## Properties [#properties]
 
-### `maxHeadingLevel (default: 6)` [#maxheadinglevel-default-6]
+### `maxHeadingLevel` (default: 6) [#maxheadinglevel-default-6]
 
 Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
-### `smoothScrolling (default: false)` [#smoothscrolling-default-false]
+### `omitH1` (default: false) [#omith1-default-false]
+
+If true, the `H1` heading is not included in the table of contents. This is useful when the `H1` is used for the page title and you want to avoid duplication.
+
+### `smoothScrolling` (default: false) [#smoothscrolling-default-false]
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 
@@ -60,14 +64,14 @@ This component does not expose any methods.
 | [borderColor](../styles-and-themes/common-units/#color)-TableOfContentsItem | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--active | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--hover | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-TableOfContents | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-TableOfContentsItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-TableOfContentsItem--active | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-TableOfContentsItem--hover | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-TableOfContents | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-TableOfContentsItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-TableOfContentsItem--active | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-TableOfContentsItem--hover | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContents | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--active | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--hover | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContents | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--active | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--hover | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-TableOfContents | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-TableOfContentsItem | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-TableOfContentsItem--active | *none* | *none* |
@@ -116,14 +120,14 @@ This component does not expose any methods.
 | [borderRightWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--active | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--hover | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-TableOfContents | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-TableOfContentsItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-TableOfContentsItem--active | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-TableOfContentsItem--hover | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-TableOfContents | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-TableOfContentsItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-TableOfContentsItem--active | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-TableOfContentsItem--hover | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContents | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--active | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--hover | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContents | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--active | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--hover | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-TableOfContents | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-TableOfContentsItem | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-TableOfContentsItem--active | *none* | *none* |
@@ -165,13 +169,13 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--active | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--hover | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-TableOfContentsItem--active | $color-primary-500 | $color-primary-500 |
-| direction-TableOfContentsItem | *none* | *none* |
-| direction-TableOfContentsItem-level-1 | *none* | *none* |
-| direction-TableOfContentsItem-level-2 | *none* | *none* |
-| direction-TableOfContentsItem-level-3 | *none* | *none* |
-| direction-TableOfContentsItem-level-4 | *none* | *none* |
-| direction-TableOfContentsItem-level-5 | *none* | *none* |
-| direction-TableOfContentsItem-level-6 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-1 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-2 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-3 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-4 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-5 | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-TableOfContentsItem-level-6 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem-level-1 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem-level-2 | *none* | *none* |
@@ -200,13 +204,13 @@ This component does not expose any methods.
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-TableOfContentsItem-level-4 | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-TableOfContentsItem-level-5 | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-TableOfContentsItem-level-6 | italic | italic |
-| fontVariant-TableOfContentsItem | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-1 | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-2 | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-3 | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-4 | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-5 | *none* | *none* |
-| fontVariant-TableOfContentsItem-level-6 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-1 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-2 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-3 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-4 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-5 | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-TableOfContentsItem-level-6 | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem--hover | *none* | *none* |
@@ -236,13 +240,13 @@ This component does not expose any methods.
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-4 | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
-| lineBreak-TableOfContentsItem | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-1 | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-2 | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-3 | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-4 | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-5 | *none* | *none* |
-| lineBreak-TableOfContentsItem-level-6 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-1 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-2 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-3 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-4 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-5 | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-TableOfContentsItem-level-6 | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | *none* | *none* |
@@ -308,20 +312,20 @@ This component does not expose any methods.
 | [paddingVertical](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-4 | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
-| textAlign-TableOfContentsItem | *none* | *none* |
-| textAlign-TableOfContentsItem-level-1 | *none* | *none* |
-| textAlign-TableOfContentsItem-level-2 | *none* | *none* |
-| textAlign-TableOfContentsItem-level-3 | *none* | *none* |
-| textAlign-TableOfContentsItem-level-4 | *none* | *none* |
-| textAlign-TableOfContentsItem-level-5 | *none* | *none* |
-| textAlign-TableOfContentsItem-level-6 | *none* | *none* |
-| textAlignLast-TableOfContentsItem | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-1 | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-2 | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-3 | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-4 | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-5 | *none* | *none* |
-| textAlignLast-TableOfContentsItem-level-6 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-1 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-2 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-3 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-4 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-5 | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-6 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-1 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-2 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-3 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-4 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-5 | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-6 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem | $color-secondary-500 | $color-secondary-500 |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--hover | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-1 | *none* | *none* |
@@ -358,20 +362,20 @@ This component does not expose any methods.
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-TableOfContentsItem-level-4 | *none* | *none* |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-TableOfContentsItem-level-5 | *none* | *none* |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-TableOfContentsItem-level-6 | *none* | *none* |
-| textIndent-TableOfContentsItem | *none* | *none* |
-| textIndent-TableOfContentsItem-level-1 | *none* | *none* |
-| textIndent-TableOfContentsItem-level-2 | *none* | *none* |
-| textIndent-TableOfContentsItem-level-3 | *none* | *none* |
-| textIndent-TableOfContentsItem-level-4 | *none* | *none* |
-| textIndent-TableOfContentsItem-level-5 | *none* | *none* |
-| textIndent-TableOfContentsItem-level-6 | *none* | *none* |
-| textShadow-TableOfContentsItem | *none* | *none* |
-| textShadow-TableOfContentsItem-level-1 | *none* | *none* |
-| textShadow-TableOfContentsItem-level-2 | *none* | *none* |
-| textShadow-TableOfContentsItem-level-3 | *none* | *none* |
-| textShadow-TableOfContentsItem-level-4 | *none* | *none* |
-| textShadow-TableOfContentsItem-level-5 | *none* | *none* |
-| textShadow-TableOfContentsItem-level-6 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-1 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-2 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-3 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-4 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-5 | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-TableOfContentsItem-level-6 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-1 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-2 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-3 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-4 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-5 | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-TableOfContentsItem-level-6 | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-TableOfContentsItem | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-TableOfContentsItem-level-1 | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-TableOfContentsItem-level-2 | *none* | *none* |
@@ -387,31 +391,31 @@ This component does not expose any methods.
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
 | [width](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
-| wordBreak-TableOfContentsItem | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-1 | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-2 | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-3 | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-4 | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-5 | *none* | *none* |
-| wordBreak-TableOfContentsItem-level-6 | *none* | *none* |
-| wordSpacing-TableOfContentsItem | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-1 | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-2 | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-3 | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-4 | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-5 | *none* | *none* |
-| wordSpacing-TableOfContentsItem-level-6 | *none* | *none* |
-| wordWrap-TableOfContentsItem | break-word | break-word |
-| wordWrap-TableOfContentsItem-level-1 | *none* | *none* |
-| wordWrap-TableOfContentsItem-level-2 | *none* | *none* |
-| wordWrap-TableOfContentsItem-level-3 | *none* | *none* |
-| wordWrap-TableOfContentsItem-level-4 | *none* | *none* |
-| wordWrap-TableOfContentsItem-level-5 | *none* | *none* |
-| wordWrap-TableOfContentsItem-level-6 | *none* | *none* |
-| writingMode-TableOfContentsItem | *none* | *none* |
-| writingMode-TableOfContentsItem-level-1 | *none* | *none* |
-| writingMode-TableOfContentsItem-level-2 | *none* | *none* |
-| writingMode-TableOfContentsItem-level-3 | *none* | *none* |
-| writingMode-TableOfContentsItem-level-4 | *none* | *none* |
-| writingMode-TableOfContentsItem-level-5 | *none* | *none* |
-| writingMode-TableOfContentsItem-level-6 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-1 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-2 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-3 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-4 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-5 | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-TableOfContentsItem-level-6 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-1 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-2 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-3 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-4 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-5 | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-TableOfContentsItem-level-6 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem | break-word | break-word |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-1 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-2 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-3 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-4 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-5 | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-TableOfContentsItem-level-6 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-1 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-2 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-3 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-4 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-5 | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-TableOfContentsItem-level-6 | *none* | *none* |

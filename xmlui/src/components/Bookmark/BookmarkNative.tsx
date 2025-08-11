@@ -1,6 +1,7 @@
 import type { ReactNode} from "react";
-import { useContext, useLayoutEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import styles from './Bookmark.module.scss';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
   title?: string;
   omitFromToc?: boolean;
   children: ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
 };
 
 export const defaultProps: Pick<Props, "level" | "omitFromToc"> = {
@@ -22,11 +24,28 @@ export const Bookmark = ({
   children,
   title,
   omitFromToc = defaultProps.omitFromToc,
+  registerComponentApi,
 }: Props) => {
   const elementRef = useRef<HTMLAnchorElement>(null);
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
   const observeIntersection = tableOfContentsContext?.hasTableOfContents;
+
+  const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
+    if (elementRef.current) {
+      elementRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        ...options,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      scrollIntoView,
+    });
+  }, [registerComponentApi, scrollIntoView]);
 
   useLayoutEffect(() => {
     if (observeIntersection && elementRef.current && uid && !omitFromToc) {

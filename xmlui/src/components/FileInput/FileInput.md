@@ -1,18 +1,15 @@
-# FileInput
+%-DESC-START
 
-The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
+**Key features:**
+- **File type filtering**: Restrict selection to specific file types using `acceptsFileType`
+- **Multiple file selection**: Enable users to select multiple files simultaneously
+- **Directory selection**: Allow folder selection instead of individual files
+- **Customizable button**: Configure button text, icons, position, and styling to match your design
 
-There are two ways to add a file to the input field:
-- Clicking on the `Browse` button and selecting the file in the file browser
-- Dragging files from a file browser to the input field.
+%-DESC-END
 
-The text box of the input field is read only.
 
-## Properties
-
-### `acceptsFileType`
-
-A list of file types the input controls accepts provided as a string array.
+%-PROP-START acceptsFileType
 
 ```xmlui-pg copy display name="Example: acceptsFileType"
 <App>
@@ -20,13 +17,9 @@ A list of file types the input controls accepts provided as a string array.
 </App>
 ```
 
-### `autoFocus (default: false)`
+%-PROP-END
 
-If this property is set to `true`, the component gets the focus automatically when displayed.
-
-### `buttonIcon`
-
-The ID of the icon to display in the button
+%-PROP-START buttonIcon
 
 ```xmlui-pg copy display name="Example: buttonIcon"
 <App>
@@ -35,11 +28,9 @@ The ID of the icon to display in the button
 </App>
 ```
 
-### `buttonIconPosition`
+%-PROP-END
 
-This optional string determines the location of the button icon.
-
-Available values: `start`, `end`
+%-PROP-START buttonIconPosition
 
 ```xmlui-pg copy display name="Example: buttonIconPosition"
 <App>
@@ -47,14 +38,11 @@ Available values: `start`, `end`
 </App>
 ```
 
-Details on different icon positions can be found in the [`Button` icon positions section](./Button.mdx#iconposition).
+%-PROP-END
 
-### `buttonLabel`
+%-PROP-START buttonLabel
 
 This property is an optional string to set a label for the button part.
-
-If no label is specified and an icon is set, the button will modify its styling to look like an icon button.
-By default the label reads `Browse`.
 
 ```xmlui-pg copy display name="Example: label"
 <App >
@@ -63,24 +51,9 @@ By default the label reads `Browse`.
 </App>
 ```
 
-### `buttonPosition`
+%-PROP-END
 
-This property determines the position of the button relative to the input field. The default is "end".
-
-Available values: `start`, `end`
-
-### `buttonSize`
-
-The size of the button (small, medium, large)
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `xs` | Extra small button |
-| `sm` | Small button |
-| `md` | Medium button |
-| `lg` | Large button |
+%-PROP-START buttonSize
 
 ```xmlui-pg copy display name="Example: buttonSize"
 <App>
@@ -88,13 +61,9 @@ Available values:
 </App>
 ```
 
-Details on different sizes can be found in the [`Button` sizes section](./Button.mdx#size).
+%-PROP-END
 
-### `buttonThemeColor`
-
-The button color scheme (primary, secondary, attention)
-
-Available values: `attention`, `primary`, `secondary`
+%-PROP-START buttonThemeColor
 
 ```xmlui-pg copy display name="Example: buttonThemeColor"
 <App>
@@ -102,13 +71,9 @@ Available values: `attention`, `primary`, `secondary`
 </App>
 ```
 
-Details on different theme colors can be found in the [`Button` theme colors section](./Button.mdx#themecolor).
+%-PROP-END
 
-### `buttonVariant`
-
-The button variant to use
-
-Available values: `solid`, `outlined`, `ghost`
+%-PROP-START buttonVariant
 
 ```xmlui-pg copy display name="Example: buttonVariant"
 <App>
@@ -116,11 +81,9 @@ Available values: `solid`, `outlined`, `ghost`
 </App>
 ```
 
-Details on different button variants can be found in the [`Button` variants section](./Button.mdx#variant).
+%-PROP-END
 
-### `directory (default: false)`
-
-This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
+%-PROP-STAR directory
 
 ```xmlui-pg copy display name="Example: directory"
 <App>
@@ -128,48 +91,9 @@ This boolean property indicates whether the component allows selecting directori
 </App>
 ```
 
-### `enabled (default: true)`
+%-PROP-END
 
-This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-```xmlui-pg copy display name="Example: enabled"
-<App>
-  <FileInput enabled="false" />
-</App>
-```
-
-### `initialValue`
-
-This property sets the component's initial value.
-
-### `label`
-
-This property sets the label of the component.
-
-### `labelBreak (default: false)`
-
-This boolean value indicates if the `FileInput` labels can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition (default: "top")`
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth`
-
-This property sets the width of the `FileInput`.
-
-### `multiple (default: false)`
-
-This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
+%-PROP-START multiple
 
 ```xmlui-pg copy display name="Example: multiple"
 <App>
@@ -178,35 +102,9 @@ This boolean property enables to add not just one (`false`), but multiple files 
 </App>
 ```
 
-### `placeholder`
+%-PROP-END
 
-A placeholder text that is visible in the input field when its empty.
-
-### `readOnly (default: false)`
-
-Set this property to `true` to disallow changing the component value.
-
-### `required`
-
-Set this property to `true` to indicate it must have a value before submitting the containing form.
-
-### `validationStatus (default: "none")`
-
-This property allows you to set the validation status of the input component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `valid` | Visual indicator for an input that is accepted |
-| `warning` | Visual indicator for an input that produced a warning |
-| `error` | Visual indicator for an input that produced an error |
-
-| Value     | Description                                           |
-| :-------- | :---------------------------------------------------- |
-| `valid`   | Visual indicator for an input that is accepted        |
-| `warning` | Visual indicator for an input that produced a warning |
-| `error`   | Visual indicator for an input that produced an error  |
+%-PROP-START validationStatus
 
 ```xmlui-pg copy display name="Example: validationStatus"
 <App>
@@ -217,11 +115,7 @@ Available values:
 </App>
 ```
 
-## Events
-
-### `didChange`
-
-This event is triggered when value of FileInput has changed.
+%-EVENT-START didChange
 
 Write in the input field and see how the `Text` underneath it is updated in accordingly.
 
@@ -229,17 +123,17 @@ Write in the input field and see how the `Text` underneath it is updated in acco
 <App var.field="">
   <FileInput onDidChange="(file) => field = file[0]?.name" />
   <Text value="{field}" />
-</App>`
+</App>
 ```
 
-### `gotFocus`
+%-EVENT-END
 
-This event is triggered when the FileInput has received the focus.
+%-EVENT-START gotFocus
 
 Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {3-4} display name="Example: gotFocus/lostFocus"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
 <App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -250,19 +144,17 @@ Note how clicking elsewhere resets the text to the original.
 </App>
 ```
 
-### `lostFocus`
+%-EVENT-END
 
-This event is triggered when the FileInput has lost the focus.
+%-EVENT-START lostFocus
 
 (See the example above)
 
-## Exposed Methods
+%-EVENT-END
 
-### `focus`
+%-API-START focus
 
-This method sets the focus on the FileInput.
-
-```xmlui-pg copy {2-3} display name="Example: focus"
+```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
   <HStack>
     <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
@@ -271,11 +163,11 @@ This method sets the focus on the FileInput.
 </App>
 ```
 
-### `open`
+%-API-END
 
-This API command triggers the file browsing dialog to open.
+%-API-START open
 
-```xmlui-pg copy {3-4} display name="Example: open"
+```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
   <HStack>
     <Button label="Open FileInput" onClick="fileInputComponent.open()" />
@@ -284,18 +176,20 @@ This API command triggers the file browsing dialog to open.
 </App>
 ```
 
-### `setValue`
+%-API-END
+
+%-API-START setValue
 
 (**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
 
-### `value`
+%-API-END
 
-By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined.
+%-API-START value
 
 In the example below, select a file using the file browser of the `FileInput` component
 and note how the `Text` component displays the selected file's name:
 
-```xmlui-pg copy {2-3} display name="Example: value"
+```xmlui-pg copy {3-4} display name="Example: value"
 <App>
   <HStack>
     <Text value="Selected file name: {fileInputComponent.value}" />
@@ -304,10 +198,14 @@ and note how the `Text` component displays the selected file's name:
 </App>
 ```
 
-## Styling
+%-API-END
+
+%-STYLE-START
 
 The `FileInput` component does not theme variables directly.
-However, it uses the [`Button`](./Button.mdx) and [`TextBox`](./TextBox.mdx) components under the hood.
+However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/TextBox) components under the hood.
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
-See [Button styling](./Button.mdx#styling) and [TextBox styling](./TextBox.mdx#styling).
+See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).
+
+%-STYLE-END

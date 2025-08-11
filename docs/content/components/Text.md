@@ -9,7 +9,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties [#properties]
 
-### `ellipses (default: true)` [#ellipses-default-true]
+### `ellipses` (default: true) [#ellipses-default-true]
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -48,7 +48,7 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-### `preserveLinebreaks (default: false)` [#preservelinebreaks-default-false]
+### `preserveLinebreaks` (default: false) [#preservelinebreaks-default-false]
 
 This property indicates if linebreaks should be preserved when displaying text.
 
@@ -319,9 +319,9 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgba($color-primary-200-rgb, .4) | rgba($color-primary-400-rgb, .4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgb(from $color-primary-200 r g b / 0.4) | rgb(from $color-primary-400 r g b / 0.4) |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |
@@ -348,6 +348,7 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | fontSize-Text | fontSize-Text |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-smaller | $fontSize-smaller |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
@@ -368,6 +369,7 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-markdown | fontWeight-Text | fontWeight-Text |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
@@ -401,10 +403,10 @@ This component does not expose any methods.
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-2 | $space-2 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Text-paragraph | $space-1 | $space-1 |
 | [textColor](../styles-and-themes/common-units/#color)-Text | $textColor-primary | $textColor-primary |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Text-deleted | *none* | *none* |
@@ -417,10 +419,10 @@ This component does not expose any methods.
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text-inserted | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |

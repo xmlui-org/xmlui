@@ -1,34 +1,34 @@
 import type { CompoundComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
-import { ThemeDefinition } from "../../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../../abstractions/ThemingDefs";
 import type { ApiInterceptorDefinition } from "../interception/abstractions";
 
-// --- This type describes a standalone app
+// This type describes a standalone app
 export type StandaloneAppDescription = {
-  // --- Application name
+  // Application name
   name?: string;
 
-  // --- Application version
+  // Application version
   version?: string;
 
-  // --- The apps entry point; rendering starts here
+  // The apps entry point; rendering starts here
   entryPoint?: ComponentLike;
 
-  // --- Optional components used by the app in the entry point
+  // Optional components used by the app in the entry point
   components?: CompoundComponentDef[];
 
-  // --- Optional themes used by the app
+  // Optional themes used by the app
   themes?: ThemeDefinition[];
 
-  // --- The ID of the default theme
+  // The ID of the default theme
   defaultTheme?: string;
 
-  // --- The default tone ("dark" or "light")
+  // The default tone ("dark" or "light")
   defaultTone?: string;
 
-  // --- Resource definitions for the app
+  // Resource definitions for the app
   resources?: Record<string, string>;
 
-  // --- Resource map for the app
+  // Resource map for the app
   resourceMap?: Record<string, string>;
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

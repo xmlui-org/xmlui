@@ -1,6 +1,14 @@
 %-DESC-START
 
-`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide for details.
+**Key features:**
+- **Exclusive selection**: Only one option can be selected at a time within the group
+- **Form integration**: Built-in validation states and seamless form compatibility
+- **Flexible layout**: Contains [Option](/components/Option) that can be arranged in any layout structure
+- **State management**: Automatically handles selection state and change events
+- **Accessibility support**: Proper keyboard navigation and screen reader compatibility
+- **Validation indicators**: Visual feedback for error, warning, and valid states
+
+`RadioGroup` is often used in forms. See [this guide](/forms) for details.
 
 %-DESC-END
 

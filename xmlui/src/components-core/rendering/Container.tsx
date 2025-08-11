@@ -1,14 +1,10 @@
+import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
 import React, {
   cloneElement,
-  Dispatch,
   forwardRef,
   Fragment,
   isValidElement,
   memo,
-  MutableRefObject,
-  ReactNode,
-  RefObject,
-  SetStateAction,
   useCallback,
   useEffect,
   useRef,
@@ -19,33 +15,34 @@ import { cloneDeep, isArray } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import memoizeOne from "memoize-one";
 
-import {
+import type {
   LookupActionOptions,
   LookupAsyncFnInner,
   LookupSyncFnInner,
 } from "../../abstractions/ActionDefs";
-import { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
-import { ContainerState } from "../../abstractions/ContainerDefs";
-import { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import {
+import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ContainerState } from "../../abstractions/ContainerDefs";
+import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
+import type {
   ArrowExpression,
   ArrowExpressionStatement,
   Statement,
-  T_ARROW_EXPRESSION_STATEMENT,
+} from "../script-runner/ScriptingSourceTree";
+import {
   T_ARROW_EXPRESSION,
-} from "../../abstractions/scripting/ScriptingSourceTree";
-import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "../abstractions/containers";
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../script-runner/ScriptingSourceTree";
+import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
+import { ContainerActionKind } from "./containers";
 import { useAppContext } from "../AppContext";
 import { buildProxy } from "../rendering/buildProxy";
-import { StatePartChangedFn } from "./ContainerWrapper";
-import {
+import type { StatePartChangedFn } from "./ContainerWrapper";
+import type {
   ComponentCleanupFn,
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
-import { useDebugView } from "../DebugViewProvider";
-import { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
@@ -55,9 +52,10 @@ import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUt
 import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
 import { LoaderComponent } from "../LoaderComponent";
-import { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "../constants";
-import { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
 type Props = {
   node: ContainerWrapperDef;
@@ -147,6 +145,8 @@ export const Container = memo(
       };
     }, []);
 
+    const { apiInstance } = useApiInterceptorContext();
+
     const runCodeAsync = useEvent(
       async (
         source: string | ParsedEventValue | ArrowExpression,
@@ -186,6 +186,7 @@ export const Container = memo(
               getCurrentState: () => stateRef.current,
               dispatch,
               appContext: evalAppContext,
+              apiInstance,
               navigate,
               location,
               lookupAction: (action, uid, actionOptions = {}) => {

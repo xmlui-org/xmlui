@@ -21,23 +21,20 @@
         'unlink', 'unknownfile', 'upload', 'user', 'userminus', 'users', 'valid',
         'warning', 'webp', 'xls', 'xlsx'
     ].toSorted()}">
-    <H1>
-        Icons
-    </H1>
-    The following icons are available in the XMLUI icon set. Icons can be used in various components such as buttons, toolbars, and more.
-    <FlowLayout gap="$space-2" padding="$space-2">
-        <Items data="{names}">
-            <VStack width="12.5%" verticalAlignment="center" horizontalAlignment="center" marginBottom="$space-8" gap="$space-2">
-                <Icon padding="$space-2" name="{$item}" height="40px" width="40px" boxShadow="$boxShadow-spread-2"/>
-                <Text fontSize="$fontSize-smaller">
-                    {$item}
-                </Text>
-            </VStack>
-        </Items>
-    </FlowLayout>
-    <DocumentLinks 
-        prevLink="/palettes" 
-        prevTitle="Palettes" 
-        nextLink="/glossary" 
-        nextTitle="Glossary"/>
+    <DocumentPageNoTOC>
+        <H1>
+            Icons
+        </H1>
+        The following icons are available in the XMLUI icon set. Icons can be used in various components such as buttons, toolbars, and more.
+        <FlowLayout gap="$space-2" padding="$space-2">
+            <Items data="{names}">
+                <VStack width="12.5%" verticalAlignment="center" horizontalAlignment="center" marginBottom="$space-8" gap="$space-2">
+                    <Icon padding="$space-2" name="{$item}" height="40px" width="40px" boxShadow="$boxShadow-spread-2"/>
+                    <Text fontSize="$fontSize-smaller">
+                        {$item}
+                    </Text>
+                </VStack>
+            </Items>
+        </FlowLayout>
+    </DocumentPageNoTOC>
 </Component>

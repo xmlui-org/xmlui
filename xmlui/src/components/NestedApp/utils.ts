@@ -44,3 +44,11 @@ export async function createQueryString(target: any) {
   // Create a query string.
   return encodeURIComponent(base64);
 }
+
+
+export function withoutTrailingSlash(str: string) {
+  if (str.endsWith("/")) {
+    return str.substring(0, str.length - 1);
+  }
+  return str;
+}

@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { httpMethodNames } from "../abstractions";
+import { createMetadata, d } from "../metadata-helpers";
 
 // NOTE: Original component this is based on is the `Loader` component
 
@@ -8,9 +8,8 @@ const COMP = "DataSource";
 export const DataSourceMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component manages fetching data from an API endpoint. This component ` +
-    `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
-    `on the backend, use the [\`APICall\`](./APICall.mdx) component.`,
+    "`DataSource` fetches and caches data from API endpoints, versus " +
+    "[`APICall`](/components/APICall) which creates, updates or deletes data.",
   props: {
     method: {
       description: `Set the HTTP method.`,
@@ -115,12 +114,25 @@ export const DataSourceMd = createMetadata({
     error: d(`This event fires when a request results in an error.`),
   },
   apis: {
-    value: d(
-      "This property retrieves the data queried from the source after optional transformations.",
-    ),
-    inProgress: d("This property indicates if the data is being fetched."),
-    isRefetching: d("This property indicates if the data is being re-fetched."),
-    loaded: d("This property indicates if the data has been loaded."),
-    refetch: d("This method requests the re-fetch of the data."),
+    value: {
+      description: `This property retrieves the data queried from the source after optional transformations.`,
+      signature: "get value(): any",
+    },
+    inProgress: {
+      description: "This property indicates if the data is being fetched.",
+      signature: "get inProgress(): boolean",
+    },
+    isRefetching: {
+      description: "This property indicates if the data is being re-fetched.",
+      signature: "get isRefetching(): boolean",
+    },
+    loaded: {
+      description: "This property indicates if the data has been loaded.",
+      signature: "get loaded(): boolean",
+    },
+    refetch: {
+      description: "This method requests the re-fetch of the data.",
+      signature: "refetch(): void",
+    },
   },
 });

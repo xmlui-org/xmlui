@@ -1,9 +1,11 @@
 %-DESC-START
 
->[!INFO]
-> `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+**Key features:**
+- **Semantic levels**: Choose from h1 through h6 for proper document structure and accessibility
+- **Text overflow control**: Automatic ellipses and line limiting for long headings
+- **Anchor generation**: Optional hover anchors for deep linking to specific sections
 
-For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
+For the shorthand versions see: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
 ```xmlui-pg copy display name="Example: Headings with levels"
 <App>
@@ -66,8 +68,8 @@ For a visual example, see the component description.
 
 %-PROP-START preserveLinebreaks
 
-```xmlui-pg copy {5} display name="Example: preserveLinebreaks"
----app copy display
+```xmlui-pg copy display name="Example: preserveLinebreaks"
+---app copy display {5}
 <App>
   <HStack>
     <H3
@@ -114,5 +116,11 @@ You can observe the effect of using `preserveLinebreaks`:
   </VStack>
 </App>
 ```
+
+%-PROP-END
+
+%-PROP-START showAnchor
+
+If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
 
 %-PROP-END

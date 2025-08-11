@@ -2,7 +2,7 @@
 
 Let's load that same London tube data into a [Select](/components/Select) component.
 
-```xmlui-pg copy display height="280px"
+```xmlui-pg display height="280px" noHeader
 <App>
   <Select id="lines" initialValue="bakerloo" dropdownHeight="200px">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
@@ -16,8 +16,8 @@ The `Select` uses the same API as the `List`. It contains an <a href="/component
 
 Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/components/Table">Table</a>.
 
-```xmlui-pg
----app copy display
+```xmlui-pg noHeader
+---app
 <App>
   <Select id="lines" initialValue="bakerloo">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
@@ -26,11 +26,12 @@ Nothing happens yet when you select a tube line. Let's wire up the selection to 
   </Select>
 
   <DataSource
-    id="stations"
+    id="tubeStations"
+    when="{lines.value}"
     url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
     resultSelector="stations"/>
 
-  <Table data="{stations}" height="280px">
+  <Table data="{tubeStations}" height="280px">
     <Column bindTo="name" />
     <Column bindTo="modes" />
   </Table>
@@ -49,7 +50,7 @@ The `Select` is wired to the `Table`. When you make a new selection, the table f
 
 How does this work? Note how the `Select` declares the property `id="lines"`.
 
-```xmlui
+```xmlui /lines/
 <Select id="lines" initialValue="bakerloo" width="30%">
 ```
 
@@ -59,18 +60,12 @@ Now look at the `url` property of the `DataSource`.
 
 ```xmlui /{lines.value}/
 <DataSource
-  id="stations"
+  id="tubeStations"
   url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
   resultSelector="stations"/>
 ```
 
-it embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `stations`, the id of the `DataSource`.
-
-```xmlui
-<Table data="{stations}">
-```
-
-So when the `DataSource` fetches fresh data, the `Table` notices the change and refills with that fresh data.
+It embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `tubeStations` (the `DataSource` id) so it automatically displays the new data.
 
 There's a name for this pattern: reactive data binding. It's what spreadsheets do when a change in one cell propagates to others that refer to it. And it's what the popular framework React enables for web apps. React, as you may know, is a complex beast that only expert programmers can tame. Fortunately the expert programmers who build XMLUI have done that for you. When you build apps declaratively with XMLUI you enjoy the benefit of reactive data binding without the burden of React's complexity. You don't need to write code to make this magic happen, it's automatic!
 

@@ -3,7 +3,7 @@ import {
   T_FUNCTION_DECLARATION,
   type FunctionDeclaration,
   type Statement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "../../components-core/script-runner/ScriptingSourceTree";
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";

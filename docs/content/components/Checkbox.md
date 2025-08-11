@@ -1,8 +1,23 @@
 # Checkbox [#checkbox]
 
-The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.
+`Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions.
 
-To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+**Key features:**
+- **Flexible labeling**: Position labels on any side and support custom label templates
+- **Validation support**: Built-in validation states for form error handling
+- **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
+
+To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/forms).
+
+## Checkbox Values [#checkbox-values]
+
+The `initialValue` and `value` properties of the checkbox are transformed to a Boolean value to display the checked (`true`) or unchecked (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
 
 ## Use children as Content Template [#use-children-as-content-template]
 
@@ -26,11 +41,11 @@ In the following example, the two Checkbox are functionally the same:
 
 ## Properties [#properties]
 
-### `autoFocus (default: false)` [#autofocus-default-false]
+### `autoFocus` (default: false) [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)` [#enabled-default-true]
+### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -49,7 +64,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `indeterminate (default: false)` [#indeterminate-default-false]
+### `indeterminate` (default: false) [#indeterminate-default-false]
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
@@ -57,8 +72,8 @@ This prop is commonly used if there are several other checkboxes linked to one c
 
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
-```xmlui-pg copy display {4} name="Example: indeterminate"
----app copy display
+```xmlui-pg copy display name="Example: indeterminate"
+---app copy display {4}
 <App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"
@@ -78,7 +93,7 @@ The following sample binds the state of two checkboxes to one and updates the st
 Try this sample by clicking the bottom group of checkboxes.
 ```
 
-### `initialValue (default: false)` [#initialvalue-default-false]
+### `initialValue` (default: false) [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
@@ -97,11 +112,11 @@ This property sets the label of the component.  If not set, the component will n
 </App>
 ```
 
-### `labelBreak (default: false)` [#labelbreak-default-false]
+### `labelBreak` (default: true) [#labelbreak-default-true]
 
-This boolean value indicates if the `Checkbox` label can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates whether the `Checkbox` label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")` [#labelposition-default-end]
+### `labelPosition` (default: "end") [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -127,7 +142,7 @@ Available values:
 
 This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `readOnly (default: false)` [#readonly-default-false]
+### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -138,11 +153,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required (default: false)` [#required-default-false]
+### `required` (default: false) [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")` [#validationstatus-default-none]
+### `validationStatus` (default: "none") [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -198,7 +213,11 @@ This event is triggered when the Checkbox has lost the focus.
 
 ### `setValue` [#setvalue]
 
-You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+This method sets the current value of the Checkbox.
+
+**Signature**: `set value(value: boolean): void`
+
+- `value`: The new value to set for the checkbox.
 
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -224,7 +243,9 @@ You can use this method to set the checkbox's current value programmatically (`t
 
 ### `value` [#value]
 
-You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
+This method returns the current value of the Checkbox.
+
+**Signature**: `get value(): boolean`
 
 You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
 

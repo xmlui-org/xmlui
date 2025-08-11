@@ -1,18 +1,20 @@
 import styles from "./ContentSeparator.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { orientationOptionMd } from "../abstractions";
 import { ContentSeparator, defaultProps } from "./ContentSeparatorNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "ContentSeparator";
 
 export const ContentSeparatorMd = createMetadata({
+  status: "stable",
   description:
-    `A \`${COMP}\` is a component that divides or separates content visually within a layout. ` +
-    `It serves as a visual cue to distinguish between different sections or groups of content, ` +
-    `helping to improve readability and organization.`,
+    "`ContentSeparator` creates visual dividers between content sections using " +
+    "horizontal or vertical lines. It's essential for improving readability by " +
+    "breaking up dense content, separating list items, or creating clear boundaries " +
+    "between different UI sections.",
   props: {
     size: {
       description:

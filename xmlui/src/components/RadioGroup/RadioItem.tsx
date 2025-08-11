@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, dDidChange } from "../metadata-helpers";
 import { RadioItem, defaultProps } from "./RadioItemNative";
 
 const COMP = "RadioItem";
@@ -17,16 +17,20 @@ export const RadioItemMd = createMetadata({
       defaultValue: defaultProps.value,
     },
   },
+  events: {
+    didChange: dDidChange(COMP),
+  }
 });
 
 export const radioItemComponentRenderer = createComponentRenderer(
   COMP,
   RadioItemMd,
-  ({ node, extractValue }) => {
+  ({ node, extractValue, lookupEventHandler }) => {
     return (
       <RadioItem
         checked={extractValue(node.props.checked)}
         value={extractValue(node.props.value)}
+        onDidChange={lookupEventHandler("didChange")}
       />
     );
   },

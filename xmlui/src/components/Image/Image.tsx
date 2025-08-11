@@ -1,17 +1,18 @@
 import styles from "./Image.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dClick, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dClick, dInternal } from "../metadata-helpers";
 import { Image, defaultProps } from "./ImageNative";
 
 const COMP = "Image";
 
 export const ImageMd = createMetadata({
+  status: "stable",
   description:
-    `The \`${COMP}\` component represents or depicts an object, scene, idea, or other concept ` +
-    `with a picture.`,
+    "`Image` displays pictures from URLs or local sources with built-in responsive " +
+    "sizing, aspect ratio control, and accessibility features. It handles different " +
+    "image formats and provides options for lazy loading and click interactions.",
   props: {
     src: d(
       "This property is used to indicate the source (path) of the image to display. " +

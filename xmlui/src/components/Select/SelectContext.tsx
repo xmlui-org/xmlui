@@ -1,16 +1,15 @@
-import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
+import { createContext, ReactNode, useContext } from "react";
 
-import type { Option } from "../abstractions";
 import type { SingleValueType, ValueType } from "./SelectNative";
+import { Option } from "../abstractions";
 
 type SelectContextValue = {
   multiSelect?: boolean;
   value: ValueType | null;
   onChange?: (selectedValue: SingleValueType) => void;
-  optionLabelRenderer: (option: Option) => ReactNode;
-  optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => ReactNode;
   setOpen: (open: boolean) => void;
+  options: Set<Option>;
+  optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => ReactNode;
 };
 
 export const SelectContext = createContext<SelectContextValue>(null);

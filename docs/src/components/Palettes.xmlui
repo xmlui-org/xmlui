@@ -5,10 +5,10 @@
     </H1>
     Select a theme from the dropdown to see the colors associated with that theme. Use the tone changer button to the right of the dropdown to switch between light and dark tones.
     <HStack>
-      <Select 
-        id="pickTheme" 
-        width="30%" 
-        initialValue="default" 
+      <Select
+        id="pickTheme"
+        width="30%"
+        initialValue="default"
         onDidChange="(newTheme) => setTheme(newTheme)">
         <Option value="default" label="xmlui"/>
         <Option value="earthtone" label="earthtone"/>
@@ -16,7 +16,7 @@
         <Option value="xmlui-orange-on-default" label="xmlui-orange"/>
         <Option value="xmlui-gray-on-default" label="xmlui-gray"/>
       </Select>
-      <ToneChangerButton/>
+      <ToneSwitch/>
     </HStack>
     <ColorPalette title="Surface" palette="surface"/>
     <ColorPalette title="Primary" palette="primary"/>
@@ -59,10 +59,5 @@
       <PaletteItem width="33.3%" color="backgroundColor--disabled"/>
       <PaletteItem width="33.3%" color="backgroundColor--selected"/>
     </FlowLayout>
-    <DocumentLinks 
-      prevLink="/globals" 
-      prevTitle="Globals" 
-      nextLink="/icons" 
-      nextTitle="Icons"/>
   </DocumentPage>
 </Component>

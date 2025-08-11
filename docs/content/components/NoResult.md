@@ -1,10 +1,10 @@
 # NoResult [#noresult]
 
-`NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.
+`NoResult` displays a visual indication that a query or search returned nothing.
 
 ## Properties [#properties]
 
-### `hideIcon (default: false)` [#hideicon-default-false]
+### `hideIcon` (default: false) [#hideicon-default-false]
 
 This boolean property indicates if the icon should be hidden.
 
@@ -17,11 +17,11 @@ This boolean property indicates if the icon should be hidden.
 </App>
 ```
 
-### `icon (default: "noresult")` [#icon-default-noresult]
+### `icon` (default: "noresult") [#icon-default-noresult]
 
 This property defines the icon to display with the component.
 
-This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
+This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](/components/Icon).
 
 ```xmlui-pg copy display name="Example: icon"
 <App>
@@ -61,8 +61,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NoResult | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NoResult | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NoResult | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NoResult | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NoResult | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NoResult | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NoResult | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-NoResult | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-NoResult | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NoResult | *none* | *none* |
@@ -75,8 +75,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-NoResult | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NoResult | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NoResult | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NoResult | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NoResult | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-NoResult | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-NoResult | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NoResult | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-NoResult | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-NoResult | *none* | *none* |

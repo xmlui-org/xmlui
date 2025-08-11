@@ -3,16 +3,18 @@ import { useOption } from "./OptionContext";
 import React, { useEffect, useMemo, useState } from "react";
 
 export function HiddenOption(option: Option) {
-  const { optionRenderer, label } = option;
+  const { label } = option;
   const { onOptionRemove, onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
+
   const opt: Option = useMemo(() => {
     return {
       ...option,
       label: label ?? node?.textContent ?? "",
       keywords: [label ?? node?.textContent ?? ""],
+      // Store the rendered ReactNode for dropdown display
     };
-  }, [option, node]);
+  }, [option, node, label]);
 
   useEffect(() => {
     onOptionAdd(opt);
@@ -21,7 +23,7 @@ export function HiddenOption(option: Option) {
 
   return (
     <div ref={(el) => setNode(el)} style={{ display: "none" }}>
-      {optionRenderer?.({})}
+      {option.children}
     </div>
   );
 }

@@ -1,6 +1,21 @@
 %-DESC-START
 
-To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+**Key features:**
+- **Flexible labeling**: Position labels on any side and support custom label templates
+- **Validation support**: Built-in validation states for form error handling
+- **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
+
+To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/forms).
+
+## Checkbox Values
+
+The `initialValue` and `value` properties of the checkbox are transformed to a Boolean value to display the checked (`true`) or unchecked (`false`) state with this logic:
+- `null` and `undefined` go to `false`.
+- If the property is Boolean, the property value is used as is.
+- If it is a number, `NaN` and `0` result in `false`; other values represent `true`.
+- If the property is a string, the empty string and the literal "false" string result in `false`; others result in `true`.
+- The empty array value goes to `false`; other array values result in `true`.
+- Object values with no properties result in `false`; other values represent `true`.
 
 %-DESC-END
 
@@ -29,8 +44,8 @@ This prop is commonly used if there are several other checkboxes linked to one c
 
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
-```xmlui-pg copy display {4} name="Example: indeterminate"
----app copy display
+```xmlui-pg copy display name="Example: indeterminate"
+---app copy display {4}
 <App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"

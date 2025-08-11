@@ -1,6 +1,6 @@
 # Working with Text
 
-Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/workingWithMarkdown).
+Text elements appear in UI components such as menu items, titles, headings, labels, and descriptions. There is also a [Markdown](/components/Markdown) component for complete text documents (like this page). We'll cover `Text` here and `Markdown` in the [next chapter](/working-with-markdown).
 
 You can nest text in any component that renders its children.
 
@@ -23,16 +23,13 @@ To gain more control we can use the  `Text` component.
 </App>
 ```
 
-Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/components/Heading), [H1](/components/H1), [H2](/components/H2), etc.
-</Callout>
-
+Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/components/Heading), [H1](/components/H1), [H2](/components/H2), etc).
 
 ```xmlui-pg display name="Example: Text can be styled"
 <App>
   <Theme
     textColor-H1 = "red"
-    textColor-H2 = "green"
-    >
+    textColor-H2 = "green">
     <H1>My Main Title</H1>
     This document contains several sections.
     <H2>Section Title</H2>
@@ -155,7 +152,7 @@ If necessary, breaks occur within a word.
 
 Sometimes you want to preserve line breaks, as when inspecting a JSON object.
 
-```xmlui-pg copy display name="Example: preserving line breaks"
+```xmlui-pg copy display name="Example: preserving line breaks" /preserveLinebreaks="true"/
 <App
   var.data = "{
     {
