@@ -31,6 +31,21 @@ $themeVars: ();
   width: 100%;
   border-radius: t.$borderRadius;
   min-height: fit-content;
+
+  &:focus-within {
+    border-radius: createThemeVar("Input:borderRadius-FileInput--focus");
+    border-color: createThemeVar("Input:borderColor-FileInput--focus");
+    background-color: createThemeVar("Input:backgroundColor-FileInput--focus");
+    box-shadow: createThemeVar("Input:boxShadow-FileInput--focus");
+    color: createThemeVar("Input:textColor-FileInput--focus");
+  }
+
+  &:has(.input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-FileInput--focus");
+    outline-color: createThemeVar("Input:outlineColor-FileInput--focus");
+    outline-style: createThemeVar("Input:outlineStyle-FileInput--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-FileInput--focus");
+  }
 }
 
 .button {

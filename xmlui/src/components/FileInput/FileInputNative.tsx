@@ -1,5 +1,5 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useRef } from "react";
+import { type CSSProperties, useCallback, useEffect, useId, useRef } from "react";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -113,6 +113,8 @@ export const FileInput = ({
   labelBreak,
   required,
 }: Props) => {
+  const _id = useId();
+  id = id || _id;
   // Don't accept any (initial) value if it is not a File array explicitly
   const _initialValue: File[] | undefined = isFileArray(initialValue) ? initialValue : undefined;
   const _value: File[] | undefined = isFileArray(value) ? value : undefined;
@@ -181,6 +183,7 @@ export const FileInput = ({
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
     <ItemWithLabel
+      id={id}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}
@@ -190,6 +193,7 @@ export const FileInput = ({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      isInputTemplateUsed={true}
     >
       <div
         className={classnames(styles.container, {
@@ -198,6 +202,7 @@ export const FileInput = ({
         })}
       >
         <button
+          id={id}
           {...getRootProps({
             tabIndex: 0,
             onFocus: handleOnFocus,
@@ -228,7 +233,6 @@ export const FileInput = ({
           />
         </button>
         <Button
-          id={id}
           disabled={!enabled}
           type="button"
           onClick={open}

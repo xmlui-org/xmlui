@@ -99,12 +99,21 @@ $componentName: "Slider";
   background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
   position: relative;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
   outline: none;
 
   &.disabled, &[data-disabled] {
     pointer-events: none;
     opacity: 0.5;
+  }
+
+  &:hover, &[data-hover] {
+    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+  }
+  &:active, &[data-active] {
+    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
+    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
   }
 }
 
