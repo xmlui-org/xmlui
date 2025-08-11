@@ -44,6 +44,7 @@ type Props = {
   | ButtonAria
   | "tabIndex"
   | "className"
+  | "role"
 >;
 
 export const defaultProps: Pick<
