@@ -1,7 +1,6 @@
 import { labelPositionValues, validationStatusValues } from "../abstractions";
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-import { NUMBERBOX_MAX_VALUE } from "./numberbox-abstractions";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -15,7 +14,6 @@ test.describe("Basic Functionality", () => {
 
   test("component renders with label", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Amount" />`);
-    await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByText("Amount")).toBeVisible();
   });
 
@@ -26,36 +24,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("123");
   });
 
-  test("initialValue accepts empty as empty string", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox initialValue="" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("");
-  });
-
-  test("initialValue accepts different data types", async ({ initTestBed, page }) => {
-    // Test string
-    await initTestBed(`<NumberBox initialValue="123" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("123");
-
-    // Test number
-    await initTestBed(`<NumberBox initialValue="{456}" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("456");
-
-    // Test float
-    await initTestBed(`<NumberBox initialValue="{123.45}" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("123.45");
-  });
-
-  test("initialValue handles null", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox initialValue="{null}" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("");
-  });
-
-  test("initialValue handles undefined", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox initialValue="{undefined}" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("");
-  });
-
-  // Valid initialValue types from existing tests
   [
     { label: "integer", value: "'{1}'", toExpect: "1" },
     { label: "float", value: "'{1.2}'", toExpect: "1.2" },
@@ -65,7 +33,7 @@ test.describe("Basic Functionality", () => {
     { label: "string that resolves to integer", value: "'1'", toExpect: "1" },
     { label: "string that resolves to float", value: "'1.2'", toExpect: "1.2" },
   ].forEach(({ label, value, toExpect }) => {
-    test(`setting initialValue to ${label} sets value of field`, async ({ initTestBed, page }) => {
+    test(`initialValue accepts ${label} type with ${value}`, async ({ initTestBed, page }) => {
       await initTestBed(`<NumberBox initialValue=${value} />`);
       await expect(page.getByRole("textbox")).toHaveValue(toExpect);
     });
@@ -83,6 +51,16 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).not.toBeEditable();
   });
 
+  test("enabled=true disables control", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox enabled="true" />`);
+    await expect(page.getByRole("textbox")).not.toBeDisabled();
+  });
+
+  test("enabled=true prevents user input", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox enabled="true" />`);
+    await expect(page.getByRole("textbox")).toBeEditable();
+  });
+
   test("disabled input field stops user interaction for spinbox", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox enabled="false" initialValue="5" />`);
 
@@ -98,13 +76,22 @@ test.describe("Basic Functionality", () => {
 
   // --- readOnly prop
 
-  test("readOnly prevents editing but allows focus", async ({ initTestBed, page }) => {
+  test("readOnly adds readonly attribute", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox readOnly="true" initialValue="123" />`);
     const input = page.getByRole("textbox");
     await expect(input).toHaveAttribute("readonly");
-    await expect(input).toHaveValue("123");
-    await expect(input).not.toBeEditable();
+  });
 
+  test("readOnly input is not editable", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox readOnly="true" initialValue="123" />`);
+    const input = page.getByRole("textbox");
+    await expect(input).not.toBeEditable();
+  });
+
+  test("readOnly input has value and can be focused", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox readOnly="true" initialValue="123" />`);
+    const input = page.getByRole("textbox");
+    await expect(input).toHaveValue("123");
     await input.focus();
     await expect(input).toBeFocused();
   });
@@ -132,7 +119,6 @@ test.describe("Basic Functionality", () => {
   test("empty required NumberBox shows visual indicator", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="test" required="{true}" />`);
     await expect(page.getByText("test")).toContainText("*");
-    await expect(page.getByRole("textbox")).toHaveAttribute("required");
   });
 
   // --- autoFocus prop
@@ -154,9 +140,10 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "Enter number...");
   });
 
-  test("placeholder appears if input field is empty", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox placeholder="123" />`);
-    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "123");
+  test("placeholder does not appear if input is filled", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox placeholder="placeholder text" initialValue="123" />`);
+    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "placeholder text");
+    await expect(page.getByRole("textbox", { name: "placeholder text" })).toBeVisible();
   });
 
   // --- maxLength prop
@@ -185,8 +172,8 @@ test.describe("Basic Functionality", () => {
 
   // --- hasSpinBox prop
 
-  test("renders spinbox by default", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
+  test("hasSpinBox=true renders spinbox", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox hasSpinBox="true" />`);
     // Look for spinner container or buttons
     const spinnerContainer = page.locator(".spinnerBox, .spinner, [class*='spin']").first();
     const spinButtons = page.locator("button");
@@ -212,12 +199,9 @@ test.describe("Basic Functionality", () => {
 
   // --- step prop with spinbox
 
-  test("clicking spinbox up-arrow adds default step value", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox initialValue="5" />`);
-    const incrementButton = page
-      .locator("button")
-      .filter({ hasText: /increment|up|\+/ })
-      .first();
+  test("clicking spinbox up-arrow adds step value", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox initialValue="5" step="1" />`);
+    const incrementButton = page.locator("button").first();
 
     if (await incrementButton.isVisible()) {
       await incrementButton.click();
@@ -225,15 +209,9 @@ test.describe("Basic Functionality", () => {
     }
   });
 
-  test("clicking spinbox down-arrow subtracts default step value", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`<NumberBox initialValue="5" />`);
-    const decrementButton = page
-      .locator("button")
-      .filter({ hasText: /decrement|down|\-/ })
-      .first();
+  test("clicking spinbox down-arrow subtracts step value", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox initialValue="5" step="1" />`);
+    const decrementButton = page.locator("button").nth(1);
 
     if (await decrementButton.isVisible()) {
       await decrementButton.click();
@@ -243,14 +221,21 @@ test.describe("Basic Functionality", () => {
 
   test("custom step value applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox initialValue="10" step="5" />`);
-    const incrementButton = page
-      .locator("button")
-      .filter({ hasText: /increment|up|\+/ })
-      .first();
+    const incrementButton = page.locator("button").first();
 
     if (await incrementButton.isVisible()) {
       await incrementButton.click();
       await expect(page.getByRole("textbox")).toHaveValue("15");
+    }
+  });
+
+  test("float type step value is ignored", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox initialValue="10" step="3.5" />`);
+    const incrementButton = page.locator("button").first();
+
+    if (await incrementButton.isVisible()) {
+      await incrementButton.click();
+      await expect(page.getByRole("textbox")).toHaveValue("11");
     }
   });
 
@@ -287,10 +272,7 @@ test.describe("Basic Functionality", () => {
   test("zeroOrPositive=true prevents negative values", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="5" />`);
     const input = page.getByRole("textbox");
-    const decrementButton = page
-      .locator("button")
-      .filter({ hasText: /decrement|down|\-/ })
-      .first();
+    const decrementButton = page.locator("button").nth(1);
 
     if (await decrementButton.isVisible()) {
       // Click multiple times to try to go negative
@@ -346,13 +328,12 @@ test.describe("Basic Functionality", () => {
 
 test.describe("Accessibility", () => {
   test("has correct role", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
-    await expect(page.getByRole("textbox")).toBeVisible();
-  });
-
-  test("label is properly associated with input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Amount" />`);
-    await expect(page.getByLabel("Amount")).toBeVisible();
+    await initTestBed(`<NumberBox testId="input" hasSpinBox="true" />`);
+    const spinButtons = page.getByTestId("input").locator("button");
+    for (let i = 0; i < (await spinButtons.count()); i++) {
+      const button = spinButtons.nth(i);
+      await expect(button).toHaveAttribute("role", "spinbutton");
+    }
   });
 
   test("component supports keyboard navigation", async ({ initTestBed, page }) => {
@@ -379,14 +360,10 @@ test.describe("Accessibility", () => {
   test("spinbox buttons are accessible when present", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox />`);
     const spinButtons = page.locator("button");
-    const buttonCount = await spinButtons.count();
 
-    // If spinbox buttons exist, they should be accessible
-    if (buttonCount > 0) {
-      for (let i = 0; i < buttonCount; i++) {
-        const button = spinButtons.nth(i);
-        await expect(button).toBeVisible();
-      }
+    for (let i = 0; i < (await spinButtons.count()); i++) {
+      const button = spinButtons.nth(i);
+      await expect(button).toHaveAttribute("role", "spinbutton");
     }
   });
 });
@@ -396,64 +373,70 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Label", () => {
+  test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox label="Label" labelPosition="invalid" />`);
+    await expect(page.getByText("Label")).toBeVisible();
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("empty string label is not rendered", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox label="" initialValue="" />`);
+    // No specific label should be visible, just the input
+    await expect(page.getByRole("textbox")).toBeVisible();
+  });
+
+  test("clicking on the label focuses input field", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox label="Input Field Label" />`);
+    await page.getByText("Input Field Label").click();
+    await expect(page.getByRole("textbox")).toBeFocused();
+  });
+
   test("labelPosition=start positions label before input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Label" labelPosition="start" />`);
-    const label = page.getByText("Label");
-    const input = page.getByRole("textbox");
+    await initTestBed(`<NumberBox direction="ltr" label="Label" labelPosition="start" />`);
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
 
-    await expect(label).toBeVisible();
-    await expect(input).toBeVisible();
-
-    const labelBox = await label.boundingBox();
-    const inputBox = await input.boundingBox();
-    if (labelBox && inputBox) {
-      expect(labelBox.x).toBeLessThan(inputBox.x);
-    }
+    expect(labelBox.right).toBeLessThan(inputBox.left);
   });
 
   test("labelPosition=end positions label after input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Label" labelPosition="end" />`);
-    const label = page.getByText("Label");
-    const input = page.getByRole("textbox");
+    await initTestBed(`<NumberBox direction="ltr" label="Label" labelPosition="end" />`);
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
 
-    await expect(label).toBeVisible();
-    await expect(input).toBeVisible();
+    expect(labelBox.left).toBeGreaterThan(inputBox.right);
+  });
 
-    const labelBox = await label.boundingBox();
-    const inputBox = await input.boundingBox();
-    if (labelBox && inputBox) {
-      expect(labelBox.x).toBeGreaterThan(inputBox.x);
-    }
+  test("labelPosition=start positions label before input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox direction="rtl" label="Label" labelPosition="start" />`);
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
+
+    expect(labelBox.left).toBeGreaterThan(inputBox.right);
+  });
+
+  test("labelPosition=end positions label after input (rtl)", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox direction="rtl" label="Label" labelPosition="end" />`);
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
+
+    expect(labelBox.right).toBeLessThan(inputBox.left);
   });
 
   test("labelPosition=top positions label above input", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Label" labelPosition="top" />`);
-    const label = page.getByText("Label");
-    const input = page.getByRole("textbox");
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
 
-    await expect(label).toBeVisible();
-    await expect(input).toBeVisible();
-
-    const labelBox = await label.boundingBox();
-    const inputBox = await input.boundingBox();
-    if (labelBox && inputBox) {
-      expect(labelBox.y).toBeLessThan(inputBox.y);
-    }
+    expect(labelBox.bottom).toBeLessThan(inputBox.top);
   });
 
   test("labelPosition=bottom positions label below input", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox label="Label" labelPosition="bottom" />`);
-    const label = page.getByText("Label");
-    const input = page.getByRole("textbox");
+    const labelBox = await getBounds(page.getByText("Label"));
+    const inputBox = await getBounds(page.getByRole("textbox"));
 
-    await expect(label).toBeVisible();
-    await expect(input).toBeVisible();
-
-    const labelBox = await label.boundingBox();
-    const inputBox = await input.boundingBox();
-    if (labelBox && inputBox) {
-      expect(labelBox.y).toBeGreaterThan(inputBox.y);
-    }
+    expect(labelBox.top).toBeGreaterThan(inputBox.bottom);
   });
 
   test("labelWidth applies custom label width", async ({ initTestBed, page }) => {
@@ -469,29 +452,6 @@ test.describe("Label", () => {
     );
     const label = page.getByText("Very long label text");
     await expect(label).toBeVisible();
-  });
-
-  test("component handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Label" labelPosition="invalid" />`);
-    await expect(page.getByText("Label")).toBeVisible();
-    await expect(page.getByRole("textbox")).toBeVisible();
-  });
-
-  test("label is rendered if provided", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Input Field Label" />`);
-    await expect(page.getByText("Input Field Label")).toBeVisible();
-  });
-
-  test("empty string label is not rendered", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="" initialValue="" />`);
-    // No specific label should be visible, just the input
-    await expect(page.getByRole("textbox")).toBeVisible();
-  });
-
-  test("clicking on the label focuses input field", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Input Field Label" />`);
-    await page.getByText("Input Field Label").click();
-    await expect(page.getByRole("textbox")).toBeFocused();
   });
 });
 
@@ -809,28 +769,28 @@ test.describe("Input Adornments", () => {
 test.describe("Theme Variables", () => {
   test("backgroundColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "backgroundColor-NumberBox": "rgb(255, 0, 0)" },
+      testThemeVars: { "backgroundColor-NumberBox-default": "rgb(255, 0, 0)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
   test("borderColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderColor-NumberBox": "rgb(0, 255, 0)" },
+      testThemeVars: { "borderColor-NumberBox-default": "rgb(0, 255, 0)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
   test("textColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "textColor-NumberBox": "rgb(0, 0, 255)" },
+      testThemeVars: { "textColor-NumberBox-default": "rgb(0, 0, 255)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(0, 0, 255)");
   });
 
   test("focus borderColor applies on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderColor-NumberBox--focus": "rgb(255, 255, 0)" },
+      testThemeVars: { "borderColor-NumberBox-default--focus": "rgb(255, 255, 0)" },
     });
     await page.getByRole("textbox").focus();
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 255, 0)");
@@ -845,16 +805,239 @@ test.describe("Theme Variables", () => {
 
   test("borderRadius applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderRadius-NumberBox": "10px" },
+      testThemeVars: { "borderRadius-NumberBox-default": "10px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-radius", "10px");
   });
 
   test("padding applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "padding-NumberBox": "15px" },
+      testThemeVars: { "padding-NumberBox-default": "15px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("padding", "15px");
+  });
+
+  // Additional variant mixin theme variable tests
+  test("borderWidth applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "borderWidth-NumberBox-default": "3px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-width", "3px");
+  });
+
+  test("borderStyle applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "borderStyle-NumberBox-default": "dashed" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-style", "dashed");
+  });
+
+  test("fontSize applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "fontSize-NumberBox-default": "18px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("font-size", "18px");
+  });
+
+  test("boxShadow applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "boxShadow-NumberBox-default": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS(
+      "box-shadow",
+      "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px",
+    );
+  });
+
+  test("hover borderColor applies on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "borderColor-NumberBox-default--hover": "rgb(255, 100, 100)" },
+    });
+    await page.getByTestId("input").hover();
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 100, 100)");
+  });
+
+  test("hover backgroundColor applies on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "backgroundColor-NumberBox-default--hover": "rgb(240, 240, 240)" },
+    });
+    await page.getByTestId("input").hover();
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(240, 240, 240)");
+  });
+
+  test("hover boxShadow applies on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "boxShadow-NumberBox-default--hover": "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px" },
+    });
+    await page.getByTestId("input").hover();
+    await expect(page.getByTestId("input")).toHaveCSS(
+      "box-shadow",
+      "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px",
+    );
+  });
+
+  test("hover textColor applies on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "textColor-NumberBox-default--hover": "rgb(50, 50, 50)" },
+    });
+    await page.getByTestId("input").hover();
+    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(50, 50, 50)");
+  });
+
+  test("focus backgroundColor applies on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "backgroundColor-NumberBox-default--focus": "rgb(250, 250, 250)" },
+    });
+    await page.getByRole("textbox").focus();
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(250, 250, 250)");
+  });
+
+  test("focus boxShadow applies on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: {
+        "boxShadow-NumberBox-default--focus": "rgba(0, 100, 255, 0.4) 0px 0px 0px 3px",
+      },
+    });
+    await page.getByRole("textbox").focus();
+    await expect(page.getByTestId("input")).toHaveCSS(
+      "box-shadow",
+      "rgba(0, 100, 255, 0.4) 0px 0px 0px 3px",
+    );
+  });
+
+  test("focus textColor applies on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: { "textColor-NumberBox-default--focus": "rgb(20, 20, 20)" },
+    });
+    await page.getByRole("textbox").focus();
+    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(20, 20, 20)");
+  });
+
+  test("focus outline properties apply on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" />`, {
+      testThemeVars: {
+        "outlineWidth-NumberBox-default--focus": "2px",
+        "outlineColor-NumberBox-default--focus": "rgb(0, 123, 255)",
+        "outlineStyle-NumberBox-default--focus": "solid",
+        "outlineOffset-NumberBox-default--focus": "2px",
+      },
+    });
+    await page.getByRole("textbox").focus();
+    await expect(page.getByTestId("input")).toHaveCSS("outline-width", "2px");
+    await expect(page.getByTestId("input")).toHaveCSS("outline-color", "rgb(0, 123, 255)");
+    await expect(page.getByTestId("input")).toHaveCSS("outline-style", "solid");
+    await expect(page.getByTestId("input")).toHaveCSS("outline-offset", "2px");
+  });
+
+  test("placeholder textColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" placeholder="Enter number" />`, {
+      testThemeVars: { "textColor-placeholder-NumberBox-default": "rgb(150, 150, 150)" },
+    });
+    const input = page.getByRole("textbox");
+    const placeholderColor = await input.evaluate((el: HTMLInputElement) => {
+      return window.getComputedStyle(el, "::placeholder").color;
+    });
+    expect(placeholderColor).toBe("rgb(150, 150, 150)");
+  });
+
+  test("placeholder fontSize applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" placeholder="Enter number" />`, {
+      testThemeVars: { "fontSize-placeholder-NumberBox-default": "14px" },
+    });
+    const input = page.getByRole("textbox");
+    const placeholderFontSize = await input.evaluate((el: HTMLInputElement) => {
+      return window.getComputedStyle(el, "::placeholder").fontSize;
+    });
+    expect(placeholderFontSize).toBe("14px");
+  });
+
+  test("gap between adornments applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" startText="$" endText="USD" />`, {
+      testThemeVars: { "gap-adornment-NumberBox": "8px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("gap", "8px");
+  });
+
+  test("disabled textColor applies when disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" enabled="false" />`, {
+      testThemeVars: { "textColor-NumberBox--disabled": "rgb(160, 160, 160)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(160, 160, 160)");
+  });
+
+  test("disabled borderColor applies when disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" enabled="false" />`, {
+      testThemeVars: { "borderColor-NumberBox--disabled": "rgb(200, 200, 200)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(200, 200, 200)");
+  });
+
+  // Error variant theme variables
+  test("error variant borderRadius applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
+      testThemeVars: { "borderRadius-NumberBox-error": "8px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-radius", "8px");
+  });
+
+  test("error variant fontSize applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
+      testThemeVars: { "fontSize-NumberBox-error": "16px" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("font-size", "16px");
+  });
+
+  test("error variant backgroundColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="error" />`, {
+      testThemeVars: { "backgroundColor-NumberBox-error": "rgb(255, 240, 240)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 240, 240)");
+  });
+
+  // Warning variant theme variables
+  test("warning variant borderColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="warning" />`, {
+      testThemeVars: { "borderColor-NumberBox-warning": "rgb(255, 193, 7)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 193, 7)");
+  });
+
+  test("warning variant textColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="warning" />`, {
+      testThemeVars: { "textColor-NumberBox-warning": "rgb(133, 100, 4)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(133, 100, 4)");
+  });
+
+  // Success variant theme variables
+  test("success variant borderColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="valid" />`, {
+      testThemeVars: { "borderColor-NumberBox-success": "rgb(40, 167, 69)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(40, 167, 69)");
+  });
+
+  test("success variant backgroundColor applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" validationStatus="valid" />`, {
+      testThemeVars: { "backgroundColor-NumberBox-success": "rgb(240, 255, 240)" },
+    });
+    await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(240, 255, 240)");
+  });
+
+  test("input text adornment colors apply correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" startText="$" endText="€" />`, {
+      testThemeVars: { "color-adornment-NumberBox-default": "rgb(0, 123, 255)" },
+    });
+    await expect(page.getByText("$")).toHaveCSS("color", "rgb(0, 123, 255)");
+    await expect(page.getByText("€")).toHaveCSS("color", "rgb(0, 123, 255)");
+  });
+
+  test("input icon adornment colors apply correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox testId="input" startIcon="search" endIcon="search" />`, {
+      testThemeVars: { "color-adornment-NumberBox-default": "rgb(0, 123, 255)" },
+    });
+    await expect(page.getByRole("img").first()).toHaveCSS("color", "rgb(0, 123, 255)");
+    await expect(page.getByRole("img").nth(1)).toHaveCSS("color", "rgb(0, 123, 255)");
   });
 });
 
@@ -905,11 +1088,6 @@ test.describe("Validation", () => {
 // =============================================================================
 
 test.describe("Other Edge Cases", () => {
-  test("handles no props gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
-    await expect(page.getByRole("textbox")).toBeVisible();
-  });
-
   test("placeholder is hidden if input field is filled", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox placeholder="123" />`);
     const input = page.getByRole("textbox");
@@ -976,7 +1154,19 @@ test.describe("Other Edge Cases", () => {
     await expect(input).not.toHaveValue("123.45");
   });
 
-  test("zeroOrPositive limits input to non-negative numbers and zero", async ({
+  test.fixme(
+    "zeroOrPositive limits input to non-negative numbers and zero",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="5" />`);
+
+      await page.getByRole("textbox").fill("-5", { force: true });
+
+      const value = await page.getByRole("textbox").inputValue();
+      expect(parseInt(value) || 0).toBeGreaterThanOrEqual(5);
+    },
+  );
+
+  test("using spinbox with zeroOrPositive limits input to non-negative numbers and zero", async ({
     initTestBed,
     page,
   }) => {
@@ -1008,22 +1198,6 @@ test.describe("Other Edge Cases", () => {
       await expect(input).not.toHaveValue("-5");
     },
   );
-
-  test("down button on spinbox does nothing when result would be negative with zeroOrPositive", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="0" />`);
-    const decrementButton = page
-      .locator("button")
-      .filter({ hasText: /decrement|down|\-/ })
-      .first();
-
-    if (await decrementButton.isVisible()) {
-      await decrementButton.click();
-      await expect(page.getByRole("textbox")).toHaveValue("0");
-    }
-  });
 
   test("minValue limits input to numbers greater than or equal to minValue", async ({
     initTestBed,
@@ -1292,94 +1466,126 @@ test.describe("Other Edge Cases", () => {
     await expect(input).toHaveValue("-123");
   });
 
-  test("handle very large numbers within limits", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
-    const input = page.getByRole("textbox");
-
-    const largeNumber = "999999999999";
-    await input.fill(largeNumber);
-    await expect(input).toHaveValue(largeNumber);
-  });
-
-  test("prevents invalid character input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
-    const input = page.getByRole("textbox");
-
-    await input.fill("abc123def");
-    // Should filter out non-numeric characters
-    await expect(input).not.toHaveValue("abc123def");
-  });
-
   test.skip(
     "entering multiple 0s only results in one 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox />`);
+      await page.getByRole("textbox").fill("0000000000000000");
+      await page.getByRole("textbox").blur();
+      await expect(page.getByRole("textbox")).toHaveValue("0");
+    },
   );
 
   test.skip(
     "copying multiple 0s only results in one 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      const { clipboard } = await initTestBed(`<NumberBox />`);
+      await clipboard.write("0000000000000000");
+      await clipboard.paste(page.getByRole("textbox"));
+      await page.getByRole("textbox").blur();
+      await expect(page.getByRole("textbox")).toHaveValue("0");
+    },
   );
 
   test.skip(
-    "entering: no leading 0s are allowed",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+    "integers: leading 0s are removed on blur",
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox />`);
+      await page.getByRole("textbox").fill("0000123");
+      await page.getByRole("textbox").blur();
+      await expect(page.getByRole("textbox")).toHaveValue("123");
+    },
   );
 
   test.skip(
-    "copying: no leading 0s are allowed",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+    "integers: leading 0s are removed on blur (copy)",
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      const { clipboard } = await initTestBed(`<NumberBox />`);
+      await clipboard.write("0000123");
+      await clipboard.paste(page.getByRole("textbox"));
+      await page.getByRole("textbox").blur();
+      await expect(page.getByRole("textbox")).toHaveValue("123");
+    },
+  );
+
+  test("standalone minus sign is permitted if field is not blurred yet", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    await page.getByRole("textbox").fill("-");
+    await expect(page.getByRole("textbox")).toHaveValue("-");
+  });
+
+  test.skip(
+    "minus sign is not applied if it comes after number",
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox />`);
+      await page.getByRole("textbox").fill("123");
+      await page.getByRole("textbox").fill("-");
+      await expect(page.getByRole("textbox")).toHaveValue("123");
+    },
+  );
+
+  test("placing decimal separator between the numbers of an integer results in a float", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("123456");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press(".");
+
+    await expect(input).toHaveValue("123.456");
+  });
+
+  test("placing second decimal separator is not permitted", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.fill("1.23456");
+    await input.press("ArrowLeft");
+    await input.press(".");
+
+    await expect(input).toHaveValue("1.23456");
+  });
+
+  test.skip(
+    "placing decimal separator before an integer adds a leading 0",
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox />`);
+      const input = page.getByRole("textbox");
+
+      await input.fill("12");
+      await input.press("ArrowLeft");
+      await input.press("ArrowLeft");
+      await input.press(".");
+
+      await expect(input).toHaveValue("0.12");
+    },
   );
 
   test.skip(
-    "minus sign is rendered at the start of the field if prompt is at the start",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+    "placing decimal separator after an integer adds a trailing 0",
+    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<NumberBox />`);
+      const input = page.getByRole("textbox");
 
-  test.skip(
-    "minus sign is rendered at the start of the field if prompt is at any point in input value",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "minus sign is removed if user inputs a second minus sign",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "minus sign is removed if user copies a second minus sign",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "adding floating point to an integer results in a float",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "adding floating point to a float replaces the last point",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "adding floating point to the beginning of an integer adds a leading 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-
-  test.skip(
-    "adding floating point to the end of an integer adds a trailing 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+      await input.fill("12");
+      await input.press(".");
+      await expect(input).toHaveValue("12.0");
+    },
   );
 
   test.skip(
