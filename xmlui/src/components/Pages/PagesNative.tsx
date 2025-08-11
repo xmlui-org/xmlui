@@ -108,7 +108,7 @@ export function Pages({
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        <Route path="*" element={<Navigate to={fallbackPath} replace  />} />
+        {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace  />} />}
       </Routes>
       {renderChild(restChildren)}
     </>
