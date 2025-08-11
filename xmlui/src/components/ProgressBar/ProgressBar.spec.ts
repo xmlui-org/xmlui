@@ -1,5 +1,4 @@
 import { test, expect } from "../../testing/fixtures";
-import { getElementStyle } from "../../testing/component-test-helpers";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -80,14 +79,14 @@ test.describe("Accessibility", () => {
 
   test("maintains accessibility attributes with edge case values", async ({
     initTestBed,
-    createProgressBarDriver,
+    page,
   }) => {
     await initTestBed(`<ProgressBar value="{-5}" />`);
-    const driver = await createProgressBarDriver();
 
-    await expect(driver.component).toHaveAttribute("aria-valuenow", "0");
-    await expect(driver.component).toHaveAttribute("aria-valuemin", "0");
-    await expect(driver.component).toHaveAttribute("aria-valuemax", "100");
+    const bar = page.getByRole("progressbar");
+    await expect(bar).toHaveAttribute("aria-valuenow", "0");
+    await expect(bar).toHaveAttribute("aria-valuemin", "0");
+    await expect(bar).toHaveAttribute("aria-valuemax", "100");
   });
 });
 
@@ -169,16 +168,42 @@ test.describe("Edge Cases", () => {
     expect(value).toBe(0);
   });
 
-  test("handles boolean values", async ({ initTestBed, createProgressBarDriver }) => {
+  test("handles 'true' value", async ({ initTestBed, createProgressBarDriver }) => {
+    await initTestBed(`<ProgressBar value="{true}" />`);
     const driver = await createProgressBarDriver();
     const value = await driver.getProgressRatio();
     expect(value).toBe(1);
   });
 
-  test("handles boolean values", async ({ initTestBed, createProgressBarDriver }) => {
+  test("handles 'false' value", async ({ initTestBed, createProgressBarDriver }) => {
     await initTestBed(`<ProgressBar value="{false}" />`);
     const driver = await createProgressBarDriver();
     const value = await driver.getProgressRatio();
     expect(value).toBe(0);
+  });
+});
+
+// =============================================================================
+// THEME VARIABLES TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("applies theme variables correctly", async ({ initTestBed, createProgressBarDriver }) => {
+    await initTestBed(`<ProgressBar value="{0.5}" />`, {
+      testThemeVars: {
+        "borderRadius-ProgressBar": "10px",
+        "borderRadius-indicator-ProgressBar": "5px",
+        "thickness-ProgressBar": "20px",
+        "backgroundColor-ProgressBar": "rgb(255, 0, 0)",
+        "color-indicator-ProgressBar": "rgb(0, 255, 0)",
+      },
+    });
+    const driver = await createProgressBarDriver();
+
+    await expect(driver.component).toHaveCSS("border-radius", "10px");
+    await expect(driver.bar).toHaveCSS("border-radius", "5px");
+    await expect(driver.component).toHaveCSS("height", "20px");
+    await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(driver.bar).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
 });
