@@ -1,6 +1,6 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { defaultProps, PaginationNative } from "./PaginationNative";
 import styles from "./Pagination.module.scss";
 
@@ -15,11 +15,11 @@ export const PaginationMd = createMetadata({
     itemCount: d("Total number of items to paginate", undefined, "number", defaultProps.itemCount),
     pageSize: d("Number of items per page", undefined, "number", defaultProps.pageSize),
     pageIndex: d("Current page index (0-based)", undefined, "number", defaultProps.pageIndex),
-    maxVisiblePages: d(
+    maxVisiblePages: dInternal(
       "Maximum number of page buttons to display",
-      undefined,
+      /* undefined,
       "number",
-      defaultProps.maxVisiblePages,
+      defaultProps.maxVisiblePages, */
     ),
     hasPageInfo: d(
       "Whether to show page information",
@@ -69,10 +69,6 @@ export const paginationComponentRenderer = createComponentRenderer(
     const itemCount = extractValue.asOptionalNumber(node.props.itemCount, 0);
     const pageSize = extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize);
     const pageIndex = extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex);
-    const maxVisiblePages = extractValue.asOptionalNumber(
-      node.props.maxVisiblePages,
-      defaultProps.maxVisiblePages,
-    );
     const hasPageInfo = extractValue.asOptionalBoolean(
       node.props.hasPageInfo,
       defaultProps.hasPageInfo,
@@ -87,7 +83,6 @@ export const paginationComponentRenderer = createComponentRenderer(
         itemCount={itemCount}
         pageSize={pageSize}
         pageIndex={pageIndex}
-        maxVisiblePages={maxVisiblePages}
         hasPageInfo={hasPageInfo}
         onPageDidChange={onPageDidChange}
         onPageSizeDidChange={onPageSizeDidChange}
