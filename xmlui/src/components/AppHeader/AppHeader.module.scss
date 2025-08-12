@@ -135,6 +135,14 @@ $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
   }
 }
 
+.logoLink{
+  padding: 0;
+  height: 100%;
+  &>:first-child {
+    height: 100%;
+  }
+}
+
 
 
 // --- We export the theme variables to add them to the component renderer
