@@ -36,13 +36,6 @@ export const spinnerComponentRenderer = createComponentRenderer(
   COMP,
   SpinnerMd,
   ({ node, className, extractValue }) => {
-    // TODO: Remove this once the SpinnerNative is updated to use CSS variables
-    // delete layoutCss.width;
-    // delete layoutCss.minWidth;
-    // delete layoutCss.maxWidth;
-    // delete layoutCss.height;
-    // delete layoutCss.minHeight;
-    // delete layoutCss.maxHeight;
     return (
       <Spinner
         className={className}

@@ -71,6 +71,7 @@ interface SelectProps {
 
   // Styling
   style?: CSSProperties;
+  className?: string;
   dropdownHeight?: CSSProperties["height"];
 
   // Validation
@@ -112,6 +113,7 @@ interface SimpleSelectProps {
   onValueChange: (selectedValue: SingleValueType) => void;
   id: string;
   style: React.CSSProperties;
+  className?: string;
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
@@ -146,6 +148,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       children,
       readOnly,
       emptyListNode,
+      className
     } = props;
 
     // Compose refs for proper forwarding
@@ -188,7 +191,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           onFocus={onFocus}
           onBlur={onBlur}
           disabled={!enabled}
-          className={classnames(styles.selectTrigger, {
+          className={classnames(className, styles.selectTrigger, {
             [styles.error]: validationStatus === "error",
             [styles.warning]: validationStatus === "warning",
             [styles.valid]: validationStatus === "valid",
@@ -251,6 +254,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
     // Styling
     style,
+    className,
     dropdownHeight,
 
     // Validation
@@ -430,6 +434,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           enabled={enabled}
           onFocus={onFocus}
           onBlur={onBlur}
+          className={className}
           style={style}
         >
           {searchable || multiSelect ? (
@@ -453,7 +458,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   className={classnames(styles.selectTrigger, styles[validationStatus], {
                     [styles.disabled]: !enabled,
                     [styles.multi]: multiSelect,
-                  })}
+                  }, className)}
                   autoFocus={autoFocus}
                 >
                   {multiSelect ? (
@@ -573,6 +578,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}
+                className={className}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 enabled={enabled}

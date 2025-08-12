@@ -55,6 +55,7 @@ type Props = {
   value?: number | string | null;
   initialValue?: number | string | null;
   style?: CSSProperties;
+  className?: string;
   step?: number | string;
   enabled?: boolean;
   placeholder?: string;
@@ -92,6 +93,7 @@ export const NumberBox = forwardRef(function NumberBox(
     value,
     initialValue,
     style,
+    className,
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
@@ -407,6 +409,7 @@ export const NumberBox = forwardRef(function NumberBox(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
     >

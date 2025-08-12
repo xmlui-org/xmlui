@@ -18,6 +18,7 @@ export type LineChartProps = {
   dataKeys: string[];
   nameKey: string;
   style?: React.CSSProperties;
+  className?: string;
   hideX?: boolean;
   hideTooltip?: boolean;
   tickFormatter?: (value: any) => any;
@@ -40,6 +41,7 @@ export function LineChart({
   dataKeys = [],
   nameKey,
   style,
+  className,
   hideX = false,
   hideTooltip = false,
   tickFormatter,

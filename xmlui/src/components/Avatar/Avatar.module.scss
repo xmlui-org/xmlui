@@ -14,58 +14,61 @@ $boxShadow-Avatar: createThemeVar("boxShadow-#{$component}");
 $textColor-Avatar: createThemeVar("textColor-#{$component}");
 $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
 
-.container {
-  @include t.borderVars($themeVars, $component);
-  aspect-ratio: 1 / 1;
-  background-color: $backgroundColor-Avatar;
-  color: $textColor-Avatar;
-  flex-shrink: 0;
-  object-fit: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: $fontWeight-Avatar;
-  white-space: nowrap;
-  user-select: none;
-  font-size: 12px;
-  box-shadow: $boxShadow-Avatar;
+@layer components {
+  .container {
+    @include t.borderVars($themeVars, $component);
+    aspect-ratio: 1 / 1;
+    background-color: $backgroundColor-Avatar;
+    color: $textColor-Avatar;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $fontWeight-Avatar;
+    white-space: nowrap;
+    user-select: none;
+    font-size: 12px;
+    box-shadow: $boxShadow-Avatar;
 
-  &.xs {
-    width: t.$space-8;
-    height: t.$space-8;
-    max-width: t.$space-8;
-    max-height: t.$space-8;
-    font-size: t.$space-3;
-  }
+    &.xs {
+      width: t.$space-8;
+      height: t.$space-8;
+      max-width: t.$space-8;
+      max-height: t.$space-8;
+      font-size: t.$space-3;
+    }
 
-  &.sm {
-    width: t.$space-12;
-    height: t.$space-12;
-    max-width: t.$space-12;
-    max-height: t.$space-12;
-    font-size: t.$space-4;
-  }
+    &.sm {
+      width: t.$space-12;
+      height: t.$space-12;
+      max-width: t.$space-12;
+      max-height: t.$space-12;
+      font-size: t.$space-4;
+    }
 
-  &.md {
-    width: t.$space-16;
-    height: t.$space-16;
-    max-width: t.$space-16;
-    max-height: t.$space-16;
-    font-size: t.$space-5;
-  }
+    &.md {
+      width: t.$space-16;
+      height: t.$space-16;
+      max-width: t.$space-16;
+      max-height: t.$space-16;
+      font-size: t.$space-5;
+    }
 
-  &.lg {
-    width: t.$space-24;
-    height: t.$space-24;
-    max-width: t.$space-24;
-    max-height: t.$space-24;
-    font-size: t.$space-8;
-  }
+    &.lg {
+      width: t.$space-24;
+      height: t.$space-24;
+      max-width: t.$space-24;
+      max-height: t.$space-24;
+      font-size: t.$space-8;
+    }
 
-  &.clickable {
-    cursor: pointer;
+    &.clickable {
+      cursor: pointer;
+    }
   }
 }
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {

@@ -305,7 +305,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     id={inputId}
                     ref={setReferenceElement}
                     style={{ width: "100%", ...style }}
-                    className={classnames(styles.badgeListWrapper, styles[validationStatus], {
+                    className={classnames(className, styles.badgeListWrapper, styles[validationStatus], {
                       [styles.disabled]: !enabled,
                       [styles.focused]: isFocused,
                     })}
