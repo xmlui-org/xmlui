@@ -1,6 +1,6 @@
 {
   "name": "create-xmlui-app",
-  "version": "0.9.97",
+  "version": "0.9.98",
   "scripts": {
     "dev": "mkdir -p dist && cp -r templates/default dist/ && ncc build ./index.ts -w -o dist/",
     "build": "ncc build ./index.ts -o dist/ --minify --no-cache --no-source-map-register && cp -r templates/default dist/",
