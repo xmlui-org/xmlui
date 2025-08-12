@@ -175,16 +175,18 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
         </Button>
 
         {/* Previous page button */}
-        <Button
-          variant="outlined"
-          size="sm"
-          disabled={isFirstPage}
-          onClick={() => handlePageChange(currentPage - 1)}
-          contextualLabel="Previous page"
-          style={{ minHeight: "36px", padding: "8px" }}
-        >
-          <Icon name="chevronleft" size="sm" />
-        </Button>
+        {visiblePages.length <= 2 && (
+          <Button
+            variant="outlined"
+            size="sm"
+            disabled={isFirstPage}
+            onClick={() => handlePageChange(currentPage - 1)}
+            contextualLabel="Previous page"
+            style={{ minHeight: "36px", padding: "8px" }}
+          >
+            <Icon name="chevronleft" size="sm" />
+          </Button>
+        )}
 
         {/* Page number buttons */}
         {visiblePages.length === 1 && (
@@ -206,16 +208,18 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           ))}
 
         {/* Next page button */}
-        <Button
-          variant="outlined"
-          size="sm"
-          disabled={isLastPage}
-          onClick={() => handlePageChange(currentPage + 1)}
-          contextualLabel="Next page"
-          style={{ minHeight: "36px", padding: "8px" }}
-        >
-          <Icon name="chevronright" size="sm" />
-        </Button>
+        {visiblePages.length <= 2 && (
+          <Button
+            variant="outlined"
+            size="sm"
+            disabled={isLastPage}
+            onClick={() => handlePageChange(currentPage + 1)}
+            contextualLabel="Next page"
+            style={{ minHeight: "36px", padding: "8px" }}
+          >
+            <Icon name="chevronright" size="sm" />
+          </Button>
+        )}
 
         {/* Last page button */}
         <Button
