@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.98
+
+### Patch Changes
+
+- ff781f3: new internal react component for integrating into existing react applications (StandaloneComponent)
+- 377f0f2: Fix image animation issue in Carousel
+- ce0ff76: Added hover & active styles for Slider on thumb. FileInput opens file browser on label focus.
+- 208768a: Fixed input adornments not changing color on setting their respective theme variable. Spinbox buttons in NumberBox now have role=spinbutton.
+
 ## 0.9.97
 
 ### Patch Changes
