@@ -39,7 +39,12 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 
   // These are the CSS property values the underlying React component can merge into
   // its "style" property
+  /**
+   * @deprecated Use className instead.
+   */
   layoutCss: CSSProperties;
+
+  className: string;
 }
 
 export type UpdateStateFn = (componentState: any, options?: any) => void; // This function updates the state of a component.

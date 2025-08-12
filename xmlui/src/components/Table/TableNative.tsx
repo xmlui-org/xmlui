@@ -1,7 +1,8 @@
-import {
+import type {
   CSSProperties,
+  ReactNode} from "react";
+import {
   forwardRef,
-  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -110,6 +111,7 @@ type TableProps = {
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
   style?: CSSProperties;
+  className?: string;
   uid?: string;
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
@@ -172,6 +174,7 @@ export const Table = forwardRef(
       sortingDidChange,
       willSort,
       style,
+      className,
       noDataRenderer,
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
@@ -488,11 +491,18 @@ export const Table = forwardRef(
 
     const scrollRef = useContext(ScrollContext);
 
-    const hasOutsideScroll =
-      scrollRef &&
-      style?.maxHeight === undefined &&
-      style?.height === undefined &&
-      style?.flex === undefined;
+    const [hasHeight, setHasHeight] = useState(false);
+    useLayoutEffect(() => {
+      if (wrapperRef.current) {
+        const computedStyles = window.getComputedStyle(wrapperRef.current);
+        const hasMaxHeight = computedStyles.maxHeight !== "none";
+        const hasHeight = computedStyles.height !== "auto";
+        const isFlex = computedStyles.display === "flex";
+        setHasHeight(hasMaxHeight || hasHeight || isFlex);
+      }
+    }, []);
+
+    const hasOutsideScroll = scrollRef && !hasHeight;
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
@@ -580,7 +590,7 @@ export const Table = forwardRef(
 
     return (
       <div
-        className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
+        className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
         onKeyDown={onKeyDown}
         ref={ref}

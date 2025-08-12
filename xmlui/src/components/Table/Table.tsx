@@ -194,7 +194,7 @@ const TableWithColumns = forwardRef(
       renderChild,
       lookupEventHandler,
       lookupSyncCallback,
-      layoutCss,
+      className,
       registerComponentApi,
     }: Pick<
       RendererContext,
@@ -202,7 +202,7 @@ const TableWithColumns = forwardRef(
       | "node"
       | "renderChild"
       | "lookupEventHandler"
-      | "layoutCss"
+      | "className"
       | "registerComponentApi"
       | "lookupSyncCallback"
     >,
@@ -282,6 +282,7 @@ const TableWithColumns = forwardRef(
           {renderChild(node.children)}
         </TableContext.Provider>
         <Table
+          className={className}
           ref={ref}
           data={data}
           columns={columns}
@@ -307,7 +308,6 @@ const TableWithColumns = forwardRef(
           sortingDidChange={lookupEventHandler("sortingDidChange")}
           onSelectionDidChange={lookupEventHandler("selectionDidChange")}
           willSort={lookupEventHandler("willSort")}
-          style={layoutCss}
           uid={node.uid}
           autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
           hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
@@ -338,7 +338,7 @@ export const tableComponentRenderer = createComponentRenderer(
     renderChild,
     lookupEventHandler,
     lookupSyncCallback,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return (
@@ -347,7 +347,7 @@ export const tableComponentRenderer = createComponentRenderer(
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
         lookupSyncCallback={lookupSyncCallback}
-        layoutCss={layoutCss}
+        className={className}
         renderChild={renderChild}
         registerComponentApi={registerComponentApi}
       />

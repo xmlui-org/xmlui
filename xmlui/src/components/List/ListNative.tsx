@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -305,11 +306,18 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
-  const hasOutsideScroll =
-    scrollRef &&
-    style?.maxHeight === undefined &&
-    style?.height === undefined &&
-    style?.flex === undefined;
+  const [hasHeight, setHasHeight] = useState(false);
+  useLayoutEffect(() => {
+    if (parentRef.current) {
+      const computedStyles = window.getComputedStyle(parentRef.current);
+      const hasMaxHeight = computedStyles.maxHeight !== "none";
+      const hasHeight = computedStyles.height !== "auto";
+      const isFlex = computedStyles.display === "flex";
+      setHasHeight(hasMaxHeight || hasHeight || isFlex);
+    }
+  }, []);
+  const hasOutsideScroll = scrollRef && !hasHeight;
+
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
@@ -520,14 +528,14 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 count={rowCount}
               >
                 {(rowIndex) => {
-                  // REVIEW: I changed this code line because in the build version rows[rowIndex] 
+                  // REVIEW: I changed this code line because in the build version rows[rowIndex]
                   // was undefined
                   // const row = rows[rowIndex];
                   // const key = row[idKey];
                   const row = rows?.[rowIndex];
                   const key = row?.[idKey];
                   if (!row) {
-                    return <Fragment key={rowIndex}/>;
+                    return <Fragment key={rowIndex} />;
                   }
                   // --- End change
                   switch (row._row_type) {

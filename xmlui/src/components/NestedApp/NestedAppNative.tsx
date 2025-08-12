@@ -17,6 +17,10 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import styles from "./NestedApp.module.scss";
 import classnames from "classnames";
+import {
+  StyleInjectionTargetContext,
+  StyleProvider,
+} from "../../components-core/theming/StyleContext";
 
 type NestedAppProps = {
   api?: any;
@@ -149,7 +153,7 @@ export function NestedApp({
         if (
           sheet.ownerNode &&
           sheet.ownerNode instanceof Element &&
-          sheet.ownerNode.hasAttribute("data-theme-root")
+          sheet.ownerNode.hasAttribute("data-style-hash")
         ) {
           return null; // Skip this stylesheet
         }
@@ -225,6 +229,8 @@ export function NestedApp({
 
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
+        <StyleInjectionTargetContext.Provider value={shadowRef.current}>
+        <StyleProvider forceNew={true}>
         <ApiInterceptorProvider
           parentInterceptorContext={parentInterceptorContext}
           key={`app-${refreshVersion}`}
@@ -251,6 +257,8 @@ export function NestedApp({
             />
           </div>
         </ApiInterceptorProvider>
+        </StyleProvider>
+        </StyleInjectionTargetContext.Provider>
       </ErrorBoundary>,
     );
   }, [
