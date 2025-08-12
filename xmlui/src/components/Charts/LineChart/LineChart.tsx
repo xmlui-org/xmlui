@@ -32,6 +32,24 @@ export const LineChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hideX,
     },
+    hideY: {
+      description:
+        "Determines whether the Y-axis should be hidden. If set to (`true`), the axis will not be displayed.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideY,
+    },
+    hideTickX: {
+      description:
+        "Determines whether the X-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideTickX,
+    },
+    hideTickY: {
+      description:
+        "Determines whether the Y-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideTickY,
+    },
     hideTooltip: {
       description:
         "Determines whether the tooltip should be hidden." +
@@ -39,9 +57,13 @@ export const LineChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.hideTooltip,
     },
-    tickFormatter: {
+    tickFormatterX: {
       description:
-        "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
+        "A function that formats the X-axis tick labels. It receives a tick value and returns a formatted string.",
+    },
+    tickFormatterY: {
+      description:
+        "A function that formats the Y-axis tick labels. It receives a tick value and returns a formatted string.",
     },
     showLegend: {
       description: "Determines whether the legend should be displayed.",
@@ -61,12 +83,16 @@ export const lineChartComponentRenderer = createComponentRenderer(
   ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
-        tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
+        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
+        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
+        hideTickX={extractValue(node.props?.hideTickX)}
+        hideTickY={extractValue(node.props?.hideTickY)}
         data={extractValue(node.props?.data)}
         style={layoutCss}
         dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}
+        hideY={extractValue(node.props?.hideY)}
         hideTooltip={extractValue(node.props?.hideTooltip)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         marginTop={extractValue.asOptionalNumber(node.props?.marginTop)}

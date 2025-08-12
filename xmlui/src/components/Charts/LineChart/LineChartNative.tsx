@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend as RLegend,
+  YAxis,
 } from "recharts";
 import type { ReactNode } from "react";
 import type React from "react";
@@ -18,9 +19,13 @@ export type LineChartProps = {
   dataKeys: string[];
   nameKey: string;
   style?: React.CSSProperties;
+  hideTickX?: boolean;
+  hideTickY?: boolean;
   hideX?: boolean;
+  hideY?: boolean;
   hideTooltip?: boolean;
-  tickFormatter?: (value: any) => any;
+  tickFormatterX?: (value: any) => any;
+  tickFormatterY?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
   marginTop?: number;
@@ -29,10 +34,15 @@ export type LineChartProps = {
   marginLeft?: number;
 };
 
-export const defaultProps: Pick<LineChartProps, "hideX" | "hideTooltip" | "showLegend"> = {
+export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip" | "showLegend" | "tickFormatterX" | "tickFormatterY" | "hideTickX" | "hideTickY"> = {
+  hideTickX: false,
+  hideTickY: false,
   hideX: false,
+  hideY: false,
   hideTooltip: false,
   showLegend: false,
+  tickFormatterX: (value) => value,
+  tickFormatterY: (value) => value,
 };
 
 export function LineChart({
@@ -40,11 +50,15 @@ export function LineChart({
   dataKeys = [],
   nameKey,
   style,
-  hideX = false,
-  hideTooltip = false,
-  tickFormatter,
+  hideX = defaultProps.hideX,
+  hideY = defaultProps.hideY,
+  hideTickX = defaultProps.hideTickX,
+  hideTickY = defaultProps.hideTickY,
+  hideTooltip = defaultProps.hideTooltip,
+  tickFormatterX = defaultProps.tickFormatterX,
+  tickFormatterY = defaultProps.tickFormatterY,
   children,
-  showLegend = false,
+  showLegend = defaultProps.showLegend,
 }: LineChartProps) {
   const { getThemeVar } = useTheme();
 
@@ -151,12 +165,12 @@ export function LineChart({
       >
         {safeData.length > 0 && nameKey
           ? safeData
-              .map((d) => d?.[nameKey])
-              .map((label, idx) => (
-                <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                  {label}
-                </span>
-              ))
+            .map((d) => d?.[nameKey])
+            .map((label, idx) => (
+              <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+                {label}
+              </span>
+            ))
           : null}
       </div>
       <div
@@ -181,15 +195,21 @@ export function LineChart({
             margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <XAxis
-              dataKey={nameKey}
               interval={interval}
               tickLine={false}
+              dataKey={nameKey}
               angle={tickAngle}
               textAnchor={tickAnchor}
-              tick={miniMode ? false : { fill: "currentColor", fontSize }}
-              tickFormatter={miniMode ? undefined : tickFormatter}
+              tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+              tickFormatter={miniMode ? undefined : tickFormatterX}
               height={miniMode || hideX ? 0 : xAxisHeight}
               hide={miniMode || hideX}
+            />
+            <YAxis
+              hide={miniMode || hideY}
+              tickLine={false}
+              tickFormatter={miniMode ? undefined : tickFormatterY}
+              tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
             />
             {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
             {dataKeys.map((dataKey, i) => (
