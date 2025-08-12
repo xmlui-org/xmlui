@@ -56,21 +56,21 @@ export const defaultProps: Pick<
 };
 
 export function BarChart({
-                           data = [],
-                           layout = defaultProps.layout,
-                           nameKey,
-                           stacked = defaultProps.stacked,
-                           dataKeys = [],
-                           hideTickX = defaultProps.hideTickX,
-                           hideTickY = defaultProps.hideTickY,
-                           hideY = defaultProps.hideY,
-                           hideX = defaultProps.hideX,
-                           tickFormatterX = defaultProps.tickFormatterX,
-                           tickFormatterY = defaultProps.tickFormatterY,
-                           style,
-                           children,
-                           showLegend = defaultProps.showLegend,
-                         }: BarChartProps) {
+  data = [],
+  layout = defaultProps.layout,
+  nameKey,
+  stacked = defaultProps.stacked,
+  dataKeys = [],
+  hideTickX = defaultProps.hideTickX,
+  hideTickY = defaultProps.hideTickY,
+  hideY = defaultProps.hideY,
+  hideX = defaultProps.hideX,
+  tickFormatterX = defaultProps.tickFormatterX,
+  tickFormatterY = defaultProps.tickFormatterY,
+  style,
+  children,
+  showLegend = defaultProps.showLegend,
+}: BarChartProps) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
