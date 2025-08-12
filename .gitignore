@@ -8,6 +8,8 @@ __deploy
 .turbo
 test-results
 coverage
-
+.next
+tests
 xmlui-optimized-output
 
+docs/scripts/component-metadata.json
