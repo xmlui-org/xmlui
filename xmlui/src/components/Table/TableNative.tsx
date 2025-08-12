@@ -1,7 +1,7 @@
 import {
-  CSSProperties,
+  type CSSProperties,
+  type ReactNode,
   forwardRef,
-  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -402,6 +402,7 @@ export const Table = forwardRef(
       alwaysShowSelectionHeader,
       checkAllRows,
       toggleRow,
+      rowDisabledPredicate,
     ]);
 
     // --- Set up page information (using the first page size option)
