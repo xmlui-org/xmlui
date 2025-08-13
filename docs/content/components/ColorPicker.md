@@ -124,6 +124,7 @@ Focus the ColorPicker component.
 This method sets the current value of the ColorPicker.
 
 **Signature**: `set value(value: string): void`
+
 - `value`: The new value to set for the color picker.
 
 ```xmlui-pg copy display name="Example: setValue"

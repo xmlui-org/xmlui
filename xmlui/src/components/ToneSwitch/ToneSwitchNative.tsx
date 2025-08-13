@@ -34,7 +34,7 @@ export function ToneSwitch({
   };
 
   return (
-    <div style={{ width: 'fit-content', display: 'inline-block' }} className="toneSwitchContainer">
+    <div style={{ width: 'fit-content', display: 'inline-block' }}>
       <Toggle
         value={activeThemeTone === "dark"}
         onDidChange={handleChange}

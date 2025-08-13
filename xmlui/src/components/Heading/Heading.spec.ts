@@ -176,18 +176,16 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     <Fragment>
       <Heading testId="headingShort">Short</Heading>
       <Heading testId="headingLong" preserveLinebreaks="true"
-        value="Though this long 
+        value="Though this long
 text does not fit into a single line,
 please do not break it!"
       />
     </Fragment>
     `);
     const { height: heightHeadingShort } = await getBounds(
-      await createHeadingDriver("headingShort")
+      await createHeadingDriver("headingShort"),
     );
-    const { height: heightHeadingLong } = await getBounds(
-      await createHeadingDriver("headingLong")
-    );
+    const { height: heightHeadingLong } = await getBounds(await createHeadingDriver("headingLong"));
 
     expect(heightHeadingLong).toEqualWithTolerance(heightHeadingShort * 3, 0.01);
   });
@@ -345,10 +343,7 @@ test("Heading overflows container dimensions", async ({
   expect(widthLayout).toEqual(widthLayoutExpected);
 });
 
-test("Heading accepts custom props", async ({
-  initTestBed,
-  createHeadingDriver,
-}) => {
+test("Heading accepts custom props", async ({ initTestBed, createHeadingDriver }) => {
   await initTestBed(`<Heading custom="test" boolean>Test Heading</Heading>`);
   const headingDriver = await createHeadingDriver();
 
@@ -357,11 +352,10 @@ test("Heading accepts custom props", async ({
 });
 
 headingLevels.forEach((level) => {
-  test(`HtmlTag '${level}' accepts custom props`, async ({
-    initTestBed,
-    createHeadingDriver,
-  }) => {
-    await initTestBed(`<${level.toLowerCase()} custom="test" boolean>Test Heading</${level.toLowerCase()}>`);
+  test(`HtmlTag '${level}' accepts custom props`, async ({ initTestBed, createHeadingDriver }) => {
+    await initTestBed(
+      `<${level.toLowerCase()} custom="test" boolean>Test Heading</${level.toLowerCase()}>`,
+    );
     const headingDriver = await createHeadingDriver();
 
     await expect(headingDriver.component).toHaveAttribute("custom", "test");
@@ -385,7 +379,10 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toHaveText("Test Heading");
   });
 
-  test("component renders with all heading levels", async ({ initTestBed, createHeadingDriver }) => {
+  test("component renders with all heading levels", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
     for (const level of levels) {
       await initTestBed(`<Heading level="${level}">Level ${level}</Heading>`);
@@ -396,7 +393,10 @@ test.describe("Basic Functionality", () => {
     }
   });
 
-  test("specialized heading components render correctly", async ({ initTestBed, createHeadingDriver }) => {
+  test("specialized heading components render correctly", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     const components = ["H1", "H2", "H3", "H4", "H5", "H6"];
     for (const component of components) {
       await initTestBed(`<${component}>Specialized ${component}</${component}>`);
@@ -424,7 +424,10 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("component has correct semantic heading roles", async ({ initTestBed, createHeadingDriver }) => {
+  test("component has correct semantic heading roles", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading level="h2">Accessible Heading</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toHaveRole("heading");
@@ -432,7 +435,10 @@ test.describe("Accessibility", () => {
     expect(tagName.toLowerCase()).toBe("h2");
   });
 
-  test("all heading levels have correct semantic roles", async ({ initTestBed, createHeadingDriver }) => {
+  test("all heading levels have correct semantic roles", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
     for (const level of levels) {
       await initTestBed(`<Heading level="${level}">Level ${level}</Heading>`);
@@ -443,16 +449,19 @@ test.describe("Accessibility", () => {
     }
   });
 
-  test("specialized components maintain semantic heading structure", async ({ initTestBed, createHeadingDriver }) => {
+  test("specialized components maintain semantic heading structure", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     const components = [
       { component: "H1", expectedTag: "h1" },
       { component: "H2", expectedTag: "h2" },
       { component: "H3", expectedTag: "h3" },
       { component: "H4", expectedTag: "h4" },
       { component: "H5", expectedTag: "h5" },
-      { component: "H6", expectedTag: "h6" }
+      { component: "H6", expectedTag: "h6" },
     ];
-    
+
     for (const { component, expectedTag } of components) {
       await initTestBed(`<${component}>Heading Level ${expectedTag}</${component}>`);
       const driver = await createHeadingDriver();
@@ -462,14 +471,21 @@ test.describe("Accessibility", () => {
     }
   });
 
-  test("component supports accessible text content", async ({ initTestBed, createHeadingDriver }) => {
+  test("component supports accessible text content", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading>Accessible heading with proper content</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
     await expect(driver.component).toHaveText("Accessible heading with proper content");
   });
 
-  test("component supports screen reader navigation", async ({ initTestBed, createHeadingDriver, page }) => {
+  test("component supports screen reader navigation", async ({
+    initTestBed,
+    createHeadingDriver,
+    page,
+  }) => {
     await initTestBed(`
       <VStack>
         <H1 testId="h1">Main Title</H1>
@@ -477,21 +493,21 @@ test.describe("Accessibility", () => {
         <H3 testId="h3">Subsection Title</H3>
       </VStack>
     `);
-    
+
     // Verify heading structure by using testId selectors
     const h1 = page.getByTestId("h1");
     const h2 = page.getByTestId("h2");
     const h3 = page.getByTestId("h3");
-    
+
     await expect(h1).toHaveRole("heading");
     await expect(h2).toHaveRole("heading");
     await expect(h3).toHaveRole("heading");
-    
+
     // Verify tag names for semantic structure
-    const h1TagName = await h1.evaluate(el => el.tagName.toLowerCase());
-    const h2TagName = await h2.evaluate(el => el.tagName.toLowerCase());
-    const h3TagName = await h3.evaluate(el => el.tagName.toLowerCase());
-    
+    const h1TagName = await h1.evaluate((el) => el.tagName.toLowerCase());
+    const h2TagName = await h2.evaluate((el) => el.tagName.toLowerCase());
+    const h3TagName = await h3.evaluate((el) => el.tagName.toLowerCase());
+
     expect(h1TagName).toBe("h1");
     expect(h2TagName).toBe("h2");
     expect(h3TagName).toBe("h3");
@@ -503,7 +519,10 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Visual States & Themes", () => {
-  test("component applies theme variables correctly", async ({ initTestBed, createHeadingDriver }) => {
+  test("component applies theme variables correctly", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading>Themed Heading</Heading>`, {
       testThemeVars: {
         "color-Heading": "rgb(255, 0, 0)",
@@ -511,10 +530,10 @@ test.describe("Visual States & Themes", () => {
     });
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
-    
+
     // Test that the component handles theme variables (may not always apply due to CSS specificity)
-    const color = await driver.component.evaluate(el => getComputedStyle(el).color);
-    
+    const color = await driver.component.evaluate((el) => getComputedStyle(el).color);
+
     // Either the theme color is applied or the component handles it gracefully
     if (color === "rgb(255, 0, 0)") {
       await expect(driver.component).toHaveCSS("color", "rgb(255, 0, 0)");
@@ -524,7 +543,10 @@ test.describe("Visual States & Themes", () => {
     }
   });
 
-  test("component supports different heading levels with different font sizes", async ({ initTestBed, createHeadingDriver }) => {
+  test("component supports different heading levels with different font sizes", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     // Test that h1 is larger than h2, h2 larger than h3, etc.
     await initTestBed(`
       <VStack>
@@ -533,19 +555,19 @@ test.describe("Visual States & Themes", () => {
         <H3 testId="h3">Heading 3</H3>
       </VStack>
     `);
-    
+
     const h1Driver = await createHeadingDriver("h1");
     const h2Driver = await createHeadingDriver("h2");
     const h3Driver = await createHeadingDriver("h3");
-    
-    const h1FontSize = await h1Driver.component.evaluate(el => getComputedStyle(el).fontSize);
-    const h2FontSize = await h2Driver.component.evaluate(el => getComputedStyle(el).fontSize);
-    const h3FontSize = await h3Driver.component.evaluate(el => getComputedStyle(el).fontSize);
-    
+
+    const h1FontSize = await h1Driver.component.evaluate((el) => getComputedStyle(el).fontSize);
+    const h2FontSize = await h2Driver.component.evaluate((el) => getComputedStyle(el).fontSize);
+    const h3FontSize = await h3Driver.component.evaluate((el) => getComputedStyle(el).fontSize);
+
     const h1Size = parseFloat(h1FontSize);
     const h2Size = parseFloat(h2FontSize);
     const h3Size = parseFloat(h3FontSize);
-    
+
     expect(h1Size).toBeGreaterThan(h2Size);
     expect(h2Size).toBeGreaterThan(h3Size);
   });
@@ -560,9 +582,9 @@ test.describe("Visual States & Themes", () => {
   test("component handles font weight variations", async ({ initTestBed, createHeadingDriver }) => {
     await initTestBed(`<Heading>Default Weight Heading</Heading>`);
     const driver = await createHeadingDriver();
-    
+
     // Verify default font weight is set (typically 600 for headings)
-    const fontWeight = await driver.component.evaluate(el => getComputedStyle(el).fontWeight);
+    const fontWeight = await driver.component.evaluate((el) => getComputedStyle(el).fontWeight);
     expect(parseInt(fontWeight)).toBeGreaterThanOrEqual(400);
   });
 
@@ -572,7 +594,10 @@ test.describe("Visual States & Themes", () => {
     await expect(driver.component).toHaveCSS("text-align", "center");
   });
 
-  test("component handles overflow and text truncation", async ({ initTestBed, createHeadingDriver }) => {
+  test("component handles overflow and text truncation", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`
       <Heading width="100px" maxLines="1">
         This is a very long heading that should be truncated
@@ -592,11 +617,11 @@ test.describe("Edge Cases", () => {
   test("component handles null and undefined props gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<Heading/>`);
     const component = page.getByTestId("test-id-component");
-    
+
     // Check if component exists in DOM
     const exists = await component.count();
     expect(exists).toBe(1);
-    
+
     // Component with no content may be hidden but should exist
     const isVisible = await component.isVisible();
     if (!isVisible) {
@@ -610,11 +635,11 @@ test.describe("Edge Cases", () => {
   test("component handles empty content", async ({ initTestBed, page }) => {
     await initTestBed(`<Heading value="" />`);
     const component = page.getByTestId("test-id-component");
-    
+
     // Check if component exists in DOM
     const exists = await component.count();
     expect(exists).toBe(1);
-    
+
     // Component with empty value may be hidden but should exist
     const isVisible = await component.isVisible();
     if (!isVisible) {
@@ -629,11 +654,11 @@ test.describe("Edge Cases", () => {
   test("component handles whitespace-only content", async ({ initTestBed, page }) => {
     await initTestBed(`<Heading>   </Heading>`);
     const component = page.getByTestId("test-id-component");
-    
+
     // Check if component exists in DOM
     const exists = await component.count();
     expect(exists).toBe(1);
-    
+
     // Component with whitespace-only content may be hidden but should exist
     const isVisible = await component.isVisible();
     if (!isVisible) {
@@ -644,7 +669,10 @@ test.describe("Edge Cases", () => {
     }
   });
 
-  test("component handles special characters correctly", async ({ initTestBed, createHeadingDriver }) => {
+  test("component handles special characters correctly", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading>Test with émojis 🚀 & quotes "hello"</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
@@ -673,10 +701,10 @@ test.describe("Edge Cases", () => {
 
   test("component handles invalid level prop gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<Heading level="invalid">Invalid Level</Heading>`);
-    
+
     const component = page.getByTestId("test-id-component");
     const isVisible = await component.isVisible();
-    
+
     if (isVisible) {
       await expect(component).toBeVisible();
       await expect(component).toHaveText("Invalid Level");
@@ -691,12 +719,15 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toHaveText('Text 123 🎉 "quoted" & symbols');
   });
 
-  test("component handles newlines and preserveLinebreaks", async ({ initTestBed, createHeadingDriver }) => {
+  test("component handles newlines and preserveLinebreaks", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading preserveLinebreaks="true" value="Line 1\nLine 2\nLine 3" />`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
     // The component should preserve the line breaks
-    const height = await driver.component.evaluate(el => getComputedStyle(el).height);
+    const height = await driver.component.evaluate((el) => getComputedStyle(el).height);
     expect(parseFloat(height)).toBeGreaterThan(20); // Should be taller due to multiple lines
   });
 });
@@ -706,7 +737,10 @@ test.describe("Edge Cases", () => {
 // =============================================================================
 
 test.describe("Performance", () => {
-  test("component renders efficiently with minimal props", async ({ initTestBed, createHeadingDriver }) => {
+  test("component renders efficiently with minimal props", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     // Simply test that the component renders without errors, not timing
     await initTestBed(`<Heading>Performance Test</Heading>`);
     const driver = await createHeadingDriver();
@@ -714,13 +748,17 @@ test.describe("Performance", () => {
     await expect(driver.component).toHaveText("Performance Test");
   });
 
-  test("component handles multiple heading instances efficiently", async ({ initTestBed, page }) => {
-    const headings = Array.from({ length: 20 }, (_, i) => 
-      `<Heading testId="heading-${i}">Heading ${i}</Heading>`
-    ).join('');
-    
+  test("component handles multiple heading instances efficiently", async ({
+    initTestBed,
+    page,
+  }) => {
+    const headings = Array.from(
+      { length: 20 },
+      (_, i) => `<Heading testId="heading-${i}">Heading ${i}</Heading>`,
+    ).join("");
+
     await initTestBed(`<VStack>${headings}</VStack>`);
-    
+
     // All headings should be visible
     for (let i = 0; i < 20; i++) {
       const heading = page.getByTestId(`heading-${i}`);
@@ -728,7 +766,10 @@ test.describe("Performance", () => {
     }
   });
 
-  test("component handles level changes without performance degradation", async ({ initTestBed, createHeadingDriver }) => {
+  test("component handles level changes without performance degradation", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading level="h1">Heading</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
@@ -737,11 +778,14 @@ test.describe("Performance", () => {
     expect(tagName.toLowerCase()).toBe("h1");
   });
 
-  test("component handles content updates efficiently", async ({ initTestBed, createHeadingDriver }) => {
+  test("component handles content updates efficiently", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`<Heading>Initial Content</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toHaveText("Initial Content");
-    
+
     // Component should handle content updates well
     await expect(driver.component).toBeVisible();
   });
@@ -752,7 +796,10 @@ test.describe("Performance", () => {
 // =============================================================================
 
 test.describe("Integration", () => {
-  test("component works correctly in VStack layout", async ({ initTestBed, createHeadingDriver }) => {
+  test("component works correctly in VStack layout", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Heading>Header 1</Heading>
@@ -763,7 +810,10 @@ test.describe("Integration", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("component works correctly in HStack layout", async ({ initTestBed, createHeadingDriver }) => {
+  test("component works correctly in HStack layout", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
     await initTestBed(`
       <HStack>
         <Heading>Left Header</Heading>
@@ -774,28 +824,36 @@ test.describe("Integration", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("component integrates with other text components", async ({ initTestBed, createHeadingDriver, page }) => {
+  test("component integrates with other text components", async ({
+    initTestBed,
+    createHeadingDriver,
+    page,
+  }) => {
     await initTestBed(`
       <VStack>
         <Heading testId="heading">Main Title</Heading>
         <Text testId="text">Body text content</Text>
       </VStack>
     `);
-    
+
     const heading = page.getByTestId("heading");
     const text = page.getByTestId("text");
-    
+
     await expect(heading).toBeVisible();
     await expect(text).toBeVisible();
     await expect(heading).toHaveText("Main Title");
     await expect(text).toHaveText("Body text content");
   });
 
-  test("component supports anchor links functionality", async ({ initTestBed, createHeadingDriver, page }) => {
+  test("component supports anchor links functionality", async ({
+    initTestBed,
+    createHeadingDriver,
+    page,
+  }) => {
     await initTestBed(`<Heading anchorId="test-anchor">Linkable Heading</Heading>`);
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
-    
+
     // Check if heading can be used as an anchor target
     await expect(driver.component).toHaveText("Linkable Heading");
   });
@@ -813,23 +871,23 @@ test.describe("Integration", () => {
         </VStack>
       </VStack>
     `);
-    
+
     const h1 = page.getByTestId("main");
     const h2 = page.getByTestId("section");
     const h3_1 = page.getByTestId("sub1");
     const h3_2 = page.getByTestId("sub2");
-    
+
     await expect(h1).toHaveRole("heading");
     await expect(h2).toHaveRole("heading");
     await expect(h3_1).toHaveRole("heading");
     await expect(h3_2).toHaveRole("heading");
-    
+
     // Verify proper heading hierarchy through tag names
-    const h1TagName = await h1.evaluate(el => el.tagName.toLowerCase());
-    const h2TagName = await h2.evaluate(el => el.tagName.toLowerCase());
-    const h3_1TagName = await h3_1.evaluate(el => el.tagName.toLowerCase());
-    const h3_2TagName = await h3_2.evaluate(el => el.tagName.toLowerCase());
-    
+    const h1TagName = await h1.evaluate((el) => el.tagName.toLowerCase());
+    const h2TagName = await h2.evaluate((el) => el.tagName.toLowerCase());
+    const h3_1TagName = await h3_1.evaluate((el) => el.tagName.toLowerCase());
+    const h3_2TagName = await h3_2.evaluate((el) => el.tagName.toLowerCase());
+
     expect(h1TagName).toBe("h1");
     expect(h2TagName).toBe("h2");
     expect(h3_1TagName).toBe("h3");
@@ -841,10 +899,10 @@ test.describe("Integration", () => {
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
     await expect(driver.component).toHaveText("Responsive Heading");
-    
+
     // Test that the component handles responsive properties
     // (The specific implementation may vary, but component should render)
-    const computedWidth = await driver.component.evaluate(el => getComputedStyle(el).width);
+    const computedWidth = await driver.component.evaluate((el) => getComputedStyle(el).width);
     expect(computedWidth).toBeTruthy(); // Should have some computed width
   });
 
@@ -856,10 +914,10 @@ test.describe("Integration", () => {
     });
     const driver = await createHeadingDriver();
     await expect(driver.component).toBeVisible();
-    
+
     // Test that the component accepts theme variables (may not always apply due to specificity)
-    const color = await driver.component.evaluate(el => getComputedStyle(el).color);
-    
+    const color = await driver.component.evaluate((el) => getComputedStyle(el).color);
+
     // Either the theme color is applied or the component handles it gracefully
     if (color === "rgb(0, 128, 0)") {
       await expect(driver.component).toHaveCSS("color", "rgb(0, 128, 0)");
@@ -869,7 +927,10 @@ test.describe("Integration", () => {
     }
   });
 
-  test("component preserves semantic heading hierarchy in large documents", async ({ initTestBed, page }) => {
+  test("component preserves semantic heading hierarchy in large documents", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <VStack>
         <H1 testId="h1">Document Title</H1>
@@ -881,15 +942,15 @@ test.describe("Integration", () => {
         <H4 testId="h4-1">Subsection 2.1.1</H4>
       </VStack>
     `);
-    
+
     // Test each heading individually using testIds
     const testIds = ["h1", "h2-1", "h3-1", "h3-2", "h2-2", "h3-3", "h4-1"];
     const expectedTags = ["h1", "h2", "h3", "h3", "h2", "h3", "h4"];
-    
+
     for (let i = 0; i < testIds.length; i++) {
       const heading = page.getByTestId(testIds[i]);
       await expect(heading).toHaveRole("heading");
-      const tagName = await heading.evaluate(el => el.tagName.toLowerCase());
+      const tagName = await heading.evaluate((el) => el.tagName.toLowerCase());
       expect(tagName).toBe(expectedTags[i]);
     }
   });

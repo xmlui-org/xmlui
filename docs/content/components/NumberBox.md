@@ -139,7 +139,7 @@ This property sets the width of the `NumberBox` component's label. If not define
 
 This property sets the maximum length of the input it accepts.
 
-### `maxValue` [#maxvalue]
+### `maxValue` (default: 999999999999999) [#maxvalue-default-999999999999999]
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.
 
@@ -155,7 +155,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 </App>
 ```
 
-### `minValue` [#minvalue]
+### `minValue` (default: -999999999999999) [#minvalue-default-999999999999999]
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.
 
@@ -355,6 +355,7 @@ This API focuses the input field of the `NumberBox`. You can use it to programma
 This API sets the value of the `NumberBox`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: number | undefined): void`
+
 You can use this method to set the component's current value programmatically.
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
@@ -379,6 +380,7 @@ You can use this method to set the component's current value programmatically.
 This API retrieves the current value of the `NumberBox`. You can use it to get the value programmatically.
 
 **Signature**: `get value(): number | undefined`
+
 You can query this read-only API property to get the input component's current value.
 
 See an example in the `setValue` API method.
@@ -468,6 +470,10 @@ See an example in the `setValue` API method.
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-warning--focus | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-default | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-error | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-success | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default--focus | *none* | *none* |

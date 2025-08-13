@@ -16,6 +16,7 @@ $componentName: "NumberBox";
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
+  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
@@ -54,6 +55,10 @@ $componentName: "NumberBox";
   }
   .adornment {
     color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+
+    * {
+      color: inherit;
+    }
   }
 }
 
@@ -61,7 +66,6 @@ $componentName: "NumberBox";
   display: flex;
   align-items: center;
   gap: createThemeVar("Input:gap-adornment-#{$componentName}");
-  padding: t.$space-2;
   width: 100%;
   border-style: solid;
   border-width: 1px;

@@ -21,7 +21,9 @@ export type Accordion = {
 };
 
 export type Tab = {
+  id?: string;
   label: string;
+  headerRenderer?: (contextVars: any) => ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
 };

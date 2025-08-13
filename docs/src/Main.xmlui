@@ -46,7 +46,7 @@
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
                 <NavLink label="Markup" to="/markup" />
-                <NavLink label="Component Scoping" to="/scoping" />
+                <!-- <NavLink label="Component Scoping" to="/scoping" /> -->
                 <NavLink label="Scripting" to="/scripting" />
                 <NavLink label="Layout" to="/layout" />
                 <NavLink label="Working with Text" to="/working-with-text" />
@@ -59,6 +59,9 @@
                 <NavLink
                     label="User-defined Components"
                     to="/user-defined-components" />
+                <NavLink
+                    label="Refactoring"
+                    to="/refactoring" />
                 <NavLink
                     label="Build a HelloWorld Component"
                     to="/build-hello-world-component" />
@@ -114,6 +117,7 @@
                     <NavLink label="HSplitter" to="/components/HSplitter" />
                     <NavLink label="HStack" to="/components/HStack" />
                     <NavLink label="Heading" to="/components/Heading" />
+                    <NavLink label="IFrame" to="/components/IFrame" />
                     <NavLink label="Icon" to="/components/Icon" />
                     <NavLink label="Image" to="/components/Image" />
                     <NavLink label="Items" to="/components/Items" />
@@ -281,6 +285,9 @@
             </Page>
             <Page url="/user-defined-components">
                 <DocumentPageNoTOC url="/pages/user-defined-components.md" />
+            </Page>
+            <Page url="/refactoring">
+                <DocumentPageNoTOC url="/pages/refactoring.md" />
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md" />

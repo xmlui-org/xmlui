@@ -123,12 +123,10 @@ export const textAreaComponentRenderer = createComponentRenderer(
     registerComponentApi,
     lookupEventHandler,
   }) => {
-    const initialValue = extractValue(node.props.initialValue);
     return (
       <TextArea
-        key={`${node.uid}-${initialValue}`}
         value={state?.value}
-        initialValue={initialValue}
+        initialValue={extractValue(node.props.initialValue)}
         updateState={updateState}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}

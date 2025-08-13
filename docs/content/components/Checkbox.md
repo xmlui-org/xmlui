@@ -216,6 +216,7 @@ This event is triggered when the Checkbox has lost the focus.
 This method sets the current value of the Checkbox.
 
 **Signature**: `set value(value: boolean): void`
+
 - `value`: The new value to set for the checkbox.
 
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
@@ -245,6 +246,7 @@ You can use this method to set the checkbox's current value programmatically (`t
 This method returns the current value of the Checkbox.
 
 **Signature**: `get value(): boolean`
+
 You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
 
 See an example in the `setValue` API method.

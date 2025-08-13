@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useId, useRef } from "react";
 import { forwardRef } from "react";
 import { Root, Range, Track, Thumb } from "@radix-ui/react-slider";
 import styles from "./Slider.module.scss";
@@ -9,7 +9,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
-import { min } from "date-fns";
 
 export const defaultProps = {
   step: 1,
@@ -24,6 +23,7 @@ export const defaultProps = {
 };
 
 type Props = {
+  id?: string;
   value?: number | number[];
   initialValue?: number | number[];
   style?: CSSProperties;
@@ -70,6 +70,7 @@ const formatValue = (val: number | number[] | undefined, defaultVal: number = 0)
 export const Slider = forwardRef(
   (
     {
+      id,
       style,
       step = defaultProps.step,
       min = defaultProps.min,
@@ -100,6 +101,8 @@ export const Slider = forwardRef(
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
+    const _id = useId();
+    id = id || _id;
     const inputRef = useRef(null);
 
     // Initialize localValue properly
@@ -107,7 +110,7 @@ export const Slider = forwardRef(
 
     // Process initialValue on mount
     useEffect(() => {
-      let initialVal;
+      let initialVal: number | number[] = min;
 
       if (typeof initialValue === "string") {
         try {
@@ -218,6 +221,8 @@ export const Slider = forwardRef(
         onBlur={onBlur}
         style={style}
         ref={forwardedRef}
+        id={id}
+        isInputTemplateUsed={true}
       >
         <div className={styles.sliderContainer}>
           <Root
@@ -265,6 +270,7 @@ export const Slider = forwardRef(
                   [styles.disabled]: !enabled
                 })}
                 style={thumbStyle ? { ...thumbStyle } : undefined}
+                id={id}
               />
             ))}
           </Root>

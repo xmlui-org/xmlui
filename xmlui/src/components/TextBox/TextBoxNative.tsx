@@ -131,8 +131,7 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
+  id = id || useId();
   const inputRef = useRef<HTMLInputElement>(null);
   
   // State to control password visibility
@@ -219,6 +218,8 @@ export const TextBox = forwardRef(function TextBox(
       enabled={enabled}
       style={style}
       ref={ref}
+      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
+      isInputTemplateUsed={true}
     >
       <div
         className={classnames(styles.inputRoot, {

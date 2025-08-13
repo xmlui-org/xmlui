@@ -43,6 +43,7 @@ import { modalViewComponentRenderer } from "./ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "./NoResult/NoResult";
 import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
 import { iconComponentRenderer } from "./Icon/Icon";
+import { iframeComponentRenderer } from "./IFrame/IFrame";
 import { itemsComponentRenderer } from "./Items/Items";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
 import { imageComponentRenderer } from "./Image/Image";
@@ -252,6 +253,7 @@ import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
+import { paginationComponentRenderer } from "./Pagination/Pagination";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -499,9 +501,16 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Image !== "false") {
       this.registerCoreComponent(imageComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_IFrame !== "false") {
+      this.registerCoreComponent(iframeComponentRenderer);
+    }
 
     if (process.env.VITE_USED_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
+    }
+
+    if (process.env.VITE_USED_COMPONENTS_Pagination !== "false") {
+      this.registerCoreComponent(paginationComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {

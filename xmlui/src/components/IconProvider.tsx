@@ -24,6 +24,8 @@ import {
   FiUsers,
   FiX,
   FiMoon,
+  FiChevronsRight,
+  FiChevronsLeft,
 } from "react-icons/fi";
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
@@ -171,6 +173,8 @@ registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {..
 registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
 registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
 registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
+registerIconRenderer("doublechevronright", (props: IconBaseProps) => <FiChevronsRight {...props} />);
+registerIconRenderer("doublechevronleft", (props: IconBaseProps) => <FiChevronsLeft {...props} />);
 registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
 registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => (
   <DotMenuHorizontalIcon {...props} />

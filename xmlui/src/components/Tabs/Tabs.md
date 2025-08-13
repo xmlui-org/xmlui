@@ -4,10 +4,13 @@
 - **Content organization**: Efficiently displays multiple content sections in a single interface area
 - **Flexible orientation**: Supports both horizontal (tabs on top) and vertical (tabs on side) layouts
 - **Active tab control**: Programmatically set which tab is initially selected
-- **Custom tab styling**: Configurable tab appearance via `tabTemplate` property
-- **Navigation methods**: Built-in methods for programmatic tab switching
+- **Custom header templates**: Configurable tab appearance via `headerTemplate` property
+- **Navigation methods**: Built-in methods for programmatic tab switching (`next()`, `prev()`, `setActiveTabIndex()`, `setActiveTabById()`)
+- **External ID support**: Optional `id` prop for TabItems with context exposure
+- **Dynamic content**: Works seamlessly with `Items` for data-driven tabs
 
-**Usage pattern:**
+## Using Tabs
+
 The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
 
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
@@ -26,67 +29,143 @@ The component accepts only [TabItem](/components/TabItem) components as children
 </App>
 ```
 
-%-DESC-END
+## Dynamic Tabs
 
-%-PROP-START activeTab
+You can create `TabItem` children dynamically:
 
-```xmlui-pg copy display name="Example: activeTab" height="200px"
-<App>
-  <Tabs activeTab="2">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START orientation
-
-```xmlui-pg copy display name="Example: orientation" height="200px"
-<App>
-  <Tabs orientation="horizontal">
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START tabTemplate
-
-```xmlui-pg copy {2-4} display name="Example: tabTemplate" height="200px"
+```xmlui-pg copy display name="Example: using Tabs with dynamic items" height="200px"
 <App>
   <Tabs>
-    <property name="tabTemplate">
-      <Card title="{$item.label}" />
+    <Items data="{[1, 2, 3, 4]}">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item}"/>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
+%-DESC-END
+
+%-PROP-START headerTemplate
+
+```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+<App>
+  <Tabs>
+    <property name="headerTemplate">
+      <Icon name="chevronright" />
+      <Text color="green">Account {$header.index}</Text>
     </property>
-    <TabItem label="Account">
-      <Text>Account</Text>
+    <Items data="{[
+        {id: 1, name: 'AcmeCorp'}, 
+        {id: 2, name: 'BetaLLC'}, 
+        {id: 3, name: 'GammaInc'}]
+      }">
+      <TabItem label="Account {$item}">
+        <Card title="Tab Content for Account {$item.name}"/>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
+The `headerTemplate` property allows you to customize the appearance of tab headers. The template receives a `$header` context variable with the following properties:
+- `id` (optional): External ID if provided to TabItem
+- `index`: Zero-based index of the tab
+- `label`: The tab's label text
+- `isActive`: Boolean indicating if this tab is currently active
+
+Individual tab items have an optional identifier, which is passed to the header template.
+
+```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+<App>
+  <Tabs>
+    <property name="headerTemplate">
+      {$header.label}{$header.id ? ' | ID: ' + $header.id : ''}
+    </property>
+    <TabItem label="Home" id="home-tab">
+      Home content
     </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
+    <TabItem label="Accounts" id="accounts-tab">
+      Accounts content
     </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
+    <TabItem label="Settings">
+      Settings content
     </TabItem>
   </Tabs>
 </App>
 ```
 
+> [!INFO] Individual `TabItem` children can customize their [header templates](./TabItem#headertemplate), too.
+
 %-PROP-END
+
+%-API-START next
+
+```xmlui-pg copy display name="Example: next()" /next/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.next()">Next Tab</Button>
+  </Fragment>
+</App>
+```
+
+%-API-END
+
+%-API-START prev
+
+```xmlui-pg copy display name="Example: prev()" /prev/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.prev()">Previous Tab</Button>
+  </Fragment>
+</App>
+```
+
+%-API-END
+
+%-API-START setActiveTabIndex
+
+```xmlui-pg copy display name="Example: setActiveTabIndex()" /setActiveTabIndex/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Tab 1">Content 1</TabItem>
+      <TabItem label="Tab 2">Content 2</TabItem>
+      <TabItem label="Tab 3">Content 3</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.setActiveTabIndex(2)">Go to Tab 3 (by Index)</Button>
+  </Fragment>
+</App>
+```
+
+%-API-END
+
+%-API-START setActiveTabById
+
+```xmlui-pg copy display name="Example: setActiveTabById()" /setActiveTabById/ height="250px"
+<App>
+  <Fragment>
+    <Tabs id="myTabs">
+      <TabItem label="Home" id="home">Home Content</TabItem>
+      <TabItem label="Settings" id="settings">Settings Content</TabItem>
+      <TabItem label="Help" id="help">Help Content</TabItem>
+    </Tabs>
+    <Button onClick="myTabs.setActiveTabById('settings')">
+      Go to Settings (by ID)
+    </Button>
+  </Fragment>
+</App>
+```
+
+%-API-END

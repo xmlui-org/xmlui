@@ -1,265 +1,268 @@
-import { test, expect } from "../../testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test.skip("component renders with default props", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark>Content</Bookmark>`, {});
-  
-  // Verify component renders
-  await expect(page.locator(".anchorRef")).toBeVisible();
-  await expect(page.locator(".anchorRef")).toContainText("Content");
-});
+test.describe("Basic Functionality", () => {
+  test("renders as standalone bookmark", async ({ initTestBed, page }) => {
+    await initTestBed(`<Bookmark id="test-bookmark" />`);
+    const bookmark = page.locator("#test-bookmark");
+    await expect(bookmark).toHaveCount(1);
+  });
 
-test.skip("component renders with uid", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark">Content</Bookmark>`, {});
-  
-  // Verify uid is set as id
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toHaveAttribute("id", "test-bookmark");
-  await expect(bookmark).toHaveAttribute("data-anchor", "true");
-});
+  test("renders children", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Bookmark id="test-bookmark">
+        <Text>Bookmark content</Text>
+      </Bookmark>
+    `);
+    const bookmark = page.locator("#test-bookmark");
+    await expect(bookmark).toBeVisible();
+    await expect(bookmark).toContainText("Bookmark content");
+  });
 
-test.skip("component renders with custom level", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark" level={3}>Heading 3</Bookmark>`, {});
-  
-  // Level is used in ToC registration but doesn't affect the DOM directly
-  // This would need to check internal component state
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toBeVisible();
-  await expect(bookmark).toContainText("Heading 3");
-});
+  test("renders children without id", async ({ initTestBed, page }) => {
+    await initTestBed(`<Bookmark>Content without id</Bookmark>`);
+    await expect(page.getByText("Content without id")).toBeVisible();
+  });
 
-test.skip("component renders with custom title", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark" title="Custom Title">Visible Content</Bookmark>`, {});
-  
-  // Title is used for ToC display but doesn't affect the DOM directly
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toBeVisible();
-  await expect(bookmark).toContainText("Visible Content");
+  // =============================================================================
+  // DOCUMENTATION USAGE PATTERNS
+  // =============================================================================
+
+  test.describe("Documentation Usage Patterns", () => {
+    test("links navigate to standalone bookmarks", async ({ initTestBed, page }) => {
+      // Based on documentation example with standalone bookmarks and adjacent content
+      await initTestBed(`
+        <VStack height="600px" gap="100px">
+          <Link to="#red-section">Jump to red</Link>
+          <Link to="#green-section">Jump to green</Link>
+          <Bookmark id="red-section" />
+          <VStack height="700px" backgroundColor="red">Red content</VStack>
+          <Bookmark id="green-section" />
+          <VStack height="700px" backgroundColor="green">Green content</VStack>
+        </VStack>
+      `);
+
+      const redLink = page.getByRole("link", { name: "Jump to red" });
+      const greenLink = page.getByRole("link", { name: "Jump to green" });
+
+      const redContent = page.getByText("Red content");
+      const greenContent = page.getByText("Green content");
+
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+
+      await greenLink.click();
+      await page.waitForURL(/#green-section$/);
+      await expect(redContent).not.toBeInViewport();
+      await expect(greenContent).toBeInViewport();
+
+      await redLink.click();
+      await page.waitForURL(/#red-section$/);
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+    });
+
+    test("links navigate to nested bookmarks", async ({ initTestBed, page }) => {
+      // Based on documentation example with standalone bookmarks and adjacent content
+      await initTestBed(`
+        <VStack height="600px" gap="100px">
+          <Link to="#red-section">Jump to red</Link>
+          <Link to="#green-section">Jump to green</Link>
+          <Bookmark id="red-section" >
+            <VStack height="700px" backgroundColor="red">Red content</VStack>
+          </Bookmark>
+          <Bookmark id="green-section" >
+            <VStack height="700px" backgroundColor="green">Green content</VStack>
+          </Bookmark>
+        </VStack>
+      `);
+
+      const redLink = page.getByRole("link", { name: "Jump to red" });
+      const greenLink = page.getByRole("link", { name: "Jump to green" });
+
+      const redContent = page.getByText("Red content");
+      const greenContent = page.getByText("Green content");
+
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+
+      await greenLink.click();
+      await page.waitForURL(/#green-section$/);
+      await expect(redContent).not.toBeInViewport();
+      await expect(greenContent).toBeInViewport();
+
+      await redLink.click();
+      await page.waitForURL(/#red-section$/);
+      await expect(redContent).toBeInViewport();
+      await expect(greenContent).not.toBeInViewport();
+    });
+  });
+
+  // =============================================================================
+  // ID PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("id property", () => {
+    test("handles special characters in id", async ({ initTestBed, page }) => {
+      await initTestBed(`<Bookmark id="bookmark-with_special.chars" />`);
+      const anchor = page.locator('[id="bookmark-with_special.chars"]');
+      await expect(anchor).toHaveCount(1);
+    });
+
+    test("handles unicode characters in id", async ({ initTestBed, page }) => {
+      await initTestBed(`<Bookmark id="书签-émojis🚀" />`);
+      const anchor = page.locator('[id="书签-émojis🚀"]');
+      await expect(anchor).toHaveCount(1);
+    });
+
+    test("handles null id gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`<Bookmark id="{null}">Content</Bookmark>`);
+      await expect(page.getByText("Content")).toBeVisible();
+    });
+
+    test("handles undefined id gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`<Bookmark id="{undefined}">Content</Bookmark>`);
+      await expect(page.getByText("Content")).toBeVisible();
+    });
+
+    test("handles object id gracefully", async ({ initTestBed, page }) => {
+      await initTestBed(`<Bookmark id="{{a: 1}}">Content</Bookmark>`);
+      const anchor = page.locator('[id="[object Object]"]');
+      await expect(anchor).toHaveCount(1);
+    });
+  });
+
+  // =============================================================================
+  // SCROLL INTO VIEW API TESTS
+  // =============================================================================
+
+  test.describe("scrollIntoView API", () => {
+    test("scrollIntoView works in scrollable container", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <VStack height="300px">
+          <Button onClick="target.scrollIntoView()" >Scroll to Target</Button>
+          <VStack height="700px" backgroundColor="lightblue">Top spacer</VStack>
+          <Bookmark id="target" ref="bookmarkRef">Target content</Bookmark>
+        </VStack>
+      `);
+
+      const bookmark = page.locator("#target");
+      await expect(bookmark).not.toBeInViewport();
+
+      const button = page.getByRole("button", { name: "Scroll to Target" });
+      await button.click();
+
+      await expect(bookmark).toBeInViewport();
+    });
+  });
 });
 
 // =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.skip("component has correct accessibility attributes", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark">Accessible Content</Bookmark>`, {});
-  
-  // Check that the bookmark has the proper ID for navigation purposes
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toHaveAttribute("id", "test-bookmark");
-  
-  // Verify it has the data-anchor attribute for accessibility
-  await expect(bookmark).toHaveAttribute("data-anchor", "true");
-});
+test.describe("Accessibility", () => {
+  test("supports keyboard navigation to content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Bookmark id="keyboard-test">
+        <Button>Focusable Content</Button>
+      </Bookmark>
+    `);
 
-test.skip("component is not focusable", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark">Content</Bookmark>`, {});
-  
-  // Bookmark is not an interactive element and should not be focusable
-  const bookmark = page.locator(".anchorRef");
-  const tabIndex = await bookmark.getAttribute('tabindex');
-  expect(tabIndex).toBeFalsy(); // Should not have tabindex
-});
-
-// =============================================================================
-// VISUAL STATE TESTS
-// =============================================================================
-
-test.skip("component has correct styling", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-bookmark">Content</Bookmark>`, {});
-  
-  // Check styling - this would depend on the specific CSS but should be minimal
-  const bookmark = page.locator(".anchorRef");
-  
-  // The bookmark should not affect the visual appearance of the content
-  // We could check for specific display properties or positioning
-  await expect(bookmark).toBeVisible();
-});
-
-// =============================================================================
-// EDGE CASE TESTS
-// =============================================================================
-
-test.skip("component handles null and undefined props gracefully", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // Test with minimal props
-  await initTestBed(`<Bookmark>Content</Bookmark>`, {});
-  
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toBeVisible();
-  
-  // Should not have an id attribute without uid
-  const id = await bookmark.getAttribute('id');
-  expect(id).toBeFalsy();
-});
-
-test.skip("component handles empty string props gracefully", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // Test with empty string uid
-  await initTestBed(`<Bookmark uid="">Content</Bookmark>`, {});
-  
-  const bookmark = page.locator(".anchorRef");
-  await expect(bookmark).toBeVisible();
-  
-  // Should have an empty id attribute
-  await expect(bookmark).toHaveAttribute("id", "");
-});
-
-test.skip("component handles special characters in content correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<Bookmark uid="test-special">Special & characters: <> " '</Bookmark>`, {});
-  
-  const bookmark = page.locator(".anchorRef");
-  
-  // Check that special characters are rendered correctly
-  await expect(bookmark).toContainText(`Special & characters: <> " '`);
-});
-
-// =============================================================================
-// INTEGRATION TESTS
-// =============================================================================
-
-test.skip("component works with TableOfContents component", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // This test would require setting up a TableOfContents component
-  await initTestBed(`
-    <Stack>
-      <TableOfContents />
-      <Stack>
-        <Bookmark uid="section1" title="Section 1">Section 1 Content</Bookmark>
-        <Bookmark uid="section2" title="Section 2">Section 2 Content</Bookmark>
-      </Stack>
-    </Stack>
-  `, {});
-  
-  // Check that the TableOfContents contains entries for the bookmarks
-  // This would require specific knowledge of the TableOfContents implementation
-  
-  // As a minimal check, verify that bookmarks are rendered
-  await expect(page.locator(".anchorRef").first()).toBeVisible();
-  await expect(page.locator(".anchorRef").nth(1)).toBeVisible();
-});
-
-test.skip("component works with navigation links", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`
-    <Stack>
-      <Link href="#section1">Go to Section 1</Link>
-      <Stack height="1000px">
-        <Text>Spacer content</Text>
-      </Stack>
-      <Bookmark uid="section1">Section 1 Content</Bookmark>
-    </Stack>
-  `, {});
-  
-  // Click the link
-  await page.click("text=Go to Section 1");
-  
-  // Wait for navigation/scrolling
-  await page.waitForTimeout(500);
-  
-  // Check if the page has scrolled to the bookmark
-  // This could be verified by checking viewport position or element visibility
-  
-  // As a minimal check, ensure the bookmark is in view
-  const isInViewport = await page.evaluate(() => {
-    const bookmark = document.getElementById('section1');
-    if (!bookmark) return false;
-    
-    const rect = bookmark.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
+    await page.keyboard.press("Tab");
+    const button = page.getByRole("button", { name: "Focusable Content" });
+    await expect(button).toBeFocused();
   });
-  
-  expect(isInViewport).toBeTruthy();
-});
-
-test.skip("component with omitFromToc doesn't appear in TableOfContents", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // This test would require setting up a TableOfContents component
-  await initTestBed(`
-    <Stack>
-      <TableOfContents />
-      <Stack>
-        <Bookmark uid="section1" title="Section 1">Section 1 Content</Bookmark>
-        <Bookmark uid="section2" title="Section 2" omitFromToc={true}>Section 2 Content</Bookmark>
-      </Stack>
-    </Stack>
-  `, {});
-  
-  // Check that only section1 appears in the TableOfContents
-  // This would require specific knowledge of the TableOfContents implementation
-  
-  // As a minimal check, verify that both bookmarks are rendered in the document
-  await expect(page.locator(".anchorRef").first()).toBeVisible();
-  await expect(page.locator(".anchorRef").nth(1)).toBeVisible();
 });
 
 // =============================================================================
-// PERFORMANCE TESTS
+// OTHER EDGE CASE TESTS
 // =============================================================================
 
-test.skip("component handles multiple instances efficiently", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // Create many bookmarks to test performance
-  let bookmarkMarkup = '<Stack>';
-  for (let i = 1; i <= 20; i++) {
-    bookmarkMarkup += `<Bookmark uid="section${i}" title="Section ${i}">Section ${i} Content</Bookmark>`;
-  }
-  bookmarkMarkup += '</Stack>';
-  
-  await initTestBed(bookmarkMarkup, {});
-  
-  // Verify all bookmarks are rendered
-  await expect(page.locator(".anchorRef")).toHaveCount(20);
-  
-  // Performance testing would require more specific metrics
-  // This is just a basic rendering check
-});
+test.describe("Other Edge Cases", () => {
+  test("links navigate to bookmarks with 'null' other props", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="600px">
+        <Link to="#green-section">Jump to green</Link>
+        <VStack height="700px" backgroundColor="red">Red content</VStack>
+        <Bookmark id="green-section" level="{null}" title="{null}" omitFromToc="{null}" />
+        <VStack height="700px" backgroundColor="green">Green content</VStack>
+      </VStack>
+    `);
 
-test.skip("component updates efficiently when props change", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  // Initial render
-  await initTestBed(`<Bookmark uid="test" title="Original Title">Content</Bookmark>`, {});
-  
-  // Verify initial render
-  await expect(page.locator(".anchorRef")).toBeVisible();
-  
-  // Update with new props
-  await initTestBed(`<Bookmark uid="test" title="Updated Title">Content</Bookmark>`, {});
-  
-  // Verify update
-  await expect(page.locator(".anchorRef")).toBeVisible();
-  
-  // Title change doesn't affect DOM directly as it's used for ToC only
-  // This would need to check internal component state
+    const greenContent = page.getByText("Green content");
+    await expect(greenContent).not.toBeInViewport();
+
+    const greenLink = page.getByRole("link", { name: "Jump to green" });
+    await greenLink.click();
+
+    await page.waitForURL(/#green-section$/);
+    await expect(greenContent).toBeInViewport();
+  });
+
+  test("links navigate to bookmarks with valid other props", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="600px">
+        <Link to="#green-section">Jump to green</Link>
+        <VStack height="700px" backgroundColor="red">Red content</VStack>
+        <Bookmark id="green-section" level="{50}" title="green content section" omitFromToc="{true}" />
+        <VStack height="700px" backgroundColor="green">Green content</VStack>
+      </VStack>
+    `);
+
+    const greenContent = page.getByText("Green content");
+    await expect(greenContent).not.toBeInViewport();
+
+    const greenLink = page.getByRole("link", { name: "Jump to green" });
+    await greenLink.click();
+
+    await page.waitForURL(/#green-section$/);
+    await expect(greenContent).toBeInViewport();
+  });
+
+  test("links navigate to bookmarks with empty children", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack height="600px">
+        <Link to="#green-section">Jump to green</Link>
+        <VStack height="700px" backgroundColor="red">Red content</VStack>
+        <Bookmark id="green-section" level="{50}" title="green content section" omitFromToc="{true}" ></Bookmark>
+        <VStack height="700px" backgroundColor="green">Green content</VStack>
+      </VStack>
+    `);
+
+    const greenContent = page.getByText("Green content");
+    await expect(greenContent).not.toBeInViewport();
+
+    const greenLink = page.getByRole("link", { name: "Jump to green" });
+    await greenLink.click();
+
+    await page.waitForURL(/#green-section$/);
+    await expect(greenContent).toBeInViewport();
+  });
+
+  test("navigates to dynamic 'id' prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack var.dynId="initial-id" height="600px">
+        <Link to="#green-section">Jump to green</Link>
+        <Button onClick="dynId = 'green-section'">Set green section id</Button>
+        <VStack height="700px" backgroundColor="red">Red content</VStack>
+        <Bookmark id="{dynId}" />
+        <VStack height="700px" backgroundColor="green">Green content</VStack>
+      </VStack>
+    `);
+
+    const greenContent = page.getByText("Green content");
+    await expect(greenContent).not.toBeInViewport();
+
+    await page.getByRole("button", { name: "Set green section id" }).click();
+
+    const greenLink = page.getByRole("link", { name: "Jump to green" });
+    await greenLink.click();
+
+    await page.waitForURL(/#green-section$/);
+    await expect(greenContent).toBeInViewport();
+  });
 });

@@ -39,6 +39,10 @@ The following app demonstrates two different patterns for using `Redirect`.
 
 ## Properties [#properties]
 
+### `replace` (default: false) [#replace-default-false]
+
+This boolean property indicates whether the redirect should replace the current history entry or create a new one.
+
 ### `to` (default: "") [#to-default-]
 
 This property defines the URL to which this component is about to redirect requests.

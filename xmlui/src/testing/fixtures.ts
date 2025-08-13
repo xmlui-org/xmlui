@@ -4,12 +4,12 @@
 import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
-import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import {
-  type ComponentDriver,
   type ComponentDriverParams,
+  type ComponentDriver,
   AccordionDriver,
   AppFooterDriver,
   AppHeaderDriver,
@@ -48,7 +48,8 @@ import {
   ValidationDisplayDriver,
   ValidationSummaryDriver,
   VStackDriver,
-  DatePickerDriver, AutoCompleteDriver,
+  DatePickerDriver,
+  AutoCompleteDriver,
   CodeBlockDriver,
   CheckboxDriver,
   DropdownMenuDriver,
@@ -57,15 +58,16 @@ import {
   FileUploadDropZoneDriver,
   LabelDriver,
   BackdropDriver,
-  SpinnerDriver
+  SpinnerDriver,
 } from "./ComponentDrivers";
-import { initComponent } from "./component-test-helpers";
+import { parseComponentIfNecessary } from "./component-test-helpers";
 
 export { expect } from "./assertions";
 
+const isCI = process?.env?.CI === "true";
+
 // -----------------------------------------------------------------
 // --- Utility
-
 
 /**
  * Writes an error in the console to indicate if multiple elements have the same testId
@@ -83,16 +85,42 @@ async function getOnlyFirstLocator(page: Page, testId: string) {
 
 class Clipboard {
   private page: Page;
+  private content: string = "";
 
   constructor(page: Page) {
     this.page = page;
   }
 
-  async getContent() {
+  init() {
+    return () => {
+      window.navigator.clipboard.readText = async () => this.content;
+      window.navigator.clipboard.read = async () => [new ClipboardItem({ "text/plain": this.content })];
+      window.navigator.clipboard.writeText = async (text) => { this.content = text };
+      window.navigator.clipboard.write = async (items) => {
+        for (const item of items) {
+          if (item.types.includes("text/plain")) {
+            this.content = await item.getType("text/plain").then((blob) => blob.text());
+          }
+        }
+      };
+    }
+  }
+
+  /**
+   * Reads the text from the clipboard.
+   *
+   * @returns The text from the clipboard.
+   */
+  async read() {
     const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
     return handle.jsonValue();
   }
 
+  /**
+   * Writes the text to the clipboard.
+   *
+   * @param text - The text to write to the clipboard.
+   */
   async write(text: string) {
     await this.page.evaluate((text) => navigator.clipboard.writeText(text), text);
   }
@@ -102,18 +130,33 @@ class Clipboard {
   }
 
   /**
-   * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver
+   * Copies the text from the given locator to the clipboard.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Select the text.
+   * 3. Copy the text to the clipboard. (ControlOrMeta+C)
+   *
+   * @param locator - a Locator to focus and copy from
    */
-  async copyFrom(driver: ComponentDriver) {
-    await driver.focus();
-    await driver.dblclick();
-    await this.page.keyboard.press("Control+c");
+  async copy(locator: Locator) {
+    await locator.focus();
+    await locator.selectText();
+    await this.page.keyboard.press("ControlOrMeta+C");
   }
 
-  async pasteTo(driver: ComponentDriver) {
-    await driver.focus();
-    await this.page.keyboard.press("Control+v");
+  /**
+   * Pastes the text from the clipboard to the given locator.
+   *
+   * Steps:
+   * 1. Focus the locator.
+   * 2. Paste the text from the clipboard. (ControlOrMeta+V)
+   *
+   * @param locator - a Locator to focus and paste to
+   */
+  async paste(locator: Locator) {
+    await locator.focus();
+    await this.page.keyboard.press("ControlOrMeta+V");
   }
 }
 
@@ -137,8 +180,9 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
 
-type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
+type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint" | "components"> & {
   testThemeVars?: Record<string, string>;
+  components?: string[];
 };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -166,19 +210,59 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       }
       const entryPoint = component as ComponentDef;
 
+      const components = description?.components?.map((c) => {
+        const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
+        if (erroneousCompoundComponentName) {
+          throw new Error(
+            `Error parsing component "${erroneousCompoundComponentName}": ${errors.join("\n")}`,
+          );
+        }
+        return component as CompoundComponentDef;
+      });
+
       if (source !== "" && entryPoint.children) {
         const sourceBaseComponent = entryPoint.children[0];
-        if (!sourceBaseComponent.testId) {
+        const isCompoundComponentRoot =
+          components &&
+          components?.length > 0 &&
+          components?.map((c) => c.name).includes(sourceBaseComponent.type);
+
+        if (!isCompoundComponentRoot && !sourceBaseComponent.testId) {
           sourceBaseComponent.testId = baseComponentTestId;
+        } else if (
+          isCompoundComponentRoot &&
+          sourceBaseComponent.children?.length === 1 &&
+          !sourceBaseComponent.children?.[0].testId
+        ) {
+          // If the source is a compound component, we need to set the testId on the first & only child
+          sourceBaseComponent.children[0].testId = baseComponentTestId;
         }
       }
-
       const themedDescription = mapThemeRelatedVars(description);
-      await initComponent(page, { ...themedDescription, entryPoint });
+
+      const _appDescription: StandaloneAppDescription = {
+        name: "test bed app",
+        ...themedDescription,
+        components,
+        entryPoint,
+      };
+
+      const clipboard = new Clipboard(page);
+      // --- Mock the clipboard API if in CI
+      if (isCI) {
+        await page.addInitScript(clipboard.init);
+      }
+
+      await page.addInitScript((app) => {
+        // @ts-ignore
+        window.TEST_ENV = app;
+      }, _appDescription);
       const { width, height } = page.viewportSize();
+      await page.goto("/");
+
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
-        clipboard: new Clipboard(page),
+        clipboard,
         width: width ?? 0,
         height: height ?? 0,
       };

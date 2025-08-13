@@ -342,6 +342,7 @@ This event is triggered when the Select has lost the focus.
 This method focuses the `Select` component. You can use it to programmatically focus the component.
 
 **Signature**: `focus(): void`
+
 ```xmlui-pg copy display name="Example: focus()" height="260px"
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
@@ -364,6 +365,7 @@ This method resets the component to its initial value, or clears the selection i
 This API sets the value of the `Select`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: string | string[] | undefined): void`
+
 - `value`: The new value to set. Can be a single value or an array of values for multi-select.
 
 ```xmlui-pg copy display name="Example: setValue()" height="260px"

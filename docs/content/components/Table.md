@@ -1355,6 +1355,7 @@ clicking that column header still does not sort because `willSort` prevents it:
 This method clears the list of currently selected table rows.
 
 **Signature**: `clearSelection(): void`
+
 ```xmlui copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
 <App>
   <HStack>
@@ -1445,6 +1446,7 @@ This method clears the list of currently selected table rows.
 This method returns the list of currently selected table rows IDs.
 
 **Signature**: `getSelectedIds(): Array<string>`
+
 (See the [example](#clearselection) at the `clearSelection` method)
 
 ### `getSelectedItems` [#getselecteditems]
@@ -1452,6 +1454,7 @@ This method returns the list of currently selected table rows IDs.
 This method returns the list of currently selected table rows items.
 
 **Signature**: `getSelectedItems(): Array<TableRowItem>`
+
 (See the [example](#clearselection) at the `clearSelection` method)
 
 ### `selectAll` [#selectall]
@@ -1459,6 +1462,7 @@ This method returns the list of currently selected table rows items.
 This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`.
 
 **Signature**: `selectAll(): void`
+
 (See the [example](#clearselection) at the `clearSelection` method)
 
 ### `selectId` [#selectid]
@@ -1466,6 +1470,7 @@ This method selects all the rows in the table. This method has no effect if the 
 This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them.
 
 **Signature**: `selectId(id: string | Array<string>): void`
+
 - `id`: The ID of the row to select, or an array of IDs to select multiple rows.
 
 (See the [example](#clearselection) at the `clearSelection` method)

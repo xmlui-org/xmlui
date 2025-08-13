@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.92",
+  "version": "0.9.99",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -13,6 +13,7 @@
     "test:e2e-non-smoke": "playwright test --project non-smoke",
     "test:e2e-smoke": "playwright test --project smoke",
     "test:e2e-ui": "playwright test --ui",
+    "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "prepublishOnly": "clean-package",
     "postpublish": "clean-package restore",

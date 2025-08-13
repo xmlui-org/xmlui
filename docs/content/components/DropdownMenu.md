@@ -150,7 +150,7 @@ This property allows you to define a custom trigger instead of the default one p
 
 ### `willOpen` [#willopen]
 
-This event fires when the `DropdownMenu` component is opened.
+This event fires when the `DropdownMenu` component is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal.
 
 ```xmlui-pg copy {6} display name="Example: willOpen" height="240px"
 <App>
@@ -173,6 +173,7 @@ This event fires when the `DropdownMenu` component is opened.
 This method command closes the dropdown.
 
 **Signature**: `close(): void`
+
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
   <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
@@ -189,6 +190,7 @@ This method command closes the dropdown.
 This method command opens the dropdown.
 
 **Signature**: `open(): void`
+
 ```xmlui-pg copy {2} display name="Example: open" height="300px"
 <App>
   <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>

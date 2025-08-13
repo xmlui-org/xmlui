@@ -2,6 +2,28 @@
 
 These examples answer common questions of the form "How do I do SOMETHING with XMLUI?" The [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) provides two related tools. Agents can call `xmlui-list-howto` to list the entries here and `xmlui-search-howto` to search them.
 
+## Expose a method from a component
+```xmlui-pg
+---app display
+<App height="300px" >
+  <UsingInternalModal id="component"/>
+  <Button label="Open the internal dialog" onClick="component.openDialog()" />
+</App>
+---comp display
+<Component name="UsingInternalModal">
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+
+  <H1>Using an Internal Modal Dialog</H1>
+
+  <method name="openDialog">
+    console.log('internal method called')
+    dialog.open();
+  </method>
+</Component>
+```
+
 ## React to button click not keystrokes
 
 ```xmlui-pg noHeader
@@ -851,7 +873,9 @@ These examples answer common questions of the form "How do I do SOMETHING with X
 </Component>
 ```
 
-## Share Add and Edit ModalDialog
+## Use the same ModalDialog to add or edit
+
+See also the [refactoring](/refactoring) guide. Briefly: props flow down, events flow up.
 
 ```xmlui-pg noHeader height="400px"
 ---app
@@ -859,8 +883,7 @@ These examples answer common questions of the form "How do I do SOMETHING with X
   <Test />
 </App>
 ---comp display
-<Component name="Test">
-  <!-- Get the current list of products -->
+<Component name="Test" var.editingProductId="{null}" var.showAddModal="{false}">
   <DataSource id="products" url="/api/products" />
 
   <HStack alignItems="center">
@@ -869,38 +892,64 @@ These examples answer common questions of the form "How do I do SOMETHING with X
     <Button
       label="Add New Product"
       size="sm"
-      onClick="productModal.open('add')"
+      onClick="showAddModal = true"
     />
   </HStack>
 
-    <Table data="{products}">
-      <Column bindTo="name" />
-      <Column bindTo="price" width="120px"/>
-      <Column header="Actions" width="240px">
-        <HStack>
-          <Button label="Edit" icon="pencil" size="sm" variant="outlined"
-            onClick="productModal.open('edit', $item)"
-          />
-          <Button label="Delete" icon="trash" size="sm" variant="outlined"
-            themeColor="attention">
-            <event name="click">
-              <APICall
-                method="delete"
-                url="/api/products/{$item.id}"
-                confirmMessage="Are you sure you want to delete '{$item.name}'?" />
-            </event>
-          </Button>
-        </HStack>
-      </Column>
-    </Table>
+  <Table data="{products}">
+    <Column bindTo="name" />
+    <Column bindTo="price" width="120px"/>
+    <Column header="Actions" width="240px">
+      <HStack>
+        <Button label="Edit" icon="pencil" size="sm" variant="outlined"
+          onClick="editingProductId = $item.id"
+        />
+        <Button label="Delete" icon="trash" size="sm" variant="outlined"
+          themeColor="attention">
+          <event name="click">
+            <APICall
+              method="delete"
+              url="/api/products/{$item.id}"
+              confirmMessage="Are you sure you want to delete '{$item.name}'?" />
+          </event>
+        </Button>
+      </HStack>
+    </Column>
+  </Table>
 
-  <!-- Use this dialog to add or edit products -->
-  <ModalDialog id="productModal">
+  <ProductModal
+    when="{showAddModal}"
+    mode="add"
+    onClose="showAddModal = false"
+    onSaved="products.refetch()"
+  />
+
+  <ProductModal
+    when="{editingProductId}"
+    mode="edit"
+    productId="{editingProductId}"
+    onClose="editingProductId = null"
+    onSaved="products.refetch()"
+  />
+</Component>
+---comp display
+<Component name="ProductModal">
+  <DataSource
+    id="productDetails"
+    url="/api/products/{$props.productId}"
+    when="{$props.mode === 'edit' && $props.productId}"
+  />
+
+  <ModalDialog
+    title="{$props.mode === 'edit' ? 'Edit Product' : 'Add Product'}"
+    when="{$props.mode === 'add' || productDetails.loaded}"
+    onClose="emitEvent('close')"
+  >
     <Form
-      data="{$params[1]}"
-      submitUrl="/api/products/{$params[0] === 'edit' ? $params[1].id : ''}"
-      submitMethod="{$params[0] === 'edit' ? 'put' : 'post'}"
-      saveLabel="{$params[0] === 'edit' ? 'Update' : 'Add'} Product"
+      data="{$props.mode === 'edit' ? productDetails.value : {}}"
+      submitUrl="{$props.mode === 'edit' ? '/api/products/' + $props.productId : '/api/products'}"
+      submitMethod="{$props.mode === 'edit' ? 'put' : 'post'}"
+      onSuccess="emitEvent('saved')"
     >
       <FormItem bindTo="name" label="Product Name" required="true" />
       <FormItem bindTo="price" label="Price" type="number" required="true" />
@@ -919,6 +968,14 @@ These examples answer common questions of the form "How do I do SOMETHING with X
       "url": "/products",
       "method": "get",
       "handler": "$state.products"
+    },
+    "get-product": {
+      "url": "/products/:id",
+      "method": "get",
+      "pathParamTypes": {
+        "id": "integer"
+      },
+      "handler": "return $state.products.find(p => p.id === $pathParams.id)"
     },
     "insert-product": {
       "url": "/products",

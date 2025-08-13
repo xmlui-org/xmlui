@@ -249,6 +249,7 @@ This event is triggered when the TextBox has lost the focus.
 This method sets the focus on the `TextBox` component.
 
 **Signature**: `focus(): void`
+
 ```xmlui-pg copy {2-3} display name="Example: focus"
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
@@ -261,6 +262,7 @@ This method sets the focus on the `TextBox` component.
 This API sets the value of the `TextBox`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: string): void`
+
 - `value`: The new value to set. If the value is empty, it will clear the input.
 
 ```xmlui-pg copy {10} display name="Example: setValue"
@@ -285,6 +287,7 @@ This API sets the value of the `TextBox`. You can use it to programmatically cha
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 **Signature**: `get value(): string | undefined`
+
 In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
 
 ```xmlui-pg copy {2-3} display name="Example: value"

@@ -4,40 +4,40 @@ import produce from "immer";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import type { Tab } from "../abstractions";
 
-type TabItem = Tab & { id: string };
+type TabItem = Tab & { innerId: string };
 
 interface ITabContext{
-  register: (tabItem: {id: string, label: string}) => void;
-  unRegister: (id: string) => void;
+  register: (tabItem: TabItem) => void;
+  unRegister: (innerId: string) => void;
   activeTabId: string;
 }
 export const TabContext = createContext<ITabContext>({
   register: (tabItem) => {},
-  unRegister: (id: string) => {},
+  unRegister: (innerId: string) => {},
   activeTabId: "",
 });
 
 export function useTabContextValue() {
-  const [tabItems, setTabItems] = useState<Array<{id: string, label: string}>>(EMPTY_ARRAY);
+  const [tabItems, setTabItems] = useState<TabItem[]>(EMPTY_ARRAY);
   const [activeTabId, setActiveTabId] = useState<string>("");
   const tabContextValue = useMemo(() => {
     return {
-      register: (column: TabItem) => {
+      register: (tabItem: TabItem) => {
         setTabItems(
           produce((draft) => {
-            const existing = draft.findIndex((col) => col.id === column.id);
+            const existing = draft.findIndex((col) => col.innerId === tabItem.innerId);
             if (existing < 0) {
-              draft.push(column);
+              draft.push(tabItem);
             } else {
-              draft[existing] = column;
+              draft[existing] = tabItem;
             }
           }),
         );
       },
-      unRegister: (id: string) => {
+      unRegister: (innerId: string) => {
         setTabItems(
           produce((draft) => {
-            return draft.filter((col) => col.id !== id);
+            return draft.filter((col) => col.innerId !== innerId);
           }),
         );
       },

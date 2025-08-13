@@ -282,6 +282,7 @@ Focus the DatePicker component.
 This method sets the current value of the DatePicker.
 
 **Signature**: `set value(value: any): void`
+
 - `value`: The new value to set for the date picker.
 
 ```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"

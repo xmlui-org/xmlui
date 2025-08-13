@@ -22,13 +22,11 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
-  dValue,
 } from "../metadata-helpers";
-import { NumberBox } from "./NumberBoxNative";
+import { defaultProps, NumberBox } from "./NumberBoxNative";
 
 const COMP = "NumberBox";
 
@@ -62,7 +60,7 @@ export const NumberBoxMd = createMetadata({
     hasSpinBox: {
       description: `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.hasSpinBox,
     },
     spinnerUpIcon: d(
       `Allows setting an alternate icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
@@ -77,32 +75,34 @@ export const NumberBoxMd = createMetadata({
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
       valueType: "number",
-      defaultValue: 1,
+      defaultValue: defaultProps.step,
     },
     integersOnly: {
       description:
         `This boolean property signs whether the input field accepts integers only (\`true\`) ` +
         `or not (\`false\`).`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.integersOnly,
     },
     zeroOrPositive: {
       description:
         `This boolean property determines whether the input value can only be 0 or positive numbers ` +
         `(\`true\`) or also negative (\`false\`).`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.zeroOrPositive,
     },
-    minValue: d(
-      "The minimum value the input field allows. Can be a float or an integer if " +
+    minValue: {
+      description: "The minimum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no minimum value check is done.",
-    ),
-    maxValue: d(
-      "The maximum value the input field allows. Can be a float or an integer if " +
+      defaultValue: defaultProps.min,
+    },
+    maxValue: {
+      description: "The maximum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no maximum value check is done.",
-    ),
+      defaultValue: defaultProps.max,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),

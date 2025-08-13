@@ -1,4 +1,3 @@
-import { sign } from "crypto";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import { Bookmark, defaultProps } from "./BookmarkNative";
@@ -12,7 +11,7 @@ export const BookmarkMd = createMetadata({
     "component has an \`id\` that you can use in links to navigate (scroll to) the bookmark's location.",
   opaque: true,
   props: {
-    uid: {
+    id: {
       description:
         "The unique identifier of the bookmark. You can use this identifier in links " +
         "to navigate to this component's location. If this identifier is not set, you cannot " +

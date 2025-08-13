@@ -1,5 +1,63 @@
 # xmlui
 
+## 0.9.99
+
+### Patch Changes
+
+- e5a09fb: Added a separate Pagination component with events and API methods for custom pagination.
+- 36360f6: improve: add tickFormatterY to LineChart, create e2e tests
+
+## 0.9.98
+
+### Patch Changes
+
+- ff781f3: new internal react component for integrating into existing react applications (StandaloneComponent)
+- 377f0f2: Fix image animation issue in Carousel
+- ce0ff76: Added hover & active styles for Slider on thumb. FileInput opens file browser on label focus.
+- 208768a: Fixed input adornments not changing color on setting their respective theme variable. Spinbox buttons in NumberBox now have role=spinbutton.
+
+## 0.9.97
+
+### Patch Changes
+
+- f7e8019: Implement simple IFrame APIs
+
+## 0.9.96
+
+### Patch Changes
+
+- 3196156: Add IFrame component (first prototype)
+- cfee78a: NumberBox tweaks: fixed missing padding theme var, fixed incorrect label association.
+- f51002a: fix: Tabs - descendant button warning
+- 3fa52d9: fix: Table sortBy now works as expected
+
+## 0.9.95
+
+### Patch Changes
+
+- af6a7a0: fix: Tabs - fixed the inconsistency in the headerTemplate.
+- 69a2a8f: Fix the useEventHaddler hook
+- 29c68fe: fix: H1 ... H6 now ignores the level property
+
+## 0.9.94
+
+### Patch Changes
+
+- 1d9365c: feat: Tabs component - use headerTemplate instead of labelTemplate/tabTemplate
+
+## 0.9.93
+
+### Patch Changes
+
+- af17117: feat:add labelTemplate prop to TabItem component
+- 44da3d9: The transformation of Checkbox and Switch values (to Booleans) are now documented and tested
+- b7a6b9a: Fix formatHumanElapsedTime unit tests, make the local-independent
+- bc95844: improve: Select and AutoComplete components
+- 52d94a2: Fix the ComponentWrapper childrenAsTemplate issue
+- 6629ce5: New end-to-end tests reviewed
+- 0254471: Fixed the initialValue issue with TextArea
+- 3318cfb: feat: provide context in browser error reports
+
 ## 0.9.92
 
 ### Patch Changes

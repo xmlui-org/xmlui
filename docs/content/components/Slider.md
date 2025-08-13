@@ -125,6 +125,7 @@ This method sets the focus on the slider component.
 This API sets the value of the `Slider`. You can use it to programmatically change the value.
 
 **Signature**: `setValue(value: number | [number, number] | undefined): void`
+
 - `value`: The new value to set. Can be a single value or an array of values for range sliders.
 
 ### `value` [#value]
@@ -145,6 +146,10 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
@@ -196,7 +201,8 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-warning | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-warning--focus | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-warning--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | $boxShadow-md | $boxShadow-md |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | $boxShadow-md | $boxShadow-md |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | $boxShadow-xl | $boxShadow-xl |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | $boxShadow-lg | $boxShadow-lg |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |

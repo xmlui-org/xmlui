@@ -227,6 +227,7 @@ This event is triggered when the FileInput has lost the focus.
 This API command focuses the input field of the component.
 
 **Signature**: `focus(): void`
+
 ```xmlui-pg copy /fileInputComponent.focus()/ display name="Example: focus"
 <App>
   <HStack>
@@ -241,6 +242,7 @@ This API command focuses the input field of the component.
 This API command triggers the file browsing dialog to open.
 
 **Signature**: `open(): void`
+
 ```xmlui-pg copy /fileInputComponent.open()/ display name="Example: open"
 <App>
   <HStack>
@@ -255,6 +257,7 @@ This API command triggers the file browsing dialog to open.
 This method sets the current value of the component.
 
 **Signature**: `setValue(files: File[]): void`
+
 - `files`: An array of File objects to set as the current value of the component.
 
 (**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
@@ -264,6 +267,7 @@ This method sets the current value of the component.
 This property holds the current value of the component, which is an array of files.
 
 **Signature**: `get value(): File[]`
+
 In the example below, select a file using the file browser of the `FileInput` component
 and note how the `Text` component displays the selected file's name:
 
@@ -283,3 +287,17 @@ However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
 See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).
+
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-FileInput--focus | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-FileInput--focus | *none* | *none* |
+| [outlineColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-FileInput--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
