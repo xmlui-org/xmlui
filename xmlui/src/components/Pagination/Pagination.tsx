@@ -96,6 +96,9 @@ export const paginationComponentRenderer = createComponentRenderer(
       defaultProps.maxVisiblePages,
     );
     if (!PageNumberValues.includes(maxVisiblePages as any)) {
+      console.warn(
+        `Invalid maxVisiblePages value provided To Pagination: ${maxVisiblePages}. Falling back to default.`,
+      );
       maxVisiblePages = defaultProps.maxVisiblePages;
     }
 
