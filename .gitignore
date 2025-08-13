@@ -11,5 +11,6 @@ coverage
 .next
 tests
 xmlui-optimized-output
+xmlui-temp-build
 
 docs/scripts/component-metadata.json
