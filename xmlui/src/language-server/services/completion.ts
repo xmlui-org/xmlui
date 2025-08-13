@@ -14,11 +14,9 @@ import {
 import {
   addOnPrefix,
   type AttributeKind,
-  type ComponentMetadataCollection,
   type MetadataProvider,
   type TaggedAttribute,
 } from "./common/metadata-utils";
-import { d } from "../../testing/infrastructure/dist/internal/chunks/index._m-k4_XL";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
