@@ -6,8 +6,9 @@
     "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
     "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
-    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip",
-    "build-optimized": "npx xmlui-optimizer",
+    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
+    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && npm run gen:download-latest-xmlui-release",
+    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npx xmlui-optimizer",
     "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
   },
   "dependencies": {
