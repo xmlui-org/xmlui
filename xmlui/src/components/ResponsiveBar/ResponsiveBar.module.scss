@@ -8,7 +8,6 @@ $themeVars: ();
 }
 
 // Define theme variables
-$gap-ResponsiveBar: createThemeVar("gap-ResponsiveBar");
 $backgroundColor-ResponsiveBar: createThemeVar("backgroundColor-ResponsiveBar");
 $padding-ResponsiveBar: createThemeVar("padding-ResponsiveBar");
 $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
@@ -17,20 +16,26 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
 .responsiveBar {
   display: flex;
   flex-direction: row;
+  flex-shrink: 1;
+  flex-grow: 0;
   align-items: center;
-  gap: $gap-ResponsiveBar;
   background-color: $backgroundColor-ResponsiveBar;
   padding: $padding-ResponsiveBar;
   margin: $margin-ResponsiveBar;
   width: 100%;
   overflow: visible; // Allow dropdown to be visible
   
+  .measurementPhase {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
   .visibleItems {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: inherit;
-    flex-shrink: 1;
+    flex-shrink: 0;
     min-width: 0;
     overflow: hidden; // Hide overflow of items, but not the dropdown
   }
@@ -43,7 +48,8 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: inherit;
+    flex-shrink: 0;
+    min-width: 0;
     pointer-events: none;
     opacity: 0;
     z-index: -1;

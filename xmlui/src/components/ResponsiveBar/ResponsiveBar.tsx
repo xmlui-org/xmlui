@@ -23,6 +23,13 @@ export const ResponsiveBarMd = createMetadata({
       valueType: "string",
       defaultValue: defaultResponsiveBarProps.overflowIcon,
     },
+    gap: {
+      description: 
+        "Gap between child elements in pixels. Controls the spacing between items " +
+        "in the responsive bar layout.",
+      valueType: "number",
+      defaultValue: defaultResponsiveBarProps.gap,
+    },
   },
   events: {
     click: dClick(COMP),
@@ -32,7 +39,6 @@ export const ResponsiveBarMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`gap-${COMP}`]: "$gap-normal",
     [`backgroundColor-${COMP}`]: "transparent",
     [`padding-${COMP}`]: "0",
     [`margin-${COMP}`]: "0",
@@ -46,6 +52,7 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
     return (
       <ResponsiveBar
         overflowIcon={extractValue(node.props?.overflowIcon)}
+        gap={extractValue(node.props?.gap)}
         onClick={lookupEventHandler("click")}
         style={layoutCss}
       >
