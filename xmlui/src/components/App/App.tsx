@@ -11,11 +11,12 @@ import { App, defaultProps } from "./AppNative";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import { IndexerContext } from "./IndexerContext";
 import { createPortal } from "react-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import { extractPaddings } from "../../components-core/utils/css-utils";
 
 // --- Define a structure to represent navigation hierarchy
 interface NavHierarchyNode {
@@ -94,10 +95,10 @@ export const AppMd = createMetadata({
   },
   events: {
     ready: {
-      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`,
     },
     messageReceived: {
-      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`
+      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
     },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
@@ -131,6 +132,7 @@ export const AppMd = createMetadata({
     },
   },
 });
+
 
 function AppNode({ node, extractValue, renderChild, className, lookupEventHandler }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
@@ -380,13 +382,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
   const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
 
-  const paddingHorizontal = extractValue.asSize(node.props.paddingHorizontal);
-  const paddingVertical = extractValue.asSize(node.props.paddingVertical);
-  const paddingLeft = extractValue.asSize(node.props.paddingLeft);
-  const paddingRight = extractValue.asSize(node.props.paddingRight);
-  const paddingTop = extractValue.asSize(node.props.paddingTop);
-  const paddingBottom = extractValue.asSize(node.props.paddingBottom);
-  const padding = extractValue.asSize(node.props.padding);
+  const paddings = extractPaddings(extractValue, node.props);
 
   return (
     <App
@@ -397,10 +393,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
-      paddingLeft={paddingLeft || paddingHorizontal || padding}
-      paddingRight={paddingRight || paddingHorizontal || padding}
-      paddingTop={paddingTop || paddingVertical || padding}
-      paddingBottom={paddingBottom || paddingVertical || padding}
+      {...paddings}
     >
       {renderedContent}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />

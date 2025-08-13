@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
-.wrapper{
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+@layer components {
+  .wrapper{
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
 }

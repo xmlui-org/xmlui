@@ -2,6 +2,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
+import { extractPaddings } from "../../components-core/utils/css-utils";
 
 const PAGE = "Page";
 
@@ -28,7 +29,8 @@ export const PageMd = createMetadata({
 export const pageRenderer = createComponentRenderer(
   PAGE,
   PageMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
+    const paddings = extractPaddings(extractValue, node.props);
     return (
       <TableOfContentsProvider>
         <RouteWrapper
@@ -36,7 +38,8 @@ export const pageRenderer = createComponentRenderer(
           uid={node.uid}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
-          style={layoutCss}
+          className={className}
+          {...paddings}
         />
       </TableOfContentsProvider>
     );

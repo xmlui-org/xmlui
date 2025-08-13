@@ -21,6 +21,11 @@ type RouteWrapperProps = {
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
   style?: CSSProperties;
+  className?: string;
+  paddingLeft?: string;
+  paddingRight?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
   uid?: string;
 };
 
@@ -29,6 +34,11 @@ export function RouteWrapper({
   renderChild,
   layoutContext,
   style,
+  className,
+  paddingLeft,
+  paddingRight,
+  paddingTop,
+  paddingBottom,
   uid,
 }: RouteWrapperProps) {
   const params = useParams();
@@ -54,20 +64,26 @@ export function RouteWrapper({
   }, [childRoute, uid]);
 
   const wrapperStyle = useMemo(() => {
-    const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest } = style;
+    const styleWithoutPaddings = { ...style };
+    // Remove padding properties from the style object
+    delete styleWithoutPaddings.padding;
+    delete styleWithoutPaddings.paddingLeft;
+    delete styleWithoutPaddings.paddingRight;
+    delete styleWithoutPaddings.paddingTop;
+    delete styleWithoutPaddings.paddingBottom;
     return {
-      ...rest,
-      "--page-padding-left-override": padding || paddingLeft,
-      "--page-padding-right-override": padding || paddingRight,
-      "--page-padding-top-override": padding || paddingTop,
-      "--page-padding-bottom-override": padding || paddingBottom,
+      ...styleWithoutPaddings,
+      "--page-padding-left-override": paddingLeft,
+      "--page-padding-right-override": paddingRight,
+      "--page-padding-top-override": paddingTop,
+      "--page-padding-bottom-override": paddingBottom,
     };
-  }, [style]);
+  }, [paddingBottom, paddingLeft, paddingRight, paddingTop, style]);
 
   return (
     <div
       key={JSON.stringify(params)}
-      className={classnames(styles.wrapper, "xmlui-page-root")}
+      className={classnames(className, styles.wrapper, "xmlui-page-root")}
       style={wrapperStyle}
     >
       {renderChild(wrappedWithContainer, layoutContext)}
