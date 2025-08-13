@@ -2089,7 +2089,6 @@ export default {
       "defaultTone": {
         "description": "This property sets the app's default tone (\"light\" or \"dark\").",
         "valueType": "string",
-        "defaultValue": "light",
         "availableValues": [
           "light",
           "dark"
@@ -2097,13 +2096,15 @@ export default {
       },
       "defaultTheme": {
         "description": "This property sets the app's default theme.",
-        "valueType": "string",
-        "defaultValue": "xmlui"
+        "valueType": "string"
       }
     },
     "events": {
       "ready": {
         "description": "This event fires when the `App` component finishes rendering on the page."
+      },
+      "messageReceived": {
+        "description": "This event fires when the `App` component receives a message from another window or iframe via the window.postMessage API."
       }
     },
     "themeVars": {
@@ -2557,19 +2558,19 @@ export default {
         "availableValues": [
           {
             "value": "xs",
-            "description": "Extra small button"
+            "description": "Extra small"
           },
           {
             "value": "sm",
-            "description": "Small button"
+            "description": "Small"
           },
           {
             "value": "md",
-            "description": "Medium button"
+            "description": "Medium"
           },
           {
             "value": "lg",
-            "description": "Large button"
+            "description": "Large"
           }
         ],
         "valueType": "string",
@@ -2646,16 +2647,21 @@ export default {
       },
       "backgroundColor": {
         "description": "The background color of the backdrop.",
-        "valueType": "string",
-        "defaultValue": "black"
+        "valueType": "string"
       },
       "opacity": {
         "description": "The opacity of the backdrop.",
-        "valueType": "string",
-        "defaultValue": "0.1"
+        "valueType": "string"
       }
     },
-    "themeVars": []
+    "themeVars": {
+      "backgroundColor-Backdrop": "var(--xmlui-backgroundColor-Backdrop)",
+      "opacity-Backdrop": "var(--xmlui-opacity-Backdrop)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-Backdrop": "black",
+      "opacity-Backdrop": "0.1"
+    }
   },
   "Badge": {
     "status": "stable",
@@ -2848,7 +2854,7 @@ export default {
     "description": "As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location.",
     "opaque": true,
     "props": {
-      "uid": {
+      "id": {
         "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.",
         "valueType": "string"
       },
@@ -2935,19 +2941,19 @@ export default {
         "availableValues": [
           {
             "value": "xs",
-            "description": "Extra small button"
+            "description": "Extra small"
           },
           {
             "value": "sm",
-            "description": "Small button"
+            "description": "Small"
           },
           {
             "value": "md",
-            "description": "Medium button"
+            "description": "Medium"
           },
           {
             "value": "lg",
-            "description": "Large button"
+            "description": "Large"
           }
         ],
         "defaultValue": "sm"
@@ -4567,7 +4573,7 @@ export default {
     },
     "events": {
       "willOpen": {
-        "description": "This event fires when the `DropdownMenu` component is opened."
+        "description": "This event fires when the `DropdownMenu` component is about to be opened. You can prevent opening the menu by returning `false` from the event handler. Otherwise, the menu will open at the end of the event handler like normal."
       }
     },
     "apis": {
@@ -5039,19 +5045,19 @@ export default {
         "availableValues": [
           {
             "value": "xs",
-            "description": "Extra small button"
+            "description": "Extra small"
           },
           {
             "value": "sm",
-            "description": "Small button"
+            "description": "Small"
           },
           {
             "value": "md",
-            "description": "Medium button"
+            "description": "Medium"
           },
           {
             "value": "lg",
-            "description": "Large button"
+            "description": "Large"
           }
         ]
       },
@@ -5098,7 +5104,17 @@ export default {
         "signature": "open(): void"
       }
     },
-    "themeVars": []
+    "themeVars": {
+      "Input:borderRadius-FileInput--focus": "var(--xmlui-borderRadius-FileInput--focus)",
+      "Input:borderColor-FileInput--focus": "var(--xmlui-borderColor-FileInput--focus)",
+      "Input:backgroundColor-FileInput--focus": "var(--xmlui-backgroundColor-FileInput--focus)",
+      "Input:boxShadow-FileInput--focus": "var(--xmlui-boxShadow-FileInput--focus)",
+      "Input:textColor-FileInput--focus": "var(--xmlui-textColor-FileInput--focus)",
+      "Input:outlineWidth-FileInput--focus": "var(--xmlui-outlineWidth-FileInput--focus)",
+      "Input:outlineColor-FileInput--focus": "var(--xmlui-outlineColor-FileInput--focus)",
+      "Input:outlineStyle-FileInput--focus": "var(--xmlui-outlineStyle-FileInput--focus)",
+      "Input:outlineOffset-FileInput--focus": "var(--xmlui-outlineOffset-FileInput--focus)"
+    }
   },
   "FileUploadDropZone": {
     "status": "stable",
@@ -9226,6 +9242,130 @@ export default {
       "size-Icon": "1.25em"
     }
   },
+  "IFrame": {
+    "status": "stable",
+    "description": "`IFrame` embeds external content from another HTML document into the current page. It provides security controls through sandbox and allow attributes, and supports features like fullscreen display and referrer policy configuration.",
+    "props": {
+      "src": {
+        "description": "Specifies the URL of the document to embed in the iframe. Either `src` or `srcdoc` should be specified, but not both."
+      },
+      "srcdoc": {
+        "description": "Specifies the HTML content to display in the iframe. Either `src` or `srcdoc` should be specified, but not both."
+      },
+      "allow": {
+        "description": "Specifies the permissions policy for the iframe. Controls which features (like camera, microphone, geolocation) the embedded content can use."
+      },
+      "name": {
+        "description": "Specifies a name for the iframe, which can be used as a target for links and forms."
+      },
+      "referrerPolicy": {
+        "description": "Controls how much referrer information is sent when fetching the iframe content.",
+        "type": "string",
+        "availableValues": [
+          {
+            "value": "no-referrer",
+            "description": "Never send referrer information"
+          },
+          {
+            "value": "no-referrer-when-downgrade",
+            "description": "Send referrer only for same-security destinations"
+          },
+          {
+            "value": "origin",
+            "description": "Send only the origin as referrer"
+          },
+          {
+            "value": "origin-when-cross-origin",
+            "description": "Send full URL for same-origin, origin only for cross-origin"
+          },
+          {
+            "value": "same-origin",
+            "description": "Send referrer only for same-origin requests"
+          },
+          {
+            "value": "strict-origin",
+            "description": "Send origin only for same-security destinations"
+          },
+          {
+            "value": "strict-origin-when-cross-origin",
+            "description": "Full URL for same-origin, origin for cross-origin same-security"
+          },
+          {
+            "value": "unsafe-url",
+            "description": "Always send full URL as referrer"
+          }
+        ]
+      },
+      "sandbox": {
+        "description": "Applies extra restrictions to the content in the iframe. Value is a space-separated list of sandbox flags (e.g., 'allow-scripts allow-same-origin')."
+      }
+    },
+    "events": {
+      "load": {
+        "description": "This event is triggered when the IFrame content has finished loading."
+      }
+    },
+    "apis": {
+      "postMessage": {
+        "description": "This method sends a message to the content window of the iframe.",
+        "signature": "postMessage(message: any, targetOrigin?: string): void",
+        "parameters": {
+          "message": "The message to send to the iframe's content window.",
+          "targetOrigin": "The origin to which the message should be sent. Defaults to '*'."
+        }
+      },
+      "getContentWindow": {
+        "description": "This method returns the content window of the iframe element.",
+        "signature": "getContentWindow(): Window | null"
+      },
+      "getContentDocument": {
+        "description": "This method returns the content document of the iframe element.",
+        "signature": "getContentDocument(): Document | null"
+      }
+    },
+    "themeVars": {
+      "border-IFrame": "var(--xmlui-border-IFrame)",
+      "borderHorizontal-IFrame": "var(--xmlui-borderHorizontal-IFrame, var(--xmlui-border-IFrame))",
+      "borderVertical-IFrame": "var(--xmlui-borderVertical-IFrame, var(--xmlui-border-IFrame))",
+      "borderLeft-IFrame": "var(--xmlui-borderLeft-IFrame, var(--xmlui-borderHorizontal-IFrame, var(--xmlui-border-IFrame)))",
+      "borderRight-IFrame": "var(--xmlui-borderRight-IFrame, var(--xmlui-borderHorizontal-IFrame, var(--xmlui-border-IFrame)))",
+      "borderTop-IFrame": "var(--xmlui-borderTop-IFrame, var(--xmlui-borderVertical-IFrame, var(--xmlui-border-IFrame)))",
+      "borderBottom-IFrame": "var(--xmlui-borderBottom-IFrame, var(--xmlui-borderVertical-IFrame, var(--xmlui-border-IFrame)))",
+      "borderWidth-IFrame": "var(--xmlui-borderWidth-IFrame)",
+      "borderHorizontalWidth-IFrame": "var(--xmlui-borderHorizontalWidth-IFrame, var(--xmlui-borderWidth-IFrame))",
+      "borderLeftWidth-IFrame": "var(--xmlui-borderLeftWidth-IFrame, var(--xmlui-borderHorizontalWidth-IFrame, var(--xmlui-borderWidth-IFrame)))",
+      "borderRightWidth-IFrame": "var(--xmlui-borderRightWidth-IFrame, var(--xmlui-borderHorizontalWidth-IFrame, var(--xmlui-borderWidth-IFrame)))",
+      "borderVerticalWidth-IFrame": "var(--xmlui-borderVerticalWidth-IFrame, var(--xmlui-borderWidth-IFrame))",
+      "borderTopWidth-IFrame": "var(--xmlui-borderTopWidth-IFrame, var(--xmlui-borderVerticalWidth-IFrame, var(--xmlui-borderWidth-IFrame)))",
+      "borderBottomWidth-IFrame": "var(--xmlui-borderBottomWidth-IFrame, var(--xmlui-borderVerticalWidth-IFrame, var(--xmlui-borderWidth-IFrame)))",
+      "borderStyle-IFrame": "var(--xmlui-borderStyle-IFrame)",
+      "borderHorizontalStyle-IFrame": "var(--xmlui-borderHorizontalStyle-IFrame, var(--xmlui-borderStyle-IFrame))",
+      "borderLeftStyle-IFrame": "var(--xmlui-borderLeftStyle-IFrame, var(--xmlui-borderHorizontalStyle-IFrame, var(--xmlui-borderStyle-IFrame)))",
+      "borderRightStyle-IFrame": "var(--xmlui-borderRightStyle-IFrame, var(--xmlui-borderHorizontalStyle-IFrame, var(--xmlui-borderStyle-IFrame)))",
+      "borderVerticalStyle-IFrame": "var(--xmlui-borderVerticalStyle-IFrame, var(--xmlui-borderStyle-IFrame))",
+      "borderTopStyle-IFrame": "var(--xmlui-borderTopStyle-IFrame, var(--xmlui-borderVerticalStyle-IFrame, var(--xmlui-borderStyle-IFrame)))",
+      "borderBottomStyle-IFrame": "var(--xmlui-borderBottomStyle-IFrame, var(--xmlui-borderVerticalStyle-IFrame, var(--xmlui-borderStyle-IFrame)))",
+      "borderColor-IFrame": "var(--xmlui-borderColor-IFrame)",
+      "borderHorizontalColor-IFrame": "var(--xmlui-borderHorizontalColor-IFrame, var(--xmlui-borderColor-IFrame))",
+      "borderLeftColor-IFrame": "var(--xmlui-borderLeftColor-IFrame, var(--xmlui-borderHorizontalColor-IFrame, var(--xmlui-borderColor-IFrame)))",
+      "borderRightColor-IFrame": "var(--xmlui-borderRightColor-IFrame, var(--xmlui-borderHorizontalColor-IFrame, var(--xmlui-borderColor-IFrame)))",
+      "borderVerticalColor-IFrame": "var(--xmlui-borderVerticalColor-IFrame, var(--xmlui-borderColor-IFrame))",
+      "borderTopColor-IFrame": "var(--xmlui-borderTopColor-IFrame, var(--xmlui-borderVerticalColor-IFrame, var(--xmlui-borderColor-IFrame)))",
+      "borderBottomColor-IFrame": "var(--xmlui-borderBottomColor-IFrame, var(--xmlui-borderVerticalColor-IFrame, var(--xmlui-borderColor-IFrame)))",
+      "borderStartStartRadius-IFrame": "var(--xmlui-borderStartStartRadius-IFrame, var(--xmlui-borderRadius-IFrame))",
+      "borderStartEndRadius-IFrame": "var(--xmlui-borderStartEndRadius-IFrame, var(--xmlui-borderRadius-IFrame))",
+      "borderEndStartRadius-IFrame": "var(--xmlui-borderEndStartRadius-IFrame, var(--xmlui-borderRadius-IFrame))",
+      "borderEndEndRadius-IFrame": "var(--xmlui-borderEndEndRadius-IFrame, var(--xmlui-borderRadius-IFrame))",
+      "width-IFrame": "var(--xmlui-width-IFrame)",
+      "height-IFrame": "var(--xmlui-height-IFrame)"
+    },
+    "defaultThemeVars": {
+      "width-IFrame": "100%",
+      "height-IFrame": "300px",
+      "borderRadius-IFrame": "$borderRadius",
+      "border-IFrame": "1px solid $borderColor"
+    }
+  },
   "Image": {
     "status": "stable",
     "description": "`Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions.",
@@ -9264,7 +9404,10 @@ export default {
         "description": "This event is triggered when the Image is clicked."
       }
     },
-    "themeVars": []
+    "themeVars": {
+      "borderRadius-Image": "var(--xmlui-borderRadius-Image)",
+      "borderColor-Image": "var(--xmlui-borderColor-Image)"
+    }
   },
   "Items": {
     "status": "stable",
@@ -10462,10 +10605,12 @@ export default {
         "defaultValue": false
       },
       "minValue": {
-        "description": "The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done."
+        "description": "The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.",
+        "defaultValue": -999999999999999
       },
       "maxValue": {
-        "description": "The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done."
+        "description": "The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.",
+        "defaultValue": 999999999999999
       }
     },
     "events": {
@@ -10500,6 +10645,7 @@ export default {
       "Input:borderWidth-NumberBox-default": "var(--xmlui-borderWidth-NumberBox-default)",
       "Input:borderStyle-NumberBox-default": "var(--xmlui-borderStyle-NumberBox-default)",
       "Input:fontSize-NumberBox-default": "var(--xmlui-fontSize-NumberBox-default)",
+      "Input:padding-NumberBox-default": "var(--xmlui-padding-NumberBox-default)",
       "Input:backgroundColor-NumberBox-default": "var(--xmlui-backgroundColor-NumberBox-default)",
       "Input:boxShadow-NumberBox-default": "var(--xmlui-boxShadow-NumberBox-default)",
       "Input:textColor-NumberBox-default": "var(--xmlui-textColor-NumberBox-default)",
@@ -10523,6 +10669,7 @@ export default {
       "Input:borderWidth-NumberBox-error": "var(--xmlui-borderWidth-NumberBox-error)",
       "Input:borderStyle-NumberBox-error": "var(--xmlui-borderStyle-NumberBox-error)",
       "Input:fontSize-NumberBox-error": "var(--xmlui-fontSize-NumberBox-error)",
+      "Input:padding-NumberBox-error": "var(--xmlui-padding-NumberBox-error)",
       "Input:backgroundColor-NumberBox-error": "var(--xmlui-backgroundColor-NumberBox-error)",
       "Input:boxShadow-NumberBox-error": "var(--xmlui-boxShadow-NumberBox-error)",
       "Input:textColor-NumberBox-error": "var(--xmlui-textColor-NumberBox-error)",
@@ -10546,6 +10693,7 @@ export default {
       "Input:borderWidth-NumberBox-warning": "var(--xmlui-borderWidth-NumberBox-warning)",
       "Input:borderStyle-NumberBox-warning": "var(--xmlui-borderStyle-NumberBox-warning)",
       "Input:fontSize-NumberBox-warning": "var(--xmlui-fontSize-NumberBox-warning)",
+      "Input:padding-NumberBox-warning": "var(--xmlui-padding-NumberBox-warning)",
       "Input:backgroundColor-NumberBox-warning": "var(--xmlui-backgroundColor-NumberBox-warning)",
       "Input:boxShadow-NumberBox-warning": "var(--xmlui-boxShadow-NumberBox-warning)",
       "Input:textColor-NumberBox-warning": "var(--xmlui-textColor-NumberBox-warning)",
@@ -10569,6 +10717,7 @@ export default {
       "Input:borderWidth-NumberBox-success": "var(--xmlui-borderWidth-NumberBox-success)",
       "Input:borderStyle-NumberBox-success": "var(--xmlui-borderStyle-NumberBox-success)",
       "Input:fontSize-NumberBox-success": "var(--xmlui-fontSize-NumberBox-success)",
+      "Input:padding-NumberBox-success": "var(--xmlui-padding-NumberBox-success)",
       "Input:backgroundColor-NumberBox-success": "var(--xmlui-backgroundColor-NumberBox-success)",
       "Input:boxShadow-NumberBox-success": "var(--xmlui-boxShadow-NumberBox-success)",
       "Input:textColor-NumberBox-success": "var(--xmlui-textColor-NumberBox-success)",
@@ -10606,12 +10755,8 @@ export default {
         "description": "This boolean property indicates whether the option is enabled or disabled.",
         "valueType": "boolean",
         "defaultValue": true
-      },
-      "optionTemplate": {
-        "description": "This property is used to define a custom option template"
       }
-    },
-    "childrenAsTemplate": "optionTemplate"
+    }
   },
   "PageMetaTitle": {
     "status": "stable",
@@ -10915,6 +11060,10 @@ export default {
     "status": "stable",
     "description": "`Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally.",
     "props": {
+      "replace": {
+        "description": "This boolean property indicates whether the redirect should replace the current history entry or create a new one.",
+        "defaultValue": false
+      },
       "to": {
         "description": "This property defines the URL to which this component is about to redirect requests.",
         "defaultValue": ""
@@ -11410,7 +11559,11 @@ export default {
       "Input:borderStyle-thumb-Slider": "var(--xmlui-borderStyle-thumb-Slider)",
       "Input:borderColor-thumb-Slider": "var(--xmlui-borderColor-thumb-Slider)",
       "Input:backgroundColor-thumb-Slider": "var(--xmlui-backgroundColor-thumb-Slider)",
-      "Input:boxShadow-thumb-Slider": "var(--xmlui-boxShadow-thumb-Slider)"
+      "Input:boxShadow-thumb-Slider": "var(--xmlui-boxShadow-thumb-Slider)",
+      "Input:backgroundColor-thumb-Slider--hover": "var(--xmlui-backgroundColor-thumb-Slider--hover)",
+      "Input:boxShadow-thumb-Slider--hover": "var(--xmlui-boxShadow-thumb-Slider--hover)",
+      "Input:backgroundColor-thumb-Slider--active": "var(--xmlui-backgroundColor-thumb-Slider--active)",
+      "Input:boxShadow-thumb-Slider--active": "var(--xmlui-boxShadow-thumb-Slider--active)"
     },
     "defaultThemeVars": {
       "backgroundColor-track-Slider": "$color-surface-200",
@@ -11419,9 +11572,10 @@ export default {
       "borderStyle-thumb-Slider": "solid",
       "borderColor-thumb-Slider": "$color-surface-50",
       "backgroundColor-thumb-Slider": "$color-primary",
-      "boxShadow-thumb-Slider": "$boxShadow-md",
-      "boxShadow-thumb-Slider--hover": "$boxShadow-lg",
-      "boxShadow-thumb-Slider--focus": "$boxShadow-xl",
+      "backgroundColor-thumb-Slider--hover": "$color-primary",
+      "boxShadow-thumb-Slider--hover": "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
+      "backgroundColor-thumb-Slider--active": "$color-primary-400",
+      "boxShadow-thumb-Slider--active": "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
       "borderRadius-Slider-default": "$borderRadius",
       "borderColor-Slider-default": "transparent",
       "borderWidth-Slider-default": "0",
@@ -11440,6 +11594,17 @@ export default {
         "borderColor-thumb-Slider": "$color-surface-950"
       }
     }
+  },
+  "Slot": {
+    "status": "experimental",
+    "description": "Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered.",
+    "props": {
+      "name": {
+        "description": "This optional property defines the name of the slot."
+      }
+    },
+    "allowArbitraryProps": true,
+    "opaque": true
   },
   "SpaceFiller": {
     "status": "stable",
@@ -12055,10 +12220,6 @@ export default {
     "status": "stable",
     "description": "`Switch` enables users to toggle between two states: on and off.",
     "props": {
-      "indeterminate": {
-        "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
-        "defaultValue": false
-      },
       "label": {
         "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
@@ -12901,6 +13062,15 @@ export default {
       "label": {
         "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
+      },
+      "headerTemplate": {
+        "description": "This property allows the customization of the TabItem header.",
+        "valueType": "ComponentDef"
+      }
+    },
+    "contextVars": {
+      "$header": {
+        "description": "This context value represents the header context with props: id (optional), index, label, isActive."
       }
     }
   },
@@ -12920,16 +13090,27 @@ export default {
         "defaultValue": "horizontal",
         "valueType": "string"
       },
-      "tabTemplate": {
+      "headerTemplate": {
         "description": "This property declares the template for the clickable tab area.",
-        "valueType": "ComponentDef",
-        "isInternal": true
+        "valueType": "ComponentDef"
       }
     },
     "apis": {
       "next": {
         "description": "This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.",
         "signature": "next(): void"
+      },
+      "prev": {
+        "description": "This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.",
+        "signature": "prev(): void"
+      },
+      "setActiveTabIndex": {
+        "description": "This method sets the active tab by index (0-based).",
+        "signature": "setActiveTabIndex(index: number): void"
+      },
+      "setActiveTabById": {
+        "description": "This method sets the active tab by its ID.",
+        "signature": "setActiveTabById(id: string): void"
       }
     },
     "themeVars": {
@@ -14345,6 +14526,7 @@ export default {
   "LineChart": {
     "status": "experimental",
     "description": "`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.",
+    "docFolder": "Charts/LineChart",
     "props": {
       "data": {
         "description": "The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point."
@@ -14362,13 +14544,31 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "hideY": {
+        "description": "Determines whether the Y-axis should be hidden. If set to (`true`), the axis will not be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideTickX": {
+        "description": "Determines whether the X-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideTickY": {
+        "description": "Determines whether the Y-axis ticks should be hidden. If set to (`true`), the ticks will not be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "hideTooltip": {
         "description": "Determines whether the tooltip should be hidden.If set to (`true`), no tooltip will be shown when hovering over data points.",
         "valueType": "boolean",
         "defaultValue": false
       },
-      "tickFormatter": {
-        "description": "A function that formats the axis tick labels. It receives a tick value and returns a formatted string."
+      "tickFormatterX": {
+        "description": "A function that formats the X-axis tick labels. It receives a tick value and returns a formatted string."
+      },
+      "tickFormatterY": {
+        "description": "A function that formats the Y-axis tick labels. It receives a tick value and returns a formatted string."
       },
       "showLegend": {
         "description": "Determines whether the legend should be displayed.",
