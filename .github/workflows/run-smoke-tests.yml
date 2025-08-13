@@ -18,7 +18,7 @@ jobs:
         !contains(github.event.head_commit.message, 'chore: version packages for stable release')
       )
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-arm64-8
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
     steps:
