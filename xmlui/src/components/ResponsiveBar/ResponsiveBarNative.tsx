@@ -51,6 +51,8 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
     const isCalculatingRef = useRef(false);
     const lastContainerWidth = useRef(0);
     const lastChildrenCount = useRef(0);
+    const lastChildrenRef = useRef<ReactNode>(null);
+    const layoutCompletedRef = useRef(false);
     
     // Two-phase rendering state
     const [isInMeasurementPhase, setIsInMeasurementPhase] = useState(true);
@@ -62,7 +64,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
       overflowItems: [],
     });
 
-    // Convert children to array for processing
+    // Convert children to array for processing - use stable reference
     const childrenArray = React.useMemo(() => {
       const result = React.Children.toArray(children).filter(
         (child): child is ReactElement => React.isValidElement(child)
@@ -71,6 +73,9 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
       return result;
     }, [children]);
 
+    // Stable children count to prevent unnecessary re-measurements
+    const childrenCount = childrenArray.length;
+
     // Measurement phase - measure all items in the same container
       const measureItems = () => {
       if (!containerRef.current) return;
@@ -78,16 +83,21 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
       console.log('📏 measureItems - Starting measurement phase');
       const items: HTMLElement[] = [];
       
-      // Get all child elements in measurement phase containers
-      const measurementContainers = containerRef.current.querySelectorAll(`.${styles.measurementPhase}`);
-      console.log('📏 Found measurement containers:', measurementContainers.length);
+      // Get the visibleItems container (during measurement phase, it has inline visibility styles)
+      const measurementContainer = containerRef.current.querySelector(`.${styles.visibleItems}`) as HTMLElement;
       
-      measurementContainers.forEach((container) => {
-        const child = container.firstElementChild as HTMLElement;
-        if (child) {
-          items.push(child);
-        }
-      });
+      if (measurementContainer) {
+        console.log('📏 Found measurement container');
+        // Get all direct child divs within the measurement container
+        const childDivs = Array.from(measurementContainer.children) as HTMLElement[];
+        
+        childDivs.forEach((div) => {
+          const child = div.firstElementChild as HTMLElement;
+          if (child) {
+            items.push(child);
+          }
+        });
+      }
 
       console.log('📏 Items to measure:', items.length);
       const widths = items.map((item, index) => {
@@ -258,14 +268,24 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
     // Phase 1: Measure items when children actually change
     useEffect(() => {
       console.log('🔄 Phase 1 Effect - children change check');
-      console.log('Current children count:', childrenArray.length, 'Last count:', lastChildrenCount.current);
-      if (childrenArray.length !== lastChildrenCount.current) {
+      console.log('Current children count:', childrenCount, 'Last count:', lastChildrenCount.current);
+      
+      // Ignore children changes that happen immediately after layout completion
+      if (layoutCompletedRef.current) {
+        console.log('⏸️ Ignoring children change - layout just completed');
+        setTimeout(() => {
+          layoutCompletedRef.current = false;
+        }, 100);
+        return;
+      }
+      
+      if (childrenCount !== lastChildrenCount.current) {
         console.log('📊 Children count changed, starting measurement phase');
-        lastChildrenCount.current = childrenArray.length;
+        lastChildrenCount.current = childrenCount;
         setIsInMeasurementPhase(true);
         setMeasuredWidths([]);
       }
-    }, [childrenArray]);
+    }, [childrenCount]);
 
     // Phase 1: Trigger measurement after render
     useEffect(() => {
@@ -279,7 +299,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
         }, 10);
         return () => clearTimeout(timer);
       }
-    }, [isInMeasurementPhase, childrenArray]);
+    }, [isInMeasurementPhase, childrenCount]);
 
     // Phase 2: Calculate layout when measurements are ready
     useEffect(() => {
@@ -288,6 +308,8 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
       if (!isInMeasurementPhase && measuredWidths.length > 0) {
         console.log('📊 Starting layout calculation with widths:', measuredWidths);
         calculateOverflowLayout();
+        // Mark that layout just completed to ignore immediate children changes
+        layoutCompletedRef.current = true;
       }
     }, [isInMeasurementPhase, measuredWidths]);
 
@@ -321,12 +343,22 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
         {...rest}
       >
         {isInMeasurementPhase ? (
-          // Phase 1: Render all items invisibly for measurement
-          childrenArray.map((child, index) => (
-            <div key={`measure-${index}`} className={styles.measurementPhase}>
-              {child}
-            </div>
-          ))
+          // Phase 1: Render all items invisibly for measurement - identical structure to layout phase
+          <div 
+            className={styles.visibleItems}
+            style={{ 
+              gap: `${gap}px`, // Gap between items same as layout phase
+              visibility: 'hidden',
+              opacity: 0,
+              pointerEvents: 'none'
+            }}
+          >
+            {childrenArray.map((child, index) => (
+              <div key={`item-${index}`}>
+                {child}
+              </div>
+            ))}
+          </div>
         ) : (
           // Phase 2: Render final layout
           <>
@@ -334,7 +366,19 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(
               className={styles.visibleItems}
               style={{ gap: `${gap}px` }} // Gap between visible items
             >
-              {layout.visibleItems.length > 0 ? layout.visibleItems : childrenArray}
+              {childrenArray.map((child, index) => {
+                const isVisible = layout.visibleItems.length > 0 
+                  ? index < layout.visibleItems.length 
+                  : true;
+                return (
+                  <div 
+                    key={`item-${index}`}
+                    style={{ display: isVisible ? 'block' : 'none' }}
+                  >
+                    {child}
+                  </div>
+                );
+              })}
             </div>
             
             {/* Overflow dropdown */}

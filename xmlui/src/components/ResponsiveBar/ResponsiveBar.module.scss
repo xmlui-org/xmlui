@@ -16,7 +16,7 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
 .responsiveBar {
   display: flex;
   flex-direction: row;
-  flex-shrink: 1;
+  flex-shrink: 0;
   flex-grow: 0;
   align-items: center;
   background-color: $backgroundColor-ResponsiveBar;
@@ -24,12 +24,6 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
   margin: $margin-ResponsiveBar;
   width: 100%;
   overflow: visible; // Allow dropdown to be visible
-  
-  .measurementPhase {
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-  }
   
   .visibleItems {
     display: flex;
