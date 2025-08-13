@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useEffect, useState, useCallback, useMemo } from "react";
+import { forwardRef, useEffect, useState, useCallback, useMemo } from "react";
 import classnames from "classnames";
 import type { CSSProperties } from "react";
 
@@ -14,9 +14,9 @@ type Props = {
   itemCount?: number;
   pageSize?: number;
   pageIndex?: number;
-  maxVisiblePages?: number;
+  maxVisiblePages?: 1 | 3 | 5;
   hasPageInfo?: boolean;
-  onPageDidChange?: (pageIndex: number) => void;
+  onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
   updateState?: UpdateStateFn;
@@ -93,10 +93,10 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     (newPageIndex: number) => {
       const clampedPageIndex = Math.max(0, Math.min(newPageIndex, totalPages - 1));
       if (clampedPageIndex !== currentPage) {
-        onPageDidChange?.(clampedPageIndex);
+        onPageDidChange?.(clampedPageIndex, pageSize, itemCount);
       }
     },
-    [currentPage, totalPages, onPageDidChange],
+    [currentPage, totalPages, onPageDidChange, pageSize, itemCount],
   );
 
   // Memoize the API object to prevent unnecessary re-renders
@@ -111,9 +111,6 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     }),
     [handlePageChange, totalPages, currentPage, internalState],
   );
-
-  // Register component APIs using useImperativeHandle for ref
-  useImperativeHandle(ref, () => paginationAPI, [paginationAPI]);
 
   // Register APIs with XMLUI framework
   useEffect(() => {
@@ -160,86 +157,115 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   const isLastPage = currentPage === totalPages - 1;
 
   return (
-    <div {...rest} id={id} className={classnames(styles.pagination, className)} style={style}>
-      <Stack orientation="horizontal" horizontalAlignment="center" verticalAlignment="center">
+    <nav
+      {...rest}
+      role="navigation"
+      aria-label="Pagination"
+      ref={ref as any}
+      id={id}
+      className={classnames(styles.pagination, className)}
+      style={style}
+    >
+      <ul role="list" className={styles.paginationList}>
         {/* First page button */}
-        <Button
-          variant="outlined"
-          size="sm"
-          disabled={isFirstPage}
-          onClick={() => handlePageChange(0)}
-          contextualLabel="First page"
-          style={{ minHeight: "36px", padding: "8px" }}
-        >
-          <Icon name="doublechevronleft" size="sm" />
-        </Button>
-
-        {/* Previous page button */}
-        {visiblePages.length <= 2 && (
+        <li>
           <Button
             variant="outlined"
             size="sm"
             disabled={isFirstPage}
-            onClick={() => handlePageChange(currentPage - 1)}
-            contextualLabel="Previous page"
+            onClick={() => handlePageChange(0)}
+            contextualLabel="First page"
             style={{ minHeight: "36px", padding: "8px" }}
+            aria-label="First page"
           >
-            <Icon name="chevronleft" size="sm" />
+            <Icon name="doublechevronleft" size="sm" />
           </Button>
+        </li>
+
+        {/* Previous page button */}
+        {visiblePages.length <= 2 && (
+          <li>
+            <Button
+              variant="outlined"
+              size="sm"
+              disabled={isFirstPage}
+              onClick={() => handlePageChange(currentPage - 1)}
+              contextualLabel="Previous page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Previous page"
+            >
+              <Icon name="chevronleft" size="sm" />
+            </Button>
+          </li>
         )}
 
         {/* Page number buttons */}
         {visiblePages.length === 1 && (
-          <Text variant="strong" style={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
-            {visiblePages[0]}
-          </Text>
+          <li>
+            <Text
+              variant="strong"
+              style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+              aria-current="true"
+            >
+              {visiblePages[0]}
+            </Text>
+          </li>
         )}
         {visiblePages.length > 1 &&
           visiblePages.map((pageNum) => (
-            <Button
-              key={pageNum}
-              variant={pageNum === currentPageNumber ? "solid" : "outlined"}
-              size="sm"
-              onClick={() => handlePageChange(pageNum - 1)}
-              contextualLabel={`Page ${pageNum}`}
-            >
-              {pageNum}
-            </Button>
+            <li key={`page-${pageNum}`}>
+              <Button
+                variant={pageNum === currentPageNumber ? "solid" : "outlined"}
+                size="sm"
+                onClick={() => handlePageChange(pageNum - 1)}
+                contextualLabel={`Page ${pageNum}`}
+                aria-current={pageNum === currentPageNumber ? "true" : undefined}
+                aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+              >
+                {pageNum}
+              </Button>
+            </li>
           ))}
 
         {/* Next page button */}
         {visiblePages.length <= 2 && (
+          <li>
+            <Button
+              variant="outlined"
+              size="sm"
+              disabled={isLastPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              contextualLabel="Next page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Next page"
+            >
+              <Icon name="chevronright" size="sm" />
+            </Button>
+          </li>
+        )}
+
+        {/* Last page button */}
+        <li>
           <Button
             variant="outlined"
             size="sm"
             disabled={isLastPage}
-            onClick={() => handlePageChange(currentPage + 1)}
-            contextualLabel="Next page"
+            onClick={() => handlePageChange(totalPages - 1)}
+            contextualLabel="Last page"
             style={{ minHeight: "36px", padding: "8px" }}
+            aria-label="Last page"
           >
-            <Icon name="chevronright" size="sm" />
+            <Icon name="doublechevronright" size="sm" />
           </Button>
-        )}
-
-        {/* Last page button */}
-        <Button
-          variant="outlined"
-          size="sm"
-          disabled={isLastPage}
-          onClick={() => handlePageChange(totalPages - 1)}
-          contextualLabel="Last page"
-          style={{ minHeight: "36px", padding: "8px" }}
-        >
-          <Icon name="doublechevronright" size="sm" />
-        </Button>
-      </Stack>
+        </li>
+      </ul>
 
       {/* Page info */}
       {hasPageInfo && (
-        <Text variant="secondary" style={{ marginTop: "8px" }}>
+        <Text variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
         </Text>
       )}
-    </div>
+    </nav>
   );
 });

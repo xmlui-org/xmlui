@@ -105,5 +105,6 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
     </>
   );
 });
+ComponentDecorator.displayName = "ComponentDecorator";
 
 export default ComponentDecorator;

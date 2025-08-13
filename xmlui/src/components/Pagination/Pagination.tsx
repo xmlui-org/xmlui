@@ -49,8 +49,6 @@ export const PaginationMd = createMetadata({
       description: "Moves to the next page",
       signature: "moveNext(): void",
     },
-  },
-  contextVars: {
     currentPage: {
       description: "Gets the current page number (1-based)",
     },
@@ -58,13 +56,26 @@ export const PaginationMd = createMetadata({
       description: "Gets the current page size",
     },
   },
+  /* contextVars: {
+    currentPage: {
+      description: "Gets the current page number (1-based)",
+    },
+    currentPageSize: {
+      description: "Gets the current page size",
+    },
+  }, */
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    "gap-Pagination": "$space-2",
+    "padding-Pagination": "$space-4",
+    "alignment-Pagination": "center",
+  },
 });
 
 export const paginationComponentRenderer = createComponentRenderer(
   COMP,
   PaginationMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState }) => {
+  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, layoutCss }) => {
     // Extract property values
     const itemCount = extractValue.asOptionalNumber(node.props.itemCount, 0);
     const pageSize = extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize);
@@ -88,6 +99,7 @@ export const paginationComponentRenderer = createComponentRenderer(
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
+        style={layoutCss}
       />
     );
   },
