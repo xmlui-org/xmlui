@@ -20,7 +20,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
 </Card>
 ```
 
-```xmlui-pg copy display height="300px" name="Example: dimension overwritten by Barchart" /height="240px"/ /height="200px"/
+```xmlui-pg copy display height="300px" name="Example: dimension overwritten by BarChart" /height="240px"/ /height="200px"/
 <Card height="240px">
   <BarChart
     layout="horizontal"
@@ -91,7 +91,7 @@ This property determines how the bars are laid out.If set to `true`, bars with t
 
 A function that formats the tick labels on the X-axis. 
 
-```xmlui-pg copy display height="320px" name="Example: tickFormatterX"
+```xmlui-pg copy display height="320px" name="Example: tickFormatterX" /tickFormatterX/
 <App>
   <BarChart
     layout="horizontal"
@@ -113,7 +113,7 @@ A function that formats the tick labels on the X-axis.
 
 A function that formats the tick labels on the Y-axis. 
 
-```xmlui-pg copy display height="320px" name="Example: tickFormatterY"
+```xmlui-pg copy display height="320px" name="Example: tickFormatterY" /tickFormatterY/
 <App>
   <BarChart
     layout="horizontal"
