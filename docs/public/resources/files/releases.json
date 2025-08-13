@@ -1,225 +1,221 @@
 [
   {
-    "tag_name": "xmlui@0.9.65",
-    "published_at": "2025-07-04T13:51:13Z",
+    "tag_name": "xmlui@0.9.98",
+    "published_at": "2025-08-12T04:31:18Z",
     "changes": [
       {
-        "description": "fix the NestedAppNative.tsx issue introduced in #1547",
-        "commit_sha": "c17fc0d"
+        "description": "new internal react component for integrating into existing react applications (StandaloneComponent)",
+        "commit_sha": "ff781f3"
+      },
+      {
+        "description": "Fix image animation issue in Carousel",
+        "commit_sha": "377f0f2"
+      },
+      {
+        "description": "Added hover & active styles for Slider on thumb. FileInput opens file browser on label focus.",
+        "commit_sha": "ce0ff76"
+      },
+      {
+        "description": "Fixed input adornments not changing color on setting their respective theme variable. Spinbox buttons in NumberBox now have role=spinbutton.",
+        "commit_sha": "208768a"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.65.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.65/xmlui-0.9.65.js"
+        "name": "xmlui-0.9.98.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.98/xmlui-0.9.98.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.64",
-    "published_at": "2025-07-04T12:41:14Z",
+    "tag_name": "xmlui@0.9.97",
+    "published_at": "2025-08-08T13:55:33Z",
     "changes": [
       {
-        "description": "Refactored the usage of theme variables in RadioGroup",
-        "commit_sha": "5ad3ffc"
-      },
-      {
-        "description": "Add a \"noHeader\" option to the xmlui-pg codefence",
-        "commit_sha": "da3c8bc"
-      },
-      {
-        "description": "Allow YAML (.yml) theme files in standalone apps",
-        "commit_sha": "301cb39"
-      },
-      {
-        "description": "Fixed Bar- & LineChart sizing in the Table component",
-        "commit_sha": "d5d3f4d"
+        "description": "Implement simple IFrame APIs",
+        "commit_sha": "f7e8019"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.64.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.64/xmlui-0.9.64.js"
+        "name": "xmlui-0.9.97.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.97/xmlui-0.9.97.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.63",
-    "published_at": "2025-07-03T11:28:48Z",
+    "tag_name": "xmlui@0.9.96",
+    "published_at": "2025-08-08T09:04:36Z",
     "changes": [
       {
-        "description": "Fix: add a workaround to ListNative to avoid issues coming from undefined row values",
-        "commit_sha": "b9c0881"
+        "description": "Add IFrame component (first prototype)",
+        "commit_sha": "3196156"
+      },
+      {
+        "description": "NumberBox tweaks: fixed missing padding theme var, fixed incorrect label association.",
+        "commit_sha": "cfee78a"
+      },
+      {
+        "description": "fix: Tabs - descendant button warning",
+        "commit_sha": "f51002a"
+      },
+      {
+        "description": "fix: Table sortBy now works as expected",
+        "commit_sha": "3fa52d9"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.63.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.63/xmlui-0.9.63.js"
+        "name": "xmlui-0.9.96.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.96/xmlui-0.9.96.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.62",
-    "published_at": "2025-07-03T05:28:49Z",
+    "tag_name": "xmlui@0.9.95",
+    "published_at": "2025-08-07T13:59:31Z",
     "changes": [
       {
-        "description": "fix: nestedApp fills the available space in AppWithCode component",
-        "commit_sha": "832f31d"
+        "description": "fix: Tabs - fixed the inconsistency in the headerTemplate.",
+        "commit_sha": "af6a7a0"
       },
       {
-        "description": "Fix the build issue with FormSection",
-        "commit_sha": "4f9ff06"
+        "description": "Fix the useEventHaddler hook",
+        "commit_sha": "69a2a8f"
+      },
+      {
+        "description": "fix: H1 ... H6 now ignores the level property",
+        "commit_sha": "29c68fe"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.62.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.62/xmlui-0.9.62.js"
+        "name": "xmlui-0.9.95.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.95/xmlui-0.9.95.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.61",
-    "published_at": "2025-07-02T13:03:21Z",
+    "tag_name": "xmlui@0.9.94",
+    "published_at": "2025-08-06T15:54:03Z",
     "changes": [
       {
-        "description": "This version does not contain any real changes; it's just for bumping the version number.",
-        "commit_sha": "4ef5f3f"
+        "description": "feat: Tabs component - use headerTemplate instead of labelTemplate/tabTemplate",
+        "commit_sha": "1d9365c"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.61.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.61/xmlui-0.9.61.js"
+        "name": "xmlui-0.9.94.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.94/xmlui-0.9.94.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.60",
-    "published_at": "2025-06-24T06:16:48Z",
+    "tag_name": "xmlui@0.9.93",
+    "published_at": "2025-08-06T08:00:33Z",
     "changes": [
       {
-        "description": "Experiment with automatic changelog generation #3",
-        "commit_sha": "498b1ef"
+        "description": "feat:add labelTemplate prop to TabItem component",
+        "commit_sha": "af17117"
+      },
+      {
+        "description": "The transformation of Checkbox and Switch values (to Booleans) are now documented and tested",
+        "commit_sha": "44da3d9"
+      },
+      {
+        "description": "Fix formatHumanElapsedTime unit tests, make the local-independent",
+        "commit_sha": "b7a6b9a"
+      },
+      {
+        "description": "improve: Select and AutoComplete components",
+        "commit_sha": "bc95844"
+      },
+      {
+        "description": "Fix the ComponentWrapper childrenAsTemplate issue",
+        "commit_sha": "52d94a2"
+      },
+      {
+        "description": "New end-to-end tests reviewed",
+        "commit_sha": "6629ce5"
+      },
+      {
+        "description": "Fixed the initialValue issue with TextArea",
+        "commit_sha": "0254471"
+      },
+      {
+        "description": "feat: provide context in browser error reports",
+        "commit_sha": "3318cfb"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.60.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.60/xmlui-0.9.60.js"
+        "name": "xmlui-0.9.93.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.93/xmlui-0.9.93.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.59",
-    "published_at": "2025-07-01T15:53:48Z",
+    "tag_name": "xmlui@0.9.92",
+    "published_at": "2025-07-31T14:31:02Z",
     "changes": [
       {
-        "description": "Rename Pages property 'defaultRoute' to 'fallbackPath'",
-        "commit_sha": "2a07157"
-      },
-      {
-        "description": "improve: expanding the styles of the components responsible for code display with new theme variables.",
-        "commit_sha": "97b3241"
-      },
-      {
-        "description": "Fixed RadioGroup disabled and validation indicator states. Also fixed an issue where the checked indicator was not aligned to center if the RadioGroup Option was resized in some way.",
-        "commit_sha": "c4abb20"
-      },
-      {
-        "description": "Added 0 min width to PieChart, Fixed focus error when one checkbox's state change depended on another",
-        "commit_sha": "f19720c"
-      },
-      {
-        "description": "Fixed NavLink indentation in horizontal App layout, if in a nested NavGroup in the NavPanel",
-        "commit_sha": "66c2288"
-      },
-      {
-        "description": "Fixed a number of color & visual state representations of the components: DatePicker, Switch, Select, TextBox, TextArea, NumberBox, AutoComplete",
-        "commit_sha": "2d27204"
+        "description": "Review component e2e tests",
+        "commit_sha": "347cda1"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.59.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.59/xmlui-0.9.59.js"
+        "name": "xmlui-0.9.92.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.92/xmlui-0.9.92.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.58",
-    "published_at": "2025-06-26T16:54:01Z",
+    "tag_name": "xmlui@0.9.90",
+    "published_at": "2025-07-30T16:33:19Z",
     "changes": [
       {
-        "description": "Fixed Pie- & DonutChart height property.",
-        "commit_sha": "dc43275"
-      },
-      {
-        "description": "make flowLayout auto-responsive behavior a bit smarter",
-        "commit_sha": "f9562b5"
-      },
-      {
-        "description": "fix: eliminating the duplication of toast messages",
-        "commit_sha": "1af11af"
-      },
-      {
-        "description": "Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.",
-        "commit_sha": "de570c2"
-      },
-      {
-        "description": "Changed open in new window button tooltip label for all occurrences.",
-        "commit_sha": "7d255a9"
-      },
-      {
-        "description": "Fixed NavLink label break if overflowing available space.",
-        "commit_sha": "69a7a1f"
-      },
-      {
-        "description": "new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage",
-        "commit_sha": "873348c"
-      },
-      {
-        "description": "default style tweaks",
-        "commit_sha": "46bfe72"
+        "description": "Remove Spinner tests",
+        "commit_sha": "4b57f7e"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.58.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.58/xmlui-0.9.58.js"
+        "name": "xmlui-0.9.90.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.90/xmlui-0.9.90.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.57",
-    "published_at": "2025-06-23T12:55:00Z",
+    "tag_name": "xmlui@0.9.88",
+    "published_at": "2025-07-29T09:37:35Z",
     "changes": [
       {
-        "description": "fix: NavPanel - use layoutCss",
-        "commit_sha": "93a1e70"
+        "description": "Fix flaky Checkbox e2e tests",
+        "commit_sha": "b79d7d8"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.57.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.57/xmlui-0.9.57.js"
+        "name": "xmlui-0.9.88.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.88/xmlui-0.9.88.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.9.56",
-    "published_at": "2025-06-21T13:16:53Z",
+    "tag_name": "xmlui@0.9.87",
+    "published_at": "2025-07-28T05:22:00Z",
     "changes": [
       {
-        "description": "feat: xmlui-devtools - start dialog animation from the click, use exit animation as well",
-        "commit_sha": "9a3c3b6"
+        "description": "Fix ios regex failure",
+        "commit_sha": "33846c2"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.9.56.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.56/xmlui-0.9.56.js"
+        "name": "xmlui-0.9.87.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.87/xmlui-0.9.87.js"
       }
     ]
   }
