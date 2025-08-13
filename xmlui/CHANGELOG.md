@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.99
+
+### Patch Changes
+
+- e5a09fb: Added a separate Pagination component with events and API methods for custom pagination.
+- 36360f6: improve: add tickFormatterY to LineChart, create e2e tests
+
 ## 0.9.98
 
 ### Patch Changes
