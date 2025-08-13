@@ -4,8 +4,8 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs").promises;
 const path = require("path");
 const { exit } = require("process");
+const { sortByVersion, XMLUI_STANDALONE_PATTERN } = require("./utils.js");
 
-const XMLUI_STANDALONE_PATTERN = /xmlui-\d+\.\d+\.\d+\w*\.js/;
 const MD_HEADING_PATTERN = /^#{1,6} \S/;
 const MD_LIST_COMMIT_SHA_PATTERN = /^-\s*[a-f0-9]{6,40}:\s*/;
 
@@ -222,24 +222,4 @@ function parseBodyIntoChanges(body) {
   }
 
   return changes;
-}
-
-function sortByVersion(a, b) {
-  /** @type {string} */
-  const versionStrA = a.tag_name.split("@")[1];
-  /** @type {string} */
-  const versionStrB = b.tag_name.split("@")[1];
-
-  const [majorA, minorA, patchA] = versionStrA.split(".").map(Number);
-  const [majorB, minorB, patchB] = versionStrB.split(".").map(Number);
-
-  if (majorB !== majorA) {
-    return majorB - majorA;
-  }
-
-  if (minorB !== minorA) {
-    return minorB - minorA;
-  }
-
-  return patchB - patchA;
 }
