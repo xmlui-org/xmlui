@@ -132,7 +132,7 @@ export const AppMd = createMetadata({
   },
 });
 
-function AppNode({ node, extractValue, renderChild, style, lookupEventHandler }) {
+function AppNode({ node, extractValue, renderChild, className, lookupEventHandler }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -345,7 +345,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
     () => ({
       scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
       noScrollbarGutters: extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false),
-      style,
+      className,
       layout: layoutType,
       loggedInUser: extractValue(node.props.loggedInUser),
       onReady: lookupEventHandler("ready"),
@@ -370,7 +370,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       node.props["logo-light"],
       node.props.defaultTone,
       node.props.defaultTheme,
-      style,
+      className,
     ],
   );
 
@@ -379,6 +379,14 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
   const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
   const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
   const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
+
+  const paddingHorizontal = extractValue.asSize(node.props.paddingHorizontal);
+  const paddingVertical = extractValue.asSize(node.props.paddingVertical);
+  const paddingLeft = extractValue.asSize(node.props.paddingLeft);
+  const paddingRight = extractValue.asSize(node.props.paddingRight);
+  const paddingTop = extractValue.asSize(node.props.paddingTop);
+  const paddingBottom = extractValue.asSize(node.props.paddingBottom);
+  const padding = extractValue.asSize(node.props.padding);
 
   return (
     <App
@@ -389,6 +397,10 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
+      paddingLeft={paddingLeft || paddingHorizontal || padding}
+      paddingRight={paddingRight || paddingHorizontal || padding}
+      paddingTop={paddingTop || paddingVertical || padding}
+      paddingBottom={paddingBottom || paddingVertical || padding}
     >
       {renderedContent}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
@@ -566,13 +578,13 @@ function PageIndexer({
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return (
       <AppNode
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        style={layoutCss}
+        className={className}
         lookupEventHandler={lookupEventHandler}
       />
     );

@@ -29,6 +29,7 @@ import { AppLayoutContext } from "./AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
+import { EMPTY_OBJECT } from "../../components-core/constants";
 
 type Props = {
   children: ReactNode;
@@ -37,7 +38,7 @@ type Props = {
   footer?: ReactNode;
   navPanel?: ReactNode;
   navPanelInDrawer?: ReactNode;
-  style: CSSProperties;
+  style?: CSSProperties;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
@@ -53,6 +54,10 @@ type Props = {
   logoLight?: string;
   defaultTone?: string;
   defaultTheme?: string;
+  paddingLeft?: string;
+  paddingRight ?: string;
+  paddingTop?: string;
+  paddingBottom ?: string;
 };
 
 export const defaultProps: Pick<
@@ -69,7 +74,7 @@ export const defaultProps: Pick<
 
 export function App({
   children,
-  style,
+  style = EMPTY_OBJECT,
   layout,
   loggedInUser,
   scrollWholePage = defaultProps.scrollWholePage,
@@ -88,6 +93,10 @@ export function App({
   defaultTheme,
   renderChild,
   name,
+  paddingLeft,
+  paddingRight,
+  paddingTop,
+  paddingBottom
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
@@ -103,15 +112,21 @@ export function App({
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
   const pagesWrapperInnerStyle = useMemo(() => {
-    const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest } = style;
+    const styleWithoutPaddings = { ...style };
+    // Remove padding properties from the style object
+    delete styleWithoutPaddings.padding;
+    delete styleWithoutPaddings.paddingLeft;
+    delete styleWithoutPaddings.paddingRight;
+    delete styleWithoutPaddings.paddingTop;
+    delete styleWithoutPaddings.paddingBottom;
     return {
-      ...rest,
-      "--page-padding-left": padding || paddingLeft,
-      "--page-padding-right": padding || paddingRight,
-      "--page-padding-top": padding || paddingTop,
-      "--page-padding-bottom": padding || paddingBottom,
+      ...styleWithoutPaddings,
+      "--page-padding-left": paddingLeft,
+      "--page-padding-right": paddingRight,
+      "--page-padding-top": paddingTop,
+      "--page-padding-bottom": paddingBottom,
     };
-  }, [style]);
+  }, [paddingBottom, paddingLeft, paddingRight, paddingTop, style]);
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
