@@ -4,17 +4,20 @@ import type { CSSProperties } from "react";
 
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button/ButtonNative";
-import { Stack } from "../Stack/StackNative";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { Text } from "../Text/TextNative";
 import { Icon } from "../Icon/IconNative";
 
+export const PageNumberValues = [1, 3, 5] as const;
+export type PageNumber = typeof PageNumberValues[number];
+
 type Props = {
   id?: string;
+  enabled?: boolean;
   itemCount?: number;
   pageSize?: number;
   pageIndex?: number;
-  maxVisiblePages?: 1 | 3 | 5;
+  maxVisiblePages?: PageNumber;
   hasPageInfo?: boolean;
   onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
@@ -46,6 +49,7 @@ interface PaginationAPI {
 export const PaginationNative = forwardRef<PaginationAPI, Props>(function PaginationNative(
   {
     id,
+    enabled = true,
     itemCount = defaultProps.itemCount,
     pageSize = defaultProps.pageSize,
     pageIndex = defaultProps.pageIndex,
@@ -156,6 +160,8 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
 
+  // Used the following resource to provide a11y:
+  // https://a11ymatters.com/pattern/pagination/
   return (
     <nav
       {...rest}
@@ -172,7 +178,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           <Button
             variant="outlined"
             size="sm"
-            disabled={isFirstPage}
+            disabled={!enabled || isFirstPage}
             onClick={() => handlePageChange(0)}
             contextualLabel="First page"
             style={{ minHeight: "36px", padding: "8px" }}
@@ -188,7 +194,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             <Button
               variant="outlined"
               size="sm"
-              disabled={isFirstPage}
+              disabled={!enabled || isFirstPage}
               onClick={() => handlePageChange(currentPage - 1)}
               contextualLabel="Previous page"
               style={{ minHeight: "36px", padding: "8px" }}
@@ -216,6 +222,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             <li key={`page-${pageNum}`}>
               <Button
                 variant={pageNum === currentPageNumber ? "solid" : "outlined"}
+                disabled={!enabled}
                 size="sm"
                 onClick={() => handlePageChange(pageNum - 1)}
                 contextualLabel={`Page ${pageNum}`}
@@ -233,7 +240,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             <Button
               variant="outlined"
               size="sm"
-              disabled={isLastPage}
+              disabled={!enabled || isLastPage}
               onClick={() => handlePageChange(currentPage + 1)}
               contextualLabel="Next page"
               style={{ minHeight: "36px", padding: "8px" }}
@@ -249,7 +256,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           <Button
             variant="outlined"
             size="sm"
-            disabled={isLastPage}
+            disabled={!enabled || isLastPage}
             onClick={() => handlePageChange(totalPages - 1)}
             contextualLabel="Last page"
             style={{ minHeight: "36px", padding: "8px" }}

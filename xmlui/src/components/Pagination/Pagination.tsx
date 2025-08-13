@@ -1,7 +1,12 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d, dInternal } from "../metadata-helpers";
-import { defaultProps, PaginationNative } from "./PaginationNative";
+import { createMetadata, d, dEnabled } from "../metadata-helpers";
+import {
+  defaultProps,
+  type PageNumber,
+  PageNumberValues,
+  PaginationNative,
+} from "./PaginationNative";
 import styles from "./Pagination.module.scss";
 
 const COMP = "Pagination";
@@ -12,14 +17,15 @@ export const PaginationMd = createMetadata({
     "`Pagination` enables navigation through large datasets by dividing content into pages. " +
     "It provides controls for page navigation and displays current page information.",
   props: {
+    enabled: dEnabled(),
     itemCount: d("Total number of items to paginate", undefined, "number", defaultProps.itemCount),
     pageSize: d("Number of items per page", undefined, "number", defaultProps.pageSize),
     pageIndex: d("Current page index (0-based)", undefined, "number", defaultProps.pageIndex),
-    maxVisiblePages: dInternal(
+    maxVisiblePages: d(
       "Maximum number of page buttons to display",
-      /* undefined,
+      undefined,
       "number",
-      defaultProps.maxVisiblePages, */
+      defaultProps.maxVisiblePages,
     ),
     hasPageInfo: d(
       "Whether to show page information",
@@ -77,6 +83,7 @@ export const paginationComponentRenderer = createComponentRenderer(
   PaginationMd,
   ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, layoutCss }) => {
     // Extract property values
+    const enabled = extractValue.asOptionalBoolean(node.props.enabled, true);
     const itemCount = extractValue.asOptionalNumber(node.props.itemCount, 0);
     const pageSize = extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize);
     const pageIndex = extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex);
@@ -84,6 +91,13 @@ export const paginationComponentRenderer = createComponentRenderer(
       node.props.hasPageInfo,
       defaultProps.hasPageInfo,
     );
+    let maxVisiblePages = extractValue.asOptionalNumber(
+      node.props.maxVisiblePages,
+      defaultProps.maxVisiblePages,
+    );
+    if (!PageNumberValues.includes(maxVisiblePages as any)) {
+      maxVisiblePages = defaultProps.maxVisiblePages;
+    }
 
     // Create event handlers
     const onPageDidChange = lookupEventHandler("pageDidChange");
@@ -91,10 +105,12 @@ export const paginationComponentRenderer = createComponentRenderer(
 
     return (
       <PaginationNative
+        enabled={enabled}
         itemCount={itemCount}
         pageSize={pageSize}
         pageIndex={pageIndex}
         hasPageInfo={hasPageInfo}
+        maxVisiblePages={maxVisiblePages as PageNumber}
         onPageDidChange={onPageDidChange}
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}
