@@ -1,6 +1,6 @@
-export const XMLUI_STANDALONE_PATTERN = /xmlui-\d+\.\d+\.\d+\w*\.js/;
+const XMLUI_STANDALONE_PATTERN = /xmlui-\d+\.\d+\.\d+\w*\.js/;
 
-export function sortByVersion(a, b) {
+function sortByVersion(a, b) {
   /** @type {string} */
   const versionStrA = a.tag_name.split("@")[1];
   /** @type {string} */
@@ -19,3 +19,8 @@ export function sortByVersion(a, b) {
 
   return patchB - patchA;
 }
+
+module.exports = {
+  XMLUI_STANDALONE_PATTERN,
+  sortByVersion
+};

@@ -55,7 +55,7 @@ async function downloadFile(url) {
 (async () => {
   try {
     const rootDir = path.resolve(__dirname, "..");
-    const buildPublicDir = path.join(rootDir, "dist/resources/files/for-download/xmlui");
+    const buildPublicDir = path.join(rootDir, "/public/resources/files/for-download/xmlui");
     const browser_download_url = await getLatestAssetUrl();
 
     if (!browser_download_url) {

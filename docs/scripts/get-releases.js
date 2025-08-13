@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { Octokit } = require("@octokit/rest");
 const fs = require("fs").promises;
 const path = require("path");
 const { exit } = require("process");
@@ -59,6 +58,7 @@ function processOptions(args) {
 
 async function getXmluiReleases(options) {
   try {
+    const { Octokit } = await import("@octokit/rest");
     const octokit = new Octokit({
       auth: options.githubToken,
     });

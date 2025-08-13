@@ -58,7 +58,7 @@
       "dependsOn": ["generate-docs"]
     },
     "build:docs": {
-      "dependsOn": ["^build:extension", "^build:xmlui", "gen:releases", "gen:get-latest-release", "generate-docs-summaries"],
+      "dependsOn": ["^build:extension", "^build:xmlui", "gen:releases", "gen:get-latest-release", "gen:download-latest-xmlui-release", "generate-docs-summaries"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
