@@ -1,0 +1,64 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Define theme variables
+$gap-ResponsiveBar: createThemeVar("gap-ResponsiveBar");
+$backgroundColor-ResponsiveBar: createThemeVar("backgroundColor-ResponsiveBar");
+$padding-ResponsiveBar: createThemeVar("padding-ResponsiveBar");
+$margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
+
+// --- This part defines the CSS styles
+.responsiveBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $gap-ResponsiveBar;
+  background-color: $backgroundColor-ResponsiveBar;
+  padding: $padding-ResponsiveBar;
+  margin: $margin-ResponsiveBar;
+  width: 100%;
+  overflow: visible; // Allow dropdown to be visible
+  
+  .visibleItems {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: inherit;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden; // Hide overflow of items, but not the dropdown
+  }
+
+  .hiddenItems {
+    visibility: hidden;
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: inherit;
+    pointer-events: none;
+    opacity: 0;
+    z-index: -1;
+  }
+
+  .overflowDropdown {
+    flex-shrink: 0;
+    width: auto;
+    min-width: 40px; /* Consistent width for calculation */
+    position: relative; /* Ensure dropdown can position correctly */
+    z-index: 1000; /* Ensure dropdown appears above other content */
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
