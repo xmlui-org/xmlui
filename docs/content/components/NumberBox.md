@@ -139,7 +139,7 @@ This property sets the width of the `NumberBox` component's label. If not define
 
 This property sets the maximum length of the input it accepts.
 
-### `maxValue` [#maxvalue]
+### `maxValue` (default: 999999999999999) [#maxvalue-default-999999999999999]
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.
 
@@ -155,7 +155,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 </App>
 ```
 
-### `minValue` [#minvalue]
+### `minValue` (default: -999999999999999) [#minvalue-default-999999999999999]
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.
 
