@@ -10,9 +10,23 @@ $themeVars: ();
 .pagination {
   display: flex;
   flex-direction: column;
+  align-items: createThemeVar("alignment-Pagination");
+  padding: createThemeVar("padding-Pagination");
+  gap: t.$space-2;
+}
+
+.paginationList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  justify-content: createThemeVar("alignment-Pagination");
+  gap: createThemeVar("gap-Pagination");
+
+  li {
+    margin: 0;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

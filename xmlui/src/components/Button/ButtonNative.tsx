@@ -1,4 +1,4 @@
-import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
+import React, { type CSSProperties, useRef, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./Button.module.scss";
