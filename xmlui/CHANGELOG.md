@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.101
+
+### Patch Changes
+
+- 791b0be: Experimenting with issuing release on larger GitHub machines
+
 ## 0.9.100
 
 ### Patch Changes
