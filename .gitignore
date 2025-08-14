@@ -1,6 +1,7 @@
 node_modules
 .vs
 .idea
+.windsurf
 __tmp
 __setup
 __deploy

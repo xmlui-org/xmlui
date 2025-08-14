@@ -68,6 +68,17 @@ $componentName: "TooltipContent";
   background: transparent;
 }
 
+.mutedText {
+  color: t.$textColor-secondary;
+  font-size: 0.75rem;
+}
+
+.valueText {
+  color: t.$textColor-primary;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export{
   themeVars: t.json-stringify($themeVars)

@@ -26,6 +26,7 @@ export type BarChartProps = {
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
+  hideTooltip?: boolean;
   tickFormatterX?: (value: any) => any;
   tickFormatterY?: (value: any) => any;
   children?: ReactNode;
@@ -40,6 +41,7 @@ export const defaultProps: Pick<
   | "hideTickY"
   | "hideX"
   | "hideY"
+  | "hideTooltip"
   | "tickFormatterX"
   | "tickFormatterY"
   | "showLegend"
@@ -50,6 +52,7 @@ export const defaultProps: Pick<
   hideTickY: false,
   hideX: false,
   hideY: false,
+  hideTooltip: false,
   tickFormatterX: (value) => value,
   tickFormatterY: (value) => value,
   showLegend: false,
@@ -65,12 +68,15 @@ export function BarChart({
   hideTickY = defaultProps.hideTickY,
   hideY = defaultProps.hideY,
   hideX = defaultProps.hideX,
+  hideTooltip = defaultProps.hideTooltip,
   tickFormatterX = defaultProps.tickFormatterX,
   tickFormatterY = defaultProps.tickFormatterY,
   style,
   children,
   showLegend = defaultProps.showLegend,
 }: BarChartProps) {
+  // Validate and normalize data
+  const validData = Array.isArray(data) ? data : [];
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -162,14 +168,14 @@ export function BarChart({
       let rightMargin = Math.ceil(maxWidth / 3);
       let xAxisH = Math.ceil(fontSize * 1.2);
       let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
-      let skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+      let skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
       if (skip > 0) {
         angle = -60;
         anchor = "end";
         rad = (Math.abs(angle) * Math.PI) / 180;
         minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
         maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
-        skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+        skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
         leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
@@ -238,7 +244,7 @@ export function BarChart({
         <RBarChart
           style={style}
           accessibilityLayer
-          data={data}
+          data={validData}
           layout={layout}
           margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
         >
@@ -249,8 +255,8 @@ export function BarChart({
                 type="number"
                 axisLine={false}
                 hide={miniMode || hideX}
-                tickFormatter={miniMode ? undefined : tickFormatterX}
-                tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
+                tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
               />
               <YAxis
                 hide={miniMode || hideY}
@@ -258,8 +264,8 @@ export function BarChart({
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
-                tickFormatter={miniMode ? undefined : tickFormatterY}
-                tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
+                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
               />
             </>
           ) : (
@@ -271,24 +277,24 @@ export function BarChart({
                 tickLine={false}
                 angle={tickAngle}
                 textAnchor={tickAnchor}
-                tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
-                tickFormatter={miniMode ? undefined : tickFormatterX}
+                tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
+                tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
                 height={miniMode || hideX ? 0 : xAxisHeight}
                 hide={miniMode || hideX}
               />
               <YAxis
                 type="number"
                 axisLine={false}
-                tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
                 hide={miniMode || hideY}
                 tickCount={yTickCount}
-                tickFormatter={miniMode ? undefined : tickFormatterY}
+                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
                 width={miniMode || hideY || hideTickY ? 0 : 40}
               />
             </>
           )}
-          {!miniMode && <Tooltip content={<TooltipContent />} />}
-          {Object.keys(config).map((key, index) => (
+          {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
+          {validData.length > 0 && Object.keys(config).map((key, index) => (
             <Bar
               key={index}
               dataKey={key}
@@ -361,7 +367,7 @@ export function BarChart({
         ref={labelsRef}
         style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
       >
-        {data
+        {validData
           .map((d) => d[nameKey])
           .map((label, idx) => (
             <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
@@ -373,4 +379,3 @@ export function BarChart({
     </ChartProvider>
   );
 }
-
