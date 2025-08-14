@@ -273,6 +273,9 @@ test.describe("Basic Functionality", () => {
         <Page>
           <HStack>
             <VStack gap="800px">
+              <Bookmark id="levelNone" title="Bookmark level none">
+                content no level
+              </Bookmark>
               <Bookmark id="level1" title="Level 1 Bookmark" level="{1}">
                 level 1 content
               </Bookmark>
@@ -294,6 +297,7 @@ test.describe("Basic Functionality", () => {
         </Page>
       `);
 
+      await expect(page.getByRole("link", { name: "Bookmark level none" })).toBeVisible();
       await expect(page.getByRole("link", { name: "Level 1 Bookmark" })).toBeVisible();
       await expect(page.getByRole("link", { name: "Level 2 Bookmark" })).toBeVisible();
       await expect(page.getByRole("link", { name: "Level 3 Bookmark" })).not.toBeVisible();
@@ -308,9 +312,9 @@ test.describe("Basic Functionality", () => {
         <Page>
           <HStack>
             <VStack gap="800px">
-              <Heading level="h1" value="Page Title" />
-              <Heading level="h2" value="Section Title" />
-              <Heading level="h3" value="Subsection Title" />
+              <Heading level="h1" value="H1 Title" />
+              <Heading level="h2" value="H2 Title" />
+              <Heading level="h3" value="H3 Title" />
               bottom of the page text
             </VStack>
             <StickyBox to="top">
@@ -320,9 +324,9 @@ test.describe("Basic Functionality", () => {
         </Page>
       `);
 
-      await expect(page.getByRole("link", { name: "Page Title" })).not.toBeVisible();
-      await expect(page.getByRole("link", { name: "Section Title" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Subsection Title" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "H1 Title" })).not.toBeVisible();
+      await expect(page.getByRole("link", { name: "H2 Title" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "H3 Title" })).toBeVisible();
     });
 
     test("includes H1 headings when omitH1 is false", async ({ initTestBed, page }) => {
@@ -352,6 +356,9 @@ test.describe("Basic Functionality", () => {
         <Page>
           <HStack>
             <VStack gap="800px">
+              <Bookmark id="no-lvl" title="No level section">
+                no level section content
+              </Bookmark>
               <Bookmark id="main" title="Main Section" level="{1}">
                 main section content
               </Bookmark>
@@ -367,6 +374,7 @@ test.describe("Basic Functionality", () => {
         </Page>
       `);
 
+      await expect(page.getByRole("link", { name: "No level section" })).not.toBeVisible();
       await expect(page.getByRole("link", { name: "Main Section" })).not.toBeVisible();
       await expect(page.getByRole("link", { name: "Subsection" })).toBeVisible();
     });
