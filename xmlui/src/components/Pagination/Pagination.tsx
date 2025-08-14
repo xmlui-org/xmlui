@@ -8,6 +8,11 @@ import {
   PaginationNative,
 } from "./PaginationNative";
 import styles from "./Pagination.module.scss";
+import {
+  orientationOptionMd,
+  type OrientationOptions,
+  orientationOptionValues,
+} from "../abstractions";
 
 const COMP = "Pagination";
 
@@ -32,6 +37,22 @@ export const PaginationMd = createMetadata({
       undefined,
       "boolean",
       defaultProps.hasPageInfo,
+    ),
+    pageSizeOptions: d(
+      "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+    ),
+    orientation: {
+      description: "Layout orientation of the pagination component",
+      options: orientationOptionValues,
+      type: "string",
+      availableValues: orientationOptionMd,
+      default: defaultProps.orientation,
+    },
+    reverseLayout: d(
+      "Whether to reverse the order of pagination sections",
+      undefined,
+      "boolean",
+      defaultProps.reverseLayout,
     ),
   },
   events: {
@@ -75,6 +96,12 @@ export const PaginationMd = createMetadata({
     "gap-Pagination": "$space-2",
     "padding-Pagination": "$space-4",
     "alignment-Pagination": "center",
+    "backgroundColor-Pagination": "transparent",
+    "borderColor-Pagination": "$color-gray-300",
+    "textColor-Pagination": "$color-gray-600",
+    "backgroundColor-selector-Pagination": "transparent",
+    "textColor-selector-Pagination": "$color-gray-600",
+    "borderRadius-selector-Pagination": "$borderRadius",
   },
 });
 
@@ -91,6 +118,7 @@ export const paginationComponentRenderer = createComponentRenderer(
       node.props.hasPageInfo,
       defaultProps.hasPageInfo,
     );
+    const pageSizeOptions = extractValue(node.props.pageSizeOptions) as number[] | undefined;
     let maxVisiblePages = extractValue.asOptionalNumber(
       node.props.maxVisiblePages,
       defaultProps.maxVisiblePages,
@@ -101,6 +129,20 @@ export const paginationComponentRenderer = createComponentRenderer(
       );
       maxVisiblePages = defaultProps.maxVisiblePages;
     }
+    let orientation = extractValue.asOptionalString(
+      node.props.orientation,
+      defaultProps.orientation,
+    );
+    if (!orientationOptionValues.includes(orientation as any)) {
+      console.warn(
+        `Invalid orientation value provided To Pagination: ${orientation}. Falling back to default.`,
+      );
+      orientation = defaultProps.orientation;
+    }
+    const reverseLayout = extractValue.asOptionalBoolean(
+      node.props.reverseLayout,
+      defaultProps.reverseLayout,
+    );
 
     // Create event handlers
     const onPageDidChange = lookupEventHandler("pageDidChange");
@@ -114,6 +156,9 @@ export const paginationComponentRenderer = createComponentRenderer(
         pageIndex={pageIndex}
         hasPageInfo={hasPageInfo}
         maxVisiblePages={maxVisiblePages as PageNumber}
+        pageSizeOptions={pageSizeOptions}
+        orientation={orientation as OrientationOptions}
+        reverseLayout={reverseLayout}
         onPageDidChange={onPageDidChange}
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}
