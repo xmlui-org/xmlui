@@ -1,0 +1,84 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Define theme variables
+$backgroundColor-ResponsiveBar: createThemeVar("backgroundColor-ResponsiveBar");
+$padding-ResponsiveBar: createThemeVar("padding-ResponsiveBar");
+$margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
+
+// --- This part defines the CSS styles
+.responsiveBar {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  flex-grow: 0;
+  align-items: center;
+  background-color: $backgroundColor-ResponsiveBar;
+  padding: $padding-ResponsiveBar;
+  margin: $margin-ResponsiveBar;
+  width: 100%;
+  overflow: visible; // Allow dropdown to be visible
+  
+  &.vertical {
+    flex-direction: column;
+    height: 100%;
+    width: auto;
+    align-items: stretch;
+    max-height: 100%; // Ensure it doesn't exceed parent height
+  }
+  
+  &.horizontal {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    align-items: center;
+  }
+  
+  .visibleItems {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 1; /* Allow this container to grow and push dropdown to the end */
+    min-width: 0;
+    overflow: hidden; // Hide overflow of items, but not the dropdown
+    
+    &.vertical {
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 0;
+      min-width: auto;
+      flex-grow: 1; // Take up available space
+      width: auto;
+      overflow: hidden; // Critical: hide overflow in vertical mode
+    }
+    
+    &.horizontal {
+      flex-direction: row;
+      align-items: center;
+      min-width: 0;
+      min-height: auto;
+      width: auto;
+      height: auto;
+    }
+  }
+
+  .overflowDropdown {
+    flex-shrink: 0;
+    width: auto;
+    min-width: 40px; /* Consistent width for calculation */
+    position: relative; /* Ensure dropdown can position correctly */
+    z-index: 1000; /* Ensure dropdown appears above other content */
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

@@ -375,9 +375,12 @@ export const ComponentName = forwardRef(function ComponentName(
     </div>
   );
 });
+
+// Note: We do NOT use displayName in XMLUI components
+// React.displayName is not used in our component convention
 ```
 
-**Key patterns**: Always use `forwardRef`, define clear TypeScript interfaces, provide sensible defaults via `defaultProps`, use scoped CSS modules, support standard HTML attributes, and handle accessibility through proper ARIA attributes.
+**Key patterns**: Always use `forwardRef`, define clear TypeScript interfaces, provide sensible defaults via `defaultProps`, use scoped CSS modules, support standard HTML attributes, handle accessibility through proper ARIA attributes, and do **not** set `displayName` on components.
 
 ## Testing
 
