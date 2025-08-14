@@ -28,6 +28,23 @@ interface LayoutState {
   overflowItems: ReactElement[];
 }
 
+// Helper component to avoid duplication of DropdownMenu properties
+const ResponsiveBarDropdown = ({ 
+  overflowIcon, 
+  children, 
+  className 
+}: { 
+  overflowIcon: string; 
+  children: ReactNode; 
+  className?: string;
+}) => (
+  <div className={className}>
+    <DropdownMenu label="More options" triggerButtonIcon={overflowIcon}>
+      {children}
+    </DropdownMenu>
+  </div>
+);
+
 export const defaultResponsiveBarProps = {
   overflowIcon: "ellipsisHorizontal:ResponsiveBar",
   gap: 0,
@@ -310,19 +327,38 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
     >
       {isInMeasurementPhase ? (
         // Phase 1: Render all items invisibly for measurement - identical structure to layout phase
-        <div
-          className={styles.visibleItems}
-          style={{
-            gap: `${gap}px`, // Gap between items same as layout phase
-            visibility: "hidden",
-            opacity: 0,
-            pointerEvents: "none",
-          }}
-        >
-          {childrenArray.map((child, index) => (
-            <div key={`item-${index}`}>{child}</div>
-          ))}
-        </div>
+        <>
+          <div
+            className={styles.visibleItems}
+            style={{
+              gap: `${gap}px`, // Gap between items same as layout phase
+              visibility: "hidden",
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+          >
+            {childrenArray.map((child, index) => (
+              <div key={`item-${index}`}>{child}</div>
+            ))}
+          </div>
+
+          {/* Measurement dropdown - rendered in same location as visible dropdown */}
+          <div 
+            ref={measurementDropdownRef}
+            style={{
+              visibility: "hidden",
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <ResponsiveBarDropdown 
+              overflowIcon={overflowIcon}
+              className={styles.overflowDropdown}
+            >
+              {childrenArray.length > 0 && <MenuItem>{childrenArray[0]}</MenuItem>}
+            </ResponsiveBarDropdown>
+          </div>
+        </>
       ) : (
         // Phase 2: Render final layout
         <>
@@ -343,13 +379,14 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
 
           {/* Overflow dropdown */}
           {layout.overflowItems.length > 0 && (
-            <div className={styles.overflowDropdown}>
-              <DropdownMenu label="More options" triggerButtonIcon={overflowIcon}>
-                {layout.overflowItems.map((item, index) => (
-                  <MenuItem key={index}>{item}</MenuItem>
-                ))}
-              </DropdownMenu>
-            </div>
+            <ResponsiveBarDropdown 
+              overflowIcon={overflowIcon}
+              className={styles.overflowDropdown}
+            >
+              {layout.overflowItems.map((item, index) => (
+                <MenuItem key={index}>{item}</MenuItem>
+              ))}
+            </ResponsiveBarDropdown>
           )}
         </>
       )}
@@ -367,15 +404,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
         }}
         aria-hidden="true"
       />
-
-      {/* Hidden dropdown for width measurement */}
-      <div ref={measurementDropdownRef} className={styles.hiddenItems}>
-        <div className={styles.overflowDropdown}>
-          <DropdownMenu label="More options" triggerButtonIcon={overflowIcon}>
-            {childrenArray.length > 0 && <MenuItem>{childrenArray[0]}</MenuItem>}
-          </DropdownMenu>
-        </div>
-      </div>
     </div>
   );
 });

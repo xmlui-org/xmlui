@@ -34,21 +34,6 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
     overflow: hidden; // Hide overflow of items, but not the dropdown
   }
 
-  .hiddenItems {
-    visibility: hidden;
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-    min-width: 0;
-    pointer-events: none;
-    opacity: 0;
-    z-index: -1;
-  }
-
   .overflowDropdown {
     flex-shrink: 0;
     width: auto;
