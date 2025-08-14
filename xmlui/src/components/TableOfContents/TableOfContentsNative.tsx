@@ -78,6 +78,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
+            console.log({ value: value.id, activeAnchorId });
             return (
               <li
                 key={value.id}
@@ -86,6 +87,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
                 })}
               >
                 <RrdNavLink
+                  aria-current={value.id === activeAnchorId ? "page" : "false"}
                   className={classnames(styles.link, {
                     [styles.head_1]: value.level === 1,
                     [styles.head_2]: value.level === 2,
