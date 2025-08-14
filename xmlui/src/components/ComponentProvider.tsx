@@ -13,6 +13,7 @@ import {
   stackComponentRenderer,
   vStackComponentRenderer,
 } from "./Stack/Stack";
+import { responsiveBarComponentRenderer } from "./ResponsiveBar/ResponsiveBar";
 import { spaceFillerComponentRenderer } from "./SpaceFiller/SpaceFiller";
 import { textAreaComponentRenderer } from "./TextArea/TextArea";
 import { navLinkComponentRenderer } from "./NavLink/NavLink";
@@ -351,6 +352,9 @@ export class ComponentRegistry {
       this.registerCoreComponent(hStackComponentRenderer);
       this.registerCoreComponent(cvStackComponentRenderer);
       this.registerCoreComponent(chStackComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ResponsiveBar !== "false") {
+      this.registerCoreComponent(responsiveBarComponentRenderer);
     }
 
     this.registerCoreComponent(SlotHolder);
