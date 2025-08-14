@@ -19,6 +19,7 @@ type Props = {
   pageIndex?: number;
   maxVisiblePages?: PageNumber;
   hasPageInfo?: boolean;
+  pageSizeOptions?: number[];
   onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -55,6 +56,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     pageIndex = defaultProps.pageIndex,
     maxVisiblePages = defaultProps.maxVisiblePages,
     hasPageInfo = defaultProps.hasPageInfo,
+    pageSizeOptions,
     onPageDidChange,
     onPageSizeDidChange,
     registerComponentApi,
@@ -101,6 +103,16 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       }
     },
     [currentPage, totalPages, onPageDidChange, pageSize, itemCount],
+  );
+
+  // Helper function to handle page size changes
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      if (newPageSize !== pageSize) {
+        onPageSizeDidChange?.(newPageSize);
+      }
+    },
+    [pageSize, onPageSizeDidChange],
   );
 
   // Memoize the API object to prevent unnecessary re-renders
@@ -172,6 +184,28 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       className={classnames(styles.pagination, className)}
       style={style}
     >
+      {/* Page size selector */}
+      {pageSizeOptions && pageSizeOptions.length > 1 && (
+        <div className={styles.selectorContainer}>
+          <Text variant="secondary" className={styles.pageSizeLabel}>
+            Rows per page
+          </Text>
+          <select
+            id={`${id}-page-size-selector`}
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            disabled={!enabled}
+            className={styles.pageSizeSelect}
+          >
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <ul role="list" className={styles.paginationList}>
         {/* First page button */}
         <li>

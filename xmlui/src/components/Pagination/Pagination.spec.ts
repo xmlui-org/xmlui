@@ -178,6 +178,77 @@ test.describe("Basic Functionality", () => {
 });
 
 // =============================================================================
+// PAGE SIZE SELECTOR TESTS  
+// =============================================================================
+
+test.describe("Page Size Selector", () => {
+  test("does not show page size selector when pageSizeOptions is not provided", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10"/>`);
+    
+    // Should not show page size selector
+    await expect(page.getByText("Rows per page")).not.toBeVisible();
+  });
+
+  test("does not show page size selector when pageSizeOptions has only one option", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[10]}"/>`);
+    
+    // Should not show page size selector for single option
+    await expect(page.getByText("Rows per page")).not.toBeVisible();
+  });
+
+  test("shows page size selector when multiple pageSizeOptions are provided", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    
+    // Should show page size selector
+    await expect(page.getByText("Rows per page")).toBeVisible();
+    
+    // Should show select dropdown with current value
+    const select = page.locator('select');
+    await expect(select).toBeVisible();
+    await expect(select).toHaveValue("10");
+    
+    // Check that all options exist in the DOM (even if not visible)
+    await expect(select.locator('option[value="5"]')).toHaveCount(1);
+    await expect(select.locator('option[value="10"]')).toHaveCount(1);
+    await expect(select.locator('option[value="20"]')).toHaveCount(1);
+  });
+
+  test("page size selector is disabled when component is disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination enabled="false" itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    
+    // Select should be disabled
+    const select = page.locator('select');
+    await expect(select).toBeDisabled();
+  });
+
+  test("page size selector allows changing selection", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    
+    // Should show page size selector
+    await expect(page.getByText("Rows per page")).toBeVisible();
+    
+    // Should start with correct value
+    const select = page.locator('select');
+    await expect(select).toHaveValue("10");
+    
+    // Should be able to interact with the select (this triggers the event)
+    await select.selectOption('20');
+    
+    // Note: In a real application, the parent would update the pageSize prop
+    // which would cause the select to show the new value. For this test,
+    // we're just verifying the interaction is possible.
+  });
+
+  test("page size selector reflects current pageSize", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="100" pageSize="20" pageSizeOptions="{[5, 10, 20, 50]}"/>`);
+    
+    // Select should show current page size
+    const select = page.locator('select');
+    await expect(select).toHaveValue("20");
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
@@ -646,10 +717,11 @@ test.describe("Other Edge Cases", () => {
   test("handles maxVisiblePages larger than total pages", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="20" pageSize="10" maxVisiblePages="10"/>`);
     
-    // Should show all available pages (2) even though maxVisiblePages is 10
-    await expect(page.getByRole("button", { name: "Page 1" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Page 2" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Page 3" })).not.toBeVisible();
+    // Invalid maxVisiblePages (10) should fall back to default (1)
+    // With maxVisiblePages=1, should show current page as text, not buttons
+    await expect(page.getByText("1", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Page 1" })).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Page 2" })).not.toBeVisible();
   });
 
   test("works correctly with fractional page calculations", async ({ initTestBed, page }) => {

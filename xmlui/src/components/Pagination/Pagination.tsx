@@ -33,6 +33,9 @@ export const PaginationMd = createMetadata({
       "boolean",
       defaultProps.hasPageInfo,
     ),
+    pageSizeOptions: d(
+      "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+    ),
   },
   events: {
     pageDidChange: d("Fired when the current page changes"),
@@ -75,6 +78,12 @@ export const PaginationMd = createMetadata({
     "gap-Pagination": "$space-2",
     "padding-Pagination": "$space-4",
     "alignment-Pagination": "center",
+    "backgroundColor-Pagination": "transparent",
+    "borderColor-Pagination": "$color-gray-300",
+    "textColor-Pagination": "$color-gray-600",
+    "backgroundColor-selector-Pagination": "transparent",
+    "textColor-selector-Pagination": "$color-gray-600",
+    "borderRadius-selector-Pagination": "$borderRadius",
   },
 });
 
@@ -91,6 +100,7 @@ export const paginationComponentRenderer = createComponentRenderer(
       node.props.hasPageInfo,
       defaultProps.hasPageInfo,
     );
+    const pageSizeOptions = extractValue(node.props.pageSizeOptions) as number[] | undefined;
     let maxVisiblePages = extractValue.asOptionalNumber(
       node.props.maxVisiblePages,
       defaultProps.maxVisiblePages,
@@ -114,6 +124,7 @@ export const paginationComponentRenderer = createComponentRenderer(
         pageIndex={pageIndex}
         hasPageInfo={hasPageInfo}
         maxVisiblePages={maxVisiblePages as PageNumber}
+        pageSizeOptions={pageSizeOptions}
         onPageDidChange={onPageDidChange}
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}

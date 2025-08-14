@@ -7,12 +7,52 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Define theme variables
+$backgroundColor-Pagination: createThemeVar("backgroundColor-Pagination");
+$borderColor-Pagination: createThemeVar("borderColor-Pagination");
+$borderRadius-selector-Pagination: createThemeVar("borderRadius-selector-Pagination");
+$textColor-Pagination: createThemeVar("textColor-Pagination");
+$backgroundColor-selector-Pagination: createThemeVar("backgroundColor-selector-Pagination");
+$textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
+
 .pagination {
   display: flex;
   flex-direction: column;
   align-items: createThemeVar("alignment-Pagination");
   padding: createThemeVar("padding-Pagination");
+  gap: t.$space-4;
+  width: 100%;
+}
+
+.selectorContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: t.$space-2;
+}
+
+.pageSizeLabel {
+  color: $textColor-selector-Pagination;
+  font-size: t.$fontSize-small;
+}
+
+.pageSizeSelect {
+  color: $textColor-selector-Pagination;
+  background-color: $backgroundColor-selector-Pagination;
+  border: 1px solid $borderColor-Pagination;
+  border-radius: $borderRadius-selector-Pagination;
+  padding: t.$space-1 t.$space-2;
+  font-size: t.$fontSize-small;
+  
+  &:focus {
+    //outline: 2px solid t.$color-primary-400;
+    outline-offset: 2px;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .paginationList {
