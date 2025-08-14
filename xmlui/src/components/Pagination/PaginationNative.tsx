@@ -206,7 +206,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       style={style}
     >
       {pageSizeOptions && pageSizeOptions.length > 1 && (
-        <div key="page-size-selector" className={styles.selectorContainer}>
+        <div key={`${id}-page-size-selector`} className={styles.selectorContainer}>
           <Text variant="secondary" className={styles.pageSizeLabel}>
             Rows per page
           </Text>
@@ -226,7 +226,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
         </div>
       )}
       {
-        <ul key="pagination-controls" role="list" className={styles.paginationList}>
+        <ul key={`${id}-pagination-controls`} className={styles.paginationList}>
           {/* First page button */}
           <li>
             <Button
@@ -322,7 +322,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
         </ul>
       }
       {hasPageInfo && (
-        <Text key="page-info" variant="secondary">
+        <Text key={`${id}-page-info`} variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
         </Text>
       )}

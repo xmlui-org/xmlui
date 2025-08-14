@@ -8,7 +8,11 @@ import {
   PaginationNative,
 } from "./PaginationNative";
 import styles from "./Pagination.module.scss";
-import { orientationOptionMd, type OrientationOptions, orientationOptionValues } from "../abstractions";
+import {
+  orientationOptionMd,
+  type OrientationOptions,
+  orientationOptionValues,
+} from "../abstractions";
 
 const COMP = "Pagination";
 
