@@ -253,6 +253,7 @@ import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
 import { legendComponentRenderer } from "./Charts/Legend/Legend";
 import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
+import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
 import { paginationComponentRenderer } from "./Pagination/Pagination";
@@ -526,6 +527,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(legendComponentRenderer);
       this.registerCoreComponent(lineChartComponentRenderer);
       this.registerCoreComponent(pieChartComponentRenderer);
+      this.registerCoreComponent(radarChartComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false") {
