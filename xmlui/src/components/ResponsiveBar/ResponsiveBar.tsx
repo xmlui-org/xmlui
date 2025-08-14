@@ -10,12 +10,22 @@ const COMP = "ResponsiveBar";
 export const ResponsiveBarMd = createMetadata({
   status: "stable",
   description:
-    "`ResponsiveBar` is a horizontal layout container that automatically manages child " +
-    "component overflow by moving items that don't fit into a dropdown menu. It provides " +
-    "a space-efficient way to display navigation items, toolbar buttons, or other components " +
-    "that need to adapt to varying container widths while maintaining full functionality.",
+    "`ResponsiveBar` is a layout container that automatically manages child " +
+    "component overflow by moving items that don't fit into a dropdown menu. It supports " +
+    "both horizontal and vertical orientations and provides a space-efficient way to display " +
+    "navigation items, toolbar buttons, or other components that need to adapt to varying " +
+    "container dimensions while maintaining full functionality.",
   docFolder: COMP,
   props: {
+    orientation: {
+      description:
+        "Layout direction of the responsive bar. In horizontal mode, items are arranged " +
+        "left-to-right and overflow is based on container width. In vertical mode, items are " +
+        "arranged top-to-bottom and overflow is based on container height.",
+      valueType: "string",
+      availableValues: ["horizontal", "vertical"],
+      defaultValue: defaultResponsiveBarProps.orientation,
+    },
     overflowIcon: {
       description: 
         "Icon to display in the dropdown trigger button when items overflow. " +
@@ -51,6 +61,7 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return (
       <ResponsiveBar
+        orientation={extractValue(node.props?.orientation)}
         overflowIcon={extractValue(node.props?.overflowIcon)}
         gap={extractValue(node.props?.gap)}
         onClick={lookupEventHandler("click")}

@@ -25,6 +25,21 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
   width: 100%;
   overflow: visible; // Allow dropdown to be visible
   
+  &.vertical {
+    flex-direction: column;
+    height: 100%;
+    width: auto;
+    align-items: stretch;
+    max-height: 100%; // Ensure it doesn't exceed parent height
+  }
+  
+  &.horizontal {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    align-items: center;
+  }
+  
   .visibleItems {
     display: flex;
     flex-direction: row;
@@ -33,6 +48,25 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
     flex-grow: 1; /* Allow this container to grow and push dropdown to the end */
     min-width: 0;
     overflow: hidden; // Hide overflow of items, but not the dropdown
+    
+    &.vertical {
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 0;
+      min-width: auto;
+      flex-grow: 1; // Take up available space
+      width: auto;
+      overflow: hidden; // Critical: hide overflow in vertical mode
+    }
+    
+    &.horizontal {
+      flex-direction: row;
+      align-items: center;
+      min-width: 0;
+      min-height: auto;
+      width: auto;
+      height: auto;
+    }
   }
 
   .overflowDropdown {
