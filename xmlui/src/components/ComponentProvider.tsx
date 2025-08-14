@@ -246,6 +246,7 @@ import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
+import { areaChartComponentRenderer } from "./Charts/AreaChart/AreaChart";
 import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
 import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
 import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
@@ -518,6 +519,7 @@ export class ComponentRegistry {
     }
 
     if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
+      this.registerCoreComponent(areaChartComponentRenderer);
       this.registerCoreComponent(barChartComponentRenderer);
       this.registerCoreComponent(donutChartComponentRenderer);
       this.registerCoreComponent(labelListComponentRenderer);
