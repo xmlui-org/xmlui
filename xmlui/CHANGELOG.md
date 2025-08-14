@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.100
+
+### Patch Changes
+
+- 2dbf6d2: Added accessibility features, enabled prop and defaultThemeVars to Pagination. Also created E2E test cases for Pagination
+
 ## 0.9.99
 
 ### Patch Changes
