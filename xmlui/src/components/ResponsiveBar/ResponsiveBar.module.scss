@@ -30,6 +30,7 @@ $margin-ResponsiveBar: createThemeVar("margin-ResponsiveBar");
     flex-direction: row;
     align-items: center;
     flex-shrink: 0;
+    flex-grow: 1; /* Allow this container to grow and push dropdown to the end */
     min-width: 0;
     overflow: hidden; // Hide overflow of items, but not the dropdown
   }

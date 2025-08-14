@@ -3,7 +3,6 @@ import React, {
   useRef,
   useEffect,
   useState,
-  useCallback,
   type CSSProperties,
   type ReactNode,
   type ReactElement,
@@ -13,6 +12,67 @@ import classnames from "classnames";
 import styles from "./ResponsiveBar.module.scss";
 import { useResizeObserver } from "../../components-core/utils/hooks";
 import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
+
+/**
+ * ResponsiveBar Component - Adaptive Horizontal Layout with Overflow Management
+ * 
+ * The ResponsiveBar is a sophisticated layout component that automatically manages horizontal space
+ * by moving child components that don't fit into a dropdown menu. It's ideal for toolbars, navigation
+ * bars, and action panels that need to adapt to different screen sizes and container widths.
+ * 
+ * ## How It Works:
+ * 
+ * ### Two-Phase Rendering System
+ * The component uses a two-phase rendering approach to accurately calculate layout:
+ * 
+ * **Phase 1 - Measurement Phase:**
+ * - Renders all child components invisibly (visibility: hidden, opacity: 0) 
+ * - Measures the actual width of each child component using getBoundingClientRect()
+ * - Also measures the dropdown button width for accurate overflow calculations
+ * - This phase ensures we have precise measurements before making layout decisions
+ * 
+ * **Phase 2 - Layout Phase:**
+ * - Uses the measured widths to calculate which items fit in the available space
+ * - Renders visible items in the main container and overflow items in a dropdown menu
+ * - Accounts for gaps between items and the space needed for the dropdown button
+ * 
+ * ### Overflow Logic
+ * The overflow calculation works as follows:
+ * 1. Calculate total width needed for all items (including gaps)
+ * 2. If all items fit: show all items, no dropdown
+ * 3. If overflow needed: calculate how many items can fit alongside the dropdown button
+ * 4. Ensure at least one item is always visible (even if it means showing dropdown with one item)
+ * 5. Account for gaps between items and the gap before the dropdown button
+ * 
+ * ### Responsive Behavior
+ * - Uses ResizeObserver to detect container width changes and recalculate layout
+ * - Prevents infinite loops by only triggering recalculation during the layout phase
+ * - Debounces calculations to avoid excessive re-renders during rapid resize events
+ * 
+ * ### Performance Optimizations
+ * - Stable children array using React.useMemo to prevent unnecessary re-measurements
+ * - Reference tracking to detect actual changes vs. rendering artifacts
+ * - Calculation throttling to prevent excessive DOM measurements
+ * - Layout completion tracking to ignore temporary children changes during layout updates
+ * 
+ * ### Key Features
+ * - **Automatic overflow management**: Items that don't fit are moved to a dropdown
+ * - **Configurable gaps**: Consistent spacing between items and dropdown
+ * - **Custom overflow icon**: Customizable dropdown trigger button icon
+ * - **Responsive**: Automatically adapts to container size changes
+ * - **Accessible**: Uses proper dropdown menu with keyboard navigation
+ * - **Performance optimized**: Minimal re-renders and efficient DOM measurements
+ * 
+ * @example
+ * ```tsx
+ * <ResponsiveBar gap={8} overflowIcon="menu">
+ *   <Button>Action 1</Button>
+ *   <Button>Action 2</Button>
+ *   <Button>Action 3</Button>
+ *   <Button>Action 4</Button>
+ * </ResponsiveBar>
+ * ```
+ */
 
 type ResponsiveBarProps = {
   children?: ReactNode;
@@ -63,7 +123,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const measurementDropdownRef = useRef<HTMLDivElement>(null);
-  const guardRef = useRef<HTMLDivElement>(null);
   const isCalculatingRef = useRef(false);
   const lastContainerWidth = useRef(0);
   const lastChildrenCount = useRef(0);
@@ -298,7 +357,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
 
   // Monitor container size changes - only in phase 2 to avoid infinite loops
   useResizeObserver(containerRef, () => {
-    if (!isInMeasurementPhase && guardRef.current && containerRef.current) {
+    if (!isInMeasurementPhase && containerRef.current) {
       const currentWidth = containerRef.current.getBoundingClientRect().width;
 
       if (currentWidth !== lastContainerWidth.current) {
@@ -390,20 +449,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
           )}
         </>
       )}
-
-      {/* Guard element - zero width, invisible, but present for resize detection */}
-      <div
-        ref={guardRef}
-        style={{
-          width: 0,
-          height: 0,
-          overflow: "hidden",
-          margin: 0,
-          padding: 0,
-          border: "none",
-        }}
-        aria-hidden="true"
-      />
     </div>
   );
 });

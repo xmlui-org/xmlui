@@ -1,4 +1,3 @@
-import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("ResponsiveBar", () => {
