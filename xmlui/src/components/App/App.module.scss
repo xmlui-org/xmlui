@@ -50,6 +50,11 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         position: relative;
         scrollbar-gutter: stable both-edges;
       }
+      &.noScrollbarGutters{
+        .contentWrapper {
+          scrollbar-gutter: auto;
+        }
+      }
       .navPanelWrapper {
         width: $width-navPanel-App;
         flex-shrink: 0;
@@ -252,35 +257,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   }
 
   .PagesWrapperInner {
-    --page-padding-left: #{t.$space-4};
-    --page-padding-right: #{t.$space-4};
-    --page-padding-top: #{t.$space-5};
-    --page-padding-bottom: #{t.$space-5};
-    --page-gap: #{t.$space-5};
     max-width: $maxWidth-content-App;
     width: 100%;
     margin: 0 auto;
     //flex: 1;
     min-height: 100%;
-    padding-top: var(--page-padding-top);
-    padding-bottom: var(--page-padding-bottom);
-    padding-right: var(--page-padding-right);
-    padding-left: var(--page-padding-left);
-    gap: var(--page-gap);
     display: flex;
     flex-direction: column;
-
-    & > :global(.xmlui-page-root) {
-      padding-top: var(--page-padding-top-override, var(--page-padding-top));
-      padding-bottom: var(--page-padding-bottom-override, var(--page-padding-bottom));
-      padding-right: var(--page-padding-right-override, var(--page-padding-right));
-      padding-left: var(--page-padding-left-override, var(--page-padding-left));
-      gap: var(--page-gap);
-      margin-top: calc(-1 * var(--page-padding-top));
-      margin-bottom: calc(-1 * var(--page-gap));
-      margin-left: calc(-1 * var(--page-padding-left));
-      margin-right: calc(-1 * var(--page-padding-right));
-    }
   }
 
   .footerWrapper {

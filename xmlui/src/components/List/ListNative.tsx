@@ -27,7 +27,7 @@ import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
 import type { CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
-import { useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
+import { useHasExplicitHeight, useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
@@ -275,6 +275,7 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
+
 export const ListNative = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,
@@ -306,16 +307,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
-  const [hasHeight, setHasHeight] = useState(false);
-  useLayoutEffect(() => {
-    if (parentRef.current) {
-      const computedStyles = window.getComputedStyle(parentRef.current);
-      const hasMaxHeight = computedStyles.maxHeight !== "none";
-      const hasHeight = computedStyles.height !== "auto";
-      const isFlex = computedStyles.display === "flex";
-      setHasHeight(hasMaxHeight || hasHeight || isFlex);
-    }
-  }, []);
+  const hasHeight = useHasExplicitHeight(parentRef);
   const hasOutsideScroll = scrollRef && !hasHeight;
 
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;

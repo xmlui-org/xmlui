@@ -22,10 +22,6 @@ type RouteWrapperProps = {
   layoutContext?: LayoutContext;
   style?: CSSProperties;
   className?: string;
-  paddingLeft?: string;
-  paddingRight?: string;
-  paddingTop?: string;
-  paddingBottom?: string;
   uid?: string;
 };
 
@@ -35,10 +31,6 @@ export function RouteWrapper({
   layoutContext,
   style,
   className,
-  paddingLeft,
-  paddingRight,
-  paddingTop,
-  paddingBottom,
   uid,
 }: RouteWrapperProps) {
   const params = useParams();
@@ -63,28 +55,11 @@ export function RouteWrapper({
     };
   }, [childRoute, uid]);
 
-  const wrapperStyle = useMemo(() => {
-    const styleWithoutPaddings = { ...style };
-    // Remove padding properties from the style object
-    delete styleWithoutPaddings.padding;
-    delete styleWithoutPaddings.paddingLeft;
-    delete styleWithoutPaddings.paddingRight;
-    delete styleWithoutPaddings.paddingTop;
-    delete styleWithoutPaddings.paddingBottom;
-    return {
-      ...styleWithoutPaddings,
-      "--page-padding-left-override": paddingLeft,
-      "--page-padding-right-override": paddingRight,
-      "--page-padding-top-override": paddingTop,
-      "--page-padding-bottom-override": paddingBottom,
-    };
-  }, [paddingBottom, paddingLeft, paddingRight, paddingTop, style]);
-
   return (
     <div
       key={JSON.stringify(params)}
       className={classnames(className, styles.wrapper, "xmlui-page-root")}
-      style={wrapperStyle}
+      style={style}
     >
       {renderChild(wrappedWithContainer, layoutContext)}
     </div>
@@ -99,6 +74,7 @@ type PagesProps = {
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   children?: ReactNode;
+  className?: ReactNode;
 };
 
 export function Pages({

@@ -41,10 +41,11 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { useEvent } from "../../components-core/utils/misc";
 import {
+  useHasExplicitHeight,
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-  useStartMargin,
+  useStartMargin
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
@@ -491,16 +492,7 @@ export const Table = forwardRef(
 
     const scrollRef = useContext(ScrollContext);
 
-    const [hasHeight, setHasHeight] = useState(false);
-    useLayoutEffect(() => {
-      if (wrapperRef.current) {
-        const computedStyles = window.getComputedStyle(wrapperRef.current);
-        const hasMaxHeight = computedStyles.maxHeight !== "none";
-        const hasHeight = computedStyles.height !== "auto";
-        const isFlex = computedStyles.display === "flex";
-        setHasHeight(hasMaxHeight || hasHeight || isFlex);
-      }
-    }, []);
+    const hasHeight = useHasExplicitHeight(wrapperRef);
 
     const hasOutsideScroll = scrollRef && !hasHeight;
 
