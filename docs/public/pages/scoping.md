@@ -180,7 +180,7 @@ Or the component ID can be transposed into the user-defined component by means o
 <App var.message="Hello from App">
   <TextBox id="textBox" initialValue="{message}" />
   <MyCard>
-    <Text>Message: {message}</Text>
+    <Text>Message: {textBox.value}</Text>
   </MyCard>
 </App>
 ---comp display filename="MyCard.xmlui"
