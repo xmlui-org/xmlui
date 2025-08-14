@@ -44,6 +44,12 @@ export const PaginationMd = createMetadata({
       availableValues: orientationOptionMd,
       default: defaultProps.orientation,
     },
+    reverseLayout: d(
+      "Whether to reverse the order of pagination sections",
+      undefined,
+      "boolean",
+      defaultProps.reverseLayout,
+    ),
   },
   events: {
     pageDidChange: d("Fired when the current page changes"),
@@ -129,6 +135,10 @@ export const paginationComponentRenderer = createComponentRenderer(
       );
       orientation = defaultProps.orientation;
     }
+    const reverseLayout = extractValue.asOptionalBoolean(
+      node.props.reverseLayout,
+      defaultProps.reverseLayout,
+    );
 
     // Create event handlers
     const onPageDidChange = lookupEventHandler("pageDidChange");
@@ -144,6 +154,7 @@ export const paginationComponentRenderer = createComponentRenderer(
         maxVisiblePages={maxVisiblePages as PageNumber}
         pageSizeOptions={pageSizeOptions}
         orientation={orientation as OrientationOptions}
+        reverseLayout={reverseLayout}
         onPageDidChange={onPageDidChange}
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}

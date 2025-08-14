@@ -10,7 +10,7 @@ import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
 
 export const PageNumberValues = [1, 3, 5] as const;
-export type PageNumber = typeof PageNumberValues[number];
+export type PageNumber = (typeof PageNumberValues)[number];
 
 type Props = {
   id?: string;
@@ -22,6 +22,7 @@ type Props = {
   hasPageInfo?: boolean;
   pageSizeOptions?: number[];
   orientation?: OrientationOptions;
+  reverseLayout?: boolean;
   onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -31,7 +32,16 @@ type Props = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps: Required<
-  Pick<Props, "itemCount" | "pageSize" | "pageIndex" | "maxVisiblePages" | "hasPageInfo" | "orientation">
+  Pick<
+    Props,
+    | "itemCount"
+    | "pageSize"
+    | "pageIndex"
+    | "maxVisiblePages"
+    | "hasPageInfo"
+    | "orientation"
+    | "reverseLayout"
+  >
 > = {
   itemCount: 0,
   pageSize: 10,
@@ -39,6 +49,7 @@ export const defaultProps: Required<
   maxVisiblePages: 1,
   hasPageInfo: true,
   orientation: "horizontal",
+  reverseLayout: false,
 };
 
 interface PaginationAPI {
@@ -61,6 +72,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     hasPageInfo = defaultProps.hasPageInfo,
     pageSizeOptions,
     orientation = defaultProps.orientation,
+    reverseLayout = defaultProps.reverseLayout,
     onPageDidChange,
     onPageSizeDidChange,
     registerComponentApi,
@@ -186,15 +198,15 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       ref={ref as any}
       id={id}
       className={classnames(
-        styles.pagination, 
+        styles.pagination,
         orientation === "vertical" ? styles.paginationVertical : styles.paginationHorizontal,
-        className
+        reverseLayout && styles.paginationReverse,
+        className,
       )}
       style={style}
     >
-      {/* Page size selector */}
       {pageSizeOptions && pageSizeOptions.length > 1 && (
-        <div className={styles.selectorContainer}>
+        <div key="page-size-selector" className={styles.selectorContainer}>
           <Text variant="secondary" className={styles.pageSizeLabel}>
             Rows per page
           </Text>
@@ -213,105 +225,104 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           </select>
         </div>
       )}
-
-      <ul role="list" className={styles.paginationList}>
-        {/* First page button */}
-        <li>
-          <Button
-            variant="outlined"
-            size="sm"
-            disabled={!enabled || isFirstPage}
-            onClick={() => handlePageChange(0)}
-            contextualLabel="First page"
-            style={{ minHeight: "36px", padding: "8px" }}
-            aria-label="First page"
-          >
-            <Icon name="doublechevronleft" size="sm" />
-          </Button>
-        </li>
-
-        {/* Previous page button */}
-        {visiblePages.length <= 2 && (
+      {
+        <ul key="pagination-controls" role="list" className={styles.paginationList}>
+          {/* First page button */}
           <li>
             <Button
               variant="outlined"
               size="sm"
               disabled={!enabled || isFirstPage}
-              onClick={() => handlePageChange(currentPage - 1)}
-              contextualLabel="Previous page"
+              onClick={() => handlePageChange(0)}
+              contextualLabel="First page"
               style={{ minHeight: "36px", padding: "8px" }}
-              aria-label="Previous page"
+              aria-label="First page"
             >
-              <Icon name="chevronleft" size="sm" />
+              <Icon name="doublechevronleft" size="sm" />
             </Button>
           </li>
-        )}
 
-        {/* Page number buttons */}
-        {visiblePages.length === 1 && (
-          <li>
-            <Text
-              variant="strong"
-              style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
-              aria-current="true"
-            >
-              {visiblePages[0]}
-            </Text>
-          </li>
-        )}
-        {visiblePages.length > 1 &&
-          visiblePages.map((pageNum) => (
-            <li key={`page-${pageNum}`}>
+          {/* Previous page button */}
+          {visiblePages.length <= 2 && (
+            <li>
               <Button
-                variant={pageNum === currentPageNumber ? "solid" : "outlined"}
-                disabled={!enabled}
+                variant="outlined"
                 size="sm"
-                onClick={() => handlePageChange(pageNum - 1)}
-                contextualLabel={`Page ${pageNum}`}
-                aria-current={pageNum === currentPageNumber ? "true" : undefined}
-                aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+                disabled={!enabled || isFirstPage}
+                onClick={() => handlePageChange(currentPage - 1)}
+                contextualLabel="Previous page"
+                style={{ minHeight: "36px", padding: "8px" }}
+                aria-label="Previous page"
               >
-                {pageNum}
+                <Icon name="chevronleft" size="sm" />
               </Button>
             </li>
-          ))}
+          )}
 
-        {/* Next page button */}
-        {visiblePages.length <= 2 && (
+          {/* Page number buttons */}
+          {visiblePages.length === 1 && (
+            <li>
+              <Text
+                variant="strong"
+                style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+                aria-current="true"
+              >
+                {visiblePages[0]}
+              </Text>
+            </li>
+          )}
+          {visiblePages.length > 1 &&
+            visiblePages.map((pageNum) => (
+              <li key={`page-${pageNum}`}>
+                <Button
+                  variant={pageNum === currentPageNumber ? "solid" : "outlined"}
+                  disabled={!enabled}
+                  size="sm"
+                  onClick={() => handlePageChange(pageNum - 1)}
+                  contextualLabel={`Page ${pageNum}`}
+                  aria-current={pageNum === currentPageNumber ? "true" : undefined}
+                  aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+                >
+                  {pageNum}
+                </Button>
+              </li>
+            ))}
+
+          {/* Next page button */}
+          {visiblePages.length <= 2 && (
+            <li>
+              <Button
+                variant="outlined"
+                size="sm"
+                disabled={!enabled || isLastPage}
+                onClick={() => handlePageChange(currentPage + 1)}
+                contextualLabel="Next page"
+                style={{ minHeight: "36px", padding: "8px" }}
+                aria-label="Next page"
+              >
+                <Icon name="chevronright" size="sm" />
+              </Button>
+            </li>
+          )}
+
+          {/* Last page button */}
           <li>
             <Button
               variant="outlined"
               size="sm"
               disabled={!enabled || isLastPage}
-              onClick={() => handlePageChange(currentPage + 1)}
-              contextualLabel="Next page"
+              onClick={() => handlePageChange(totalPages - 1)}
+              contextualLabel="Last page"
               style={{ minHeight: "36px", padding: "8px" }}
-              aria-label="Next page"
+              aria-label="Last page"
             >
-              <Icon name="chevronright" size="sm" />
+              <Icon name="doublechevronright" size="sm" />
             </Button>
           </li>
-        )}
-
-        {/* Last page button */}
-        <li>
-          <Button
-            variant="outlined"
-            size="sm"
-            disabled={!enabled || isLastPage}
-            onClick={() => handlePageChange(totalPages - 1)}
-            contextualLabel="Last page"
-            style={{ minHeight: "36px", padding: "8px" }}
-            aria-label="Last page"
-          >
-            <Icon name="doublechevronright" size="sm" />
-          </Button>
-        </li>
-      </ul>
-
-      {/* Page info */}
+        </ul>
+      }
       {hasPageInfo && (
-        <Text variant="secondary">
+        <Text key="page-info" variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
         </Text>
       )}

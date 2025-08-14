@@ -33,6 +33,16 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
   align-items: center;
 }
 
+.paginationReverse {
+  &.paginationHorizontal {
+    flex-direction: row-reverse;
+  }
+  
+  &.paginationVertical {
+    flex-direction: column-reverse;
+  }
+}
+
 .selectorContainer {
   display: flex;
   flex-direction: row;

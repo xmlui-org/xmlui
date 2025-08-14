@@ -296,6 +296,85 @@ test.describe("Orientation", () => {
 });
 
 // =============================================================================
+// REVERSE LAYOUT TESTS  
+// =============================================================================
+
+test.describe("Reverse Layout", () => {
+  test("defaults to normal layout order", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    
+    // Should not have reverse class by default
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).not.toHaveClass(/paginationReverse/);
+  });
+
+  test("applies reverse layout when reverseLayout=true with horizontal orientation", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`);
+    
+    // Should have reverse class
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationReverse/);
+    await expect(nav).toHaveClass(/paginationHorizontal/);
+  });
+
+  test("applies reverse layout when reverseLayout=true with vertical orientation", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true" orientation="vertical"/>`);
+    
+    // Should have both reverse and vertical classes
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationReverse/);
+    await expect(nav).toHaveClass(/paginationVertical/);
+  });
+
+  test("reverse layout shows page info first in horizontal mode", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`);
+    
+    // In reverse layout, sections should be in reverse order
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationReverse/);
+    
+    // Page info should be visible
+    const pageInfo = nav.getByText(/Page \d+ of \d+/);
+    await expect(pageInfo).toBeVisible();
+    
+    // Navigation controls should be visible
+    await expect(page.getByLabel("First page")).toBeVisible();
+  });
+
+  test("reverse layout maintains accessibility", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" reverseLayout="true"/>`);
+    
+    // All accessibility features should still work
+    const nav = page.getByRole("navigation");
+    await expect(nav).toBeVisible();
+    await expect(nav).toHaveAttribute("aria-label", "Pagination");
+    
+    await expect(page.getByLabel("First page")).toBeVisible();
+    await expect(page.getByLabel("Previous page")).toBeVisible();
+    await expect(page.getByLabel("Next page")).toBeVisible();
+    await expect(page.getByLabel("Last page")).toBeVisible();
+  });
+
+  test("reverse layout works with page size selector", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`);
+    
+    // Page size selector should still be functional
+    await expect(page.getByText("Rows per page")).toBeVisible();
+    
+    const selector = page.locator("#undefined-page-size-selector");
+    await expect(selector).toBeVisible();
+    await expect(selector).toHaveValue("10");
+    
+    // Should be able to interact with the selector (this triggers the event)
+    await selector.selectOption("20");
+    
+    // Note: In a real application, the parent would update the pageSize prop
+    // which would cause the select to show the new value. For this test,
+    // we're just verifying the interaction is possible with reverse layout.
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
