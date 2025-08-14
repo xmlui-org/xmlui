@@ -17,11 +17,20 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
 
 .pagination {
   display: flex;
-  flex-direction: column;
   align-items: createThemeVar("alignment-Pagination");
   padding: createThemeVar("padding-Pagination");
   gap: t.$space-4;
   width: 100%;
+}
+
+.paginationHorizontal {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.paginationVertical {
+  flex-direction: column;
+  align-items: center;
 }
 
 .selectorContainer {

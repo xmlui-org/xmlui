@@ -7,6 +7,7 @@ import { Button } from "../Button/ButtonNative";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { Text } from "../Text/TextNative";
 import { Icon } from "../Icon/IconNative";
+import type { OrientationOptions } from "../abstractions";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = typeof PageNumberValues[number];
@@ -20,6 +21,7 @@ type Props = {
   maxVisiblePages?: PageNumber;
   hasPageInfo?: boolean;
   pageSizeOptions?: number[];
+  orientation?: OrientationOptions;
   onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -29,13 +31,14 @@ type Props = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps: Required<
-  Pick<Props, "itemCount" | "pageSize" | "pageIndex" | "maxVisiblePages" | "hasPageInfo">
+  Pick<Props, "itemCount" | "pageSize" | "pageIndex" | "maxVisiblePages" | "hasPageInfo" | "orientation">
 > = {
   itemCount: 0,
   pageSize: 10,
   pageIndex: 0,
   maxVisiblePages: 1,
   hasPageInfo: true,
+  orientation: "horizontal",
 };
 
 interface PaginationAPI {
@@ -57,6 +60,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     maxVisiblePages = defaultProps.maxVisiblePages,
     hasPageInfo = defaultProps.hasPageInfo,
     pageSizeOptions,
+    orientation = defaultProps.orientation,
     onPageDidChange,
     onPageSizeDidChange,
     registerComponentApi,
@@ -181,7 +185,11 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       aria-label="Pagination"
       ref={ref as any}
       id={id}
-      className={classnames(styles.pagination, className)}
+      className={classnames(
+        styles.pagination, 
+        orientation === "vertical" ? styles.paginationVertical : styles.paginationHorizontal,
+        className
+      )}
       style={style}
     >
       {/* Page size selector */}

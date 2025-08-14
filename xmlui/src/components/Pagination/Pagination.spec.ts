@@ -249,6 +249,53 @@ test.describe("Page Size Selector", () => {
 });
 
 // =============================================================================
+// ORIENTATION TESTS  
+// =============================================================================
+
+test.describe("Orientation", () => {
+  test("defaults to horizontal orientation", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10"/>`);
+    
+    // Should have horizontal class by default
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationHorizontal/);
+  });
+
+  test("applies horizontal orientation when specified", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" orientation="horizontal"/>`);
+    
+    // Should have horizontal class
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationHorizontal/);
+  });
+
+  test("applies vertical orientation when specified", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" orientation="vertical"/>`);
+    
+    // Should have vertical class
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationVertical/);
+  });
+
+  test("falls back to default orientation for invalid values", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" orientation="invalid"/>`);
+    
+    // Should fall back to horizontal (default)
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationHorizontal/);
+  });
+
+  test("vertical orientation works with page size selector", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" orientation="vertical" pageSizeOptions="{[5, 10, 20]}"/>`);
+    
+    // Should have vertical class and show page size selector
+    const nav = page.locator('nav[aria-label="Pagination"]');
+    await expect(nav).toHaveClass(/paginationVertical/);
+    await expect(page.getByText("Rows per page")).toBeVisible();
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
