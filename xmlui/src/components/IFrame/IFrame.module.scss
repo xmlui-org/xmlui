@@ -10,13 +10,17 @@ $themeVars: ();
 $component: "IFrame";
 $themeVars: t.composeBorderVars($themeVars, $component);
 
-.iframe {
-  @include t.borderVars($themeVars, $component);
 
-  display: block;
-  width: createThemeVar("width-IFrame");
-  height: createThemeVar("height-IFrame");
+@layer components {
+  .iframe {
+    @include t.borderVars($themeVars, $component);
+
+    display: block;
+    width: createThemeVar("width-IFrame");
+    height: createThemeVar("height-IFrame");
+  }
 }
+
 
 // --- We export the theme variables to add them to the component renderer
 :export{

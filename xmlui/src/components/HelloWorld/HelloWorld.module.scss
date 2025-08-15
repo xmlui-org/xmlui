@@ -15,88 +15,90 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, $component, $component);
 
-.helloWorld {
-  @include t.paddingVars($themeVars, $component);
-  @include t.borderVars($themeVars, $component);
-  @include t.textVars($themeVars, $component);
-  
-  border-radius: createThemeVar("borderRadius-#{$component}");
-  max-width: createThemeVar("maxWidth-#{$component}");
-}
+@layer components {
+  .helloWorld {
+    @include t.paddingVars($themeVars, $component);
+    @include t.borderVars($themeVars, $component);
+    @include t.textVars($themeVars, $component);
 
-.content {
-  text-align: createThemeVar("textAlign-#{$component}-content");
-}
-
-.message {
-  margin-bottom: createThemeVar("marginBottom-#{$component}-message");
-  font-size: createThemeVar("fontSize-#{$component}-message");
-  font-weight: createThemeVar("fontWeight-#{$component}-message");
-}
-
-.children {
-  margin: createThemeVar("margin-#{$component}-children");
-  padding: createThemeVar("padding-#{$component}-children");
-  background-color: createThemeVar("backgroundColor-#{$component}-children");
-  border-radius: createThemeVar("borderRadius-#{$component}-children");
-  font-style: createThemeVar("fontStyle-#{$component}-children");
-}
-
-.interactive {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: createThemeVar("gap-#{$component}-interactive");
-}
-
-.clickButton {
-  background-color: createThemeVar("backgroundColor-#{$component}-clickButton");
-  color: createThemeVar("textColor-#{$component}-clickButton");
-  border: createThemeVar("border-#{$component}-clickButton");
-  border-radius: createThemeVar("borderRadius-#{$component}-clickButton");
-  padding: createThemeVar("padding-#{$component}-clickButton");
-  font-size: createThemeVar("fontSize-#{$component}-clickButton");
-  font-weight: createThemeVar("fontWeight-#{$component}-clickButton");
-  cursor: pointer;
-  transition: createThemeVar("transition-#{$component}-clickButton");
-
-  &:hover {
-    background-color: createThemeVar("backgroundColor-#{$component}-clickButton--hover");
+    border-radius: createThemeVar("borderRadius-#{$component}");
+    max-width: createThemeVar("maxWidth-#{$component}");
   }
 
-  &:active {
-    transform: createThemeVar("transform-#{$component}-clickButton--active");
+  .content {
+    text-align: createThemeVar("textAlign-#{$component}-content");
   }
-}
 
-.counter {
-  font-size: createThemeVar("fontSize-#{$component}-counter");
-  font-weight: createThemeVar("fontWeight-#{$component}-counter");
-}
+  .message {
+    margin-bottom: createThemeVar("marginBottom-#{$component}-message");
+    font-size: createThemeVar("fontSize-#{$component}-message");
+    font-weight: createThemeVar("fontWeight-#{$component}-message");
+  }
 
-.count {
-  display: inline-block;
-  background-color: createThemeVar("backgroundColor-#{$component}-count");
-  color: createThemeVar("textColor-#{$component}-count");
-  padding: createThemeVar("padding-#{$component}-count");
-  border-radius: createThemeVar("borderRadius-#{$component}-count");
-  font-weight: createThemeVar("fontWeight-#{$component}-count");
-  min-width: createThemeVar("minWidth-#{$component}-count");
-  text-align: center;
-}
+  .children {
+    margin: createThemeVar("margin-#{$component}-children");
+    padding: createThemeVar("padding-#{$component}-children");
+    background-color: createThemeVar("backgroundColor-#{$component}-children");
+    border-radius: createThemeVar("borderRadius-#{$component}-children");
+    font-style: createThemeVar("fontStyle-#{$component}-children");
+  }
 
-.resetButton {
-  background-color: createThemeVar("backgroundColor-#{$component}-resetButton");
-  color: createThemeVar("textColor-#{$component}-resetButton");
-  border: createThemeVar("border-#{$component}-resetButton");
-  border-radius: createThemeVar("borderRadius-#{$component}-resetButton");
-  padding: createThemeVar("padding-#{$component}-resetButton");
-  font-size: createThemeVar("fontSize-#{$component}-resetButton");
-  cursor: pointer;
-  transition: createThemeVar("transition-#{$component}-resetButton");
+  .interactive {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: createThemeVar("gap-#{$component}-interactive");
+  }
 
-  &:hover {
-    background-color: createThemeVar("backgroundColor-#{$component}-resetButton--hover");
+  .clickButton {
+    background-color: createThemeVar("backgroundColor-#{$component}-clickButton");
+    color: createThemeVar("textColor-#{$component}-clickButton");
+    border: createThemeVar("border-#{$component}-clickButton");
+    border-radius: createThemeVar("borderRadius-#{$component}-clickButton");
+    padding: createThemeVar("padding-#{$component}-clickButton");
+    font-size: createThemeVar("fontSize-#{$component}-clickButton");
+    font-weight: createThemeVar("fontWeight-#{$component}-clickButton");
+    cursor: pointer;
+    transition: createThemeVar("transition-#{$component}-clickButton");
+
+    &:hover {
+      background-color: createThemeVar("backgroundColor-#{$component}-clickButton--hover");
+    }
+
+    &:active {
+      transform: createThemeVar("transform-#{$component}-clickButton--active");
+    }
+  }
+
+  .counter {
+    font-size: createThemeVar("fontSize-#{$component}-counter");
+    font-weight: createThemeVar("fontWeight-#{$component}-counter");
+  }
+
+  .count {
+    display: inline-block;
+    background-color: createThemeVar("backgroundColor-#{$component}-count");
+    color: createThemeVar("textColor-#{$component}-count");
+    padding: createThemeVar("padding-#{$component}-count");
+    border-radius: createThemeVar("borderRadius-#{$component}-count");
+    font-weight: createThemeVar("fontWeight-#{$component}-count");
+    min-width: createThemeVar("minWidth-#{$component}-count");
+    text-align: center;
+  }
+
+  .resetButton {
+    background-color: createThemeVar("backgroundColor-#{$component}-resetButton");
+    color: createThemeVar("textColor-#{$component}-resetButton");
+    border: createThemeVar("border-#{$component}-resetButton");
+    border-radius: createThemeVar("borderRadius-#{$component}-resetButton");
+    padding: createThemeVar("padding-#{$component}-resetButton");
+    font-size: createThemeVar("fontSize-#{$component}-resetButton");
+    cursor: pointer;
+    transition: createThemeVar("transition-#{$component}-resetButton");
+
+    &:hover {
+      background-color: createThemeVar("backgroundColor-#{$component}-resetButton--hover");
+    }
   }
 }
 
