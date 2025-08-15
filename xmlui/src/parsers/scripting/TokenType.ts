@@ -110,5 +110,4 @@ export enum TokenType {
   Delete,
   Function,
   As,
-  From,
 }
