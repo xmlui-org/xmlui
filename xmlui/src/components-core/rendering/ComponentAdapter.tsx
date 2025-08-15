@@ -244,7 +244,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       extractResourceUrl,
       renderChild: memoedRenderChild,
       registerComponentApi: memoedRegisterComponentApi,
-      layoutCss: stableLayoutCss,
       className,
       layoutContext: layoutContextRef?.current,
       uid,
