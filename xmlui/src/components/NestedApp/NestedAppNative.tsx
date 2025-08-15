@@ -170,11 +170,9 @@ export function NestedApp({
             // Create a new CSSStyleSheet object
             const newSheet = new CSSStyleSheet();
             // Get the CSS rules as text
-            console.log("Processing stylesheet:", sheet.cssRules);
             const cssText = Array.from(sheet.cssRules)
               .map((rule) => rule.cssText)
               .join(" \n");
-            console.log("processed cssText:", cssText);
             // Apply the text to the new sheet object
             await newSheet.replace(cssText);
             return newSheet;

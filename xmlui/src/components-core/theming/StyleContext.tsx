@@ -85,14 +85,14 @@ export const StyleInjectionTargetContext = createContext<Document | ShadowRoot |
 
 function useDomRoot(){
   const domRoot = useContext(StyleInjectionTargetContext);
-  return domRoot || document;
+  return domRoot;
 }
 
 export function useStyles(styles?: StyleObjectType): string {
   // we skip this whole thing if we're indexing
   const {indexing} = useIndexerContext();
   const domRoot = useDomRoot();
-  const injectionTarget = domRoot instanceof ShadowRoot ? domRoot : document.head
+  const injectionTarget = typeof document === "undefined" ? null : domRoot instanceof ShadowRoot ? domRoot : document.head
   const registry = useStyleRegistry();
   const { className, styleHash } = useMemo(() => {
     if(indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
