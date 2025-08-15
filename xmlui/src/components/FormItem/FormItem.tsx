@@ -234,7 +234,6 @@ export const formItemComponentRenderer = createComponentRenderer(
     renderChild,
     extractValue,
     className,
-    layoutCss,
     layoutContext,
     lookupEventHandler,
     lookupAction,
@@ -272,14 +271,7 @@ export const formItemComponentRenderer = createComponentRenderer(
       ...rest
     } = node.props;
 
-    const nonLayoutCssProps = !layoutCss
-      ? rest
-      : Object.fromEntries(
-          Object.entries(rest).filter(([key, _]) => {
-            return !layoutCss?.hasOwnProperty(key);
-          }),
-        );
-    const resolvedRestProps = extractValue(nonLayoutCssProps);
+    const resolvedRestProps = extractValue(rest);
     const formItemType = extractValue.asOptionalString(type);
     const isCustomFormItem =
       (formItemType === undefined || formItemType === "custom") && !!node.children;

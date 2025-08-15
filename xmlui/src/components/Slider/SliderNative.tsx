@@ -233,7 +233,7 @@ export const Slider = forwardRef(
             ref={inputRef}
             tabIndex={tabIndex}
             aria-readonly={readOnly}
-            className={classnames(styles.sliderRoot, {
+            className={classnames(className, styles.sliderRoot, {
               [styles.disabled]: !enabled,
               [styles.readOnly]: readOnly
             })}

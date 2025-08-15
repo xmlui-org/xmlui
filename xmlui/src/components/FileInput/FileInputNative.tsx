@@ -27,6 +27,7 @@ type Props = {
   id?: string;
   enabled?: boolean;
   style?: CSSProperties;
+  className?: string;
   // Button styles
   buttonLabel?: string;
   variant?: ButtonVariant;
@@ -86,6 +87,7 @@ export const FileInput = ({
   id,
   enabled = defaultProps.enabled,
   style,
+  className,
   placeholder,
   buttonPosition = defaultProps.buttonPosition,
   buttonLabel = defaultProps.buttonLabel,
@@ -193,6 +195,7 @@ export const FileInput = ({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       isInputTemplateUsed={true}
     >
       <div
