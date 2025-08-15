@@ -23,15 +23,14 @@ export const Backdrop = forwardRef(function Backdrop(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const styleWithoutDims = { ...style, width: undefined };
   return (
     <div
       className={classNames(styles.backdropContainer, className)}
-      style={{ width: style.width ?? "fit-content" }}
       ref={forwardedRef}
+      style={style}
     >
       {children}
-      <div className={styles.backdrop} style={{ ...styleWithoutDims, backgroundColor, opacity }} />
+      <div className={styles.backdrop} style={{ backgroundColor, opacity }} />
       {overlayTemplate && <div className={styles.overlay}>{overlayTemplate}</div>}
     </div>
   );

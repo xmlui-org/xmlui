@@ -223,15 +223,19 @@ export const TextArea = forwardRef(function TextArea(
     [enterSubmits, escResets],
   );
 
+  let classes = classnames(className, styles.textarea, {
+    [styles.resizeHorizontal]: resize === "horizontal",
+    [styles.resizeVertical]: resize === "vertical",
+    [styles.resizeBoth]: resize === "both",
+    [styles.focused]: focused,
+    [styles.disabled]: !enabled,
+    [styles.error]: validationStatus === "error",
+    [styles.warning]: validationStatus === "warning",
+    [styles.valid]: validationStatus === "valid",
+  });
   const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
     React.RefAttributes<HTMLTextAreaElement> = {
-    className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
-      [styles.focused]: focused,
-      [styles.disabled]: !enabled,
-      [styles.error]: validationStatus === "error",
-      [styles.warning]: validationStatus === "warning",
-      [styles.valid]: validationStatus === "valid",
-    }),
+    className: classes,
     ref: inputRef,
     style: style as any,
     value: controlled ? value || "" : undefined,
@@ -265,12 +269,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={className}
+        className={classes}
       >
         <TextAreaResizable
           {...textareaProps}
           style={style as any}
-          className={className}
+          className={classes}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -291,12 +295,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={className}
+        className={classes}
       >
         <TextareaAutosize
           {...textareaProps}
           style={style as any}
-          className={className}
+          className={classes}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -317,7 +321,7 @@ export const TextArea = forwardRef(function TextArea(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
-      className={className}
+      className={classes}
     >
       <textarea {...textareaProps} rows={rows} />
     </ItemWithLabel>

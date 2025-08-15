@@ -13,6 +13,7 @@ $opacity-Backdrop: createThemeVar("opacity-Backdrop");
 .backdropContainer {
   position: relative;
   display: inline-block;
+  width: fit-content;
 }
 
 .backdrop {
