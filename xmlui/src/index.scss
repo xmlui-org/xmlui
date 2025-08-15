@@ -1,7 +1,9 @@
 @use "./components-core/theming/themes.scss" as t;
 
 /* 1. Declare the order of all layers in your application.
-      'dynamic' is last, so it will override all other layers. */
+      'dynamic' is last, so it will override all other layers.
+      IF YOU ARE CHANGING THE ORDER, MAKE SURE TO UPDATE THE ORDER IN NestedApp, too.
+       */
 @layer reset, base, components, dynamic;
 
 

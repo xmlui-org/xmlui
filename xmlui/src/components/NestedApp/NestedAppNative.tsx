@@ -146,6 +146,13 @@ export function NestedApp({
     if (!shadowRef.current && rootRef.current) {
       // Clone existing style and link tags
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
+      let style = document.createElement("style");
+
+      // since we are using shadow DOM, we need to define the layers here
+      // to ensure that the styles are applied correctly (the adopted styleheets setting is asynchronous, so the layer order might not be respected if we don't do this)
+      // MUST BE IN SYNC WITH THE STYLESHEET ORDER IN index.scss
+      style.innerHTML = "@layer reset, base, components, dynamic;"
+      shadowRef.current.appendChild(style);
 
       // This should run once to prepare the stylesheets
       const sheetPromises = Array.from(document.styleSheets).map(async (sheet) => {
@@ -163,9 +170,11 @@ export function NestedApp({
             // Create a new CSSStyleSheet object
             const newSheet = new CSSStyleSheet();
             // Get the CSS rules as text
+            console.log("Processing stylesheet:", sheet.cssRules);
             const cssText = Array.from(sheet.cssRules)
               .map((rule) => rule.cssText)
-              .join(" ");
+              .join(" \n");
+            console.log("processed cssText:", cssText);
             // Apply the text to the new sheet object
             await newSheet.replace(cssText);
             return newSheet;

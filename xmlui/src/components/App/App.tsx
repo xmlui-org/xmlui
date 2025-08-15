@@ -342,6 +342,8 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     findOrCreateNavGroup,
   ]);
 
+  const applyDefaultContentPadding= !Pages;
+
   // --- Memoize all app props to prevent unnecessary re-renders
   const appProps = useMemo(
     () => ({
@@ -358,6 +360,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       logoLight: extractValue(node.props["logo-light"]),
       defaultTone: extractValue(node.props.defaultTone),
       defaultTheme: extractValue(node.props.defaultTheme),
+      applyDefaultContentPadding
     }),
     [
       extractValue,
@@ -373,6 +376,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       node.props.defaultTone,
       node.props.defaultTheme,
       className,
+      applyDefaultContentPadding
     ],
   );
 
@@ -381,8 +385,6 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
   const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
   const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
-
-  const paddings = extractPaddings(extractValue, node.props);
 
   return (
     <App
@@ -393,7 +395,6 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
-      {...paddings}
     >
       {renderedContent}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />

@@ -59,207 +59,210 @@ $borderColor-button-splitView-NestedApp: createThemeVar(
 );
 $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
 
-.nestedAppPlaceholder{
-  width: 100%;
-  height: 100%;
-  background-color: t.$backgroundColor;
-  position: relative;
-}
-
-.loadingContainer {
-  position: absolute;
-  left: 50%;
-  top: calc(50% - 25px);
-  transform: translateX(-50%); /* Center perfectly on the X axis */
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Center the content horizontally */
-  width: 300px;
-  height: 50px;
-}
-
-.logoWrapper {
-  width: 50px;
-  height: 50px;
-  transform: translateZ(0);
-  .animatedLogoPath{
-    will-change: stroke-dashoffset, stroke-dasharray;
-    /* The total length of the rectangle path is ~82. */
-    stroke-dasharray: 82;
-    stroke-dashoffset: 82;
-
-    /* Animation: name, duration, easing, and iteration count */
-    animation: draw-loop 3s ease-in-out infinite;
-  }
-}
-
-.loadingText {
-  margin-right: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px; /* Increased by 20% from 16px */
-  font-weight: 500;
-  color: $color-loadingText-NestedApp;
-  text-align: right;
-}
-
-/* Defines the animation steps */
-@keyframes draw-loop {
-  /* At the start, the path is not drawn */
-  0% {
-    stroke-dashoffset: 82;
-  }
-  /* Animate to fully drawn over 40% of the duration */
-  40% {
-    stroke-dashoffset: 0;
-  }
-  /* Hold the fully drawn state until the end */
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-.nestedAppRoot{
-  width: 100%;
-  height: 100%;
-  position: relative;
-  isolation: isolate;
-  background-color: t.$backgroundColor;
-  &.shouldAnimate{
-    transition: clip-path 1s, opacity 1s;
-    clip-path: inset(50% round 50%);
-    &:not(.initialized){
-      opacity: 0;
-    }
-    &.initialized{
-      opacity: 1;
-      clip-path: inset(0% round 0%);
-    }
-  }
-}
-
-// --- End of theme variables collection
-
-.nestedAppContainer {
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
-
-  //https://stackoverflow.com/a/70422489
-  //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block#identifying_the_containing_block
-  //" ...If the position property is absolute or fixed, the containing block may also be formed by the edge of the padding box of the nearest ancestor element that has any of the following:
-  // A filter, backdrop-filter, transform, or perspective value other than none. ..."
-
-  // so we do this to make the position 'fixed' elements to be positioned relative to the nestedAppContainer
-  //transform: scale(1);
-  margin-top: $marginTop-NestedApp;
-  margin-bottom: $marginBottom-NestedApp;
-  width: 100%;
-  height: fit-content;
-  display: flex;
-  border-radius: $bordRadius-NestedApp;
-  flex-direction: column;
-  gap: $gap-frame-NestedApp;
-  background-color: $backgroundColor-frame-NestedApp;
-  align-content: center;
-  box-shadow: $boxShadow-NestedApp;
-  overflow: hidden;
-
-  .contentContainer {
+@layer components {
+  .nestedAppPlaceholder{
     width: 100%;
     height: 100%;
-    overflow: auto;
+    background-color: t.$backgroundColor;
+    position: relative;
+  }
+
+  .loadingContainer {
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 25px);
+    transform: translateX(-50%); /* Center perfectly on the X axis */
     display: flex;
     align-items: center;
+    justify-content: center; /* Center the content horizontally */
+    width: 300px;
+    height: 50px;
+  }
 
-    .splitViewMarkdown{
-      height: 100%;
-      :global(.global-codeBlock){
-        background-color: $backgroundColor-code-splitView-NestedApp;
-        height: 100%;
-        border: none;
-        border-radius: 0;
+  .logoWrapper {
+    width: 50px;
+    height: 50px;
+    transform: translateZ(0);
+    .animatedLogoPath{
+      will-change: stroke-dashoffset, stroke-dasharray;
+      /* The total length of the rectangle path is ~82. */
+      stroke-dasharray: 82;
+      stroke-dashoffset: 82;
+
+      /* Animation: name, duration, easing, and iteration count */
+      animation: draw-loop 3s ease-in-out infinite;
+    }
+  }
+
+  .loadingText {
+    margin-right: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; /* Increased by 20% from 16px */
+    font-weight: 500;
+    color: $color-loadingText-NestedApp;
+    text-align: right;
+  }
+
+  /* Defines the animation steps */
+  @keyframes draw-loop {
+    /* At the start, the path is not drawn */
+    0% {
+      stroke-dashoffset: 82;
+    }
+    /* Animate to fully drawn over 40% of the duration */
+    40% {
+      stroke-dashoffset: 0;
+    }
+    /* Hold the fully drawn state until the end */
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .nestedAppRoot{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    isolation: isolate;
+    background-color: t.$backgroundColor;
+    &.shouldAnimate{
+      transition: clip-path 1s, opacity 1s;
+      clip-path: inset(50% round 50%);
+      &:not(.initialized){
+        opacity: 0;
+      }
+      &.initialized{
+        opacity: 1;
+        clip-path: inset(0% round 0%);
       }
     }
   }
-}
 
-.hidden{
-  display: none;
-}
+  // --- End of theme variables collection
 
-:is(html[class~="dark"]) {
+  .nestedAppContainer {
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+
+    //https://stackoverflow.com/a/70422489
+    //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block#identifying_the_containing_block
+    //" ...If the position property is absolute or fixed, the containing block may also be formed by the edge of the padding box of the nearest ancestor element that has any of the following:
+    // A filter, backdrop-filter, transform, or perspective value other than none. ..."
+
+    // so we do this to make the position 'fixed' elements to be positioned relative to the nestedAppContainer
+    //transform: scale(1);
+    margin-top: $marginTop-NestedApp;
+    margin-bottom: $marginBottom-NestedApp;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    border-radius: $bordRadius-NestedApp;
+    flex-direction: column;
+    gap: $gap-frame-NestedApp;
+    background-color: $backgroundColor-frame-NestedApp;
+    align-content: center;
+    box-shadow: $boxShadow-NestedApp;
+    overflow: hidden;
+
+    .contentContainer {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+
+      .splitViewMarkdown{
+        height: 100%;
+        :global(.global-codeBlock){
+          background-color: $backgroundColor-code-splitView-NestedApp;
+          height: 100%;
+          border: none;
+          border-radius: 0;
+        }
+      }
+    }
+  }
+
+  .hidden{
+    display: none;
+  }
+
+  :is(html[class~="dark"]) {
+    .preview {
+      border: 1px solid #33404f;
+    }
+  }
+
   .preview {
-    border: 1px solid #33404f;
+    overflow: hidden;
   }
-}
 
-.preview {
-  overflow: hidden;
-}
+  .viewControls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: $padding-viewControls-NestedApp;
+    background-color: $backgroundColor-viewControls-NestedApp;
+    border-radius: $bordRadius-viewControls-NestedApp;
+  }
 
-.viewControls {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: $padding-viewControls-NestedApp;
-  background-color: $backgroundColor-viewControls-NestedApp;
-  border-radius: $bordRadius-viewControls-NestedApp;
-}
+  .logo {
+    width: $width-logo-splitView-NestedApp;
+    height: $height-logo-splitView-NestedApp;
+  }
 
-.logo {
-  width: $width-logo-splitView-NestedApp;
-  height: $height-logo-splitView-NestedApp;
-}
+  .splitViewButton {
+    padding: $padding-button-splitView-NestedApp !important;
+    width: $width-button-splitView-NestedApp !important;
+    height: $height-button-splitView-NestedApp !important;
+    color: $color-button-splitView-NestedApp !important;
+    border-radius: $borderRadius-button-splitView-NestedApp !important;
+    border-color: $borderColor-button-splitView-NestedApp !important;
 
-.splitViewButton {
-  padding: $padding-button-splitView-NestedApp !important;
-  width: $width-button-splitView-NestedApp !important;
-  height: $height-button-splitView-NestedApp !important;
-  color: $color-button-splitView-NestedApp !important;
-  border-radius: $borderRadius-button-splitView-NestedApp !important;
-  border-color: $borderColor-button-splitView-NestedApp !important;
-
-  &.show {
-    background-color: $backgroundColor-button-splitView-NestedApp--active;
-    color: $color-button-splitView-NestedApp--active !important;
-    &:hover {
-      background-color: $backgroundColor-button-splitView-NestedApp--active !important;
+    &.show {
+      background-color: $backgroundColor-button-splitView-NestedApp--active;
+      color: $color-button-splitView-NestedApp--active !important;
+      &:hover {
+        background-color: $backgroundColor-button-splitView-NestedApp--active !important;
+      }
+    }
+    &.hide {
+      background-color: transparent;
+      &:hover {
+        background-color: transparent !important;
+      }
     }
   }
-  &.hide {
-    background-color: transparent;
-    &:hover {
-      background-color: transparent !important;
+
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 t.$space-2;
+    border-bottom: $borderBottom-header-NestedApp;
+    justify-content: space-between;
+
+    .headerText {
+      @include t.textVars($themeVars, "header-#{$component}");
+      padding-left: t.$space-2;
+      margin-right: auto;
+    }
+
+    .headerButton {
+      padding: t.$space-2 t.$space-3;
+    }
+
+    .spacer {
+      flex: 1 1 0 !important;
+      place-self: stretch;
     }
   }
-}
 
-.header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 t.$space-2;
-  border-bottom: $borderBottom-header-NestedApp;
-  justify-content: space-between;
-
-  .headerText {
-    @include t.textVars($themeVars, "header-#{$component}");
-    padding-left: t.$space-2;
-    margin-right: auto;
-  }
-
-  .headerButton {
-    padding: t.$space-2 t.$space-3;
-  }
-
-  .spacer {
-    flex: 1 1 0 !important;
-    place-self: stretch;
+  .wrapper {
+    width: $width-controls-NestedApp;
   }
 }
 
-.wrapper {
-  width: $width-controls-NestedApp;
-}
 
 // --- We export the theme variables to add them to the component renderer
 :export {

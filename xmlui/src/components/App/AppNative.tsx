@@ -55,6 +55,7 @@ type Props = {
   logoLight?: string;
   defaultTone?: string;
   defaultTheme?: string;
+  applyDefaultContentPadding?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -91,6 +92,7 @@ export function App({
   renderChild,
   name,
   className,
+  applyDefaultContentPadding
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
@@ -308,6 +310,9 @@ export function App({
   ];
 
   let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
+  let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
+    [styles.withDefaultContentPadding]: applyDefaultContentPadding,
+  });
   switch (safeLayout) {
     case "vertical":
       content = (
@@ -319,7 +324,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner}>
+                <div className={pagesWrapperClasses}>
                   {children}
                 </div>
               </ScrollContext.Provider>
@@ -347,7 +352,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner}>
+                <div className={pagesWrapperClasses}>
                   {children}
                 </div>
               </ScrollContext.Provider>
@@ -377,7 +382,7 @@ export function App({
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner}>
+                  <div className={pagesWrapperClasses}>
                     {children}
                   </div>
                 </ScrollContext.Provider>
@@ -413,7 +418,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>
@@ -437,7 +442,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>
@@ -465,7 +470,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>

@@ -264,6 +264,13 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     min-height: 100%;
     display: flex;
     flex-direction: column;
+    &.withDefaultContentPadding{
+      padding-left: t.$space-4;
+      padding-right: t.$space-4;
+      padding-top: t.$space-5;
+      padding-bottom: t.$space-5;
+      gap: t.$space-5;
+    }
   }
 
   .footerWrapper {
