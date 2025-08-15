@@ -44,7 +44,7 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
    */
   layoutCss: CSSProperties;
 
-  className: string;
+  className?: string;
 }
 
 export type UpdateStateFn = (componentState: any, options?: any) => void; // This function updates the state of a component.
