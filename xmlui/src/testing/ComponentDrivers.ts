@@ -144,9 +144,9 @@ export class ContentSeparatorDriver extends ComponentDriver {
   async getOrientation() {
     const classList = await this.separator.evaluate((el) => el.className);
 
-    if (classList.includes('horizontal')) return 'horizontal';
-    if (classList.includes('vertical')) return 'vertical';
-    return 'unknown';
+    if (classList.includes("horizontal")) return "horizontal";
+    if (classList.includes("vertical")) return "vertical";
+    return "unknown";
   }
 
   async getComputedHeight() {
@@ -182,16 +182,16 @@ export class SplitterDriver extends ComponentDriver {
     // Look for the non-floating resizer element
     const allResizerCandidates = this.locator.locator('[class*="resizer"]');
     const resizerCount = await allResizerCandidates.count();
-    
+
     for (let i = 0; i < resizerCount; i++) {
       const candidate = allResizerCandidates.nth(i);
-      const className = await candidate.getAttribute('class');
+      const className = await candidate.getAttribute("class");
       // Look for resizer that doesn't contain "floating" in its class
-      if (className && className.includes('resizer') && !className.includes('floating')) {
+      if (className && className.includes("resizer") && !className.includes("floating")) {
         return candidate;
       }
     }
-    
+
     // Fallback: return first resizer element
     return allResizerCandidates.first();
   }
@@ -203,16 +203,16 @@ export class SplitterDriver extends ComponentDriver {
     // Look for the floating resizer element
     const allResizerCandidates = this.locator.locator('[class*="resizer"]');
     const resizerCount = await allResizerCandidates.count();
-    
+
     for (let i = 0; i < resizerCount; i++) {
       const candidate = allResizerCandidates.nth(i);
-      const className = await candidate.getAttribute('class');
+      const className = await candidate.getAttribute("class");
       // Look for resizer that contains "floating" in its class
-      if (className && className.includes('floating')) {
+      if (className && className.includes("floating")) {
         return candidate;
       }
     }
-    
+
     // If no floating resizer found, return null locator
     return this.locator.locator('[class*="floating"][class*="resizer"]').first();
   }
@@ -239,14 +239,14 @@ export class SplitterDriver extends ComponentDriver {
     // Try to get both types of resizers
     const resizer = await this.getResizer();
     const floatingResizer = await this.getFloatingResizer();
-    
+
     // Determine which resizer to use based on visibility
     let targetResizer = resizer;
-    
+
     try {
       const isResizerVisible = await resizer.isVisible();
       const isFloatingResizerVisible = await floatingResizer.isVisible();
-      
+
       if (!isResizerVisible && isFloatingResizerVisible) {
         targetResizer = floatingResizer;
       } else if (!isResizerVisible) {
@@ -258,7 +258,7 @@ export class SplitterDriver extends ComponentDriver {
       // If there's any error checking visibility, use the regular resizer
       targetResizer = resizer;
     }
-    
+
     // Get the resizer bounds
     const resizerBounds = await targetResizer.boundingBox();
     if (!resizerBounds) {
@@ -275,7 +275,7 @@ export class SplitterDriver extends ComponentDriver {
     await this.page.mouse.down();
     await this.page.mouse.move(endX, endY, { steps: 5 });
     await this.page.mouse.up();
-    
+
     // Wait a bit for the component to update
     await this.page.waitForTimeout(100);
   }
@@ -316,7 +316,7 @@ export class ExpandableItemDriver extends ComponentDriver {
 
   getSwitch() {
     // Get the actual switch input element, not the wrapper
-    return this.component.getByRole('switch');
+    return this.component.getByRole("switch");
   }
 
   async isExpanded() {
@@ -324,7 +324,7 @@ export class ExpandableItemDriver extends ComponentDriver {
   }
 
   async isDisabled() {
-    return await this.component.evaluate((el) => el.className.includes('disabled'));
+    return await this.component.evaluate((el) => el.className.includes("disabled"));
   }
 
   async expand() {
@@ -348,7 +348,7 @@ export class ExpandableItemDriver extends ComponentDriver {
 
 export class FileInputDriver extends ComponentDriver {
   getTextBox() {
-    return this.component.locator('input[readonly]');
+    return this.component.locator("input[readonly]");
   }
 
   getHiddenInput() {
@@ -380,7 +380,7 @@ export class FileInputDriver extends ComponentDriver {
 
   async getPlaceholder() {
     const textBox = this.getTextBox();
-    return await textBox.getAttribute("placeholder") || "";
+    return (await textBox.getAttribute("placeholder")) || "";
   }
 
   async focusButton() {
@@ -389,22 +389,22 @@ export class FileInputDriver extends ComponentDriver {
 
   async hasReadOnlyAttribute() {
     const textBox = this.getTextBox();
-    return await textBox.getAttribute("readonly") !== null;
+    return (await textBox.getAttribute("readonly")) !== null;
   }
 
   async getAcceptedFileTypes() {
     const hiddenInput = this.getHiddenInput();
-    return await hiddenInput.getAttribute("accept") || "";
+    return (await hiddenInput.getAttribute("accept")) || "";
   }
 
   async isMultiple() {
     const hiddenInput = this.getHiddenInput();
-    return await hiddenInput.getAttribute("multiple") !== null;
+    return (await hiddenInput.getAttribute("multiple")) !== null;
   }
 
   async isDirectory() {
     const hiddenInput = this.getHiddenInput();
-    return await hiddenInput.getAttribute("webkitdirectory") !== null;
+    return (await hiddenInput.getAttribute("webkitdirectory")) !== null;
   }
 }
 
@@ -424,7 +424,7 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 
   getDropIcon() {
-    return this.getDropPlaceholder().locator('svg');
+    return this.getDropPlaceholder().locator("svg");
   }
 
   async isDropPlaceholderVisible() {
@@ -438,37 +438,39 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 
   async getDropText() {
-    return await this.getDropPlaceholder().textContent() || "";
+    return (await this.getDropPlaceholder().textContent()) || "";
   }
 
   async triggerDragEnter() {
-    await this.component.dispatchEvent('dragenter');
+    await this.component.dispatchEvent("dragenter");
   }
 
   async triggerDragLeave() {
-    await this.component.dispatchEvent('dragleave');
+    await this.component.dispatchEvent("dragleave");
   }
 
-  async triggerDrop(files: string[] = ['test.txt']) {
+  async triggerDrop(files: string[] = ["test.txt"]) {
     // Simulate file drop event
-    await this.component.dispatchEvent('drop', {
+    await this.component.dispatchEvent("drop", {
       dataTransfer: {
-        files: files.map(name => ({ name, type: 'text/plain', size: 100 }))
-      }
+        files: files.map((name) => ({ name, type: "text/plain", size: 100 })),
+      },
     });
   }
 
   async triggerPaste() {
-    await this.component.dispatchEvent('paste', {
+    await this.component.dispatchEvent("paste", {
       clipboardData: {
-        files: [{ name: 'pasted.txt', type: 'text/plain', size: 50 }],
-        items: [{ kind: 'file', getAsFile: () => ({ name: 'pasted.txt' }) }]
-      }
+        files: [{ name: "pasted.txt", type: "text/plain", size: 50 }],
+        items: [{ kind: "file", getAsFile: () => ({ name: "pasted.txt" }) }],
+      },
     });
   }
 
   async hasChildren() {
-    const childrenCount = await this.component.locator('> *:not(input):not([class*="_dropPlaceholder_"])').count();
+    const childrenCount = await this.component
+      .locator('> *:not(input):not([class*="_dropPlaceholder_"])')
+      .count();
     return childrenCount > 0;
   }
 }
@@ -499,7 +501,6 @@ export class BackdropDriver extends ComponentDriver {
     return "0.1"; // Default backdrop opacity
   }
 }
-
 
 export class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
@@ -777,28 +778,16 @@ export class TextAreaDriver extends InputComponentDriver {
 // --- ProgressBar
 
 export class ProgressBarDriver extends ComponentDriver {
-  get wrapper() {
-    return this.component;
-  }
-
   get bar() {
     return this.component.locator("> div");
   }
 
-  async getValue() {
+  async getProgressRatio() {
     const style = await this.bar.getAttribute("style");
     if (!style) return 0;
 
     const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
     return widthMatch ? parseFloat(widthMatch[1]) / 100 : 0;
-  }
-
-  async getBarWidth() {
-    const style = await this.bar.getAttribute("style");
-    if (!style) return "0%";
-
-    const widthMatch = style.match(/width:\s*(\d+(?:\.\d+)?)%/);
-    return widthMatch ? `${widthMatch[1]}%` : "0%";
   }
 }
 
@@ -809,9 +798,9 @@ export class ListDriver extends ComponentDriver {
    * Gets all list item elements
    */
   get items() {
-    return this.component.locator('[data-list-item]').or(
-      this.component.locator('div').filter({ hasText: /^(?!.*Loading).*/ })
-    );
+    return this.component
+      .locator("[data-list-item]")
+      .or(this.component.locator("div").filter({ hasText: /^(?!.*Loading).*/ }));
   }
 
   /**
@@ -832,37 +821,37 @@ export class ListDriver extends ComponentDriver {
    * Gets group header elements
    */
   get groupHeaders() {
-    return this.component.locator('[data-group-header]').or(
-      this.component.locator('div').filter({ hasText: /^Category:|^Header:/ })
-    );
+    return this.component
+      .locator("[data-group-header]")
+      .or(this.component.locator("div").filter({ hasText: /^Category:|^Header:/ }));
   }
 
   /**
    * Gets group footer elements
    */
   get groupFooters() {
-    return this.component.locator('[data-group-footer]').or(
-      this.component.locator('div').filter({ hasText: /^End of/ })
-    );
+    return this.component
+      .locator("[data-group-footer]")
+      .or(this.component.locator("div").filter({ hasText: /^End of/ }));
   }
 
   /**
    * Gets the empty state element
    */
   get emptyState() {
-    return this.component.locator('[data-empty-state]').or(
-      this.component.getByText('No items found!')
-    );
+    return this.component
+      .locator("[data-empty-state]")
+      .or(this.component.getByText("No items found!"));
   }
 
   /**
    * Scrolls the list to a specific position
    */
-  async scrollTo(position: 'top' | 'bottom' | number) {
-    if (position === 'top') {
-      await this.component.evaluate(el => el.scrollTo({ top: 0 }));
-    } else if (position === 'bottom') {
-      await this.component.evaluate(el => el.scrollTo({ top: el.scrollHeight }));
+  async scrollTo(position: "top" | "bottom" | number) {
+    if (position === "top") {
+      await this.component.evaluate((el) => el.scrollTo({ top: 0 }));
+    } else if (position === "bottom") {
+      await this.component.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
     } else {
       await this.component.evaluate((el, pos) => el.scrollTo({ top: pos }), position);
     }
@@ -895,7 +884,8 @@ export class ListDriver extends ComponentDriver {
   async isEmpty() {
     // Check for the actual "No data available" text that appears when list is empty
     const noDataText = await this.component.textContent();
-    const hasNoDataMessage = noDataText?.includes('No data available') || noDataText?.includes('No items found');
+    const hasNoDataMessage =
+      noDataText?.includes("No data available") || noDataText?.includes("No items found");
 
     // Also check if there are any actual data items
     const itemCount = await this.items.count();
@@ -909,8 +899,8 @@ export class ListDriver extends ComponentDriver {
    */
   async getVisibleItemTexts() {
     const items = await this.items.all();
-    const texts = await Promise.all(items.map(item => item.textContent()));
-    return texts.filter(text => text !== null);
+    const texts = await Promise.all(items.map((item) => item.textContent()));
+    return texts.filter((text) => text !== null);
   }
 }
 
@@ -1073,7 +1063,7 @@ export class CodeBlockDriver extends ComponentDriver {
   }
 
   getFilename() {
-    return this.getHeader().locator('span');
+    return this.getHeader().locator("span");
   }
 
   async isCopyButtonVisible() {
@@ -1103,9 +1093,7 @@ export class CheckboxDriver extends InputComponentDriver {
   async getIndicatorColor() {
     const specifier = this.component.getByRole("checkbox").or(this.component).last();
     const { boxShadow } = await getPseudoStyles(specifier, "::before", "box-shadow");
-    const colorMatch = boxShadow.match(
-      /(rgba?\([^)]+\)|hsla?\([^)]+\)|#[a-fA-F0-9]{3,8})/
-    );
+    const colorMatch = boxShadow.match(/(rgba?\([^)]+\)|hsla?\([^)]+\)|#[a-fA-F0-9]{3,8})/);
     return colorMatch ? colorMatch[1] : null;
   }
 }
@@ -1122,14 +1110,20 @@ export class SpinnerDriver extends ComponentDriver {
    */
   get spinnerElement() {
     // Filter for spinner elements and use the first one by default
-    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).first();
+    return this.page
+      .locator('[data-testid="test-id-component"]')
+      .filter({ has: this.page.locator("div") })
+      .first();
   }
 
   /**
    * Gets a specific spinner element by index (for multiple spinners)
    */
   getSpinnerByIndex(index: number) {
-    return this.page.locator('[data-testid="test-id-component"]').filter({ has: this.page.locator('div') }).nth(index);
+    return this.page
+      .locator('[data-testid="test-id-component"]')
+      .filter({ has: this.page.locator("div") })
+      .nth(index);
   }
 
   /**
@@ -1164,7 +1158,7 @@ export class SpinnerDriver extends ComponentDriver {
         width: styles.width,
         height: styles.height,
         animationDuration: styles.animationDuration,
-        className: el.className
+        className: el.className,
       };
     });
   }
@@ -1176,12 +1170,12 @@ export class SpinnerDriver extends ComponentDriver {
     const element = this.spinnerElement;
     return await element.evaluate((el: HTMLElement) => {
       // Check the first child div for animation duration
-      const firstChild = el.querySelector('div');
+      const firstChild = el.querySelector("div");
       if (firstChild) {
         const styles = window.getComputedStyle(firstChild);
         return styles.animationDuration;
       }
-      return '0s';
+      return "0s";
     });
   }
 
@@ -1189,14 +1183,14 @@ export class SpinnerDriver extends ComponentDriver {
    * Waits for the spinner to appear
    */
   async waitForSpinner(timeout: number = 5000): Promise<void> {
-    await this.spinnerElement.waitFor({ state: 'visible', timeout });
+    await this.spinnerElement.waitFor({ state: "visible", timeout });
   }
 
   /**
    * Waits for the spinner to disappear
    */
   async waitForSpinnerToDisappear(timeout: number = 5000): Promise<void> {
-    await this.spinnerElement.waitFor({ state: 'hidden', timeout });
+    await this.spinnerElement.waitFor({ state: "hidden", timeout });
   }
 
   /**
@@ -1210,7 +1204,7 @@ export class SpinnerDriver extends ComponentDriver {
    * Gets the CSS class name to verify CSS modules are working
    */
   async getClassName(): Promise<string> {
-    return await this.spinnerElement.getAttribute('class') || '';
+    return (await this.spinnerElement.getAttribute("class")) || "";
   }
 
   /**
@@ -1218,7 +1212,7 @@ export class SpinnerDriver extends ComponentDriver {
    */
   async getChildCount(): Promise<number> {
     return await this.spinnerElement.evaluate((el: HTMLElement) => {
-      return el.querySelectorAll('div').length;
+      return el.querySelectorAll("div").length;
     });
   }
 
@@ -1241,7 +1235,7 @@ export class SpinnerDriver extends ComponentDriver {
    */
   async getFullScreenWrapperInfo() {
     const wrapper = this.fullScreenWrapper;
-    if (!await wrapper.isVisible()) {
+    if (!(await wrapper.isVisible())) {
       return null;
     }
 
@@ -1251,8 +1245,8 @@ export class SpinnerDriver extends ComponentDriver {
       return {
         position: styles.position,
         inset: styles.inset,
-        parentClassName: parent?.className || '',
-        hasSpinnerChild: !!el.querySelector('[class*="_lds-ring_"]')
+        parentClassName: parent?.className || "",
+        hasSpinnerChild: !!el.querySelector('[class*="_lds-ring_"]'),
       };
     });
   }
@@ -1266,7 +1260,7 @@ export class DropdownMenuDriver extends ComponentDriver {
    * For DropdownMenu, we'll look for the button on the page level since Radix UI may render it separately
    */
   getTrigger() {
-    return this.page.getByRole('button').first();
+    return this.page.getByRole("button").first();
   }
 
   /**
@@ -1283,10 +1277,10 @@ export class DropdownMenuDriver extends ComponentDriver {
   async close() {
     // Try clicking on the trigger first to close, then fall back to clicking outside
     try {
-      await this.page.keyboard.press('Escape');
+      await this.page.keyboard.press("Escape");
     } catch {
       // If escape doesn't work, try clicking on a safe area
-      await this.page.click('html');
+      await this.page.click("html");
     }
   }
 
@@ -1294,14 +1288,14 @@ export class DropdownMenuDriver extends ComponentDriver {
    * Get all menu items
    */
   getMenuItems() {
-    return this.page.getByRole('menuitem');
+    return this.page.getByRole("menuitem");
   }
 
   /**
    * Get a specific menu item by text
    */
   getMenuItem(text: string) {
-    return this.page.getByRole('menuitem', { name: text });
+    return this.page.getByRole("menuitem", { name: text });
   }
 
   /**
@@ -1356,13 +1350,13 @@ export class DropdownMenuDriver extends ComponentDriver {
    * Wait for menu to open
    */
   async waitForOpen() {
-    await this.getMenuContent().waitFor({ state: 'visible' });
+    await this.getMenuContent().waitFor({ state: "visible" });
   }
 
   /**
    * Wait for menu to close
    */
   async waitForClose() {
-    await this.getMenuContent().waitFor({ state: 'hidden' });
+    await this.getMenuContent().waitFor({ state: "hidden" });
   }
 }

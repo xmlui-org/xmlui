@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend as RLegend,
+  YAxis,
 } from "recharts";
 import type { ReactNode } from "react";
 import type React from "react";
@@ -12,16 +13,22 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
+import classnames from "classnames";
+import styles from './LineChart.module.scss';
 
 export type LineChartProps = {
   data: any[];
   dataKeys: string[];
   nameKey: string;
   style?: React.CSSProperties;
+  hideTickX?: boolean;
+  hideTickY?: boolean;
   className?: string;
   hideX?: boolean;
+  hideY?: boolean;
   hideTooltip?: boolean;
-  tickFormatter?: (value: any) => any;
+  tickFormatterX?: (value: any) => any;
+  tickFormatterY?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
   marginTop?: number;
@@ -30,10 +37,15 @@ export type LineChartProps = {
   marginLeft?: number;
 };
 
-export const defaultProps: Pick<LineChartProps, "hideX" | "hideTooltip" | "showLegend"> = {
+export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip" | "showLegend" | "tickFormatterX" | "tickFormatterY" | "hideTickX" | "hideTickY"> = {
+  hideTickX: false,
+  hideTickY: false,
   hideX: false,
+  hideY: false,
   hideTooltip: false,
   showLegend: false,
+  tickFormatterX: (value) => value,
+  tickFormatterY: (value) => value,
 };
 
 export function LineChart({
@@ -42,11 +54,15 @@ export function LineChart({
   nameKey,
   style,
   className,
-  hideX = false,
-  hideTooltip = false,
-  tickFormatter,
+  hideX = defaultProps.hideX,
+  hideY = defaultProps.hideY,
+  hideTickX = defaultProps.hideTickX,
+  hideTickY = defaultProps.hideTickY,
+  hideTooltip = defaultProps.hideTooltip,
+  tickFormatterX = defaultProps.tickFormatterX,
+  tickFormatterY = defaultProps.tickFormatterY,
   children,
-  showLegend = false,
+  showLegend = defaultProps.showLegend,
 }: LineChartProps) {
   const { getThemeVar } = useTheme();
 
@@ -153,26 +169,20 @@ export function LineChart({
       >
         {safeData.length > 0 && nameKey
           ? safeData
-              .map((d) => d?.[nameKey])
-              .map((label, idx) => (
-                <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                  {label}
-                </span>
-              ))
+            .map((d) => d?.[nameKey])
+            .map((label, idx) => (
+              <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+                {label}
+              </span>
+            ))
           : null}
       </div>
       <div
-        style={{
-          flexGrow: 1,
-          width: style?.width || "100%",
-          height: style?.height || "100%",
-          padding: 0,
-          margin: 0,
-        }}
+        className={classnames(className, styles.wrapper)}
+        style={style}
       >
         <ResponsiveContainer
           ref={containerRef}
-          style={style}
           width="100%"
           height="100%"
           debounce={100}
@@ -183,15 +193,21 @@ export function LineChart({
             margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <XAxis
-              dataKey={nameKey}
               interval={interval}
               tickLine={false}
+              dataKey={nameKey}
               angle={tickAngle}
               textAnchor={tickAnchor}
-              tick={miniMode ? false : { fill: "currentColor", fontSize }}
-              tickFormatter={miniMode ? undefined : tickFormatter}
+              tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+              tickFormatter={miniMode ? undefined : tickFormatterX}
               height={miniMode || hideX ? 0 : xAxisHeight}
               hide={miniMode || hideX}
+            />
+            <YAxis
+              hide={miniMode || hideY}
+              tickLine={false}
+              tickFormatter={miniMode ? undefined : tickFormatterY}
+              tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
             />
             {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
             {dataKeys.map((dataKey, i) => (

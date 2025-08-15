@@ -189,8 +189,7 @@ export const alignmentOptionMd: PropertyValueDescription[] = [
 ];
 
 // --- Available orientation options
-const orientationOptionValues = ["horizontal", "vertical"] as const;
-export const orientationOptionNames = [...orientationOptionValues];
+export const orientationOptionValues = ["horizontal", "vertical"] as const;
 export type OrientationOptions = (typeof orientationOptionValues)[number];
 export const orientationOptionMd: PropertyValueDescription[] = [
   { value: "horizontal", description: "The component will fill the available space horizontally" },

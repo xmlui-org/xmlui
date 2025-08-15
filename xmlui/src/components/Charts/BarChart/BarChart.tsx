@@ -77,6 +77,11 @@ export const BarChartMd = createMetadata({
       description: "A function that formats the tick labels on the Y-axis. ",
       defaultValue: JSON.stringify(defaultProps.tickFormatterY),
     },
+    hideTooltip: {
+      description: "Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideTooltip,
+    },
     showLegend: {
       description: "Determines whether the legend should be displayed.",
       valueType: "boolean",
@@ -103,6 +108,7 @@ export const barChartComponentRenderer = createComponentRenderer(
         hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
         hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
         hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
+        hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
       >
         {renderChild(node.children)}

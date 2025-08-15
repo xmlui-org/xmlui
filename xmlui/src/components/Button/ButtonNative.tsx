@@ -1,4 +1,4 @@
-import React, { type CSSProperties, useEffect, useRef } from "react";
+import React, { type CSSProperties, useRef, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./Button.module.scss";
@@ -44,6 +44,7 @@ type Props = {
   | ButtonAria
   | "tabIndex"
   | "className"
+  | "role"
 >;
 
 export const defaultProps: Pick<

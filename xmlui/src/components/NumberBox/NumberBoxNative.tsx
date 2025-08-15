@@ -41,6 +41,7 @@ export const defaultProps = {
   zeroOrPositive: false,
   min: -NUMBERBOX_MAX_VALUE,
   max: NUMBERBOX_MAX_VALUE,
+  step: 1,
   updateState: noop,
   onDidChange: noop,
   onFocus: noop,
@@ -98,7 +99,7 @@ export const NumberBox = forwardRef(function NumberBox(
     placeholder,
     validationStatus = defaultProps.validationStatus,
     hasSpinBox = defaultProps.hasSpinBox,
-    step,
+    step = defaultProps.step,
     integersOnly = defaultProps.integersOnly,
     zeroOrPositive = defaultProps.zeroOrPositive,
     min = zeroOrPositive ? 0 : defaultProps.min,
@@ -126,7 +127,8 @@ export const NumberBox = forwardRef(function NumberBox(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  id = id || useId();
+  const _id = useId();
+  id = id || _id;
   // --- Ensure the provided value is a number or null
 
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
@@ -455,6 +457,7 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="up"
               type="button"
+              role="spinbutton"
               variant={"ghost"}
               themeColor={"secondary"}
               tabIndex={-1}
@@ -467,6 +470,7 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="down"
               type="button"
+              role="spinbutton"
               tabIndex={-1}
               variant={"ghost"}
               themeColor={"secondary"}

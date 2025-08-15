@@ -1,5 +1,37 @@
 # xmlui-vscode
 
+## 0.9.101
+
+### Patch Changes
+
+- Updated dependencies [791b0be]
+  - xmlui@0.9.101
+
+## 0.9.100
+
+### Patch Changes
+
+- Updated dependencies [2dbf6d2]
+  - xmlui@0.9.100
+
+## 0.9.99
+
+### Patch Changes
+
+- Updated dependencies [e5a09fb]
+- Updated dependencies [36360f6]
+  - xmlui@0.9.99
+
+## 0.9.98
+
+### Patch Changes
+
+- Updated dependencies [ff781f3]
+- Updated dependencies [377f0f2]
+- Updated dependencies [ce0ff76]
+- Updated dependencies [208768a]
+  - xmlui@0.9.98
+
 ## 0.9.97
 
 ### Patch Changes

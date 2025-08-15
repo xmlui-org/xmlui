@@ -106,11 +106,21 @@ class Clipboard {
     }
   }
 
+  /**
+   * Reads the text from the clipboard.
+   *
+   * @returns The text from the clipboard.
+   */
   async read() {
     const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
     return handle.jsonValue();
   }
 
+  /**
+   * Writes the text to the clipboard.
+   *
+   * @param text - The text to write to the clipboard.
+   */
   async write(text: string) {
     await this.page.evaluate((text) => navigator.clipboard.writeText(text), text);
   }

@@ -1,5 +1,33 @@
 # xmlui
 
+## 0.9.101
+
+### Patch Changes
+
+- 791b0be: Experimenting with issuing release on larger GitHub machines
+
+## 0.9.100
+
+### Patch Changes
+
+- 2dbf6d2: Added accessibility features, enabled prop and defaultThemeVars to Pagination. Also created E2E test cases for Pagination
+
+## 0.9.99
+
+### Patch Changes
+
+- e5a09fb: Added a separate Pagination component with events and API methods for custom pagination.
+- 36360f6: improve: add tickFormatterY to LineChart, create e2e tests
+
+## 0.9.98
+
+### Patch Changes
+
+- ff781f3: new internal react component for integrating into existing react applications (StandaloneComponent)
+- 377f0f2: Fix image animation issue in Carousel
+- ce0ff76: Added hover & active styles for Slider on thumb. FileInput opens file browser on label focus.
+- 208768a: Fixed input adornments not changing color on setting their respective theme variable. Spinbox buttons in NumberBox now have role=spinbutton.
+
 ## 0.9.97
 
 ### Patch Changes

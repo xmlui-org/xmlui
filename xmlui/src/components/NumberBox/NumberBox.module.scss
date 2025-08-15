@@ -55,6 +55,10 @@ $componentName: "NumberBox";
   }
   .adornment {
     color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+
+    * {
+      color: inherit;
+    }
   }
 }
 

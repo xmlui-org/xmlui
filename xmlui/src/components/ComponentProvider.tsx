@@ -13,6 +13,7 @@ import {
   stackComponentRenderer,
   vStackComponentRenderer,
 } from "./Stack/Stack";
+import { responsiveBarComponentRenderer } from "./ResponsiveBar/ResponsiveBar";
 import { spaceFillerComponentRenderer } from "./SpaceFiller/SpaceFiller";
 import { textAreaComponentRenderer } from "./TextArea/TextArea";
 import { navLinkComponentRenderer } from "./NavLink/NavLink";
@@ -253,6 +254,7 @@ import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
+import { paginationComponentRenderer } from "./Pagination/Pagination";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -350,6 +352,9 @@ export class ComponentRegistry {
       this.registerCoreComponent(hStackComponentRenderer);
       this.registerCoreComponent(cvStackComponentRenderer);
       this.registerCoreComponent(chStackComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ResponsiveBar !== "false") {
+      this.registerCoreComponent(responsiveBarComponentRenderer);
     }
 
     this.registerCoreComponent(SlotHolder);
@@ -506,6 +511,10 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
+    }
+
+    if (process.env.VITE_USED_COMPONENTS_Pagination !== "false") {
+      this.registerCoreComponent(paginationComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {

@@ -407,6 +407,7 @@ export const Table = forwardRef(
       alwaysShowSelectionHeader,
       checkAllRows,
       toggleRow,
+      rowDisabledPredicate,
     ]);
 
     // --- Set up page information (using the first page size option)

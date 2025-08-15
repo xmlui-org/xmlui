@@ -328,6 +328,7 @@ const TableWithColumns = forwardRef(
     return tableContent;
   },
 );
+TableWithColumns.displayName = "TableWithColumns";
 
 export const tableComponentRenderer = createComponentRenderer(
   COMP,

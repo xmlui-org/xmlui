@@ -28,6 +28,7 @@ export type BarChartProps = {
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
+  hideTooltip?: boolean;
   tickFormatterX?: (value: any) => any;
   tickFormatterY?: (value: any) => any;
   children?: ReactNode;
@@ -43,6 +44,7 @@ export const defaultProps: Pick<
   | "hideTickY"
   | "hideX"
   | "hideY"
+  | "hideTooltip"
   | "tickFormatterX"
   | "tickFormatterY"
   | "showLegend"
@@ -53,6 +55,7 @@ export const defaultProps: Pick<
   hideTickY: false,
   hideX: false,
   hideY: false,
+  hideTooltip: false,
   tickFormatterX: (value) => value,
   tickFormatterY: (value) => value,
   showLegend: false,
@@ -68,6 +71,7 @@ export function BarChart({
   hideTickY = defaultProps.hideTickY,
   hideY = defaultProps.hideY,
   hideX = defaultProps.hideX,
+  hideTooltip = defaultProps.hideTooltip,
   tickFormatterX = defaultProps.tickFormatterX,
   tickFormatterY = defaultProps.tickFormatterY,
   style,
@@ -75,6 +79,8 @@ export function BarChart({
   children,
   showLegend = defaultProps.showLegend,
 }: BarChartProps) {
+  // Validate and normalize data
+  const validData = Array.isArray(data) ? data : [];
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -166,14 +172,14 @@ export function BarChart({
       let rightMargin = Math.ceil(maxWidth / 3);
       let xAxisH = Math.ceil(fontSize * 1.2);
       let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
-      let skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+      let skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
       if (skip > 0) {
         angle = -60;
         anchor = "end";
         rad = (Math.abs(angle) * Math.PI) / 180;
         minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
         maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
-        skip = Math.max(0, Math.ceil(data.length / maxTicks) - 1);
+        skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
         leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
@@ -222,10 +228,8 @@ export function BarChart({
           height={"100%"}
         >
           <RBarChart
-            // className={className}
-            // style={style}
             accessibilityLayer
-            data={data}
+            data={validData}
             layout={layout}
             margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
@@ -334,7 +338,7 @@ export function BarChart({
         ref={labelsRef}
         style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
       >
-        {data
+        {validData
           .map((d) => d[nameKey])
           .map((label, idx) => (
             <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>

@@ -19,7 +19,14 @@ export const ProgressBar = forwardRef(function ProgressBar(
 ) {
   return (
     <div className={classnames(styles.wrapper, className)} style={style} ref={forwardedRef}>
-      <div style={{ width: `${value * 100}%` }} className={styles.bar} />
+      <div
+        role="progressbar"
+        aria-valuenow={value * 100}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        style={{ width: `${value * 100}%` }}
+        className={styles.bar}
+      />
     </div>
   );
 });

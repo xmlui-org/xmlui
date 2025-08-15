@@ -287,3 +287,17 @@ However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
 See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).
+
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-FileInput--focus | *none* | *none* |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-FileInput--focus | *none* | *none* |
+| [outlineColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-FileInput--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
