@@ -92,8 +92,6 @@ export const barChartComponentRenderer = createComponentRenderer(
     return (
       <BarChart
         className={className}
-        width={extractValue.asSize(node.props.width)}
-        height={extractValue.asSize(node.props.height)}
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
         tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
