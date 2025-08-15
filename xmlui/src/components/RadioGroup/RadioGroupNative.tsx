@@ -176,6 +176,7 @@ export const RadioGroupOption = ({
   enabled = true,
   optionRenderer,
   style,
+  className
 }: Option) => {
   const id = useId();
   const radioGroupContext = useContext(RadioGroupStatusContext);
@@ -209,7 +210,7 @@ export const RadioGroupOption = ({
   );
 
   return (
-    <div key={id} className={styles.radioOptionContainer} style={style}>
+    <div key={id} className={classnames(styles.radioOptionContainer, className)} style={style}>
       {!!optionRenderer ? (
         <label className={styles.optionLabel}>
           <div className={styles.itemContainer}>{item}</div>

@@ -651,7 +651,7 @@ export const ComboboxOption = forwardRef(function Combobox(
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
     const visibleContentRef = useRef<HTMLDivElement>(null);
-    const { value, label, enabled = true, children } = option;
+    const { value, label, enabled = true, children, className } = option;
     const { value: selectedValue, optionRenderer } = useSelect();
     const { onOptionRemove, onOptionAdd } = useOption();
 
@@ -672,7 +672,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     return (
       <SelectItem
         ref={ref}
-        className={styles.selectItem}
+        className={classnames(styles.selectItem, className)}
         value={value + ""}
         textValue={label || visibleContentRef.current?.textContent}
         disabled={!enabled}
