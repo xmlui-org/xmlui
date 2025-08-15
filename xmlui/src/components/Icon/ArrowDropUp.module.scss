@@ -1,3 +1,5 @@
-.arrowDropUp {
-  fill: var(--colorFontMain);
+@layer components {
+  .arrowDropUp {
+    fill: var(--colorFontMain);
+  }
 }

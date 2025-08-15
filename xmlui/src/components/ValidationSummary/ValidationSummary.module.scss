@@ -22,54 +22,56 @@ $themeVars: ();
   }
 }
 
-.summaryContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+@layer components {
+  .summaryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
-  &:empty{
-    display: none;
-  }
-}
-
-.validationContainer {
-  position: relative;
-  padding-top: 0;
-  padding-bottom: 0.5rem;
-  padding-left: 1rem;
-
-  &::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    content: "";
-    height: 100%;
-    width: 2px;
-  }
-
-  ul {
-    list-style-position: inside;
-    padding-left: 0;
-  }
-
-  li {
-    padding-left: 2rem;
-
-    &::marker {
-      font-size: 0.625em;
+    &:empty{
+      display: none;
     }
   }
-  .noMarker {
-    list-style: none;
-    padding-left: 1.6rem;
-    line-height: 1.6rem;
-  }
 
-  @include validationDisplayVariant("error");
-  @include validationDisplayVariant("warning");
-  @include validationDisplayVariant("info");
-  @include validationDisplayVariant("valid");
+  .validationContainer {
+    position: relative;
+    padding-top: 0;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      content: "";
+      height: 100%;
+      width: 2px;
+    }
+
+    ul {
+      list-style-position: inside;
+      padding-left: 0;
+    }
+
+    li {
+      padding-left: 2rem;
+
+      &::marker {
+        font-size: 0.625em;
+      }
+    }
+    .noMarker {
+      list-style: none;
+      padding-left: 1.6rem;
+      line-height: 1.6rem;
+    }
+
+    @include validationDisplayVariant("error");
+    @include validationDisplayVariant("warning");
+    @include validationDisplayVariant("info");
+    @include validationDisplayVariant("valid");
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -11,12 +11,14 @@
       margin-top: t.$space-4;
     }
   }
+
+  @media (min-width: 40em) {
+    .dialogActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: t.$space-4;
+    }
+  }
+
 }
 
-@media (min-width: 40em) {
-  .dialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: t.$space-4;
-  }
-}

@@ -20,11 +20,13 @@ export type ToneSwitchProps = {
    * @default "moon"
    */
   iconDark?: string;
+  className?: string;
 };
 
 export function ToneSwitch({
   iconLight = DEFAULT_LIGHT_ICON,
-  iconDark = DEFAULT_DARK_ICON
+  iconDark = DEFAULT_DARK_ICON,
+  className
 }: ToneSwitchProps) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
   //console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
@@ -34,7 +36,7 @@ export function ToneSwitch({
   };
 
   return (
-    <div style={{ width: 'fit-content', display: 'inline-block' }}>
+    <div style={{ width: 'fit-content', display: 'inline-block' }} className={className}>
       <Toggle
         value={activeThemeTone === "dark"}
         onDidChange={handleChange}

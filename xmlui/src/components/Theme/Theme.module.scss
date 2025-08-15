@@ -1,22 +1,24 @@
 @use "../../components-core/theming/themes" as t;
 
-.wrapper{
-  //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
-  display: contents;
-}
+@layer components {
+  .wrapper{
+    //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
+    display: contents;
+  }
 
-.baseRootComponent {
-  width: 100%;
-  position: relative;
-  height: inherit;
-  font-family: t.$fontFamily;
-  background-color: t.$backgroundColor;
-  font-size: t.$fontSize;
-  font-weight: t.$fontWeight;
-  color: t.$textColor-primary;
-  overflow: auto;
-  direction: t.$direction;
-  font-feature-settings: t.$font-feature-settings;
+  .baseRootComponent {
+    width: 100%;
+    position: relative;
+    height: inherit;
+    font-family: t.$fontFamily;
+    background-color: t.$backgroundColor;
+    font-size: t.$fontSize;
+    font-weight: t.$fontWeight;
+    color: t.$textColor-primary;
+    overflow: auto;
+    direction: t.$direction;
+    font-feature-settings: t.$font-feature-settings;
 
-  --stack-gap-default: #{t.$space-4};
+    --stack-gap-default: #{t.$space-4};
+  }
 }
