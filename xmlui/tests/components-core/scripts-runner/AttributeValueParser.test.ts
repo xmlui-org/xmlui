@@ -1,7 +1,8 @@
 import { assert, describe, expect, it } from "vitest";
 
 import { parseAttributeValue } from "../../../src/components-core/script-runner/AttributeValueParser";
-import { Identifier, T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { Identifier, ObjectLiteral, T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { T_OBJECT_LITERAL } from "../../../src/parsers/scripting/ScriptingNodeTypes";
 
 describe("Attribute value parsing", () => {
   it("Empty value", () => {
@@ -162,4 +163,20 @@ describe("Attribute value parsing", () => {
     }
     assert.fail("Exception expected");
   });
+
+    it("object value #1", () => {
+    // --- Act
+    const source = "{{ from: from, to: to }}";
+    const val = parseAttributeValue(source)!;
+
+    // --- Assert
+    expect(val.__PARSED).toBe(true);
+    expect(val.parseId).toBeTypeOf("number");
+    expect(val.segments).toHaveLength(1);
+    expect(val.segments![0].expr).toBeDefined();
+    expect(val.segments![0].literal).toBeUndefined();
+    expect(val.segments![0].expr.type).toBe(T_OBJECT_LITERAL);
+    expect((val.segments![0].expr as ObjectLiteral).props.length).toBe(2);
+  });
+
 });

@@ -113,7 +113,6 @@ describe("Lexer - miscellaneous", () => {
     { src: "delete", exp: TokenType.Delete },
     { src: "function", exp: TokenType.Function },
     { src: "as", exp: TokenType.As },
-    { src: "from", exp: TokenType.From },
   ];
   miscCases.forEach(c => {
     it(`Token ${c.src} #1`, () => {
