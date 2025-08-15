@@ -125,6 +125,7 @@ type MenuItemProps = {
   children?: ReactNode;
   label?: string;
   style?: CSSProperties;
+  className?: string;
   to?: string;
   active?: boolean;
   enabled?: boolean;
@@ -141,6 +142,7 @@ export const MenuItem = forwardRef(function MenuItem(
     onClick = noop,
     label,
     style,
+    className,
     icon,
     iconPosition = defaultMenuItemProps.iconPosition,
     active = defaultMenuItemProps.active,
@@ -153,7 +155,7 @@ export const MenuItem = forwardRef(function MenuItem(
   return (
     <ReactDropdownMenu.Item
       style={style}
-      className={classnames(styles.DropdownMenuItem, {
+      className={classnames(className, styles.DropdownMenuItem, {
         [styles.active]: active,
         [styles.disabled]: !enabled,
       })}
