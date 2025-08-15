@@ -240,8 +240,8 @@ export function BarChart({
                   type="number"
                   axisLine={false}
                   hide={miniMode || hideX}
-                  tickFormatter={miniMode ? undefined : tickFormatterX}
-                  tick={miniMode ? false : { fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
+                  tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
                 />
                 <YAxis
                   hide={miniMode || hideY}
@@ -249,8 +249,8 @@ export function BarChart({
                   type="category"
                   interval={"equidistantPreserveStart"}
                   tickLine={false}
-                  tickFormatter={miniMode ? undefined : tickFormatterY}
-                  tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
+                  tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
                 />
               </>
             ) : (
@@ -262,24 +262,24 @@ export function BarChart({
                   tickLine={false}
                   angle={tickAngle}
                   textAnchor={tickAnchor}
-                  tick={miniMode ? false : !hideTickX && { fill: "currentColor", fontSize }}
-                  tickFormatter={miniMode ? undefined : tickFormatterX}
+                  tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
+                  tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
                   height={miniMode || hideX ? 0 : xAxisHeight}
                   hide={miniMode || hideX}
                 />
                 <YAxis
                   type="number"
                   axisLine={false}
-                  tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
+                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
                   hide={miniMode || hideY}
                   tickCount={yTickCount}
-                  tickFormatter={miniMode ? undefined : tickFormatterY}
+                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
                   width={miniMode || hideY || hideTickY ? 0 : 40}
                 />
               </>
             )}
-            {!miniMode && <Tooltip content={<TooltipContent />} />}
-            {Object.keys(config).map((key, index) => (
+          {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
+          {validData.length > 0 && Object.keys(config).map((key, index) => (
               <Bar
                 key={index}
                 dataKey={key}
