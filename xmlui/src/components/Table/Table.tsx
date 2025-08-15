@@ -45,7 +45,8 @@ export const TableMd = createMetadata({
     ),
     headerHeight: d(`This optional property is used to specify the height of the table header.`),
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
-    pageSizes: {
+    pageSize: d(`This property defines the number of rows to display per page when pagination is enabled.`),
+    pageSizeOptions: {
       description:
         "This property holds an array of page sizes (numbers) the user can select for " +
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
@@ -285,7 +286,8 @@ const TableWithColumns = forwardRef(
           ref={ref}
           data={data}
           columns={columns}
-          pageSizes={extractValue(node.props.pageSizes)}
+          pageSizeOptions={extractValue(node.props.pageSizeOptions)}
+          pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
           rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
           registerComponentApi={registerComponentApi}
           noDataRenderer={

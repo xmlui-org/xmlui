@@ -53,6 +53,7 @@ import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
+import { PaginationNative } from "../Pagination/PaginationNative";
 
 // =====================================================================================================================
 // Helper types
@@ -99,7 +100,9 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
-  pageSizes?: number[];
+  pageSizeOptions?: number[];
+  currentPageIndex?: number;
+  pageSize?: number;
   rowDisabledPredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
@@ -162,7 +165,8 @@ export const Table = forwardRef(
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
-      pageSizes = defaultProps.pageSizes,
+      pageSizeOptions = defaultProps.pageSizeOptions,
+      currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
       sortBy,
       sortingDirection = defaultProps.sortingDirection,
@@ -408,8 +412,8 @@ export const Table = forwardRef(
     // --- Set up page information (using the first page size option)
     // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
-      pageSize: isPaginated ? pageSizes[0] : Number.MAX_VALUE,
-      pageIndex: 0,
+      pageSize: isPaginated ? pageSizeOptions[0] : Number.MAX_VALUE,
+      pageIndex: currentPageIndex,
     });
 
     const prevIsPaginated = usePrevious(isPaginated);
@@ -419,19 +423,20 @@ export const Table = forwardRef(
         setPagination((prev) => {
           return {
             ...prev,
-            pageSize: pageSizes[0],
+            pageSize: pageSizeOptions[0],
+            pageIndex: 0,
           };
         });
       }
       if (prevIsPaginated && !isPaginated) {
-        setPagination((prev) => {
+        setPagination(() => {
           return {
             pageIndex: 0,
             pageSize: Number.MAX_VALUE,
           };
         });
       }
-    }, [isPaginated, pageSizes, prevIsPaginated]);
+    }, [isPaginated, pageSizeOptions, prevIsPaginated]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
@@ -782,6 +787,16 @@ export const Table = forwardRef(
           ))}
 
         {isPaginated && hasData && rows.length > 0 && pagination && (
+          <PaginationNative
+            pageIndex={pagination.pageIndex}
+            pageSize={pagination.pageSize}
+            itemCount={safeData.length}
+            onPageDidChange={(page) => table.setPageIndex(page)}
+            onPageSizeDidChange={(size) => table.setPageSize(size)}
+          />
+        )}
+
+        {/* isPaginated && hasData && rows.length > 0 && pagination && (
           // --- Render the pagination controls
           <div className={styles.pagination}>
             <div style={{ flex: 1 }}>
@@ -843,7 +858,7 @@ export const Table = forwardRef(
               </Button>
             </div>
           </div>
-        )}
+        ) */}
       </div>
     );
   },
@@ -897,7 +912,7 @@ export const defaultProps = {
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
-  pageSizes: [10],
+  pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as SortingDirection,
   autoFocus: false,
   hideHeader: false,
