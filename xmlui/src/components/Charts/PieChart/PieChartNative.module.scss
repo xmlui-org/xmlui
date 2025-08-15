@@ -10,6 +10,12 @@ $themeVars: ();
 $componentName: "PieChart";
 
 @layer components {
+
+  .wrapper{
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
   .chartContainer {
     margin-left: auto;
     margin-right: auto;

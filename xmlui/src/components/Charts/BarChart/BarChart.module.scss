@@ -7,17 +7,18 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-
-$componentName: "LabelList";
+$componentName: "BarChart";
 
 @layer components {
-  .labelList {
-    fill: createThemeVar("textColor-LabelList");
+
+  .wrapper{
+    width: 100%;
+    flex: 1;
+    min-height: 0;
   }
 }
 
-
 // --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: t.json-stringify($themeVars)
+  themeVars: t.json-stringify($themeVars);
 }
