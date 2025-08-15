@@ -119,6 +119,32 @@ All these rules apply within a user-defined component defined in a file like `My
 </Component>
 ```
 
+A variable declared in a user-defined component can be passed into another user-defined component.
+
+
+```xmlui-pg
+---app display filename="Main.xmlui"
+<App>
+  <MyComponent />
+</App>
+---comp display filename="MyComponent.xmlui"
+<Component name="MyComponent" var.message="Hello from MyComponent">
+  <Card>
+    <Text>Message: {message}</Text>
+  </Card>
+  <MyOtherComponent message="{message}" />
+</Component>
+---comp display filename="MyOtherComponent.xmlui"
+<Component name="MyOtherComponent">
+  <Card>
+    <Text>Passed message: {$props.message}</Text>
+  </Card>
+</Component>
+```
+
+
+
+
 ## Component IDs
 
 A component ID declared on a Main.xmlui component is visible to built-in child components (e.g. `Text`) at any level.
