@@ -18,7 +18,7 @@ export const SpreadsheetMd = createMetadata({
 export const spreadsheetComponentRenderer = createComponentRenderer(
   COMP,
   SpreadsheetMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, renderChild }: any) => {
     return <JSpreadsheet worksheets={extractValue(node.props.worksheets)} />;
   },
 );
