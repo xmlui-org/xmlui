@@ -167,6 +167,7 @@ export const Table = forwardRef(
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
       pageSizeOptions = defaultProps.pageSizeOptions,
+      pageSize = pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0],
       currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
       sortBy,
@@ -414,7 +415,7 @@ export const Table = forwardRef(
     // --- Set up page information (using the first page size option)
     // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
-      pageSize: isPaginated ? pageSizeOptions[0] : Number.MAX_VALUE,
+      pageSize: isPaginated ? pageSize : Number.MAX_VALUE,
       pageIndex: currentPageIndex,
     });
 
@@ -425,7 +426,7 @@ export const Table = forwardRef(
         setPagination((prev) => {
           return {
             ...prev,
-            pageSize: pageSizeOptions[0],
+            pageSize: pageSize,
             pageIndex: 0,
           };
         });
@@ -438,7 +439,7 @@ export const Table = forwardRef(
           };
         });
       }
-    }, [isPaginated, pageSizeOptions, prevIsPaginated]);
+    }, [isPaginated, pageSizeOptions, prevIsPaginated, pageSize]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
