@@ -1,3 +1,26 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "SimpleTooltip";
+$themeVars: t.composePaddingVars($themeVars, $component);
+
+// --- Theme variables for SimpleTooltip component
+$backgroundColor-SimpleTooltip: createThemeVar("backgroundColor-#{$component}");
+$textColor-SimpleTooltip: createThemeVar("textColor-#{$component}");
+$borderRadius-SimpleTooltip: createThemeVar("borderRadius-#{$component}");
+$fontSize-SimpleTooltip: createThemeVar("fontSize-#{$component}");
+$lineHeight-SimpleTooltip: createThemeVar("lineHeight-#{$component}");
+$boxShadow-SimpleTooltip: createThemeVar("boxShadow-#{$component}");
+$arrowFill-SimpleTooltip: createThemeVar("arrowFill-#{$component}");
+$animationDuration-SimpleTooltip: createThemeVar("animationDuration-#{$component}");
+$animationTimingFunction-SimpleTooltip: createThemeVar("animationTimingFunction-#{$component}");
+
 /* SimpleTooltip styles */
 
 .hiddenTrigger {
@@ -12,16 +35,16 @@
 }
 
 .content {
-  border-radius: 4px;
-  padding: 10px 15px;
-  font-size: 15px;
-  line-height: 1;
-  color: var(--xmlui-color-tooltip-text, white);
-  background-color: var(--xmlui-color-tooltip-background, #222);
-  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  border-radius: $borderRadius-SimpleTooltip;
+  @include t.paddingVars($themeVars, $component);
+  font-size: $fontSize-SimpleTooltip;
+  line-height: $lineHeight-SimpleTooltip;
+  color: $textColor-SimpleTooltip;
+  background-color: $backgroundColor-SimpleTooltip;
+  box-shadow: $boxShadow-SimpleTooltip;
   user-select: none;
-  animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-duration: $animationDuration-SimpleTooltip;
+  animation-timing-function: $animationTimingFunction-SimpleTooltip;
   will-change: transform, opacity;
 }
 
@@ -42,7 +65,7 @@
 }
 
 .arrow {
-  fill: var(--xmlui-color-tooltip-background, #222);
+  fill: $arrowFill-SimpleTooltip;
 }
 
 @keyframes slideUpAndFade {
@@ -87,4 +110,9 @@
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

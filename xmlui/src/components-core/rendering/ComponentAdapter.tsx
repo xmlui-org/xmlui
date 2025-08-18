@@ -31,8 +31,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
-import { Text } from "../../components/Text/TextNative";
-import { SimpleTooltip } from "../..";
+import { parseTooltipOptions, SimpleTooltip } from "../../components/SimpleTooltip/SimpleTooltipNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -166,6 +165,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Check if the component has a tooltip property
   const tooltipData = useMemo(
     () => valueExtractor(safeNode.props?.tooltip, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Check if the component has a tooltipOptions property
+  const tooltipOptions = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipOptions, true),
     [safeNode.props, valueExtractor],
   );
 
@@ -374,7 +379,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       ...childrenArray,
     );
     
+    // --- Handle tooltips
     if (tooltipData) {
+      // --- Obtain options
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+
+      // --- If the tooltip is not a string, we assume it is a valid tooltip data
       const elementWithTooltipRef = cloneElement(
         clonedElement,
         {
@@ -386,15 +396,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       return (
         <>
           {elementWithTooltipRef}
-          <SimpleTooltip 
-            side="left" 
-            align="center" 
-            text={tooltipData} 
-            triggerRef={tooltipTriggerRef} 
+          <SimpleTooltip
+            text={tooltipData}
+            triggerRef={tooltipTriggerRef}
+            {...parsedOptions}
           />
         </>
       );
     }
+
+    // --- No tooltip
     return clonedElement;
   }
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.

@@ -1,7 +1,9 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { SimpleTooltip, defaultProps } from "./SimpleTooltipNative";
 import type { SimpleTooltipProps } from "./SimpleTooltipNative";
+import styles from "./SimpleTooltip.module.scss";
 
 const COMP = "SimpleTooltip";
 
@@ -65,6 +67,30 @@ export const SimpleTooltipMd = createMetadata({
   events: {},
   apis: {},
   contextVars: {},
+  themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "#222",
+    [`textColor-${COMP}`]: "white",
+    [`borderRadius-${COMP}`]: "4px",
+    [`fontSize-${COMP}`]: "15px",
+    [`lineHeight-${COMP}`]: "1",
+    [`paddingTop-${COMP}`]: "10px",
+    [`paddingBottom-${COMP}`]: "10px",
+    [`paddingLeft-${COMP}`]: "15px",
+    [`paddingRight-${COMP}`]: "15px",
+    [`boxShadow-${COMP}`]: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
+    [`arrowFill-${COMP}`]: "#222",
+    [`animationDuration-${COMP}`]: "400ms",
+    [`animationTimingFunction-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
+
+    // Dark mode variants
+    dark: {
+      [`backgroundColor-${COMP}`]: "#333",
+      [`textColor-${COMP}`]: "#f0f0f0",
+      [`arrowFill-${COMP}`]: "#333",
+    },
+  },
 });
 
 export const simpleTooltipComponentRenderer = createComponentRenderer(

@@ -52,7 +52,6 @@ import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { useEvent } from "./components-core/utils/misc";
 import { createMetadata, d } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
-import { SimpleTooltip } from "./components/SimpleTooltip/SimpleTooltipNative";
 
 export type {
   ThemeDefinition,
@@ -111,5 +110,4 @@ export {
   useAppLayoutContext,
   useEvent,
   StandaloneComponent,
-  SimpleTooltip
 };
