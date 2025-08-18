@@ -1,4 +1,4 @@
-import { type CSSProperties, forwardRef } from "react";
+import { type CSSProperties, forwardRef, type ForwardedRef } from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
@@ -19,7 +19,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Icon = forwardRef(function Icon(
   { name, fallback, style, className, size, onClick, ...restProps }: IconBaseProps,
-  ref,
+  ref: ForwardedRef<HTMLElement>,
 ) {
   const iconRenderer = useFindIconRenderer(name, fallback);
 
@@ -44,13 +44,16 @@ export const Icon = forwardRef(function Icon(
   // ---
   const customIconUrl = useCustomIconUrl(name);
   if (customIconUrl) {
-    return <CustomIcon {...computedProps} url={customIconUrl} name={name} />;
+    return <CustomIcon {...computedProps} url={customIconUrl} name={name} ref={ref} />;
   }
 
   return iconRenderer?.renderer?.(computedProps) || null;
 });
 
-function CustomIcon(props: IconBaseProps & { size?: string; url: string }) {
+const CustomIcon = forwardRef(function CustomIcon(
+  props: IconBaseProps & { size?: string; url: string },
+  ref: ForwardedRef<HTMLElement>
+) {
   const { url, width, height, name, style, className } = props;
 
   const resourceUrl = useResourceUrl(url);
@@ -61,13 +64,13 @@ function CustomIcon(props: IconBaseProps & { size?: string; url: string }) {
     const renderedIcon = customSvgIconRenderer?.({ style, className });
     if (!renderedIcon) {
       //to prevent layout shift
-      return <span style={style} className={className} />;
+      return <span ref={ref as ForwardedRef<HTMLSpanElement>} style={style} className={className} />;
     }
     return renderedIcon;
   }
 
-  return <img src={resourceUrl} style={{ width, height, ...style }} alt={name} />;
-}
+  return <img ref={ref as ForwardedRef<HTMLImageElement>} src={resourceUrl} style={{ width, height, ...style }} alt={name} />;
+});
 
 function useCustomIconUrl(iconName?: string) {
   const { getResourceUrl } = useTheme();

@@ -31,7 +31,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
-import { parseTooltipOptions, SimpleTooltip } from "../../components/SimpleTooltip/SimpleTooltipNative";
+import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -363,7 +363,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         : ref
           ? composeRefs(ref, (renderedNode as any).ref)
           : (renderedNode as any).ref;
-    
+
     const clonedElement = cloneElement(
       renderedNode,
       {
@@ -378,40 +378,28 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       } as any,
       ...childrenArray,
     );
-    
+
     // --- Handle tooltips
     if (tooltipData) {
       // --- Obtain options
       const parsedOptions = parseTooltipOptions(tooltipOptions);
 
-      // --- If the tooltip is not a string, we assume it is a valid tooltip data
-      const elementWithTooltipRef = cloneElement(
-        clonedElement,
-        {
-          ...clonedElement.props as any,
-          ref: composeRefs(clonedRef, tooltipTriggerRef),
-        }
-      );
-      
       return (
-        <>
-          {elementWithTooltipRef}
-          <SimpleTooltip
-            text={tooltipData}
-            triggerRef={tooltipTriggerRef}
-            {...parsedOptions}
-          />
-        </>
+        <Tooltip text={tooltipData} {...parsedOptions}>
+          {clonedElement}
+        </Tooltip>
       );
     }
 
     // --- No tooltip
     return clonedElement;
   }
+
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  return React.isValidElement(renderedNode) && !!children
+  const nodeToRender = React.isValidElement(renderedNode) && !!children
     ? cloneElement(renderedNode, null, children)
     : renderedNode;
+  return nodeToRender;
 });
 
 /**

@@ -1,15 +1,15 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { SimpleTooltip, defaultProps } from "./SimpleTooltipNative";
-import type { SimpleTooltipProps } from "./SimpleTooltipNative";
-import styles from "./SimpleTooltip.module.scss";
+import { Tooltip, defaultProps } from "./TooltipNative";
+import type { TooltipProps } from "./TooltipNative";
+import styles from "./Tooltip.module.scss";
 
-const COMP = "SimpleTooltip";
+const COMP = "Tooltip";
 
-export const SimpleTooltipMd = createMetadata({
+export const TooltipMd = createMetadata({
   status: "stable",
-  description: "A simple tooltip component that displays text when hovering over trigger content.",
+  description: "A tooltip component that displays text when hovering over trigger content.",
   props: {
     text: {
       description: "The text content to display in the tooltip",
@@ -93,9 +93,9 @@ export const SimpleTooltipMd = createMetadata({
   },
 });
 
-export const simpleTooltipComponentRenderer = createComponentRenderer(
-  "SimpleTooltip",
-  SimpleTooltipMd,
+export const tooltipComponentRenderer = createComponentRenderer(
+  "Tooltip",
+  TooltipMd,
   ({ node, extractValue, renderChild, layoutContext }) => {
     // If there are no children, do not render anything
     if (!node.children || node.children.length === 0) {
@@ -108,8 +108,8 @@ export const simpleTooltipComponentRenderer = createComponentRenderer(
     const skipDelayDuration = extractValue.asOptionalNumber(node.props.skipDelayDuration, defaultProps.skipDelayDuration);
     const defaultOpen = extractValue.asOptionalBoolean(node.props.defaultOpen, defaultProps.defaultOpen);
     const showArrow = extractValue.asOptionalBoolean(node.props.showArrow, defaultProps.showArrow);
-    const side = extractValue.asOptionalString(node.props.side, defaultProps.side) as SimpleTooltipProps["side"];
-    const align = extractValue.asOptionalString(node.props.align, defaultProps.align) as SimpleTooltipProps["align"];
+    const side = extractValue.asOptionalString(node.props.side, defaultProps.side) as TooltipProps["side"];
+    const align = extractValue.asOptionalString(node.props.align, defaultProps.align) as TooltipProps["align"];
     const sideOffset = extractValue.asOptionalNumber(node.props.sideOffset, defaultProps.sideOffset);
     const alignOffset = extractValue.asOptionalNumber(node.props.alignOffset, defaultProps.alignOffset);
     const avoidCollisions = extractValue.asOptionalBoolean(node.props.avoidCollisions, defaultProps.avoidCollisions);
@@ -123,7 +123,7 @@ export const simpleTooltipComponentRenderer = createComponentRenderer(
     const triggerChild = node.children[0];
 
     return (
-      <SimpleTooltip
+      <Tooltip
         text={text}
         delayDuration={delayDuration}
         skipDelayDuration={skipDelayDuration}
@@ -136,7 +136,7 @@ export const simpleTooltipComponentRenderer = createComponentRenderer(
         avoidCollisions={avoidCollisions}
       >
         {renderChild(triggerChild, layoutContext)}
-      </SimpleTooltip>
+      </Tooltip>
     );
   },
 );

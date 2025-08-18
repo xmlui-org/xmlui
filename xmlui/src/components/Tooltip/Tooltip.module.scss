@@ -7,21 +7,21 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$component: "SimpleTooltip";
+$component: "Tooltip";
 $themeVars: t.composePaddingVars($themeVars, $component);
 
-// --- Theme variables for SimpleTooltip component
-$backgroundColor-SimpleTooltip: createThemeVar("backgroundColor-#{$component}");
-$textColor-SimpleTooltip: createThemeVar("textColor-#{$component}");
-$borderRadius-SimpleTooltip: createThemeVar("borderRadius-#{$component}");
-$fontSize-SimpleTooltip: createThemeVar("fontSize-#{$component}");
-$lineHeight-SimpleTooltip: createThemeVar("lineHeight-#{$component}");
-$boxShadow-SimpleTooltip: createThemeVar("boxShadow-#{$component}");
-$arrowFill-SimpleTooltip: createThemeVar("arrowFill-#{$component}");
-$animationDuration-SimpleTooltip: createThemeVar("animationDuration-#{$component}");
-$animationTimingFunction-SimpleTooltip: createThemeVar("animationTimingFunction-#{$component}");
+// --- Theme variables for Tooltip component
+$backgroundColor-Tooltip: createThemeVar("backgroundColor-#{$component}");
+$textColor-Tooltip: createThemeVar("textColor-#{$component}");
+$borderRadius-Tooltip: createThemeVar("borderRadius-#{$component}");
+$fontSize-Tooltip: createThemeVar("fontSize-#{$component}");
+$lineHeight-Tooltip: createThemeVar("lineHeight-#{$component}");
+$boxShadow-Tooltip: createThemeVar("boxShadow-#{$component}");
+$arrowFill-Tooltip: createThemeVar("arrowFill-#{$component}");
+$animationDuration-Tooltip: createThemeVar("animationDuration-#{$component}");
+$animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$component}");
 
-/* SimpleTooltip styles */
+/* Tooltip styles */
 
 .hiddenTrigger {
   position: fixed;
@@ -35,17 +35,18 @@ $animationTimingFunction-SimpleTooltip: createThemeVar("animationTimingFunction-
 }
 
 .content {
-  border-radius: $borderRadius-SimpleTooltip;
+  border-radius: $borderRadius-Tooltip;
   @include t.paddingVars($themeVars, $component);
-  font-size: $fontSize-SimpleTooltip;
-  line-height: $lineHeight-SimpleTooltip;
-  color: $textColor-SimpleTooltip;
-  background-color: $backgroundColor-SimpleTooltip;
-  box-shadow: $boxShadow-SimpleTooltip;
+  font-size: $fontSize-Tooltip;
+  line-height: $lineHeight-Tooltip;
+  color: $textColor-Tooltip;
+  background-color: $backgroundColor-Tooltip;
+  box-shadow: $boxShadow-Tooltip;
   user-select: none;
-  animation-duration: $animationDuration-SimpleTooltip;
-  animation-timing-function: $animationTimingFunction-SimpleTooltip;
+  animation-duration: $animationDuration-Tooltip;
+  animation-timing-function: $animationTimingFunction-Tooltip;
   will-change: transform, opacity;
+  z-index: 9999;
 }
 
 .content[data-state='delayed-open'][data-side='top'] {
@@ -65,7 +66,7 @@ $animationTimingFunction-SimpleTooltip: createThemeVar("animationTimingFunction-
 }
 
 .arrow {
-  fill: $arrowFill-SimpleTooltip;
+  fill: $arrowFill-Tooltip;
 }
 
 @keyframes slideUpAndFade {
