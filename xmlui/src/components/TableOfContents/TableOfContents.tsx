@@ -36,7 +36,7 @@ export const TableOfContentsMd = createMetadata({
         "This is useful when the `H1` is used for the page title and you want to avoid duplication.",
       valueType: "boolean",
       defaultValue: false,
-    }
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

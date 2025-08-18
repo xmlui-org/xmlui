@@ -33,9 +33,6 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
 
 .nav {
-  border-width: createThemeVar("borderWidth-#{$component}");
-  border-color: createThemeVar("borderColor-#{$component}");
-  border-style: createThemeVar("borderStyle-#{$component}");
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   background-color: $backgroundColor-TableOfContents;
