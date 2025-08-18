@@ -57,7 +57,8 @@ export const Tabs = forwardRef(function Tabs(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const tabsId = id || useId();
+  const _id = useId();
+  const tabsId = id || _id;
 
   // Ensure activeTab is within valid bounds
   const validActiveTab = useMemo(() => {
