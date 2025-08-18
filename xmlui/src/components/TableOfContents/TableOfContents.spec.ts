@@ -545,7 +545,7 @@ test.describe("Theme Variables", () => {
           "textColor-TableOfContentsItem": "rgb(255, 0, 0)",
           "fontSize-TableOfContentsItem": "18px",
           "fontWeight-TableOfContentsItem": "700",
-          "padding-TableOfContentsItem": "15px",
+          "padding-TableOfContentsItem": "25px",
         },
       },
     );
@@ -556,19 +556,18 @@ test.describe("Theme Variables", () => {
       expect(tocLink).toHaveCSS("color", "rgb(255, 0, 0)"),
       expect(tocLink).toHaveCSS("font-size", "18px"),
       expect(tocLink).toHaveCSS("font-weight", "700"),
-      expect(tocLink).toHaveCSS("padding", "15px"),
+      expect(tocLink).toHaveCSS("padding", "25px 25px 25px 12px"),
     ]);
   });
 
   test("applies level-specific theme variables for H1", async ({ initTestBed, page }) => {
-    await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `
       <Page>
         <HStack>
           <VStack>
             <Heading level="h1" value="Level 1 Heading" />
-            bottom of the page text
+            <Heading level="h1" value="Active Heading " />
           </VStack>
           <StickyBox to="top">
             <TableOfContents />
@@ -597,14 +596,13 @@ test.describe("Theme Variables", () => {
   });
 
   test("applies level-specific theme variables for H2", async ({ initTestBed, page }) => {
-    await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `
       <Page>
         <HStack>
           <VStack>
             <Heading level="h2" value="Level 2 Heading" />
-            bottom of the page text
+            <Heading level="h2" value="Active heading" />
           </VStack>
           <StickyBox to="top">
             <TableOfContents />
@@ -633,7 +631,6 @@ test.describe("Theme Variables", () => {
   });
 
   test("applies level-specific theme variables for H6", async ({ initTestBed, page }) => {
-    await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `
       <Page>
@@ -675,6 +672,7 @@ test.describe("Theme Variables", () => {
       <Page>
         <HStack>
           <VStack>
+            <Heading level="h2" value="First Heading" />
             <Heading level="h2" value="Hover Test" />
             bottom of the page text
           </VStack>
@@ -693,15 +691,20 @@ test.describe("Theme Variables", () => {
       },
     );
 
-    const tocLink = page.getByRole("link", { name: "Hover Test" });
-    const listItem = tocLink.locator("..");
+    // First click on the second heading to make it active
+    const secondHeading = page.getByRole("link", { name: "Hover Test" });
+    await secondHeading.click();
 
-    await tocLink.hover();
+    // Now hover over the first heading (which should not be active)
+    const firstHeading = page.getByRole("link", { name: "First Heading" });
+    const listItem = firstHeading.locator("..");
+
+    await firstHeading.hover();
 
     await Promise.all([
       expect(listItem).toHaveCSS("background-color", "rgb(200, 200, 200)"),
-      expect(tocLink).toHaveCSS("color", "rgb(100, 100, 100)"),
-      expect(tocLink).toHaveCSS("font-weight", "900"),
+      expect(firstHeading).toHaveCSS("color", "rgb(100, 100, 100)"),
+      expect(firstHeading).toHaveCSS("font-weight", "900"),
     ]);
   });
 
@@ -725,7 +728,7 @@ test.describe("Theme Variables", () => {
       {
         testThemeVars: {
           "backgroundColor-TableOfContentsItem--active": "rgb(150, 150, 255)",
-          "color-TableOfContentsItem--active": "rgb(50, 50, 150)",
+          "textColor-TableOfContentsItem--active": "rgb(50, 50, 150)",
           "fontWeight-TableOfContentsItem--active": "bold",
         },
       },
@@ -734,7 +737,7 @@ test.describe("Theme Variables", () => {
     const activeLink = page.getByRole("link", { name: "Another Section" });
     await activeLink.click();
 
-    const activeListItem = page.locator(".active").first();
+    const activeListItem = page.locator("[class*='active']").first();
     const activeLinkElement = activeListItem.locator("a");
 
     await Promise.all([

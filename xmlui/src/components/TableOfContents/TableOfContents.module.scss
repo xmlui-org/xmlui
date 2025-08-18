@@ -19,7 +19,6 @@ $themeVars: t.composeBorderVars($themeVars, $componentItem);
 $themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--hover");
 $themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--active");
 $themeVars: t.composePaddingVars($themeVars, $componentItem);
-
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-1");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-1");
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-2");
@@ -67,7 +66,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
       .link {
         display: block;
         overflow-wrap: break-word;
-        color: createThemeVar("textColor-#{$componentItem}");
         @include t.paddingVars($themeVars, $componentItem);
         @include t.textVars($themeVars, $componentItem);
 
@@ -136,7 +134,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
         background-color: createThemeVar("backgroundColor-#{$componentItem}--active");
 
         .link {
-          color: createThemeVar("color-#{$componentItem}--active");
+          color: createThemeVar("textColor-#{$componentItem}--active");
           font-weight: createThemeVar("fontWeight-#{$componentItem}--active");
 
           &.head_1 {
