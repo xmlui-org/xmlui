@@ -162,21 +162,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
 
-  // --- Check if the component has a tooltip property
-  const tooltipData = useMemo(
-    () => valueExtractor(safeNode.props?.tooltip, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  // --- Check if the component has a tooltipOptions property
-  const tooltipOptions = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipOptions, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  // --- Create a ref for tooltip trigger (only used when tooltip is present)
-  const tooltipTriggerRef = useRef<HTMLElement>(null);
-
   // --- Obtain the component renderer and descriptor from the component registry
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
@@ -349,6 +334,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     );
   }
 
+  let nodeToRender: ReactNode = renderedNode;
   // --- If we have a single React node with forwarded reference, or mouse events
   // --- let's merge the "rest" properties with it.
   if ((ref || !isEmpty(mouseEventHandlers)) && renderedNode && React.isValidElement(renderedNode)) {
@@ -364,7 +350,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           ? composeRefs(ref, (renderedNode as any).ref)
           : (renderedNode as any).ref;
 
-    const clonedElement = cloneElement(
+    nodeToRender = cloneElement(
       renderedNode,
       {
         ref: clonedRef,
@@ -378,27 +364,44 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       } as any,
       ...childrenArray,
     );
-
-    // --- Handle tooltips
-    if (tooltipData) {
-      // --- Obtain options
-      const parsedOptions = parseTooltipOptions(tooltipOptions);
-
-      return (
-        <Tooltip text={tooltipData} {...parsedOptions}>
-          {clonedElement}
-        </Tooltip>
-      );
-    }
-
-    // --- No tooltip
-    return clonedElement;
+  } else {
+    // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
+    nodeToRender =
+      React.isValidElement(renderedNode) && !!children
+        ? cloneElement(renderedNode, null, children)
+        : renderedNode;
   }
 
-  // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  const nodeToRender = React.isValidElement(renderedNode) && !!children
-    ? cloneElement(renderedNode, null, children)
-    : renderedNode;
+  // --- Check if the component has a tooltip property
+  const tooltipText = useMemo(
+    () => valueExtractor(safeNode.props?.tooltip, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Check if the component has a tooltip property
+  const tooltipMarkdown = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
+    [safeNode.props, valueExtractor],
+  );
+  // --- Check if the component has a tooltipOptions property
+  const tooltipOptions = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipOptions, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Handle tooltips
+  if (tooltipMarkdown || tooltipText) {
+    // --- Obtain options
+    const parsedOptions = parseTooltipOptions(tooltipOptions);
+
+    return (
+      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+        {nodeToRender}
+      </Tooltip>
+    );
+  }
+
+  // --- Done
   return nodeToRender;
 });
 

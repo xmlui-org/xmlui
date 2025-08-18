@@ -70,8 +70,8 @@ export const TooltipMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "#222",
-    [`textColor-${COMP}`]: "white",
+    [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`textColor-${COMP}`]: "$textcolor-primary",
     [`borderRadius-${COMP}`]: "4px",
     [`fontSize-${COMP}`]: "15px",
     [`lineHeight-${COMP}`]: "1",
@@ -102,19 +102,8 @@ export const tooltipComponentRenderer = createComponentRenderer(
       return null;
     }
 
-    // Extract all prop values
-    const text = extractValue.asOptionalString(node.props.text);
-    const delayDuration = extractValue.asOptionalNumber(node.props.delayDuration, defaultProps.delayDuration);
-    const skipDelayDuration = extractValue.asOptionalNumber(node.props.skipDelayDuration, defaultProps.skipDelayDuration);
-    const defaultOpen = extractValue.asOptionalBoolean(node.props.defaultOpen, defaultProps.defaultOpen);
-    const showArrow = extractValue.asOptionalBoolean(node.props.showArrow, defaultProps.showArrow);
-    const side = extractValue.asOptionalString(node.props.side, defaultProps.side) as TooltipProps["side"];
-    const align = extractValue.asOptionalString(node.props.align, defaultProps.align) as TooltipProps["align"];
-    const sideOffset = extractValue.asOptionalNumber(node.props.sideOffset, defaultProps.sideOffset);
-    const alignOffset = extractValue.asOptionalNumber(node.props.alignOffset, defaultProps.alignOffset);
-    const avoidCollisions = extractValue.asOptionalBoolean(node.props.avoidCollisions, defaultProps.avoidCollisions);
-
     // If text is not provided, do not render anything
+    const text = extractValue.asOptionalString(node.props.text)
     if (!text) {
       return null;
     }
@@ -125,15 +114,15 @@ export const tooltipComponentRenderer = createComponentRenderer(
     return (
       <Tooltip
         text={text}
-        delayDuration={delayDuration}
-        skipDelayDuration={skipDelayDuration}
-        defaultOpen={defaultOpen}
-        showArrow={showArrow}
-        side={side}
-        align={align}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        avoidCollisions={avoidCollisions}
+        delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
+        skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
+        defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}
+        showArrow={extractValue.asOptionalBoolean(node.props.showArrow)}
+        side={extractValue.asOptionalString(node.props.side) as TooltipProps["side"]}
+        align={extractValue.asOptionalString(node.props.align) as TooltipProps["align"]}
+        sideOffset={extractValue.asOptionalNumber(node.props.sideOffset)}
+        alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
+        avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
       >
         {renderChild(triggerChild, layoutContext)}
       </Tooltip>

@@ -11,6 +11,7 @@ import { isPlainObject } from "lodash-es";
 
 import styles from "./Tooltip.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Markdown } from "../Markdown/Markdown";
 
 type TooltipOptions = {
   /**
@@ -66,6 +67,11 @@ type TooltipProps = TooltipOptions & {
   text: string;
 
   /**
+   * The markdown content to display in the tooltip
+   */
+  markdown?: string;
+
+  /**
    * The content that will trigger the tooltip (used when triggerRef is not provided)
    */
   children?: ReactNode;
@@ -88,6 +94,7 @@ export const defaultProps: TooltipOptions = {
 export const Tooltip = forwardRef(function Tooltip(
   {
     text,
+    markdown,
     delayDuration = defaultProps.delayDuration,
     skipDelayDuration = defaultProps.skipDelayDuration,
     defaultOpen = defaultProps.defaultOpen,
@@ -120,7 +127,7 @@ export const Tooltip = forwardRef(function Tooltip(
             alignOffset={alignOffset}
             avoidCollisions={avoidCollisions}
           >
-            {text}
+            {markdown ? <Markdown>{markdown}</Markdown> : text}
             {showArrow && <RadixTooltip.Arrow className={styles.arrow} />}
           </RadixTooltip.Content>
         </RadixTooltip.Portal>
