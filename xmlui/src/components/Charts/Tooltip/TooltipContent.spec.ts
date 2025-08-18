@@ -113,8 +113,8 @@ test.describe("Basic Functionality", () => {
       // The indicator prop would be passed through chart tooltip configuration
       await initTestBed(`
         <BarChart
-          nameKey="name"
-          dataKeys="{['value']}"
+          yKey="name"
+          xKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -158,8 +158,8 @@ test.describe("Basic Functionality", () => {
     test("displays multiple data series correctly", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          nameKey="name"
-          dataKeys="{['sales', 'profit']}"
+          yKey="name"
+          xKeys="{['sales', 'profit']}"
           data="{${multiSeriesData}}"
           width="400px"
           height="400px"
@@ -564,7 +564,7 @@ test.describe("Performance and Edge Cases", () => {
       },
       { 
         component: "BarChart", 
-        props: 'nameKey="name" dataKeys="{[\'value\']}"',
+        props: 'yKey="name" xKeys="{[\'value\']}"',
         hoverTarget: ".recharts-bar-rectangle"
       }
     ];
