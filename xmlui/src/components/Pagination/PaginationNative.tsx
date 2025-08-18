@@ -138,8 +138,8 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       moveLast: () => handlePageChange(totalPages - 1),
       movePrev: () => handlePageChange(currentPage - 1),
       moveNext: () => handlePageChange(currentPage + 1),
-      currentPage: () => internalState.currentPage,
-      currentPageSize: () => internalState.currentPageSize,
+      currentPage: internalState.currentPage,
+      currentPageSize: internalState.currentPageSize,
     }),
     [handlePageChange, totalPages, currentPage, internalState],
   );

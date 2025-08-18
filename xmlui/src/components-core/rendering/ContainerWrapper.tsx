@@ -1,8 +1,15 @@
-import { forwardRef, memo, MutableRefObject, ReactNode, RefObject, useMemo } from "react";
+import {
+  forwardRef,
+  memo,
+  type MutableRefObject,
+  type ReactNode,
+  type RefObject,
+  useMemo,
+} from "react";
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
-import { LayoutContext } from "../../abstractions/RendererDefs";
-import { ContainerDispatcher } from "../abstractions/ComponentRenderer";
-import { ProxyAction } from "../rendering/buildProxy";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
+import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
+import type { ProxyAction } from "../rendering/buildProxy";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
 
@@ -34,7 +41,7 @@ export type ContainerState = Record<string | symbol, any>;
  * the host component ID). This type defines the shape of a hash object that
  * stores the API endpoints.
  */
-export type ComponentApi = Record<string, ((...args: any[]) => any) | boolean>;
+export type ComponentApi = Record<string, ((...args: any[]) => any) | boolean | number | string>;
 
 /**
  * This type declares that function's signature, which registers an exposed
@@ -141,7 +148,10 @@ export const ContainerWrapper = memo(
           uidInfoRef={uidInfoRef}
           isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
           ref={ref}
-          {...rest}>{children}</StateContainer>
+          {...rest}
+        >
+          {children}
+        </StateContainer>
       </ErrorBoundary>
     );
   }),
