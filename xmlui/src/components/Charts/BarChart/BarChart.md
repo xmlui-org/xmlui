@@ -5,15 +5,15 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="300px" name="Example: dimension determined by the parent" /Card height="240px" width="75%"/
 <Card height="240px" width="75%">
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
         { 'sprint': 'Sprint 2', 'A': 32 },
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -21,7 +21,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="300px" name="Example: dimension overwritten by BarChart" /height="240px"/ /height="200px"/
 <Card height="240px">
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="200px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -29,8 +29,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -49,7 +49,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="320px" name="Example: tickFormatterY" /tickFormatterY/
 <App>
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="240px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -57,8 +57,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -72,7 +72,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="320px" name="Example: tickFormatterX" /tickFormatterX/
 <App>
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="240px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -80,8 +80,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
