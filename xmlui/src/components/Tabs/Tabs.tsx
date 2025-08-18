@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
-import { createMetadata, d, dComponent } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dDidChange } from "../metadata-helpers";
 
 const COMP = "Tabs";
 
@@ -33,6 +33,9 @@ export const TabsMd = createMetadata({
     headerTemplate: {
       ...dComponent(`This property declares the template for the clickable tab area.`),
     },
+  },
+  events: {
+    didChange: dDidChange(COMP),
   },
   apis: {
     next: {
@@ -70,7 +73,7 @@ export const TabsMd = createMetadata({
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, layoutCss, registerComponentApi }) => {
+  ({ extractValue, node, renderChild, layoutCss, registerComponentApi, lookupEventHandler }) => {
     return (
       <Tabs
         id={node?.uid}
@@ -91,6 +94,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         }
         activeTab={extractValue(node.props?.activeTab)}
         orientation={extractValue(node.props?.orientation)}
+        onDidChange={lookupEventHandler("didChange")}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}
