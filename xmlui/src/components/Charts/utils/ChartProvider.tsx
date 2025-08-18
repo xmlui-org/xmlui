@@ -4,8 +4,8 @@ import { createContext, useContext } from "react";
 
 type ChartContextType = {
   dataKey: string;
-  dataKeys: string[];
-  nameKey: string;
+  xKeys: string[];
+  yKey: string;
   labelList: any;
   setLabelList: any;
   legend: any;
@@ -14,8 +14,8 @@ type ChartContextType = {
 
 const ChartContext = createContext<ChartContextType | undefined>({
   dataKey: "",
-  nameKey: "",
-  dataKeys: [],
+  xKeys: [],
+  yKey: "",
   labelList: null,
   setLabelList: () => {},
   legend: null,
@@ -24,23 +24,23 @@ const ChartContext = createContext<ChartContextType | undefined>({
 
 export function useChartContextValue({
   dataKey = "",
-  dataKeys = [],
-  nameKey = "",
+  xKeys = [],
+  yKey = "",
 }: {
   dataKey?: string;
-  dataKeys?: string[];
-  nameKey: string;
+  xKeys?: string[];
+  yKey?: string;
 }) {
   const [dKey] = useState(dataKey);
-  const [dKeys] = useState(dataKeys);
-  const [nKey] = useState(nameKey);
+  const [dKeys] = useState(xKeys);
+  const [nKey] = useState(yKey);
   const [labelList, setLabelList] = useState(null);
   const [legend, setLegend] = useState(null);
 
   return {
     dataKey: dKey,
-    nameKey: nKey,
-    dataKeys: dKeys,
+    xKeys: dKeys,
+    yKey: nKey,
     labelList,
     setLabelList,
     legend,

@@ -17,10 +17,10 @@ import { useTheme } from "../../../components-core/theming/ThemeContext";
 
 export type BarChartProps = {
   data: any[];
-  layout?: "horizontal" | "vertical";
-  nameKey: string;
+  orientation?: "horizontal" | "vertical";
   stacked?: boolean;
-  dataKeys?: string[];
+  xKeys?: string[];
+  yKey: string;
   style?: CSSProperties;
   hideTickX?: boolean;
   hideTickY?: boolean;
@@ -35,7 +35,7 @@ export type BarChartProps = {
 
 export const defaultProps: Pick<
   BarChartProps,
-  | "layout"
+  | "orientation"
   | "stacked"
   | "hideTickX"
   | "hideTickY"
@@ -46,7 +46,7 @@ export const defaultProps: Pick<
   | "tickFormatterY"
   | "showLegend"
 > = {
-  layout: "vertical",
+  orientation: "vertical",
   stacked: false,
   hideTickX: false,
   hideTickY: false,
@@ -60,10 +60,10 @@ export const defaultProps: Pick<
 
 export function BarChart({
   data = [],
-  layout = defaultProps.layout,
-  nameKey,
+  orientation = defaultProps.orientation,
   stacked = defaultProps.stacked,
-  dataKeys = [],
+  xKeys = [],
+  yKey,
   hideTickX = defaultProps.hideTickX,
   hideTickY = defaultProps.hideTickY,
   hideY = defaultProps.hideY,
@@ -123,7 +123,7 @@ export function BarChart({
   const config = useMemo(() => {
     return Object.assign(
       {},
-      ...dataKeys.map((key, index) => {
+      ...xKeys.map((key, index) => {
         return {
           [key]: {
             label: key,
@@ -132,9 +132,9 @@ export function BarChart({
         };
       }),
     );
-  }, [colorValues, dataKeys]);
+  }, [colorValues, xKeys]);
 
-  const chartContextValue = useChartContextValue({ dataKeys, nameKey });
+  const chartContextValue = useChartContextValue({ xKeys, yKey });
 
   const containerRef = useRef(null);
   const labelsRef = useRef<HTMLDivElement>(null);
@@ -189,7 +189,7 @@ export function BarChart({
       const maxXTickHeight =
         xTicks.length > 0 ? Math.max(...xTicks.map((t) => t.getBBox().height)) : fontSize;
       let bottomMargin = 10;
-      if (layout === "vertical") {
+      if (orientation === "vertical") {
         bottomMargin = maxXTickHeight;
       } else {
         bottomMargin = Math.max(xAxisH, maxXTickHeight);
@@ -245,11 +245,11 @@ export function BarChart({
           style={style}
           accessibilityLayer
           data={validData}
-          layout={layout}
+          layout={orientation}
           margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
         >
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
-          {layout === "vertical" ? (
+          {orientation === "vertical" ? (
             <>
               <XAxis
                 type="number"
@@ -260,7 +260,7 @@ export function BarChart({
               />
               <YAxis
                 hide={miniMode || hideY}
-                dataKey={nameKey}
+                dataKey={yKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
@@ -271,7 +271,7 @@ export function BarChart({
           ) : (
             <>
               <XAxis
-                dataKey={nameKey}
+                dataKey={yKey}
                 type="category"
                 interval={interval}
                 tickLine={false}
@@ -338,10 +338,10 @@ export function BarChart({
     );
   }, [
     data,
-    layout,
-    nameKey,
+    orientation,
     stacked,
-    dataKeys,
+    xKeys,
+    yKey,
     style,
     miniMode,
     chartMargin,
@@ -368,7 +368,7 @@ export function BarChart({
         style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
       >
         {validData
-          .map((d) => d[nameKey])
+          .map((d) => d[yKey])
           .map((label, idx) => (
             <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
               {label}
