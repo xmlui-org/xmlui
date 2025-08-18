@@ -9,7 +9,7 @@ import { errReportComponent, xmlUiMarkupToComponent } from "../../components-cor
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
-import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
 import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";

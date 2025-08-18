@@ -324,7 +324,6 @@ function ThemeProvider({
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
-      root,
       themes,
       resources,
       resourceMap,
@@ -344,13 +343,13 @@ function ThemeProvider({
     availableThemeIds,
     resourceMap,
     resources,
-    root,
     themes,
   ]);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
       root,
+      setRoot,
       activeThemeId,
       activeThemeTone: activeThemeTone,
       activeTheme,

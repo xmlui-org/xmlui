@@ -22,7 +22,6 @@ import {
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
-
 type Props = {
   id?: string;
   isRoot?: boolean;
@@ -55,8 +54,8 @@ export function Theme({
 }: Props) {
   const generatedId = useId();
 
-  const { themes, resources, resourceMap, activeThemeId, root } = useThemes();
-  const { activeTheme, activeThemeTone } = useTheme();
+  const { themes, resources, resourceMap, activeThemeId } = useThemes();
+  const { activeTheme, activeThemeTone, root } = useTheme();
   const themeTone = tone || activeThemeTone;
   const currentTheme: ThemeDefinition = useMemo(() => {
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
@@ -93,8 +92,9 @@ export function Theme({
   const transformedStyles = useMemo(() => {
     const ret = {
       "&": {
-        ...themeCssVars, "colorScheme": themeTone
-      }
+        ...themeCssVars,
+        colorScheme: themeTone,
+      },
     };
 
     if (isRoot) {
@@ -108,44 +108,45 @@ export function Theme({
 
       ret[`@media (min-width: calc(${maxWidthPhone} + 1px))`] = {
         "&": {
-          "--screenSize": 1
-        }
-      }
+          "--screenSize": 1,
+        },
+      };
 
       ret[`@media (min-width: calc(${maxWidthLandscapePhone} + 1px))`] = {
         "&": {
-          "--screenSize": 2
-        }
-      }
+          "--screenSize": 2,
+        },
+      };
 
       ret[`@media (min-width: calc(${maxWidthTablet} + 1px))`] = {
         "&": {
-          "--screenSize": 3
-        }
-      }
+          "--screenSize": 3,
+        },
+      };
 
       ret[`@media (min-width: calc(${maxWidthDesktop} + 1px))`] = {
         "&": {
-          "--screenSize": 4
-        }
-      }
+          "--screenSize": 4,
+        },
+      };
 
       ret[`@media (min-width: calc(${maxWidthLargeDesktop} + 1px))`] = {
         "&": {
-          "--screenSize": 5
-        }
-      }
+          "--screenSize": 5,
+        },
+      };
     }
     return ret;
   }, [isRoot, themeCssVars, themeTone, getThemeVar]);
 
   const className = useStyles(transformedStyles);
 
-  const [themeRoot, setThemeRoot] = useState(root);
+  const [currentThemeRoot, setCurrentThemeRoot] = useState(root);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
-      root: root,
+      root: currentThemeRoot,
+      setRoot: setCurrentThemeRoot,
       activeThemeId,
       activeThemeTone: themeTone,
       activeTheme: currentTheme,
@@ -156,21 +157,21 @@ export function Theme({
     };
     return themeVal;
   }, [
-    root,
     activeThemeId,
-    themeTone,
-    currentTheme,
-    themeCssVars,
     allThemeVarsWithResolvedHierarchicalVars,
+    currentTheme,
+    currentThemeRoot,
     getResourceUrl,
     getThemeVar,
+    themeCssVars,
+    themeTone,
   ]);
 
   const { indexing } = useIndexerContext();
 
-  const htmlClasses = useMemo(() => {
+  const rootClasses = useMemo(() => {
     if (isRoot) {
-      return [className, styles.body];
+      return [className, styles.root];
     }
     return EMPTY_ARRAY;
   }, [className, isRoot]);
@@ -188,7 +189,7 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <RootClasses classNames={htmlClasses}/>
+        <RootClasses classNames={rootClasses} />
         <ErrorBoundary node={node} location={"theme-root"}>
           {renderChild(node.children)}
           {children}
@@ -204,6 +205,18 @@ export function Theme({
       <div className={classnames(styles.wrapper, className)}>
         {renderChild(node.children, { ...layoutContext, themeClassName: className })}
       </div>
+      {root &&
+        createPortal(
+          <div
+            className={classnames(className)}
+            ref={(el) => {
+              if (el) {
+                setCurrentThemeRoot(el);
+              }
+            }}
+          ></div>,
+          root,
+        )}
     </ThemeContext.Provider>
   );
 }
@@ -218,14 +231,16 @@ type HtmlClassProps = {
  */
 export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
   const registry = useStyleRegistry();
-  const domRoot = useDomRoot()
+  const domRoot = useDomRoot();
 
   useIsomorphicLayoutEffect(() => {
     // This runs on the client to handle dynamic updates.
     // The SSR part is handled by the render itself.
-    if (typeof document !== 'undefined') {
+    if (typeof document !== "undefined") {
       const insideShadowRoot = domRoot instanceof ShadowRoot;
-      let documentElement = insideShadowRoot ? domRoot.getElementById("nested-app-root") : document.documentElement;
+      let documentElement = insideShadowRoot
+        ? domRoot.getElementById("nested-app-root")
+        : document.documentElement;
       documentElement.classList.add(...classNames);
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
@@ -237,7 +252,6 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
 
   // For SSR, we just add the class to the registry. The component renders nothing.
   registry.addRootClasses(classNames);
-
 
   return null;
 }
