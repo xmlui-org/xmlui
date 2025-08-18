@@ -73,7 +73,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={styles.nav} ref={ref} style={style}>
+    <nav aria-label="Table of Contents" className={styles.nav} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
@@ -112,6 +112,6 @@ export const TableOfContents = forwardRef(function TableOfContents(
           return null;
         })}
       </ul>
-    </div>
+    </nav>
   );
 });

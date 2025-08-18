@@ -34,9 +34,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
 
 .nav {
-  border-width: createThemeVar('borderWidth-#{$component}');
-  border-color: createThemeVar('borderColor-#{$component}');
-  border-style: createThemeVar('borderStyle-#{$component}');
+  border-width: createThemeVar("borderWidth-#{$component}");
+  border-color: createThemeVar("borderColor-#{$component}");
+  border-style: createThemeVar("borderStyle-#{$component}");
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   background-color: $backgroundColor-TableOfContents;
@@ -54,7 +54,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
   // --- Do not collapse these padding properties; they are intentionally expanded
   margin-top: createThemeVar("marginTop-#{$component}");
   margin-bottom: createThemeVar("marginBottom-#{$component}");
-  
+
   .list {
     margin: 0;
     padding: 0;

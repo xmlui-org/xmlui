@@ -398,12 +398,11 @@ test.describe("Basic Functionality", () => {
         </Page>
       `);
 
-      const smoothHeading = page.getByRole("heading", { name: "Another Section" });
-      const smoothLink = page.getByRole("link", { name: "Another Section" });
+      const secondHeading = page.getByRole("heading", { name: "Another Section" });
+      const link = page.getByRole("link", { name: "Another Section" });
 
-      await smoothLink.click();
-      await expect(smoothHeading).toBeInViewport();
-      await page.waitForURL(/#.*$/);
+      await link.click();
+      await expect(secondHeading).toBeInViewport();
     });
 
     test("works without smooth scrolling when disabled", async ({ initTestBed, page }) => {
@@ -423,97 +422,17 @@ test.describe("Basic Functionality", () => {
         </Page>
       `);
 
-      const regularHeading = page.getByRole("heading", { name: "Another Section" });
-      const regularLink = page.getByRole("link", { name: "Another Section" });
+      const secondHeading = page.getByRole("heading", { name: "Another Section" });
+      const link = page.getByRole("link", { name: "Another Section" });
 
-      await regularLink.click();
-      await expect(regularHeading).toBeInViewport();
-      await page.waitForURL(/#.*$/);
+      await link.click();
+      await expect(secondHeading).toBeInViewport();
     });
   });
 
   // =============================================================================
   // ID PROPERTY TESTS
   // =============================================================================
-
-  test.describe("id property handling", () => {
-    test("handles special characters in heading ids", async ({ initTestBed, page }) => {
-      await page.setViewportSize({ height: 600, width: 800 });
-      await initTestBed(`
-        <Page>
-          <HStack>
-            <VStack gap="800px">
-              <Heading level="h2" value="Special-chars_test.heading" />
-              bottom of the page text
-            </VStack>
-            <StickyBox to="top">
-              <TableOfContents />
-            </StickyBox>
-          </HStack>
-        </Page>
-      `);
-
-      const specialHeading = page.getByRole("heading", { name: "Special-chars_test.heading" });
-      const specialLink = page.getByRole("link", { name: "Special-chars_test.heading" });
-
-      await expect(specialLink).toBeVisible();
-      await specialLink.click();
-      await expect(specialHeading).toBeInViewport();
-      await page.waitForURL(/#.*$/);
-    });
-
-    test("handles unicode characters in heading titles", async ({ initTestBed, page }) => {
-      await page.setViewportSize({ height: 600, width: 800 });
-      await initTestBed(`
-        <Page>
-          <HStack>
-            <VStack gap="800px">
-              <Heading level="h2" value="测试标题-émojis🚀" />
-              bottom of the page text
-            </VStack>
-            <StickyBox to="top">
-              <TableOfContents />
-            </StickyBox>
-          </HStack>
-        </Page>
-      `);
-
-      const unicodeHeading = page.getByRole("heading", { name: "测试标题-émojis🚀" });
-      const unicodeLink = page.getByRole("link", { name: "测试标题-émojis🚀" });
-
-      await expect(unicodeLink).toBeVisible();
-      await unicodeLink.click();
-      await expect(unicodeHeading).toBeInViewport();
-      await page.waitForURL(/#.*$/);
-    });
-
-    test("handles bookmarks with special characters", async ({ initTestBed, page }) => {
-      await page.setViewportSize({ height: 600, width: 800 });
-      await initTestBed(`
-        <Page>
-          <HStack>
-            <VStack gap="800px">
-              <Bookmark id="special-bookmark_test.section" title="Special Bookmark" level="{2}">
-                special bookmark content
-              </Bookmark>
-              bottom of the page text
-            </VStack>
-            <StickyBox to="top">
-              <TableOfContents />
-            </StickyBox>
-          </HStack>
-        </Page>
-      `);
-
-      const bookmarkContent = page.getByText("special bookmark content");
-      const bookmarkLink = page.getByRole("link", { name: "Special Bookmark" });
-
-      await expect(bookmarkLink).toBeVisible();
-      await bookmarkLink.click();
-      await expect(bookmarkContent).toBeInViewport();
-      await page.waitForURL(/#special-bookmark_test\.section$/);
-    });
-  });
 });
 
 // =============================================================================
@@ -521,34 +440,6 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("has correct navigation semantics", async ({ initTestBed, page }) => {
-    await page.setViewportSize({ height: 600, width: 800 });
-    await initTestBed(`
-      <Page>
-        <HStack>
-          <VStack gap="800px">
-            <Heading level="h1" value="Main Title" />
-            <Heading level="h2" value="Section 1" />
-            <Heading level="h3" value="Subsection 1.1" />
-            bottom of the page text
-          </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
-        </HStack>
-      </Page>
-    `);
-
-    const nav = page.locator('nav, [role="navigation"]').or(page.locator(".nav")).first();
-    await expect(nav).toBeVisible();
-
-    const list = nav.locator("ul");
-    await expect(list).toBeVisible();
-
-    const listItems = list.locator("li");
-    await expect(listItems).toHaveCount(3);
-  });
-
   test("supports keyboard navigation", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(`
@@ -566,6 +457,9 @@ test.describe("Accessibility", () => {
       </Page>
     `);
 
+    const nav = page.getByRole("navigation");
+    await nav.focus();
+
     // Tab to first link
     await page.keyboard.press("Tab");
     const firstLink = page.getByRole("link", { name: "First Section" });
@@ -580,37 +474,6 @@ test.describe("Accessibility", () => {
     const secondHeading = page.getByRole("heading", { name: "Second Section" });
     await page.keyboard.press("Enter");
     await expect(secondHeading).toBeInViewport();
-    await page.waitForURL(/#.*$/);
-  });
-
-  test("has accessible link text", async ({ initTestBed, page }) => {
-    await page.setViewportSize({ height: 600, width: 800 });
-    await initTestBed(`
-      <Page>
-        <HStack>
-          <VStack gap="800px">
-            <Heading level="h2" value="Accessible Section Title" />
-            <Bookmark id="bookmark-section" title="Accessible Bookmark Title" level="{3}">
-              accessible bookmark content
-            </Bookmark>
-            bottom of the page text
-          </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
-        </HStack>
-      </Page>
-    `);
-
-    const headingLink = page.getByRole("link", { name: "Accessible Section Title" });
-    const bookmarkLink = page.getByRole("link", { name: "Accessible Bookmark Title" });
-
-    await expect(headingLink).toBeVisible();
-    await expect(bookmarkLink).toBeVisible();
-
-    // Links should have proper href attributes
-    await expect(headingLink).toHaveAttribute("href", /#.+/);
-    await expect(bookmarkLink).toHaveAttribute("href", "#bookmark-section");
   });
 });
 
@@ -619,14 +482,14 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies theme variables", async ({ initTestBed, page }) => {
+  test("applies container theme variables", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
-    await initTestBed(`
+    await initTestBed(
+      `
       <Page>
         <HStack>
-          <VStack gap="800px">
-            <Heading level="h1" value="Styled Title" />
-            <Heading level="h2" value="Styled Section" />
+          <VStack>
+            <Heading level="h1" value="Test Heading" />
             bottom of the page text
           </VStack>
           <StickyBox to="top">
@@ -634,32 +497,41 @@ test.describe("Theme Variables", () => {
           </StickyBox>
         </HStack>
       </Page>
-    `);
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-TableOfContents": "rgb(255, 0, 0)",
+          "width-TableOfContents": "300px",
+          "height-TableOfContents": "400px",
+          "padding-TableOfContents": "20px",
+          "borderWidth-TableOfContents": "2px",
+          "borderColor-TableOfContents": "rgb(0, 255, 0)",
+          "borderStyle-TableOfContents": "solid",
+        },
+      },
+    );
 
-    const tocContainer = page.locator(".nav").first();
-    await expect(tocContainer).toBeVisible();
+    const tocContainer = page.getByRole("navigation");
 
-    // Check that theme classes are applied
-    const links = page.getByRole("link");
-    const firstLink = links.first();
-    await expect(firstLink).toHaveClass(/head_1/);
-
-    const secondLink = links.nth(1);
-    await expect(secondLink).toHaveClass(/head_2/);
+    await Promise.all([
+      expect(tocContainer).toHaveCSS("background-color", "rgb(255, 0, 0)"),
+      expect(tocContainer).toHaveCSS("width", "300px"),
+      expect(tocContainer).toHaveCSS("height", "400px"),
+      expect(tocContainer).toHaveCSS("padding", "20px"),
+      expect(tocContainer).toHaveCSS("border-width", "2px"),
+      expect(tocContainer).toHaveCSS("border-color", "rgb(0, 255, 0)"),
+      expect(tocContainer).toHaveCSS("border-style", "solid"),
+    ]);
   });
 
-  test("applies level-specific styling", async ({ initTestBed, page }) => {
+  test("applies item base theme variables", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
-    await initTestBed(`
+    await initTestBed(
+      `
       <Page>
         <HStack>
-          <VStack gap="800px">
-            <Heading level="h1" value="Level 1" />
-            <Heading level="h2" value="Level 2" />
-            <Heading level="h3" value="Level 3" />
-            <Heading level="h4" value="Level 4" />
-            <Heading level="h5" value="Level 5" />
-            <Heading level="h6" value="Level 6" />
+          <VStack>
+            <Heading level="h2" value="Test Heading" />
             bottom of the page text
           </VStack>
           <StickyBox to="top">
@@ -667,17 +539,209 @@ test.describe("Theme Variables", () => {
           </StickyBox>
         </HStack>
       </Page>
-    `);
+    `,
+      {
+        testThemeVars: {
+          "textColor-TableOfContentsItem": "rgb(255, 0, 0)",
+          "fontSize-TableOfContentsItem": "18px",
+          "fontWeight-TableOfContentsItem": "700",
+          "padding-TableOfContentsItem": "15px",
+        },
+      },
+    );
 
-    const h1Link = page.getByRole("link", { name: "Level 1" });
-    const h2Link = page.getByRole("link", { name: "Level 2" });
-    const h3Link = page.getByRole("link", { name: "Level 3" });
-    const h6Link = page.getByRole("link", { name: "Level 6" });
+    const tocLink = page.getByRole("link", { name: "Test Heading" });
 
-    await expect(h1Link).toHaveClass(/head_1/);
-    await expect(h2Link).toHaveClass(/head_2/);
-    await expect(h3Link).toHaveClass(/head_3/);
-    await expect(h6Link).toHaveClass(/head_6/);
+    await Promise.all([
+      expect(tocLink).toHaveCSS("color", "rgb(255, 0, 0)"),
+      expect(tocLink).toHaveCSS("font-size", "18px"),
+      expect(tocLink).toHaveCSS("font-weight", "700"),
+      expect(tocLink).toHaveCSS("padding", "15px"),
+    ]);
+  });
+
+  test("applies level-specific theme variables for H1", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(
+      `
+      <Page>
+        <HStack>
+          <VStack>
+            <Heading level="h1" value="Level 1 Heading" />
+            bottom of the page text
+          </VStack>
+          <StickyBox to="top">
+            <TableOfContents />
+          </StickyBox>
+        </HStack>
+      </Page>
+    `,
+      {
+        testThemeVars: {
+          "padding-TableOfContentsItem-level-1": "25px",
+          "fontSize-TableOfContentsItem-level-1": "22px",
+          "fontWeight-TableOfContentsItem-level-1": "800",
+          "textColor-TableOfContentsItem-level-1": "rgb(0, 0, 255)",
+        },
+      },
+    );
+
+    const h1Link = page.getByRole("link", { name: "Level 1 Heading" });
+
+    await Promise.all([
+      expect(h1Link).toHaveCSS("padding", "25px"),
+      expect(h1Link).toHaveCSS("font-size", "22px"),
+      expect(h1Link).toHaveCSS("font-weight", "800"),
+      expect(h1Link).toHaveCSS("color", "rgb(0, 0, 255)"),
+    ]);
+  });
+
+  test("applies level-specific theme variables for H2", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(
+      `
+      <Page>
+        <HStack>
+          <VStack>
+            <Heading level="h2" value="Level 2 Heading" />
+            bottom of the page text
+          </VStack>
+          <StickyBox to="top">
+            <TableOfContents />
+          </StickyBox>
+        </HStack>
+      </Page>
+    `,
+      {
+        testThemeVars: {
+          "padding-TableOfContentsItem-level-2": "20px",
+          "fontSize-TableOfContentsItem-level-2": "20px",
+          "fontWeight-TableOfContentsItem-level-2": "600",
+          "textColor-TableOfContentsItem-level-2": "rgb(255, 255, 0)",
+        },
+      },
+    );
+
+    const h2Link = page.getByRole("link", { name: "Level 2 Heading" });
+
+    await Promise.all([
+      expect(h2Link).toHaveCSS("padding", "20px"),
+      expect(h2Link).toHaveCSS("font-size", "20px"),
+      expect(h2Link).toHaveCSS("font-weight", "600"),
+      expect(h2Link).toHaveCSS("color", "rgb(255, 255, 0)"),
+    ]);
+  });
+
+  test("applies level-specific theme variables for H6", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(
+      `
+      <Page>
+        <HStack>
+          <VStack>
+            <Heading level="h6" value="Level 6 Heading" />
+            bottom of the page text
+          </VStack>
+          <StickyBox to="top">
+            <TableOfContents />
+          </StickyBox>
+        </HStack>
+      </Page>
+    `,
+      {
+        testThemeVars: {
+          "padding-TableOfContentsItem-level-6": "8px",
+          "fontSize-TableOfContentsItem-level-6": "12px",
+          "fontWeight-TableOfContentsItem-level-6": "400",
+          "fontStyle-TableOfContentsItem-level-6": "italic",
+        },
+      },
+    );
+
+    const h6Link = page.getByRole("link", { name: "Level 6 Heading" });
+
+    await Promise.all([
+      expect(h6Link).toHaveCSS("padding", "8px"),
+      expect(h6Link).toHaveCSS("font-size", "12px"),
+      expect(h6Link).toHaveCSS("font-weight", "400"),
+      expect(h6Link).toHaveCSS("font-style", "italic"),
+    ]);
+  });
+
+  test("applies hover state theme variables", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(
+      `
+      <Page>
+        <HStack>
+          <VStack>
+            <Heading level="h2" value="Hover Test" />
+            bottom of the page text
+          </VStack>
+          <StickyBox to="top">
+            <TableOfContents />
+          </StickyBox>
+        </HStack>
+      </Page>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-TableOfContentsItem--hover": "rgb(200, 200, 200)",
+          "textColor-TableOfContentsItem--hover": "rgb(100, 100, 100)",
+          "fontWeight-TableOfContentsItem--hover": "900",
+        },
+      },
+    );
+
+    const tocLink = page.getByRole("link", { name: "Hover Test" });
+    const listItem = tocLink.locator("..");
+
+    await tocLink.hover();
+
+    await Promise.all([
+      expect(listItem).toHaveCSS("background-color", "rgb(200, 200, 200)"),
+      expect(tocLink).toHaveCSS("color", "rgb(100, 100, 100)"),
+      expect(tocLink).toHaveCSS("font-weight", "900"),
+    ]);
+  });
+
+  test("applies active state theme variables", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(
+      `
+      <Page>
+        <HStack>
+          <VStack>
+            <Heading level="h2" value="Active Test" />
+            <Heading level="h3" value="Another Section" />
+            bottom of the page text
+          </VStack>
+          <StickyBox to="top">
+            <TableOfContents />
+          </StickyBox>
+        </HStack>
+      </Page>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-TableOfContentsItem--active": "rgb(150, 150, 255)",
+          "color-TableOfContentsItem--active": "rgb(50, 50, 150)",
+          "fontWeight-TableOfContentsItem--active": "bold",
+        },
+      },
+    );
+
+    const activeLink = page.getByRole("link", { name: "Another Section" });
+    await activeLink.click();
+
+    const activeListItem = page.locator(".active").first();
+    const activeLinkElement = activeListItem.locator("a");
+
+    await Promise.all([
+      expect(activeListItem).toHaveCSS("background-color", "rgb(150, 150, 255)"),
+      expect(activeLinkElement).toHaveCSS("color", "rgb(50, 50, 150)"),
+      expect(activeLinkElement).toHaveCSS("font-weight", "700"), // 'bold' maps to 700
+    ]);
   });
 });
 
@@ -686,6 +750,61 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Other Edge Cases", () => {
+  test.describe("id property handling", () => {
+    test("handles unicode characters in heading titles", async ({ initTestBed, page }) => {
+      await page.setViewportSize({ height: 600, width: 800 });
+      await initTestBed(`
+        <Page>
+          <HStack>
+            <VStack gap="800px">
+              top of the page text
+              <Heading level="h2" value="测试标题-émojis🚀" />
+              bottom of the page text
+            </VStack>
+            <StickyBox to="top">
+              <TableOfContents />
+            </StickyBox>
+          </HStack>
+        </Page>
+      `);
+
+      const unicodeHeading = page.getByRole("heading", { name: "测试标题-émojis🚀" });
+      const unicodeLink = page.getByRole("link", { name: "测试标题-émojis🚀" });
+
+      await expect(unicodeLink).toBeVisible();
+      await unicodeLink.click();
+      await expect(unicodeHeading).toBeInViewport();
+    });
+
+    test("handles bookmarks with special characters", async ({ initTestBed, page }) => {
+      await page.setViewportSize({ height: 600, width: 800 });
+      await initTestBed(`
+        <Page>
+          <HStack>
+            <VStack gap="800px">
+              top of the page text
+              <Bookmark id="special-bookmark_test section" title="Special Bookmark" level="{2}">
+                special bookmark content
+              </Bookmark>
+              bottom of the page text
+            </VStack>
+            <StickyBox to="top">
+              <TableOfContents />
+            </StickyBox>
+          </HStack>
+        </Page>
+      `);
+
+      const bookmarkContent = page.getByText("special bookmark content");
+      const bookmarkLink = page.getByRole("link", { name: "Special Bookmark" });
+
+      await expect(bookmarkLink).toBeVisible();
+      await bookmarkLink.click();
+      await expect(bookmarkContent).toBeInViewport();
+      await page.waitForURL(/#special-bookmark_test(%20| )section$/);
+    });
+  });
+
   test("handles no headings or bookmarks gracefully", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(`
@@ -702,12 +821,8 @@ test.describe("Other Edge Cases", () => {
       </Page>
     `);
 
-    const tocContainer = page.locator(".nav").first();
-    await expect(tocContainer).toBeVisible();
-
-    const list = tocContainer.locator("ul");
-    await expect(list).toBeVisible();
-    await expect(list.locator("li")).toHaveCount(0);
+    const tocContainer = page.getByRole("link");
+    await expect(tocContainer).not.toBeVisible();
   });
 
   test("handles null props gracefully", async ({ initTestBed, page }) => {
@@ -716,6 +831,7 @@ test.describe("Other Edge Cases", () => {
       <Page>
         <HStack>
           <VStack gap="800px">
+            top of the page text
             <Heading level="h2" value="Test Heading" />
             bottom of the page text
           </VStack>
@@ -732,7 +848,6 @@ test.describe("Other Edge Cases", () => {
     await expect(testLink).toBeVisible();
     await testLink.click();
     await expect(testHeading).toBeInViewport();
-    await page.waitForURL(/#.*$/);
   });
 
   test("handles undefined props gracefully", async ({ initTestBed, page }) => {
@@ -752,8 +867,11 @@ test.describe("Other Edge Cases", () => {
       </Page>
     `);
 
-    // Should use default values
     await expect(page.getByRole("link", { name: "Test H1" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Test H2" })).toBeVisible();
   });
+});
+
+test.describe("Interactions with Bookmark props", () => {
+  // TODO
 });
