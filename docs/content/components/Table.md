@@ -609,7 +609,7 @@ This property adds pagination controls to the `Table`.
 
 ```xmlui copy /isPaginated="true"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -669,7 +669,7 @@ This property adds pagination controls to the `Table`.
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -713,7 +713,7 @@ A property to customize what to display if the table does not contain any data.
 </App>
 ```
 
-### `pageSizes` [#pagesizes]
+### `pageSizeOptions` [#pagesizeoptions]
 
 This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
 
@@ -721,9 +721,9 @@ Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
-```xmlui copy /pageSizes="{[3, 6, 12]}"/
+```xmlui copy /pageSizeOptions="{[3, 6, 12]}"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -731,7 +731,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 </App>
 ```
 
-```xmlui-pg name="Example: pageSizes"
+```xmlui-pg name="Example: pageSizeOptions"
 <App>
   <Table data='{[
   {
@@ -783,7 +783,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
