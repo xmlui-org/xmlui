@@ -12,7 +12,6 @@ import {
   useState,
 } from "react";
 import { flushSync } from "react-dom";
-import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
   CellContext,
   Column,
@@ -49,12 +48,12 @@ import {
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
-import { Button } from "../Button/ButtonNative";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
+import { PaginationNative } from "../Pagination/PaginationNative";
 
 // =====================================================================================================================
 // Helper types
@@ -89,6 +88,8 @@ type RowWithOrder = {
 };
 
 type SortingDirection = "ascending" | "descending";
+export const TablePaginationControlsLocationValues = ["top", "bottom", "both"] as const;
+export type TablePaginationControlsLocation = typeof TablePaginationControlsLocationValues[number];
 
 // =====================================================================================================================
 // React Table component implementation
@@ -101,7 +102,10 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
-  pageSizes?: number[];
+  pageSizeOptions?: number[];
+  currentPageIndex?: number;
+  pageSize?: number;
+  paginationControlsLocation?: TablePaginationControlsLocation;
   rowDisabledPredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
@@ -165,7 +169,9 @@ export const Table = forwardRef(
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
-      pageSizes = defaultProps.pageSizes,
+      pageSizeOptions = defaultProps.pageSizeOptions,
+      pageSize = pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0],
+      currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
       sortBy,
       sortingDirection = defaultProps.sortingDirection,
@@ -184,6 +190,7 @@ export const Table = forwardRef(
       registerComponentApi,
       onSelectionDidChange,
       noBottomBorder = defaultProps.noBottomBorder,
+      paginationControlsLocation = defaultProps.paginationControlsLocation,
       // cols
     }: TableProps,
     forwardedRef,
@@ -413,8 +420,8 @@ export const Table = forwardRef(
     // --- Set up page information (using the first page size option)
     // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
-      pageSize: isPaginated ? pageSizes[0] : Number.MAX_VALUE,
-      pageIndex: 0,
+      pageSize: isPaginated ? pageSize : Number.MAX_VALUE,
+      pageIndex: currentPageIndex,
     });
 
     const prevIsPaginated = usePrevious(isPaginated);
@@ -424,19 +431,20 @@ export const Table = forwardRef(
         setPagination((prev) => {
           return {
             ...prev,
-            pageSize: pageSizes[0],
+            pageSize: pageSize,
+            pageIndex: 0,
           };
         });
       }
       if (prevIsPaginated && !isPaginated) {
-        setPagination((prev) => {
+        setPagination(() => {
           return {
             pageIndex: 0,
             pageSize: Number.MAX_VALUE,
           };
         });
       }
-    }, [isPaginated, pageSizes, prevIsPaginated]);
+    }, [isPaginated, pageSizeOptions, prevIsPaginated, pageSize]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
@@ -581,6 +589,17 @@ export const Table = forwardRef(
       registerComponentApi(selectionApi);
     }, [registerComponentApi, selectionApi]);
 
+    const paginationControls = (
+      <PaginationNative
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        itemCount={safeData.length}
+        pageSizeOptions={pageSizeOptions}
+        onPageDidChange={(page) => table.setPageIndex(page)}
+        onPageSizeDidChange={(size) => table.setPageSize(size)}
+      />
+    );
+
     return (
       <div
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
@@ -589,6 +608,13 @@ export const Table = forwardRef(
         ref={ref}
         style={style}
       >
+        {isPaginated &&
+          hasData &&
+          rows.length > 0 &&
+          pagination &&
+          (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
+          paginationControls}
+
         <table
           className={styles.table}
           ref={tableRef}
@@ -784,69 +810,12 @@ export const Table = forwardRef(
             <div className={styles.noRows}>No data available</div>
           ))}
 
-        {isPaginated && hasData && rows.length > 0 && pagination && (
-          // --- Render the pagination controls
-          <div className={styles.pagination}>
-            <div style={{ flex: 1 }}>
-              <span className={styles.paginationLabel}>
-                Showing {rows[0].original.order} to {rows[rows.length - 1].original.order} of{" "}
-                {safeData.length} entries
-              </span>
-            </div>
-            {pageSizes.length > 1 && (
-              <div>
-                <span className={styles.paginationLabel}>Rows per page</span>
-                <select
-                  className={styles.paginationSelect}
-                  value={pagination.pageSize}
-                  onChange={(e) => {
-                    table.setPageSize(Number(e.target.value));
-                  }}
-                >
-                  {pageSizes.map((pageSize) => (
-                    <option key={pageSize} value={pageSize}>
-                      {pageSize}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-            <div className={styles.paginationButtons}>
-              <Button
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-                type={"button"}
-                variant={"ghost"}
-              >
-                <FiChevronsLeft />
-              </Button>
-              <Button
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                type={"button"}
-                variant={"ghost"}
-              >
-                <FiChevronLeft />
-              </Button>
-              <Button
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                type={"button"}
-                variant={"ghost"}
-              >
-                <FiChevronRight />
-              </Button>
-              <Button
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-                type={"button"}
-                variant={"ghost"}
-              >
-                <FiChevronsRight />
-              </Button>
-            </div>
-          </div>
-        )}
+        {isPaginated &&
+          hasData &&
+          rows.length > 0 &&
+          pagination &&
+          (paginationControlsLocation === "bottom" || paginationControlsLocation === "both") &&
+          paginationControls}
       </div>
     );
   },
@@ -900,11 +869,12 @@ export const defaultProps = {
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
-  pageSizes: [10],
+  pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as SortingDirection,
   autoFocus: false,
   hideHeader: false,
   hideNoDataView: false,
   alwaysShowSelectionHeader: false,
   noBottomBorder: false,
+  paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
 };
