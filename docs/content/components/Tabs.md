@@ -114,7 +114,9 @@ Available values: `horizontal` **(default)**, `vertical`
 
 ## Events [#events]
 
-This component does not have any events.
+### `didChange` [#didchange]
+
+This event is triggered when value of Tabs has changed.
 
 ## Exposed Methods [#exposed-methods]
 
