@@ -68,6 +68,7 @@
                 <NavLink
                     label="Build a TableEditor Component"
                     to="/build-editor-component" />
+                <NavLink label="Hosted Deployment" to="/hosted-deployment" />
                 <NavLink label="How To" to="/howto" />
             </NavGroup>
             <NavGroup label="Reference">
@@ -333,6 +334,9 @@
             </Page>
             <Page url="/howto">
                 <DocumentPage url="/pages/howto.md" />
+            </Page>
+            <Page url="/hosted-deployment">
+                <DocumentPage url="/pages/hosted-deployment.md" />
             </Page>
             <Page url="/change-log">
                 <ChangeLog />

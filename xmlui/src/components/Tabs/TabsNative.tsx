@@ -20,6 +20,7 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
+import { noop } from "../../components-core/constants";
 
 type Props = {
   id?: string;
@@ -31,6 +32,7 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
   className?: string;
   distributeEvenly?: boolean;
+  onDidChange?: (index: number, id: string, label: string) => void;
 };
 
 export const defaultProps = {
@@ -50,6 +52,7 @@ export const Tabs = forwardRef(function Tabs(
     registerComponentApi,
     className,
     distributeEvenly = defaultProps.distributeEvenly,
+    onDidChange = noop,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -135,6 +138,7 @@ export const Tabs = forwardRef(function Tabs(
           if (newIndex !== activeIndex) {
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
+            onDidChange?.(newIndex, tab, tabItems[newIndex]?.label);
           }
         }}
         orientation={orientation}

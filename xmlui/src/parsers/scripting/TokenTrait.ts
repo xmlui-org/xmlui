@@ -112,5 +112,4 @@ export const tokenTraits: Record<TokenType, TokenTrait> = {
   [TokenType.Delete]: { expressionStart: true, canBeUnary: true, keywordLike: true },
   [TokenType.Function]: { keywordLike: true, expressionStart: true },
   [TokenType.As]: { keywordLike: true },
-  [TokenType.From]: { keywordLike: true },
 };
