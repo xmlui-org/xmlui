@@ -45,9 +45,6 @@ export type ThemeScope = {
 export type AppThemes = {
   root: HTMLElement | undefined; // Represents the root HTML element the theme is assigned to
 
-  // Sets the root HTML element the theme is assigned to
-  setRoot: Dispatch<SetStateAction<HTMLElement | undefined>>;
-
   // Sets the active theme id
   setActiveThemeId: (newThemeId: string) => void; 
 

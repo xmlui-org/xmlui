@@ -83,12 +83,15 @@ export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CS
 
 export const StyleInjectionTargetContext = createContext<Document | ShadowRoot | null>(null);
 
-function useDomRoot(){
+export function useDomRoot(){
   const domRoot = useContext(StyleInjectionTargetContext);
   return domRoot;
 }
 
-export function useStyles(styles?: StyleObjectType): string {
+type InjectOptions = {
+  prepend?: boolean;
+}
+export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EMPTY_OBJECT ): string {
   // we skip this whole thing if we're indexing
   const {indexing} = useIndexerContext();
   const domRoot = useDomRoot();
@@ -111,7 +114,12 @@ export function useStyles(styles?: StyleObjectType): string {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("data-style-hash", styleHash);
       styleElement.innerHTML = `@layer dynamic {\n${css}\n}`;
-      injectionTarget.appendChild(styleElement);
+      if(prepend){
+        injectionTarget.insertBefore(styleElement, injectionTarget.firstChild.nextSibling);
+      } else {
+        injectionTarget.appendChild(styleElement);
+      }
+
       registry.injected.add(styleHash);
     }
   }, [registry, styleHash, injectionTarget]);

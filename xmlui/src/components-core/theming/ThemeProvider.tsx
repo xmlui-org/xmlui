@@ -35,6 +35,7 @@ import type {
 } from "../../abstractions/ThemingDefs";
 import { omit } from "lodash-es";
 import { ThemeToneKeys } from "./utils";
+import { useDomRoot } from "./StyleContext";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,
@@ -307,12 +308,23 @@ function ThemeProvider({
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
     useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
+
+  const domRoot = useDomRoot();
   const [root, setRoot] = useState(null);
+
+  useIsomorphicLayoutEffect(() => {
+    if (typeof document !== "undefined") {
+      if(domRoot instanceof ShadowRoot){
+        setRoot(domRoot.getElementById("nested-app-root"));
+      } else {
+        setRoot(document.body);
+      }
+    }
+  }, [domRoot]);
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
       root,
-      setRoot,
       themes,
       resources,
       resourceMap,

@@ -261,6 +261,13 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
   .wrapper {
     width: $width-controls-NestedApp;
   }
+
+  .shadowRoot{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    isolation: isolate;
+  }
 }
 
 

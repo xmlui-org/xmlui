@@ -76,6 +76,7 @@ function stableJSONStringify(obj: any): string {
 
 export class StyleRegistry {
   public cache: Map<string, StyleCacheEntry> = new Map();
+  public rootClasses: Set<string> = new Set();
   public injected: Set<string> = new Set();
 
   // NEW: A map to track how many components are using a style.
@@ -121,7 +122,7 @@ export class StyleRegistry {
         nestedRules.push(this._processNestedRule(selector, key, value as StyleObjectType));
       } else {
         // It's a direct CSS property (e.g., 'backgroundColor').
-        directProps.push(`  ${toKebabCase(key)}: ${value};`);
+        directProps.push(`${toKebabCase(key)}:${value};`);
       }
     }
 
@@ -129,7 +130,7 @@ export class StyleRegistry {
 
     // 2. Generate the CSS for the direct properties at the current selector level.
     if (directProps.length > 0) {
-      finalCss += `${selector} {\n${directProps.join('\n')}\n}\n`;
+      finalCss += `${selector} {${directProps.join('')}}`;
     }
 
     // 3. Append the CSS from all the processed nested rules.
@@ -142,7 +143,7 @@ export class StyleRegistry {
     // If the key is an at-rule (@media, @container, @keyframes), wrap the recursive call.
     if (nestedKey.startsWith('@')) {
       // The inner content is generated relative to the original parent selector.
-      return `${nestedKey} {\n${this._generateCss(parentSelector, nestedStyles)}\n}\n`;
+      return `${nestedKey}{${this._generateCss(parentSelector, nestedStyles)}}`;
     }
 
     // If the key is a nested selector, resolve the '&' placeholder.
@@ -152,10 +153,28 @@ export class StyleRegistry {
   }
 
   public getSsrStyles(): string {
-    const allCss = Array.from(this.cache.values()).map(entry => entry.css).join('\n');
+    const allCss = Array.from(this.cache.values()).map(entry => entry.css).join('');
     // Wrap the entire output in our top-most layer.
-    return `@layer dynamic {\n${allCss}\n}`;
+    return `@layer dynamic {${allCss}}`;
   }
+
+  /**
+   * Adds a class name to be applied to the <html> tag.
+   */
+  public addRootClasses(classNames: Array<string>): void {
+    classNames.forEach((className)=>{
+      this.rootClasses.add(className);
+    });
+  }
+
+  /**
+   * Returns a space-separated string of all collected html classes.
+   */
+  public getRootClasses(): string {
+    return Array.from(this.rootClasses).join(' ');
+  }
+
+
 
   // NEW: A helper to safely get the current reference count.
   public getRefCount(styleHash: string): number {

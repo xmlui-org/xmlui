@@ -6,19 +6,21 @@
     display: contents;
   }
 
-  .baseRootComponent {
-    width: 100%;
-    position: relative;
-    height: inherit;
+  .body{
     font-family: t.$fontFamily;
     background-color: t.$backgroundColor;
     font-size: t.$fontSize;
     font-weight: t.$fontWeight;
     color: t.$textColor-primary;
-    overflow: auto;
     direction: t.$direction;
     font-feature-settings: t.$font-feature-settings;
-
     --stack-gap-default: #{t.$space-4};
+  }
+
+  .baseRootComponent {
+    width: 100%;
+    position: relative;
+    height: inherit;
+    overflow: auto;
   }
 }
