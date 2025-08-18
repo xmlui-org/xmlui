@@ -1,6 +1,8 @@
 import { defaultProps, LineChart } from "./LineChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata, d } from "../../metadata-helpers";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
+import styles from "./LineChart.module.scss";
 
 const COMP = "LineChart";
 
@@ -75,6 +77,10 @@ export const LineChartMd = createMetadata({
     marginRight: d("The right margin of the chart"),
     marginBottom: d("The bottom margin of the chart"),
     marginLeft: d("The left margin of the chart"),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`width-line-LineChart`]: "1px",
   },
 });
 
