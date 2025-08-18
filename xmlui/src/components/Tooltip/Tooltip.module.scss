@@ -1,0 +1,119 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Tooltip";
+$themeVars: t.composePaddingVars($themeVars, $component);
+
+// --- Theme variables for Tooltip component
+$backgroundColor-Tooltip: createThemeVar("backgroundColor-#{$component}");
+$textColor-Tooltip: createThemeVar("textColor-#{$component}");
+$borderRadius-Tooltip: createThemeVar("borderRadius-#{$component}");
+$fontSize-Tooltip: createThemeVar("fontSize-#{$component}");
+$lineHeight-Tooltip: createThemeVar("lineHeight-#{$component}");
+$boxShadow-Tooltip: createThemeVar("boxShadow-#{$component}");
+$arrowFill-Tooltip: createThemeVar("arrowFill-#{$component}");
+$animationDuration-Tooltip: createThemeVar("animationDuration-#{$component}");
+$animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$component}");
+
+/* Tooltip styles */
+
+.hiddenTrigger {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+}
+
+.content {
+  border-radius: $borderRadius-Tooltip;
+  @include t.paddingVars($themeVars, $component);
+  font-size: $fontSize-Tooltip;
+  line-height: $lineHeight-Tooltip;
+  color: $textColor-Tooltip;
+  background-color: $backgroundColor-Tooltip;
+  box-shadow: $boxShadow-Tooltip;
+  user-select: none;
+  animation-duration: $animationDuration-Tooltip;
+  animation-timing-function: $animationTimingFunction-Tooltip;
+  will-change: transform, opacity;
+  z-index: 9999;
+}
+
+.content[data-state='delayed-open'][data-side='top'] {
+  animation-name: slideDownAndFade;
+}
+
+.content[data-state='delayed-open'][data-side='right'] {
+  animation-name: slideLeftAndFade;
+}
+
+.content[data-state='delayed-open'][data-side='bottom'] {
+  animation-name: slideUpAndFade;
+}
+
+.content[data-state='delayed-open'][data-side='left'] {
+  animation-name: slideRightAndFade;
+}
+
+.arrow {
+  fill: $arrowFill-Tooltip;
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

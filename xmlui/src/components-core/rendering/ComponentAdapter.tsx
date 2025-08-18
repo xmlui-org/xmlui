@@ -1,5 +1,5 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
+import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -31,6 +31,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
+import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
 
 // --- The available properties of Component
@@ -340,6 +341,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     );
   }
 
+  let nodeToRender: ReactNode = renderedNode;
   // --- If we have a single React node with forwarded reference, or mouse events
   // --- let's merge the "rest" properties with it.
   if ((ref || !isEmpty(mouseEventHandlers)) && renderedNode && React.isValidElement(renderedNode)) {
@@ -347,17 +349,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- https://www.radix-ui.com/primitives/docs/guides/composition
 
     const childrenArray = !children ? [] : Array.isArray(children) ? children : [children];
-    return cloneElement(
+
+    const clonedRef =
+      renderedNode.type === React.Fragment
+        ? undefined
+        : ref
+          ? composeRefs(ref, (renderedNode as any).ref)
+          : (renderedNode as any).ref;
+
+    nodeToRender = cloneElement(
       renderedNode,
       {
-        // ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
-        // ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
-        ref:
-          renderedNode.type === React.Fragment
-            ? undefined
-            : ref
-              ? composeRefs(ref, (renderedNode as any).ref)
-              : (renderedNode as any).ref,
+        ref: clonedRef,
         ...mergeProps(
           {
             ...renderedNode.props,
@@ -368,11 +371,45 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       } as any,
       ...childrenArray,
     );
+  } else {
+    // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
+    nodeToRender =
+      React.isValidElement(renderedNode) && !!children
+        ? cloneElement(renderedNode, null, children)
+        : renderedNode;
   }
-  // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  return React.isValidElement(renderedNode) && !!children
-    ? cloneElement(renderedNode, null, children)
-    : renderedNode;
+
+  // --- Check if the component has a tooltip property
+  const tooltipText = useMemo(
+    () => valueExtractor(safeNode.props?.tooltip, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Check if the component has a tooltip property
+  const tooltipMarkdown = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
+    [safeNode.props, valueExtractor],
+  );
+  // --- Check if the component has a tooltipOptions property
+  const tooltipOptions = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipOptions, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Handle tooltips
+  if (tooltipMarkdown || tooltipText) {
+    // --- Obtain options
+    const parsedOptions = parseTooltipOptions(tooltipOptions);
+
+    return (
+      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+        {nodeToRender}
+      </Tooltip>
+    );
+  }
+
+  // --- Done
+  return nodeToRender;
 });
 
 /**

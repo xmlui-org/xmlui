@@ -168,6 +168,7 @@
                     <NavLink label="Theme" to="/components/Theme" />
                     <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
                     <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
+                    <NavLink label="Tooltip" to="/components/Tooltip" />
                     <NavLink label="VSplitter" to="/components/VSplitter" />
                     <NavLink label="VStack" to="/components/VStack" />
                     <!-- END GENERATED CONTENT/Component references links -->

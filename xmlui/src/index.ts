@@ -113,5 +113,5 @@ export {
   StyleProvider,
   StyleRegistry,
   useEvent,
-  StandaloneComponent
+  StandaloneComponent,
 };
