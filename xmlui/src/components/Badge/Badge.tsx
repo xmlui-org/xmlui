@@ -71,7 +71,7 @@ export const BadgeMd = createMetadata({
 export const badgeComponentRenderer = createComponentRenderer(
   COMP,
   BadgeMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     const value = extractValue.asDisplayText(node.props.value);
     const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
       node.props?.colorMap,
@@ -89,7 +89,7 @@ export const badgeComponentRenderer = createComponentRenderer(
       }
     }
     return (
-      <Badge variant={extractValue(node.props.variant)} color={colorValue} style={layoutCss}>
+      <Badge variant={extractValue(node.props.variant)} color={colorValue} className={className}>
         {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
       </Badge>
     );

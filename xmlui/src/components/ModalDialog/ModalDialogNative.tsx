@@ -34,6 +34,7 @@ type OnOpen = (...args: any[]) => void;
 type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
+  className?: string;
   onClose?: OnClose;
   onOpen?: OnOpen;
   children?: ReactNode;

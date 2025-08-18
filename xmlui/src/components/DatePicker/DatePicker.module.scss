@@ -22,16 +22,18 @@ $componentName: "DatePicker";
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
-    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
   }
 
   .placeholder {
@@ -45,7 +47,9 @@ $componentName: "DatePicker";
 }
 
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
+$backgroundColor-item-DatePicker--hover: createThemeVar(
+  "Input:backgroundColor-item-DatePicker--hover"
+);
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
@@ -54,82 +58,83 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
 
-.datePicker {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  flex-direction: row;
-  width: 100%;
-  min-height: $minHeight;
-  border-width: 1px;
-  border-style: solid;
-  transition: background-color ease-in .1s;
-  overflow: hidden;
-  gap: t.$space-2;
-  font-size: createThemeVar("Input:fontSize-DatePicker");
+@layer components {
+  .datePicker {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-direction: row;
+    width: 100%;
+    min-height: $minHeight;
+    border-width: 1px;
+    border-style: solid;
+    transition: background-color ease-in 0.1s;
+    overflow: hidden;
+    gap: t.$space-2;
+    font-size: createThemeVar("Input:fontSize-DatePicker");
 
-  @include variant("default");
+    @include variant("default");
 
-  &.error {
-    @include variant("error");
-  }
+    &.error {
+      @include variant("error");
+    }
 
-  &.warning {
-    @include variant("warning");
-  }
+    &.warning {
+      @include variant("warning");
+    }
 
-  &.valid {
-    @include variant("success");
-  }
+    &.valid {
+      @include variant("success");
+    }
 
-  &.disabled {
-    cursor: not-allowed;
-    background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
-    color: createThemeVar("Input:textColor-DatePicker--disabled");
-    border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
-
-    .indicator, .datePickerInput {
+    &.disabled {
       cursor: not-allowed;
+      background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
+      color: createThemeVar("Input:textColor-DatePicker--disabled");
+      border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
+
+      .indicator,
+      .datePickerInput {
+        cursor: not-allowed;
+      }
     }
   }
-}
 
-.inlinePickerMenu {
-  padding: 0;
-  overflow-y: auto;
-  width: 100%;
-  max-width: fit-content;
-  height: fit-content;
+  .inlinePickerMenu {
+    padding: 0;
+    overflow-y: auto;
+    width: 100%;
+    max-width: fit-content;
+    height: fit-content;
 
-  @include variant("default");
+    @include variant("default");
 
-  &.error {
-    @include variant("error");
+    &.error {
+      @include variant("error");
+    }
+
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
   }
 
-  &.warning {
-    @include variant("warning");
+  .datePickerMenu {
+    padding: t.$space-4;
+    overflow-y: auto;
+    height: fit-content;
+    box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
+    background-color: createThemeVar("Input:backgroundColor-menu-DatePicker");
+    border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
+    border: 1px solid $rdp-accent-color;
   }
 
-  &.valid {
-    @include variant("success");
-  }
-}
-
-.datePickerMenu {
-  padding: t.$space-4;
-  overflow-y: auto;
-  height: fit-content;
-  box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
-  background-color: createThemeVar("Input:backgroundColor-menu-DatePicker");
-  border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
-  border: 1px solid $rdp-accent-color;
-
-}
-
-/* Variables declaration */
-/* prettier-ignore */
-.root {
+  /* Variables declaration */
+  /* prettier-ignore */
+  .root {
   --rdp-day-height: 44px; /* The height of the day cells. */
   --rdp-day-width: 44px; /* The width of the day cells. */
 
@@ -178,427 +183,414 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   --rdp-animation_timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.root[dir="rtl"] {
-  --rdp-gradient-direction: -90deg;
-}
-
-.root[data-broadcast-calendar="true"] {
-  --rdp-outside-opacity: unset;
-}
-
-/* Root of the component. */
-.root {
-  position: relative; /* Required to position the navigation toolbar. */
-  box-sizing: border-box;
-}
-
-.root * {
-  box-sizing: border-box;
-}
-
-.day {
-  width: var(--rdp-day-width);
-  height: var(--rdp-day-height);
-  text-align: center;
-}
-
-.day_button {
-  background: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-
-  width: var(--rdp-day_button-width);
-  height: var(--rdp-day_button-height);
-  border: var(--rdp-day_button-border);
-  border-radius: var(--rdp-day_button-border-radius);
-
-  &:hover {
-    background-color: $backgroundColor-item-DatePicker--hover;
+  .root[dir="rtl"] {
+    --rdp-gradient-direction: -90deg;
   }
-}
 
-.day_button:disabled {
-  cursor: revert;
-}
-
-.caption_label {
-  z-index: 1;
-
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding-left: t.$space-2;
-  padding-right: t.$space-2;
-
-  white-space: nowrap;
-  border: 0;
-}
-
-.dropdown:focus-visible ~ .caption_label {
-  outline: 5px auto t.$outlineColor--focus;
-}
-
-.button_next,
-.button_previous {
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  appearance: none;
-
-  width: var(--rdp-nav_button-width);
-  height: var(--rdp-nav_button-height);
-
-  &:hover {
-    background-color: $backgroundColor-item-DatePicker--hover;
+  .root[data-broadcast-calendar="true"] {
+    --rdp-outside-opacity: unset;
   }
-}
 
-.button_next:disabled,
-.button_next[aria-disabled="true"],
-.button_previous:disabled,
-.button_previous[aria-disabled="true"] {
-  cursor: revert;
+  /* Root of the component. */
+  .root {
+    position: relative; /* Required to position the navigation toolbar. */
+    box-sizing: border-box;
+  }
 
-  opacity: var(--rdp-nav_button-disabled-opacity);
-}
+  .root * {
+    box-sizing: border-box;
+  }
 
-.chevron {
-  display: inline-block;
-  fill: currentColor;
-}
+  .day {
+    width: var(--rdp-day-width);
+    height: var(--rdp-day-height);
+    text-align: center;
+  }
 
-.root[dir="rtl"] .nav .chevron {
-  transform: rotate(180deg);
-  transform-origin: 50%;
-}
+  .day_button {
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 
-.dropdowns {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-}
-.dropdown {
-  z-index: 2;
+    width: var(--rdp-day_button-width);
+    height: var(--rdp-day_button-height);
+    border: var(--rdp-day_button-border);
+    border-radius: var(--rdp-day_button-border-radius);
 
-  /* Reset */
-  opacity: 0;
-  appearance: none;
-  position: absolute;
-  inset-block-start: 0;
-  inset-block-end: 0;
-  inset-inline-start: 0;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  cursor: inherit;
-  border: none;
-  line-height: inherit;
-}
+    &:hover {
+      background-color: $backgroundColor-item-DatePicker--hover;
+    }
+  }
 
-.dropdown_root {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding: t.$space-1_5;
+  .day_button:disabled {
+    cursor: revert;
+  }
 
-  &:hover {
-    background-color: $backgroundColor-item-DatePicker--hover;
+  .caption_label {
+    z-index: 1;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding-left: t.$space-2;
+    padding-right: t.$space-2;
+
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .dropdown:focus-visible ~ .caption_label {
+    outline: 5px auto t.$outlineColor--focus;
+  }
+
+  .button_next,
+  .button_previous {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    appearance: none;
+
+    width: var(--rdp-nav_button-width);
+    height: var(--rdp-nav_button-height);
+
+    &:hover {
+      background-color: $backgroundColor-item-DatePicker--hover;
+    }
+  }
+
+  .button_next:disabled,
+  .button_next[aria-disabled="true"],
+  .button_previous:disabled,
+  .button_previous[aria-disabled="true"] {
+    cursor: revert;
+
+    opacity: var(--rdp-nav_button-disabled-opacity);
+  }
+
+  .chevron {
+    display: inline-block;
+    fill: currentColor;
+  }
+
+  .root[dir="rtl"] .nav .chevron {
+    transform: rotate(180deg);
+    transform-origin: 50%;
+  }
+
+  .dropdowns {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+  }
+  .dropdown {
+    z-index: 2;
+
+    /* Reset */
+    opacity: 0;
+    appearance: none;
+    position: absolute;
+    inset-block-start: 0;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    cursor: inherit;
+    border: none;
+    line-height: inherit;
+  }
+
+  .dropdown_root {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: t.$space-1_5;
+
+    &:hover {
+      background-color: $backgroundColor-item-DatePicker--hover;
+      cursor: pointer;
+    }
+  }
+
+  .dropdown_root[data-disabled="true"] .chevron {
+    opacity: var(--rdp-disabled-opacity);
+  }
+
+  .month_caption {
+    display: flex;
+    align-content: center;
+    padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
+    height: var(--rdp-nav-height);
+    font-weight: bold;
+    font-size: large;
+  }
+
+  .root[data-nav-layout="around"] .month,
+  .root[data-nav-layout="after"] .month {
+    position: relative;
+  }
+
+  .root[data-nav-layout="around"] .month_caption {
+    justify-content: center;
+    margin-inline-start: var(--rdp-nav_button-width);
+    margin-inline-end: var(--rdp-nav_button-width);
+    position: relative;
+  }
+
+  .root[data-nav-layout="around"] .button_previous {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    height: var(--rdp-nav-height);
+    display: inline-flex;
+  }
+
+  .root[data-nav-layout="around"] .button_next {
+    position: absolute;
+    inset-inline-end: 0;
+    top: 0;
+    height: var(--rdp-nav-height);
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  .months {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rdp-months-gap);
+    max-width: fit-content;
+  }
+
+  .month_grid {
+    border-collapse: collapse;
+  }
+
+  .nav {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+
+    display: flex;
+    align-items: center;
+
+    height: var(--rdp-nav-height);
+  }
+
+  .weekday {
+    opacity: var(--rdp-weekday-opacity);
+    padding: var(--rdp-weekday-padding);
+    font-weight: 500;
+    font-size: smaller;
+    color: t.$textColor-secondary;
+    text-align: var(--rdp-weekday-text-align);
+    text-transform: var(--rdp-weekday-text-transform);
+  }
+
+  .week_number {
+    opacity: var(--rdp-week_number-opacity);
+    font-weight: 400;
+    font-size: small;
+    height: var(--rdp-week_number-height);
+    width: var(--rdp-week_number-width);
+    border: var(--rdp-week_number-border);
+    border-radius: var(--rdp-week_number-border-radius);
+    text-align: var(--rdp-weeknumber-text-align);
+  }
+
+  /* DAY MODIFIERS */
+  .today:not(.outside) {
+    color: t.$color-primary-500;
+  }
+
+  .selected {
+    font-weight: bold;
+    font-size: large;
+  }
+
+  .selected .day_button {
+    border: 2px solid $borderColor-selectedItem-DatePicker;
+  }
+
+  .outside {
+    opacity: var(--rdp-outside-opacity);
+  }
+
+  .disabled {
+    opacity: var(--rdp-disabled-opacity);
+  }
+
+  .hidden {
+    visibility: hidden;
+    color: var(--rdp-range_start-color);
+  }
+
+  .range_start {
+    background: var(--rdp-range_start-background);
+  }
+
+  .range_start .day_button {
+    background-color: var(--rdp-range_start-date-background-color);
+    color: var(--rdp-range_start-color);
+  }
+
+  .range_middle {
+    background-color: var(--rdp-range_middle-background-color);
+  }
+
+  .range_middle .day_button {
+    border-color: transparent;
+    border: unset;
+    border-radius: unset;
+    color: var(--rdp-range_middle-color);
+  }
+
+  .range_end {
+    background: var(--rdp-range_end-background);
+    color: var(--rdp-range_end-color);
+  }
+
+  .range_end .day_button {
+    color: var(--rdp-range_start-color);
+    background-color: var(--rdp-range_end-date-background-color);
+  }
+
+  .range_start.range_end {
+    background: revert;
+  }
+
+  .focusable {
     cursor: pointer;
   }
-}
 
-.dropdown_root[data-disabled="true"] .chevron {
-  opacity: var(--rdp-disabled-opacity);
-}
-
-.month_caption {
-  display: flex;
-  align-content: center;
-  padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
-  height: var(--rdp-nav-height);
-  font-weight: bold;
-  font-size: large;
-}
-
-.root[data-nav-layout="around"] .month,
-.root[data-nav-layout="after"] .month {
-  position: relative;
-}
-
-.root[data-nav-layout="around"] .month_caption {
-  justify-content: center;
-  margin-inline-start: var(--rdp-nav_button-width);
-  margin-inline-end: var(--rdp-nav_button-width);
-  position: relative;
-}
-
-.root[data-nav-layout="around"] .button_previous {
-  position: absolute;
-  inset-inline-start: 0;
-  top: 0;
-  height: var(--rdp-nav-height);
-  display: inline-flex;
-}
-
-.root[data-nav-layout="around"] .button_next {
-  position: absolute;
-  inset-inline-end: 0;
-  top: 0;
-  height: var(--rdp-nav-height);
-  display: inline-flex;
-  justify-content: center;
-}
-
-.months {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--rdp-months-gap);
-  max-width: fit-content;
-}
-
-.month_grid {
-  border-collapse: collapse;
-}
-
-.nav {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-end: 0;
-
-  display: flex;
-  align-items: center;
-
-  height: var(--rdp-nav-height);
-}
-
-.weekday {
-  opacity: var(--rdp-weekday-opacity);
-  padding: var(--rdp-weekday-padding);
-  font-weight: 500;
-  font-size: smaller;
-  color: t.$textColor-secondary;
-  text-align: var(--rdp-weekday-text-align);
-  text-transform: var(--rdp-weekday-text-transform);
-}
-
-.week_number {
-  opacity: var(--rdp-week_number-opacity);
-  font-weight: 400;
-  font-size: small;
-  height: var(--rdp-week_number-height);
-  width: var(--rdp-week_number-width);
-  border: var(--rdp-week_number-border);
-  border-radius: var(--rdp-week_number-border-radius);
-  text-align: var(--rdp-weeknumber-text-align);
-}
-
-/* DAY MODIFIERS */
-.today:not(.outside) {
-  color: t.$color-primary-500;
-}
-
-.selected {
-  font-weight: bold;
-  font-size: large;
-}
-
-.selected .day_button {
-  border: 2px solid $borderColor-selectedItem-DatePicker;;
-}
-
-.outside {
-  opacity: var(--rdp-outside-opacity);
-}
-
-.disabled {
-  opacity: var(--rdp-disabled-opacity);
-}
-
-.hidden {
-  visibility: hidden;
-  color: var(--rdp-range_start-color);
-}
-
-.range_start {
-  background: var(--rdp-range_start-background);
-}
-
-.range_start .day_button {
-  background-color: var(--rdp-range_start-date-background-color);
-  color: var(--rdp-range_start-color);
-}
-
-.range_middle {
-  background-color: var(--rdp-range_middle-background-color);
-}
-
-.range_middle .day_button {
-  border-color: transparent;
-  border: unset;
-  border-radius: unset;
-  color: var(--rdp-range_middle-color);
-}
-
-.range_end {
-  background: var(--rdp-range_end-background);
-  color: var(--rdp-range_end-color);
-}
-
-.range_end .day_button {
-  color: var(--rdp-range_start-color);
-  background-color: var(--rdp-range_end-date-background-color);
-}
-
-.range_start.range_end {
-  background: revert;
-}
-
-.focusable {
-  cursor: pointer;
-}
-
-.datePickerValue {
-  display: flex;
-  flex: 1;
-}
-
-@keyframes rdp-slide_in_left {
-  0% {
-    transform: translateX(-100%);
+  .datePickerValue {
+    display: flex;
+    flex: 1;
   }
-  100% {
-    transform: translateX(0);
+
+  @keyframes rdp-slide_in_left {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes rdp-slide_in_right {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes rdp-slide_out_left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes rdp-slide_out_right {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .weeks_before_enter {
+    animation: rdp-slide_in_left var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .weeks_before_exit {
+    animation: rdp-slide_out_left var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .weeks_after_enter {
+    animation: rdp-slide_in_right var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .weeks_after_exit {
+    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing)
+      forwards;
+  }
+
+  .root[dir="rtl"] .weeks_after_enter {
+    animation: rdp-slide_in_left var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .root[dir="rtl"] .weeks_before_exit {
+    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing)
+      forwards;
+  }
+
+  .root[dir="rtl"] .weeks_before_enter {
+    animation: rdp-slide_in_right var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .root[dir="rtl"] .weeks_after_exit {
+    animation: rdp-slide_out_left var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  @keyframes rdp-fade_in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes rdp-fade_out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  .caption_after_enter {
+    animation: rdp-fade_in var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .caption_after_exit {
+    animation: rdp-fade_out var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .caption_before_enter {
+    animation: rdp-fade_in var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
+  }
+
+  .caption_before_exit {
+    animation: rdp-fade_out var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
   }
 }
-
-@keyframes rdp-slide_in_right {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-@keyframes rdp-slide_out_left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes rdp-slide_out_right {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.weeks_before_enter {
-  animation: rdp-slide_in_left var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.weeks_before_exit {
-  animation: rdp-slide_out_left var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.weeks_after_enter {
-  animation: rdp-slide_in_right var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.weeks_after_exit {
-  animation: rdp-slide_out_right var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.root[dir="rtl"] .weeks_after_enter {
-  animation: rdp-slide_in_left var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.root[dir="rtl"] .weeks_before_exit {
-  animation: rdp-slide_out_right var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.root[dir="rtl"] .weeks_before_enter {
-  animation: rdp-slide_in_right var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.root[dir="rtl"] .weeks_after_exit {
-  animation: rdp-slide_out_left var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-@keyframes rdp-fade_in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes rdp-fade_out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.caption_after_enter {
-  animation: rdp-fade_in var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.caption_after_exit {
-  animation: rdp-fade_out var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.caption_before_enter {
-  animation: rdp-fade_in var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-.caption_before_exit {
-  animation: rdp-fade_out var(--rdp-animation_duration)
-  var(--rdp-animation_timing) forwards;
-}
-
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-
-

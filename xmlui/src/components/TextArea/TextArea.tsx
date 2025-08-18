@@ -119,7 +119,7 @@ export const textAreaComponentRenderer = createComponentRenderer(
     extractValue,
     state,
     updateState,
-    layoutCss,
+    className,
     registerComponentApi,
     lookupEventHandler,
   }) => {
@@ -138,7 +138,7 @@ export const textAreaComponentRenderer = createComponentRenderer(
         resize={node.props.resize as ResizeOptions}
         enterSubmits={extractValue.asOptionalBoolean(node.props.enterSubmits)}
         escResets={extractValue.asOptionalBoolean(node.props.escResets)}
-        style={layoutCss}
+        className={className}
         registerComponentApi={registerComponentApi}
         maxRows={extractValue.asOptionalNumber(node.props.maxRows)}
         minRows={extractValue.asOptionalNumber(node.props.minRows)}

@@ -16,12 +16,14 @@ import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
+import classnames from "classnames";
 
 export type PieChartProps = {
   data: any[];
   dataKey: string;
   nameKey: string;
   style?: CSSProperties;
+  className?: string;
   showLabel?: boolean;
   showLabelList?: boolean;
   labelListPosition?: LabelPosition;
@@ -112,6 +114,7 @@ export function PieChart({
   dataKey,
   nameKey,
   style,
+  className,
   showLabel = defaultProps.showLabel,
   showLabelList = defaultProps.showLabelList,
   labelListPosition = defaultProps.labelListPosition,
@@ -175,15 +178,8 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <div
-        style={{
-          flexGrow: 1,
-          minHeight: 0,
-          width: style.width || "100%",
-          height: style.height || "100%",
-        }}
-      >
-        <ResponsiveContainer style={style} width="100%" height="100%" minWidth={0}>
+      <div className={classnames(styles.wrapper, className)} style={style}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <RPieChart>
             <Tooltip content={<TooltipContent />} />
             <Pie

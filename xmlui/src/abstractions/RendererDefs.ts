@@ -37,9 +37,7 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
   // This function retrieves a sync function the component can use as a callback
   lookupSyncCallback: LookupSyncFn;
 
-  // These are the CSS property values the underlying React component can merge into
-  // its "style" property
-  layoutCss: CSSProperties;
+  className?: string;
 }
 
 export type UpdateStateFn = (componentState: any, options?: any) => void; // This function updates the state of a component.

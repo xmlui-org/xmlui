@@ -20,43 +20,45 @@ $horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-Card"
 $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
 
 
-.wrapper {
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
-  box-shadow: $boxShadow-Card;
-  background-color: $backgroundColor-Card;
-  display: flex;
-  flex-direction: column;
-  gap: $gap-Card;
-
-   .avatarWrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: $verticalalAlignment-title-Card;
-    gap: $gap-avatar-Card;
-    min-width: 0;
-  }
-
-   .titleWrapper {
+@layer components {
+  .wrapper {
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    box-shadow: $boxShadow-Card;
+    background-color: $backgroundColor-Card;
     display: flex;
     flex-direction: column;
-    align-items: $horizontalAlignment-title-Card;
-    width: 100%;
-    gap: $gap-title-Card;
-    min-width: 0;
-  }
+    gap: $gap-Card;
 
-  &.horizontal {
-    flex-direction: row;
-    align-items: center;
-  }
+    .avatarWrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: $verticalalAlignment-title-Card;
+      gap: $gap-avatar-Card;
+      min-width: 0;
+    }
 
-  &.vertical {  
-    flex-direction: column;
-  }
+    .titleWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: $horizontalAlignment-title-Card;
+      width: 100%;
+      gap: $gap-title-Card;
+      min-width: 0;
+    }
 
-  &.isClickable {
-    cursor: pointer;
+    &.horizontal {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    &.vertical {
+      flex-direction: column;
+    }
+
+    &.isClickable {
+      cursor: pointer;
+    }
   }
 }
 

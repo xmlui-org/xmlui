@@ -187,7 +187,7 @@ export const Toggle = forwardRef(function Toggle(
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         autoFocus={autoFocus}
-        className={classnames(styles.resetAppearance, className, {
+        className={classnames(styles.resetAppearance, {
           [styles.checkbox]: variant === "checkbox",
           [styles.switch]: variant === "switch",
           [styles.error]: validationStatus === "error",
@@ -198,7 +198,6 @@ export const Toggle = forwardRef(function Toggle(
     );
   }, [
     inputId,
-    className,
     enabled,
     handleOnBlur,
     handleOnFocus,
@@ -218,6 +217,7 @@ export const Toggle = forwardRef(function Toggle(
       id={inputId}
       label={label}
       style={style}
+      className={className}
       labelPosition={labelPosition}
       labelWidth={labelWidth}
       labelBreak={labelBreak}

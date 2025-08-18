@@ -41,20 +41,20 @@ export const FlowLayoutMd = createMetadata({
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, layoutCss, extractValue }) => {
+  ({ node, renderChild, className, extractValue }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
 
     const columnGap =
       extractValue.asSize(node.props?.columnGap) ||
-      layoutCss.gap ||
+      extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
     const rowGap =
-      extractValue.asSize(node.props?.rowGap) || layoutCss.gap || extractValue.asSize("$space-4");
+      extractValue.asSize(node.props?.rowGap) || extractValue.asSize(node.props?.gap) || extractValue.asSize("$space-4");
 
     return (
-      <FlowLayout style={layoutCss} columnGap={columnGap} rowGap={rowGap}>
+      <FlowLayout className={className} columnGap={columnGap} rowGap={rowGap}>
         {renderChild(node.children, {
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
             if (hints?.opaque) {

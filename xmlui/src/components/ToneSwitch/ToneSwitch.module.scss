@@ -7,74 +7,76 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.iconSwitch {
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  border-radius: 1rem;
-  border: 1px solid createThemeVar("borderColor-ToneSwitch");
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-  cursor: pointer;
-  min-height: 1rem;
-  width: calc(1rem * 3);
-  position: relative;
-  pointer-events: auto;
+@layer components {
+  .iconSwitch {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 1rem;
+    border: 1px solid createThemeVar("borderColor-ToneSwitch");
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    min-height: 1rem;
+    width: calc(1rem * 3);
+    position: relative;
+    pointer-events: auto;
 
-  &:hover {
-    border-color: createThemeVar("borderColor-ToneSwitch--hover");
+    &:hover {
+      border-color: createThemeVar("borderColor-ToneSwitch--hover");
+    }
   }
-}
 
-.iconThumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background-color: white;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-}
+  .iconThumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: white;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+  }
 
-.iconSwitch.light .iconThumb {
-  transform: translateX(0);
-}
+  .iconSwitch.light .iconThumb {
+    transform: translateX(0);
+  }
 
-.iconSwitch.dark .iconThumb {
-  transform: translateX(calc(1rem + 4px));
-}
+  .iconSwitch.dark .iconThumb {
+    transform: translateX(calc(1rem + 4px));
+  }
 
 
-// Alternative global override for the label class
-:global(.toneSwitchContainer) {
-  width: fit-content !important;
-  
-  :global(.label) {
+  // Alternative global override for the label class
+  :global(.toneSwitchContainer) {
     width: fit-content !important;
+
+    :global(.label) {
+      width: fit-content !important;
+    }
   }
-}
 
-.iconSwitch.light {
-  background-color: createThemeVar("backgroundColor-ToneSwitch-light");
-  color: createThemeVar("color-ToneSwitch-light");
-}
+  .iconSwitch.light {
+    background-color: createThemeVar("backgroundColor-ToneSwitch-light");
+    color: createThemeVar("color-ToneSwitch-light");
+  }
 
-.iconSwitch.dark {
-  background-color: createThemeVar("backgroundColor-ToneSwitch-dark");
-  color: createThemeVar("color-ToneSwitch-dark");
-}
+  .iconSwitch.dark {
+    background-color: createThemeVar("backgroundColor-ToneSwitch-dark");
+    color: createThemeVar("color-ToneSwitch-dark");
+  }
 
-.icon {
-  font-size: 12px;
-  width: 12px;
-  height: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--icon-color, #666);
-  pointer-events: none;
+  .icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-color, #666);
+    pointer-events: none;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

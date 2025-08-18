@@ -11,9 +11,7 @@ export type BadgeColors = {
 };
 
 // --- Type guard for BadgeColors ---
-export function isBadgeColors(
-  color: any,
-): color is BadgeColors {
+export function isBadgeColors(color: any): color is BadgeColors {
   return (
     typeof color === "object" &&
     color !== null &&
@@ -29,6 +27,7 @@ type Props = {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
   style?: CSSProperties;
+  className?: string;
 };
 
 export const defaultProps: Pick<Props, "variant"> = {
@@ -36,16 +35,19 @@ export const defaultProps: Pick<Props, "variant"> = {
 };
 
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = defaultProps.variant, style }: Props,
+  { children, color, variant = defaultProps.variant, style, className }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
       ref={forwardedRef}
-      className={classnames({
-        [styles.badge]: variant === "badge",
-        [styles.pill]: variant === "pill",
-      })}
+      className={classnames(
+        {
+          [styles.badge]: variant === "badge",
+          [styles.pill]: variant === "pill",
+        },
+        className,
+      )}
       style={{
         ...(color
           ? typeof color === "string"

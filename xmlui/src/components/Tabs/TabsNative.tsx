@@ -131,7 +131,7 @@ export const Tabs = forwardRef(function Tabs(
       <RTabsRoot
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(styles.tabs, className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);

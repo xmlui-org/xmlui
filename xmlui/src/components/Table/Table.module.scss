@@ -31,325 +31,328 @@ $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
 $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 
-.wrapper {
-  width: 100%;
-  outline: none;
-  overflow: auto;
-  isolation: isolate;
 
-  &.noScroll {
-    overflow-y: initial;
+@layer components {
+  .wrapper {
+    width: 100%;
+    outline: none;
+    overflow: auto;
+    isolation: isolate;
+
+    &.noScroll {
+      overflow-y: initial;
+    }
   }
-}
 
 
-.headerWrapper, .tableBody {
-  display: inline-block;
-  min-width: 100%;
-  background-color: $backgroundColor-Table;
-}
+  .headerWrapper, .tableBody {
+    display: inline-block;
+    min-width: 100%;
+    background-color: $backgroundColor-Table;
+  }
 
-.clickableHeader {
-  width: 100%;
-  height: 100%;
-  color: $textColor-heading-Table;
-  background-color: transparent;
-  border: none;
-  transition: color 0.2s, background-color 0.2s;
-  cursor: pointer;
-  @include t.paddingVars($themeVars, "heading-#{$component}");
+  .clickableHeader {
+    width: 100%;
+    height: 100%;
+    color: $textColor-heading-Table;
+    background-color: transparent;
+    border: none;
+    transition: color 0.2s, background-color 0.2s;
+    cursor: pointer;
+    @include t.paddingVars($themeVars, "heading-#{$component}");
+
+    .headerContent {
+      padding: 0;
+    }
+
+    &:not([disabled]) {
+      &:hover {
+        background-color: $backgroundColor-heading-Table--hover;
+      }
+
+      &:active {
+        background-color: $backgroundColor-heading-Table--active;
+      }
+
+      &:focus-visible {
+        outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
+
+      }
+    }
+  }
 
   .headerContent {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: t.$space-1;
+    max-width: 100%;
+    text-transform: $textTransform-heading-Table;
+    font-size: $fontSize-heading-Table;
+    color: $textColor-heading-Table;
+    font-weight: $fontWeight-heading-Table;
+    user-select: text;
+    @include t.paddingVars($themeVars, "heading-#{$component}");
+  }
+
+  .headerRow {
+    height: 100%;
+    background-color: $backgroundColor-heading-Table;
+  }
+
+  .columnCell, .cell{
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: text;
+    overflow: hidden;
+  }
+
+  .table {
+    display: block;
+    color: $textColor-Table;
+
+    .row, .headerRow {
+      display: flex;
+      flex-direction: row;
+      border-bottom: createThemeVar("borderBottom-cell-Table");
+      user-select: none;
+      //background-color: inherit;
+
+      .checkBoxWrapper {
+        font-size: 1rem;
+        visibility: hidden;
+
+        &.showInHeader {
+          visibility: visible;
+        }
+      }
+
+      &:hover,
+      &.selected,
+      &:focus-within,
+      &.allSelected {
+        .checkBoxWrapper {
+          visibility: visible;
+        }
+      }
+
+      .columnCell:first-child {
+        .headerContent {
+          padding-left: $paddingHorizontal-cell-first-Table;
+        }
+
+        > button {
+          padding-left: $paddingHorizontal-cell-first-Table;
+
+          .headerContent {
+            padding-left: 0;
+          }
+        }
+      }
+
+      .columnCell:last-child {
+        .headerContent {
+          padding-right: $paddingHorizontal-cell-last-Table;
+        }
+
+        > button {
+          padding-right: $paddingHorizontal-cell-last-Table;
+
+          .headerContent {
+            padding-right: 0;
+          }
+        }
+      }
+
+      .cell:first-child {
+        .cellContent{
+          padding-left: $paddingHorizontal-cell-first-Table;
+          border-left: 0;
+        }
+
+      }
+
+      .cell:last-child {
+        .cellContent{
+          padding-right: $paddingHorizontal-cell-last-Table;
+          border-right: 0;
+        }
+      }
+    }
+
+    .row {
+      font-size: $fontSize-row-Table;
+      font-weight: $fontWeight-row-Table;
+      background-color: $backgroundColor-row-Table;
+
+      &.selected {
+        background-color: $backgroundColor-selected-Table;
+
+        .cell {
+          background-color: $backgroundColor-selected-Table;
+
+        }
+      }
+
+      &:hover {
+        background-color: $backgroundColor-row-Table--hover;
+
+        .cell {
+          background-color: $backgroundColor-row-Table--hover;
+        }
+      }
+
+      &.selected.focused {
+        background-color: $backgroundColor-selected-Table;
+
+        .cell {
+          background-color: $backgroundColor-selected-Table;
+        }
+      }
+
+      &.selected:hover {
+        background-color: $backgroundColor-selected-Table--hover;
+
+        .cell {
+          background-color: $backgroundColor-selected-Table--hover;
+        }
+      }
+
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.6;
+      }
+
+      &.noBottomBorder:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .cellContent {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    @include t.paddingVars($themeVars, "cell-#{$component}");
+  }
+
+  .headerWrapper {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .columnCell {
+    background-color: $backgroundColor-heading-Table;
+    text-align: start;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     padding: 0;
   }
 
-  &:not([disabled]) {
-    &:hover {
-      background-color: $backgroundColor-heading-Table--hover;
-    }
-
-    &:active {
-      background-color: $backgroundColor-heading-Table--active;
-    }
-
-    &:focus-visible {
-      outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
-      outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
-      outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
-      outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
-
-    }
+  .noRows {
+    width: 100%;
+    text-align: center;
+    margin-top: t.$space-16;
   }
-}
 
-.headerContent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: t.$space-1;
-  max-width: 100%;
-  text-transform: $textTransform-heading-Table;
-  font-size: $fontSize-heading-Table;
-  color: $textColor-heading-Table;
-  font-weight: $fontWeight-heading-Table;
-  user-select: text;
-  @include t.paddingVars($themeVars, "heading-#{$component}");
-}
-
-.headerRow {
-  height: 100%;
-  background-color: $backgroundColor-heading-Table;
-}
-
-.columnCell, .cell{
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  user-select: text;
-  overflow: hidden;
-}
-
-.table {
-  display: block;
-  color: $textColor-Table;
-
-  .row, .headerRow {
+  .pagination {
+    position: sticky;
+    left: 0;
+    padding-top: t.$space-4;
+    padding-bottom: t.$space-4;
+    padding-inline: t.$space-4;
     display: flex;
     flex-direction: row;
-    border-bottom: createThemeVar("borderBottom-cell-Table");
-    user-select: none;
-    //background-color: inherit;
-
-    .checkBoxWrapper {
-      font-size: 1rem;
-      visibility: hidden;
-
-      &.showInHeader {
-        visibility: visible;
-      }
-    }
-
-    &:hover,
-    &.selected,
-    &:focus-within,
-    &.allSelected {
-      .checkBoxWrapper {
-        visibility: visible;
-      }
-    }
-
-    .columnCell:first-child {
-      .headerContent {
-        padding-left: $paddingHorizontal-cell-first-Table;
-      }
-
-      > button {
-        padding-left: $paddingHorizontal-cell-first-Table;
-
-        .headerContent {
-          padding-left: 0;
-        }
-      }
-    }
-
-    .columnCell:last-child {
-      .headerContent {
-        padding-right: $paddingHorizontal-cell-last-Table;
-      }
-
-      > button {
-        padding-right: $paddingHorizontal-cell-last-Table;
-
-        .headerContent {
-          padding-right: 0;
-        }
-      }
-    }
-
-    .cell:first-child {
-      .cellContent{
-        padding-left: $paddingHorizontal-cell-first-Table;
-        border-left: 0;
-      }
-
-    }
-
-    .cell:last-child {
-      .cellContent{
-        padding-right: $paddingHorizontal-cell-last-Table;
-        border-right: 0;
-      }
-    }
+    align-items: center;
+    justify-content: flex-end;
+    gap: t.$space-8;
+    width: 100%;
+    margin: 0 auto;
+    background-color: $backgroundColor-pagination-Table;
   }
 
-  .row {
-    font-size: $fontSize-row-Table;
-    font-weight: $fontWeight-row-Table;
-    background-color: $backgroundColor-row-Table;
+  .paginationLabel {
+    color: $textColor-pagination-Table;
+    font-size: t.$fontSize-small;
+  }
 
-    &.selected {
-      background-color: $backgroundColor-selected-Table;
+  .paginationSelect {
+    color: inherit;
+    background-color: transparent;
+    margin-left: t.$space-4;
+  }
 
-      .cell {
-        background-color: $backgroundColor-selected-Table;
+  .paginationButtons {
+    display: flex;
+    flex-direction: row;
+  }
 
-      }
-    }
+  .searchIconWrapper {
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loadingWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: t.$space-2;
+    padding-bottom: t.$space-2;
+  }
+
+  .checkBoxWrapper {
+    opacity: 0.5;
 
     &:hover {
-      background-color: $backgroundColor-row-Table--hover;
-
-      .cell {
-        background-color: $backgroundColor-row-Table--hover;
-      }
-    }
-
-    &.selected.focused {
-      background-color: $backgroundColor-selected-Table;
-
-      .cell {
-        background-color: $backgroundColor-selected-Table;
-      }
-    }
-
-    &.selected:hover {
-      background-color: $backgroundColor-selected-Table--hover;
-
-      .cell {
-        background-color: $backgroundColor-selected-Table--hover;
-      }
-    }
-
-    &.disabled {
-      pointer-events: none;
-      opacity: 0.6;
-    }
-
-    &.noBottomBorder:last-child {
-      border-bottom: none;
+      opacity: 1;
     }
   }
-}
 
-.cellContent {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  @include t.paddingVars($themeVars, "cell-#{$component}");
-}
-
-.headerWrapper {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.columnCell {
-  background-color: $backgroundColor-heading-Table;
-  text-align: start;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding: 0;
-}
-
-.noRows {
-  width: 100%;
-  text-align: center;
-  margin-top: t.$space-16;
-}
-
-.pagination {
-  position: sticky;
-  left: 0;
-  padding-top: t.$space-4;
-  padding-bottom: t.$space-4;
-  padding-inline: t.$space-4;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: t.$space-8;
-  width: 100%;
-  margin: 0 auto;
-  background-color: $backgroundColor-pagination-Table;
-}
-
-.paginationLabel {
-  color: $textColor-pagination-Table;
-  font-size: t.$fontSize-small;
-}
-
-.paginationSelect {
-  color: inherit;
-  background-color: transparent;
-  margin-left: t.$space-4;
-}
-
-.paginationButtons {
-  display: flex;
-  flex-direction: row;
-}
-
-.searchIconWrapper {
-  width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loadingWrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding-top: t.$space-2;
-  padding-bottom: t.$space-2;
-}
-
-.checkBoxWrapper {
-  opacity: 0.5;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
-.resizer {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 6px;
-  cursor: col-resize;
-  user-select: none;
-  touch-action: none;
-  right: 0;
-  overflow: visible;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  &:before{
-    content: '';
-    width: 1px;
-    height: 100%;
-    background:createThemeVar("borderColor-cell-Table");
-  }
-}
-
-.resizer.isResizing {
-  opacity: 1;
-  &:before{
-    box-shadow: t.$boxShadow;
-  }
-}
-
-@media (hover: hover) {
   .resizer {
-    opacity: 0;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 6px;
+    cursor: col-resize;
+    user-select: none;
+    touch-action: none;
+    right: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    &:before{
+      content: '';
+      width: 1px;
+      height: 100%;
+      background:createThemeVar("borderColor-cell-Table");
+    }
   }
 
-  *:hover > .resizer {
+  .resizer.isResizing {
     opacity: 1;
+    &:before{
+      box-shadow: t.$boxShadow;
+    }
+  }
+
+  @media (hover: hover) {
+    .resizer {
+      opacity: 0;
+    }
+
+    *:hover > .resizer {
+      opacity: 1;
+    }
   }
 }
 

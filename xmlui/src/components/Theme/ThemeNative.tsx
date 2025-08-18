@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import React, { useId, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
@@ -10,28 +10,17 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import { EMPTY_OBJECT } from "../../components-core/constants";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
-
-function getClassName(css: string) {
-  return `theme-${calculateHash(css)}`;
-}
-
-function calculateHash(str: string) {
-  let hash = 0,
-    i: number,
-    chr: number;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
+import {
+  useDomRoot,
+  useStyleRegistry,
+  useStyles,
+} from "../../components-core/theming/StyleContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   id?: string;
@@ -65,8 +54,8 @@ export function Theme({
 }: Props) {
   const generatedId = useId();
 
-  const { themes, resources, resourceMap, activeThemeId, setRoot, root } = useThemes();
-  const { activeTheme, activeThemeTone } = useTheme();
+  const { themes, resources, resourceMap, activeThemeId } = useThemes();
+  const { activeTheme, activeThemeTone, root } = useTheme();
   const themeTone = tone || activeThemeTone;
   const currentTheme: ThemeDefinition = useMemo(() => {
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
@@ -100,56 +89,64 @@ export function Theme({
     getThemeVar,
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
 
-  const { css, className } = useMemo(() => {
-    const vars = { ...themeCssVars, "color-scheme": themeTone };
-    // const vars = themeCssVars;
-    let css = Object.entries(vars)
-      .map(([key, value]) => {
-        return key + ":" + value + ";";
-      })
-      .join(" ");
+  const transformedStyles = useMemo(() => {
+    const ret = {
+      "&": {
+        ...themeCssVars,
+        colorScheme: themeTone,
+      },
+    };
 
-    const className = getClassName(css);
     if (isRoot) {
-      css += `--screenSize: 0;`;
+      ret["&"]["--screenSize"] = 0;
+
       const maxWidthPhone = getThemeVar("maxWidth-phone");
       const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
       const maxWidthTablet = getThemeVar("maxWidth-tablet");
       const maxWidthDesktop = getThemeVar("maxWidth-desktop");
       const maxWidthLargeDesktop = getThemeVar("maxWidth-large-desktop");
-      const mediaClasses = ` @media (min-width: calc(${maxWidthPhone} + 1px)) {
-        --screenSize: 1;
-      }
 
-      @media (min-width: calc(${maxWidthLandscapePhone} + 1px)) {
-          --screenSize: 2;
-      }
+      ret[`@media (min-width: calc(${maxWidthPhone} + 1px))`] = {
+        "&": {
+          "--screenSize": 1,
+        },
+      };
 
-      @media (min-width: calc(${maxWidthTablet} + 1px)) {
-          --screenSize: 3;
-      }
+      ret[`@media (min-width: calc(${maxWidthLandscapePhone} + 1px))`] = {
+        "&": {
+          "--screenSize": 2,
+        },
+      };
 
-      @media (min-width: calc(${maxWidthDesktop} + 1px)) {
-          --screenSize: 4;
-      }
+      ret[`@media (min-width: calc(${maxWidthTablet} + 1px))`] = {
+        "&": {
+          "--screenSize": 3,
+        },
+      };
 
-      @media (min-width: calc(${maxWidthLargeDesktop} + 1px)) {
-          --screenSize: 5;
-      }
-    `;
-      css += mediaClasses;
+      ret[`@media (min-width: calc(${maxWidthDesktop} + 1px))`] = {
+        "&": {
+          "--screenSize": 4,
+        },
+      };
+
+      ret[`@media (min-width: calc(${maxWidthLargeDesktop} + 1px))`] = {
+        "&": {
+          "--screenSize": 5,
+        },
+      };
     }
-    return {
-      className,
-      css,
-    };
+    return ret;
   }, [isRoot, themeCssVars, themeTone, getThemeVar]);
 
-  const [themeRoot, setThemeRoot] = useState(root);
+  const className = useStyles(transformedStyles);
+
+  const [currentThemeRoot, setCurrentThemeRoot] = useState(root);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
-      root: themeRoot,
+      root: currentThemeRoot,
+      setRoot: setCurrentThemeRoot,
       activeThemeId,
       activeThemeTone: themeTone,
       activeTheme: currentTheme,
@@ -160,17 +157,25 @@ export function Theme({
     };
     return themeVal;
   }, [
-    themeRoot,
     activeThemeId,
-    themeTone,
-    currentTheme,
-    themeCssVars,
     allThemeVarsWithResolvedHierarchicalVars,
+    currentTheme,
+    currentThemeRoot,
     getResourceUrl,
     getThemeVar,
+    themeCssVars,
+    themeTone,
   ]);
 
   const { indexing } = useIndexerContext();
+
+  const rootClasses = useMemo(() => {
+    if (isRoot) {
+      return [className, styles.root];
+    }
+    return EMPTY_ARRAY;
+  }, [className, isRoot]);
+
   if (indexing) {
     return children;
   }
@@ -184,26 +189,12 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style
-          type="text/css"
-          data-theme-root={true}
-          dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }}
-        />
-        <div
-          id={"_ui-engine-theme-root"}
-          className={classnames(styles.baseRootComponent, className)}
-          ref={(el) => {
-            if (el) {
-              setRoot(el);
-            }
-          }}
-        >
-          <ErrorBoundary node={node} location={"theme-root"}>
-            {renderChild(node.children)}
-            {children}
-          </ErrorBoundary>
-          <NotificationToast toastDuration={toastDuration} />
-        </div>
+        <RootClasses classNames={rootClasses} />
+        <ErrorBoundary node={node} location={"theme-root"}>
+          {renderChild(node.children)}
+          {children}
+        </ErrorBoundary>
+        <NotificationToast toastDuration={toastDuration} />
       </>
       // </ThemeContext.Provider>
     );
@@ -211,8 +202,7 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <style type="text/css" dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
-      <div className={classnames(styles.baseRootComponent, styles.wrapper, className)}>
+      <div className={classnames(styles.wrapper, className)}>
         {renderChild(node.children, { ...layoutContext, themeClassName: className })}
       </div>
       {root &&
@@ -221,7 +211,7 @@ export function Theme({
             className={classnames(className)}
             ref={(el) => {
               if (el) {
-                setThemeRoot(el);
+                setCurrentThemeRoot(el);
               }
             }}
           ></div>,
@@ -229,4 +219,39 @@ export function Theme({
         )}
     </ThemeContext.Provider>
   );
+}
+
+type HtmlClassProps = {
+  classNames: Array<string>;
+};
+
+/**
+ * A render-less component that adds a class to the html tag during SSR
+ * and on the client.
+ */
+export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
+  const registry = useStyleRegistry();
+  const domRoot = useDomRoot();
+
+  useIsomorphicLayoutEffect(() => {
+    // This runs on the client to handle dynamic updates.
+    // The SSR part is handled by the render itself.
+    if (typeof document !== "undefined") {
+      const insideShadowRoot = domRoot instanceof ShadowRoot;
+      let documentElement = insideShadowRoot
+        ? domRoot.getElementById("nested-app-root")
+        : document.documentElement;
+      documentElement.classList.add(...classNames);
+      // Clean up when the component unmounts to remove the class if needed.
+      return () => {
+        documentElement.classList.remove(...classNames);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classNames]);
+
+  // For SSR, we just add the class to the registry. The component renders nothing.
+  registry.addRootClasses(classNames);
+
+  return null;
 }

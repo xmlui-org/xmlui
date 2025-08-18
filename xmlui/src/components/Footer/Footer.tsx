@@ -4,6 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Footer } from "./FooterNative";
 import { createMetadata } from "../metadata-helpers";
+import classnames from "classnames";
 
 const COMP = "Footer";
 
@@ -37,9 +38,9 @@ export const FooterMd = createMetadata({
 export const footerRenderer = createComponentRenderer(
   COMP,
   FooterMd,
-  ({ node, renderChild, layoutCss, layoutContext }) => {
+  ({ node, renderChild, className, layoutContext }) => {
     return (
-      <Footer style={layoutCss} className={layoutContext?.themeClassName}>
+      <Footer className={classnames(layoutContext?.themeClassName, className)}>
         {renderChild(node.children, {
           type: "Stack",
           orientation: "horizontal",

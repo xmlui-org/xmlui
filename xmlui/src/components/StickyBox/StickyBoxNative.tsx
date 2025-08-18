@@ -18,11 +18,12 @@ export const defaultProps = {
 type Props = {
     children: ReactNode;
     uid?: string;
-    layout?: CSSProperties;
+    style?: CSSProperties;
+    className?: string;
     to: "top" | "bottom";
 };
 
-export function StickyBox({children, uid, layout, to = defaultProps.to}: Props) {
+export function StickyBox({children, uid, style, to = defaultProps.to, className}: Props) {
     const sentinelRef = useRef(null);
     const [wrapper, setWrapper] = useState(null);
     const [stuck, setStuck] = useState(false);
@@ -37,10 +38,10 @@ export function StickyBox({children, uid, layout, to = defaultProps.to}: Props) 
             // scrollParent.setAttribute("data-xmlui-scroll-padding", true);
         }
     }, [scrollParent, wrapper]);
-    const wrapperClassName = classnames(styles.wrapper);
+    const wrapperClassName = classnames(styles.wrapper, className);
     const stickyStyles = {
         backgroundColor: realBackground,
-        ...layout,
+        ...style,
     };
     const stickyClassName = "";
     return (

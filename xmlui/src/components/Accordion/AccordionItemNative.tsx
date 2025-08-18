@@ -36,6 +36,7 @@ type Props = {
   initiallyExpanded?: boolean;
 
   style?: React.CSSProperties;
+  className?: string;
 };
 
 export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> = {
@@ -44,13 +45,14 @@ export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> =
 };
 
 export const AccordionItemComponent = forwardRef(function AccordionItemComponent(
-  { 
-    id, 
-    header, 
-    headerRenderer = defaultProps.headerRenderer, 
-    content, 
-    initiallyExpanded = defaultProps.initiallyExpanded, 
-    style 
+  {
+    id,
+    header,
+    headerRenderer = defaultProps.headerRenderer,
+    content,
+    initiallyExpanded = defaultProps.initiallyExpanded,
+    style,
+    className,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -91,7 +93,13 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
   }, [triggerId, unRegister]);
 
   return (
-    <RAccordion.Item key={itemId} value={itemId} className={styles.item} ref={forwardedRef} style={style}>
+    <RAccordion.Item
+      key={itemId}
+      value={itemId}
+      className={classnames(styles.item, className)}
+      ref={forwardedRef}
+      style={style}
+    >
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
           id={`trigger_${itemId}`}

@@ -27,6 +27,7 @@ type Props = {
   updateState?: UpdateStateFn;
   initialValue?: string;
   style?: CSSProperties;
+  className?: string;
   maxLength?: number;
   enabled?: boolean;
   placeholder?: string;
@@ -103,6 +104,7 @@ export const TextBox = forwardRef(function TextBox(
     updateState = defaultProps.updateState,
     initialValue = defaultProps.initialValue,
     style,
+    className,
     maxLength,
     enabled = defaultProps.enabled,
     placeholder,
@@ -217,6 +219,7 @@ export const TextBox = forwardRef(function TextBox(
       required={required}
       enabled={enabled}
       style={style}
+      className={className}
       ref={ref}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}

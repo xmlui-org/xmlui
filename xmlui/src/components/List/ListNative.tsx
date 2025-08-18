@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -26,7 +27,7 @@ import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
 import type { CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
-import { useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
+import { useHasExplicitHeight, useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
@@ -214,6 +215,7 @@ type DynamicHeightListProps = {
   pageInfo?: PageInfo;
   idKey?: string;
   style?: CSSProperties;
+  className?: string;
   emptyListPlaceholder?: ReactNode;
   groupsInitiallyExpanded?: boolean;
   defaultGroups: Array<string>;
@@ -272,6 +274,7 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
+
 export const ListNative = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,
@@ -289,6 +292,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     pageInfo,
     idKey = defaultProps.idKey,
     style,
+    className,
     emptyListPlaceholder,
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
@@ -302,12 +306,9 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
+  const hasHeight = useHasExplicitHeight(parentRef);
+  const hasOutsideScroll = scrollRef && !hasHeight;
 
-  const hasOutsideScroll =
-    scrollRef &&
-    style?.maxHeight === undefined &&
-    style?.height === undefined &&
-    style?.flex === undefined;
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const shouldStickToBottom = useRef(scrollAnchor === "bottom");
@@ -479,9 +480,13 @@ export const ListNative = forwardRef(function DynamicHeightList(
         <div
           ref={rootRef}
           style={style}
-          className={classnames(styles.outerWrapper, {
-            [styles.hasOutsideScroll]: hasOutsideScroll,
-          })}
+          className={classnames(
+            styles.outerWrapper,
+            {
+              [styles.hasOutsideScroll]: hasOutsideScroll,
+            },
+            className,
+          )}
         >
           {loading && rows.length === 0 && (
             <div className={styles.loadingWrapper}>
@@ -514,22 +519,20 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 count={rowCount}
               >
                 {(rowIndex) => {
-                  // REVIEW: I changed this code line because in the build version rows[rowIndex] 
+                  // REVIEW: I changed this code line because in the build version rows[rowIndex]
                   // was undefined
                   // const row = rows[rowIndex];
                   // const key = row[idKey];
                   const row = rows?.[rowIndex];
                   const key = row?.[idKey];
                   if (!row) {
-                    return <Fragment key={rowIndex}/>;
+                    return <Fragment key={rowIndex} />;
                   }
                   // --- End change
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>
-                          {sectionRenderer?.(row, key) || <div />}
-                        </Fragment>
+                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
                       );
                     case RowType.SECTION_FOOTER:
                       return (

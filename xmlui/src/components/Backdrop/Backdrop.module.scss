@@ -10,27 +10,30 @@ $themeVars: ();
 $backgroundColor-Backdrop: createThemeVar("backgroundColor-Backdrop");
 $opacity-Backdrop: createThemeVar("opacity-Backdrop");
 
-.backdropContainer {
-  position: relative;
-  display: inline-block;
-}
+@layer components {
+  .backdropContainer {
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+  }
 
-.backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: $backgroundColor-Backdrop;
-  opacity: $opacity-Backdrop;
-}
+  .backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: $backgroundColor-Backdrop;
+    opacity: $opacity-Backdrop;
+  }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

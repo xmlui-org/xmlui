@@ -27,39 +27,42 @@ $componentName: "ColorPicker";
   }
 }
 
-.colorInput {
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}");
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding: 2px;
+@layer components {
+  .colorInput {
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}");
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 2px;
 
-  &::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
 
-  &::-webkit-color-swatch {
-    border: none;
-    border-radius: 2px;
-  }
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 2px;
+    }
 
-  @include variant("default");
+    @include variant("default");
 
-  &.error {
-    @include variant("error");
-  }
+    &.error {
+      @include variant("error");
+    }
 
-  &.warning {
-    @include variant("warning");
-  }
+    &.warning {
+      @include variant("warning");
+    }
 
-  &.valid {
-    @include variant("success");
-  }
+    &.valid {
+      @include variant("success");
+    }
 
-  &:before, &:after {
-    display: none;
+    &:before,
+    &:after {
+      display: none;
+    }
   }
 }
 

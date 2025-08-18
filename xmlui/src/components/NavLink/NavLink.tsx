@@ -87,7 +87,7 @@ export const NavLinkMd = createMetadata({
 export const navLinkComponentRenderer = createComponentRenderer(
   COMP,
   NavLinkMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     const iconName = extractValue.asString(node.props.icon);
     return (
       <NavLink
@@ -97,7 +97,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         vertical={extractValue.asOptionalBoolean(node.props.vertical)}
         displayActive={extractValue.asOptionalBoolean(node.props.displayActive)}
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
-        style={layoutCss}
+        className={className}
         target={extractValue(node.props?.target)}
         icon={<Icon name={iconName} className={styles.icon} />}
       >

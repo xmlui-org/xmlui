@@ -13,6 +13,7 @@ import { Tooltip } from "./Tooltip";
 
 type ModalProps = {
   style?: CSSProperties;
+  className?: string;
   children?: ReactNode;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;

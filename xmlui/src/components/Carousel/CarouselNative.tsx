@@ -18,6 +18,7 @@ type CarouselApi = UseEmblaCarouselType[1];
 
 export type CarouselProps = {
   style?: CSSProperties;
+  className?: string;
   orientation?: OrientationOptions;
   indicators?: boolean;
   controls?: boolean;
@@ -63,6 +64,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     orientation = defaultProps.orientation,
     children,
     style,
+    className,
     indicators = defaultProps.indicators,
     onDisplayDidChange = noop,
     autoplay = defaultProps.autoplay,
@@ -221,7 +223,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
       <div
         style={style}
         ref={ref}
-        className={classnames(styles.carousel)}
+        className={classnames(styles.carousel, className)}
         role="region"
         tabIndex={-1}
         aria-roledescription="carousel"

@@ -11,11 +11,12 @@ import { App, defaultProps } from "./AppNative";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import { IndexerContext } from "./IndexerContext";
 import { createPortal } from "react-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import { extractPaddings } from "../../components-core/utils/css-utils";
 
 // --- Define a structure to represent navigation hierarchy
 interface NavHierarchyNode {
@@ -94,10 +95,10 @@ export const AppMd = createMetadata({
   },
   events: {
     ready: {
-      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`,
     },
     messageReceived: {
-      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`
+      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
     },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
@@ -132,7 +133,8 @@ export const AppMd = createMetadata({
   },
 });
 
-function AppNode({ node, extractValue, renderChild, style, lookupEventHandler }) {
+
+function AppNode({ node, extractValue, renderChild, className, lookupEventHandler }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -340,12 +342,14 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
     findOrCreateNavGroup,
   ]);
 
+  const applyDefaultContentPadding= !Pages;
+
   // --- Memoize all app props to prevent unnecessary re-renders
   const appProps = useMemo(
     () => ({
       scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
       noScrollbarGutters: extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false),
-      style,
+      className,
       layout: layoutType,
       loggedInUser: extractValue(node.props.loggedInUser),
       onReady: lookupEventHandler("ready"),
@@ -356,6 +360,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       logoLight: extractValue(node.props["logo-light"]),
       defaultTone: extractValue(node.props.defaultTone),
       defaultTheme: extractValue(node.props.defaultTheme),
+      applyDefaultContentPadding
     }),
     [
       extractValue,
@@ -370,7 +375,8 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       node.props["logo-light"],
       node.props.defaultTone,
       node.props.defaultTheme,
-      style,
+      className,
+      applyDefaultContentPadding
     ],
   );
 
@@ -566,13 +572,13 @@ function PageIndexer({
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return (
       <AppNode
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        style={layoutCss}
+        className={className}
         lookupEventHandler={lookupEventHandler}
       />
     );

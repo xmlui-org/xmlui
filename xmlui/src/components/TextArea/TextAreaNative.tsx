@@ -50,6 +50,7 @@ type Props = {
   onBlur?: () => void;
   controlled?: boolean;
   style?: CSSProperties;
+  className?: string;
   registerComponentApi?: RegisterComponentApiFn;
   autoSize?: boolean;
   maxRows?: number;
@@ -101,6 +102,7 @@ export const TextArea = forwardRef(function TextArea(
     enterSubmits = defaultProps.enterSubmits,
     escResets,
     style,
+    className,
     registerComponentApi,
     autoSize,
     maxRows,
@@ -221,15 +223,19 @@ export const TextArea = forwardRef(function TextArea(
     [enterSubmits, escResets],
   );
 
+  let classes = classnames(className, styles.textarea, {
+    [styles.resizeHorizontal]: resize === "horizontal",
+    [styles.resizeVertical]: resize === "vertical",
+    [styles.resizeBoth]: resize === "both",
+    [styles.focused]: focused,
+    [styles.disabled]: !enabled,
+    [styles.error]: validationStatus === "error",
+    [styles.warning]: validationStatus === "warning",
+    [styles.valid]: validationStatus === "valid",
+  });
   const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
     React.RefAttributes<HTMLTextAreaElement> = {
-    className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
-      [styles.focused]: focused,
-      [styles.disabled]: !enabled,
-      [styles.error]: validationStatus === "error",
-      [styles.warning]: validationStatus === "warning",
-      [styles.valid]: validationStatus === "valid",
-    }),
+    className: classes,
     ref: inputRef,
     style: style as any,
     value: controlled ? value || "" : undefined,
@@ -263,10 +269,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={classes}
       >
         <TextAreaResizable
           {...textareaProps}
           style={style as any}
+          className={classes}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -287,10 +295,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={classes}
       >
         <TextareaAutosize
           {...textareaProps}
           style={style as any}
+          className={classes}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -311,6 +321,7 @@ export const TextArea = forwardRef(function TextArea(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={classes}
     >
       <textarea {...textareaProps} rows={rows} />
     </ItemWithLabel>

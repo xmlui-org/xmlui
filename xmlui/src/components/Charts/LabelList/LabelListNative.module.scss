@@ -10,11 +10,14 @@ $themeVars: ();
 
 $componentName: "LabelList";
 
-.labelList {
-  fill: createThemeVar("textColor-LabelList");
+@layer components {
+  .labelList {
+    fill: createThemeVar("textColor-LabelList");
+  }
 }
 
+
 // --- We export the theme variables to add them to the component renderer
-:export{
+:export {
   themeVars: t.json-stringify($themeVars)
 }

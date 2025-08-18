@@ -28,10 +28,10 @@ export const LogoMd = createMetadata({
 export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
-  ({ node, layoutCss, extractValue }) => {
+  ({ node, className, extractValue }) => {
     return (
       <Logo
-        style={layoutCss}
+        className={className}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         alt={extractValue(node.props.alt)}
       />

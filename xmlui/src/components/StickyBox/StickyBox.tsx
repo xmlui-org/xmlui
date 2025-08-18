@@ -30,9 +30,9 @@ export const StickyBoxMd = createMetadata({
 export const stickyBoxComponentRenderer = createComponentRenderer(
   COMP,
   StickyBoxMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
+  ({ node, renderChild, extractValue, className }) => {
     return (
-      <StickyBox uid={node.uid} layout={layoutCss} to={extractValue(node.props?.to)}>
+      <StickyBox uid={node.uid} className={className} to={extractValue(node.props?.to)}>
         {renderChild(node.children)}
       </StickyBox>
     );

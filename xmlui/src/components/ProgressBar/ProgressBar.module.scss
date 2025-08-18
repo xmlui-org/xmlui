@@ -13,22 +13,24 @@ $borderRadius-ProgressBar: createThemeVar("borderRadius-ProgressBar");
 $borderRadius-indicator-ProgressBar: createThemeVar("borderRadius-indicator-ProgressBar");
 $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
 
-.wrapper {
-  width: 100%;
-  background-color: $backgroundColor-ProgressBar;
-  border-radius: $borderRadius-ProgressBar;
-  overflow: hidden;
-  position: relative;
-  height: $thickness-ProgressBar;
-}
+@layer components {
+  .wrapper {
+    width: 100%;
+    background-color: $backgroundColor-ProgressBar;
+    border-radius: $borderRadius-ProgressBar;
+    overflow: hidden;
+    position: relative;
+    height: $thickness-ProgressBar;
+  }
 
-.bar {
-  position: absolute;
-  background-color: $color-indicator-ProgressBar;
-  border-radius: $borderRadius-indicator-ProgressBar;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  .bar {
+    position: absolute;
+    background-color: $color-indicator-ProgressBar;
+    border-radius: $borderRadius-indicator-ProgressBar;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

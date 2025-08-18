@@ -17,7 +17,10 @@ export type ThemeScope = {
   activeThemeTone: ThemeTone; 
 
   // The HTML element that works as the root of the theme's scope.
-  root: HTMLElement | undefined; 
+  root: HTMLElement | undefined;
+
+  // Sets the root HTML element the theme is assigned to
+  setRoot: Dispatch<SetStateAction<HTMLElement | undefined>>;
 
   // The active theme in the current scope
   activeTheme: ThemeDefinition; 
@@ -43,11 +46,6 @@ export type ThemeScope = {
 // This type represents the object managing app themes. When an app runs, styles are
 // applied according to the current (active) application theme and tone.
 export type AppThemes = {
-  root: HTMLElement | undefined; // Represents the root HTML element the theme is assigned to
-
-  // Sets the root HTML element the theme is assigned to
-  setRoot: Dispatch<SetStateAction<HTMLElement | undefined>>;
-
   // Sets the active theme id
   setActiveThemeId: (newThemeId: string) => void; 
 

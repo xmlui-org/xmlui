@@ -84,11 +84,11 @@ export const NestedAppMd = createMetadata({
 export const nestedAppComponentRenderer = createComponentRenderer(
   COMP,
   NestedAppMd,
-  ({ node, extractValue, layoutCss }) => {
+  ({ node, extractValue, className }) => {
     return (
       <IndexAwareNestedApp
         app={node.props?.app}
-        style={layoutCss}
+        className={className}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}
         config={extractValue(node.props?.config)}

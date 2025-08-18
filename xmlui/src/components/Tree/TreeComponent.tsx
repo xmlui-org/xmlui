@@ -26,9 +26,10 @@ export const TreeMd = createMetadata({
 export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
-  ({ node, extractValue, renderChild }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <TreeComponent
+        className={className}
         data={extractValue(node.props.data)}
         selectedUid={extractValue(node.props.selectedUid)}
         itemRenderer={(item: any) => {

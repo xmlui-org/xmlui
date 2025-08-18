@@ -22,73 +22,76 @@ $height-NavPanel: createThemeVar("height-AppHeader");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
 $alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
 
-.wrapper {
-  --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
-  height: 100%;
-  width: 100%;
-  flex-shrink: 0;
-  box-shadow: $boxShadow-NavPanel;
-  @include t.paddingVars($themeVars, $component);
-  @include t.borderVars($themeVars, $component);
 
-  overflow: auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: thin;
+@layer components {
+  .wrapper {
+    --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
+    height: 100%;
+    width: 100%;
+    flex-shrink: 0;
+    box-shadow: $boxShadow-NavPanel;
+    @include t.paddingVars($themeVars, $component);
+    @include t.borderVars($themeVars, $component);
 
-  &:not(.condensed){
-    background-color: $backgroundColor-NavPanel;
-  }
-
-  &.vertical {
-    scrollbar-gutter: stable;
-  }
-
-  &.horizontal{
-    box-shadow: none;
-    height: $height-NavPanel;
-    background-color: $backgroundColor-NavPanel-horizontal;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
 
     &:not(.condensed){
+      background-color: $backgroundColor-NavPanel;
+    }
+
+    &.vertical {
+      scrollbar-gutter: stable;
+    }
+
+    &.horizontal{
+      box-shadow: none;
+      height: $height-NavPanel;
+      background-color: $backgroundColor-NavPanel-horizontal;
+
+      &:not(.condensed){
+        .wrapperInner{
+          padding-inline: createThemeVar("paddingHorizontal-#{$component}");
+          justify-content: $alignment-content-AppHeader;
+        }
+      }
       .wrapperInner{
-        padding-inline: createThemeVar("paddingHorizontal-#{$component}");
+        height: 100%;
+        flex-direction: row;
+        max-width: $maxWidth-content-NavPanel;
+        //align-items: center;
+        width: 100%;
+        margin: 0 auto;
         justify-content: $alignment-content-AppHeader;
       }
     }
-    .wrapperInner{
-      height: 100%;
-      flex-direction: row;
-      max-width: $maxWidth-content-NavPanel;
-      //align-items: center;
-      width: 100%;
-      margin: 0 auto;
-      justify-content: $alignment-content-AppHeader;
-    }
   }
-}
 
-.wrapperInner{
-  display: flex;
-  flex-direction: column;
-  justify-content: $alignment-content-AppHeader;
-}
-
-
-.logoWrapper{
-  &:not(:empty) {
+  .wrapperInner{
     display: flex;
-    flex-shrink: 0;
-    height: $height-NavPanel;
-    padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
-    padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
-    padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
-    margin-bottom: $marginBottom-logo-NavPanel;
-    justify-content: createThemeVar("horizontalAlignment-logo-#{$component}");
+    flex-direction: column;
+    justify-content: $alignment-content-AppHeader;
   }
 
-  &.inDrawer {     //to make room for the close button
-    min-height: 32px;
+
+  .logoWrapper{
+    &:not(:empty) {
+      display: flex;
+      flex-shrink: 0;
+      height: $height-NavPanel;
+      padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
+      padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
+      padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
+      margin-bottom: $marginBottom-logo-NavPanel;
+      justify-content: createThemeVar("horizontalAlignment-logo-#{$component}");
+    }
+
+    &.inDrawer {     //to make room for the close button
+      min-height: 32px;
+    }
   }
 }
 

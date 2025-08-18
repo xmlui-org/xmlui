@@ -46,12 +46,12 @@ export const ContentSeparatorMd = createMetadata({
 export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
-  ({ node, layoutCss, extractValue }) => {
+  ({ node, className, extractValue }) => {
     return (
       <ContentSeparator
         orientation={extractValue(node.props.orientation)}
         size={extractValue.asSize(node.props.size)}
-        style={layoutCss}
+        className={className}
       />
     );
   },

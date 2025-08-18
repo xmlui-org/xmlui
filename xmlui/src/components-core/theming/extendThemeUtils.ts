@@ -32,7 +32,7 @@ export function collectThemeChainByExtends(
   const rootTones: Record<string | ThemeTone, ThemeDefinitionDetails> = cloneDeep(RootThemeDefinition.tones) || {};
   Object.entries(componentDefaultThemeVars).forEach(([key, value]) => {
     if (typeof value === "string") {
-      rootThemeVars[key] = value;
+      rootThemeVars[key.trim()] = value;
     } else {
       Object.entries(value).forEach(([themeVarKey, themeVarVal]) => {
         if (!rootTones[key]) {
@@ -40,7 +40,7 @@ export function collectThemeChainByExtends(
         }
         rootTones[key].themeVars = {
           ...rootTones[key].themeVars,
-          [themeVarKey]: themeVarVal,
+          [themeVarKey.trim()]: themeVarVal,
         };
       });
     }

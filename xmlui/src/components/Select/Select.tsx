@@ -173,7 +173,7 @@ export const selectComponentRenderer = createComponentRenderer(
     extractValue,
     renderChild,
     lookupEventHandler,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
@@ -182,7 +182,7 @@ export const selectComponentRenderer = createComponentRenderer(
     return (
       <Select
         multiSelect={multiSelect}
-        style={layoutCss}
+        className={className}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,

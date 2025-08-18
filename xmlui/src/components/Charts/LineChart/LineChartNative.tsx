@@ -13,6 +13,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
+import classnames from "classnames";
+import styles from './LineChart.module.scss';
 
 export type LineChartProps = {
   data: any[];
@@ -21,6 +23,7 @@ export type LineChartProps = {
   style?: React.CSSProperties;
   hideTickX?: boolean;
   hideTickY?: boolean;
+  className?: string;
   hideX?: boolean;
   hideY?: boolean;
   hideTooltip?: boolean;
@@ -50,6 +53,7 @@ export function LineChart({
   dataKeys = [],
   nameKey,
   style,
+  className,
   hideX = defaultProps.hideX,
   hideY = defaultProps.hideY,
   hideTickX = defaultProps.hideTickX,
@@ -177,17 +181,11 @@ export function LineChart({
           : null}
       </div>
       <div
-        style={{
-          flexGrow: 1,
-          width: style?.width || "100%",
-          height: style?.height || "100%",
-          padding: 0,
-          margin: 0,
-        }}
+        className={classnames(className, styles.wrapper)}
+        style={style}
       >
         <ResponsiveContainer
           ref={containerRef}
-          style={style}
           width="100%"
           height="100%"
           debounce={100}
