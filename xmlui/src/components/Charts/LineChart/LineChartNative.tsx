@@ -155,6 +155,9 @@ export function LineChart({
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
   }, [data, nameKey, xAxisHeight]);
+  
+  // The stroke width of the lines
+  const strokeWidth = getThemeVar("width-line-LineChart");
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -219,7 +222,7 @@ export function LineChart({
                 dataKey={dataKey}
                 name={dataKey}
                 stroke={colorValues[i]}
-                strokeWidth={1}
+                strokeWidth={strokeWidth}
                 dot={false}
               />
             ))}
