@@ -41,13 +41,13 @@ export const NoResultMd = createMetadata({
 export const noResultComponentRenderer = createComponentRenderer(
   COMP,
   NoResultMd,
-  ({ node, extractValue, layoutCss }) => {
+  ({ node, extractValue, className }) => {
     return (
       <NoResult
         label={extractValue.asDisplayText(node.props.label || node.children || "No results found")}
         icon={node.props.icon}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
-        style={layoutCss}
+        className={className}
       />
     );
   },

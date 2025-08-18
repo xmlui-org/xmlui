@@ -29,6 +29,7 @@ type Props = {
   forceActive?: boolean;
   vertical?: boolean;
   style?: CSSProperties;
+  className?: string;
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
   accessibilityProps?: any;
@@ -47,6 +48,7 @@ export const NavLink = forwardRef(function NavLink(
     onClick,
     icon,
     forceActive,
+    className,
     ...rest
   }: Props,
   ref: Ref<any>,
@@ -76,7 +78,7 @@ export const NavLink = forwardRef(function NavLink(
     };
   }, [level, style, layoutIsVertical]);
 
-  const baseClasses = classnames(styles.content, styles.base, {
+  const baseClasses = classnames(styles.content, styles.base, className, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
     [styles.includeHoverIndicator]: displayActive,

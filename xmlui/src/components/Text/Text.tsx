@@ -128,7 +128,7 @@ export const TextMd = createMetadata({
 export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
       node.props;
 
@@ -142,7 +142,7 @@ export const textComponentRenderer = createComponentRenderer(
       <Text
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
-        style={layoutCss}
+        className={className}
         preserveLinebreaks={extractValue.asOptionalBoolean(
           preserveLinebreaks,
           defaultProps.preserveLinebreaks,

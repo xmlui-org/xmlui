@@ -20,6 +20,7 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
+import { noop } from "../../components-core/constants";
 
 type Props = {
   id?: string;
@@ -31,6 +32,7 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
   className?: string;
   distributeEvenly?: boolean;
+  onDidChange?: (index: number, id: string, label: string) => void;
 };
 
 export const defaultProps = {
@@ -50,11 +52,13 @@ export const Tabs = forwardRef(function Tabs(
     registerComponentApi,
     className,
     distributeEvenly = defaultProps.distributeEvenly,
+    onDidChange = noop,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const tabsId = id || useId();
+  const _id = useId();
+  const tabsId = id || _id;
 
   // Ensure activeTab is within valid bounds
   const validActiveTab = useMemo(() => {
@@ -128,13 +132,14 @@ export const Tabs = forwardRef(function Tabs(
       <RTabsRoot
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(styles.tabs, className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);
           if (newIndex !== activeIndex) {
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
+            onDidChange?.(newIndex, tab, tabItems[newIndex]?.label);
           }
         }}
         orientation={orientation}

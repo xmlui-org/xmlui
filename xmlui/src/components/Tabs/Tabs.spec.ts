@@ -924,3 +924,76 @@ test.describe("dynamic content", () => {
     await expect(page.getByText("Content for account 3")).toBeVisible();
   });
 });
+
+test.describe("onDidChange callback functionality", () => {
+  test("onDidChange callback is called when tab changes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.tabChangeInfo="No change yet">
+      <Tabs onDidChange="(index, id, label) => {
+        tabChangeInfo = 'Tab: ' + index + ' - ' + label;
+      }">
+        <TabItem label="First Tab">
+          <Text>First tab content</Text>
+        </TabItem>
+        <TabItem label="Second Tab">
+          <Text>Second tab content</Text>
+        </TabItem>
+        <TabItem label="Third Tab">
+          <Text>Third tab content</Text>
+        </TabItem>
+      </Tabs>
+      <Text>{tabChangeInfo}</Text>
+      </Fragment>
+    `);
+
+    // Initially should show no change
+    await expect(page.getByText("No change yet")).toBeVisible();
+    await expect(page.getByText("First tab content")).toBeVisible();
+
+    // Click on second tab
+    await page.getByRole("tab", { name: "Second Tab" }).click();
+    await expect(page.getByText("Second tab content")).toBeVisible();
+    await expect(page.getByText("Tab: 1 - Second Tab")).toBeVisible();
+
+    // Click on third tab
+    await page.getByRole("tab", { name: "Third Tab" }).click();
+    await expect(page.getByText("Third tab content")).toBeVisible();
+    await expect(page.getByText("Tab: 2 - Third Tab")).toBeVisible();
+
+    // Click back to first tab
+    await page.getByRole("tab", { name: "First Tab" }).click();
+    await expect(page.getByText("First tab content")).toBeVisible();
+    await expect(page.getByText("Tab: 0 - First Tab")).toBeVisible();
+  });
+
+  test("onDidChange callback is not called when same tab is clicked", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.changeCount="{0}">
+      <Tabs onDidChange="(index, id, label) => {
+        changeCount = changeCount + 1;
+      }">
+        <TabItem label="Tab One">
+          <Text>Content one</Text>
+        </TabItem>
+        <TabItem label="Tab Two">
+          <Text>Content two</Text>
+        </TabItem>
+      </Tabs>
+      <Text>Changes: {changeCount}</Text>
+      </Fragment>
+    `);
+
+    // Initially should show 0 changes
+    await expect(page.getByText("Changes: 0")).toBeVisible();
+    await expect(page.getByText("Content one")).toBeVisible();
+    
+    // Click on second tab - should trigger onDidChange
+    await page.getByRole("tab", { name: "Tab Two" }).click();
+    await expect(page.getByText("Content two")).toBeVisible();
+    await expect(page.getByText("Changes: 1")).toBeVisible();
+
+    // Click on second tab again - should NOT trigger onDidChange
+    await page.getByRole("tab", { name: "Tab Two" }).click();
+    await expect(page.getByText("Changes: 1")).toBeVisible(); // Should still be 1
+  });
+});

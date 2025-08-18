@@ -93,10 +93,10 @@ export const columnComponentRenderer = createComponentRenderer(
   COMP,
   ColumnMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, layoutCss } = rendererContext;
+    const { node, renderChild, extractValue, className } = rendererContext;
     return (
       <Column
-        style={layoutCss}
+        className={className}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
         canSort={extractValue.asOptionalBoolean(node.props.canSort, true)}

@@ -1,14 +1,16 @@
 @use "../../components-core/theming/themes" as t;
 
-.loggedInUserInfoWrapper{
-  padding: t.$space-2;
-  font-size: t.$fontSize-small;
-}
+@layer components {
+  .loggedInUserInfoWrapper {
+    padding: t.$space-2;
+    font-size: t.$fontSize-small;
+  }
 
-.name{
-  color: t.$textColor-primary
-}
+  .name {
+    color: t.$textColor-primary;
+  }
 
-.email{
-  color: t.$textColor-subtitle
+  .email {
+    color: t.$textColor-subtitle;
+  }
 }

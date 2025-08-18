@@ -135,7 +135,7 @@ export const numberBoxComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     // --- Handle initial value as a number
@@ -145,7 +145,7 @@ export const numberBoxComponentRenderer = createComponentRenderer(
     }
     return (
       <NumberBox
-        style={layoutCss}
+        className={className}
         value={state?.value}
         initialValue={extractedInitialValue}
         step={extractValue(node.props.step)}

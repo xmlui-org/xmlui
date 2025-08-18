@@ -7,65 +7,66 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-
 $componentName: "TooltipContent";
 
-.tooltipContainer {
-  display: grid;
-  min-width: 8rem;
-  align-items: start;
-  gap: 1.5px;
-  border-radius: 8px;
-  background: t.$backgroundColor-secondary;
-  padding: .4rem;
-  font-size: 0.75rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
+@layer components {
+  .tooltipContainer {
+    display: grid;
+    min-width: 8rem;
+    align-items: start;
+    gap: 1.5px;
+    border-radius: 8px;
+    background: t.$backgroundColor-secondary;
+    padding: 0.4rem;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
 
-.gridGap {
-  display: grid;
-  gap: 1.5px;
-}
+  .gridGap {
+    display: grid;
+    gap: 1.5px;
+  }
 
-.labelGrid {
-  display: grid;
-  gap: 1.5px;
-}
+  .labelGrid {
+    display: grid;
+    gap: 1.5px;
+  }
 
-.itemContainer {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-}
+  .itemContainer {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
 
-.valueContainer {
-  display: flex;
-  flex: 1;
-  gap: t.$space-2;
-  justify-content: space-between;
-  align-items: center;
-}
+  .valueContainer {
+    display: flex;
+    flex: 1;
+    gap: t.$space-2;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.indicator {
-  flex-shrink: 0;
-  border-radius: 2px;
-}
+  .indicator {
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
 
-.dot {
-  width: 10px;
-  height: 10px;
-}
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
 
-.line {
-  width: 4px;
-}
+  .line {
+    width: 4px;
+  }
 
-.dashed {
-  width: 0;
-  border: 1.5px dashed;
-  background: transparent;
+  .dashed {
+    width: 0;
+    border: 1.5px dashed;
+    background: transparent;
+  }
 }
 
 .mutedText {
@@ -80,6 +81,6 @@ $componentName: "TooltipContent";
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

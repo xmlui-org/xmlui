@@ -1,6 +1,8 @@
 import { defaultProps, LineChart } from "./LineChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata, d } from "../../metadata-helpers";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
+import styles from "./LineChart.module.scss";
 
 const COMP = "LineChart";
 
@@ -76,12 +78,16 @@ export const LineChartMd = createMetadata({
     marginBottom: d("The bottom margin of the chart"),
     marginLeft: d("The left margin of the chart"),
   },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`width-line-LineChart`]: "1px",
+  },
 });
 
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
@@ -89,7 +95,7 @@ export const lineChartComponentRenderer = createComponentRenderer(
         hideTickX={extractValue(node.props?.hideTickX)}
         hideTickY={extractValue(node.props?.hideTickY)}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
+        className={className}
         dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}

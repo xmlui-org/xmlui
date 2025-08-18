@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState, type ForwardedRef } from "react";
 import * as RAccordion from "@radix-ui/react-accordion";
+import classnames from "classnames";
 
 import styles from "./Accordion.module.scss";
 
@@ -8,6 +9,7 @@ import { noop } from "../../components-core/constants";
 import { AccordionContext } from "../../components/Accordion/AccordionContext";
 
 type Props = {
+  className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
   triggerPosition?: "start" | "end";
@@ -31,6 +33,7 @@ export const defaultProps: Pick<
 
 export const AccordionComponent = forwardRef(function AccordionComponent(
   {
+    className,
     style,
     children,
     hideIcon = defaultProps.hideIcon,
@@ -158,7 +161,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
         ref={forwardedRef}
         value={expandedItems}
         type="multiple"
-        className={styles.root}
+        className={classnames(styles.root, className)}
         onValueChange={(value) => setExpandedItems(value)}
       >
         {children}

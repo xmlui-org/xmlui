@@ -32,6 +32,7 @@ import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
+import { useComponentStyle } from "../theming/StyleContext";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -217,9 +218,15 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // });
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
 
+  // const className = useComponentStyle(cssProps);
+
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
+
+  const className = useComponentStyle(stableLayoutCss);
+
+  const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
@@ -238,10 +245,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       extractResourceUrl,
       renderChild: memoedRenderChild,
       registerComponentApi: memoedRegisterComponentApi,
-      layoutCss: stableLayoutCss,
+      className,
       layoutContext: layoutContextRef?.current,
       uid,
     };
+
 
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
@@ -259,7 +267,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderedNode = renderer(rendererContext);
     }
 
-    const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.

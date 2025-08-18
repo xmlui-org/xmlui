@@ -76,14 +76,14 @@ export const LinkMd = createMetadata({
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <LinkNative
         to={extractValue(node.props.to)}
         icon={extractValue(node.props.icon)}
         active={extractValue.asOptionalBoolean(node.props.active, false)}
         target={extractValue(node.props?.target)}
-        style={layoutCss}
+        className={className}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
       >
         {node.props.label

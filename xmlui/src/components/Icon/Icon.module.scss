@@ -6,24 +6,26 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.base {
-  display: inline-block;
-  vertical-align: text-bottom;
-  color: inherit;
-  width: t.useVar(var(--icon-width), createThemeVar("size-Icon"));
-  height: t.useVar(var(--icon-height), createThemeVar("size-Icon"));
+@layer components {
+  .base {
+    display: inline-block;
+    vertical-align: text-bottom;
+    color: inherit;
+    width: t.useVar(var(--icon-width), createThemeVar("size-Icon"));
+    height: t.useVar(var(--icon-height), createThemeVar("size-Icon"));
 
-  // NOTE: browser compat problems with "revert-layer"
-  // NOTE #2: this solution is necessary because of the default stroke widths applied to our icons coming from react-icons:
-  // Different icons have different default stroke widths.
-  stroke-width: revert-layer;
+    // NOTE: browser compat problems with "revert-layer"
+    // NOTE #2: this solution is necessary because of the default stroke widths applied to our icons coming from react-icons:
+    // Different icons have different default stroke widths.
+    stroke-width: revert-layer;
 
-  &.clickable {
-    cursor: pointer;
-  }
+    &.clickable {
+      cursor: pointer;
+    }
 
-  * {
-    color: inherit !important;
+    * {
+      color: inherit !important;
+    }
   }
 }
 

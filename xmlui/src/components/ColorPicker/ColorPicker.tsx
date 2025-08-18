@@ -71,7 +71,7 @@ export const colorPickerComponentRenderer = createComponentRenderer(
   ({
     node,
     extractValue,
-    layoutCss,
+    className,
     state,
     lookupEventHandler,
     registerComponentApi,
@@ -89,7 +89,7 @@ export const colorPickerComponentRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
-        style={layoutCss}
+        className={className}
         required={extractValue.asOptionalBoolean(node.props?.required)}
         enabled={enabled && !readonly}
         autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}

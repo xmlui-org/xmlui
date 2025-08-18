@@ -98,14 +98,14 @@ export const DropdownMenuMd = createMetadata({
 export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
     return (
       <DropdownMenu
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
         label={extractValue(node.props?.label)}
         registerComponentApi={registerComponentApi}
         onWillOpen={lookupEventHandler("willOpen")}
-        style={layoutCss}
+        className={className}
         alignment={extractValue(node.props?.alignment)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
@@ -180,7 +180,7 @@ export const MenuItemMd = createMetadata({
 export const menuItemRenderer = createComponentRenderer(
   MICOMP,
   MenuItemMd,
-  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, layoutCss }) => {
+  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, className }) => {
     const clickEventHandler = lookupEventHandler("click");
 
     let clickHandler;
@@ -195,7 +195,7 @@ export const menuItemRenderer = createComponentRenderer(
       <MenuItem
         onClick={clickHandler}
         label={extractValue(node.props?.label)}
-        style={layoutCss}
+        className={className}
         iconPosition={extractValue(node.props.iconPosition)}
         icon={
           node.props?.icon && (

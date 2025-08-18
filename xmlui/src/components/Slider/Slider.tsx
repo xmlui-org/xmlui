@@ -147,7 +147,7 @@ export const sliderComponentRenderer = createComponentRenderer(
     extractValue,
     lookupEventHandler,
     lookupSyncCallback,
-    layoutCss,
+    className,
     updateState,
     state,
     registerComponentApi,
@@ -163,7 +163,7 @@ export const sliderComponentRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
-        style={layoutCss}
+        className={className}
         step={extractValue(node.props?.step)}
         min={extractValue(node.props?.minValue)}
         max={extractValue(node.props?.maxValue)}

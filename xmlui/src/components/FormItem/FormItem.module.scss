@@ -9,87 +9,89 @@ $themeVars: ();
 
 // TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
 
-.container {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: start;
-  gap: 0.5em;
-
-  &.top {
+@layer components {
+  .container {
+    display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: start;
-    justify-content: center;
-  }
-
-  &.end {
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: start;
     gap: 0.5em;
-  }
 
-  &.bottom {
-    flex-direction: column-reverse;
-    align-items: start;
-    justify-content: center;
-  }
-
-  &.start {
-    flex-direction: row;
-    align-items: center;
-    justify-content: start;
-    gap: 0.5em;
-  }
-
-  &.shrinkToLabel {
-    width: fit-content;
-  }
-
-  .itemWithLabel {
-    width: 100%;
-  }
-
-  .inputLabel {
-    display: flex;
-    color: createThemeVar("textColor-FormItemLabel");
-    font-family: createThemeVar("fontFamily-FormItemLabel");
-    font-size: createThemeVar("fontSize-FormItemLabel");
-    font-weight: createThemeVar("fontWeight-FormItemLabel");
-    font-style: createThemeVar("fontStyle-FormItemLabel");
-    text-transform: createThemeVar("textTransform-FormItemLabel");
-    user-select: none;
-    cursor: pointer;
-    word-break: normal;
-    white-space: nowrap;
-
-    &.disabled {
-      cursor: not-allowed;
-      color: t.$textColor--disabled;
+    &.top {
+      flex-direction: column;
+      align-items: start;
+      justify-content: center;
     }
 
-    &.labelBreak {
-      white-space: normal;
+    &.end {
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: start;
+      gap: 0.5em;
+    }
+
+    &.bottom {
+      flex-direction: column-reverse;
+      align-items: start;
+      justify-content: center;
+    }
+
+    &.start {
+      flex-direction: row;
+      align-items: center;
+      justify-content: start;
+      gap: 0.5em;
+    }
+
+    &.shrinkToLabel {
+      width: fit-content;
+    }
+
+    .itemWithLabel {
+      width: 100%;
+    }
+
+    .inputLabel {
+      display: flex;
+      color: createThemeVar("textColor-FormItemLabel");
+      font-family: createThemeVar("fontFamily-FormItemLabel");
+      font-size: createThemeVar("fontSize-FormItemLabel");
+      font-weight: createThemeVar("fontWeight-FormItemLabel");
+      font-style: createThemeVar("fontStyle-FormItemLabel");
+      text-transform: createThemeVar("textTransform-FormItemLabel");
+      user-select: none;
+      cursor: pointer;
       word-break: normal;
-      overflow-wrap: break-word;
-    }
+      white-space: nowrap;
 
-    &.required {
-      color: createThemeVar("textColor-FormItemLabel-required");
-      font-size: createThemeVar("fontSize-FormItemLabel-required");
-      font-weight: createThemeVar("fontWeight-FormItemLabel-required");
-      font-style: createThemeVar("fontStyle-FormItemLabel-required");
-      text-transform: createThemeVar("textTransform-FormItemLabel-required");
-    }
+      &.disabled {
+        cursor: not-allowed;
+        color: t.$textColor--disabled;
+      }
 
-    .requiredMark {
-      margin-left: 0.2em;
-      color: createThemeVar("textColor-FormItemLabel-requiredMark")
+      &.labelBreak {
+        white-space: normal;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+
+      &.required {
+        color: createThemeVar("textColor-FormItemLabel-required");
+        font-size: createThemeVar("fontSize-FormItemLabel-required");
+        font-weight: createThemeVar("fontWeight-FormItemLabel-required");
+        font-style: createThemeVar("fontStyle-FormItemLabel-required");
+        text-transform: createThemeVar("textTransform-FormItemLabel-required");
+      }
+
+      .requiredMark {
+        margin-left: 0.2em;
+        color: createThemeVar("textColor-FormItemLabel-requiredMark");
+      }
     }
   }
 }
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: t.json-stringify($themeVars)
+  themeVars: t.json-stringify($themeVars);
 }

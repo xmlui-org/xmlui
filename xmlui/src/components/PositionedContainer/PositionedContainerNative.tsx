@@ -5,25 +5,18 @@ import styles from "./PositionedContainer.module.scss";
 
 type Props = {
   children: ReactNode;
-  top: CSSProperties["top"];
-  right: CSSProperties["right"];
-  bottom: CSSProperties["bottom"];
-  left: CSSProperties["left"];
+  className?: string;
   visibleOnHover: boolean;
 };
 
 export function PositionedContainer({
   children,
-  top,
-  right,
-  bottom,
-  left,
+  className,
   visibleOnHover = false,
 }: Props) {
   return (
     <div
-      style={{ top, right, bottom, left }}
-      className={classnames(styles.wrapper, {
+      className={classnames(styles.wrapper, className, {
         [styles.visibleOnHover]: visibleOnHover,
       })}
     >

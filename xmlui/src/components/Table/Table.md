@@ -364,7 +364,7 @@ The default value is `false`.
 
 ```xmlui copy /isPaginated="true"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -424,7 +424,7 @@ The default value is `false`.
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -466,15 +466,15 @@ This property is useful when data is loaded conditionally or receiving it takes 
 
 %-PROP-END
 
-%-PROP-START pageSizes
+%-PROP-START pageSizeOptions
 
 Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
-```xmlui copy /pageSizes="{[3, 6, 12]}"/
+```xmlui copy /pageSizeOptions="{[3, 6, 12]}"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -482,7 +482,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 </App>
 ```
 
-```xmlui-pg name="Example: pageSizes"
+```xmlui-pg name="Example: pageSizeOptions"
 <App>
   <Table data='{[
   {
@@ -534,7 +534,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>

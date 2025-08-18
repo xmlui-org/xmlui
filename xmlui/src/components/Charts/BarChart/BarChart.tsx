@@ -93,10 +93,10 @@ export const BarChartMd = createMetadata({
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <BarChart
-        style={layoutCss}
+        className={className}
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
         tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}

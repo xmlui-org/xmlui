@@ -14,15 +14,14 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
-import { Table, defaultProps } from "./TableNative";
+import { Table, TablePaginationControlsLocationValues, defaultProps } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 
 const COMP = "Table";
 
 export const TableMd = createMetadata({
   status: "stable",
-  description:
-    "`Table` presents structured data for viewing, sorting, selection, and interaction.",
+  description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
   props: {
     items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +
@@ -45,7 +44,10 @@ export const TableMd = createMetadata({
     ),
     headerHeight: d(`This optional property is used to specify the height of the table header.`),
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
-    pageSizes: {
+    pageSize: d(
+      `This property defines the number of rows to display per page when pagination is enabled.`,
+    ),
+    pageSizeOptions: {
       description:
         "This property holds an array of page sizes (numbers) the user can select for " +
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
@@ -112,6 +114,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    paginationControlsLocation: {
+      description: `This property determines the location of the pagination controls.` +
+      ` It can be set to \`top\`, \`bottom\`, or \`both\`.`,
+      valueType: "string",
+      availableValues: TablePaginationControlsLocationValues,
+      defaultValue: defaultProps.paginationControlsLocation,
+    },
   },
   events: {
     sortingDidChange: d(
@@ -143,12 +152,14 @@ export const TableMd = createMetadata({
       signature: "getSelectedIds(): Array<string>",
     },
     selectAll: {
-      description: `This method selects all the rows in the table. This method has no effect if the ` +
+      description:
+        `This method selects all the rows in the table. This method has no effect if the ` +
         `rowsSelectable property is set to \`false\`.`,
       signature: "selectAll(): void",
     },
     selectId: {
-      description: `This method selects the row with the specified ID. This method has no effect if the ` +
+      description:
+        `This method selects the row with the specified ID. This method has no effect if the ` +
         `\`rowsSelectable\` property is set to \`false\`. The method argument can be a ` +
         `single id or an array of them.`,
       signature: "selectId(id: string | Array<string>): void",
@@ -194,7 +205,7 @@ const TableWithColumns = forwardRef(
       renderChild,
       lookupEventHandler,
       lookupSyncCallback,
-      layoutCss,
+      className,
       registerComponentApi,
     }: Pick<
       RendererContext,
@@ -202,7 +213,7 @@ const TableWithColumns = forwardRef(
       | "node"
       | "renderChild"
       | "lookupEventHandler"
-      | "layoutCss"
+      | "className"
       | "registerComponentApi"
       | "lookupSyncCallback"
     >,
@@ -282,10 +293,12 @@ const TableWithColumns = forwardRef(
           {renderChild(node.children)}
         </TableContext.Provider>
         <Table
+          className={className}
           ref={ref}
           data={data}
           columns={columns}
-          pageSizes={extractValue(node.props.pageSizes)}
+          pageSizeOptions={extractValue(node.props.pageSizeOptions)}
+          pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
           rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
           registerComponentApi={registerComponentApi}
           noDataRenderer={
@@ -307,7 +320,6 @@ const TableWithColumns = forwardRef(
           sortingDidChange={lookupEventHandler("sortingDidChange")}
           onSelectionDidChange={lookupEventHandler("selectionDidChange")}
           willSort={lookupEventHandler("willSort")}
-          style={layoutCss}
           uid={node.uid}
           autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
           hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
@@ -318,6 +330,9 @@ const TableWithColumns = forwardRef(
             node.props.alwaysShowSelectionHeader,
           )}
           noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
+          paginationControlsLocation={extractValue.asOptionalString(
+            node.props.paginationControlsLocation,
+          )}
         />
       </>
     );
@@ -339,7 +354,7 @@ export const tableComponentRenderer = createComponentRenderer(
     renderChild,
     lookupEventHandler,
     lookupSyncCallback,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return (
@@ -348,7 +363,7 @@ export const tableComponentRenderer = createComponentRenderer(
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
         lookupSyncCallback={lookupSyncCallback}
-        layoutCss={layoutCss}
+        className={className}
         renderChild={renderChild}
         registerComponentApi={registerComponentApi}
       />

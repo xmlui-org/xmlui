@@ -45,10 +45,10 @@ export const TreeDisplayMd = createMetadata({
 export const treeDisplayComponentRenderer = createComponentRenderer(
   COMP,
   TreeDisplayMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <TreeDisplay
-        style={layoutCss}
+        className={className}
         content={extractValue.asOptionalString(node.props.content)}
         itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
       >

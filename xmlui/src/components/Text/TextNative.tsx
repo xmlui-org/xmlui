@@ -17,6 +17,7 @@ type TextProps = {
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
   style?: CSSProperties;
+  className?: string;
   [variantSpecificProps: string]: any;
 };
 
@@ -32,6 +33,7 @@ export const Text = forwardRef(function Text(
     variant,
     maxLines = defaultProps.maxLines,
     style,
+    className,
     children,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
@@ -55,7 +57,7 @@ export const Text = forwardRef(function Text(
       <Element
         {...restVariantSpecificProps}
         ref={ref as any}
-        className={classnames([
+        className={classnames(
           syntaxHighlightClasses,
           styles.text,
           styles[variant || "default"],
@@ -64,7 +66,8 @@ export const Text = forwardRef(function Text(
             [styles.preserveLinebreaks]: preserveLinebreaks,
             [styles.noEllipsis]: !ellipses,
           },
-        ])}
+          className,
+        )}
         style={{
           ...style,
           ...getMaxLinesStyle(maxLines),

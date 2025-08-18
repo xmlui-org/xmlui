@@ -118,7 +118,7 @@ export const AppHeader = ({
               <>
                 {!!logoUrl && (
                   <div className={styles.logoContainer}>
-                    <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
+                    <NavLink to={"/"} displayActive={false} className={styles.logoLink}>
                       <Logo />
                     </NavLink>
                   </div>

@@ -17,125 +17,134 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
 $alignment-content-AppHeader: createThemeVar("alignment-content-#{$component}");
 
-.header {
-  position: relative;
-  height: createThemeVar("height-#{$component}");
-  box-sizing: content-box;
-  background-color: createThemeVar("backgroundColor-#{$component}");
-  @include t.borderVars($themeVars, $component);
-}
 
-.headerInner {
-  height: 100%;
-  flex: 1;
-  gap: t.$space-4;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  max-width: createThemeVar("maxWidth-content-#{$component}");
-  padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
-  @include t.paddingVars($themeVars, $component);
-
-  &.full {
-    max-width: createThemeVar("maxWidth-#{$component}");
-  }
-  width: 100%;
-  margin: 0 auto;
-}
-
-.childrenWrapper {
-  --stack-gap-default: #{t.$space-2};
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  align-items: center;
-  gap: var(--stack-gap-default);
-  justify-content: $alignment-content-AppHeader;
-}
-
-.subNavPanelSlot{
-  display: flex;
-  flex-direction: row;
-}
-
-.logoAndTitle {
-  display: flex;
-  align-items: center;
-  gap: t.$space-4;
-  height: 100%;
-
-  &:not(:empty) {
-    padding-right: t.$space-2;
+@layer components {
+  .header {
+    position: relative;
+    height: createThemeVar("height-#{$component}");
+    box-sizing: content-box;
+    background-color: createThemeVar("backgroundColor-#{$component}");
+    @include t.borderVars($themeVars, $component);
   }
 
-  &:empty {
-    display: none;
-  }
-}
-
-.logoContainer:not(:empty) {
-  flex-shrink: 0;
-  display: flex;
-  width: $width-logo-AppHeader;
-  height: 100%;
-  align-items: center;
-  @include t.paddingVars($themeVars, "logo-#{$component}");
-}
-
-.customLogoContainer {
-  display: flex;
-  height: 100%;
-  align-items: center;
-
-  & > img {
+  .headerInner {
     height: 100%;
-  }
-}
+    flex: 1;
+    gap: t.$space-4;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    max-width: createThemeVar("maxWidth-content-#{$component}");
+    padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
+    @include t.paddingVars($themeVars, $component);
 
-.rightItems {
-  --stack-gap-default: #{t.$space-2};
-  gap: var(--stack-gap-default);
-  height: 100%;
-
-  &:not(:empty) {
-    padding-left: t.$space-4;
-  }
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.appHub {
-  text-decoration: none;
-  margin-right: t.$space-4;
-  width: 40px;
-  padding: t.$space-2;
-  color: t.$textColor-subtitle;
-  cursor: pointer;
-
-  &:hover {
-    color: t.$textColor-secondary;
-  }
-
-  svg {
+    &.full {
+      max-width: createThemeVar("maxWidth-#{$component}");
+    }
     width: 100%;
+    margin: 0 auto;
+  }
+
+  .childrenWrapper {
+    --stack-gap-default: #{t.$space-2};
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-width: 0;
     height: 100%;
+    align-items: center;
+    gap: var(--stack-gap-default);
+    justify-content: $alignment-content-AppHeader;
+  }
+
+  .subNavPanelSlot{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .logoAndTitle {
+    display: flex;
+    align-items: center;
+    gap: t.$space-4;
+    height: 100%;
+
+    &:not(:empty) {
+      padding-right: t.$space-2;
+    }
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .logoContainer:not(:empty) {
+    flex-shrink: 0;
+    display: flex;
+    width: $width-logo-AppHeader;
+    height: 100%;
+    align-items: center;
+    @include t.paddingVars($themeVars, "logo-#{$component}");
+  }
+
+  .customLogoContainer {
+    display: flex;
+    height: 100%;
+    align-items: center;
+
+    & > img {
+      height: 100%;
+    }
+  }
+
+  .rightItems {
+    --stack-gap-default: #{t.$space-2};
+    gap: var(--stack-gap-default);
+    height: 100%;
+
+    &:not(:empty) {
+      padding-left: t.$space-4;
+    }
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .appHub {
+    text-decoration: none;
+    margin-right: t.$space-4;
+    width: 40px;
+    padding: t.$space-2;
+    color: t.$textColor-subtitle;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$textColor-secondary;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .drawerToggle.drawerToggle{
+    padding: createThemeVar("padding-drawerToggle-#{$component}") !important;
+    display: none;
+    @include t.withMaxScreenSize(2) {
+      display: block;
+    }
+  }
+
+  .logoLink{
+    padding: 0;
+    height: 100%;
+    &>:first-child {
+      height: 100%;
+    }
   }
 }
-
-.drawerToggle.drawerToggle{
-  padding: createThemeVar("padding-drawerToggle-#{$component}") !important;
-  display: none;
-  @include t.withMaxScreenSize(2) {
-    display: block;
-  }
-}
-
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {

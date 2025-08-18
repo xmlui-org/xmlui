@@ -33,10 +33,10 @@ export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, layoutCss } = rendererContext;
+    const { node, renderChild, extractValue, className } = rendererContext;
     return (
       <AccordionItemComponent
-        style={layoutCss}
+        className={className}
         id={extractValue(node.uid)}
         header={extractValue(node.props.header)}
         initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}

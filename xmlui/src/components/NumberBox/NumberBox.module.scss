@@ -62,79 +62,81 @@ $componentName: "NumberBox";
   }
 }
 
-.inputRoot {
-  display: flex;
-  align-items: center;
-  gap: createThemeVar("Input:gap-adornment-#{$componentName}");
-  width: 100%;
-  border-style: solid;
-  border-width: 1px;
-  transition: background-color ease-in 0.1s;
-  overflow: hidden;
-
-  @include variant("default");
-
-  &.error {
-    @include variant("error");
-  }
-  &.warning {
-    @include variant("warning");
-  }
-  &.valid {
-    @include variant("success");
-  }
-
-  &:has(.input:is(:disabled)) {
-    cursor: not-allowed;
-    background-color: createThemeVar("Input:backgroundColor-NumberBox--disabled");
-    color: createThemeVar("Input:textColor-NumberBox--disabled");
-    border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
-  }
-
-  .input {
-    font-size: inherit;
-    color: inherit;
-    border: 0;
-    outline: none;
-    background-color: transparent;
-    padding: 0;
-    width: 100%;
-    cursor: inherit;
-
-    /* Remove default spinners */
-    /* Chrome, Safari, Edge, Opera */
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    /* Firefox */
-    -webkit-appearance: textfield;
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  .spinnerBox {
+@layer components {
+  .inputRoot {
     display: flex;
-    flex-direction: column;
-    height: 0;
     align-items: center;
-    justify-content: center;
+    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    transition: background-color ease-in 0.1s;
+    overflow: hidden;
+
+    @include variant("default");
+
+    &.error {
+      @include variant("error");
+    }
+    &.warning {
+      @include variant("warning");
+    }
+    &.valid {
+      @include variant("success");
+    }
+
+    &:has(.input:is(:disabled)) {
+      cursor: not-allowed;
+      background-color: createThemeVar("Input:backgroundColor-NumberBox--disabled");
+      color: createThemeVar("Input:textColor-NumberBox--disabled");
+      border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
+    }
+
+    .input {
+      font-size: inherit;
+      color: inherit;
+      border: 0;
+      outline: none;
+      background-color: transparent;
+      padding: 0;
+      width: 100%;
+      cursor: inherit;
+
+      /* Remove default spinners */
+      /* Chrome, Safari, Edge, Opera */
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      /* Firefox */
+      -webkit-appearance: textfield;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .spinnerBox {
+      display: flex;
+      flex-direction: column;
+      height: 0;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinnerButton {
+      padding: 0 !important;
+      width: t.$space-6;
+      border: none;
+
+      // &:hover {
+      //   background-color: transparent !important;
+      // }
+    }
   }
 
-  .spinnerButton {
-    padding: 0 !important;
-    width: t.$space-6;
-    border: none;
-
-    // &:hover {
-    //   background-color: transparent !important;
-    // }
+  .readOnly {
+    cursor: text;
   }
-}
-
-.readOnly {
-  cursor: text;
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -4,6 +4,7 @@ import Color from "color";
 
 import { getVarKey } from "../theming/themeVars";
 import { EMPTY_OBJECT } from "../constants";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 
 /**
  * Converts a string to its kebab-case representation
@@ -174,3 +175,20 @@ export const useScrollbarWidth = () => {
   }
   return widthRef.current;
 };
+
+export function extractPaddings(extractValue: ValueExtractor, props) {
+  const paddingHorizontal = extractValue.asSize(props.paddingHorizontal);
+  const paddingVertical = extractValue.asSize(props.paddingVertical);
+  const paddingLeft = extractValue.asSize(props.paddingLeft);
+  const paddingRight = extractValue.asSize(props.paddingRight);
+  const paddingTop = extractValue.asSize(props.paddingTop);
+  const paddingBottom = extractValue.asSize(props.paddingBottom);
+  const padding = extractValue.asSize(props.padding);
+
+  return {
+    paddingLeft: paddingLeft || paddingHorizontal || padding,
+    paddingRight: paddingRight || paddingHorizontal || padding,
+    paddingTop: paddingTop || paddingVertical || padding,
+    paddingBottom: paddingBottom || paddingVertical || padding,
+  };
+}

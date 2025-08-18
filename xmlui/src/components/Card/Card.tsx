@@ -89,10 +89,10 @@ export const CardMd = createMetadata({
 export const cardComponentRenderer = createComponentRenderer(
   "Card",
   CardMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <Card
-        style={layoutCss}
+        className={className}
         title={extractValue.asOptionalString(node.props.title)}
         linkTo={extractValue.asOptionalString(node.props.linkTo)}
         subtitle={extractValue.asOptionalString(node.props.subtitle)}

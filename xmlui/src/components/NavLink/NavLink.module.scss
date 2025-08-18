@@ -38,166 +38,169 @@ $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}
 
 $transition: color 0.1s, background-color 0.1s;
 
-.content {
-  --nav-link-level: 0;
-  &.base {
-    &::before{
-      content: "";
-      width: calc(var(--nav-link-level) * 1em);
-      display: block;
-      flex-shrink: 0;
-    }
-    @include t.borderVars($themeVars, $component);
-    @include t.paddingVars($themeVars, $component);
-    outline: inherit;
-    text-decoration: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-size: $fontSize-NavLink;
-    font-weight: $fontWeight-NavLink;
-    font-family: $fontFamily-NavLink;
-    word-wrap: $wordWrap-NavLink;
-    position: relative;
-    transition: $transition;
-    color: $textColor-NavLink;
-    background-color: $backgroundColor-NavLink;
-    flex-shrink: 0;
-    white-space: nowrap;
-
-    .icon {
-      color: $color-icon-NavLink;
-    }
-
-    * {
-      color: $textColor-NavLink;
-    }
-
-    &.includeHoverIndicator {
-      &:after {
-        transition: $transition;
-        position: absolute;
-        left: 0.1em;
-        right: 0.1em;
-        bottom: 0;
-        height: $thickness-indicator-NavLink;
-        border-radius: $borderRadius-indicator-NavLink;
+@layer components {
+  .content {
+    --nav-link-level: 0;
+    &.base {
+      &::before{
         content: "";
+        width: calc(var(--nav-link-level) * 1em);
+        display: block;
+        flex-shrink: 0;
       }
-    }
+      @include t.borderVars($themeVars, $component);
+      @include t.paddingVars($themeVars, $component);
+      outline: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: $fontSize-NavLink;
+      font-weight: $fontWeight-NavLink;
+      font-family: $fontFamily-NavLink;
+      word-wrap: $wordWrap-NavLink;
+      position: relative;
+      transition: $transition;
+      color: $textColor-NavLink;
+      background-color: $backgroundColor-NavLink;
+      flex-shrink: 0;
+      white-space: nowrap;
 
-    &:hover,
-    &:focus-visible {
-      color: $textColor-NavLink--hover;
-      background-color: $backgroundColor-NavLink--hover;
+      .icon {
+        color: $color-icon-NavLink;
+      }
+
       * {
+        color: $textColor-NavLink;
+      }
+
+      &.includeHoverIndicator {
+        &:after {
+          transition: $transition;
+          position: absolute;
+          left: 0.1em;
+          right: 0.1em;
+          bottom: 0;
+          height: $thickness-indicator-NavLink;
+          border-radius: $borderRadius-indicator-NavLink;
+          content: "";
+        }
+      }
+
+      &:hover,
+      &:focus-visible {
         color: $textColor-NavLink--hover;
+        background-color: $backgroundColor-NavLink--hover;
+        * {
+          color: $textColor-NavLink--hover;
+        }
+        &:after {
+          background-color: $color-indicator-NavLink--hover;
+        }
       }
-      &:after {
-        background-color: $color-indicator-NavLink--hover;
-      }
-    }
 
 
-    &:focus-visible{
-      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
-      outline-color: createThemeVar('outlineColor-#{$component}--focus');
-      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
-      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
-    }
-
-    &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
-      outline: none;
-      &:not(:hover):focus-visible{
+      &:focus-visible{
         outline-width: createThemeVar('outlineWidth-#{$component}--focus');
         outline-color: createThemeVar('outlineColor-#{$component}--focus');
         outline-style: createThemeVar('outlineStyle-#{$component}--focus');
         outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
       }
-    }
 
-    &:active.displayActive {
-      color: $textColor-NavLink--pressed;
-      background-color: $backgroundColor-NavLink--pressed;
-      font-weight: $fontWeight-NavLink--pressed;
-      * {
-        font-weight: $fontWeight-NavLink--pressed;
-        color: $textColor-NavLink--pressed;
-      }
-      &:after {
-        background-color: $color-indicator-NavLink--pressed;
-      }
-    }
-
-    &.navItemActive {
-      color: $textColor-NavLink--active;
-      background-color: $backgroundColor-NavLink--active;
-      font-weight: $fontWeight-NavLink--active;
-      * {
-        font-weight: $fontWeight-NavLink--active;
-        color: $textColor-NavLink--active;
-      }
-      & > * {
-        z-index: 1;
-      }
-      &:hover {
-        color: $textColor-NavLink--hover--active;
-        background-color: $backgroundColor-NavLink--hover--active;
-        * {
-          color: $textColor-NavLink--hover--active;
+      &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
+        outline: none;
+        &:not(:hover):focus-visible{
+          outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+          outline-color: createThemeVar('outlineColor-#{$component}--focus');
+          outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+          outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
         }
       }
-      &:after {
-        z-index: 0;
-        background-color: $color-indicator-NavLink--active;
-      }
 
-      &:active {
-        color: $textColor-NavLink--pressed--active;
-        background-color: $backgroundColor-NavLink--pressed--active;
+      &:active.displayActive {
+        color: $textColor-NavLink--pressed;
+        background-color: $backgroundColor-NavLink--pressed;
         font-weight: $fontWeight-NavLink--pressed;
         * {
           font-weight: $fontWeight-NavLink--pressed;
-          color: $textColor-NavLink--pressed--active;
+          color: $textColor-NavLink--pressed;
         }
         &:after {
           background-color: $color-indicator-NavLink--pressed;
         }
       }
-    }
 
-    &.disabled {
-      cursor: not-allowed;
-      color: t.$textColor--disabled;
-    }
+      &.navItemActive {
+        color: $textColor-NavLink--active;
+        background-color: $backgroundColor-NavLink--active;
+        font-weight: $fontWeight-NavLink--active;
+        * {
+          font-weight: $fontWeight-NavLink--active;
+          color: $textColor-NavLink--active;
+        }
+        & > * {
+          z-index: 1;
+        }
+        &:hover {
+          color: $textColor-NavLink--hover--active;
+          background-color: $backgroundColor-NavLink--hover--active;
+          * {
+            color: $textColor-NavLink--hover--active;
+          }
+        }
+        &:after {
+          z-index: 0;
+          background-color: $color-indicator-NavLink--active;
+        }
 
-    &.vertical {
-      &:after {
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: auto;
-        width: $thickness-indicator-NavLink;
-        height: auto;
-        border-radius: $borderRadius-indicator-NavLink;
+        &:active {
+          color: $textColor-NavLink--pressed--active;
+          background-color: $backgroundColor-NavLink--pressed--active;
+          font-weight: $fontWeight-NavLink--pressed;
+          * {
+            font-weight: $fontWeight-NavLink--pressed;
+            color: $textColor-NavLink--pressed--active;
+          }
+          &:after {
+            background-color: $color-indicator-NavLink--pressed;
+          }
+        }
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        color: t.$textColor--disabled;
+      }
+
+      &.vertical {
+        &:after {
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: auto;
+          width: $thickness-indicator-NavLink;
+          height: auto;
+          border-radius: $borderRadius-indicator-NavLink;
+        }
+      }
+
+      &.indented {
+        padding-left: 2.4em;
+        flex-shrink: 0;
       }
     }
+  }
 
-    &.indented {
-      padding-left: 2.4em;
-      flex-shrink: 0;
-    }
+  .innerContent{
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    flex: 1;
+    white-space: break-spaces;
+    overflow-wrap: anywhere;
   }
 }
 
-.innerContent{
-  display: flex;
-  align-items: center;
-  gap: t.$space-2;
-  flex: 1;
-  white-space: break-spaces;
-  overflow-wrap: anywhere;
-}
 
 // --- We export the theme variables to add them to the component renderer
 :export {

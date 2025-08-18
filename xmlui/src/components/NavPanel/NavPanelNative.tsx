@@ -273,12 +273,13 @@ export const NavPanel = forwardRef(function NavPanel(
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
   // Register the linkMap when navLinks change
+  const registerLinkMap = linkInfoContext?.registerLinkMap;
   useEffect(() => {
-    if (linkInfoContext?.registerLinkMap && navLinks) {
+    if (registerLinkMap && navLinks) {
       const linkMap = buildLinkMap(navLinks);
-      linkInfoContext.registerLinkMap(linkMap);
+      registerLinkMap(linkMap);
     }
-  }, [navLinks, linkInfoContext?.registerLinkMap]);
+  }, [navLinks, registerLinkMap]);
 
   if (inDrawer) {
     return (

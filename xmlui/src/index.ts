@@ -49,6 +49,8 @@ import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerBut
 import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { StyleProvider } from "./components-core/theming/StyleContext";
+import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
 import { createMetadata, d } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
@@ -108,6 +110,8 @@ export {
   Logo,
   useSearchContextContent,
   useAppLayoutContext,
+  StyleProvider,
+  StyleRegistry,
   useEvent,
   StandaloneComponent,
 };

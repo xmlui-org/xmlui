@@ -11,72 +11,74 @@ $component: "TreeDisplay";
 $fontSize-TreeDisplay: createThemeVar("fontSize-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, $component);
 
-.treeDisplay {
-  display: block;
-  @include t.borderVars($themeVars, $component);
-  background-color: createThemeVar("backgroundColor-#{$component}");
-  padding: createThemeVar("padding-#{$component}");
-  padding-left: createThemeVar("paddingLeft-#{$component}");
-}
+@layer components {
+  .treeDisplay {
+    display: block;
+    @include t.borderVars($themeVars, $component);
+    background-color: createThemeVar("backgroundColor-#{$component}");
+    padding: createThemeVar("padding-#{$component}");
+    padding-left: createThemeVar("paddingLeft-#{$component}");
+  }
 
-.content {
-  display: block;
-  word-break: break-word;
-  font-family: createThemeVar("fontFamily-#{$component}");
-  font-size: $fontSize-TreeDisplay;
-  color: createThemeVar("color-#{$component}");
-}
+  .content {
+    display: block;
+    word-break: break-word;
+    font-family: createThemeVar("fontFamily-#{$component}");
+    font-size: $fontSize-TreeDisplay;
+    color: createThemeVar("color-#{$component}");
+  }
 
-.treeNode {
-  position: relative;
-  padding: 0;
-  margin: 0;
-}
+  .treeNode {
+    position: relative;
+    padding: 0;
+    margin: 0;
+  }
 
-.treeNodeRow {
-  display: flex;
-  align-items: center;
-  position: relative;
-  margin: 0;
-}
+  .treeNodeRow {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 0;
+  }
 
-.connectorArea {
-  position: relative;
-  flex-shrink: 0;
-}
+  .connectorArea {
+    position: relative;
+    flex-shrink: 0;
+  }
 
-.connector {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
+  .connector {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 
-.connectorLine {
-  stroke: createThemeVar("color-connect-#{$component}");
-  fill: none;
-}
+  .connectorLine {
+    stroke: createThemeVar("color-connect-#{$component}");
+    fill: none;
+  }
 
-.ancestorLine {
-  position: absolute;
-  top: 0;
-  width: 1.5px;
-  height: 100%;
-  background-color: createThemeVar("color-connect-#{$component}");
-  z-index: 1;
-  pointer-events: none;
-}
+  .ancestorLine {
+    position: absolute;
+    top: 0;
+    width: 1.5px;
+    height: 100%;
+    background-color: createThemeVar("color-connect-#{$component}");
+    z-index: 1;
+    pointer-events: none;
+  }
 
-.treeNodeContent {
-  padding: 0 4px;
-  display: inline-block;
-  position: relative;
-  z-index: 2;
-}
+  .treeNodeContent {
+    padding: 0 4px;
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+  }
 
-.childrenContainer {
-  position: relative;
-  margin: 0;
-  padding: 0;
+  .childrenContainer {
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

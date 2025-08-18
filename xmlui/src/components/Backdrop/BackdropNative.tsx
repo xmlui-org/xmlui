@@ -1,9 +1,11 @@
 import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode } from "react";
 
 import styles from "./Backdrop.module.scss";
+import classNames from "classnames";
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   children?: ReactNode;
   overlayTemplate?: ReactNode;
   opacity?: string;
@@ -13,6 +15,7 @@ type Props = {
 export const Backdrop = forwardRef(function Backdrop(
   {
     style,
+    className,
     children,
     overlayTemplate,
     backgroundColor,
@@ -20,15 +23,14 @@ export const Backdrop = forwardRef(function Backdrop(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const styleWithoutDims = { ...style, width: undefined };
   return (
     <div
-      className={styles.backdropContainer}
-      style={{ width: style.width ?? "fit-content" }}
+      className={classNames(styles.backdropContainer, className)}
       ref={forwardedRef}
+      style={style}
     >
       {children}
-      <div className={styles.backdrop} style={{ ...styleWithoutDims, backgroundColor, opacity }} />
+      <div className={styles.backdrop} style={{ backgroundColor, opacity }} />
       {overlayTemplate && <div className={styles.overlay}>{overlayTemplate}</div>}
     </div>
   );

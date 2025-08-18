@@ -9,6 +9,7 @@ export type Option = {
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
+  className?: string;
   readOnly?: boolean;
   keywords?: string[];
   children?: ReactNode;

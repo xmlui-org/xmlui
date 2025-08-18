@@ -15,17 +15,18 @@ type CodeBlockProps = {
   textToCopy?: string;
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;
+  className?: string;
 };
 
 export const defaultProps = {
   // No default props needed for this component currently
 };
 
-export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
+export function CodeBlock({ children, meta, textToCopy, style, className }: CodeBlockProps) {
   // 'global-codeBlock' class is there so we could apply styles if this codeblock is used inside a splitView nested app
   if (!meta) {
     return (
-      <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
+      <div className={classnames(className, styles.codeBlock, 'global-codeBlock')} style={style}>
         <div className={styles.codeBlockContent}>
           {children}
         </div>

@@ -662,7 +662,7 @@ test.describe("Component APIs", () => {
           pageSize="10" 
           pageIndex="2"
         />
-        <Button onClick="testState = pagination.currentPage()">Get Current Page</Button>
+        <Button onClick="testState = pagination.currentPage">Get Current Page</Button>
       </Fragment>
     `);
     
@@ -678,7 +678,7 @@ test.describe("Component APIs", () => {
           itemCount="50" 
           pageSize="15"
         />
-        <Button onClick="testState = pagination.currentPageSize()">Get Page Size</Button>
+        <Button onClick="testState = pagination.currentPageSize">Get Page Size</Button>
       </Fragment>
     `);
     

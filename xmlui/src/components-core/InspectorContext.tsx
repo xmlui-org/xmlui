@@ -1,5 +1,6 @@
-import React, {
+import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -15,7 +16,7 @@ import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./InspectorButton.module.scss";
-import { ProjectCompilation } from "../abstractions/scripting/Compilation";
+import type { ProjectCompilation } from "../abstractions/scripting/Compilation";
 import { InspectorDialog } from "./devtools/InspectorDialog";
 import AppWithCodeViewNative from "../components/NestedApp/AppWithCodeViewNative";
 import { XmlUiHelper } from "../parsers/xmlui-parser";
@@ -48,7 +49,7 @@ export function InspectorProvider({
   projectCompilation,
   mockApi,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   sources?: Record<string, string>;
   projectCompilation?: ProjectCompilation;
   mockApi?: any;

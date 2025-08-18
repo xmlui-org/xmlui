@@ -19,13 +19,10 @@ export const PositionedContainerMd = createMetadata({
 export const positionedContainerComponentRenderer = createComponentRenderer(
   COMP,
   PositionedContainerMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <PositionedContainer
-        top={layoutCss.top}
-        right={layoutCss.right}
-        bottom={layoutCss.bottom}
-        left={layoutCss.left}
+        className={className}
         visibleOnHover={extractValue.asOptionalBoolean(node.props.visibleOnHover)}
       >
         {renderChild(node.children)}
