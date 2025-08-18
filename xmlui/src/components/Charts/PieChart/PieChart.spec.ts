@@ -42,7 +42,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -56,7 +57,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -71,7 +73,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -90,7 +93,8 @@ test.describe("data handling", () => {
         nameKey="name"
         dataKey="value"
         data="{${emptyData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -104,7 +108,8 @@ test.describe("data handling", () => {
         nameKey="name"
         dataKey="value"
         data="{${singlePointData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -118,7 +123,8 @@ test.describe("data handling", () => {
         nameKey="name"
         dataKey="value"
         data="{null}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -132,7 +138,8 @@ test.describe("data handling", () => {
         nameKey="name"
         dataKey="value"
         data="{${largeDataset}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -150,7 +157,8 @@ test.describe("legend", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -165,7 +173,8 @@ test.describe("legend", () => {
         dataKey="value"
         data="{${sampleData}}"
         showLegend
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -183,7 +192,8 @@ test.describe("tooltip", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -202,7 +212,8 @@ test.describe("tooltip", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -228,7 +239,8 @@ test.describe("labels", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -245,7 +257,8 @@ test.describe("labels", () => {
         dataKey="value"
         data="{${sampleData}}"
         showLabel="{false}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -262,7 +275,8 @@ test.describe("labels", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -280,7 +294,8 @@ test.describe("labels", () => {
         data="{${sampleData}}"
         showLabel="{false}"
         showLabelList
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -299,7 +314,8 @@ test.describe("labels", () => {
         showLabel="{false}"
         showLabelList
         labelListPosition="outside"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -319,7 +335,8 @@ test.describe("radius configuration", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -334,7 +351,8 @@ test.describe("radius configuration", () => {
         dataKey="value"
         data="{${sampleData}}"
         outerRadius="{100}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -349,7 +367,8 @@ test.describe("radius configuration", () => {
         dataKey="value"
         data="{${sampleData}}"
         innerRadius="{50}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -366,7 +385,8 @@ test.describe("radius configuration", () => {
         data="{${sampleData}}"
         innerRadius="{40}"
         outerRadius="{80}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -384,7 +404,8 @@ test.describe("responsive behavior", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '200px', height: '200px'}}"
+        width="200px"
+        height="200px"
       />
     `);
     
@@ -399,7 +420,8 @@ test.describe("responsive behavior", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '100px', height: '100px'}}"
+        width="100px"
+        height="100px"
       />
     `);
     
@@ -414,7 +436,8 @@ test.describe("responsive behavior", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '800px', height: '600px'}}"
+        width="800px"
+        height="600px"
       />
     `);
     
@@ -429,7 +452,8 @@ test.describe("responsive behavior", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '600px', height: '300px'}}"
+        width="600px"
+        height="300px"
       />
     `);
     
@@ -448,7 +472,8 @@ test.describe("interaction", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -469,7 +494,8 @@ test.describe("interaction", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -498,7 +524,8 @@ test.describe("children support", () => {
         nameKey="name"
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       >
         <Text>Chart Title</Text>
       </PieChart>
@@ -519,7 +546,8 @@ test.describe("edge cases", () => {
       <PieChart
         nameKey="name"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -533,7 +561,8 @@ test.describe("edge cases", () => {
       <PieChart
         dataKey="value"
         data="{${sampleData}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -554,7 +583,8 @@ test.describe("edge cases", () => {
         nameKey="name"
         dataKey="value"
         data="{${dataWithMissingValues}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -576,7 +606,8 @@ test.describe("edge cases", () => {
         nameKey="name"
         dataKey="value"
         data="{${dataWithZeros}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -598,7 +629,8 @@ test.describe("edge cases", () => {
         nameKey="name"
         dataKey="value"
         data="{${dataWithNegatives}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
@@ -620,7 +652,8 @@ test.describe("edge cases", () => {
         nameKey="name"
         dataKey="value"
         data="{${dataWithLargeValues}}"
-        style="{{width: '400px', height: '400px'}}"
+        width="400px"
+        height="400px"
       />
     `);
     
