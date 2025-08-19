@@ -136,7 +136,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
           background-color: createThemeVar("backgroundColor-#{$componentItem}--active");
 
           .link {
-            color: createThemeVar("color-#{$componentItem}--active");
+            color: createThemeVar("textColor-#{$componentItem}--active");
             font-weight: createThemeVar("fontWeight-#{$componentItem}--active");
 
             &.head_1 {

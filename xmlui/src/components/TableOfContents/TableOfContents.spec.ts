@@ -17,9 +17,7 @@ test.describe("Basic Functionality", () => {
             <Heading value="Third Heading" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>`);
 
@@ -44,9 +42,7 @@ test.describe("Basic Functionality", () => {
             </Bookmark>
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `);
@@ -76,9 +72,7 @@ test.describe("Basic Functionality", () => {
             </Bookmark>
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `);
@@ -107,9 +101,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h2" value="Section C" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -152,9 +144,7 @@ test.describe("Basic Functionality", () => {
               </Bookmark>
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -190,9 +180,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h2" value="Thirsd Section" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -229,9 +217,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h6" value="H6 Title" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents maxHeadingLevel="{3}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -256,9 +242,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h3" value="Hidden H3" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents maxHeadingLevel="{1}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -291,9 +275,7 @@ test.describe("Basic Functionality", () => {
               </Bookmark>
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents maxHeadingLevel="{2}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -318,9 +300,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h3" value="H3 Title" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents omitH1="{true}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -340,9 +320,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h2" value="Section Title" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents omitH1="{false}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -368,9 +346,7 @@ test.describe("Basic Functionality", () => {
               </Bookmark>
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents omitH1="{true}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -392,9 +368,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h2" value="Another Section" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents smoothScrolling="{true}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -416,9 +390,7 @@ test.describe("Basic Functionality", () => {
               <Heading level="h2" value="Another Section" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents smoothScrolling="{false}" />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -451,9 +423,7 @@ test.describe("Accessibility", () => {
             <Heading level="h2" value="Second Section" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `);
@@ -493,9 +463,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h1" value="Test Heading" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -540,9 +508,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h2" value="Test Heading" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -577,9 +543,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h1" value="Level 1 Heading" />
             <Heading level="h1" value="Active Heading " />
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -612,9 +576,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h2" value="Level 2 Heading" />
             <Heading level="h2" value="Active heading" />
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -647,9 +609,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h6" value="Level 6 Heading" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -684,9 +644,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h2" value="Hover Test" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -727,9 +685,7 @@ test.describe("Theme Variables", () => {
             <Heading level="h3" value="Another Section" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `,
@@ -746,7 +702,7 @@ test.describe("Theme Variables", () => {
     await activeLink.click();
 
     const activeListItem = page.locator("[class*='active']").first();
-    const activeLinkElement = activeListItem.locator("a");
+    const activeLinkElement = activeListItem.getByRole("link");
 
     await Promise.all([
       expect(activeListItem).toHaveCSS("background-color", "rgb(150, 150, 255)"),
@@ -772,9 +728,7 @@ test.describe("Other Edge Cases", () => {
               <Heading level="h2" value="测试标题-émojis🚀" />
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -799,9 +753,7 @@ test.describe("Other Edge Cases", () => {
               </Bookmark>
               bottom of the page text
             </VStack>
-            <StickyBox to="top">
               <TableOfContents />
-            </StickyBox>
           </HStack>
         </Page>
       `);
@@ -825,9 +777,7 @@ test.describe("Other Edge Cases", () => {
             <Text>Just some text content</Text>
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
-            <TableOfContents />
-          </StickyBox>
+          <TableOfContents />
         </HStack>
       </Page>
     `);
@@ -846,9 +796,7 @@ test.describe("Other Edge Cases", () => {
             <Heading level="h2" value="Test Heading" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
             <TableOfContents maxHeadingLevel="{null}" omitH1="{null}" smoothScrolling="{null}" />
-          </StickyBox>
         </HStack>
       </Page>
     `);
@@ -871,9 +819,7 @@ test.describe("Other Edge Cases", () => {
             <Heading level="h2" value="Test H2" />
             bottom of the page text
           </VStack>
-          <StickyBox to="top">
             <TableOfContents maxHeadingLevel="{undefined}" omitH1="{undefined}" smoothScrolling="{undefined}" />
-          </StickyBox>
         </HStack>
       </Page>
     `);
