@@ -1014,3 +1014,59 @@ See also the [refactoring](/refactoring) guide. Briefly: props flow down, events
   }
 }
 ```
+
+## How to integrate pagination with Lists and Tables
+
+XMLUI provides a `Pagination` component that can be used to display visual controls for the pagination feature, no matter whether it is handled inside or outside of a layout component requiring that feature.
+
+### Table
+
+The [`Table`](./table) component provides out-of-the-box support for pagination,
+so you can access pagination options via the following properties: `isPaginated`, `pageSize`, `pageSizeOptions`, `paginationControlsLocation`.
+
+```xmlui noHeader copy 
+<Table
+  data="/api/endpoint"
+  isPaginated
+  pageSize="10"
+  pageSizeOptions="{[5, 10, 20, 30]}"
+  paginationControlsLocation="both"
+>
+    ...
+</Table>
+```
+
+### General Pattern
+
+Other components, such as the `List`, can be hooked up with pagination using a `DataSource` combined with the `Pagination` component. This pattern works as a more generic solution where either the component does not have pagination implemented in the component itself, or you wish to use custom pagination logic.
+
+In this case the `DataSource` component does the heavy lifting by querying the page index, the previous and next page IDs. This can be done using variables and query parameters.
+
+> **NOTE:** The `Pagination` component currently has to know about the exact number of all items.
+> In the future, the component will handle unknown number of pages.
+
+```xmlui noHeader copy
+<Stack
+  var.pageSize="{10}"
+  var.currentPage="{0}"
+  var.before="{0}"
+  var.after="{pageSize-1}"
+>
+  <DataSource id="ds" url="/api/endpoint" queryParams="{{ from: before, to: after }}" />
+  <Pagination
+    id="pagination"
+    itemCount="50"
+    pageSize="{pageSize}"
+    pageSizeOptions="{[5, 10, 15]}"
+    pageIndex="{currentPage}"
+    onPageDidChange="(page) => {
+      currentPage = page;
+      first = page * pageSize; last = first + pageSize - 1;
+    }"
+    onPageSizeDidChange="(size) => {
+      pageSize = size; last = first + pageSize - 1;
+    }"
+  />
+  <List data="{ds.value}" />
+</Stack>
+```

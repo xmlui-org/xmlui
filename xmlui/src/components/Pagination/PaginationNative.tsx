@@ -230,7 +230,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           {/* First page button */}
           <li>
             <Button
-              variant="outlined"
+              variant="ghost"
               size="sm"
               disabled={!enabled || isFirstPage}
               onClick={() => handlePageChange(0)}
@@ -246,7 +246,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           {visiblePages.length <= 2 && (
             <li>
               <Button
-                variant="outlined"
+                variant="ghost"
                 size="sm"
                 disabled={!enabled || isFirstPage}
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -292,7 +292,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           {visiblePages.length <= 2 && (
             <li>
               <Button
-                variant="outlined"
+                variant="ghost"
                 size="sm"
                 disabled={!enabled || isLastPage}
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -308,7 +308,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           {/* Last page button */}
           <li>
             <Button
-              variant="outlined"
+              variant="ghost"
               size="sm"
               disabled={!enabled || isLastPage}
               onClick={() => handlePageChange(totalPages - 1)}
