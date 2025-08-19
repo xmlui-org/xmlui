@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { CSSProperties, ReactNode, useEffect, useRef, useState, useCallback } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -34,6 +34,7 @@ export type BarChartProps = {
   children?: ReactNode;
   showLegend?: boolean;
   className?: string;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<
@@ -78,10 +79,27 @@ export function BarChart({
   className,
   children,
   showLegend = defaultProps.showLegend,
+  tooltipRenderer,
 }: BarChartProps) {
   // Validate and normalize data
   const validData = Array.isArray(data) ? data : [];
   const { getThemeVar } = useTheme();
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent />;
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: props.payload,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer]
+  );
 
   const colorValues = useMemo(() => {
     return [
@@ -270,16 +288,22 @@ export function BarChart({
                 <YAxis
                   type="number"
                   axisLine={false}
-                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
+                  tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
                   hide={miniMode || hideY}
                   tickCount={yTickCount}
-                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
+                  tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
                   width={miniMode || hideY || hideTickY ? 0 : 40}
                 />
               </>
             )}
-          {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
-          {validData.length > 0 && Object.keys(config).map((key, index) => (
+            {!miniMode && !hideTooltip && (
+              <Tooltip
+                content={
+                  safeTooltipRenderer
+                }
+              />
+            )}
+            {validData.length > 0 && Object.keys(config).map((key, index) => (
               <Bar
                 key={index}
                 dataKey={key}
@@ -329,6 +353,7 @@ export function BarChart({
     tickFormatterY,
     xAxisHeight,
     yTickCount,
+    safeTooltipRenderer,
   ]);
 
   return (
