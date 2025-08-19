@@ -89,7 +89,7 @@ export const BarChartMd = createMetadata({
       defaultValue: defaultProps.showLegend,
     },
     tooltipTemplate: {
-      description: "A function that customizes the tooltip content.",
+      description: "This property allows replacing the default template to display a tooltip.",
     },
   },
 });

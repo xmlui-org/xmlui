@@ -75,7 +75,7 @@ export const LineChartMd = createMetadata({
       defaultValue: defaultProps.showLegend,
     },
     tooltipTemplate: {
-      description: "A function that customizes the tooltip content.",
+      description: "This property allows replacing the default template to display a tooltip.",
     },
     marginTop: d("The top margin of the chart"),
     marginRight: d("The right margin of the chart"),
