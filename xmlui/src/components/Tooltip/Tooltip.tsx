@@ -71,6 +71,7 @@ export const TooltipMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`border-${COMP}`]: "none",
     [`textColor-${COMP}`]: "$textcolor-primary",
     [`borderRadius-${COMP}`]: "4px",
     [`fontSize-${COMP}`]: "15px",
@@ -80,16 +81,11 @@ export const TooltipMd = createMetadata({
     [`paddingLeft-${COMP}`]: "15px",
     [`paddingRight-${COMP}`]: "15px",
     [`boxShadow-${COMP}`]: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
-    [`arrowFill-${COMP}`]: "#222",
+    [`fill-arrow-${COMP}`]: "$color-surface-200",
+    [`stroke-arrow-${COMP}`]: "$color-surface-200",
+    [`strokeWidth-arrow-${COMP}`]: "0",
     [`animationDuration-${COMP}`]: "400ms",
-    [`animationTimingFunction-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
-
-    // Dark mode variants
-    dark: {
-      [`backgroundColor-${COMP}`]: "#333",
-      [`textColor-${COMP}`]: "#f0f0f0",
-      [`arrowFill-${COMP}`]: "#333",
-    },
+    [`animation-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
   },
 });
 

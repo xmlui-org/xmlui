@@ -147,4 +147,8 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [width](../styles-and-themes/common-units/#size)-line-LineChart | 1px | 1px |

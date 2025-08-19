@@ -796,6 +796,8 @@ function addThemeVarDescriptions(component) {
 
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links
 const themeKeywordLinks = {
+  animation: "[animation](../styles-and-themes/layout-props/#animation)",
+  animationDuration: "[animationDuration](../styles-and-themes/layout-props/#animationDuration)",
   color: "[color](../styles-and-themes/common-units/#color)",
   borderColor: "[borderColor](../styles-and-themes/common-units/#color)",
   borderBottomColor: "[borderBottomColor](../styles-and-themes/common-units/#color)",
@@ -807,6 +809,8 @@ const themeKeywordLinks = {
   backgroundColor: "[backgroundColor](../styles-and-themes/common-units/#color)",
   textDecorationColor: "[textDecorationColor](../styles-and-themes/common-units/#color)",
   textColor: "[textColor](../styles-and-themes/common-units/#color)",
+  fill: "[fill](../styles-and-themes/common-units/#color)",
+  stroke: "[stroke](../styles-and-themes/common-units/#color)",
   fontWeight: "[fontWeight](../styles-and-themes/common-units/#fontWeight)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
   borderStyle: "[borderStyle](../styles-and-themes/common-units/#border-style)",
@@ -834,6 +838,7 @@ const themeKeywordLinks = {
   borderRightWidth: "[borderRightWidth](../styles-and-themes/common-units/#size)",
   borderLeftWidth: "[borderLeftWidth](../styles-and-themes/common-units/#size)",
   textDecorationThickness: "[textDecorationThickness](../styles-and-themes/common-units/#size)",
+  strokeWidth: "[strokeWidth](../styles-and-themes/common-units/#size)",
   offset: "[offset](../styles-and-themes/common-units/#size)",
   padding: "[padding](../styles-and-themes/common-units/#size)",
   paddingTop: "[paddingTop](../styles-and-themes/common-units/#size)",

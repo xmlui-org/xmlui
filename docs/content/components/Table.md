@@ -713,6 +713,86 @@ A property to customize what to display if the table does not contain any data.
 </App>
 ```
 
+### `pageSize` [#pagesize]
+
+This property defines the number of rows to display per page when pagination is enabled.
+
+Options
+
+Page sizes are only accepted in an array, even if the array contains one item.
+
+Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
+
+```xmlui copy /pageSizeOptions="{[3, 6, 12]}"/
+<App>
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: pageSizeOptions"
+<App>
+  <Table data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' 
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
 ### `pageSizeOptions` [#pagesizeoptions]
 
 This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
@@ -790,6 +870,12 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   </Table>
 </App>
 ```
+
+### `paginationControlsLocation` (default: "bottom") [#paginationcontrolslocation-default-bottom]
+
+This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.
+
+Available values: `top`, `bottom` **(default)**, `both`
 
 ### `rowDisabledPredicate` [#rowdisabledpredicate]
 

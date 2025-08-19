@@ -2,9 +2,6 @@ import {
   type ReactNode,
   type ForwardedRef,
   forwardRef,
-  type RefObject,
-  useEffect,
-  useState,
 } from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
@@ -83,7 +80,7 @@ export const defaultProps: TooltipOptions = {
   delayDuration: 700,
   skipDelayDuration: 300,
   defaultOpen: false,
-  showArrow: true,
+  showArrow: false,
   side: "top",
   align: "center",
   sideOffset: 4,

@@ -13,7 +13,7 @@ You can provide a link to this route to display a particular `Page`.
 Currently, all navigation is done on the clientside.
 No page is fetched from the server, thus the application operates as a [Single Page Application](https://developer.mozilla.org/en-US/docs/Glossary/SPA).
 
-```xmlui-pg copy {3-4, 7, 10} display name="Example: using Pages and Page" height="150px"
+```xmlui-pg copy {3-4, 7, 10} display name="Example: using Pages and Page" height="170px"
 <App>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -34,7 +34,7 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 %-PROP-START fallbackPath
 
-```xmlui-pg copy {6-13} display name="Example: fallbackPath" height="150px"
+```xmlui-pg copy {6-13} display name="Example: fallbackPath" height="170px"
 <App>
   <NavPanel>
     <NavLink label="Not Home" to="/not-home" icon="trash"/>

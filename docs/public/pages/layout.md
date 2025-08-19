@@ -98,12 +98,23 @@ Components can align their children in the viewport both vertically and horizont
 ```xmlui-pg display name="Example: alignment" /horizontalAlignment/ /verticalAlignment/
 <App>
   <HStack>
-    <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">
+    <VStack 
+      width="50%" 
+      border="2px dotted red" 
+      height="200px" 
+      horizontalAlignment="end"
+    >
       <Text>Item #1</Text>
       <Text>Item #2</Text>
       <Text>Item #3</Text>
     </VStack>
-    <VStack width="50%" border="2px dotted green" height="200px" verticalAlignment="center">
+    <VStack
+      width="50%" 
+      border="2px 
+      dotted green" 
+      height="200px" 
+      verticalAlignment="center"
+    >
       <Text>Item #1</Text>
       <Text>Item #2</Text>
       <Text>Item #3</Text>
