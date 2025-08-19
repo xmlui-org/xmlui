@@ -34,5 +34,25 @@ Always used as a direct child of [Tabs](/components/Tabs) components. The `label
 
 > [!INFO] You can customize the [header templates](./Tabs#headertemplate) of **all** tab items, too. You can mix the `Tabs` level header templates with the `TabItem` level ones. In this case, the `TabItem` level template prevails.
 
-
 %-PROP-END
+
+%-EVENT-START activated
+
+```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px" 
+<App var.activationCount="{0}">
+  <Tabs>
+    <TabItem label="Account" onActivated="activationCount++">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  <Text>The Account tab has been activated {activationCount} times.</Text>
+</App>
+```
+
+%-EVENT-END

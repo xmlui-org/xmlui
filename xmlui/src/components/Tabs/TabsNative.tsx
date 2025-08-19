@@ -135,11 +135,12 @@ export const Tabs = forwardRef(function Tabs(
         className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
+          const tabItem = tabItems.find((item) => item.innerId === tab);
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);
           if (newIndex !== activeIndex) {
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
-            onDidChange?.(newIndex, tab, tabItems[newIndex]?.label);
+            onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
           }
         }}
         orientation={orientation}

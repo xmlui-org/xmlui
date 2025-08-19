@@ -27,6 +27,7 @@ export type Tab = {
   headerRenderer?: (contextVars: any) => ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
+  activated?: () => void;
 };
 
 export const LinkTargetNames = ["_self", "_blank", "_parent", "_top", "_unfencedTop"] as const;

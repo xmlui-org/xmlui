@@ -118,6 +118,31 @@ Available values: `horizontal` **(default)**, `vertical`
 
 This event is triggered when value of Tabs has changed.
 
+The event handler gets these parameters, which refer to the active tab after the change:
+- `index`: The active tab index
+- `id`: The identifier of the active tab (if not defined, the framework provides an auto-generated id)
+- `label`: The label of the active tab
+
+```xmlui-pg copy display name="Example: didChange" /onDidChange/ height="200px"
+<App var.lastTab="(none)">
+  <Tabs onDidChange="
+    (newIndex, id, label) => 
+      lastTab = newIndex + ': ' + label + ' (' + id + ')'
+    ">
+    <TabItem id="account" label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  <Text>Tab index changed to {lastTab}</Text>
+</App>
+```
+
 ## Exposed Methods [#exposed-methods]
 
 ### `next` [#next]
