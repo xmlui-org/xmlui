@@ -1,5 +1,23 @@
 # xmlui
 
+## 0.10.0
+
+### Minor Changes
+
+- 000a311: Add tooltip behavior to visible components
+- eb8b958: Rework inline styling system, prepare for responsive styling
+
+### Patch Changes
+
+- 6d0ce52: Added features to the Pagination component: page size selector dropdown control. Also added the following props: layout orientation and layout order reversal.
+- 8c98f33: feat: add theme variable support for LineChart stroke width
+- ef86593: feat: add didChange event handler to Tabs component
+- da5f4e7: test: create e2e tests for chart components
+- 47c7a2d: Integrated the new Pagination component with Table.
+- 740f904: Add "activated" event to TabItem
+- 5009c52: Add "parts" to component metadata
+- 2f5ec32: Remove "from" from the list or reserved script keywords, as no longer used
+
 ## 0.9.101
 
 ### Patch Changes
