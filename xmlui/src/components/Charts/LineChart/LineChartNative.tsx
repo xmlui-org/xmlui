@@ -125,7 +125,7 @@ export function LineChart({
 
   const safeTooltipRenderer = useCallback(
     (props: any) => {
-      if (!tooltipRenderer) return <TooltipContent />;
+      if (!tooltipRenderer) return <TooltipContent {...props}/>;
 
       // Extract tooltip data from Recharts props
       const tooltipData = {
