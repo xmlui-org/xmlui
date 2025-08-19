@@ -137,6 +137,15 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 **Signature**: `get value(): string | undefined`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`item`**: The text box input area.
+- **`label`**: The label displayed for the text box.
+
+**Default part**: `item`
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

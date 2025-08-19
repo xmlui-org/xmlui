@@ -40,6 +40,15 @@ export const TextBoxMd = createMetadata({
   description:
     "`TextBox` captures user text input for forms, search fields, and data entry " +
     "with support for validation, icons, and formatting hints.",
+  parts: {
+    label: {
+      description: "The label displayed for the text box.",
+    },
+    item: {
+      description: "The text box input area.",
+    }
+  },
+  defaultPart: "item",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {

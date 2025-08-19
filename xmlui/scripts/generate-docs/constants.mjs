@@ -118,6 +118,7 @@ export const METADATA_SECTIONS = {
   PROPS: "props",
   API: "apis",
   EVENTS: "events",
+  PARTS: "parts",
   STYLES: "styles"
 };
 
@@ -128,6 +129,7 @@ export const DIRECTIVE_CONFIG = {
     description: "DESC",
     props: "PROP",
     events: "EVENT",
+    parts: "PART",
     styles: "STYLE",
     apis: "API",
     contextVars: "CONTEXT_VAR"
@@ -139,7 +141,8 @@ export const SECTION_DISPLAY_NAMES = {
   events: "Events",
   styles: "Styling",
   apis: "Exposed Methods",
-  contextVars: "Context Values"
+  contextVars: "Context Values",
+  parts: "Parts"
 };
 
 export const SECTION_REFERENCE_KEYS = {
