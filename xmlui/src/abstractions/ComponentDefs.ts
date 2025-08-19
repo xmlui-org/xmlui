@@ -238,6 +238,12 @@ export type ComponentApiMetadata = {
   readonly parameters?: Record<string, string>;
 };
 
+// This type defines the metadata of a component part. It is used to describe the
+// individual parts that make up the component.
+export type ComponentPartMetadata = {
+  description: string;
+}
+
 // Components have metadata that the rendering engine uses to render the component.
 // This type defines the structure of such metadata.
 //
@@ -306,6 +312,12 @@ export type ComponentMetadata<
 
   // Indicates that the component represent an HTML tag
   isHtmlTag?: boolean;
+
+  // Describes the individual parts that make up the component
+  parts?: Record<string, ComponentPartMetadata>;
+
+  // The name of the default part. Layout properties will be applied to this part by default.
+  defaultPart?: string;
 };
 
 export interface ParentRenderContext {

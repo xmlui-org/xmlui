@@ -156,6 +156,12 @@ export class MetadataProcessor {
       result += addApisSection(fileData, component);
       result += "\n\n";
 
+      const partsSection = addPartsSection(fileData, component);
+      if (partsSection) {
+        result += partsSection;
+        result += "\n\n";
+      }
+
       result += addStylesSection(fileData, component);
       result += "\n";
 
@@ -327,6 +333,31 @@ function addEventsSection(data, component) {
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
+  return buffer;
+}
+
+function addPartsSection(data, component) {
+  logger.info(`Processing ${component.displayName} parts`);
+  
+  if (!component.parts || Object.keys(component.parts ?? {}).length === 0) {
+    return "";
+  }
+
+  let buffer = `## ${SECTION_DISPLAY_NAMES.parts}\n\n`;
+
+  // Add lead text for components with parts
+  buffer += "The component has some parts that can be styled through layout properties and theme variables separately:\n\n";
+
+  // Use pattern utility for processing parts
+  processComponentSection(component.parts, (partName, part) => {
+    buffer += `- **\`${partName}\`**: ${part.description}\n`;
+  });
+
+  // Add default part information if available
+  if (component.defaultPart) {
+    buffer += `\n**Default part**: \`${component.defaultPart}\`\n`;
+  }
+
   return buffer;
 }
 
