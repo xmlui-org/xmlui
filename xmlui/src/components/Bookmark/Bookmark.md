@@ -24,12 +24,15 @@ Add an `id` property to `Bookmark` instances and use the same identifiers in lin
   </NavPanel>
   <Pages>
     <Page url="/">
-      <Bookmark id="red" />
-      <VStack height="200px" backgroundColor="red" />
-      <Bookmark id="green" />
-      <VStack height="200px" backgroundColor="green" />
-      <Bookmark id="blue" />
-      <VStack height="200px" backgroundColor="blue" />
+      <Bookmark id="red">
+        <VStack height="200px" backgroundColor="red" />
+      </Bookmark>
+      <Bookmark id="green">
+        <VStack height="200px" backgroundColor="green" />
+      </Bookmark>
+      <Bookmark id="blue">
+        <VStack height="200px" backgroundColor="blue" />
+      </Bookmark>
     </Page>
   </Pages>
 </App>
