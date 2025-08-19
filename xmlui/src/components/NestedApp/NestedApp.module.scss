@@ -263,6 +263,8 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
   }
 
   .shadowRoot{
+    // "My solution was to add a dummy transform property so that all elements with fixed position got attached to their parent div." see: https://stackoverflow.com/a/70422489
+    transform: scale(1);
     width: 100%;
     height: 100%;
     position: relative;
