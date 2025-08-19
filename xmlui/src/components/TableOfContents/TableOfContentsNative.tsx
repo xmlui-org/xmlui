@@ -3,11 +3,10 @@ import {
   type ForwardedRef,
   forwardRef,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import { NavLink as RrdNavLink } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
@@ -36,7 +35,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     smoothScrolling = defaultProps.smoothScrolling,
     maxHeadingLevel = defaultProps.maxHeadingLevel,
     omitH1 = defaultProps.omitH1,
-    className
+    className,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -76,7 +75,12 @@ export const TableOfContents = forwardRef(function TableOfContents(
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={classnames(styles.nav, className)} ref={ref} style={style}>
+    <nav
+      aria-label="Table of Contents"
+      className={classnames(styles.nav, className)}
+      ref={ref}
+      style={style}
+    >
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel && (!omitH1 || value.level !== 1)) {
@@ -87,7 +91,8 @@ export const TableOfContents = forwardRef(function TableOfContents(
                   [styles.active]: value.id === activeAnchorId,
                 })}
               >
-                <RrdNavLink
+                <Link
+                  aria-current={value.id === activeAnchorId ? "page" : "false"}
                   className={classnames(styles.link, {
                     [styles.head_1]: value.level === 1,
                     [styles.head_2]: value.level === 2,
@@ -107,13 +112,13 @@ export const TableOfContents = forwardRef(function TableOfContents(
                   id={value.id}
                 >
                   {value.text}
-                </RrdNavLink>
+                </Link>
               </li>
             );
           }
           return null;
         })}
       </ul>
-    </div>
+    </nav>
   );
 });
