@@ -1,11 +1,4 @@
-import {
-  type ReactNode,
-  type ForwardedRef,
-  forwardRef,
-  type RefObject,
-  useEffect,
-  useState,
-} from "react";
+import { type ReactNode, type ForwardedRef, forwardRef } from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
 
@@ -72,6 +65,11 @@ type TooltipProps = TooltipOptions & {
   markdown?: string;
 
   /**
+   * The template for the tooltip content
+   */
+  tooltipTemplate?: ReactNode;
+
+  /**
    * The content that will trigger the tooltip (used when triggerRef is not provided)
    */
   children?: ReactNode;
@@ -83,7 +81,7 @@ export const defaultProps: TooltipOptions = {
   delayDuration: 700,
   skipDelayDuration: 300,
   defaultOpen: false,
-  showArrow: true,
+  showArrow: false,
   side: "top",
   align: "center",
   sideOffset: 4,
@@ -95,6 +93,7 @@ export const Tooltip = forwardRef(function Tooltip(
   {
     text,
     markdown,
+    tooltipTemplate,
     delayDuration = defaultProps.delayDuration,
     skipDelayDuration = defaultProps.skipDelayDuration,
     defaultOpen = defaultProps.defaultOpen,
@@ -109,27 +108,34 @@ export const Tooltip = forwardRef(function Tooltip(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { root } = useTheme();
+  const showTooltip = !!(text || markdown || tooltipTemplate);
 
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
       <RadixTooltip.Root defaultOpen={defaultOpen}>
         <RadixTooltip.Trigger asChild>
-          <span>
-            {children}
-          </span>
+          <span>{children}</span>
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
-          <RadixTooltip.Content
-            className={styles.content}
-            side={side}
-            align={align}
-            sideOffset={sideOffset}
-            alignOffset={alignOffset}
-            avoidCollisions={avoidCollisions}
-          >
-            {markdown ? <Markdown>{markdown}</Markdown> : text}
-            {showArrow && <RadixTooltip.Arrow className={styles.arrow} />}
-          </RadixTooltip.Content>
+          {showTooltip && (
+            <RadixTooltip.Content
+              className={styles.content}
+              side={side}
+              align={align}
+              sideOffset={sideOffset}
+              alignOffset={alignOffset}
+              avoidCollisions={avoidCollisions}
+            >
+              {tooltipTemplate ? (
+                tooltipTemplate
+              ) : markdown ? (
+                <Markdown>{markdown}</Markdown>
+              ) : (
+                text
+              )}
+              {showArrow && <RadixTooltip.Arrow className={styles.arrow} />}
+            </RadixTooltip.Content>
+          )}
         </RadixTooltip.Portal>
       </RadixTooltip.Root>
     </RadixTooltip.Provider>

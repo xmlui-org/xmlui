@@ -9,17 +9,20 @@ $themeVars: ();
 
 $component: "Tooltip";
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
+
 
 // --- Theme variables for Tooltip component
 $backgroundColor-Tooltip: createThemeVar("backgroundColor-#{$component}");
 $textColor-Tooltip: createThemeVar("textColor-#{$component}");
-$borderRadius-Tooltip: createThemeVar("borderRadius-#{$component}");
 $fontSize-Tooltip: createThemeVar("fontSize-#{$component}");
 $lineHeight-Tooltip: createThemeVar("lineHeight-#{$component}");
 $boxShadow-Tooltip: createThemeVar("boxShadow-#{$component}");
-$arrowFill-Tooltip: createThemeVar("arrowFill-#{$component}");
+$fill-arrow-Tooltip: createThemeVar("fill-arrow-#{$component}");
+$stroke-arrow-Tooltip: createThemeVar("stroke-arrow-#{$component}");
+$strokeWidth-arrow-Tooltip: createThemeVar("strokeWidth-arrow-#{$component}");  
 $animationDuration-Tooltip: createThemeVar("animationDuration-#{$component}");
-$animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$component}");
+$animation-Tooltip: createThemeVar("animation-#{$component}");
 
 /* Tooltip styles */
 
@@ -35,8 +38,8 @@ $animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$com
 }
 
 .content {
-  border-radius: $borderRadius-Tooltip;
   @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
   font-size: $fontSize-Tooltip;
   line-height: $lineHeight-Tooltip;
   color: $textColor-Tooltip;
@@ -44,7 +47,7 @@ $animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$com
   box-shadow: $boxShadow-Tooltip;
   user-select: none;
   animation-duration: $animationDuration-Tooltip;
-  animation-timing-function: $animationTimingFunction-Tooltip;
+  animation-timing-function: $animation-Tooltip;
   will-change: transform, opacity;
   z-index: 9999;
 }
@@ -66,7 +69,9 @@ $animationTimingFunction-Tooltip: createThemeVar("animationTimingFunction-#{$com
 }
 
 .arrow {
-  fill: $arrowFill-Tooltip;
+  fill: $fill-arrow-Tooltip;
+  stroke: $stroke-arrow-Tooltip;
+  stroke-width: $strokeWidth-arrow-Tooltip;
 }
 
 @keyframes slideUpAndFade {

@@ -14,7 +14,7 @@ Use `Bookmark` as a standalone tag or wrap children with it.
 
 Add an `id` property to `Bookmark` instances and use the same identifiers in links with hash tags, as the following example shows:
 
-```xmlui-pg copy display height="300px" name="Example: standalone Bookmark"
+```xmlui-pg copy display height="320px" name="Example: standalone Bookmark"
 ---app display copy
 <App layout="vertical-full-header" scrollWholePage="false">
   <NavPanel>
@@ -41,7 +41,7 @@ Clicking a link scrolls the bookmarked component adjacent to the corresponding `
 
 Alternatively, you can nest components into `Bookmark`:
 
-```xmlui-pg copy display height="300px" name="Example: Bookmark with nested children"
+```xmlui-pg copy display height="320px" name="Example: Bookmark with nested children"
 ---app display copy
 <App layout="vertical-full-header" scrollWholePage="false">
   <NavPanel>

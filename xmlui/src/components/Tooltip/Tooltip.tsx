@@ -14,7 +14,17 @@ export const TooltipMd = createMetadata({
     text: {
       description: "The text content to display in the tooltip",
       type: "string",
-      isRequired: true,
+      isRequired: false,
+    },
+    markdown: {
+      description: "The markdown content to display in the tooltip",
+      type: "string",
+      isRequired: false,
+    },
+    tooltipTemplate: {
+      description: "The template for the tooltip content",
+      type: "Component",
+      isRequired: false,
     },
     delayDuration: {
       description: "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
@@ -71,6 +81,7 @@ export const TooltipMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`border-${COMP}`]: "none",
     [`textColor-${COMP}`]: "$textcolor-primary",
     [`borderRadius-${COMP}`]: "4px",
     [`fontSize-${COMP}`]: "15px",
@@ -80,16 +91,11 @@ export const TooltipMd = createMetadata({
     [`paddingLeft-${COMP}`]: "15px",
     [`paddingRight-${COMP}`]: "15px",
     [`boxShadow-${COMP}`]: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
-    [`arrowFill-${COMP}`]: "#222",
+    [`fill-arrow-${COMP}`]: "$color-surface-200",
+    [`stroke-arrow-${COMP}`]: "$color-surface-200",
+    [`strokeWidth-arrow-${COMP}`]: "0",
     [`animationDuration-${COMP}`]: "400ms",
-    [`animationTimingFunction-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
-
-    // Dark mode variants
-    dark: {
-      [`backgroundColor-${COMP}`]: "#333",
-      [`textColor-${COMP}`]: "#f0f0f0",
-      [`arrowFill-${COMP}`]: "#333",
-    },
+    [`animation-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
   },
 });
 
@@ -104,16 +110,14 @@ export const tooltipComponentRenderer = createComponentRenderer(
 
     // If text is not provided, do not render anything
     const text = extractValue.asOptionalString(node.props.text)
-    if (!text) {
-      return null;
-    }
-
-    // Use the first child as the tooltip trigger and ignore the other children
-    const triggerChild = node.children[0];
+    const markdown = extractValue.asOptionalString(node.props.markdown);
+    const tooltipTemplate = node.props.tooltipTemplate;
 
     return (
       <Tooltip
         text={text}
+        markdown={markdown}
+        tooltipTemplate={renderChild(tooltipTemplate)}
         delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
         skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
         defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}
@@ -124,7 +128,7 @@ export const tooltipComponentRenderer = createComponentRenderer(
         alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
         avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
       >
-        {renderChild(triggerChild, layoutContext)}
+        {renderChild(node.children, layoutContext)}
       </Tooltip>
     );
   },
