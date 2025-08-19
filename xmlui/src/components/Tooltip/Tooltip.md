@@ -95,4 +95,19 @@ The string form of `tooltipOptions` is composed of names or name and value pairs
 </App>
 ```
 
+### Using the Tooltip component
+
+Instead of using the tooltip-related properties, you can wrap the component into a `Tooltip`:
+
+```xmlui-pg display copy height="300px" name="Example: Using the Tooltip component"
+<App>
+  <VStack height="100px" horizontalAlignment="center">
+    <Tooltip side="bottom" markdown="This *example* uses a `Tooltip` component">
+      <Card title="Card 1: within a Tooltip" />
+      <Card title="Card 2: within the same Tooltip" />
+    </Tooltip>
+  </VStack>
+</App>
+```
+
 %-DESC-END

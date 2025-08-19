@@ -97,6 +97,21 @@ The string form of `tooltipOptions` is composed of names or name and value pairs
 </App>
 ```
 
+### Using the Tooltip component [#using-the-tooltip-component]
+
+Instead of using the tooltip-related properties, you can wrap the component into a `Tooltip`:
+
+```xmlui-pg display copy height="300px" name="Example: Using the Tooltip component"
+<App>
+  <VStack height="100px" horizontalAlignment="center">
+    <Tooltip side="bottom" markdown="This *example* uses a `Tooltip` component">
+      <Card title="Card 1: within a Tooltip" />
+      <Card title="Card 2: within the same Tooltip" />
+    </Tooltip>
+  </VStack>
+</App>
+```
+
 ## Properties [#properties]
 
 ### `align` (default: "center") [#align-default-center]
@@ -121,6 +136,10 @@ The open state of the tooltip when it is initially rendered
 
 The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)
 
+### `markdown` [#markdown]
+
+The markdown content to display in the tooltip
+
 ### `showArrow` (default: false) [#showarrow-default-false]
 
 Whether to show the arrow pointing to the trigger element
@@ -139,7 +158,7 @@ The distance in pixels from the trigger
 
 How much time a user has to enter another trigger without incurring a delay again (in ms)
 
-### `text` (required) [#text-required]
+### `text` [#text]
 
 The text content to display in the tooltip
 

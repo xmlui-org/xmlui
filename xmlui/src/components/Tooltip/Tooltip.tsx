@@ -14,7 +14,12 @@ export const TooltipMd = createMetadata({
     text: {
       description: "The text content to display in the tooltip",
       type: "string",
-      isRequired: true,
+      isRequired: false,
+    },
+    markdown: {
+      description: "The markdown content to display in the tooltip",
+      type: "string",
+      isRequired: false,
     },
     delayDuration: {
       description: "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
@@ -100,16 +105,15 @@ export const tooltipComponentRenderer = createComponentRenderer(
 
     // If text is not provided, do not render anything
     const text = extractValue.asOptionalString(node.props.text)
-    if (!text) {
+    const markdown = extractValue.asOptionalString(node.props.markdown);
+    if (!text && !markdown) {
       return null;
     }
-
-    // Use the first child as the tooltip trigger and ignore the other children
-    const triggerChild = node.children[0];
 
     return (
       <Tooltip
         text={text}
+        markdown={markdown}
         delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
         skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
         defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}
@@ -120,7 +124,7 @@ export const tooltipComponentRenderer = createComponentRenderer(
         alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
         avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
       >
-        {renderChild(triggerChild, layoutContext)}
+        {renderChild(node.children, layoutContext)}
       </Tooltip>
     );
   },
