@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import type { ReactNode } from "react";
 import type React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
@@ -35,6 +35,7 @@ export type LineChartProps = {
   marginRight?: number;
   marginBottom?: number;
   marginLeft?: number;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip" | "showLegend" | "tickFormatterX" | "tickFormatterY" | "hideTickX" | "hideTickY"> = {
@@ -63,6 +64,7 @@ export function LineChart({
   tickFormatterY = defaultProps.tickFormatterY,
   children,
   showLegend = defaultProps.showLegend,
+  tooltipRenderer,
 }: LineChartProps) {
   const { getThemeVar } = useTheme();
 
@@ -120,6 +122,22 @@ export function LineChart({
   const fontSize = 12;
 
   const safeData = Array.isArray(data) ? data : [];
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent />;
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: props.payload,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer]
+  );
 
   useEffect(() => {
     const calc = () => {
@@ -212,7 +230,7 @@ export function LineChart({
               tickFormatter={miniMode ? undefined : tickFormatterY}
               tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
             />
-            {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {dataKeys.map((dataKey, i) => (
               <Line
                 key={dataKey}
