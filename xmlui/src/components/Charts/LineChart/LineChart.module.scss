@@ -9,8 +9,17 @@ $themeVars: ();
 
 $componentName: "LineChart";
 
+@layer components {
+
+  .wrapper{
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+}
 
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

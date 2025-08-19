@@ -25,76 +25,78 @@ $textDecorationColor-Link--active: createThemeVar("textDecorationColor-#{$compon
 $textDecorationStyle-Link: createThemeVar("textDecorationStyle-#{$component}");
 $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
 
-.container {
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
-  @include t.textVars($themeVars, $component);
-  flex-shrink: 0;
-  cursor: pointer;
-  text-decoration: none;
-  width: fit-content;
-  max-width: 100%;
-  max-height: 100%;
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-
-  &.active {
-    color: $textColor-Link--active;
-    font-weight: $fontWeight-Link--active;
-  }
-
-  &.disabled{
-    pointer-events: none;
-  }
-
-  &:not(.disabled){
-    &:hover {
-      color: $textColor-Link--hover;
-    }
-
-    &:focus-visible{
-      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
-      outline-color: createThemeVar('outlineColor-#{$component}--focus');
-      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
-      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
-    }
+@layer components {
+  .container {
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    @include t.textVars($themeVars, $component);
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+    width: fit-content;
+    max-width: 100%;
+    max-height: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
 
     &.active {
+      color: $textColor-Link--active;
+      font-weight: $fontWeight-Link--active;
+    }
+
+    &.disabled {
+      pointer-events: none;
+    }
+
+    &:not(.disabled) {
       &:hover {
-        color: $textColor-Link--hover--active;
+        color: $textColor-Link--hover;
+      }
+
+      &:focus-visible {
+        outline-width: createThemeVar("outlineWidth-#{$component}--focus");
+        outline-color: createThemeVar("outlineColor-#{$component}--focus");
+        outline-style: createThemeVar("outlineStyle-#{$component}--focus");
+        outline-offset: createThemeVar("outlineOffset-#{$component}--focus");
+      }
+
+      &.active {
+        &:hover {
+          color: $textColor-Link--hover--active;
+        }
       }
     }
   }
-}
 
-.iconWrapper {
-  @include t.paddingVars($themeVars, "icon-#{$component}");
-  padding-right: $gap-icon-Link;
-  line-height: 0;
-}
+  .iconWrapper {
+    @include t.paddingVars($themeVars, "icon-#{$component}");
+    padding-right: $gap-icon-Link;
+    line-height: 0;
+  }
 
-.container:not(.active) {
-  text-underline-offset: $textUnderlineOffset-Link;
-  text-decoration-line: $textDecorationLine-Link;
-  text-decoration-color: $textDecorationColor-Link;
-  &:not([disabled]) {
-    &:hover {
-      text-decoration-color: $textDecorationColor-Link--hover;
-      text-decoration-style: $textDecorationStyle-Link;
-      text-decoration-thickness: $textDecorationThickness-Link;
+  .container:not(.active) {
+    text-underline-offset: $textUnderlineOffset-Link;
+    text-decoration-line: $textDecorationLine-Link;
+    text-decoration-color: $textDecorationColor-Link;
+    &:not([disabled]) {
+      &:hover {
+        text-decoration-color: $textDecorationColor-Link--hover;
+        text-decoration-style: $textDecorationStyle-Link;
+        text-decoration-thickness: $textDecorationThickness-Link;
 
-      &:has(> button) {
-        text-decoration-line: none;
+        &:has(> button) {
+          text-decoration-line: none;
+        }
       }
-    }
-    &:active {
-      text-decoration-color: $textDecorationColor-Link--active;
-      text-decoration-style: $textDecorationStyle-Link;
-      text-decoration-thickness: $textDecorationThickness-Link;
+      &:active {
+        text-decoration-color: $textDecorationColor-Link--active;
+        text-decoration-style: $textDecorationStyle-Link;
+        text-decoration-thickness: $textDecorationThickness-Link;
 
-      &:has(> button) {
-        text-decoration-line: none;
+        &:has(> button) {
+          text-decoration-line: none;
+        }
       }
     }
   }

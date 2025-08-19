@@ -29,6 +29,7 @@ import { AppLayoutContext } from "./AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
+import { EMPTY_OBJECT } from "../../components-core/constants";
 
 type Props = {
   children: ReactNode;
@@ -37,7 +38,8 @@ type Props = {
   footer?: ReactNode;
   navPanel?: ReactNode;
   navPanelInDrawer?: ReactNode;
-  style: CSSProperties;
+  style?: CSSProperties;
+  className?: string;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
@@ -53,6 +55,7 @@ type Props = {
   logoLight?: string;
   defaultTone?: string;
   defaultTheme?: string;
+  applyDefaultContentPadding?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -69,7 +72,7 @@ export const defaultProps: Pick<
 
 export function App({
   children,
-  style,
+  style = EMPTY_OBJECT,
   layout,
   loggedInUser,
   scrollWholePage = defaultProps.scrollWholePage,
@@ -88,6 +91,8 @@ export function App({
   defaultTheme,
   renderChild,
   name,
+  className,
+  applyDefaultContentPadding
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
@@ -101,17 +106,6 @@ export function App({
   const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
-
-  const pagesWrapperInnerStyle = useMemo(() => {
-    const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest } = style;
-    return {
-      ...rest,
-      "--page-padding-left": padding || paddingLeft,
-      "--page-padding-right": padding || paddingRight,
-      "--page-padding-top": padding || paddingTop,
-      "--page-padding-bottom": padding || paddingBottom,
-    };
-  }, [style]);
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
@@ -189,6 +183,7 @@ export function App({
 
   const styleWithHelpers = useMemo(() => {
     return {
+      ...style,
       "--header-height":
         !scrollWholePage ||
         safeLayout === "vertical" ||
@@ -207,7 +202,7 @@ export function App({
       "--footer-abs-height": footerHeight + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
-  }, [footerHeight, headerHeight, noScrollbarGutters, safeLayout, scrollWholePage, scrollbarWidth]);
+  }, [footerHeight, headerHeight, noScrollbarGutters, safeLayout, scrollWholePage, scrollbarWidth, style]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
@@ -215,6 +210,7 @@ export function App({
   const toggleDrawer = useCallback(() => {
     setDrawerVisible((prev) => !prev);
   }, []);
+
 
   useIsomorphicLayoutEffect(() => {
     scrollContainerRef.current?.scrollTo({
@@ -300,6 +296,7 @@ export function App({
   }, [location, safeLayout]);
 
   const wrapperBaseClasses = [
+    className,
     styles.wrapper,
     {
       [styles.scrollWholePage]: scrollWholePage,
@@ -313,6 +310,9 @@ export function App({
   ];
 
   let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
+  let pagesWrapperClasses = classnames(styles.PagesWrapperInner, {
+    [styles.withDefaultContentPadding]: applyDefaultContentPadding,
+  });
   switch (safeLayout) {
     case "vertical":
       content = (
@@ -324,7 +324,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                <div className={pagesWrapperClasses}>
                   {children}
                 </div>
               </ScrollContext.Provider>
@@ -352,7 +352,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                <div className={pagesWrapperClasses}>
                   {children}
                 </div>
               </ScrollContext.Provider>
@@ -382,7 +382,7 @@ export function App({
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                  <div className={pagesWrapperClasses}>
                     {children}
                   </div>
                 </ScrollContext.Provider>
@@ -418,7 +418,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>
@@ -442,7 +442,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>
@@ -470,7 +470,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+              <div className={pagesWrapperClasses}>
                 {children}
               </div>
             </ScrollContext.Provider>

@@ -12,6 +12,7 @@ type ItemWithLabelProps = {
   id?: string;
   labelPosition?: LabelPosition;
   style?: CSSProperties;
+  className?: string;
   labelStyle?: CSSProperties;
   label?: string;
   labelWidth?: string;
@@ -37,6 +38,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     id,
     labelPosition = "top",
     style,
+    className,
     label,
     labelBreak = defaultProps.labelBreak,
     labelWidth,
@@ -57,7 +59,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
     return (
-      <Slot style={style} id={inputId} ref={ref}>
+      <Slot style={style} className={className} id={inputId} ref={ref}>
         {children}
       </Slot>
     );
@@ -71,7 +73,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={style} ref={ref} className={styles.itemWithLabel}>
+    <div style={style} ref={ref} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",

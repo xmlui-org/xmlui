@@ -16,7 +16,7 @@ export const EditorMd = createMetadata({
 export const devToolsComponentRenderer = createComponentRenderer(
   COMP,
   EditorMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, renderChild }: any) => {
     return (
       <DevTools />
     );

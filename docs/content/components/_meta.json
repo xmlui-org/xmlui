@@ -93,6 +93,7 @@
   "Theme": "Theme",
   "ToneChangerButton": "ToneChangerButton",
   "ToneSwitch": "ToneSwitch",
+  "Tooltip": "Tooltip",
   "VSplitter": "VSplitter",
   "VStack": "VStack"
 }

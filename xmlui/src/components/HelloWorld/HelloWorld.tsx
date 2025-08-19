@@ -111,7 +111,7 @@ export const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi, updateState }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
@@ -120,7 +120,7 @@ export const helloWorldComponentRenderer = createComponentRenderer(
         onReset={lookupEventHandler("onReset")}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
-        style={layoutCss}
+        className={className}
       >
         {renderChild(node.children)}
       </HelloWorld>

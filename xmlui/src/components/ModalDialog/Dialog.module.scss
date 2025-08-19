@@ -1,20 +1,24 @@
 @use "../../components-core/theming/themes" as t;
 
-.dialogContent {
-  display: flex;
-  flex-direction: column;
-}
-
-.dialogActions {
-  &:not(:empty){
-    margin-top: t.$space-4;
-  }
-}
-
-@media (min-width: 40em) {
-  .dialogActions {
+@layer components {
+  .dialogContent {
     display: flex;
-    justify-content: flex-end;
-    gap: t.$space-4;
+    flex-direction: column;
   }
+
+  .dialogActions {
+    &:not(:empty) {
+      margin-top: t.$space-4;
+    }
+  }
+
+  @media (min-width: 40em) {
+    .dialogActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: t.$space-4;
+    }
+  }
+
 }
+

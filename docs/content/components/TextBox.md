@@ -297,6 +297,15 @@ In the example below, typing in the `TextBox` will also display the length of th
 </App>
 ```
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`item`**: The text box input area.
+- **`label`**: The label displayed for the text box.
+
+**Default part**: `item`
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

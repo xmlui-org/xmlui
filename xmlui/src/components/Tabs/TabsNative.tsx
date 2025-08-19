@@ -57,7 +57,8 @@ export const Tabs = forwardRef(function Tabs(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const tabsId = id || useId();
+  const _id = useId();
+  const tabsId = id || _id;
 
   // Ensure activeTab is within valid bounds
   const validActiveTab = useMemo(() => {
@@ -131,7 +132,7 @@ export const Tabs = forwardRef(function Tabs(
       <RTabsRoot
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(styles.tabs, className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);

@@ -56,119 +56,122 @@ $textColor-RadioGroupOption-error: createThemeVar("Input:textColor-RadioGroupOpt
 $textColor-RadioGroupOption-warning: createThemeVar("Input:textColor-RadioGroupOption-warning");
 $textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupOption-success");
 
-.radioGroupContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: t.$space-2;
-}
 
-.radioOptionContainer {
-  display: flex;
-  align-items: center;
-  gap: $gap-RadioGroupOption;
-}
+@layer components {
+  .radioGroupContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: t.$space-2;
+  }
 
-.radioOption {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 100%;
-  background: $backgroundColor-RadioGroupOption-default;
-  border-width: $borderWidth-RadioGroupOption;
-  border-style: solid;
-  border-color: $borderColor-RadioGroupOption-default;
-  padding: 0;
-  cursor: pointer;
+  .radioOptionContainer {
+    display: flex;
+    align-items: center;
+    gap: $gap-RadioGroupOption;
+  }
 
-  &:hover {
-    border-color: $borderColor-RadioGroupOption-default--hover;
-  }
-  &:focus-visible {
-    outline-width: createThemeVar("Input:outlineWidth-RadioGroupOption--focus");
-    outline-color: createThemeVar("Input:outlineColor-RadioGroupOption--focus");
-    outline-style: createThemeVar("Input:outlineStyle-RadioGroupOption--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
-  }
-  &:disabled {
-    cursor: not-allowed;
-    border-color: $borderColor-RadioGroupOption--disabled;
-  }
-  &:disabled + label {
-    cursor: not-allowed;
-    color: $color-RadioGroupOption--disabled;
-  }
-  &:not(:disabled) {
-    &:not(.error):not(.warning):not(.valid) {
-      border-color: $borderColor-checked-RadioGroupOption;
+  .radioOption {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 100%;
+    background: $backgroundColor-RadioGroupOption-default;
+    border-width: $borderWidth-RadioGroupOption;
+    border-style: solid;
+    border-color: $borderColor-RadioGroupOption-default;
+    padding: 0;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $borderColor-RadioGroupOption-default--hover;
     }
+    &:focus-visible {
+      outline-width: createThemeVar("Input:outlineWidth-RadioGroupOption--focus");
+      outline-color: createThemeVar("Input:outlineColor-RadioGroupOption--focus");
+      outline-style: createThemeVar("Input:outlineStyle-RadioGroupOption--focus");
+      outline-offset: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
+    }
+    &:disabled {
+      cursor: not-allowed;
+      border-color: $borderColor-RadioGroupOption--disabled;
+    }
+    &:disabled + label {
+      cursor: not-allowed;
+      color: $color-RadioGroupOption--disabled;
+    }
+    &:not(:disabled) {
+      &:not(.error):not(.warning):not(.valid) {
+        border-color: $borderColor-checked-RadioGroupOption;
+      }
+      &.error {
+        border-width: $borderWidth-RadioGroupOption-validation;
+        border-color: $borderColor-RadioGroupOption-error;
+      }
+      &.warning {
+        border-width: $borderWidth-RadioGroupOption-validation;
+        border-color: $borderColor-RadioGroupOption-warning;
+      }
+      &.valid {
+        border-width: $borderWidth-RadioGroupOption-validation;
+        border-color: $borderColor-RadioGroupOption-success;
+      }
+    }
+  }
+
+  // The indicator is the circle that appears inside the radio button:
+  // both the larger circle and an inner circle.
+  .indicator {
+    display: grid;
+    place-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+                    circle,
+                    transparent 28%,
+                    $backgroundColor-checked-RadioGroupOption 34%
+    );
+
+    &.disabled {
+      background: radial-gradient(
+                      circle,
+                      transparent 28%,
+                      $backgroundColor-checked-RadioGroupOption--disabled 34%
+      );
+    }
+  }
+
+  .itemContainer {
+    z-index: -1;
+    position: relative;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .optionLabel {
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .label {
+    width: 100%;
+    color: $textColor-RadioGroupOption-default;
+    font-size: $fontSize-RadioGroupOption;
+    font-weight: $fontWeight-RadioGroupOption;
+    user-select: none;
+    cursor: pointer;
+
     &.error {
-      border-width: $borderWidth-RadioGroupOption-validation;
-      border-color: $borderColor-RadioGroupOption-error;
+      color: $textColor-RadioGroupOption-error;
     }
     &.warning {
-      border-width: $borderWidth-RadioGroupOption-validation;
-      border-color: $borderColor-RadioGroupOption-warning;
+      color: $textColor-RadioGroupOption-warning;
     }
     &.valid {
-      border-width: $borderWidth-RadioGroupOption-validation;
-      border-color: $borderColor-RadioGroupOption-success;
+      color: $textColor-RadioGroupOption-success;
     }
-  }
-}
-
-// The indicator is the circle that appears inside the radio button:
-// both the larger circle and an inner circle.
-.indicator {
-  display: grid;
-  place-content: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    transparent 28%,
-    $backgroundColor-checked-RadioGroupOption 34%
-  );
-
-  &.disabled {
-    background: radial-gradient(
-      circle,
-      transparent 28%,
-      $backgroundColor-checked-RadioGroupOption--disabled 34%
-    );
-  }
-}
-
-.itemContainer {
-  z-index: -1;
-  position: relative;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.optionLabel {
-  width: 100%;
-  cursor: pointer;
-}
-
-.label {
-  width: 100%;
-  color: $textColor-RadioGroupOption-default;
-  font-size: $fontSize-RadioGroupOption;
-  font-weight: $fontWeight-RadioGroupOption;
-  user-select: none;
-  cursor: pointer;
-
-  &.error {
-    color: $textColor-RadioGroupOption-error;
-  }
-  &.warning {
-    color: $textColor-RadioGroupOption-warning;
-  }
-  &.valid {
-    color: $textColor-RadioGroupOption-success;
   }
 }
 

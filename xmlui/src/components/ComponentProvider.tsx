@@ -255,6 +255,7 @@ import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
 import { paginationComponentRenderer } from "./Pagination/Pagination";
+import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -453,6 +454,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Badge !== "false") {
       this.registerCoreComponent(badgeComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_SimpleTooltip !== "false") {
+      this.registerCoreComponent(tooltipComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Avatar !== "false") {
       this.registerCoreComponent(avatarComponentRenderer);

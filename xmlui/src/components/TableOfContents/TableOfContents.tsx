@@ -76,10 +76,10 @@ function IndexAwareTableOfContents(props) {
 export const tableOfContentsRenderer = createComponentRenderer(
   COMP,
   TableOfContentsMd,
-  ({ layoutCss, node, extractValue }) => {
+  ({ className, node, extractValue }) => {
     return (
       <IndexAwareTableOfContents
-        style={layoutCss}
+        className={className}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
         omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}

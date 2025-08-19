@@ -96,7 +96,7 @@ export const switchComponentRenderer = createComponentRenderer(
   ({
     node,
     extractValue,
-    layoutCss,
+    className,
     updateState,
     state,
     lookupEventHandler,
@@ -105,7 +105,7 @@ export const switchComponentRenderer = createComponentRenderer(
     return (
       <Toggle
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        style={layoutCss}
+        className={className}
         initialValue={extractValue.asOptionalBoolean(
           node.props.initialValue,
           defaultProps.initialValue,

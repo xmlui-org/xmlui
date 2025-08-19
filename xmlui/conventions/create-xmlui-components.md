@@ -38,6 +38,21 @@ XMLUI components expose several key concepts that enable rich interactivity:
 - **Exposed Methods**: Programmatic APIs that allow parent components to control child behavior (e.g., `setValue()`, `focus()`)
 - **Context Variables**: Data that components expose to their children, accessible via `$variableName` syntax
 
+### Component Creation Conventions
+
+When creating new XMLUI components, follow these strict conventions:
+
+**File Structure:**
+- **Never create `index.ts` files** when creating components
+- **Never create example files** to demonstrate the component
+- **Only create end-to-end tests and documentation when explicitly requested**
+- **Do not add the React component to the xmlui folder's package.json file**
+
+**Focus on Core Functionality:**
+- Prioritize the component's core functionality and API design
+- Ensure proper XMLUI integration and registration
+- Examples and comprehensive documentation are secondary concerns unless specifically requested
+
 ### File Organization
 
 Each component should have its own directory under `src/components/` with the following structure:
@@ -46,17 +61,18 @@ Each component should have its own directory under `src/components/` with the fo
 ComponentName/
 ├── ComponentName.tsx              # Component definition (required)
 ├── ComponentNameNative.tsx        # Native implementation (dual-file pattern)
-├── ComponentName.module.scss      # Component styles (optional)
-├── ComponentName.spec.ts          # End-to-end tests (suggested)
-└── ComponentName.md               # Documentation examples (required)
+└── ComponentName.module.scss      # Component styles (optional)
 ```
 
 **Key files:**
 - **Component definition**: Always named exactly like the component (e.g., `Avatar.tsx`)
 - **Native file**: Appended with "Native" suffix (e.g., `AvatarNative.tsx`)
 - **SCSS module**: Always follows `.module.scss` pattern for scoped styles
-- **Test files**: `.spec.ts` for end-to-end tests
-- **Documentation**: `.md` file with usage examples and playground snippets
+
+**Important conventions:**
+- **Never create `index.ts` files** when creating components - components should be imported directly from their main files
+- **Never create example files** to demonstrate the component - examples should be in documentation or playground only
+- **Create end-to-end tests and documentation only when explicitly requested** - focus on core functionality first
 
 ### Standard Dual-File Pattern
 
@@ -312,9 +328,8 @@ Follow this implementation flow for creating new XMLUI components:
 3. **Create a rudimentary version of the native component** - Make the code compile with basic functionality
 4. **Add component registration** - At this point you can test the rudimentary component in XMLUI markup
 5. **Implement the native component in full** - Add complete functionality, styling, and behavior
-6. **Add end-to-end tests** - Ensure component reliability and functionality
-7. **Add comprehensive documentation** - Include usage patterns and working examples
-8. **Tune the component according to feedback** - Refine based on user testing and requirements
+
+**Note**: End-to-end tests and comprehensive documentation should only be created when explicitly requested. Focus on core functionality first.
 
 ### Native Component Structure
 

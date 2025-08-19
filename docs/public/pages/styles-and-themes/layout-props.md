@@ -2,6 +2,14 @@
 
 This document summarizes the layout properties you can use for UI Engine components.
 
+## `animation`
+
+Sets the animation to apply to the component.
+
+## `animationDuration`
+
+Sets the duration of the animation associated with the component.
+
 ## `background`
 
 Sets the background [color value](/styles-and-themes/common-units#color) of a component (shortcut to `backgroundColor`).
@@ -93,6 +101,10 @@ Sets the mouse [cursor](/styles-and-themes/common-units#cursor), if any, to show
 ## `direction`
 
 This property sets the direction of text, table columns, and horizontal overflow. Use `rtl` for languages written from right to left (like Hebrew or Arabic), and `ltr` for those written from left to right (like English and most other languages). By default, the prop's value is `ltr`.
+
+## `fill`
+
+Sets the fill [color](/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
 
 ## `fontFamily`
 
@@ -241,6 +253,14 @@ Sets the [size](/styles-and-themes/common-units#size) of the vertical paddings (
 ## `right`
 
 Sets the [right](/styles-and-themes/common-units#size) position of the component to the specified value.
+
+## `stroke`
+
+Sets the [stroke color](/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
+
+## `strokeWidth`
+
+Sets the [stroke width](/styles-and-themes/common-units#size) of graphical elements (such as SVG icons).
 
 ## `textAlign`
 

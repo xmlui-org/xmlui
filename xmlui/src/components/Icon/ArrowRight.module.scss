@@ -1,3 +1,5 @@
-.arrowRight {
-  fill: var(--colorFontMain);
+@layer components {
+  .arrowRight {
+    fill: var(--colorFontMain);
+  }
 }

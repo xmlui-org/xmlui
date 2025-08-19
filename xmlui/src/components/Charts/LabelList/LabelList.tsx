@@ -35,12 +35,12 @@ export const LabelListMd = createMetadata({
 export const labelListComponentRenderer = createComponentRenderer(
   COMP,
   LabelListMd,
-  ({ extractValue, node, layoutCss }: any) => {
+  ({ extractValue, node, className }: any) => {
     return (
       <LabelList
         key={extractValue(node.props?.dataKey)}
         position={extractValue.asOptionalString(node.props?.position)}
-        style={layoutCss}
+        className={className}
       />
     );
   },

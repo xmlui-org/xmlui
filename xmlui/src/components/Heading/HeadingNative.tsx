@@ -126,7 +126,7 @@ export const Heading = forwardRef(function Heading(
       id={uid}
       title={title}
       style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
-      className={classnames(styles.heading, styles[Element], className || "", {
+      className={classnames(styles.heading, styles[Element], className, {
         [styles.truncateOverflow]: maxLines > 0,
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,

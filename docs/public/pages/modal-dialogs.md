@@ -61,7 +61,7 @@ This is the imperative method. You invoke `ModalDialog`'s `open()` and `close()`
 When embedding a form in a dialog, the form's cancel and successful submit actions automatically close the dialog hosting the form (unless you change this logic). Note that you can pass data via `dialog.open()`, `ModalDialog` receives it as `$param`.
 
 
-```xmlui-pg display {3, 23}
+```xmlui-pg display {3, 23} height="400px"
 <App>
   <ModalDialog id="dialog">
     <Text> ID: { $param } </Text>

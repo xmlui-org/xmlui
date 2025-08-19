@@ -61,13 +61,13 @@ export const NumberBoxMd2 = createMetadata({
     },
     spinnerUpIcon: d(
       `Allows setting the icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
-      `app configuration file.`,
+        `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
+        `app configuration file.`,
     ),
     spinnerDownIcon: d(
       `Allows setting the icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
-      `app configuration file.`,
+        `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
+        `app configuration file.`,
     ),
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
@@ -135,43 +135,43 @@ export const numberBox2ComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return (
       <NumberBox2
-      style={layoutCss}
-      value={state?.value}
-      initialValue={extractValue.asOptionalString(node.props.initialValue)}
-      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-      placeholder={extractValue.asOptionalString(node.props.placeholder)}
-      validationStatus={extractValue(node.props.validationStatus)}
-      updateState={updateState}
-      onDidChange={lookupEventHandler("didChange")}
-      onFocus={lookupEventHandler("gotFocus")}
-      onBlur={lookupEventHandler("lostFocus")}
-      registerComponentApi={registerComponentApi}
-      hasSpinBox={extractValue.asOptionalBoolean(node.props.hasSpinBox)}
-      step={extractValue(node.props.step)}
-      integersOnly={extractValue.asOptionalBoolean(node.props.integersOnly)}
-      zeroOrPositive={extractValue.asOptionalBoolean(node.props.zeroOrPositive)}
-      maxFractionDigits={extractValue.asOptionalNumber(node.props.maxFractionDigits)}
-      min={extractValue.asOptionalNumber(node.props.minValue)}
-      max={extractValue.asOptionalNumber(node.props.maxValue)}
-      startText={extractValue.asOptionalString(node.props.startText)}
-      startIcon={extractValue.asOptionalString(node.props.startIcon)}
-      endText={extractValue.asOptionalString(node.props.endText)}
-      endIcon={extractValue.asOptionalString(node.props.endIcon)}
-      spinnerUpIcon={extractValue.asOptionalString(node.props.spinnerUpIcon)}
-      spinnerDownIcon={extractValue.asOptionalString(node.props.spinnerDownIcon)}
-      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      //maxLength={extractValue(node.props.maxLength)}
-      label={extractValue(node.props.label)}
-      labelPosition={extractValue(node.props.labelPosition)}
-      labelWidth={extractValue(node.props.labelWidth)}
-      labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
-      required={extractValue.asOptionalBoolean(node.props.required)}
+        className={className}
+        value={state?.value}
+        initialValue={extractValue.asOptionalString(node.props.initialValue)}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        placeholder={extractValue.asOptionalString(node.props.placeholder)}
+        validationStatus={extractValue(node.props.validationStatus)}
+        updateState={updateState}
+        onDidChange={lookupEventHandler("didChange")}
+        onFocus={lookupEventHandler("gotFocus")}
+        onBlur={lookupEventHandler("lostFocus")}
+        registerComponentApi={registerComponentApi}
+        hasSpinBox={extractValue.asOptionalBoolean(node.props.hasSpinBox)}
+        step={extractValue(node.props.step)}
+        integersOnly={extractValue.asOptionalBoolean(node.props.integersOnly)}
+        zeroOrPositive={extractValue.asOptionalBoolean(node.props.zeroOrPositive)}
+        maxFractionDigits={extractValue.asOptionalNumber(node.props.maxFractionDigits)}
+        min={extractValue.asOptionalNumber(node.props.minValue)}
+        max={extractValue.asOptionalNumber(node.props.maxValue)}
+        startText={extractValue.asOptionalString(node.props.startText)}
+        startIcon={extractValue.asOptionalString(node.props.startIcon)}
+        endText={extractValue.asOptionalString(node.props.endText)}
+        endIcon={extractValue.asOptionalString(node.props.endIcon)}
+        spinnerUpIcon={extractValue.asOptionalString(node.props.spinnerUpIcon)}
+        spinnerDownIcon={extractValue.asOptionalString(node.props.spinnerDownIcon)}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        //maxLength={extractValue(node.props.maxLength)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
       />
     );
   },

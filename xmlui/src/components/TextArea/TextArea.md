@@ -158,7 +158,10 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ```xmlui-pg copy display name="Example: didChange"
 <App var.field="">
-  <TextArea autoFocus="true" initialValue="{field}" onDidChange="(val) => field = val" />
+  <TextArea 
+    initialValue="{field}" 
+    onDidChange="(val) => field = val" 
+  />
   <Text value="{field}" />
 </App>
 ```

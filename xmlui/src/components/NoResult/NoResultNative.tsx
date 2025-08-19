@@ -1,4 +1,5 @@
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import classnames from "classnames";
 
 import styles from "./NoResult.module.scss";
 
@@ -7,7 +8,7 @@ import { Icon } from "../Icon/IconNative";
 // Default props for the NoResult component
 export const defaultProps = {
   hideIcon: false,
-  icon: "noresult"
+  icon: "noresult",
 };
 
 type Props = {
@@ -15,14 +16,15 @@ type Props = {
   icon?: string;
   hideIcon?: boolean;
   style?: CSSProperties;
+  className?: string;
 };
 
 export const NoResult = forwardRef(function NoResult(
-  { label, icon = defaultProps.icon, hideIcon = defaultProps.hideIcon, style }: Props,
+  { label, icon = defaultProps.icon, hideIcon = defaultProps.hideIcon, style, className }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
-    <div className={styles.wrapper} style={style} ref={forwardedRef}>
+    <div className={classnames(styles.wrapper, className)} style={style} ref={forwardedRef}>
       {!hideIcon && <Icon name={icon} className={styles.icon} />}
       {label}
     </div>

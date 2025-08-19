@@ -108,7 +108,7 @@ export const PaginationMd = createMetadata({
 export const paginationComponentRenderer = createComponentRenderer(
   COMP,
   PaginationMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, layoutCss }) => {
+  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, className }) => {
     // Extract property values
     const enabled = extractValue.asOptionalBoolean(node.props.enabled, true);
     const itemCount = extractValue.asOptionalNumber(node.props.itemCount, 0);
@@ -163,7 +163,7 @@ export const paginationComponentRenderer = createComponentRenderer(
         onPageSizeDidChange={onPageSizeDidChange}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
-        style={layoutCss}
+        className={className}
       />
     );
   },

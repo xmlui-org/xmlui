@@ -1,6 +1,7 @@
+import type {
+  CSSProperties,
+  ReactNode} from "react";
 import {
-  type CSSProperties,
-  type ReactNode,
   forwardRef,
   useCallback,
   useContext,
@@ -39,10 +40,11 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { useEvent } from "../../components-core/utils/misc";
 import {
+  useHasExplicitHeight,
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-  useStartMargin,
+  useStartMargin
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
@@ -114,6 +116,7 @@ type TableProps = {
   onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
   style?: CSSProperties;
+  className?: string;
   uid?: string;
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
@@ -178,6 +181,7 @@ export const Table = forwardRef(
       sortingDidChange,
       willSort,
       style,
+      className,
       noDataRenderer,
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
@@ -317,6 +321,7 @@ export const Table = forwardRef(
             starSizedWidth,
             pinTo: col.pinTo,
             style: col.style,
+            className: col.className,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
           },
@@ -496,11 +501,9 @@ export const Table = forwardRef(
 
     const scrollRef = useContext(ScrollContext);
 
-    const hasOutsideScroll =
-      scrollRef &&
-      style?.maxHeight === undefined &&
-      style?.height === undefined &&
-      style?.flex === undefined;
+    const hasHeight = useHasExplicitHeight(wrapperRef);
+
+    const hasOutsideScroll = scrollRef && !hasHeight;
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
@@ -599,7 +602,7 @@ export const Table = forwardRef(
 
     return (
       <div
-        className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
+        className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
         onKeyDown={onKeyDown}
         ref={ref}

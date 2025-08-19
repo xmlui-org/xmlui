@@ -87,7 +87,7 @@ export const LineChartMd = createMetadata({
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
@@ -95,7 +95,7 @@ export const lineChartComponentRenderer = createComponentRenderer(
         hideTickX={extractValue(node.props?.hideTickX)}
         hideTickY={extractValue(node.props?.hideTickY)}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
+        className={className}
         dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}

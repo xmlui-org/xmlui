@@ -99,7 +99,7 @@ type HSplitterComponentDef = ComponentDef<typeof HSplitterMd>;
 type RenderSplitterPars = {
   node: SplitterComponentDef | VSplitterComponentDef | HSplitterComponentDef;
   extractValue: ValueExtractor;
-  layoutCss: React.CSSProperties;
+  className: string | undefined;
   renderChild: RenderChildFn;
   orientation?: OrientationOptions;
   lookupEventHandler: LookupEventHandlerFn<typeof SplitterMd>;
@@ -110,7 +110,7 @@ const DEFAULT_ORIENTATION = "vertical";
 function renderSplitter({
   node,
   extractValue,
-  layoutCss,
+  className,
   renderChild,
   lookupEventHandler,
   orientation = extractValue(node.props.orientation) ?? DEFAULT_ORIENTATION,
@@ -120,7 +120,7 @@ function renderSplitter({
   }
   return (
     <Splitter
-      style={layoutCss}
+      className={className}
       swapped={extractValue.asOptionalBoolean(node.props?.swapped)}
       orientation={orientation}
       splitterTemplate={renderChild(node.props?.splitterTemplate)}
@@ -138,11 +138,11 @@ function renderSplitter({
 export const splitterComponentRenderer = createComponentRenderer(
   COMP,
   SplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
-      layoutCss,
+      className,
       renderChild,
       lookupEventHandler: lookupEventHandler as any,
     });
@@ -152,11 +152,11 @@ export const splitterComponentRenderer = createComponentRenderer(
 export const vSplitterComponentRenderer = createComponentRenderer(
   "VSplitter",
   VSplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
-      layoutCss,
+      className,
       renderChild,
       orientation: "vertical",
       lookupEventHandler: lookupEventHandler as any,
@@ -167,11 +167,11 @@ export const vSplitterComponentRenderer = createComponentRenderer(
 export const hSplitterComponentRenderer = createComponentRenderer(
   "HSplitter",
   HSplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
-      layoutCss,
+      className,
       renderChild,
       orientation: "horizontal",
       lookupEventHandler: lookupEventHandler as any,

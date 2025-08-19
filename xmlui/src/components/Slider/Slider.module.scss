@@ -29,115 +29,117 @@ $componentName: "Slider";
   }
 }
 
-// Container for the slider
-.sliderContainer {
-  width: 100%;
-  position: relative;
-  padding: t.$space-2 0;
-}
-
-// Root element
-.sliderRoot {
-  position: relative;
-  display: flex;
-  width: 100%;
-  touch-action: none;
-  user-select: none;
-  align-items: center;
-  height: 20px;
-}
-
-// Track element
-.sliderTrack {
-  position: relative;
-  height: 8px;
-  width: 100%;
-  flex-grow: 1;
-  overflow: hidden;
-  border-radius: 9999px;
-  background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}");
-
-  @include variant("default");
-
-  &.error {
-    @include variant("error");
-  }
-  &.warning {
-    @include variant("warning");
-  }
-  &.valid {
-    @include variant("success");
+@layer components {
+  // Container for the slider
+  .sliderContainer {
+    width: 100%;
+    position: relative;
+    padding: t.$space-2 0;
   }
 
-  &.disabled, &[data-disabled] {
-    background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
+  // Root element
+  .sliderRoot {
+    position: relative;
+    display: flex;
+    width: 100%;
+    touch-action: none;
+    user-select: none;
+    align-items: center;
+    height: 20px;
   }
-}
 
-// Range element
-.sliderRange {
-  position: absolute;
-  height: 100%;
-  background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}");
-  border-radius: 9999px;
+  // Track element
+  .sliderTrack {
+    position: relative;
+    height: 8px;
+    width: 100%;
+    flex-grow: 1;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}");
 
-  &.disabled, &[data-disabled] {
-    background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
+    @include variant("default");
+
+    &.error {
+      @include variant("error");
+    }
+    &.warning {
+      @include variant("warning");
+    }
+    &.valid {
+      @include variant("success");
+    }
+
+    &.disabled, &[data-disabled] {
+      background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
+    }
   }
-}
 
-// Thumb element
-.sliderThumb {
-  cursor: pointer;
-  display: block;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: createThemeVar("Input:borderWidth-thumb-#{$componentName}")
-          createThemeVar("Input:borderStyle-thumb-#{$componentName}")
-          createThemeVar("Input:borderColor-thumb-#{$componentName}");
-  background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
-  box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
-  position: relative;
-  transition: background-color 0.2s, box-shadow 0.2s;
-  outline: none;
+  // Range element
+  .sliderRange {
+    position: absolute;
+    height: 100%;
+    background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}");
+    border-radius: 9999px;
 
-  &.disabled, &[data-disabled] {
-    pointer-events: none;
+    &.disabled, &[data-disabled] {
+      background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
+    }
+  }
+
+  // Thumb element
+  .sliderThumb {
+    cursor: pointer;
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: createThemeVar("Input:borderWidth-thumb-#{$componentName}")
+    createThemeVar("Input:borderStyle-thumb-#{$componentName}")
+    createThemeVar("Input:borderColor-thumb-#{$componentName}");
+    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
+    position: relative;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    outline: none;
+
+    &.disabled, &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &:hover, &[data-hover] {
+      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
+      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+    }
+    &:active, &[data-active] {
+      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
+      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
+    }
+  }
+
+  /* States */
+  .disabled {
     opacity: 0.5;
+    cursor: not-allowed;
   }
 
-  &:hover, &[data-hover] {
-    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+  .readOnly {
+    opacity: 0.7;
+    cursor: default;
   }
-  &:active, &[data-active] {
-    background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
-    box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
+
+  .error {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-error");
   }
-}
 
-/* States */
-.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  .warning {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-warning");
+  }
 
-.readOnly {
-  opacity: 0.7;
-  cursor: default;
-}
-
-.error {
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-error");
-}
-
-.warning {
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-warning");
-}
-
-.valid {
-  border-color: createThemeVar("Input:borderColor-#{$componentName}-success");
+  .valid {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-success");
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

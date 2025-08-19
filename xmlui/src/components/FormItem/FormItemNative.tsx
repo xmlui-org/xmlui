@@ -60,6 +60,7 @@ const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> =
 type Props = {
   children?: ReactNode;
   style?: CSSProperties;
+  className?: string;
   bindTo: string;
   type?: FormControlType;
   labelPosition?: LabelPosition;
@@ -143,6 +144,7 @@ export const FormItem = memo(function FormItem({
   regexInvalidSeverity,
   // ---
   style,
+  className,
   bindTo,
   type = defaultProps.type,
   label,
@@ -498,6 +500,7 @@ export const FormItem = memo(function FormItem({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       validationResult={
         <div ref={animateContainerRef}>
           {isHelperTextShown &&

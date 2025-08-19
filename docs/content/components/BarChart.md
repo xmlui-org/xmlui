@@ -61,6 +61,10 @@ Controls the visibility of the X-axis ticks. If set to `true`, tick labels on th
 
 Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.
 
+### `hideTooltip` (default: false) [#hidetooltip-default-false]
+
+Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.
+
 ### `hideX` (default: false) [#hidex-default-false]
 
 Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.

@@ -166,6 +166,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
 
 type FlowLayoutProps = {
   style?: CSSProperties;
+  className?: string;
   columnGap: string | number;
   rowGap: string | number;
   children: ReactNode;
@@ -177,7 +178,7 @@ export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap"> = {
 };
 
 export const FlowLayout = forwardRef(function FlowLayout(
-  { style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps,
+  { style, className, columnGap = 0, rowGap = 0, children }: FlowLayoutProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [numberOfChildren, setNumberOfChildren] = useState(0);
@@ -205,7 +206,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
   }, [_columnGap, _rowGap]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
-      <div style={style} ref={forwardedRef}>
+      <div style={style} className={className} ref={forwardedRef}>
         <div className={styles.outer}>
           <div className={classnames(styles.flowContainer, styles.horizontal)} style={innerStyle}>
             {children}

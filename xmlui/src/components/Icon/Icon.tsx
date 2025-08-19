@@ -43,12 +43,12 @@ export const IconMd = createMetadata({
 export const iconComponentRenderer = createComponentRenderer(
   COMP,
   IconMd,
-  ({ node, extractValue, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, className, lookupEventHandler }) => {
     return (
       <Icon
         name={extractValue.asOptionalString(node.props.name)}
         size={extractValue(node.props.size)}
-        style={layoutCss}
+        className={className}
         fallback={extractValue.asOptionalString(node.props.fallback)}
         onClick={lookupEventHandler("click")}
       />

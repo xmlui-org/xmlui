@@ -48,6 +48,7 @@ import type { FormMd } from "./Form";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
+import classnames from "classnames";
 
 export const getByPath = (obj: any, path: string) => {
   return get(obj, path);
@@ -219,6 +220,7 @@ type Props = {
   initialValue?: any;
   children: ReactNode;
   style?: CSSProperties;
+  className?: string;
   enabled?: boolean;
   cancelLabel?: string;
   saveLabel?: string;
@@ -276,6 +278,7 @@ const Form = forwardRef(function (
     initialValue = EMPTY_OBJECT,
     children,
     style,
+    className,
     enabled = true,
     cancelLabel = defaultProps.cancelLabel,
     saveLabel = defaultProps.saveLabel,
@@ -464,7 +467,7 @@ const Form = forwardRef(function (
     <>
       <form
         style={style}
-        className={styles.wrapper}
+        className={classnames(styles.wrapper, className)}
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
@@ -522,13 +525,15 @@ export function FormWithContextVar({
   renderChild,
   extractValue,
   style,
+  className,
   lookupEventHandler,
   registerComponentApi,
 }: {
   node: FormComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
-  style: CSSProperties;
+  style?: CSSProperties;
+  className?: string;
   lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
   registerComponentApi: RegisterComponentApiFn;
 }) {
@@ -587,6 +592,7 @@ export function FormWithContextVar({
       dispatch={dispatch}
       id={node.uid}
       style={style}
+      className={className}
       cancelLabel={extractValue(node.props.cancelLabel)}
       saveLabel={extractValue(node.props.saveLabel)}
       saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}

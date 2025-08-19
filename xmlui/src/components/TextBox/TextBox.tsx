@@ -40,6 +40,15 @@ export const TextBoxMd = createMetadata({
   description:
     "`TextBox` captures user text input for forms, search fields, and data entry " +
     "with support for validation, icons, and formatting hints.",
+  parts: {
+    label: {
+      description: "The label displayed for the text box.",
+    },
+    item: {
+      description: "The text box input area.",
+    }
+  },
+  defaultPart: "item",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {
@@ -148,7 +157,7 @@ export const TextBoxMd = createMetadata({
 type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
 
 function renderTextBox(
-  layoutCss: React.CSSProperties,
+  className: string | undefined,
   state: any,
   updateState: (componentState: any) => void,
   extractValue: ValueExtractor,
@@ -160,11 +169,12 @@ function renderTextBox(
   registerComponentApi: RegisterComponentApiFn,
   type: "text" | "password" = "text",
 ) {
-  delete layoutCss.gap;
+  // TODO: How can we use the gap from the className?
+  //delete layoutCss.gap;
   return (
     <TextBox
       type={type}
-      style={layoutCss}
+      className={className}
       value={state.value}
       updateState={updateState}
       initialValue={extractValue(node.props.initialValue)}
@@ -204,11 +214,11 @@ export const textBoxComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      layoutCss,
+      className,
       state,
       updateState,
       extractValue,
@@ -235,11 +245,11 @@ export const passwordInputComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      layoutCss,
+      className,
       state,
       updateState,
       extractValue,

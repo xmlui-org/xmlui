@@ -201,6 +201,8 @@ import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
+import { Tooltip } from "@radix-ui/react-tooltip";
+import { TooltipMd } from "./Tooltip/Tooltip";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -380,6 +382,7 @@ export const collectedComponentMetadata = {
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
+  Tooltip: TooltipMd,
   HSplitter: HSplitterMd,
   VSplitter: VSplitterMd,
   Stack: StackMd,

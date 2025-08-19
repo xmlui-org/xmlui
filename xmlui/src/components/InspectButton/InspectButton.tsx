@@ -6,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { CSSProperties, ReactNode } from "react";
 import { PiFileCode } from "react-icons/pi";
 import { createMetadata } from "../metadata-helpers";
+import classnames from "classnames";
 
 const COMP = "InspectButton";
 export const InspectButtonMd = createMetadata({
@@ -17,13 +18,13 @@ export const InspectButtonMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-function InspectButton({ children, style }: { children: ReactNode; style: CSSProperties }) {
+function InspectButton({ children, style, className }: { children: ReactNode; style?: CSSProperties, className?: string }) {
   const { setInspectMode, inspectMode } = useInspectMode();
 
   return (
     <Button
       style={style}
-      className={styles.inspectButton}
+      className={classnames(styles.inspectButton, className)}
       themeColor={inspectMode ? "primary" : "secondary"}
       variant={inspectMode ? "solid" : "outlined"}
       onClick={() => {
@@ -42,7 +43,7 @@ function InspectButton({ children, style }: { children: ReactNode; style: CSSPro
 export const inspectButtonComponentRenderer = createComponentRenderer(
   COMP,
   InspectButtonMd,
-  ({ renderChild, node, layoutCss }) => {
-    return <InspectButton style={layoutCss}>{renderChild(node.children)}</InspectButton>;
+  ({ renderChild, node, className }) => {
+    return <InspectButton className={className}>{renderChild(node.children)}</InspectButton>;
   },
 );

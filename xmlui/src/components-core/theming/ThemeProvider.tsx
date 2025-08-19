@@ -33,7 +33,9 @@ import type {
   ThemeScope,
   ThemeTone,
 } from "../../abstractions/ThemingDefs";
+import { omit } from "lodash-es";
 import { ThemeToneKeys } from "./utils";
+import { useDomRoot } from "./StyleContext";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,
@@ -110,7 +112,7 @@ export function useCompiledTheme(
     themeDefChain?.forEach((theme) => {
       mergedThemeVars = {
         ...mergedThemeVars,
-        ...theme.themeVars,
+        ...omit(theme.themeVars, "light", "dark"),
         ...(theme.themeVars?.[activeTone] as unknown as Record<string, string>),
         ...theme.tones?.[activeTone]?.themeVars,
       };
@@ -120,9 +122,9 @@ export function useCompiledTheme(
     const resultedTheme = [
       ...themeDefChain
         .map((themeDef) => ({
-          ...themeDef.themeVars,
-          ...(themeDef.themeVars?.[activeTone] as unknown as Record<string, string>),
-          ...themeDef.tones?.[activeTone]?.themeVars,
+            ...omit(themeDef.themeVars, "light", "dark"),
+            ...(themeDef.themeVars?.[activeTone] as unknown as Record<string, string>),
+            ...themeDef.tones?.[activeTone]?.themeVars,
         }))
         .slice(0, themeDefChain.length - 1),
       {
@@ -134,7 +136,7 @@ export function useCompiledTheme(
         ...generateButtonTones(mergedThemeVars),
       },
       {
-        ...themeDefChain[themeDefChain.length - 1].themeVars,
+        ...omit(themeDefChain[themeDefChain.length - 1].themeVars, "light", "dark"),
         ...generateTextFontSizes(mergedThemeVars),
         ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
           string,
@@ -306,12 +308,22 @@ function ThemeProvider({
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
     useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
+
+  const domRoot = useDomRoot();
   const [root, setRoot] = useState(null);
+
+  useIsomorphicLayoutEffect(() => {
+    if (typeof document !== "undefined") {
+      if(domRoot instanceof ShadowRoot){
+        setRoot(domRoot.getElementById("nested-app-root"));
+      } else {
+        setRoot(document.body);
+      }
+    }
+  }, [domRoot]);
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
-      root,
-      setRoot,
       themes,
       resources,
       resourceMap,
@@ -331,13 +343,13 @@ function ThemeProvider({
     availableThemeIds,
     resourceMap,
     resources,
-    root,
     themes,
   ]);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
       root,
+      setRoot,
       activeThemeId,
       activeThemeTone: activeThemeTone,
       activeTheme,

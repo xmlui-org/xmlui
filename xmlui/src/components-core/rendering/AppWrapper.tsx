@@ -182,7 +182,6 @@ export const AppWrapper = ({
     : typeof window === "undefined" || process.env.VITE_REMIX;
 
   return (
-    <React.StrictMode>
       <ErrorBoundary node={node} location={"root-outer"}>
         <QueryClientProvider client={queryClient}>
           {/* No router in the REMIX environment */}
@@ -196,6 +195,5 @@ export const AppWrapper = ({
           )}
         </QueryClientProvider>
       </ErrorBoundary>
-    </React.StrictMode>
   );
 };

@@ -7,56 +7,58 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+@layer components {
+  .outer {
+    contain: layout;
+  }
 
-.outer{
-  contain: layout;
-}
+  .flowContainer {
+    display: flex;
+    flex-wrap: wrap;
 
-.flowContainer {
-  display: flex;
-  flex-wrap: wrap;
+    &.horizontal {
+      flex-direction: row;
 
-  &.horizontal {
-    flex-direction: row;
+      .flowItem {
+        flex-shrink: 0;
 
-    .flowItem {
-      flex-shrink: 0;
+        & > * {
+          width: 100% !important; //reset the wrapped content's width-like properties to their default
+          min-width: 0 !important;
+          max-width: none !important;
+        }
+      }
+    }
 
-      & > * {
-        width: 100% !important; //reset the wrapped content's width-like properties to their default
-        min-width: 0 !important;
-        max-width: none !important;
+    &.vertical {
+      height: 100%;
+      flex-direction: column;
+      align-content: flex-start;
+
+      .flowItem {
+        width: auto;
+        flex-shrink: 0;
+
+        & > * {
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+        }
       }
     }
   }
 
-  &.vertical {
-    height: 100%;
-    flex-direction: column;
-    align-content: flex-start;
-
-    .flowItem {
-      width: auto;
-      flex-shrink: 0;
-
-      & > * {
-        height: auto !important;
-        min-height: 0 !important;
-        max-height: none !important;
-      }
-    }
+  //we use the .break class to create a new line in the flow
+  // if there are multiple star-sized elements in a row, the break will be ignored between them
+  .break:not(.forceBreak):has(+ .starSized) {
+    display: none;
   }
-}
 
-//we use the .break class to create a new line in the flow
-// if there are multiple star-sized elements in a row, the break will be ignored between them
-.break:not(.forceBreak):has(+ .starSized) {
-  display: none;
-}
-
-.break, .forceBreak {
-  flex-basis: 100%;
-  height: 0;
+  .break,
+  .forceBreak {
+    flex-basis: 100%;
+    height: 0;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

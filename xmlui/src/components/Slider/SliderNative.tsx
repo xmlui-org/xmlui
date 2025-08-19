@@ -27,6 +27,7 @@ type Props = {
   value?: number | number[];
   initialValue?: number | number[];
   style?: CSSProperties;
+  className?: string;
   step?: number;
   max?: number;
   min?: number;
@@ -72,6 +73,7 @@ export const Slider = forwardRef(
     {
       id,
       style,
+      className,
       step = defaultProps.step,
       min = defaultProps.min,
       max = defaultProps.max,
@@ -220,6 +222,7 @@ export const Slider = forwardRef(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={className}
         ref={forwardedRef}
         id={id}
         isInputTemplateUsed={true}
@@ -230,7 +233,7 @@ export const Slider = forwardRef(
             ref={inputRef}
             tabIndex={tabIndex}
             aria-readonly={readOnly}
-            className={classnames(styles.sliderRoot, {
+            className={classnames(className, styles.sliderRoot, {
               [styles.disabled]: !enabled,
               [styles.readOnly]: readOnly
             })}

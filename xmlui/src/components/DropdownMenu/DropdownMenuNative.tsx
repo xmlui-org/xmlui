@@ -23,6 +23,7 @@ type DropdownMenuProps = {
   label?: string;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
+  className?: string;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
@@ -54,6 +55,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     label,
     registerComponentApi,
     style,
+    className,
     onWillOpen,
     alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
@@ -107,7 +109,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         <ReactDropdownMenu.Content
           align={alignment}
           style={style}
-          className={styles.DropdownMenuContent}
+          className={classnames(styles.DropdownMenuContent, className)}
         >
           {children}
         </ReactDropdownMenu.Content>
@@ -123,6 +125,7 @@ type MenuItemProps = {
   children?: ReactNode;
   label?: string;
   style?: CSSProperties;
+  className?: string;
   to?: string;
   active?: boolean;
   enabled?: boolean;
@@ -139,6 +142,7 @@ export const MenuItem = forwardRef(function MenuItem(
     onClick = noop,
     label,
     style,
+    className,
     icon,
     iconPosition = defaultMenuItemProps.iconPosition,
     active = defaultMenuItemProps.active,
@@ -151,7 +155,7 @@ export const MenuItem = forwardRef(function MenuItem(
   return (
     <ReactDropdownMenu.Item
       style={style}
-      className={classnames(styles.DropdownMenuItem, {
+      className={classnames(className, styles.DropdownMenuItem, {
         [styles.active]: active,
         [styles.disabled]: !enabled,
       })}

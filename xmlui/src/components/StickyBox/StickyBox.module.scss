@@ -7,14 +7,18 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.wrapper {
-  z-index: 1;
-}
+@layer components {
+  .wrapper {
+    z-index: 1;
+  }
 
-.sentinel ~ *:has([data-anchor="true"]){
-  [data-anchor="true"]{
-    //my-scroll-margin-top is set by the heading component, we have to take that into account, too
-    scroll-margin-top: calc(var(--my-scroll-margin-top, 0px) + var(--xmlui-scroll-margin-top, 0px));
+  .sentinel ~ *:has([data-anchor="true"]) {
+    [data-anchor="true"] {
+      //my-scroll-margin-top is set by the heading component, we have to take that into account, too
+      scroll-margin-top: calc(
+        var(--my-scroll-margin-top, 0px) + var(--xmlui-scroll-margin-top, 0px)
+      );
+    }
   }
 }
 

@@ -96,6 +96,7 @@ type ResponsiveBarProps = {
   gap?: number; // Gap between children in pixels
   orientation?: "horizontal" | "vertical"; // Layout direction
   style?: CSSProperties;
+  className?: string;
   onClick?: () => void;
   [key: string]: any; // For test props
 };
@@ -135,6 +136,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
     gap = defaultResponsiveBarProps.gap,
     orientation = defaultResponsiveBarProps.orientation,
     style,
+    className,
     onClick,
     ...rest
   }: ResponsiveBarProps,
@@ -419,7 +421,8 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       }}
       className={classnames(
         styles.responsiveBar, 
-        orientation === "vertical" ? styles.vertical : styles.horizontal
+        orientation === "vertical" ? styles.vertical : styles.horizontal,
+        className
       )}
       style={{
         ...style,

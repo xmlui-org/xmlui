@@ -10,15 +10,9 @@ $themeVars: ();
 $backgroundColor-DropdownMenu: createThemeVar("backgroundColor-DropdownMenu");
 $borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
 $boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
-$borderColor-DropdownMenu-content: createThemeVar(
-  "borderColor-DropdownMenu-content"
-);
-$borderWidth-DropdownMenu-content: createThemeVar(
-  "borderWidth-DropdownMenu-content"
-);
-$borderStyle-DropdownMenu-content: createThemeVar(
-  "borderStyle-DropdownMenu-content"
-);
+$borderColor-DropdownMenu-content: createThemeVar("borderColor-DropdownMenu-content");
+$borderWidth-DropdownMenu-content: createThemeVar("borderWidth-DropdownMenu-content");
+$borderStyle-DropdownMenu-content: createThemeVar("borderStyle-DropdownMenu-content");
 $minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
 $backgroundColor-MenuItem: createThemeVar("backgroundColor-MenuItem");
 $color-MenuItem: createThemeVar("color-MenuItem");
@@ -40,76 +34,78 @@ $width-MenuSeparator: createThemeVar("width-MenuSeparator");
 $height-MenuSeparator: createThemeVar("height-MenuSeparator");
 $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 
-.DropdownMenuContent,
-.DropdownMenuSubContent {
-  background-color: $backgroundColor-DropdownMenu;
-  border-radius: $borderRadius-DropdownMenu;
-  min-width: $minWidth-DropdowMenu;
-  box-shadow: $boxShadow-DropdownMenu;
-  overflow: hidden;
-  animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
-  border: $borderWidth-DropdownMenu-content
-    $borderStyle-DropdownMenu-content $borderColor-DropdownMenu-content;
-}
-
-.DropdownMenuItem,
-.DropdownMenuSubTrigger {
-  background-color: $backgroundColor-MenuItem;
-  color: $color-MenuItem;
-  font-family: $fontFamily-MenuItem;
-  display: flex;
-  border: 0;
-  width: 100%;
-  gap: $gap-MenuItem;
-  font-size: $fontSize-MenuItem;
-  padding: $paddingVertical-MenuItem 0;
-  padding-inline: $paddingHorizontal-MenuItem; //t.$space-3;
-  cursor: pointer;
-  align-items: center;
-  justify-content: space-between;
-  user-select: none;
-  outline: none;
-
-  &:hover,
-  &[data-highlighted] {
-    background-color: $backgroundColor-MenuItem--hover;
-    color: $color-MenuItem--hover;
+@layer components {
+  .DropdownMenuContent,
+  .DropdownMenuSubContent {
+    background-color: $backgroundColor-DropdownMenu;
+    border-radius: $borderRadius-DropdownMenu;
+    min-width: $minWidth-DropdowMenu;
+    box-shadow: $boxShadow-DropdownMenu;
+    overflow: hidden;
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    border: $borderWidth-DropdownMenu-content $borderStyle-DropdownMenu-content
+      $borderColor-DropdownMenu-content;
   }
 
-  &.active {
-    background-color: $backgroundColor-MenuItem--active;
-    color: $color-MenuItem--active;
-
-    &:hover {
-      background-color: $backgroundColor-MenuItem--active--hover;
-      color: $color-MenuItem--active--hover;
-    }
-  }
-
-  &.disabled {
+  .DropdownMenuItem,
+  .DropdownMenuSubTrigger {
     background-color: $backgroundColor-MenuItem;
-    color: $color-MenuItem--disabled;
-    cursor: not-allowed;
+    color: $color-MenuItem;
+    font-family: $fontFamily-MenuItem;
+    display: flex;
+    border: 0;
+    width: 100%;
+    gap: $gap-MenuItem;
+    font-size: $fontSize-MenuItem;
+    padding: $paddingVertical-MenuItem 0;
+    padding-inline: $paddingHorizontal-MenuItem; //t.$space-3;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    outline: none;
 
-    &:hover {
+    &:hover,
+    &[data-highlighted] {
+      background-color: $backgroundColor-MenuItem--hover;
+      color: $color-MenuItem--hover;
+    }
+
+    &.active {
+      background-color: $backgroundColor-MenuItem--active;
+      color: $color-MenuItem--active;
+
+      &:hover {
+        background-color: $backgroundColor-MenuItem--active--hover;
+        color: $color-MenuItem--active--hover;
+      }
+    }
+
+    &.disabled {
       background-color: $backgroundColor-MenuItem;
       color: $color-MenuItem--disabled;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: $backgroundColor-MenuItem;
+        color: $color-MenuItem--disabled;
+      }
+    }
+
+    .wrapper {
+      flex: 1;
     }
   }
 
-  .wrapper {
-    flex: 1;
+  .DropdownMenuSeparator {
+    margin-top: $marginTop-MenuSeparator;
+    margin-bottom: $marginBottom-MenuSeparator;
+    width: $width-MenuSeparator;
+    height: $height-MenuSeparator;
+    background-color: $color-MenuSeparator;
   }
-}
-
-.DropdownMenuSeparator {
-  margin-top: $marginTop-MenuSeparator;
-  margin-bottom: $marginBottom-MenuSeparator;
-  width: $width-MenuSeparator;
-  height: $height-MenuSeparator;
-  background-color: $color-MenuSeparator;
 }
 
 // --- We export the theme variables to add them to the component renderer
