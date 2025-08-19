@@ -20,10 +20,16 @@ export const PaginationMd = createMetadata({
   status: "experimental",
   description:
     "`Pagination` enables navigation through large datasets by dividing content into pages. " +
-    "It provides controls for page navigation and displays current page information.",
+    "It provides controls for page navigation and can display current page information.",
   props: {
     enabled: dEnabled(),
-    itemCount: d("Total number of items to paginate", undefined, "number", defaultProps.itemCount),
+    itemCount: d(
+      "Total number of items to paginate. " +
+        "If not provided, the component renders simplified pagination controls " +
+        "that are enabled/disabled using the `hasPrevPage` and `hasNextPage` props.",
+      undefined,
+      "number",
+    ),
     pageSize: d("Number of items per page", undefined, "number", defaultProps.pageSize),
     pageIndex: d("Current page index (0-based)", undefined, "number", defaultProps.pageIndex),
     maxVisiblePages: d(
@@ -40,6 +46,16 @@ export const PaginationMd = createMetadata({
     ),
     pageSizeOptions: d(
       "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+    ),
+    hasPrevPage: d(
+      "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",
+      undefined,
+      "boolean",
+    ),
+    hasNextPage: d(
+      "Whether to disable the next page button. Only takes effect if itemCount is not provided.",
+      undefined,
+      "boolean",
     ),
     orientation: {
       description: "Layout orientation of the pagination component",
@@ -111,13 +127,15 @@ export const paginationComponentRenderer = createComponentRenderer(
   ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, className }) => {
     // Extract property values
     const enabled = extractValue.asOptionalBoolean(node.props.enabled, true);
-    const itemCount = extractValue.asOptionalNumber(node.props.itemCount, 0);
+    const itemCount = extractValue.asOptionalNumber(node.props.itemCount);
     const pageSize = extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize);
     const pageIndex = extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex);
     const hasPageInfo = extractValue.asOptionalBoolean(
       node.props.hasPageInfo,
       defaultProps.hasPageInfo,
     );
+    const hasPrevPage = extractValue.asOptionalBoolean(node.props.hasPrevPage);
+    const hasNextPage = extractValue.asOptionalBoolean(node.props.hasNextPage);
     const pageSizeOptions = extractValue(node.props.pageSizeOptions) as number[] | undefined;
     let maxVisiblePages = extractValue.asOptionalNumber(
       node.props.maxVisiblePages,
@@ -155,6 +173,8 @@ export const paginationComponentRenderer = createComponentRenderer(
         pageSize={pageSize}
         pageIndex={pageIndex}
         hasPageInfo={hasPageInfo}
+        hasPrevPage={hasPrevPage}
+        hasNextPage={hasNextPage}
         maxVisiblePages={maxVisiblePages as PageNumber}
         pageSizeOptions={pageSizeOptions}
         orientation={orientation as OrientationOptions}
