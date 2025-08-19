@@ -1,6 +1,7 @@
 import { BarChart, defaultProps } from "./BarChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata } from "../../metadata-helpers";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "BarChart";
 
@@ -87,6 +88,9 @@ export const BarChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
   },
 });
 
@@ -110,6 +114,22 @@ export const barChartComponentRenderer = createComponentRenderer(
         hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
         hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </BarChart>

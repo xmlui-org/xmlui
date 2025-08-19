@@ -3,6 +3,7 @@ import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata, d } from "../../metadata-helpers";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
 import styles from "./LineChart.module.scss";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "LineChart";
 
@@ -73,6 +74,9 @@ export const LineChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
     marginTop: d("The top margin of the chart"),
     marginRight: d("The right margin of the chart"),
     marginBottom: d("The bottom margin of the chart"),
@@ -106,6 +110,22 @@ export const lineChartComponentRenderer = createComponentRenderer(
         marginRight={extractValue.asOptionalNumber(node.props?.marginRight)}
         marginBottom={extractValue.asOptionalNumber(node.props?.marginBottom)}
         marginLeft={extractValue.asOptionalNumber(node.props?.marginLeft)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </LineChart>

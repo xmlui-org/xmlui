@@ -420,3 +420,88 @@ test.describe("responsive behavior", () => {
     await expect(page.locator(linesSelector)).toHaveCount(2);
   });
 });
+
+// --- Tooltip Template Tests
+
+test.describe("tooltipTemplate", () => {
+  test("renders custom tooltip template", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <BarChart
+        nameKey="name"
+        data="{${sampleData}}"
+        dataKeys="{['sales', 'profit']}"
+        width="600px"
+        height="400px"
+      >
+        <property name="tooltipTemplate">
+          <VStack>
+            <Text>Custom Tooltip</Text>
+            <Text>Label: {$tooltip.label}</Text>
+            <Text>Active: {$tooltip.active}</Text>
+          </VStack>
+        </property>
+      </BarChart>
+    `);
+    
+    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    const chart = page.locator(chartSvg).first();
+    await chart.hover({ position: { x: 200, y: 100 } });
+    
+    // Wait for tooltip to appear
+    await page.waitForTimeout(500);
+    await expect(page.locator(tooltipSelector)).toBeVisible();
+    
+    // Check for custom tooltip content
+    await expect(page.getByText("Custom Tooltip")).toBeVisible();
+    await expect(page.getByText(/Label:/)).toBeVisible();
+    await expect(page.getByText(/Active:/)).toBeVisible();
+  });
+
+  test("tooltip template is not rendered when hideTooltip is true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <LineChart
+        nameKey="name"
+        data="{${sampleData}}"
+        dataKeys="{['sales', 'profit']}"
+        hideTooltip
+        width="600px"
+        height="400px"
+      >
+        <property name="tooltipTemplate">
+          <Text>This tooltip should not appear</Text>
+        </property>
+      </LineChart>
+    `);
+    
+    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    const chart = page.locator(chartSvg).first();
+    await chart.hover({ position: { x: 200, y: 100 } });
+    
+    await page.waitForTimeout(500);
+    await expect(page.locator(tooltipSelector)).not.toBeVisible();
+    await expect(page.getByText("This tooltip should not appear")).not.toBeVisible();
+  });
+
+  test("falls back to default tooltip when tooltipTemplate is not provided", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <LineChart
+          nameKey="name"
+          data="{${sampleData}}"
+          dataKeys="{['sales', 'profit']}"
+          width="600px"
+          height="400px"
+        />
+      `);
+      
+      await page.waitForSelector(chartRoot, { timeout: 10000 });
+      const chart = page.locator(chartSvg).first();
+      await chart.hover({ position: { x: 200, y: 100 } });
+      
+      await page.waitForTimeout(500);
+      await expect(page.locator(tooltipSelector)).toBeVisible();
+      
+      // Default tooltip should contain standard recharts tooltip content
+      const tooltip = page.locator(tooltipSelector);
+      await expect(tooltip).toBeVisible();
+    });
+});
