@@ -23,6 +23,8 @@ type Props = {
   pageSizeOptions?: number[];
   orientation?: OrientationOptions;
   reverseLayout?: boolean;
+  hasPrevPage?: boolean;
+  hasNextPage?: boolean;
   onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
@@ -34,7 +36,6 @@ type Props = {
 export const defaultProps: Required<
   Pick<
     Props,
-    | "itemCount"
     | "pageSize"
     | "pageIndex"
     | "maxVisiblePages"
@@ -43,7 +44,6 @@ export const defaultProps: Required<
     | "reverseLayout"
   >
 > = {
-  itemCount: 0,
   pageSize: 10,
   pageIndex: 0,
   maxVisiblePages: 1,
@@ -65,7 +65,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   {
     id,
     enabled = true,
-    itemCount = defaultProps.itemCount,
+    itemCount,
     pageSize = defaultProps.pageSize,
     pageIndex = defaultProps.pageIndex,
     maxVisiblePages = defaultProps.maxVisiblePages,
@@ -73,6 +73,8 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     pageSizeOptions,
     orientation = defaultProps.orientation,
     reverseLayout = defaultProps.reverseLayout,
+    hasPrevPage,
+    hasNextPage,
     onPageDidChange,
     onPageSizeDidChange,
     registerComponentApi,
@@ -83,9 +85,14 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   },
   ref,
 ) {
-  // Calculate pagination values
-  const totalPages = Math.max(1, Math.ceil(itemCount / pageSize));
-  const currentPage = Math.max(0, Math.min(pageIndex, totalPages - 1));
+  // Check if we have valid itemCount for full pagination
+  const hasValidItemCount = typeof itemCount === "number" && itemCount >= 0;
+
+  // Calculate pagination values only when itemCount is valid
+  const totalPages = hasValidItemCount ? Math.max(1, Math.ceil(itemCount / pageSize)) : 1;
+  const currentPage = hasValidItemCount
+    ? Math.max(0, Math.min(pageIndex, totalPages - 1))
+    : pageIndex;
   const currentPageNumber = currentPage + 1; // 1-based for display
 
   // Track internal state for API access
@@ -105,20 +112,22 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     updateState?.({
       currentPage: currentPageNumber,
       currentPageSize: pageSize,
-      totalPages,
+      totalPages: hasValidItemCount ? totalPages : undefined,
       itemCount,
     });
-  }, [currentPageNumber, pageSize, totalPages, itemCount, updateState]);
+  }, [currentPageNumber, pageSize, totalPages, itemCount, updateState, hasValidItemCount]);
 
   // Helper function to handle page changes
   const handlePageChange = useCallback(
     (newPageIndex: number) => {
-      const clampedPageIndex = Math.max(0, Math.min(newPageIndex, totalPages - 1));
+      const clampedPageIndex = hasValidItemCount
+        ? Math.max(0, Math.min(newPageIndex, totalPages - 1))
+        : newPageIndex;
       if (clampedPageIndex !== currentPage) {
-        onPageDidChange?.(clampedPageIndex, pageSize, itemCount);
+        onPageDidChange?.(clampedPageIndex, pageSize, itemCount || 0);
       }
     },
-    [currentPage, totalPages, onPageDidChange, pageSize, itemCount],
+    [currentPage, totalPages, onPageDidChange, pageSize, itemCount, hasValidItemCount],
   );
 
   // Helper function to handle page size changes
@@ -151,9 +160,56 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     }
   }, [registerComponentApi, paginationAPI]);
 
-  // Don't render if no items
-  if (itemCount === 0) {
-    return null;
+  // For undefined itemCount, show simplified pagination
+  if (!hasValidItemCount) {
+    return (
+      <nav
+        {...rest}
+        role="navigation"
+        aria-label="Pagination"
+        ref={ref as any}
+        id={id}
+        className={classnames(
+          styles.pagination,
+          orientation === "vertical" ? styles.paginationVertical : styles.paginationHorizontal,
+          reverseLayout && styles.paginationReverse,
+          className,
+        )}
+        style={style}
+      >
+        <ul key={`${id}-pagination-controls`} className={styles.paginationList}>
+          {/* Previous page button */}
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || !hasPrevPage}
+              onClick={() => handlePageChange(currentPage - 1)}
+              contextualLabel="Previous page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Previous page"
+            >
+              <Icon name="chevronleft" size="sm" />
+            </Button>
+          </li>
+
+          {/* Next page button */}
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || !hasNextPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              contextualLabel="Next page"
+              style={{ minHeight: "36px", padding: "8px" }}
+              aria-label="Next page"
+            >
+              <Icon name="chevronright" size="sm" />
+            </Button>
+          </li>
+        </ul>
+      </nav>
+    );
   }
 
   // Calculate which page numbers to show
@@ -206,7 +262,11 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       style={style}
     >
       {pageSizeOptions && pageSizeOptions.length > 1 && (
-        <div key={`${id}-page-size-selector`} className={styles.selectorContainer}>
+        <div
+          id={`page-size-selector-container`}
+          key={`${id}-page-size-selector-container`}
+          className={styles.selectorContainer}
+        >
           <Text variant="secondary" className={styles.pageSizeLabel}>
             Rows per page
           </Text>
