@@ -21,6 +21,11 @@ export const TooltipMd = createMetadata({
       type: "string",
       isRequired: false,
     },
+    tooltipTemplate: {
+      description: "The template for the tooltip content",
+      type: "Component",
+      isRequired: false,
+    },
     delayDuration: {
       description: "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
       type: "number",
@@ -106,14 +111,13 @@ export const tooltipComponentRenderer = createComponentRenderer(
     // If text is not provided, do not render anything
     const text = extractValue.asOptionalString(node.props.text)
     const markdown = extractValue.asOptionalString(node.props.markdown);
-    if (!text && !markdown) {
-      return null;
-    }
+    const tooltipTemplate = node.props.tooltipTemplate;
 
     return (
       <Tooltip
         text={text}
         markdown={markdown}
+        tooltipTemplate={renderChild(tooltipTemplate)}
         delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
         skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
         defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}

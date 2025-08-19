@@ -99,7 +99,7 @@ The string form of `tooltipOptions` is composed of names or name and value pairs
 
 Instead of using the tooltip-related properties, you can wrap the component into a `Tooltip`:
 
-```xmlui-pg display copy height="300px" name="Example: Using the Tooltip component"
+```xmlui-pg display copy height="260px" name="Example: Using the Tooltip component"
 <App>
   <VStack height="100px" horizontalAlignment="center">
     <Tooltip side="bottom" markdown="This *example* uses a `Tooltip` component">
@@ -109,5 +109,26 @@ Instead of using the tooltip-related properties, you can wrap the component into
   </VStack>
 </App>
 ```
+
+### Using a Tooltip template
+
+You can specify tooltips that you could not otherwise do with the `text` or `markdown` properties.
+
+```xmlui-pg display copy height="200px" name="Example: Using a tooltipTemplate" /tooltipTemplate/
+<App>
+  <VStack height="100px" horizontalAlignment="center">
+    <Tooltip side="bottom">
+      <property name="tooltipTemplate">
+        <HStack>
+          <Stack width="24px" height="24px" backgroundColor="purple" />
+          <H2>This is a tooltip</H2>
+        </HStack>
+      </property>
+      <Card title="I have a templated Tooltip!" />
+    </Tooltip>
+  </VStack>
+</App>
+```
+
 
 %-DESC-END
