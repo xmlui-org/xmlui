@@ -87,6 +87,10 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     li {
       margin: 0;
     }
+
+    &.paginationListVertical {
+      flex-direction: column;
+    }
   }
 }
 

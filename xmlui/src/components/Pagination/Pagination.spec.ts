@@ -70,10 +70,10 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Page 1 of 5 (100 items)")).toBeVisible();
   });
 
-  test("handles hasPageInfo property correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" hasPageInfo="false"/>`);
+  test("handles showPageInfo property correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" showPageInfo="false"/>`);
 
-    // Should not show page info when hasPageInfo is false
+    // Should not show page info when showPageInfo is false
     await expect(page.getByText(/Page \d+ of \d+/)).not.toBeVisible();
 
     // But should still show navigation buttons
@@ -82,14 +82,14 @@ test.describe("Basic Functionality", () => {
 
   test("handles pageIndex property correctly", async ({ initTestBed, page }) => {
     await initTestBed(
-      `<Pagination itemCount="50" pageSize="10" pageIndex="2" hasPageInfo="false" />`,
+      `<Pagination itemCount="50" pageSize="10" pageIndex="2" showPageInfo="false" />`,
     );
 
     // Should show page 3 (0-based index 2)
-    await expect(page.getByText("3")).toBeVisible();
+    await expect(page.getByText("3", { exact: true })).toBeVisible();
   });
 
-  test.skip("handles maxVisiblePages property correctly", async ({ initTestBed, page }) => {
+  test("handles maxVisiblePages property correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="100" pageSize="10" maxVisiblePages="3"/>`);
 
     // With maxVisiblePages=3, should only show 3 page buttons
@@ -102,11 +102,11 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("button", { name: "Page 3" })).toBeVisible();
   });
 
-  test.skip("handles maxVisiblePages when there's only one page", async ({ initTestBed, page }) => {
+  test("handles maxVisiblePages when there's only one page", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="5" pageSize="10" maxVisiblePages="1"/>`);
 
     // Should show just the page number as text, not a button
-    await expect(page.getByText("1")).toBeVisible();
+    await expect(page.getByText("1", { exact: true })).toBeVisible();
     // Should not have clickable page buttons
     const pageButtons = page.getByRole("button").filter({ hasText: /^\d+$/ });
     await expect(pageButtons).toHaveCount(0);
