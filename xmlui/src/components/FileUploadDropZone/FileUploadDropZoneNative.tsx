@@ -46,6 +46,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     allowPaste = defaultProps.allowPaste,
     text = defaultProps.text,
     disabled = defaultProps.disabled,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -118,6 +119,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
       className={classnames(styles.wrapper, className)}
       onPaste={handleOnPaste}
       ref={forwardedRef}
+      {...rest}
     >
       <input {...getInputProps()} />
       {children}

@@ -18,7 +18,7 @@ type LogoProps = {
 };
 
 export const Logo = forwardRef(function Logo(
-  { style, alt = defaultProps.alt, inline = defaultProps.inline, className }: LogoProps,
+  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -34,6 +34,7 @@ export const Logo = forwardRef(function Logo(
       inline={inline}
       className={className}
       style={{ width: "auto", boxShadow: "none", ...style }}
+      {...rest}
     />
   );
 });

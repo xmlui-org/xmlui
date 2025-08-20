@@ -1,10 +1,11 @@
-import { type CSSProperties, forwardRef, type ForwardedRef } from "react";
+import { type CSSProperties, forwardRef, type ForwardedRef, cloneElement } from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
 import classnames from "classnames";
 import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   children?: React.ReactNode;
@@ -48,29 +49,49 @@ export const Icon = forwardRef(function Icon(
     return <CustomIcon {...computedProps} url={customIconUrl} name={name} ref={ref} />;
   }
 
-  return iconRenderer?.renderer?.(computedProps) || null;
+  const renderedIcon = iconRenderer?.renderer?.(computedProps, ref);
+  if (!renderedIcon) {
+    return null;
+  }
+
+  return <span ref={ref} style={{ width: "fit-content" }}>{renderedIcon}</span>;
 });
 
 const CustomIcon = forwardRef(function CustomIcon(
   props: IconBaseProps & { size?: string; url: string },
-  ref: ForwardedRef<HTMLElement>
+  ref: ForwardedRef<HTMLElement>,
 ) {
-  const { url, width, height, name, style, className } = props;
+  const { url, width, height, name, style, className, ...rest } = props;
 
   const resourceUrl = useResourceUrl(url);
   const isSvgIcon = resourceUrl?.toLowerCase()?.endsWith(".svg");
   const customSvgIconRenderer = useCustomSvgIconRenderer(resourceUrl);
 
   if (resourceUrl && isSvgIcon) {
-    const renderedIcon = customSvgIconRenderer?.({ style, className });
+    const renderedIcon = customSvgIconRenderer?.({ style, className, ...rest });
     if (!renderedIcon) {
       //to prevent layout shift
-      return <span ref={ref as ForwardedRef<HTMLSpanElement>} style={style} className={className} />;
+      return (
+        <span
+          {...(rest as any)}
+          ref={ref as ForwardedRef<HTMLSpanElement>}
+          style={style}
+          className={className}
+        />
+      );
     }
     return renderedIcon;
   }
 
-  return <img ref={ref as ForwardedRef<HTMLImageElement>} src={resourceUrl} style={{ width, height, ...style }} alt={name} />;
+  return (
+    <img
+      ref={ref as ForwardedRef<HTMLImageElement>}
+      src={resourceUrl}
+      style={{ width, height, ...style }}
+      alt={name}
+      {...(rest as any)}
+    />
+  );
 });
 
 function useCustomIconUrl(iconName?: string) {

@@ -114,6 +114,7 @@ export const FileInput = ({
   labelWidth,
   labelBreak,
   required,
+  ...rest
 }: Props) => {
   const _id = useId();
   id = id || _id;
@@ -197,6 +198,7 @@ export const FileInput = ({
       style={style}
       className={className}
       isInputTemplateUsed={true}
+      {...rest}
     >
       <div
         className={classnames(styles.container, {

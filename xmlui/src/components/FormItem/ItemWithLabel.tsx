@@ -37,7 +37,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
     labelPosition = "top",
-    style,
+    style = {},
     className,
     label,
     labelBreak = defaultProps.labelBreak,
@@ -74,7 +74,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={styles} ref={ref} className={classnames(className, styles.itemWithLabel)}>
+    <div ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",

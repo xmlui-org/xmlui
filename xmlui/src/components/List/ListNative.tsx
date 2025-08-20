@@ -20,6 +20,7 @@ import {
   orderBy as lodashOrderBy,
   sortBy,
   uniq,
+  rest,
 } from "lodash-es";
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
@@ -298,6 +299,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
     borderCollapse = defaultProps.borderCollapse,
+    ...rest
   }: DynamicHeightListProps,
   ref,
 ) {
@@ -487,6 +489,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
             },
             className,
           )}
+          {...rest}
         >
           {loading && rows.length === 0 && (
             <div className={styles.loadingWrapper}>

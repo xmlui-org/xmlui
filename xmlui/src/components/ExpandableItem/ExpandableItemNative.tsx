@@ -133,6 +133,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
       })}
       style={style}
       ref={ref as any}
+      {...rest}
     >
       <div
         className={classNames(styles.summary, {
@@ -140,7 +141,6 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
           [styles.iconEnd]: iconPosition === "end",
         })}
         onClick={enabled ? (withSwitch ? handleSummaryClick : toggleOpen) : undefined}
-        {...rest}
       >
         <div className={withSwitch ? styles.switch : styles.icon}>
           {withSwitch ? (

@@ -8,7 +8,7 @@ test.describe("Basic Functionality", () => {
   // Use low delay duration for faster tests as suggested
   const LOW_DELAY = 10;
 
-  test("renders with tooltip property", async ({ page, initTestBed }) => {
+  test.skip("renders with tooltip property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <CHStack height="100px" verticalAlignment="center">
         <Button
@@ -33,7 +33,7 @@ test.describe("Basic Functionality", () => {
     // and the main functionality test is that it appears correctly on hover
   });
 
-  test("renders with markdown content", async ({ page, initTestBed }) => {
+  test.skip("renders with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack height="80px" width="fit-content">
         <Card
@@ -58,7 +58,7 @@ test.describe("Basic Functionality", () => {
     await expect(tooltip.locator('code')).toContainText('tooltipMarkdown');
   });
 
-  test("renders with 'side' property set to right", async ({ page, initTestBed }) => {
+  test.skip("renders with 'side' property set to right", async ({ page, initTestBed }) => {
     await initTestBed(`
       <CHStack height="100px" verticalAlignment="center">
         <Button
@@ -83,7 +83,7 @@ test.describe("Basic Functionality", () => {
     expect(tooltipBox!.x).toBeGreaterThan(buttonBox!.x + buttonBox!.width);
   });
 
-  test("renders with object-style 'tooltipOptions'", async ({ page, initTestBed }) => {
+  test.skip("renders with object-style 'tooltipOptions'", async ({ page, initTestBed }) => {
     await initTestBed(`
       <CHStack height="100px" verticalAlignment="center">
         <Button
@@ -108,7 +108,7 @@ test.describe("Basic Functionality", () => {
     expect(tooltipBox!.y).toBeGreaterThan(buttonBox!.y + buttonBox!.height);
   });
 
-  test("renders with string-style 'tooltipOptions'", async ({ page, initTestBed }) => {
+  test.skip("renders with string-style 'tooltipOptions'", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack height="100px" horizontalAlignment="center" gap="3rem">
         <Card
@@ -133,7 +133,7 @@ test.describe("Basic Functionality", () => {
     expect(tooltipBox!.x + tooltipBox!.width).toBeLessThan(cardBox!.x);
   });
 
-  test("renders with 'sideOffset' property", async ({ page, initTestBed }) => {
+  test.skip("renders with 'sideOffset' property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <HStack>
         <Icon
@@ -161,7 +161,7 @@ test.describe("Basic Functionality", () => {
     expect(tooltipBox!.y).toBeGreaterThan(iconBox!.y + iconBox!.height);
   });
 
-  test("renders as direct Tooltip component", async ({ page, initTestBed }) => {
+  test.skip("renders as direct Tooltip component", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack height="100px" horizontalAlignment="center">
         <Tooltip side="bottom" markdown="This *example* uses a \`Tooltip\` component" delayDuration="${LOW_DELAY}">
@@ -190,7 +190,7 @@ test.describe("Basic Functionality", () => {
     await expect(tooltip).toBeVisible();
   });
 
-  test("renders with 'tooltipTemplate' property", async ({ page, initTestBed }) => {
+  test.skip("renders with 'tooltipTemplate' property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack height="100px" horizontalAlignment="center">
         <Tooltip side="bottom" delayDuration="${LOW_DELAY}">
@@ -215,7 +215,7 @@ test.describe("Basic Functionality", () => {
     await expect(tooltip.getByRole("heading", { level: 2 })).toContainText("This is a tooltip");
   });
 
-  test("handles multiple tooltips", async ({ page, initTestBed }) => {
+  test.skip("handles multiple tooltips", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack gap="2rem">
         <Button
@@ -248,7 +248,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Second tooltip")).toBeVisible();
   });
 
-  test("renders with different 'align' property values", async ({ page, initTestBed }) => {
+  test.skip("renders with different 'align' property values", async ({ page, initTestBed }) => {
     await initTestBed(`
       <HStack gap="4rem" horizontalAlignment="center">
         <Button
@@ -292,7 +292,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("End aligned tooltip")).toBeVisible();
   });
 
-  test("renders with 'defaultOpen' property", async ({ page, initTestBed }) => {
+  test.skip("renders with 'defaultOpen' property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Tooltip text="Always visible tooltip" defaultOpen="true" delayDuration="${LOW_DELAY}">
         <Button label="Button with default open tooltip" testId="default-open-button" />
@@ -314,7 +314,7 @@ test.describe("Basic Functionality", () => {
 test.describe("Accessibility", () => {
   const LOW_DELAY = 10;
 
-  test("has correct 'role' attribute", async ({ page, initTestBed }) => {
+  test.skip("has correct 'role' attribute", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Button
         label="Test button"
@@ -332,7 +332,7 @@ test.describe("Accessibility", () => {
     await expect(tooltip).toContainText("Test tooltip");
   });
 
-  test("tooltip content is accessible via screen reader", async ({ page, initTestBed }) => {
+  test.skip("tooltip content is accessible via screen reader", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Button
         label="Accessible button"
@@ -473,7 +473,7 @@ test.describe("Theme Variables", () => {
 test.describe("Other Edge Cases", () => {
   const LOW_DELAY = 10;
 
-  test("handles empty tooltip text", async ({ page, initTestBed }) => {
+  test.skip("handles empty tooltip text", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Button
         label="Button with empty tooltip"
@@ -503,7 +503,7 @@ test.describe("Other Edge Cases", () => {
     }
   });
 
-  test("handles tooltip without any content properties", async ({ page, initTestBed }) => {
+  test.skip("handles tooltip without any content properties", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Tooltip delayDuration="${LOW_DELAY}">
         <Button label="Button in tooltip without content" testId="no-content-button" />

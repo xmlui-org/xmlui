@@ -295,6 +295,7 @@ const Form = forwardRef(function (
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
+    ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
@@ -473,6 +474,7 @@ const Form = forwardRef(function (
         id={id}
         key={formState.resetVersion}
         ref={formRef}
+        {...rest}
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>

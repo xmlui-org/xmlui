@@ -1,4 +1,4 @@
-import React, { type CSSProperties, memo, type ReactNode, useRef } from "react";
+import React, { type CSSProperties, forwardRef, memo, type ReactNode, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -82,14 +82,15 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   );
 }
 
-export const Markdown = memo(function Markdown({
+export const Markdown = memo(forwardRef<HTMLDivElement, MarkdownProps>(function Markdown({
   removeIndents = defaultProps.removeIndents,
   children,
   style,
   className,
   codeHighlighter,
   showHeadingAnchors,
-}: MarkdownProps) {
+  ...rest
+}: MarkdownProps, ref) {
   const imageInfo = useRef(new Map<string, boolean>());
   if (typeof children !== "string") {
     return null;
@@ -114,7 +115,7 @@ export const Markdown = memo(function Markdown({
   };
 
   return (
-    <div className={classnames(styles.markdownContent, className)} style={style}>
+    <div ref={ref} className={classnames(styles.markdownContent, className)} style={style} {...rest}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
         rehypePlugins={[rehypeRaw]}
@@ -385,7 +386,7 @@ export const Markdown = memo(function Markdown({
       </ReactMarkdown>
     </div>
   );
-});
+}));
 
 const HorizontalRule = () => {
   return <hr className={styles.horizontalRule} />;
@@ -689,51 +690,4 @@ function removeTextIndents(input: string): string {
   );
 
   return trimmedLines.join("\n");
-}
-
-function getCustomAnchor(value: string): [string, string] {
-  if (!value) {
-    return ["", ""];
-  }
-
-  // --- Match the pattern: "Heading text [#anchor]"
-  const match = value.match(/^(.*?)\s*\[#([^\]]+)\]$/);
-
-  if (match) {
-    const headingLabel = match[1].trim(); // Extract the heading text
-    const anchorId = match[2].trim(); // Extract the anchor ID
-    return [headingLabel, anchorId];
-  }
-
-  // If no match, return the full value as the heading label and an empty anchor ID
-  return [value.trim(), ""];
-}
-
-function headingToAnchorLink(rawStr: string) {
-  return (
-    rawStr
-      .trim()
-      .toLocaleLowerCase()
-      // replace all non-alphanumeric characters with hyphens
-      .replaceAll(/[^A-Za-z0-9-]/g, "-")
-      // remove multiple hyphens
-      .replaceAll(/--+/g, "-")
-      // remove leading and trailing hyphens
-      .replace(/^-|-$/, "")
-      // remove backticks
-      .replace(/`/g, "")
-      // remove parentheses
-      .replace(/"|'/g, "")
-  );
-}
-
-function extractTextNodes(node: React.ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return node.toString();
-  if (React.isValidElement(node) && node.props && node.props.children) {
-    if (Array.isArray(node.props.children)) {
-      return node.props.children.map(extractTextNodes).join("");
-    }
-    return extractTextNodes(node.props.children);
-  }
-  return "";
 }
