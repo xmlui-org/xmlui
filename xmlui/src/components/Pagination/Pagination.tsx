@@ -38,11 +38,23 @@ export const PaginationMd = createMetadata({
       "number",
       defaultProps.maxVisiblePages,
     ),
-    hasPageInfo: d(
+    showPageInfo: d(
       "Whether to show page information",
       undefined,
       "boolean",
-      defaultProps.hasPageInfo,
+      defaultProps.showPageInfo,
+    ),
+    showPageSizeSelector: d(
+      "Whether to show the page size selector",
+      undefined,
+      "boolean",
+      defaultProps.showPageSizeSelector,
+    ),
+    showCurrentPage: d(
+      "Whether to show the current page indicator",
+      undefined,
+      "boolean",
+      defaultProps.showCurrentPage,
     ),
     pageSizeOptions: d(
       "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
@@ -99,14 +111,6 @@ export const PaginationMd = createMetadata({
       description: "Gets the current page size",
     },
   },
-  /* contextVars: {
-    currentPage: {
-      description: "Gets the current page number (1-based)",
-    },
-    currentPageSize: {
-      description: "Gets the current page size",
-    },
-  }, */
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "gap-Pagination": "$space-2",
@@ -125,18 +129,6 @@ export const paginationComponentRenderer = createComponentRenderer(
   COMP,
   PaginationMd,
   ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, className }) => {
-    // Extract property values
-    const enabled = extractValue.asOptionalBoolean(node.props.enabled, true);
-    const itemCount = extractValue.asOptionalNumber(node.props.itemCount);
-    const pageSize = extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize);
-    const pageIndex = extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex);
-    const hasPageInfo = extractValue.asOptionalBoolean(
-      node.props.hasPageInfo,
-      defaultProps.hasPageInfo,
-    );
-    const hasPrevPage = extractValue.asOptionalBoolean(node.props.hasPrevPage);
-    const hasNextPage = extractValue.asOptionalBoolean(node.props.hasNextPage);
-    const pageSizeOptions = extractValue(node.props.pageSizeOptions) as number[] | undefined;
     let maxVisiblePages = extractValue.asOptionalNumber(
       node.props.maxVisiblePages,
       defaultProps.maxVisiblePages,
@@ -147,6 +139,7 @@ export const paginationComponentRenderer = createComponentRenderer(
       );
       maxVisiblePages = defaultProps.maxVisiblePages;
     }
+
     let orientation = extractValue.asOptionalString(
       node.props.orientation,
       defaultProps.orientation,
@@ -157,30 +150,36 @@ export const paginationComponentRenderer = createComponentRenderer(
       );
       orientation = defaultProps.orientation;
     }
-    const reverseLayout = extractValue.asOptionalBoolean(
-      node.props.reverseLayout,
-      defaultProps.reverseLayout,
-    );
-
-    // Create event handlers
-    const onPageDidChange = lookupEventHandler("pageDidChange");
-    const onPageSizeDidChange = lookupEventHandler("pageSizeDidChange");
 
     return (
       <PaginationNative
-        enabled={enabled}
-        itemCount={itemCount}
-        pageSize={pageSize}
-        pageIndex={pageIndex}
-        hasPageInfo={hasPageInfo}
-        hasPrevPage={hasPrevPage}
-        hasNextPage={hasNextPage}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
+        itemCount={extractValue.asOptionalNumber(node.props.itemCount)}
+        pageSize={extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize)}
+        pageIndex={extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex)}
+        showPageInfo={extractValue.asOptionalBoolean(
+          node.props.showPageInfo,
+          defaultProps.showPageInfo,
+        )}
+        showPageSizeSelector={extractValue.asOptionalBoolean(
+          node.props.showPageSizeSelector,
+          defaultProps.showPageSizeSelector,
+        )}
+        showCurrentPage={extractValue.asOptionalBoolean(
+          node.props.showCurrentPage,
+          defaultProps.showCurrentPage,
+        )}
+        hasPrevPage={extractValue.asOptionalBoolean(node.props.hasPrevPage)}
+        hasNextPage={extractValue.asOptionalBoolean(node.props.hasNextPage)}
         maxVisiblePages={maxVisiblePages as PageNumber}
-        pageSizeOptions={pageSizeOptions}
+        pageSizeOptions={extractValue(node.props.pageSizeOptions) as number[] | undefined}
         orientation={orientation as OrientationOptions}
-        reverseLayout={reverseLayout}
-        onPageDidChange={onPageDidChange}
-        onPageSizeDidChange={onPageSizeDidChange}
+        reverseLayout={extractValue.asOptionalBoolean(
+          node.props.reverseLayout,
+          defaultProps.reverseLayout,
+        )}
+        onPageDidChange={lookupEventHandler("pageDidChange")}
+        onPageSizeDidChange={lookupEventHandler("pageSizeDidChange")}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
         className={className}

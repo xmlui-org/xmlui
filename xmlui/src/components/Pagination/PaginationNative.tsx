@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState, useCallback, useMemo } from "react";
 import classnames from "classnames";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button/ButtonNative";
@@ -8,6 +8,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { Text } from "../Text/TextNative";
 import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
+import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];
@@ -19,7 +20,9 @@ type Props = {
   pageSize?: number;
   pageIndex?: number;
   maxVisiblePages?: PageNumber;
-  hasPageInfo?: boolean;
+  showPageInfo?: boolean;
+  showPageSizeSelector?: boolean;
+  showCurrentPage?: boolean;
   pageSizeOptions?: number[];
   orientation?: OrientationOptions;
   reverseLayout?: boolean;
@@ -39,26 +42,30 @@ export const defaultProps: Required<
     | "pageSize"
     | "pageIndex"
     | "maxVisiblePages"
-    | "hasPageInfo"
+    | "showPageInfo"
+    | "showPageSizeSelector"
     | "orientation"
     | "reverseLayout"
+    | "showCurrentPage"
   >
 > = {
   pageSize: 10,
   pageIndex: 0,
   maxVisiblePages: 1,
-  hasPageInfo: true,
+  showPageInfo: true,
+  showPageSizeSelector: true,
   orientation: "horizontal",
   reverseLayout: false,
+  showCurrentPage: true,
 };
 
-interface PaginationAPI {
+interface PaginationAPI extends ComponentApi {
   moveFirst: () => void;
   moveLast: () => void;
   movePrev: () => void;
   moveNext: () => void;
-  currentPage: () => number;
-  currentPageSize: () => number;
+  currentPage: number;
+  currentPageSize: number;
 }
 
 export const PaginationNative = forwardRef<PaginationAPI, Props>(function PaginationNative(
@@ -69,7 +76,9 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     pageSize = defaultProps.pageSize,
     pageIndex = defaultProps.pageIndex,
     maxVisiblePages = defaultProps.maxVisiblePages,
-    hasPageInfo = defaultProps.hasPageInfo,
+    showPageInfo = defaultProps.showPageInfo,
+    showPageSizeSelector = defaultProps.showPageSizeSelector,
+    showCurrentPage = defaultProps.showCurrentPage,
     pageSizeOptions,
     orientation = defaultProps.orientation,
     reverseLayout = defaultProps.reverseLayout,
@@ -141,7 +150,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   );
 
   // Memoize the API object to prevent unnecessary re-renders
-  const paginationAPI = useMemo(
+  const paginationAPI: PaginationAPI = useMemo(
     () => ({
       moveFirst: () => handlePageChange(0),
       moveLast: () => handlePageChange(totalPages - 1),
@@ -261,14 +270,14 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       )}
       style={style}
     >
-      {pageSizeOptions && pageSizeOptions.length > 1 && (
+      {showPageSizeSelector && pageSizeOptions && pageSizeOptions.length > 1 && (
         <div
           id={`page-size-selector-container`}
           key={`${id}-page-size-selector-container`}
           className={styles.selectorContainer}
         >
           <Text variant="secondary" className={styles.pageSizeLabel}>
-            Rows per page
+            Items per page
           </Text>
           <select
             id={`${id}-page-size-selector`}
@@ -319,8 +328,8 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             </li>
           )}
 
-          {/* Page number buttons */}
-          {visiblePages.length === 1 && (
+          {/* Page number buttons or text indicator */}
+          {showCurrentPage && visiblePages.length === 1 && (
             <li>
               <Text
                 variant="strong"
@@ -335,12 +344,12 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             visiblePages.map((pageNum) => (
               <li key={`page-${pageNum}`}>
                 <Button
-                  variant={pageNum === currentPageNumber ? "solid" : "outlined"}
+                  variant={pageNum === currentPageNumber ? "solid" : "ghost"}
                   disabled={!enabled}
                   size="sm"
                   onClick={() => handlePageChange(pageNum - 1)}
                   contextualLabel={`Page ${pageNum}`}
-                  aria-current={pageNum === currentPageNumber ? "true" : undefined}
+                  aria-current={pageNum === currentPageNumber || undefined}
                   aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
                 >
                   {pageNum}
@@ -381,7 +390,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           </li>
         </ul>
       }
-      {hasPageInfo && (
+      {showPageInfo && (
         <Text key={`${id}-page-info`} variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
         </Text>
