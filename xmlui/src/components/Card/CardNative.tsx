@@ -42,12 +42,13 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
     avatarSize,
     onClick,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
-    maxLines: 1
+    maxLines: 1,
   };
   return (
     <div
@@ -63,6 +64,7 @@ export const Card = forwardRef(function Card(
       )}
       style={style}
       onClick={onClick}
+      {...rest}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <div className={styles.avatarWrapper}>
@@ -71,7 +73,7 @@ export const Card = forwardRef(function Card(
             {linkTo ? (
               title ? (
                 <LinkNative to={linkTo + ""}>
-                  <Heading {...titleProps} >{title}</Heading>
+                  <Heading {...titleProps}>{title}</Heading>
                 </LinkNative>
               ) : null
             ) : title ? (

@@ -114,7 +114,7 @@ export const Tooltip = forwardRef(function Tooltip(
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
       <RadixTooltip.Root defaultOpen={defaultOpen}>
         <RadixTooltip.Trigger asChild>
-          <span>{children}</span>
+          {children}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (

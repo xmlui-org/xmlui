@@ -78,6 +78,7 @@ export const Toggle = forwardRef(function Toggle(
     autoFocus,
     registerComponentApi,
     inputRenderer,
+    ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -226,6 +227,7 @@ export const Toggle = forwardRef(function Toggle(
       isInputTemplateUsed={!!inputRenderer}
       shrinkToLabel={true}
       labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
+      {...rest}
       // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
       // --- By setting pointerEvents we kind of 'disable' the label click, too
     >

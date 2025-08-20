@@ -62,6 +62,7 @@ export const ColorPicker = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
@@ -123,6 +124,7 @@ export const ColorPicker = forwardRef(
         style={style}
         className={className}
         ref={forwardedRef}
+        {...rest}
       >
         {/* Produces a 7 character RGB color output in hex as a string type */}
         <input

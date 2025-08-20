@@ -148,7 +148,8 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       children,
       readOnly,
       emptyListNode,
-      className
+      className,
+      ...rest
     } = props;
 
     // Compose refs for proper forwarding
@@ -203,6 +204,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           }}
           ref={ref}
           autoFocus={autoFocus}
+          {...rest}
         >
           <div
             className={classnames(styles.selectValue, {
@@ -287,6 +289,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     updateState = noop,
     registerComponentApi,
     children,
+
+    ...rest
   },
   ref,
 ) {
@@ -589,6 +593,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 height={dropdownHeight}
                 width={width}
                 emptyListNode={emptyListNode}
+                {...rest}
               >
                 {children}
               </SimpleSelect>

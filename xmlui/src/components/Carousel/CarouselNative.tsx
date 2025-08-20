@@ -77,6 +77,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     autoplayInterval = defaultProps.autoplayInterval,
     stopAutoplayOnInteraction = defaultProps.stopAutoplayOnInteraction,
     registerComponentApi,
+    ...rest
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -227,6 +228,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         role="region"
         tabIndex={-1}
         aria-roledescription="carousel"
+        {...rest}
       >
         <div ref={carouselRef} className={styles.carouselContentWrapper}>
           <div

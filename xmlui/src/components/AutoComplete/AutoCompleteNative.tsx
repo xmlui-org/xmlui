@@ -96,7 +96,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
     registerComponentApi,
-
     emptyListTemplate,
     style,
     className,
@@ -112,6 +111,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     required = defaultProps.required,
     creatable = defaultProps.creatable,
     optionRenderer,
+    ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -305,10 +305,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     id={inputId}
                     ref={setReferenceElement}
                     style={{ width: "100%", ...style }}
-                    className={classnames(className, styles.badgeListWrapper, styles[validationStatus], {
-                      [styles.disabled]: !enabled,
-                      [styles.focused]: isFocused,
-                    })}
+                    className={classnames(
+                      className,
+                      styles.badgeListWrapper,
+                      styles[validationStatus],
+                      {
+                        [styles.disabled]: !enabled,
+                        [styles.focused]: isFocused,
+                      },
+                    )}
+                    {...rest}
                   >
                     {Array.isArray(selectedValue) && (
                       <div className={styles.badgeList}>

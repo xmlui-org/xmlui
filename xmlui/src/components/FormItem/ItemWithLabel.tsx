@@ -52,6 +52,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     labelStyle,
     validationResult,
     isInputTemplateUsed = false,
+    ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -73,7 +74,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={style} ref={ref} className={classnames(className, styles.itemWithLabel)}>
+    <div style={styles} ref={ref} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
@@ -82,6 +83,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           [styles.end]: labelPosition === "end",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
+        {...rest}
       >
         {label && (
           <label

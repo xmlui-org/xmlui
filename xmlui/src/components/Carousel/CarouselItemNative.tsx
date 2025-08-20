@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
-  { children, style }: Props,
+  { children, style, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
@@ -36,6 +36,7 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
       role="group"
       aria-roledescription="slide"
       className={classnames(styles.carouselItem)}
+      {...rest}
     >
       <div className={styles.innerWrapper} ref={forwardedRef} style={style}>
         {children}

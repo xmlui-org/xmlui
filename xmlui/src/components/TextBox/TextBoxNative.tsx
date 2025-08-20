@@ -130,6 +130,7 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+    ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -224,6 +225,7 @@ export const TextBox = forwardRef(function TextBox(
       ref={ref}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
+      {...rest}
     >
       <div
         className={classnames(styles.inputRoot, {

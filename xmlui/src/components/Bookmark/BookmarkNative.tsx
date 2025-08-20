@@ -1,8 +1,8 @@
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import styles from './Bookmark.module.scss';
+import styles from "./Bookmark.module.scss";
 
 type Props = {
   uid?: string;
@@ -25,6 +25,7 @@ export const Bookmark = ({
   title,
   omitFromToc = defaultProps.omitFromToc,
   registerComponentApi,
+  ...rest
 }: Props) => {
   const elementRef = useRef<HTMLAnchorElement>(null);
   const tableOfContentsContext = useContext(TableOfContentsContext);
@@ -34,8 +35,8 @@ export const Bookmark = ({
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
     if (elementRef.current) {
       elementRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
         ...options,
       });
     }
@@ -59,7 +60,7 @@ export const Bookmark = ({
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span ref={elementRef} id={uid} data-anchor={true} className={styles.anchorRef}>
+    <span ref={elementRef} id={uid} data-anchor={true} className={styles.anchorRef} {...rest}>
       {children}
     </span>
   );

@@ -35,11 +35,12 @@ export const defaultProps: Pick<Props, "variant"> = {
 };
 
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = defaultProps.variant, style, className }: Props,
+  { children, color, variant = defaultProps.variant, style, className, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
+      {...rest}
       ref={forwardedRef}
       className={classnames(
         {

@@ -27,7 +27,7 @@ type Props = {
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
-  registerSubNavPanelSlot?: (node: HTMLElement)=>void;
+  registerSubNavPanelSlot?: (node: HTMLElement) => void;
   renderChild?: RenderChildFn;
 };
 
@@ -47,7 +47,7 @@ function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
 }
 
 export function useLogoUrl() {
-  const {logo, logoLight, logoDark} = useAppLayoutContext() || {};
+  const { logo, logoLight, logoDark } = useAppLayoutContext() || {};
   const logoUrlByTone = {
     light: logoLight,
     dark: logoDark,
@@ -55,7 +55,8 @@ export function useLogoUrl() {
   const { activeThemeTone } = useTheme();
 
   const baseLogoUrl = useResourceUrl("resource:logo") || logo;
-  const toneLogoUrl = useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
+  const toneLogoUrl =
+    useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
 
   return toneLogoUrl || baseLogoUrl;
 }
@@ -74,6 +75,7 @@ export const AppHeader = ({
   title,
   titleContent,
   registerSubNavPanelSlot,
+  ...rest
 }: Props) => {
   const { mediaSize } = useAppContext();
   const logoUrl = useLogoUrl();
@@ -87,12 +89,12 @@ export const AppHeader = ({
       titleContent
     );
 
-  useIsomorphicLayoutEffect(()=>{
+  useIsomorphicLayoutEffect(() => {
     registerSubNavPanelSlot?.(subNavPanelSlot.current);
   }, []);
 
   return (
-    <div className={classnames(styles.header, className)} style={style}>
+    <div className={classnames(styles.header, className)} style={style} {...rest}>
       <div
         className={classnames(styles.headerInner, {
           [styles.full]: !canRestrictContentWidth,
@@ -127,7 +129,7 @@ export const AppHeader = ({
               </>
             ))}
         </div>
-        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot}/>
+        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot} />
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>

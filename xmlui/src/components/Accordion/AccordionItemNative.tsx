@@ -53,6 +53,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     initiallyExpanded = defaultProps.initiallyExpanded,
     style,
     className,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -106,6 +107,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",
           })}
+          {...rest}
         >
           {headerRenderer(header)}
           {!hideIcon && (

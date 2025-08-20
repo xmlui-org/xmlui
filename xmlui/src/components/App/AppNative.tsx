@@ -60,7 +60,12 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady" | "onMessageReceived"
+  | "scrollWholePage"
+  | "noScrollbarGutters"
+  | "defaultTone"
+  | "defaultTheme"
+  | "onReady"
+  | "onMessageReceived"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
@@ -92,7 +97,8 @@ export function App({
   renderChild,
   name,
   className,
-  applyDefaultContentPadding
+  applyDefaultContentPadding,
+  ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
@@ -135,10 +141,10 @@ export function App({
       onMessageReceived?.(event.data, event);
     };
 
-    window.addEventListener('message', handleMessage);
-    
+    window.addEventListener("message", handleMessage);
+
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, [onMessageReceived]);
 
@@ -202,7 +208,15 @@ export function App({
       "--footer-abs-height": footerHeight + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
-  }, [footerHeight, headerHeight, noScrollbarGutters, safeLayout, scrollWholePage, scrollbarWidth, style]);
+  }, [
+    footerHeight,
+    headerHeight,
+    noScrollbarGutters,
+    safeLayout,
+    scrollWholePage,
+    scrollbarWidth,
+    style,
+  ]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
@@ -210,7 +224,6 @@ export function App({
   const toggleDrawer = useCallback(() => {
     setDrawerVisible((prev) => !prev);
   }, []);
-
 
   useIsomorphicLayoutEffect(() => {
     scrollContainerRef.current?.scrollTo({
@@ -278,11 +291,11 @@ export function App({
     appGlobals?.isNested,
   ]);
 
-  const linkInfoContextValue = useMemo(()=>{
+  const linkInfoContextValue = useMemo(() => {
     return {
       linkMap,
-      registerLinkMap
-    }
+      registerLinkMap,
+    };
   }, [linkMap, registerLinkMap]);
 
   useEffect(() => {
@@ -316,7 +329,11 @@ export function App({
   switch (safeLayout) {
     case "vertical":
       content = (
-        <div className={classnames(wrapperBaseClasses, styles.vertical)} style={styleWithHelpers}>
+        <div
+          className={classnames(wrapperBaseClasses, styles.vertical)}
+          style={styleWithHelpers}
+          {...rest}
+        >
           {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
           <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
             <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
@@ -324,9 +341,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={pagesWrapperClasses}>
-                  {children}
-                </div>
+                <div className={pagesWrapperClasses}>{children}</div>
               </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -352,9 +367,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={pagesWrapperClasses}>
-                  {children}
-                </div>
+                <div className={pagesWrapperClasses}>{children}</div>
               </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -382,9 +395,7 @@ export function App({
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={pagesWrapperClasses}>
-                    {children}
-                  </div>
+                  <div className={pagesWrapperClasses}>{children}</div>
                 </ScrollContext.Provider>
               </div>
             </main>
@@ -418,9 +429,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>
-                {children}
-              </div>
+              <div className={pagesWrapperClasses}>{children}</div>
             </ScrollContext.Provider>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -442,9 +451,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>
-                {children}
-              </div>
+              <div className={pagesWrapperClasses}>{children}</div>
             </ScrollContext.Provider>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -470,9 +477,7 @@ export function App({
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>
-                {children}
-              </div>
+              <div className={pagesWrapperClasses}>{children}</div>
             </ScrollContext.Provider>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>

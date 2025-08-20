@@ -20,6 +20,7 @@ export const Backdrop = forwardRef(function Backdrop(
     overlayTemplate,
     backgroundColor,
     opacity,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -28,6 +29,7 @@ export const Backdrop = forwardRef(function Backdrop(
       className={classNames(styles.backdropContainer, className)}
       ref={forwardedRef}
       style={style}
+      {...rest}
     >
       {children}
       <div className={styles.backdrop} style={{ backgroundColor, opacity }} />
