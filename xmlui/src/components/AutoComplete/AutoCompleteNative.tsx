@@ -280,6 +280,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
             onFocus={onFocus}
             onBlur={onBlur}
             className={className}
+            {...rest}
           >
             <Popover
               open={open}
@@ -314,7 +315,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         [styles.focused]: isFocused,
                       },
                     )}
-                    {...rest}
                   >
                     {Array.isArray(selectedValue) && (
                       <div className={styles.badgeList}>

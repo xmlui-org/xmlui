@@ -170,13 +170,6 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       [onValueChange, readOnly],
     );
 
-    // Generate trigger class names based on validation status
-    const triggerClassName = classnames(styles.selectTrigger, {
-      [styles.error]: validationStatus === "error",
-      [styles.warning]: validationStatus === "warning",
-      [styles.valid]: validationStatus === "valid",
-    });
-
     const optionsArray = useMemo(() => Array.from(options), [options]);
 
     const selectedOption = useMemo(() => {
@@ -440,6 +433,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           onBlur={onBlur}
           className={className}
           style={style}
+          {...rest}
         >
           {searchable || multiSelect ? (
             <OptionTypeProvider Component={HiddenOption}>

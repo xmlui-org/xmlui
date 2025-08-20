@@ -146,6 +146,7 @@ export const DatePicker = forwardRef(function DatePicker(
     readOnly = false,
     required,
     autoFocus = false,
+    ...rest
   }: Props,
   ref: React.Ref<HTMLDivElement>,
 ) {
@@ -280,6 +281,7 @@ export const DatePicker = forwardRef(function DatePicker(
       style={style}
       className={className}
       ref={ref}
+      {...rest}
     >
       {inline ? (
         <div className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>

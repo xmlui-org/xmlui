@@ -734,7 +734,7 @@ export const Table = forwardRef(
                       rowVirtualizer.measureElement(el);
                     }}
                     onClick={(event) => {
-                      if (event.defaultPrevented) {
+                      if (event?.defaultPrevented) {
                         return;
                       }
                       const target = event.target as HTMLElement;

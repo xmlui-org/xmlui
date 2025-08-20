@@ -49,6 +49,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     withSwitch = defaultExpandableItemProps.withSwitch,
     onExpandedChange,
     registerComponentApi,
+    ...rest
   }: ExpandableItemProps,
   ref,
 ) {
@@ -139,6 +140,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
           [styles.iconEnd]: iconPosition === "end",
         })}
         onClick={enabled ? (withSwitch ? handleSummaryClick : toggleOpen) : undefined}
+        {...rest}
       >
         <div className={withSwitch ? styles.switch : styles.icon}>
           {withSwitch ? (
