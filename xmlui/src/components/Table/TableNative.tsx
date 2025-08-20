@@ -191,6 +191,7 @@ export const Table = forwardRef(
       onSelectionDidChange,
       noBottomBorder = defaultProps.noBottomBorder,
       paginationControlsLocation = defaultProps.paginationControlsLocation,
+      ...rest
       // cols
     }: TableProps,
     forwardedRef,
@@ -333,8 +334,8 @@ export const Table = forwardRef(
           allowStarSize: boolean,
           propName: string,
         ): { width?: number; starSizedWidth?: string } {
-          let starSizedWidth;
-          let width;
+          let starSizedWidth: string;
+          let width: number;
           const resolvedWidth = isThemeVarName(colWidth) ? getThemeVar(colWidth) : colWidth;
           if (typeof resolvedWidth === "number") {
             width = resolvedWidth;
@@ -552,7 +553,7 @@ export const Table = forwardRef(
           availableWidth -= columnSizing[column.id] || column.columnDef.size || 0;
         } else {
           columnsWithoutSize.push(column);
-          let units;
+          let units: number;
           if (column.columnDef.meta?.starSizedWidth) {
             units = Number(column.columnDef.meta?.starSizedWidth.replace("*", "").trim()) || 1;
           } else {
@@ -607,6 +608,7 @@ export const Table = forwardRef(
         onKeyDown={onKeyDown}
         ref={ref}
         style={style}
+          {...rest}
       >
         {isPaginated &&
           hasData &&

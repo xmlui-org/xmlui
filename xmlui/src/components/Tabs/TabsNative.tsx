@@ -53,6 +53,7 @@ export const Tabs = forwardRef(function Tabs(
     className,
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -145,6 +146,7 @@ export const Tabs = forwardRef(function Tabs(
         }}
         orientation={orientation}
         style={style}
+        {...rest}
       >
         <RTabsList className={styles.tabsList} role="tablist">
           {tabItems.map((tab, index) => (

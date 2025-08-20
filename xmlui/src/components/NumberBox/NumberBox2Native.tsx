@@ -132,6 +132,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -376,6 +377,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
       onBlur={onBlur}
       style={style}
       className={className}
+      {...rest}
     >
       <div
         className={classnames(styles.inputRoot, {

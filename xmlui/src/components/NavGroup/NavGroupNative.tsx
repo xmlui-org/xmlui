@@ -82,6 +82,7 @@ export const NavGroup = forwardRef(function NavGroup(
     iconHorizontalExpanded,
     iconVerticalCollapsed,
     iconVerticalExpanded,
+    ...rest
   }: Props,
   ref,
 ) {
@@ -131,6 +132,7 @@ export const NavGroup = forwardRef(function NavGroup(
           ref={ref}
           initiallyExpanded={initiallyExpanded}
           disabled={disabled}
+          {...rest}
         />
       ) : (
         <DropDownNavGroup
@@ -141,6 +143,7 @@ export const NavGroup = forwardRef(function NavGroup(
           ref={ref}
           to={to}
           disabled={disabled}
+          {...rest}
         />
       )}
     </NavGroupContext.Provider>
@@ -168,6 +171,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     to,
     initiallyExpanded = false,
     disabled = false,
+    ...rest
   }: ExpandableNavGroupProps,
   ref,
 ) {
@@ -198,6 +202,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         icon={icon}
         to={to}
         disabled={disabled}
+        {...rest}
       >
         {label}
         <div style={{ flex: 1 }} />
@@ -224,6 +229,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     node,
     to,
     disabled = false,
+    ...rest
   }: {
     style?: CSSProperties;
     label: string;
@@ -254,7 +260,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   }
   const [expanded, setExpanded] = useState(false);
   return (
-    <Wrapper onOpenChange={(open) => setExpanded(open)}>
+    <Wrapper onOpenChange={(open) => setExpanded(open)} {...rest}>
       <Trigger asChild disabled={disabled}>
         <NavLink
           icon={icon}

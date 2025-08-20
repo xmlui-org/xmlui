@@ -327,6 +327,7 @@ This component does not expose any methods.
 | [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-5 | *none* | *none* |
 | [textAlignLast](../styles-and-themes/common-units/#text-align)-TableOfContentsItem-level-6 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem | $color-secondary-500 | $color-secondary-500 |
+| [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--hover | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-1 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-2 | *none* | *none* |

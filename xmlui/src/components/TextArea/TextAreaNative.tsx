@@ -114,6 +114,7 @@ export const TextArea = forwardRef(function TextArea(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
 ) {
@@ -269,7 +270,6 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={classes}
       >
         <TextAreaResizable
           {...textareaProps}
@@ -295,7 +295,6 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={classes}
       >
         <TextareaAutosize
           {...textareaProps}
@@ -321,9 +320,9 @@ export const TextArea = forwardRef(function TextArea(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
-      className={classes}
+      {...rest}
     >
-      <textarea {...textareaProps} rows={rows} />
+      <textarea {...textareaProps} rows={rows} className={classes} />
     </ItemWithLabel>
   );
 });

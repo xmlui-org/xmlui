@@ -124,6 +124,7 @@ export const NumberBox = forwardRef(function NumberBox(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -414,6 +415,7 @@ export const NumberBox = forwardRef(function NumberBox(
       className={className}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
+      {...rest}
     >
       <div
         className={classnames(styles.inputRoot, {

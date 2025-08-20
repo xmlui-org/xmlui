@@ -14,11 +14,16 @@ export const defaultProps = {
 };
 
 export const ProgressBar = forwardRef(function ProgressBar(
-  { value = defaultProps.value, style, className }: Props,
+  { value = defaultProps.value, style, className, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
-    <div className={classnames(styles.wrapper, className)} style={style} ref={forwardedRef}>
+    <div
+      className={classnames(styles.wrapper, className)}
+      style={style}
+      ref={forwardedRef}
+      {...rest}
+    >
       <div
         role="progressbar"
         aria-valuenow={value * 100}

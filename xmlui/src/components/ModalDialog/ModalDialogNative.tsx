@@ -19,6 +19,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { rest } from "lodash-es";
 
 // Default props for ModalDialog component
 export const defaultProps = {
@@ -132,6 +133,7 @@ export const ModalDialog = React.forwardRef(
       closeButtonVisible = defaultProps.closeButtonVisible,
       onOpen,
       onClose,
+      ...rest
     }: ModalProps,
     ref,
   ) => {
@@ -203,6 +205,7 @@ export const ModalDialog = React.forwardRef(
         }}
         ref={composedRef}
         style={{ ...style, gap: undefined }}
+        {...rest}
       >
         {!!title && (
           <Dialog.Title style={{ marginTop: 0 }}>

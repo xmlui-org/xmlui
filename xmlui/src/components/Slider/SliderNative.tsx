@@ -100,6 +100,7 @@ export const Slider = forwardRef(
       thumbStyle,
       showValues = defaultProps.showValues,
       valueFormat = defaultProps.valueFormat,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
@@ -226,6 +227,7 @@ export const Slider = forwardRef(
         ref={forwardedRef}
         id={id}
         isInputTemplateUsed={true}
+        {...rest}
       >
         <div className={styles.sliderContainer}>
           <Root

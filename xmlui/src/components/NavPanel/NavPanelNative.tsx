@@ -216,6 +216,7 @@ function DrawerNavPanel({
   children,
   className,
   style,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
@@ -225,7 +226,7 @@ function DrawerNavPanel({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   return (
     <NavPanelContext.Provider value={contextValue}>
-      <div ref={scrollContainerRef} className={classnames(styles.wrapper, className)} style={style}>
+      <div ref={scrollContainerRef} className={classnames(styles.wrapper, className)} style={style} {...rest}>
         <ScrollContext.Provider value={scrollContainerRef}>
           <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
             {logoContent || <Logo />}

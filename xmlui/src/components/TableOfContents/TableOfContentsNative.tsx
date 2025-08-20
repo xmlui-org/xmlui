@@ -36,6 +36,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     maxHeadingLevel = defaultProps.maxHeadingLevel,
     omitH1 = defaultProps.omitH1,
     className,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -80,6 +81,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
       className={classnames(styles.nav, className)}
       ref={ref}
       style={style}
+      {...rest}
     >
       <ul className={styles.list}>
         {headings.map((value) => {
