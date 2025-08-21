@@ -180,12 +180,12 @@ export const Slider = forwardRef(
     );
 
     // Component APIs
-    const handleOnFocus = useCallback(() => {
-      onFocus?.();
+    const handleOnFocus = useCallback((ev) => {
+      onFocus?.(ev);
     }, [onFocus]);
 
-    const handleOnBlur = useCallback(() => {
-      onBlur?.();
+    const handleOnBlur = useCallback((ev) => {
+      onBlur?.(ev);
     }, [onBlur]);
 
     const focus = useCallback(() => {

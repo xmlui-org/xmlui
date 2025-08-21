@@ -417,10 +417,20 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     [multiSelect, toggleOption, value, options],
   );
 
+  const setPopOverTriggerRef = useMemo(() => (newRef: HTMLDivElement | null) => {
+    setReferenceElement(newRef);
+    if (typeof ref === "function") {
+      ref(newRef);
+    } else {
+      ref.current = newRef;
+    }
+  }, [ref]);
+
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
         <ItemWithLabel
+          {...rest}
           ref={ref}
           id={inputId}
           labelPosition={labelPosition as any}
@@ -433,7 +443,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           onBlur={onBlur}
           className={className}
           style={style}
-          {...rest}
         >
           {searchable || multiSelect ? (
             <OptionTypeProvider Component={HiddenOption}>
@@ -442,7 +451,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   id={inputId}
                   aria-haspopup="listbox"
                   style={style}
-                  ref={setReferenceElement}
+                  ref={(p) => {setReferenceElement(p); if (typeof ref === "function") ref(p); else ref.current=p}}
                   onFocus={onFocus}
                   onBlur={onBlur}
                   disabled={!enabled}
@@ -458,6 +467,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     [styles.multi]: multiSelect,
                   }, className)}
                   autoFocus={autoFocus}
+                  {...rest}
                 >
                   {multiSelect ? (
                     Array.isArray(value) && value.length > 0 ? (
