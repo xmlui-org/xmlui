@@ -208,18 +208,6 @@
       alert('Counter was reset!');
     };
 
-    window.transformPeople = function(data) {
-      console.log(data);
-      const items = data.data.items;
-      const itemMap = {
-        A: 'Austin',
-        B: 'Boston'
-      };
-      return items.map(item => ({
-        ...item,
-        city: itemMap[item.group]
-      }));
-    };
 
   </script>
 </body>
