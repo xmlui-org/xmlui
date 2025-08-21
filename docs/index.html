@@ -208,34 +208,6 @@
       alert('Counter was reset!');
     };
 
-    // Enhanced debugLog function for index.html
-    window.debugLog = function(data, label) {
-      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-      console.group(`🐛 ${label || 'Debug'} (${timestamp})`);
-
-      // Check if it's likely a Proxy object
-      const isProxy = data && typeof data === 'object' &&
-        (data.constructor?.name === 'Object' &&
-          data.toString?.() === '[object Object]');
-
-      console.log('Is Proxy:', isProxy);
-      console.log('Raw:', data);
-
-      // Show unwrapped data for objects
-      if (typeof data === 'object' && data !== null) {
-        try {
-          const unwrapped = JSON.parse(JSON.stringify(data));
-          console.log('Unwrapped:', unwrapped);
-          console.log('Keys:', Object.keys(data));
-        } catch (e) {
-          console.log('Could not unwrap:', e.message);
-        }
-      }
-
-      console.groupEnd();
-      return data;
-    };
-
     window.transformPeople = function(data) {
       console.log(data);
       const items = data.data.items;
