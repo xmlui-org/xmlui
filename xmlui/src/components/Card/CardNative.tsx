@@ -7,7 +7,6 @@ import { Avatar } from "../Avatar/AvatarNative";
 import { LinkNative } from "../Link/LinkNative";
 import type { HeadingProps } from "../Heading/HeadingNative";
 import { Heading } from "../Heading/HeadingNative";
-import { Stack } from "../Stack/StackNative";
 import { Text } from "../Text/TextNative";
 
 type Props = {
@@ -52,6 +51,7 @@ export const Card = forwardRef(function Card(
   };
   return (
     <div
+      {...rest}
       ref={forwardedRef}
       className={classnames(
         styles.wrapper,
@@ -64,7 +64,6 @@ export const Card = forwardRef(function Card(
       )}
       style={style}
       onClick={onClick}
-      {...rest}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <div className={styles.avatarWrapper}>

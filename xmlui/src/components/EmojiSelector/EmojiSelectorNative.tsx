@@ -29,9 +29,9 @@ export const EmojiSelector = forwardRef<HTMLDivElement, EmojiSelectorProps>(
     ref,
   ) => (
     <div
+      {...rest}
       ref={ref}
       style={{ display: "inline-block", width: "fit-content", height: "fit-content" }}
-      {...rest}
     >
       <EmojiPicker
         autoFocusSearch={autoFocus}

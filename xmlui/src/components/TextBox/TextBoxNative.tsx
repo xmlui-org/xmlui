@@ -213,6 +213,7 @@ export const TextBox = forwardRef(function TextBox(
 
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}
@@ -225,7 +226,6 @@ export const TextBox = forwardRef(function TextBox(
       ref={ref}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
-      {...rest}
     >
       <div
         className={classnames(styles.inputRoot, {

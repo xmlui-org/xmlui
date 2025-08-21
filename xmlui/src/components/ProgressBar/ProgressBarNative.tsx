@@ -19,10 +19,10 @@ export const ProgressBar = forwardRef(function ProgressBar(
 ) {
   return (
     <div
+      {...rest}
       className={classnames(styles.wrapper, className)}
       style={style}
       ref={forwardedRef}
-      {...rest}
     >
       <div
         role="progressbar"

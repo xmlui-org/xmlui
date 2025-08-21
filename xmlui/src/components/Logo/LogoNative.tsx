@@ -28,13 +28,13 @@ export const Logo = forwardRef(function Logo(
   //width auto for safari
   return (
     <Image
+      {...rest}
       ref={forwardedRef}
       src={logoUrl}
       alt={alt}
       inline={inline}
       className={className}
       style={{ width: "auto", boxShadow: "none", ...style }}
-      {...rest}
     />
   );
 });

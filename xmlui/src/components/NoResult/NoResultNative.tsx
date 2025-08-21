@@ -20,11 +20,23 @@ type Props = {
 };
 
 export const NoResult = forwardRef(function NoResult(
-  { label, icon = defaultProps.icon, hideIcon = defaultProps.hideIcon, style, className, ...rest }: Props,
+  {
+    label,
+    icon = defaultProps.icon,
+    hideIcon = defaultProps.hideIcon,
+    style,
+    className,
+    ...rest
+  }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
-    <div className={classnames(styles.wrapper, className)} style={style} ref={forwardedRef} {...rest}>
+    <div
+      {...rest}
+      className={classnames(styles.wrapper, className)}
+      style={style}
+      ref={forwardedRef}
+    >
       {!hideIcon && <Icon name={icon} className={styles.icon} />}
       {label}
     </div>

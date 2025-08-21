@@ -1,11 +1,10 @@
-import { type CSSProperties, forwardRef, type ForwardedRef, cloneElement } from "react";
+import { type CSSProperties, forwardRef, type ForwardedRef } from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
 import classnames from "classnames";
 import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   children?: React.ReactNode;

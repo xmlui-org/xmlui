@@ -122,6 +122,7 @@ export const Heading = forwardRef(function Heading(
 
   return (
     <Element
+      {...furtherProps}
       ref={ref}
       id={uid}
       title={title}
@@ -131,7 +132,6 @@ export const Heading = forwardRef(function Heading(
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,
       })}
-      {...furtherProps}
     >
       {anchorId && (
         <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />

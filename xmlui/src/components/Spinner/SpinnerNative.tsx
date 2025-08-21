@@ -44,10 +44,10 @@ export const Spinner = forwardRef(function Spinner(
     if (fullScreen) {
       return (
         <div
+          {...rest}
           role="status"
           aria-label="Loading"
           className={styles.fullScreenSpinnerWrapper}
-          {...rest}
         >
           <div
             className={classnames(styles["lds-ring"], className)}
@@ -64,12 +64,12 @@ export const Spinner = forwardRef(function Spinner(
     }
     return (
       <div
+        {...rest}
         className={classnames(styles["lds-ring"], className)}
         role="status"
         aria-label="Loading"
         style={style}
         ref={forwardedRef}
-        {...rest}
       >
         <div></div>
         <div></div>

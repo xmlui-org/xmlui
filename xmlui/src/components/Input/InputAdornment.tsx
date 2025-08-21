@@ -12,14 +12,15 @@ interface AdornmentProps {
   onClick?: () => void;
 }
 
-export function Adornment({ iconName, text, className, onClick }: AdornmentProps) {
+export function Adornment({ iconName, text, className, onClick, ...rest }: AdornmentProps) {
   return (
     <>
       {iconName || text ? (
-        <div 
-          className={classnames(styles.wrapper, className, { 
-            [styles.clickable]: !!onClick 
-          })} 
+        <div
+          {...rest}
+          className={classnames(styles.wrapper, className, {
+            [styles.clickable]: !!onClick,
+          })}
           role={onClick ? "button" : "presentation"}
           onClick={onClick}
           tabIndex={onClick ? 0 : undefined}

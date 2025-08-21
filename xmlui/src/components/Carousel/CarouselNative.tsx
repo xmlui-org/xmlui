@@ -222,13 +222,13 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   return (
     <CarouselContext.Provider value={carouselContextValue}>
       <div
+        {...rest}
         style={style}
         ref={ref}
         className={classnames(styles.carousel, className)}
         role="region"
         tabIndex={-1}
         aria-roledescription="carousel"
-        {...rest}
       >
         <div ref={carouselRef} className={styles.carouselContentWrapper}>
           <div

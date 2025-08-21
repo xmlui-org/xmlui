@@ -214,6 +214,7 @@ export const Slider = forwardRef(
 
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
         label={displayLabel}
         labelWidth={labelWidth}
@@ -227,7 +228,6 @@ export const Slider = forwardRef(
         ref={forwardedRef}
         id={id}
         isInputTemplateUsed={true}
-        {...rest}
       >
         <div className={styles.sliderContainer}>
           <Root

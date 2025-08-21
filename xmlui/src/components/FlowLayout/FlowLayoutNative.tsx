@@ -59,7 +59,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
       setNumberOfChildren((prev) => prev - 1);
     };
   }, [setNumberOfChildren]);
-  const { activeTheme, root } = useTheme();
+  const { root } = useTheme();
   const _width = restProps.width || "100%";
   const _minWidth = restProps.minWidth || undefined;
   const _maxWidth = restProps.maxWidth || undefined;

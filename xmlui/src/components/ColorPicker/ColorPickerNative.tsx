@@ -113,6 +113,7 @@ export const ColorPicker = forwardRef(
 
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -124,7 +125,6 @@ export const ColorPicker = forwardRef(
         style={style}
         className={className}
         ref={forwardedRef}
-        {...rest}
       >
         {/* Produces a 7 character RGB color output in hex as a string type */}
         <input

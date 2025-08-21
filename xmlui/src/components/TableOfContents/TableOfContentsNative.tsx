@@ -77,11 +77,11 @@ export const TableOfContents = forwardRef(function TableOfContents(
 
   return (
     <nav
+      {...rest}
       aria-label="Table of Contents"
       className={classnames(styles.nav, className)}
       ref={ref}
       style={style}
-      {...rest}
     >
       <ul className={styles.list}>
         {headings.map((value) => {

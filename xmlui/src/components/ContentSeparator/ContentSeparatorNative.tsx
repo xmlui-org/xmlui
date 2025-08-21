@@ -18,6 +18,7 @@ export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps
   ({ orientation = defaultProps.orientation, size, style, className, ...rest }, ref) => {
     return (
       <div
+        {...rest}
         ref={ref}
         className={classnames(
           styles.separator,
@@ -32,7 +33,6 @@ export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps
           width: orientation === "horizontal" ? "100%" : size,
           ...style,
         }}
-        {...rest}
       />
     );
   }

@@ -7,7 +7,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -480,6 +479,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     <ListItemTypeContext.Provider value={rowTypeContextValue}>
       <ListContext.Provider value={expandContextValue}>
         <div
+          {...rest}
           ref={rootRef}
           style={style}
           className={classnames(
@@ -489,7 +489,6 @@ export const ListNative = forwardRef(function DynamicHeightList(
             },
             className,
           )}
-          {...rest}
         >
           {loading && rows.length === 0 && (
             <div className={styles.loadingWrapper}>

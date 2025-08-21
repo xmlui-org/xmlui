@@ -90,7 +90,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         setOpen(isOpen);
       }}
     >
-      <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any} {...rest}>
+      <ReactDropdownMenu.Trigger {...rest} asChild disabled={disabled} ref={ref as any}>
         {triggerTemplate ? (
           triggerTemplate
         ) : (

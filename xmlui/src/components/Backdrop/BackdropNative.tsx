@@ -26,10 +26,10 @@ export const Backdrop = forwardRef(function Backdrop(
 ) {
   return (
     <div
+      {...rest}
       className={classNames(styles.backdropContainer, className)}
       ref={forwardedRef}
       style={style}
-      {...rest}
     >
       {children}
       <div className={styles.backdrop} style={{ backgroundColor, opacity }} />

@@ -35,17 +35,6 @@ export const defaultProps: Pick<Props, "showLogo"> = {
   showLogo: true,
 };
 
-function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
-  const img = new Image();
-  img.src = url;
-  img.onload = () => {
-    onLoaded();
-  };
-  img.onerror = () => {
-    onError();
-  };
-}
-
 export function useLogoUrl() {
   const { logo, logoLight, logoDark } = useAppLayoutContext() || {};
   const logoUrlByTone = {
@@ -94,7 +83,7 @@ export const AppHeader = ({
   }, []);
 
   return (
-    <div className={classnames(styles.header, className)} style={style} {...rest}>
+    <div {...rest} className={classnames(styles.header, className)} style={style}>
       <div
         className={classnames(styles.headerInner, {
           [styles.full]: !canRestrictContentWidth,

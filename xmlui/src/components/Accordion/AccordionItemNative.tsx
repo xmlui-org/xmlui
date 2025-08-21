@@ -103,11 +103,11 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     >
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
+          {...rest}
           id={`trigger_${itemId}`}
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",
           })}
-          {...rest}
         >
           {headerRenderer(header)}
           {!hideIcon && (

@@ -330,9 +330,9 @@ export function App({
     case "vertical":
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical)}
           style={styleWithHelpers}
-          {...rest}
         >
           {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
           <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
@@ -354,6 +354,7 @@ export function App({
     case "vertical-sticky":
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
           style={styleWithHelpers}
         >
@@ -380,6 +381,7 @@ export function App({
     case "vertical-full-header":
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
@@ -410,6 +412,7 @@ export function App({
     case "condensed-sticky":
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, {
             [styles.sticky]: safeLayout === "condensed-sticky",
           })}
@@ -441,6 +444,7 @@ export function App({
     case "horizontal": {
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal)}
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
@@ -464,6 +468,7 @@ export function App({
     case "horizontal-sticky":
       content = (
         <div
+          {...rest}
           className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
           style={styleWithHelpers}
           ref={scrollPageContainerRef}

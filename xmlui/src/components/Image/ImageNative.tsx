@@ -41,6 +41,7 @@ export const Image = forwardRef(function Img(
 ) {
   return (
     <img
+      {...rest}
       src={src}
       ref={ref as any}
       alt={alt}
@@ -61,7 +62,6 @@ export const Image = forwardRef(function Img(
         ...(inline ? { display: "inline" } : {}),
       }}
       onClick={onClick}
-      {...rest}
     />
   );
 });

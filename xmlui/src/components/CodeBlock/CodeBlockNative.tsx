@@ -38,9 +38,9 @@ export function CodeBlock({
   if (!meta) {
     return (
       <div
+        {...rest}
         className={classnames(className, styles.codeBlock, "global-codeBlock")}
         style={style}
-        {...rest}
       >
         <div className={styles.codeBlockContent}>{children}</div>
       </div>

@@ -467,6 +467,7 @@ const Form = forwardRef(function (
   return (
     <>
       <form
+        {...rest}
         style={style}
         className={classnames(styles.wrapper, className)}
         onSubmit={doSubmit}
@@ -474,7 +475,6 @@ const Form = forwardRef(function (
         id={id}
         key={formState.resetVersion}
         ref={formRef}
-        {...rest}
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>

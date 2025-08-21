@@ -115,11 +115,11 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   return (
     <div
       {...getRootProps()}
+      {...rest}
       style={style}
       className={classnames(styles.wrapper, className)}
       onPaste={handleOnPaste}
       ref={forwardedRef}
-      {...rest}
     >
       <input {...getInputProps()} />
       {children}

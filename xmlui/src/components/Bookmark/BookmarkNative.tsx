@@ -60,7 +60,7 @@ export const Bookmark = ({
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span ref={elementRef} id={uid} data-anchor={true} className={styles.anchorRef} {...rest}>
+    <span {...rest} ref={elementRef} id={uid} data-anchor={true} className={styles.anchorRef}>
       {children}
     </span>
   );

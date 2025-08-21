@@ -186,6 +186,7 @@ export const FileInput = ({
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}
@@ -198,7 +199,6 @@ export const FileInput = ({
       style={style}
       className={className}
       isInputTemplateUsed={true}
-      {...rest}
     >
       <div
         className={classnames(styles.container, {

@@ -42,6 +42,7 @@ export const Splitter = ({
   floating = defaultProps.floating,
   splitterTemplate,
   resize = noop,
+  ...rest
 }: SplitterProps) => {
   const [size, setSize] = useState(0);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
@@ -167,11 +168,16 @@ export const Splitter = ({
 
   return (
     <div
+      {...rest}
       ref={(s) => setSplitter(s)}
-      className={classnames(styles.splitter, {
-        [styles.horizontal]: orientation === "horizontal",
-        [styles.vertical]: orientation === "vertical",
-      }, className)}
+      className={classnames(
+        styles.splitter,
+        {
+          [styles.horizontal]: orientation === "horizontal",
+          [styles.vertical]: orientation === "vertical",
+        },
+        className,
+      )}
       style={style}
     >
       {React.Children.count(children) > 1 ? (

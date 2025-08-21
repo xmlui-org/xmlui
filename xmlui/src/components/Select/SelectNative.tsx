@@ -179,6 +179,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     return (
       <SelectRoot value={stringValue} onValueChange={handleValueChange}>
         <SelectTrigger
+          {...rest}
           id={id}
           aria-haspopup="listbox"
           style={style}
@@ -197,7 +198,6 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           }}
           ref={ref}
           autoFocus={autoFocus}
-          {...rest}
         >
           <div
             className={classnames(styles.selectValue, {
@@ -439,6 +439,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 style={style}
               >
                 <PopoverTrigger
+                  {...rest}
                   id={inputId}
                   aria-haspopup="listbox"
                   style={style}
@@ -463,7 +464,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     className,
                   )}
                   autoFocus={autoFocus}
-                  {...rest}
                 >
                   <>
                     {multiSelect ? (
@@ -593,6 +593,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               style={style}
             >
               <SimpleSelect
+                {...rest}
                 readOnly={!!readOnly}
                 ref={ref}
                 key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
@@ -611,7 +612,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 height={dropdownHeight}
                 width={width}
                 emptyListNode={emptyListNode}
-                {...rest}
               >
                 {children}
               </SimpleSelect>

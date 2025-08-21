@@ -126,6 +126,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
 
   return (
     <div
+      {...rest}
       className={classNames(styles.expandableItem, className, {
         [styles.open]: isOpen,
         [styles.disabled]: !enabled,
@@ -133,7 +134,6 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
       })}
       style={style}
       ref={ref as any}
-      {...rest}
     >
       <div
         className={classNames(styles.summary, {

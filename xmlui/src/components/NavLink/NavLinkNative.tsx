@@ -108,8 +108,8 @@ export const NavLink = forwardRef(function NavLink(
   } else {
     content = (
       <RrdNavLink
-        id={uid}
         {...rest}
+        id={uid}
         ref={ref}
         to={smartTo as To}
         style={styleObj}

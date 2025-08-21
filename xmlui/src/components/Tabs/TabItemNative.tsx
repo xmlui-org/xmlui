@@ -39,12 +39,12 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   return (
     <Content
+      {...rest}
       key={innerId}
       value={innerId}
       className={styles.tabsContent}
       ref={forwardedRef}
       style={style}
-      {...rest}
     >
       {children}
     </Content>

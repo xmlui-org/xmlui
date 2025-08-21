@@ -288,6 +288,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
               }}
             >
               <ItemWithLabel
+                {...rest}
                 id={inputId}
                 ref={forwardedRef}
                 labelPosition={labelPosition as any}
@@ -299,7 +300,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 onFocus={onFocus}
                 onBlur={onBlur}
                 className={className}
-                {...rest}
               >
                 <PopoverTrigger asChild>
                   <div

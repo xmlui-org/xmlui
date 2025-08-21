@@ -366,6 +366,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
 
   return (
     <ItemWithLabel
+      {...rest}
       ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
@@ -377,7 +378,6 @@ export const NumberBox2 = forwardRef(function NumberBox2(
       onBlur={onBlur}
       style={style}
       className={className}
-      {...rest}
     >
       <div
         className={classnames(styles.inputRoot, {

@@ -301,6 +301,7 @@ export const DatePicker = forwardRef(function DatePicker(
   ) : (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <ItemWithLabel
+        {...rest}
         id={inputId}
         labelPosition={labelPosition as any}
         label={label}
@@ -313,7 +314,6 @@ export const DatePicker = forwardRef(function DatePicker(
         style={style}
         className={className}
         ref={ref}
-        {...rest}
       >
         <PopoverTrigger
           ref={setReferenceElement}

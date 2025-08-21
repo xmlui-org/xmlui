@@ -158,13 +158,13 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
   return (
     <AccordionContext.Provider value={contextValue}>
       <RAccordion.Root
+        {...rest}
         style={style}
         ref={forwardedRef}
         value={expandedItems}
         type="multiple"
         className={classnames(styles.root, className)}
         onValueChange={(value) => setExpandedItems(value)}
-        {...rest}
       >
         {children}
       </RAccordion.Root>

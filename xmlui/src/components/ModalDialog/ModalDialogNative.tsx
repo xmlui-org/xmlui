@@ -143,7 +143,8 @@ export const ModalDialog = React.forwardRef(
     // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
     // String-based type checking: Use constructor.name to identify ShadowRoot
     // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
-    const isDialogRootInShadowDom = typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot;
+    const isDialogRootInShadowDom =
+      typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot;
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
@@ -193,6 +194,7 @@ export const ModalDialog = React.forwardRef(
 
     const Content = (
       <Dialog.Content
+        {...rest}
         className={classnames(styles.content)}
         onPointerDownOutside={(event) => {
           if (
@@ -205,7 +207,6 @@ export const ModalDialog = React.forwardRef(
         }}
         ref={composedRef}
         style={{ ...style, gap: undefined }}
-        {...rest}
       >
         {!!title && (
           <Dialog.Title style={{ marginTop: 0 }}>

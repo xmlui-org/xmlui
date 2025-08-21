@@ -32,11 +32,11 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
 
   return (
     <div
+      {...rest}
       key={id}
       role="group"
       aria-roledescription="slide"
       className={classnames(styles.carouselItem)}
-      {...rest}
     >
       <div className={styles.innerWrapper} ref={forwardedRef} style={style}>
         {children}

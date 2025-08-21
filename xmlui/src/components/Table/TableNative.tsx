@@ -1,6 +1,4 @@
-import type {
-  CSSProperties,
-  ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import {
   forwardRef,
   useCallback,
@@ -44,7 +42,7 @@ import {
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-  useStartMargin
+  useStartMargin,
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
@@ -89,7 +87,8 @@ type RowWithOrder = {
 
 type SortingDirection = "ascending" | "descending";
 export const TablePaginationControlsLocationValues = ["top", "bottom", "both"] as const;
-export type TablePaginationControlsLocation = typeof TablePaginationControlsLocationValues[number];
+export type TablePaginationControlsLocation =
+  (typeof TablePaginationControlsLocationValues)[number];
 
 // =====================================================================================================================
 // React Table component implementation
@@ -603,12 +602,12 @@ export const Table = forwardRef(
 
     return (
       <div
+        {...rest}
         className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
         onKeyDown={onKeyDown}
         ref={ref}
         style={style}
-          {...rest}
       >
         {isPaginated &&
           hasData &&

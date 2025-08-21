@@ -89,33 +89,28 @@ export const defaultProps: TooltipOptions = {
   avoidCollisions: true,
 };
 
-export const Tooltip = forwardRef(function Tooltip(
-  {
-    text,
-    markdown,
-    tooltipTemplate,
-    delayDuration = defaultProps.delayDuration,
-    skipDelayDuration = defaultProps.skipDelayDuration,
-    defaultOpen = defaultProps.defaultOpen,
-    showArrow = defaultProps.showArrow,
-    side = defaultProps.side,
-    align = defaultProps.align,
-    sideOffset = defaultProps.sideOffset,
-    alignOffset = defaultProps.alignOffset,
-    avoidCollisions = defaultProps.avoidCollisions,
-    children,
-  }: TooltipProps,
-  forwardedRef: ForwardedRef<HTMLDivElement>,
-) {
+export const Tooltip = function Tooltip({
+  text,
+  markdown,
+  tooltipTemplate,
+  delayDuration = defaultProps.delayDuration,
+  skipDelayDuration = defaultProps.skipDelayDuration,
+  defaultOpen = defaultProps.defaultOpen,
+  showArrow = defaultProps.showArrow,
+  side = defaultProps.side,
+  align = defaultProps.align,
+  sideOffset = defaultProps.sideOffset,
+  alignOffset = defaultProps.alignOffset,
+  avoidCollisions = defaultProps.avoidCollisions,
+  children,
+}: TooltipProps) {
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
 
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
       <RadixTooltip.Root defaultOpen={defaultOpen}>
-        <RadixTooltip.Trigger asChild>
-          {children}
-        </RadixTooltip.Trigger>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (
             <RadixTooltip.Content
@@ -140,7 +135,7 @@ export const Tooltip = forwardRef(function Tooltip(
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   );
-});
+};
 
 /**
  * Parses tooltip options from any input and returns an object containing only the option properties
