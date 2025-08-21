@@ -135,6 +135,10 @@ A function that formats the tick labels on the Y-axis.
 </App>
 ```
 
+### `tooltipTemplate` [#tooltiptemplate]
+
+This property allows replacing the default template to display a tooltip.
+
 ## Events [#events]
 
 This component does not have any events.
