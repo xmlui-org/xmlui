@@ -13,7 +13,7 @@ You rarely need to use the Tooltip component directly, as visual components supp
   <CHStack height="100px" verticalAlignment="center" >
     <Button
       label="Hover the mouse over me!"
-      tooltip="I'm a hovered!"
+      tooltip="I'm hovered!"
     >
     </Button>
   </CHStack>
@@ -62,7 +62,7 @@ You can define `tooltipOptions` as a string or as an object. In the latter case,
   <CHStack height="100px" verticalAlignment="center" >
     <Button
       label="Hover the mouse over me!"
-      tooltip="My options use an object"
+      tooltip="Using an object"
       tooltipOptions="{{ showArrow: false, side: 'bottom', align: 'start' }}"
     >
     </Button>
@@ -105,8 +105,10 @@ Instead of using the tooltip-related properties, you can wrap the component into
 <App>
   <VStack height="100px" horizontalAlignment="center">
     <Tooltip side="bottom" markdown="This *example* uses a `Tooltip` component">
-      <Card title="Card 1: within a Tooltip" />
-      <Card title="Card 2: within the same Tooltip" />
+      <Stack>
+        <Card title="Card 1: within a Tooltip" />
+        <Card title="Card 2: within the same Tooltip" />
+      </Stack>
     </Tooltip>
   </VStack>
 </App>
