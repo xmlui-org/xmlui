@@ -141,7 +141,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     gap: t.$space-1;
     justify-content: center;
     align-items: center;
-    border-radius: t.$borderRadius;
+    border-radius: createThemeVar("borderRadius-#{$componentName}-badge");
     font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
     color: createThemeVar("Input:textColor-#{$componentName}-badge");

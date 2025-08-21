@@ -54,7 +54,7 @@ export const Icon = forwardRef(function Icon(
     return null;
   }
 
-  return <span ref={ref} style={{ width: "fit-content" }}>{renderedIcon}</span>;
+  return <span ref={ref} style={{ display: "contents" }}>{renderedIcon}</span>;
 });
 
 const CustomIcon = forwardRef(function CustomIcon(
