@@ -10,7 +10,6 @@ import {
   dEnabled,
   dEndIcon,
   dEndText,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,

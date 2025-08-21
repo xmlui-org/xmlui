@@ -36,9 +36,12 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui-pg copy display name="Example: dateFormat" height="120px"
+```xmlui-pg copy display name="Example: dateFormat" height="440px"
 <App>
-  <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+  <DatePicker 
+    inline 
+    dateFormat="dd-MM-yyyy" 
+    initialValue="05/25/2024" />
 </App>
 ```
 
@@ -46,9 +49,80 @@ The table below shows the available date formats:
 
 An optional array of dates that are disabled
 
-```xmlui-pg copy display name="Example: disabledDates" height="120px"
+The `disabledDates` prop supports multiple patterns for disabling specific dates in the calendar. You can use Date objects, strings (parsed using the `dateFormat`), or complex matcher objects.
+
+**Basic patterns:**
+
+| Pattern | Description | Example |
+| :------ | :---------- | :------ |
+| Single string | Disable one specific date | `"05/25/2024"` |
+| Array of strings | Disable multiple specific dates | `["05/25/2024", "05/26/2024"]` |
+| Boolean | Disable all dates | `true` |
+
+> [!INFO] You can use the [getDate()](/globals#getdate) function to query the current date.
+
+```xmlui-pg copy display name="Example: Disable specific dates" height="440px"
 <App>
-  <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+  <DatePicker 
+    inline 
+    disabledDates="{['05/26/2024', '05/27/2024']}" 
+    initialValue="05/25/2024" />
+</App>  
+```
+
+**Advanced patterns:**
+
+| Pattern | Description | Example |
+| :------ | :---------- | :------ |
+| Date range | Disable a range of dates | `{from: "05/20/2024", to: "05/25/2024"}` |
+| Day of week | Disable specific weekdays (0=Sunday, 6=Saturday) | `{dayOfWeek: [0, 6]}` |
+| Before date | Disable all dates before a specific date | `{before: "05/25/2024"}` |
+| After date | Disable all dates after a specific date | `{after: "05/25/2024"}` |
+| Date interval | Disable dates between two dates (exclusive) | `{before: "05/30/2024", after: "05/20/2024"}` |
+
+```xmlui-pg copy display name="Example: Disable weekends" height="440px"
+<App>
+  <DatePicker inline disabledDates="{{dayOfWeek: [0, 6]}}" />
+</App>  
+```
+
+```xmlui-pg copy display name="Example: Disable date range" height="440px"
+<App>
+  <DatePicker 
+    inline 
+    disabledDates="{{from: '05/20/2024', to: '05/25/2024'}}" 
+    initialValue="05/18/2024" />
+</App>  
+```
+
+```xmlui-pg copy display name="Example: Disable dates before today" height="440px"
+<App>
+  <DatePicker
+    inline 
+    disabledDates="{{before: getDate()}}"
+    intialValue="{getDate()}"/>
+</App>  
+```
+
+```xmlui-pg copy display name="Example: Disable dates today and after" height="440px"
+<App>
+  <DatePicker
+    inline 
+    disabledDates="{[getDate(), {after: getDate()}]}"
+    intialValue="{getDate()}"/>
+</App>  
+```
+
+```xmlui-pg copy display name="Example: Complex combination" height="440px"
+<App>
+  <DatePicker 
+    inline
+    disabledDates="{[
+    {dayOfWeek: [0, 6]}, 
+    {from: '12/24/2024', to: '12/26/2024'}, 
+    '01/01/2025']}" 
+    initialValue="12/20/2024"
+/>
 </App>  
 ```
 
@@ -74,9 +148,9 @@ This property sets an optional text to appear on the end (right side when the le
 
 This property sets the component's initial value.
 
-```xmlui-pg copy display name="Example: initialValue" height="120px"
+```xmlui-pg copy display name="Example: initialValue" height="440px"
 <App>
-  <DatePicker initialValue="05/25/2024" />
+  <DatePicker inline initialValue="05/25/2024" />
 </App>  
 ```
 
@@ -113,9 +187,9 @@ This property sets the width of the `DatePicker` component's label. If not defin
 
 The optional end date of the selectable date range. If not defined, the range allows any future dates.
 
-```xmlui-pg copy display name="Example: maxValue" height="120px"
+```xmlui-pg copy display name="Example: maxValue" height="440px"
 <App>
-  <DatePicker maxValue="05/26/2024" />
+  <DatePicker inline maxValue="05/26/2024" />
 </App>
 ```
 
@@ -123,9 +197,9 @@ The optional end date of the selectable date range. If not defined, the range al
 
 The optional start date of the selectable date range. If not defined, the range allows any dates in the past.
 
-```xmlui-pg copy display name="Example: minValue" height="120px"
+```xmlui-pg copy display name="Example: minValue" height="440px"
 <App>
-  <DatePicker minValue="05/24/2024" />
+  <DatePicker inline minValue="05/24/2024" />
 </App>
 ```
 
@@ -135,7 +209,7 @@ The mode of the datepicker (single or range)
 
 Available values: `single` **(default)**, `range`
 
-```xmlui-pg copy {2-3} display name="Example: mode" height="240px"
+```xmlui-pg copy {2-3} display name="Example: mode" height="560px"
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
@@ -146,7 +220,7 @@ Available values: `single` **(default)**, `range`
 
 An optional placeholder text that is visible in the input field when its empty.
 
-```xmlui-pg copy display name="Example: placeholder" height="120px"
+```xmlui-pg copy display name="Example: placeholder" height="500px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>  
@@ -160,7 +234,7 @@ Set this property to `true` to disallow changing the component value.
 
 Whether to show the week number in the calendar
 
-```xmlui-pg copy display name="Example: showWeekNumber" height="120px"
+```xmlui-pg copy display name="Example: showWeekNumber" height="500px"
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
@@ -192,7 +266,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui-pg copy display name="Example: validationStatus" height="300px"
+```xmlui-pg copy display name="Example: validationStatus" height="500px"
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -227,9 +301,9 @@ Available values:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui-pg copy display name="Example: weekStartsOn" height="120px"
+```xmlui-pg copy display name="Example: weekStartsOn" height="440px"
 <App>
-  <DatePicker weekStartsOn="1" />
+  <DatePicker inline weekStartsOn="1" />
 </App>
 ```
 
@@ -241,10 +315,13 @@ This event is triggered when value of DatePicker has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui-pg copy {2} display name="Example: didChange" height="120px"
-<App var.field="">
-  <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
+```xmlui-pg copy {2} display name="Example: didChange" height="520px"
+<App var.field="(none)">
   <Text value="{field}" />
+  <DatePicker 
+    inline
+    initialValue="{field}" 
+    onDidChange="(val) => field = val" />
 </App>
 ```
 
@@ -255,9 +332,11 @@ This event is triggered when the DatePicker has received the focus.
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="120px"
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="540px"
 <App var.isFocused="false">
-  <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
+  <Text value="{isFocused === true 
+    ? 'DatePicker focused' : 'DatePicker lost focus'}" 
+  />
   <DatePicker
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false"
@@ -285,20 +364,17 @@ This method sets the current value of the DatePicker.
 
 - `value`: The new value to set for the date picker.
 
-```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="500px"
 <App>
-  <DatePicker
-    id="picker"
-    readOnly="true"
-  />
   <HStack>
     <Button
-      label="Add Text"
+      label="Set Date to 05/25/2024"
       onClick="picker.setValue('05/25/2024')" />
     <Button
-      label="Remove Text"
+      label="Remove Date"
       onClick="picker.setValue('')" />
   </HStack>
+  <DatePicker inline id="picker" />
 </App>
 ```
 

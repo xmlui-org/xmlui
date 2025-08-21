@@ -432,6 +432,7 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-badge | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-default | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-error | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-success | *none* | *none* |
@@ -488,12 +489,12 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [padding](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-2_5 | $space-2_5 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-item-Select | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-0_5 | $space-0_5 |
 | [textColor](../styles-and-themes/common-units/#color)-indicator-Select | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-200 |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select | *none* | *none* |

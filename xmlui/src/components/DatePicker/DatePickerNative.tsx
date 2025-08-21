@@ -1,6 +1,6 @@
 import { type CSSProperties, useId } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import type { DateRange } from "react-day-picker";
+import type { DateRange, Matcher } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
 import classnames from "classnames";
@@ -19,6 +19,42 @@ import { Item } from "@radix-ui/react-dropdown-menu";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
+
+// Extended matcher types that support string dates in addition to Date objects
+type StringDateRange = { 
+  from: string | Date; 
+  to?: string | Date; 
+};
+
+type StringDateBefore = { 
+  before: string | Date; 
+};
+
+type StringDateAfter = { 
+  after: string | Date; 
+};
+
+type StringDateInterval = { 
+  before: string | Date; 
+  after: string | Date; 
+};
+
+type DayOfWeekMatcher = { 
+  dayOfWeek: number | number[]; 
+};
+
+type ExtendedMatcher = 
+  | boolean
+  | string
+  | Date
+  | (string | Date)[]
+  | StringDateRange
+  | StringDateBefore  
+  | StringDateAfter
+  | StringDateInterval
+  | DayOfWeekMatcher
+  | ((date: Date) => boolean)
+  | ExtendedMatcher[];
 
 type Props = {
   id?: string;
@@ -40,7 +76,7 @@ type Props = {
   weekStartsOn?: WeekDays;
   minValue?: string;
   maxValue?: string;
-  disabledDates?: string[];
+  disabledDates?: ExtendedMatcher;
   inline?: boolean;
   startText?: string;
   startIcon?: string;
@@ -97,7 +133,7 @@ export const defaultProps: Pick<
   dateFormat: "MM/dd/yyyy",
   showWeekNumber: false,
   weekStartsOn: WeekDays.Sunday,
-  disabledDates: [],
+  disabledDates: undefined as ExtendedMatcher | undefined,
 };
 
 const Chevron = ({ ...props }) => {
@@ -154,6 +190,7 @@ export const DatePicker = forwardRef(function DatePicker(
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [isMenuFocused, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
   const generatedId = useId();
   const inputId = id || generatedId;
 
@@ -168,6 +205,8 @@ export const DatePicker = forwardRef(function DatePicker(
     }
     return undefined;
   }, [value, mode]);
+
+  console.log("sel", selected)
 
   useEffect(() => {
     if (!dateFormats.includes(dateFormat)) {
@@ -185,8 +224,126 @@ export const DatePicker = forwardRef(function DatePicker(
     return maxValue ? parse(maxValue, dateFormat, new Date()) : undefined;
   }, [maxValue, dateFormat]);
 
+  const defaultMonth = useMemo(() => {
+    if (mode === "single" && selected) {
+      return selected;
+    } else if (mode === "range" && selected && typeof selected === "object" && selected.from) {
+      return selected.from;
+    }
+    return undefined;
+  }, [selected, mode]);
+
   const disabled = useMemo(() => {
-    return disabledDates?.map((date) => parse(date, dateFormat, new Date()));
+    if (!disabledDates) {
+      return undefined;
+    }
+
+    const convertStringToDate = (dateValue: string | Date): Date | undefined => {
+      if (dateValue instanceof Date) {
+        return dateValue;
+      }
+      if (typeof dateValue === 'string') {
+        // Try to parse as ISO date first
+        const isoDate = parseISODate(dateValue);
+        if (isoDate) {
+          return isoDate;
+        }
+        // Parse using the specified dateFormat
+        const parsedDate = parse(dateValue, dateFormat, new Date());
+        if (isValid(parsedDate)) {
+          return parsedDate;
+        }
+      }
+      return undefined;
+    };
+
+    const convertMatcher = (matcher: ExtendedMatcher): Matcher | undefined => {
+      // Handle boolean - disable all dates
+      if (typeof matcher === 'boolean') {
+        return matcher;
+      }
+
+      // Handle function matcher - pass through as is
+      if (typeof matcher === 'function') {
+        return matcher;
+      }
+
+      // Handle single Date or string
+      if (matcher instanceof Date || typeof matcher === 'string') {
+        const convertedDate = convertStringToDate(matcher);
+        return convertedDate || undefined;
+      }
+
+      // Handle array of mixed matchers (combines multiple disable patterns)
+      if (Array.isArray(matcher)) {
+        const convertedMatchers: any[] = [];
+        
+        for (const item of matcher) {
+          if (typeof item === 'object' && item !== null && !Array.isArray(item) && !(item instanceof Date)) {
+            // Handle nested matcher objects in array (e.g., {dayOfWeek: [0,6]}, {from: date, to: date})
+            const nestedResult = convertMatcher(item);
+            if (nestedResult) {
+              convertedMatchers.push(nestedResult);
+            }
+          } else if (item instanceof Date || typeof item === 'string') {
+            // Handle individual dates in the array
+            const convertedDate = convertStringToDate(item);
+            if (convertedDate) {
+              convertedMatchers.push(convertedDate);
+            }
+          }
+        }
+        
+        // Return array of all matchers to combine their effects
+        return convertedMatchers.length > 0 ? convertedMatchers as Matcher : undefined;
+      }
+
+      // Handle object matchers (DateRange, DateBefore, DateAfter, DateInterval, DayOfWeek)
+      if (typeof matcher === 'object' && matcher !== null) {
+        // Handle DateRange: { from: Date, to?: Date }
+        if ('from' in matcher) {
+          const fromDate = convertStringToDate(matcher.from);
+          const toDate = matcher.to ? convertStringToDate(matcher.to) : undefined;
+          if (fromDate) {
+            return { from: fromDate, to: toDate };
+          }
+        }
+
+        // Handle DateBefore: { before: Date }
+        if ('before' in matcher && !('after' in matcher)) {
+          const beforeDate = convertStringToDate(matcher.before);
+          if (beforeDate) {
+            return { before: beforeDate };
+          }
+        }
+
+        // Handle DateAfter: { after: Date }
+        if ('after' in matcher && !('before' in matcher)) {
+          const afterDate = convertStringToDate(matcher.after);
+          if (afterDate) {
+            return { after: afterDate };
+          }
+        }
+
+        // Handle DateInterval: { before: Date, after: Date }
+        if ('before' in matcher && 'after' in matcher) {
+          const beforeDate = convertStringToDate(matcher.before);
+          const afterDate = convertStringToDate(matcher.after);
+          if (beforeDate && afterDate) {
+            return { before: beforeDate, after: afterDate };
+          }
+        }
+
+        // Handle DayOfWeek: { dayOfWeek: number | number[] }
+        if ('dayOfWeek' in matcher) {
+          return { dayOfWeek: matcher.dayOfWeek };
+        }
+      }
+
+      return undefined;
+    };
+
+    return convertMatcher(disabledDates);
   }, [disabledDates, dateFormat]);
 
   const [open, setOpen] = useState(false);
@@ -206,8 +363,7 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [referenceElement]);
 
   const setValue = useEvent((newValue: string) => {
-    const parsedDate = parseDate(newValue);
-    handleSelect(parsedDate);
+    updateState({ value: newValue });
   });
 
   useEffect(() => {
@@ -229,6 +385,20 @@ export const DatePicker = forwardRef(function DatePicker(
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
+
+  // Update inline month when selected value changes
+  useEffect(() => {
+    if (inline) {
+      if (mode === "single" && selected) {
+        setInlineMonth(selected);
+      } else if (mode === "range" && selected && typeof selected === "object" && selected.from) {
+        setInlineMonth(selected.from);
+      } else if (!selected) {
+        // Reset to defaultMonth logic when no selection
+        setInlineMonth(defaultMonth);
+      }
+    }
+  }, [selected, mode, inline, defaultMonth]);
 
   const handleSelect = useCallback(
     (dateOrRange?: Date | DateRange) => {
@@ -282,6 +452,8 @@ export const DatePicker = forwardRef(function DatePicker(
           fixedWeeks
           startMonth={startDate}
           endMonth={endDate}
+          month={inlineMonth}
+          onMonthChange={setInlineMonth}
           disabled={disabled}
           weekStartsOn={_weekStartsOn}
           showWeekNumber={showWeekNumber}
@@ -378,6 +550,7 @@ export const DatePicker = forwardRef(function DatePicker(
             captionLayout="dropdown"
             startMonth={startDate}
             endMonth={endDate}
+            defaultMonth={defaultMonth}
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
