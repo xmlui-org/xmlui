@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.10.1
+
+### Patch Changes
+
+- 442416b: Refactor visual components to allow tooltip
+- a018431: feat: add custom tooltip template support for Bar and Line charts
+- 33cb547: Pagination component now handles itemCount being undefined/null. Introduced hasPrevPage and hasNextPage props to toggle button disabled state.
+- b5d7537: Enhance the disabledDates property of DatePicker
+
 ## 0.10.0
 
 ### Minor Changes
