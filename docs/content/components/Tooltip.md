@@ -134,6 +134,94 @@ You can specify tooltips that you could not otherwise do with the `text` or `mar
 </App>
 ```
 
+A `tooltipTemplate` may be able to use the `$tooltip` context variable.
+
+```xmlui-pg display copy height="600px" name="Example: tooltipTemplate with $tooltip context variable"
+<App
+    var.starData="{[
+      { star_date: '2025-02-11T00:00:00Z', xmlui_stars: 0, xmlui_test_server_stars: 0, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-18T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 0, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-19T00:00:00Z', xmlui_stars: 4, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-20T00:00:00Z', xmlui_stars: 48, xmlui_test_server_stars: 5, xmlui_invoice_stars: 2, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-21T00:00:00Z', xmlui_stars: 62, xmlui_test_server_stars: 8, xmlui_invoice_stars: 3, xmlui_mcp_stars: 2 },
+      { star_date: '2025-07-22T00:00:00Z', xmlui_stars: 16, xmlui_test_server_stars: 3, xmlui_invoice_stars: 1, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-23T00:00:00Z', xmlui_stars: 6, xmlui_test_server_stars: 2, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-24T00:00:00Z', xmlui_stars: 3, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-25T00:00:00Z', xmlui_stars: 10, xmlui_test_server_stars: 2, xmlui_invoice_stars: 1, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-26T00:00:00Z', xmlui_stars: 2, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-27T00:00:00Z', xmlui_stars: 3, xmlui_test_server_stars: 1, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-28T00:00:00Z', xmlui_stars: 4, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-29T00:00:00Z', xmlui_stars: 4, xmlui_test_server_stars: 2, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-07-30T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 0, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 },
+      { star_date: '2025-07-31T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-01T00:00:00Z', xmlui_stars: 2, xmlui_test_server_stars: 0, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-05T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-07T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 0, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 },
+      { star_date: '2025-08-08T00:00:00Z', xmlui_stars: 3, xmlui_test_server_stars: 1, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-12T00:00:00Z', xmlui_stars: 2, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 },
+      { star_date: '2025-08-14T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 0, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-15T00:00:00Z', xmlui_stars: 2, xmlui_test_server_stars: 1, xmlui_invoice_stars: 0, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-18T00:00:00Z', xmlui_stars: 2, xmlui_test_server_stars: 0, xmlui_invoice_stars: 1, xmlui_mcp_stars: 1 },
+      { star_date: '2025-08-19T00:00:00Z', xmlui_stars: 3, xmlui_test_server_stars: 1, xmlui_invoice_stars: 1, xmlui_mcp_stars: 0 },
+      { star_date: '2025-08-20T00:00:00Z', xmlui_stars: 1, xmlui_test_server_stars: 0, xmlui_invoice_stars: 0, xmlui_mcp_stars: 1 }
+    ]}"
+  >
+
+    <VStack padding="$space-4" gap="$space-4">
+      <Text fontSize="$fontSize-xl" fontWeight="$fontWeight-semibold">
+        XMLUI Stars Over Time
+      </Text>
+
+      <Card height="400px">
+        <LineChart
+          data="{starData}"
+          dataKeys="{['xmlui_stars', 'xmlui_test_server_stars', 'xmlui_invoice_stars', 'xmlui_mcp_stars']}"
+          nameKey="star_date"
+          showLegend="true"
+          tickFormatterX="{formatDateWithoutYear}">
+          <property name="tooltipTemplate">
+            <Theme
+              border-cell-Table="none"
+              padding-cell-Table="0">
+              <VStack
+                width="16rem"
+                borderRadius="$borderRadius"
+                boxShadow="$boxShadow-md"
+                backgroundColor="$color-surface-100">
+                <Text>
+                  {formatDate($tooltip.label)}
+                </Text>
+                <Table
+                  lineHeight="$lineHeight-tight"
+                  data="{$tooltip.payload}"
+                  hideHeader="true"
+                  noBottomBorder="true">
+                  <Column width="3*">
+                    <HStack gap="$space-2" verticalAlignment="center">
+                      <Stack
+                        width="8px"
+                        height="8px"
+                        backgroundColor="{$item.color}" />
+                      <Text fontSize="$fontSize-smaller">
+                        {$item.dataKey}
+                      </Text>
+                    </HStack>
+                  </Column>
+                  <Column>
+                    <Text fontSize="$fontSize-smaller">
+                      {$item.value}
+                    </Text>
+                  </Column>
+                </Table>
+              </VStack>
+            </Theme>
+          </property>
+        </LineChart>
+      </Card>
+    </VStack>
+</App>
+```
+
 ## Properties [#properties]
 
 ### `align` (default: "center") [#align-default-center]
