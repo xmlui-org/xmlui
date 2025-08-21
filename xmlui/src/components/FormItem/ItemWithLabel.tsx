@@ -22,8 +22,8 @@ type ItemWithLabelProps = {
   children: ReactNode;
   validationInProgress?: boolean;
   shrinkToLabel?: boolean;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
   isInputTemplateUsed?: boolean;
   validationResult?: ReactNode;
 };
@@ -37,7 +37,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
     labelPosition = "top",
-    style,
+    style = {},
     className,
     label,
     labelBreak = defaultProps.labelBreak,
@@ -52,6 +52,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     labelStyle,
     validationResult,
     isInputTemplateUsed = false,
+    ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -59,7 +60,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
     return (
-      <Slot style={style} className={className} id={inputId} ref={ref}>
+      <Slot {...rest} style={style} className={className} id={inputId} ref={ref}>
         {children}
       </Slot>
     );
@@ -73,7 +74,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={style} ref={ref} className={classnames(className, styles.itemWithLabel)}>
+    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",

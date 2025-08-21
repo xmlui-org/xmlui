@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -130,7 +130,7 @@ import TableDeleteRowIcon from "./Icon/TableDeleteRowIcon";
 import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 
-type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
+type IconRenderer<T extends IconBaseProps> = (props: T, ref: ForwardedRef<HTMLElement>) => React.ReactElement<T>;
 
 type IconRegistryEntry = {
   renderer: IconRenderer<any>;

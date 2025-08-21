@@ -77,6 +77,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     autoplayInterval = defaultProps.autoplayInterval,
     stopAutoplayOnInteraction = defaultProps.stopAutoplayOnInteraction,
     registerComponentApi,
+    ...rest
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -221,6 +222,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   return (
     <CarouselContext.Provider value={carouselContextValue}>
       <div
+        {...rest}
         style={style}
         ref={ref}
         className={classnames(styles.carousel, className)}

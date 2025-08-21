@@ -914,7 +914,11 @@ export class HeadingDriver extends ComponentDriver {}
 
 // --- Icon
 
-export class IconDriver extends ComponentDriver {}
+export class IconDriver extends ComponentDriver {
+  get svgIcon() {
+    return this.component.locator("svg");
+  }
+}
 
 // --- Stack
 

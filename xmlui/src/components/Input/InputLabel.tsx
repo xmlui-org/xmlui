@@ -13,9 +13,13 @@ type Props = {
   focused?: boolean;
 };
 
-export const InputLabel = ({ text, required, forFieldId, disabled }: Props) => {
+export const InputLabel = ({ text, required, forFieldId, disabled, ...rest }: Props) => {
   return (
-    <label className={classnames(styles.inputLabel, { [styles.disabled]: disabled })} htmlFor={forFieldId}>
+    <label
+      {...rest}
+      className={classnames(styles.inputLabel, { [styles.disabled]: disabled })}
+      htmlFor={forFieldId}
+    >
       {text} {required && <span className={styles.required}>*</span>}
     </label>
   );

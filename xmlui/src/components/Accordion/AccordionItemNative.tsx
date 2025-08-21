@@ -53,6 +53,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     initiallyExpanded = defaultProps.initiallyExpanded,
     style,
     className,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -102,6 +103,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     >
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
+          {...rest}
           id={`trigger_${itemId}`}
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",

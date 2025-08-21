@@ -62,6 +62,7 @@ export const ColorPicker = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
@@ -112,6 +113,7 @@ export const ColorPicker = forwardRef(
 
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}

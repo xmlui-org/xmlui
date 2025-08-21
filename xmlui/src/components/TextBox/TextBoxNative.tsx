@@ -130,6 +130,7 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+    ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -212,6 +213,7 @@ export const TextBox = forwardRef(function TextBox(
 
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}

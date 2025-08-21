@@ -78,6 +78,7 @@ export const Toggle = forwardRef(function Toggle(
     autoFocus,
     registerComponentApi,
     inputRenderer,
+    ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -213,10 +214,11 @@ export const Toggle = forwardRef(function Toggle(
 
   return (
     <ItemWithLabel
+      {...rest}
       ref={forwardedRef}
       id={inputId}
       label={label}
-      style={style}
+      style={{...style, width: "fit-content"}}
       className={className}
       labelPosition={labelPosition}
       labelWidth={labelWidth}

@@ -65,6 +65,7 @@ export const LinkNative = forwardRef(function LinkNative(
   const Node = to ? Link : "div";
   return (
     <Node
+      {...anchorProps}
       ref={forwardedRef as any}
       to={smartTo}
       style={style}
@@ -75,7 +76,6 @@ export const LinkNative = forwardRef(function LinkNative(
         [styles.active]: active,
         [styles.disabled]: disabled,
       })}
-      {...anchorProps}
     >
       {icon && (
         <div className={styles.iconWrapper}>

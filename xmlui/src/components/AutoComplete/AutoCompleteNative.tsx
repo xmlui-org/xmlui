@@ -47,8 +47,8 @@ type AutoCompleteProps = {
   className?: string;
   onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   autoFocus?: boolean;
@@ -96,7 +96,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
     registerComponentApi,
-
     emptyListTemplate,
     style,
     className,
@@ -112,6 +111,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     required = defaultProps.required,
     creatable = defaultProps.creatable,
     optionRenderer,
+    ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -268,47 +268,53 @@ export const AutoComplete = forwardRef(function AutoComplete(
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
       <OptionContext.Provider value={optionContextValue}>
         <OptionTypeProvider Component={HiddenOption}>
-          <ItemWithLabel
-            id={inputId}
-            ref={forwardedRef}
-            labelPosition={labelPosition as any}
-            label={label}
-            labelWidth={labelWidth}
-            labelBreak={labelBreak}
-            required={required}
-            enabled={enabled}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            className={className}
+          <Popover
+            open={open}
+            onOpenChange={(isOpen) => {
+              if (readOnly) return;
+              setOpen(isOpen);
+            }}
+            modal={false}
           >
-            <Popover
-              open={open}
-              onOpenChange={(isOpen) => {
-                if (readOnly) return;
-                setOpen(isOpen);
+            <Cmd
+              ref={dropdownRef}
+              className={styles.command}
+              filter={(value, search, keywords) => {
+                if (readOnly) return 1;
+                if (!searchTerm || searchTerm.trim() === "") return 1;
+                const extendedValue = value + " " + keywords.join(" ");
+                if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
+                return 0;
               }}
-              modal={false}
             >
-              <Cmd
-                ref={dropdownRef}
-                className={styles.command}
-                filter={(value, search, keywords) => {
-                  if (readOnly) return 1;
-                  if (!searchTerm || searchTerm.trim() === "") return 1;
-                  const extendedValue = value + " " + keywords.join(" ");
-                  if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
-                  return 0;
-                }}
+              <ItemWithLabel
+                {...rest}
+                id={inputId}
+                ref={forwardedRef}
+                labelPosition={labelPosition as any}
+                label={label}
+                labelWidth={labelWidth}
+                labelBreak={labelBreak}
+                required={required}
+                enabled={enabled}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={className}
               >
                 <PopoverTrigger asChild>
                   <div
                     id={inputId}
                     ref={setReferenceElement}
                     style={{ width: "100%", ...style }}
-                    className={classnames(className, styles.badgeListWrapper, styles[validationStatus], {
-                      [styles.disabled]: !enabled,
-                      [styles.focused]: isFocused,
-                    })}
+                    className={classnames(
+                      className,
+                      styles.badgeListWrapper,
+                      styles[validationStatus],
+                      {
+                        [styles.disabled]: !enabled,
+                        [styles.focused]: isFocused,
+                      },
+                    )}
                   >
                     {Array.isArray(selectedValue) && (
                       <div className={styles.badgeList}>
@@ -330,24 +336,21 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       </div>
                     )}
                     <CmdInput
-                      onFocus={() => {
+                      onFocus={(ev) => {
                         setIsFocused(true);
-                        onFocus();
+                        onFocus(ev);
                       }}
-                      onBlur={() => {
+                      onBlur={(ev) => {
                         if (inputValue === "" && !multi) {
                           clearValue();
                         } else {
-                          if (
-                            !Array.isArray(selectedValue) &&
-                            inputValue !== selectedValue?.label
-                          ) {
+                          if (!Array.isArray(selectedValue) && selectedValue) {
                             setInputValue(selectedValue?.label);
                           } else {
                             setInputValue("");
                           }
                         }
-                        onBlur();
+                        onBlur(ev);
                         setIsFocused(false);
                       }}
                       onKeyDown={(event) => {
@@ -397,41 +400,42 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     </div>
                   </div>
                 </PopoverTrigger>
-                {open && (
-                  <Portal container={root}>
-                    <PopoverContent
-                      asChild
-                      style={{ width, height: dropdownHeight }}
-                      className={styles.popoverContent}
-                      align="start"
-                      onOpenAutoFocus={(e) => e.preventDefault()}
+              </ItemWithLabel>
+
+              {open && (
+                <Portal container={root}>
+                  <PopoverContent
+                    asChild
+                    style={{ width, height: dropdownHeight }}
+                    className={styles.popoverContent}
+                    align="start"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <CmdList
+                      role="listbox"
+                      className={styles.commandList}
+                      style={{ height: dropdownHeight }}
                     >
-                      <CmdList
-                        role="listbox"
-                        className={styles.commandList}
-                        style={{ height: dropdownHeight }}
-                      >
-                        <CmdEmpty>{emptyListNode}</CmdEmpty>
-                        {creatable && <CreatableItem />}
-                        <CmdGroup>
-                          {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                            <AutoCompleteOption
-                              key={value}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                              readOnly={readOnly}
-                            />
-                          ))}
-                        </CmdGroup>
-                      </CmdList>
-                    </PopoverContent>
-                  </Portal>
-                )}
-              </Cmd>
-            </Popover>
-          </ItemWithLabel>
+                      <CmdEmpty>{emptyListNode}</CmdEmpty>
+                      {creatable && <CreatableItem />}
+                      <CmdGroup>
+                        {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                          <AutoCompleteOption
+                            key={value}
+                            value={value}
+                            label={label}
+                            enabled={enabled}
+                            keywords={keywords}
+                            readOnly={readOnly}
+                          />
+                        ))}
+                      </CmdGroup>
+                    </CmdList>
+                  </PopoverContent>
+                </Portal>
+              )}
+            </Cmd>
+          </Popover>
           {children}
         </OptionTypeProvider>
       </OptionContext.Provider>

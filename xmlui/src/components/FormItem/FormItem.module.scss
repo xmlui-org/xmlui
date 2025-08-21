@@ -47,10 +47,6 @@ $themeVars: ();
       width: fit-content;
     }
 
-    .itemWithLabel {
-      width: 100%;
-    }
-
     .inputLabel {
       display: flex;
       color: createThemeVar("textColor-FormItemLabel");
@@ -88,6 +84,10 @@ $themeVars: ();
         color: createThemeVar("textColor-FormItemLabel-requiredMark");
       }
     }
+  }
+
+  .itemWithLabel {
+    width: 100%;
   }
 }
 

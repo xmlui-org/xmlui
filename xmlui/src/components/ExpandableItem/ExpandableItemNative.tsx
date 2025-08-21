@@ -49,6 +49,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     withSwitch = defaultExpandableItemProps.withSwitch,
     onExpandedChange,
     registerComponentApi,
+    ...rest
   }: ExpandableItemProps,
   ref,
 ) {
@@ -125,6 +126,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
 
   return (
     <div
+      {...rest}
       className={classNames(styles.expandableItem, className, {
         [styles.open]: isOpen,
         [styles.disabled]: !enabled,

@@ -295,6 +295,7 @@ const Form = forwardRef(function (
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
+    ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
@@ -466,6 +467,7 @@ const Form = forwardRef(function (
   return (
     <>
       <form
+        {...rest}
         style={style}
         className={classnames(styles.wrapper, className)}
         onSubmit={doSubmit}

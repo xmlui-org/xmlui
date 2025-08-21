@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
 import type React from "react";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
@@ -146,14 +146,14 @@ type TransformedMarkdownProps = {
   showHeadingAnchors?: boolean;
 };
 
-const TransformedMarkdown = ({
+const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(({
   children,
   removeIndents,
   className,
   extractValue,
   codeHighlighter,
   showHeadingAnchors,
-}: TransformedMarkdownProps) => {
+}: TransformedMarkdownProps, ref) => {
   const markdownContent = useMemo(() => {
     if (typeof children !== "string") {
       return null;
@@ -188,6 +188,7 @@ const TransformedMarkdown = ({
 
   return (
     <Markdown
+      ref={ref}
       removeIndents={removeIndents}
       codeHighlighter={codeHighlighter}
       className={className}
@@ -196,6 +197,6 @@ const TransformedMarkdown = ({
       {markdownContent}
     </Markdown>
   );
-};
+});
 
 export { Markdown } from "./MarkdownNative";

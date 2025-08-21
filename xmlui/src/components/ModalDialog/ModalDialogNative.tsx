@@ -19,6 +19,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { rest } from "lodash-es";
 
 // Default props for ModalDialog component
 export const defaultProps = {
@@ -132,6 +133,7 @@ export const ModalDialog = React.forwardRef(
       closeButtonVisible = defaultProps.closeButtonVisible,
       onOpen,
       onClose,
+      ...rest
     }: ModalProps,
     ref,
   ) => {
@@ -141,7 +143,8 @@ export const ModalDialog = React.forwardRef(
     // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
     // String-based type checking: Use constructor.name to identify ShadowRoot
     // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
-    const isDialogRootInShadowDom = typeof ShadowRoot !== 'undefined' && root?.getRootNode() instanceof ShadowRoot;
+    const isDialogRootInShadowDom =
+      typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot;
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
@@ -191,6 +194,7 @@ export const ModalDialog = React.forwardRef(
 
     const Content = (
       <Dialog.Content
+        {...rest}
         className={classnames(styles.content)}
         onPointerDownOutside={(event) => {
           if (

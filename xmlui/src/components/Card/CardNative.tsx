@@ -7,7 +7,6 @@ import { Avatar } from "../Avatar/AvatarNative";
 import { LinkNative } from "../Link/LinkNative";
 import type { HeadingProps } from "../Heading/HeadingNative";
 import { Heading } from "../Heading/HeadingNative";
-import { Stack } from "../Stack/StackNative";
 import { Text } from "../Text/TextNative";
 
 type Props = {
@@ -42,15 +41,17 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
     avatarSize,
     onClick,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
-    maxLines: 1
+    maxLines: 1,
   };
   return (
     <div
+      {...rest}
       ref={forwardedRef}
       className={classnames(
         styles.wrapper,
@@ -71,7 +72,7 @@ export const Card = forwardRef(function Card(
             {linkTo ? (
               title ? (
                 <LinkNative to={linkTo + ""}>
-                  <Heading {...titleProps} >{title}</Heading>
+                  <Heading {...titleProps}>{title}</Heading>
                 </LinkNative>
               ) : null
             ) : title ? (

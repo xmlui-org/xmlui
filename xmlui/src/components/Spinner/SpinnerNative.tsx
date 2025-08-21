@@ -18,7 +18,13 @@ type SpinnerProps = {
 
 // source https://loading.io/css/
 export const Spinner = forwardRef(function Spinner(
-  { delay = defaultProps.delay, fullScreen = defaultProps.fullScreen, style, className }: SpinnerProps,
+  {
+    delay = defaultProps.delay,
+    fullScreen = defaultProps.fullScreen,
+    style,
+    className,
+    ...rest
+  }: SpinnerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [pastDelay, setPastDelay] = useState(delay === 0);
@@ -37,8 +43,17 @@ export const Spinner = forwardRef(function Spinner(
   } else {
     if (fullScreen) {
       return (
-        <div role="status" aria-label="Loading" className={styles.fullScreenSpinnerWrapper}>
-          <div className={classnames(styles["lds-ring"], className)} style={style} ref={forwardedRef}>
+        <div
+          {...rest}
+          role="status"
+          aria-label="Loading"
+          className={styles.fullScreenSpinnerWrapper}
+        >
+          <div
+            className={classnames(styles["lds-ring"], className)}
+            style={style}
+            ref={forwardedRef}
+          >
             <div></div>
             <div></div>
             <div></div>
@@ -49,6 +64,7 @@ export const Spinner = forwardRef(function Spinner(
     }
     return (
       <div
+        {...rest}
         className={classnames(styles["lds-ring"], className)}
         role="status"
         aria-label="Loading"

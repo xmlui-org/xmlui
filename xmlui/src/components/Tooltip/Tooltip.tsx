@@ -27,12 +27,14 @@ export const TooltipMd = createMetadata({
       isRequired: false,
     },
     delayDuration: {
-      description: "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
+      description:
+        "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
       type: "number",
       defaultValue: defaultProps.delayDuration,
     },
     skipDelayDuration: {
-      description: "How much time a user has to enter another trigger without incurring a delay again (in ms)",
+      description:
+        "How much time a user has to enter another trigger without incurring a delay again (in ms)",
       type: "number",
       defaultValue: defaultProps.skipDelayDuration,
     },
@@ -69,7 +71,8 @@ export const TooltipMd = createMetadata({
       defaultValue: defaultProps.alignOffset,
     },
     avoidCollisions: {
-      description: "When true, overrides the side and align preferences to prevent collisions with boundary edges",
+      description:
+        "When true, overrides the side and align preferences to prevent collisions with boundary edges",
       type: "boolean",
       defaultValue: defaultProps.avoidCollisions,
     },
@@ -80,7 +83,7 @@ export const TooltipMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`backgroundColor-${COMP}`]: "$color-surface-0",
     [`border-${COMP}`]: "none",
     [`textColor-${COMP}`]: "$textcolor-primary",
     [`borderRadius-${COMP}`]: "4px",
@@ -90,12 +93,16 @@ export const TooltipMd = createMetadata({
     [`paddingBottom-${COMP}`]: "10px",
     [`paddingLeft-${COMP}`]: "15px",
     [`paddingRight-${COMP}`]: "15px",
-    [`boxShadow-${COMP}`]: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
+    [`boxShadow-${COMP}`]:
+      "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
     [`fill-arrow-${COMP}`]: "$color-surface-200",
     [`stroke-arrow-${COMP}`]: "$color-surface-200",
     [`strokeWidth-arrow-${COMP}`]: "0",
     [`animationDuration-${COMP}`]: "400ms",
     [`animation-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
+    dark: {
+      [`backgroundColor-${COMP}`]: "$color-surface-200",
+    },
   },
 });
 
@@ -109,7 +116,7 @@ export const tooltipComponentRenderer = createComponentRenderer(
     }
 
     // If text is not provided, do not render anything
-    const text = extractValue.asOptionalString(node.props.text)
+    const text = extractValue.asOptionalString(node.props.text);
     const markdown = extractValue.asOptionalString(node.props.markdown);
     const tooltipTemplate = node.props.tooltipTemplate;
 

@@ -26,7 +26,12 @@ type Props = {
   id?: string;
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
-  headerRenderer?: (item: { id?: string; index: number; label: string; isActive: boolean }) => ReactNode;
+  headerRenderer?: (item: {
+    id?: string;
+    index: number;
+    label: string;
+    isActive: boolean;
+  }) => ReactNode;
   style?: CSSProperties;
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
@@ -53,6 +58,7 @@ export const Tabs = forwardRef(function Tabs(
     className,
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -130,6 +136,7 @@ export const Tabs = forwardRef(function Tabs(
   return (
     <TabContext.Provider value={tabContextValue}>
       <RTabsRoot
+        {...rest}
         id={tabsId}
         ref={forwardedRef}
         className={classnames(className, styles.tabs)}
@@ -148,11 +155,7 @@ export const Tabs = forwardRef(function Tabs(
       >
         <RTabsList className={styles.tabsList} role="tablist">
           {tabItems.map((tab, index) => (
-            <RTabsTrigger
-              key={tab.innerId}
-              value={tab.innerId}
-              asChild
-            >
+            <RTabsTrigger key={tab.innerId} value={tab.innerId} asChild>
               <div
                 role="tab"
                 aria-label={tab.label}
@@ -160,23 +163,21 @@ export const Tabs = forwardRef(function Tabs(
                   [styles.distributeEvenly]: distributeEvenly,
                 })}
               >
-                {
-                  tab.headerRenderer ?
-                    tab.headerRenderer({
+                {tab.headerRenderer
+                  ? tab.headerRenderer({
                       ...(tab.id !== undefined && { id: tab.id }),
                       index,
                       label: tab.label,
-                      isActive: tab.innerId === currentTab
+                      isActive: tab.innerId === currentTab,
                     })
-                    : headerRenderer ?
-                      headerRenderer({
+                  : headerRenderer
+                    ? headerRenderer({
                         ...(tab.id !== undefined && { id: tab.id }),
                         index,
                         label: tab.label,
-                        isActive: tab.innerId === currentTab
+                        isActive: tab.innerId === currentTab,
                       })
-                      : tab.label
-                }
+                    : tab.label}
               </div>
             </RTabsTrigger>
           ))}

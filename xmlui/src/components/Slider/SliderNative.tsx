@@ -35,8 +35,8 @@ type Props = {
   validationStatus?: ValidationStatus;
   minStepsBetweenThumbs?: number;
   onDidChange?: (newValue: number | number[]) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
   autoFocus?: boolean;
@@ -100,6 +100,7 @@ export const Slider = forwardRef(
       thumbStyle,
       showValues = defaultProps.showValues,
       valueFormat = defaultProps.valueFormat,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
@@ -179,12 +180,12 @@ export const Slider = forwardRef(
     );
 
     // Component APIs
-    const handleOnFocus = useCallback(() => {
-      onFocus?.();
+    const handleOnFocus = useCallback((ev) => {
+      onFocus?.(ev);
     }, [onFocus]);
 
-    const handleOnBlur = useCallback(() => {
-      onBlur?.();
+    const handleOnBlur = useCallback((ev) => {
+      onBlur?.(ev);
     }, [onBlur]);
 
     const focus = useCallback(() => {
@@ -213,6 +214,7 @@ export const Slider = forwardRef(
 
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
         label={displayLabel}
         labelWidth={labelWidth}

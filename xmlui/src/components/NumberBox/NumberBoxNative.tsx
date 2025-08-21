@@ -124,6 +124,7 @@ export const NumberBox = forwardRef(function NumberBox(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -400,6 +401,7 @@ export const NumberBox = forwardRef(function NumberBox(
 
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       ref={forwardedRef}
       labelPosition={labelPosition as any}

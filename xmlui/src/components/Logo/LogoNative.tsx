@@ -18,7 +18,7 @@ type LogoProps = {
 };
 
 export const Logo = forwardRef(function Logo(
-  { style, alt = defaultProps.alt, inline = defaultProps.inline, className }: LogoProps,
+  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -28,6 +28,7 @@ export const Logo = forwardRef(function Logo(
   //width auto for safari
   return (
     <Image
+      {...rest}
       ref={forwardedRef}
       src={logoUrl}
       alt={alt}

@@ -63,6 +63,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     triggerButtonThemeColor = defaultDropdownMenuProps.triggerButtonThemeColor,
     triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
     triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
+    ...rest
   }: DropdownMenuProps,
   ref,
 ) {
@@ -89,7 +90,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         setOpen(isOpen);
       }}
     >
-      <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any}>
+      <ReactDropdownMenu.Trigger {...rest} asChild disabled={disabled} ref={ref as any}>
         {triggerTemplate ? (
           triggerTemplate
         ) : (

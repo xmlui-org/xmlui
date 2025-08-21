@@ -20,11 +20,13 @@ export const Backdrop = forwardRef(function Backdrop(
     overlayTemplate,
     backgroundColor,
     opacity,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
+      {...rest}
       className={classNames(styles.backdropContainer, className)}
       ref={forwardedRef}
       style={style}

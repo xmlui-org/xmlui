@@ -202,7 +202,7 @@ This component does not expose any methods.
 | --- | --- | --- |
 | [animation](../styles-and-themes/layout-props/#animation)-Tooltip | cubic-bezier(0.16, 1, 0.3, 1) | cubic-bezier(0.16, 1, 0.3, 1) |
 | [animationDuration](../styles-and-themes/layout-props/#animationDuration)-Tooltip | 400ms | 400ms |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Tooltip | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Tooltip | $color-surface-0 | $color-surface-200 |
 | [border](../styles-and-themes/common-units/#border)-Tooltip | none | none |
 | [borderBottom](../styles-and-themes/common-units/#border)-Tooltip | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-Tooltip | *none* | *none* |

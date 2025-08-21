@@ -79,7 +79,7 @@ export const defaultProps = {
   controlled: true,
   enterSubmits: true,
   rows: 2,
-  enabled: true
+  enabled: true,
 };
 
 export const TextArea = forwardRef(function TextArea(
@@ -114,6 +114,7 @@ export const TextArea = forwardRef(function TextArea(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
 ) {
@@ -259,6 +260,7 @@ export const TextArea = forwardRef(function TextArea(
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
       <ItemWithLabel
+        {...rest}
         ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
@@ -269,7 +271,6 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={classes}
       >
         <TextAreaResizable
           {...textareaProps}
@@ -285,6 +286,7 @@ export const TextArea = forwardRef(function TextArea(
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
       <ItemWithLabel
+        {...rest}
         ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
@@ -295,7 +297,6 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
-        className={classes}
       >
         <TextareaAutosize
           {...textareaProps}
@@ -311,6 +312,7 @@ export const TextArea = forwardRef(function TextArea(
 
   return (
     <ItemWithLabel
+      {...rest}
       ref={forwardedRef as any}
       labelPosition={labelPosition as any}
       label={label}
@@ -321,9 +323,8 @@ export const TextArea = forwardRef(function TextArea(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
-      className={classes}
     >
-      <textarea {...textareaProps} rows={rows} />
+      <textarea {...textareaProps} rows={rows} className={classes} />
     </ItemWithLabel>
   );
 });

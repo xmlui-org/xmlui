@@ -55,8 +55,8 @@ type RadioGroupProps = {
   required?: boolean;
   updateState?: UpdateStateFn;
   onDidChange?: (newValue: string) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   children?: React.ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
 };
@@ -80,7 +80,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
     children,
     registerComponentApi,
     style,
-    className
+    className,
+    ...rest
   }: RadioGroupProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -109,15 +110,21 @@ export const RadioGroup = forwardRef(function RadioGroup(
   );
 
   // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    setFocused(true);
-    onFocus?.();
-  }, [onFocus]);
+  const handleOnFocus = useCallback(
+    (ev: React.FocusEvent<HTMLDivElement, Element>) => {
+      setFocused(true);
+      onFocus?.(ev);
+    },
+    [onFocus],
+  );
 
-  const handleOnBlur = useCallback(() => {
-    setFocused(false);
-    onBlur?.();
-  }, [onBlur]);
+  const handleOnBlur = useCallback(
+    (ev: React.FocusEvent<HTMLDivElement, Element>) => {
+      setFocused(false);
+      onBlur?.(ev);
+    },
+    [onBlur],
+  );
 
   const setValue = useEvent((val: string) => {
     updateValue(val);
@@ -135,21 +142,22 @@ export const RadioGroup = forwardRef(function RadioGroup(
   }, [value, updateValue, validationStatus, enabled]);
 
   return (
-    <ItemWithLabel
-      ref={forwardedRef}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-    >
-      <OptionTypeProvider Component={RadioGroupOption}>
-        <RadioGroupStatusContext.Provider value={contextValue}>
+    <OptionTypeProvider Component={RadioGroupOption}>
+      <RadioGroupStatusContext.Provider value={contextValue}>
+        <ItemWithLabel
+          {...rest}
+          ref={forwardedRef}
+          labelPosition={labelPosition as any}
+          label={label}
+          labelWidth={labelWidth}
+          labelBreak={labelBreak}
+          required={required}
+          enabled={enabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          style={style}
+          className={className}
+        >
           <InnerRadioGroup.Root
             id={id}
             onBlur={handleOnBlur}
@@ -164,9 +172,9 @@ export const RadioGroup = forwardRef(function RadioGroup(
           >
             {children}
           </InnerRadioGroup.Root>
-        </RadioGroupStatusContext.Provider>
-      </OptionTypeProvider>
-    </ItemWithLabel>
+        </ItemWithLabel>
+      </RadioGroupStatusContext.Provider>
+    </OptionTypeProvider>
   );
 });
 
@@ -176,7 +184,7 @@ export const RadioGroupOption = ({
   enabled = true,
   optionRenderer,
   style,
-  className
+  className,
 }: Option) => {
   const id = useId();
   const radioGroupContext = useContext(RadioGroupStatusContext);

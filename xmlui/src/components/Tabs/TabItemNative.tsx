@@ -8,7 +8,7 @@ import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, headerRenderer, style, id, activated }: Tab,
+  { children, label, headerRenderer, style, id, activated, ...rest }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerId = useId();
@@ -39,6 +39,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   return (
     <Content
+      {...rest}
       key={innerId}
       value={innerId}
       className={styles.tabsContent}

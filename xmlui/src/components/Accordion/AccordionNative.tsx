@@ -43,6 +43,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
     onDisplayDidChange = noop,
     registerComponentApi,
     rotateExpanded = defaultProps.rotateExpanded,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -157,6 +158,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
   return (
     <AccordionContext.Provider value={contextValue}>
       <RAccordion.Root
+        {...rest}
         style={style}
         ref={forwardedRef}
         value={expandedItems}

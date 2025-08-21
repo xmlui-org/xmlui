@@ -36,6 +36,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
     maxHeadingLevel = defaultProps.maxHeadingLevel,
     omitH1 = defaultProps.omitH1,
     className,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -76,6 +77,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
 
   return (
     <nav
+      {...rest}
       aria-label="Table of Contents"
       className={classnames(styles.nav, className)}
       ref={ref}

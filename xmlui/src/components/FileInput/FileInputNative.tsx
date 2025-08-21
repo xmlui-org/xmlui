@@ -114,6 +114,7 @@ export const FileInput = ({
   labelWidth,
   labelBreak,
   required,
+  ...rest
 }: Props) => {
   const _id = useId();
   id = id || _id;
@@ -185,6 +186,7 @@ export const FileInput = ({
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}

@@ -41,7 +41,7 @@ const TreeRow = memo(function TreeRow({ index, style, data }: TreeRowProps) {
 
   const onToggleNode = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (event.defaultPrevented) {
+      if (event?.defaultPrevented) {
         return;
       }
       toggleNode(treeItem);
