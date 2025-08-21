@@ -24,42 +24,42 @@
 }
 ---comp display
 <Component name="Test"
-  var.localState="{{
-    currentStep: 2,
-    errors: ['Invalid email', 'Password too short'],
-    formData: { email: 'test@example.com', age: 25 }
-  }}">
+  var.counter = "{1}"
+>
 
   <DataSource
     id="userData"
     url="/api/user_data"
   />
 
-  <Text>User Debug Info</Text>
+  <script>
+    // can customize here
+    function debug(msg, data) {
+      console.log(msg, data)
+    };
+  </script>
 
-  <!-- Method 1: JSON.stringify with preserveLinebreaks -->
+  <Text>Method 1: JSON.stringify with preserveLinebreaks</Text>
+
   <Text preserveLinebreaks="true">
     {JSON.stringify(userData.value, null, 2)}
   </Text>
 
-  <!-- Method 2: Console.log in handler -->
+  <Text>Method 2: Console.log in handler</Text>
+
   <Button
-    label="Log to Console"
-    onClick="console.log('Button clicked, userData:', userData.value)"
+    label="Log to console"
+    onClick="console.log(userData);console.log(userData.value)"
   />
 
-  <!-- Method 3: Window function for component variables -->
-  <Button
-  label="Debug Local State"
-  onClick="window.debugLog(localState, 'Local component state')"
-  />
+  <Text>Method 3: Use Fragment and custom debug function to watch changes</Text>
 
-  <!-- Method 4: Unwrapping Proxy objects -->
-  <Button
-    label="Debug Unwrapped Data"
-    onClick="console.log('Unwrapped userData:', JSON.parse(JSON.stringify(userData.value)))"
-  />
+  <Fragment when="{debug('counter', counter)}" />
 
+  <Button
+    label="Update counter"
+    onClick="{counter++}"
+  />
 
 </Component>
 ```
