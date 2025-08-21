@@ -432,7 +432,7 @@ test.describe("Integration", () => {
       </VStack>
     `);
     const { top: topText0 } = await getBounds(await createTextDriver("text0"));
-    const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+    const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).svgIcon);
     const { top: topText1 } = await getBounds(await createTextDriver("text1"));
 
     expect(topText0).toBeLessThan(topIcon0);

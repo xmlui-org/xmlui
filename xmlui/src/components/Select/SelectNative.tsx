@@ -417,18 +417,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     [multiSelect, toggleOption, value, options],
   );
 
-  const setPopOverTriggerRef = useMemo(
-    () => (newRef: HTMLDivElement | null) => {
-      setReferenceElement(newRef);
-      if (typeof ref === "function") {
-        ref(newRef);
-      } else {
-        ref.current = newRef;
-      }
-    },
-    [ref],
-  );
-
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>

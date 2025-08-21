@@ -314,7 +314,7 @@ test("Heading is block in VStack", async ({
     </VStack>
   `);
   const { top: topHeading0 } = await getBounds(await createHeadingDriver("heading0"));
-  const { top: topIcon0 } = await getBounds(await createIconDriver("icon0"));
+  const { top: topIcon0 } = await getBounds((await createIconDriver("icon0")).svgIcon);
   const { top: topHeading1 } = await getBounds(await createHeadingDriver("heading1"));
 
   expect(topHeading0).toBeLessThan(topIcon0);

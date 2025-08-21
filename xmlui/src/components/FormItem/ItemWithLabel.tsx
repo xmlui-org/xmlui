@@ -22,8 +22,8 @@ type ItemWithLabelProps = {
   children: ReactNode;
   validationInProgress?: boolean;
   shrinkToLabel?: boolean;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
   isInputTemplateUsed?: boolean;
   validationResult?: ReactNode;
 };
