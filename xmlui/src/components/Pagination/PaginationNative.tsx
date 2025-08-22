@@ -291,11 +291,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       style={style}
     >
       {showPageSizeSelector && pageSizeOptions && pageSizeOptions.length > 1 && (
-        <div
-          id={`page-size-selector-container`}
-          key={`${id}-page-size-selector-container`}
-          className={styles.selectorContainer}
-        >
+        <div data-component={`page-size-selector-container`} className={styles.selectorContainer}>
           <Text variant="secondary" className={styles.pageSizeLabel}>
             Items per page
           </Text>
@@ -316,7 +312,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       )}
       {
         <ul
-          key={`${id}-pagination-controls`}
+          data-component={`pagination-controls`}
           className={classnames(styles.paginationList, {
             [styles.paginationListVertical]: orientation === "vertical",
             // layout is already horizontal by default
@@ -433,7 +429,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
         </ul>
       }
       {showPageInfo && (
-        <Text key={`${id}-page-info`} variant="secondary">
+        <Text data-component={`page-info`} variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
         </Text>
       )}

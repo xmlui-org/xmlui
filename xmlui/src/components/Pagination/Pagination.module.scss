@@ -21,12 +21,12 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     align-items: createThemeVar("alignment-Pagination");
     padding: createThemeVar("padding-Pagination");
     gap: t.$space-4;
-    width: 100%;
   }
 
   .paginationHorizontal {
     flex-direction: row;
     justify-content: space-between;
+    width: 100%;
   }
 
   .paginationVertical {
