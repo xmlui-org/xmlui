@@ -25,7 +25,7 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import {
-  TimePicker,
+  TimePickerNative,
   TimePickerFormatValues,
   TimePickerMaxDetailValues,
   defaultProps,
@@ -36,10 +36,10 @@ const COMP = "TimePicker";
 export const TimePickerMd = createMetadata({
   status: "experimental",
   description:
-    "`TimePicker` provides an interactive time selection interface with a customizable " +
-    "clock popup. Users can input time values directly via keyboard or select times " +
-    "using the visual clock interface. Supports various time formats including 12-hour " +
-    "and 24-hour displays with configurable precision levels.",
+    "`TimePicker` provides an interactive time selection interface using the extracted " +
+    "react-time-picker source code directly. Users can input time values via keyboard " +
+    "with support for various time formats including 12-hour and 24-hour displays " +
+    "and configurable precision levels. This version does not include the clock popup.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -70,11 +70,6 @@ export const TimePickerMd = createMetadata({
     maxTime: {
       description: "Maximum time that the user can select", 
       valueType: "string",
-    },
-    disableClock: {
-      description: "When set to true, will remove the clock button and disable the clock popup",
-      valueType: "boolean",
-      defaultValue: defaultProps.disableClock,
     },
     clearable: {
       description: "Whether to show a clear button that allows clearing the selected time",
@@ -152,40 +147,24 @@ export const timePickerComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     registerComponentApi,
   }) => {
+    const extractedInitialValue = extractValue(node.props.initialValue);
+    const stateValue = state?.value;
+    
+    console.log('[TimePicker Renderer] Debug:', {
+      'node.props.initialValue': node.props.initialValue,
+      'extractedInitialValue': extractedInitialValue,
+      'state': state,
+      'stateValue': stateValue
+    });
+    
     return (
-      <TimePicker
-        id={node.uid}
+      <TimePickerNative
+        {...node.props}
         className={className}
-        value={state?.value}
-        initialValue={extractValue(node.props.initialValue)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
+        initialValue={extractedInitialValue}
+        value={stateValue}
         updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        onInvalidChange={lookupEventHandler("invalidTime")}
         registerComponentApi={registerComponentApi}
-        format={extractValue(node.props.format)}
-        maxDetail={extractValue(node.props.maxDetail)}
-        minTime={extractValue(node.props.minTime)}
-        maxTime={extractValue(node.props.maxTime)}
-        disableClock={extractValue.asOptionalBoolean(node.props.disableClock)}
-        clearable={extractValue.asOptionalBoolean(node.props.clearable)}
-        clearIcon={extractValue.asOptionalString(node.props.clearIcon)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        name={extractValue.asOptionalString(node.props.name)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       />
     );
   },
