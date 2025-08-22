@@ -296,7 +296,7 @@ function AmPm({
 
   // Convert the HTML select onChange to match Radix UI onValueChange
   const handleValueChange = useCallback((newValue: string) => {
-    console.log('AmPm handleValueChange:', newValue);
+    console.log('AmPm handleValueChange:', { newValue, currentValue: value });
     if (onChange) {
       // Create a synthetic event to match the expected onChange signature
       const syntheticEvent = {
@@ -304,10 +304,14 @@ function AmPm({
       } as React.ChangeEvent<HTMLSelectElement>;
       onChange(syntheticEvent);
     }
-  }, [onChange]);
+  }, [onChange, value]);
+
+  // Ensure we have a stable value for Radix UI
+  const selectValue = value || undefined;
+  console.log('AmPm SelectRoot value:', selectValue);
 
   return (
-    <SelectRoot value={value || undefined} onValueChange={handleValueChange}>
+    <SelectRoot value={selectValue} onValueChange={handleValueChange}>
       <SelectTrigger
         aria-label={ariaLabel}
         autoFocus={autoFocus}
@@ -676,15 +680,38 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     setLocalValue(valueToUse || null);
   }, [controlledValue, initialValue]);
 
+  // Determine what components to show based on format
+  const is12HourFormat = format && format.includes('a');
+  const showSeconds = (format && format.includes('s')) || maxDetail === 'second';
+  const showLeadingZeros = format && (format.includes('HH') || format.includes('mm') || format.includes('ss'));
+
   // Parse value into individual components
   useEffect(() => {
     if (localValue) {
-      const parsedHour = getHours(localValue);
-      const parsedMinute = getMinutes(localValue);
-      const parsedSecond = getSeconds(localValue);
+      const timeString = String(localValue).toLowerCase();
       
-      setAmPm(convert24to12(parsedHour)[1]);
-      setHour(parsedHour.toString().padStart(2, '0'));
+      // Check if the time string contains AM/PM
+      const hasAmPm = timeString.includes('am') || timeString.includes('pm');
+      const isAmPmPm = timeString.includes('pm');
+      
+      // Extract just the time part (remove AM/PM suffix)
+      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, '').trim();
+      
+      const parsedHour = getHours(timePart);
+      const parsedMinute = getMinutes(timePart);
+      const parsedSecond = getSeconds(timePart);
+      
+      // Set AM/PM based on the actual string content or convert from 24-hour
+      if (hasAmPm) {
+        setAmPm(isAmPmPm ? 'pm' : 'am');
+      } else {
+        // If no AM/PM in string, derive it from 24-hour format
+        setAmPm(convert24to12(parsedHour)[1]);
+      }
+      
+      // For display purposes, show the hour in 12-hour format if needed
+      const displayHour = is12HourFormat ? convert24to12(parsedHour)[0] : parsedHour;
+      setHour(displayHour.toString().padStart(2, '0'));
       setMinute(parsedMinute.toString().padStart(2, '0'));
       setSecond(parsedSecond.toString().padStart(2, '0'));
     } else {
@@ -693,12 +720,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
       setMinute(null);
       setSecond(null);
     }
-  }, [localValue]);
-
-  // Determine what components to show based on format
-  const is12HourFormat = format && format.includes('a');
-  const showSeconds = (format && format.includes('s')) || maxDetail === 'second';
-  const showLeadingZeros = format && (format.includes('HH') || format.includes('mm') || format.includes('ss'));
+  }, [localValue, is12HourFormat]);
 
   // Debug logging
   console.log('TimePicker Debug:', { format, is12HourFormat, amPm, localValue });
@@ -813,13 +835,15 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleAmPmChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     const newAmPm = event.target.value as AmPmType;
+    console.log('handleAmPmChange:', { oldAmPm: amPm, newAmPm, hour, minute, second });
     setAmPm(newAmPm);
     
     if (hour && minute) {
       const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
+      console.log('handleAmPmChange - calling handleChange with:', timeString);
       handleChange(timeString);
     }
-  }, [hour, minute, second, is12HourFormat, handleChange]);
+  }, [hour, minute, second, is12HourFormat, handleChange, amPm]);
 
   // Helper function to format the complete time value
   function formatTimeValue(h: string | null, m: string | null, s: string | null, ap: AmPmType | null, is12Hour: boolean): string | null {
