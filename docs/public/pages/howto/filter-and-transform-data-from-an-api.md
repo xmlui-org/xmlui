@@ -5,7 +5,7 @@
 <App>
   <Test />
 </App>
----api
+---api display
 {
   "apiUrl": "/api",
   "initialize": "$state.people = [
@@ -53,8 +53,8 @@
 
   <!-- Use transformResult -->
 
-  <!--
-  window.transformPeople = function(data) {
+  <script>
+  function transformPeople (data) {
     console.log(data);
     const items = data.data.items;
     const itemMap = {
@@ -66,12 +66,13 @@
       city: itemMap[item.group]
     }));
   };
-  -->
+
+  </script>
 
   <DataSource
     id="transformedPeople"
     url="/api/people"
-    transformResult="{window.transformPeople}"
+    transformResult="{transformPeople}"
   />
 
   <Text>All people:</Text>

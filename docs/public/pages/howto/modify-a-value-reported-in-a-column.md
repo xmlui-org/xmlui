@@ -18,10 +18,10 @@
     <Column bindTo="issue_date" />
     <Column bindTo="due_date" />
     <Column bindTo="paid_date" />
-    <Column>
+    <Column header="total">
       ${$item.total}             <!-- unbound column, prepend $ to the $item value -->
     </Column>
-    <Column>
+    <Column header="status">
         <StatusBadge status="{$item.status}" />  <!-- embed component, pass value -->
     </Column>
   </Table>
