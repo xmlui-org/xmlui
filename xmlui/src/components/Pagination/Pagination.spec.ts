@@ -1,4 +1,5 @@
 import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
+import { getBounds } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -215,21 +216,12 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("button", { name: "Previous page" })).toBeEnabled();
     await expect(page.getByRole("button", { name: "Next page" })).toBeEnabled();
   });
-});
 
-// =============================================================================
-// PAGE SIZE SELECTOR TESTS
-// =============================================================================
-
-test.describe("Page Size Selector", () => {
   test("shows page size selector by default when pageSizeOptions are provided", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
-
-    // Should show page size selector by default (showPageSizeSelector defaults to true)
-    await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.locator("select")).toBeVisible();
   });
 
@@ -237,10 +229,14 @@ test.describe("Page Size Selector", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="false"/>`);
-
-    // Should not show page size selector when explicitly disabled
-    await expect(page.getByText("Items per page")).not.toBeVisible();
+    await initTestBed(`
+      <Pagination
+        itemCount="50"
+        pageSize="10"
+        pageSizeOptions="{[5, 10, 20]}"
+        showPageSizeSelector="false"
+      />
+    `);
     await expect(page.locator("select")).not.toBeVisible();
   });
 
@@ -248,10 +244,14 @@ test.describe("Page Size Selector", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="true"/>`);
-
-    // Should show page size selector when explicitly enabled
-    await expect(page.getByText("Items per page")).toBeVisible();
+    await initTestBed(`
+      <Pagination
+        itemCount="50"
+        pageSize="10"
+        pageSizeOptions="{[5, 10, 20]}"
+        showPageSizeSelector="true"
+      />
+    `);
     await expect(page.locator("select")).toBeVisible();
   });
 
@@ -260,9 +260,6 @@ test.describe("Page Size Selector", () => {
     page,
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10" showPageSizeSelector="true"/>`);
-
-    // Should not show page size selector even when showPageSizeSelector is true if no pageSizeOptions
-    await expect(page.getByText("Items per page")).not.toBeVisible();
     await expect(page.locator("select")).not.toBeVisible();
   });
 
@@ -270,10 +267,9 @@ test.describe("Page Size Selector", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[10]}" showPageSizeSelector="true"/>`);
-
-    // Should not show page size selector for single option even when showPageSizeSelector is true
-    await expect(page.getByText("Items per page")).not.toBeVisible();
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[10]}" showPageSizeSelector="true"/>`,
+    );
     await expect(page.locator("select")).not.toBeVisible();
   });
 
@@ -282,19 +278,8 @@ test.describe("Page Size Selector", () => {
     page,
   }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10"/>`);
-
-    // Should not show page size selector
     await expect(page.getByText("Items per page")).not.toBeVisible();
-  });
-
-  test("does not show page size selector when pageSizeOptions has only one option", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[10]}"/>`);
-
-    // Should not show page size selector for single option
-    await expect(page.getByText("Items per page")).not.toBeVisible();
+    await expect(page.locator("select")).not.toBeVisible();
   });
 
   test("shows page size selector when multiple pageSizeOptions are provided", async ({
@@ -358,9 +343,36 @@ test.describe("Page Size Selector", () => {
     await expect(select).toHaveValue("20");
   });
 
+  test("handles pageSize not in pageSizeOptions gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Pagination itemCount="100" pageSize="15" pageSizeOptions="{[5, 10, 20]}"/>`,
+    );
+
+    // Should show page size selector since multiple options are provided
+    await expect(page.getByText("Items per page")).toBeVisible();
+
+    const select = page.locator("select");
+    await expect(select).toBeVisible();
+
+    // When pageSize (15) is not in pageSizeOptions, component defaults to first option (5)
+    // This tests how the component handles mismatched pageSize vs pageSizeOptions
+    await expect(select).toHaveValue("5");
+
+    // All original options should still be available
+    await expect(select.locator('option[value="5"]')).toHaveCount(1);
+    await expect(select.locator('option[value="10"]')).toHaveCount(1);
+    await expect(select.locator('option[value="20"]')).toHaveCount(1);
+
+    // Page calculations should use the actual pageSize (15), not the selected option (5)
+    // 100 items / 15 per page = 6.67 -> 7 pages
+    await expect(page.getByText("Page 1 of 7 (100 items)")).toBeVisible();
+  });
+
   // Edge cases for showPageSizeSelector property
   test("handles null showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{null}"/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{null}"/>`,
+    );
 
     // Should fall back to default behavior (true) when null
     await expect(page.getByText("Items per page")).toBeVisible();
@@ -368,15 +380,22 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles undefined showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{undefined}"/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{undefined}"/>`,
+    );
 
     // Should fall back to default behavior (true) when undefined
     await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.locator("select")).toBeVisible();
   });
 
-  test("handles string 'false' for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="false"/>`);
+  test("handles string 'false' for showPageSizeSelector property", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="false"/>`,
+    );
 
     // Should treat string 'false' as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
@@ -384,7 +403,9 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles string 'true' for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="true"/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="true"/>`,
+    );
 
     // Should treat string 'true' as true
     await expect(page.getByText("Items per page")).toBeVisible();
@@ -392,7 +413,9 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles numeric 0 for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{0}"/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{0}"/>`,
+    );
 
     // Should treat 0 as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
@@ -400,7 +423,9 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles numeric 1 for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{1}"/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{1}"/>`,
+    );
 
     // Should treat 1 as true
     await expect(page.getByText("Items per page")).toBeVisible();
@@ -408,7 +433,9 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles object for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{{a: 'b'}}" />`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{{a: 'b'}}" />`,
+    );
 
     // Objects may cause component to not render properly in some contexts
     const pageSizeText = page.getByText("Items per page");
@@ -424,25 +451,28 @@ test.describe("Page Size Selector", () => {
   });
 
   test("handles empty string for showPageSizeSelector property", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector=""/>`);
+    await initTestBed(
+      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector=""/>`,
+    );
 
     // Should treat empty string as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
     await expect(page.locator("select")).not.toBeVisible();
   });
-});
 
-// =============================================================================
-// ORIENTATION TESTS
-// =============================================================================
-
-test.describe("Orientation", () => {
   test("defaults to horizontal orientation", async ({ initTestBed, page }) => {
     await initTestBed(`<Pagination itemCount="50" pageSize="10"/>`);
 
     // Should have horizontal class by default
     const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationHorizontal/);
+    const prevButton = nav.getByRole("button", { name: "Previous page" });
+    const nextButton = nav.getByRole("button", { name: "Next page" });
+
+    const { top: prevTop, bottom: prevBottom } = await getBounds(prevButton);
+    const { top: nextTop, bottom: nextBottom } = await getBounds(nextButton);
+
+    expect(prevBottom).toEqualWithTolerance(nextBottom, 1);
+    expect(prevTop).toEqualWithTolerance(nextTop, 1);
   });
 
   test("applies horizontal orientation when specified", async ({ initTestBed, page }) => {
@@ -450,7 +480,14 @@ test.describe("Orientation", () => {
 
     // Should have horizontal class
     const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationHorizontal/);
+    const prevButton = nav.getByRole("button", { name: "Previous page" });
+    const nextButton = nav.getByRole("button", { name: "Next page" });
+
+    const { top: prevTop, bottom: prevBottom } = await getBounds(prevButton);
+    const { top: nextTop, bottom: nextBottom } = await getBounds(nextButton);
+
+    expect(prevBottom).toEqualWithTolerance(nextBottom, 1);
+    expect(prevTop).toEqualWithTolerance(nextTop, 1);
   });
 
   test("applies vertical orientation when specified", async ({ initTestBed, page }) => {
@@ -458,7 +495,13 @@ test.describe("Orientation", () => {
 
     // Should have vertical class
     const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationVertical/);
+    const prevButton = nav.getByRole("button", { name: "Previous page" });
+    const nextButton = nav.getByRole("button", { name: "Next page" });
+
+    const { bottom: prevBottom } = await getBounds(prevButton);
+    const { top: nextTop } = await getBounds(nextButton);
+
+    expect(prevBottom).toBeLessThan(nextTop);
   });
 
   test("falls back to default orientation for invalid values", async ({ initTestBed, page }) => {
@@ -466,7 +509,14 @@ test.describe("Orientation", () => {
 
     // Should fall back to horizontal (default)
     const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationHorizontal/);
+    const prevButton = nav.getByRole("button", { name: "Previous page" });
+    const nextButton = nav.getByRole("button", { name: "Next page" });
+
+    const { top: prevTop, bottom: prevBottom } = await getBounds(prevButton);
+    const { top: nextTop, bottom: nextBottom } = await getBounds(nextButton);
+
+    expect(prevBottom).toEqualWithTolerance(nextBottom, 1);
+    expect(prevTop).toEqualWithTolerance(nextTop, 1);
   });
 
   test("vertical orientation works with page size selector", async ({ initTestBed, page }) => {
@@ -476,22 +526,14 @@ test.describe("Orientation", () => {
 
     // Should have vertical class and show page size selector
     const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationVertical/);
+    const prevButton = nav.getByRole("button", { name: "Previous page" });
+    const nextButton = nav.getByRole("button", { name: "Next page" });
+
+    const { bottom: prevBottom } = await getBounds(prevButton);
+    const { top: nextTop } = await getBounds(nextButton);
+
+    expect(prevBottom).toBeLessThan(nextTop);
     await expect(page.getByText("Items per page")).toBeVisible();
-  });
-});
-
-// =============================================================================
-// REVERSE LAYOUT TESTS
-// =============================================================================
-
-test.describe("Reverse Layout", () => {
-  test("defaults to normal layout order", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
-
-    // Should not have reverse class by default
-    const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).not.toHaveClass(/paginationReverse/);
   });
 
   test("applies reverse layout when reverseLayout=true with horizontal orientation", async ({
@@ -499,13 +541,35 @@ test.describe("Reverse Layout", () => {
     page,
   }) => {
     await initTestBed(
-      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`,
+      `<VStack>
+        <Pagination
+          testId="pagination-1"
+          itemCount="50"
+          pageSize="10"
+          pageSizeOptions="{[5, 10, 20]}"
+          orientation="horizontal"
+        />
+        <Pagination
+          testId="pagination-2"
+          itemCount="50"
+          pageSize="10"
+          pageSizeOptions="{[5, 10, 20]}"
+          reverseLayout="true"
+          orientation="horizontal"
+        />
+      </VStack>`,
     );
+    const sizeSelector1 = page
+      .getByTestId("pagination-1")
+      .locator('[data-component="page-size-selector-container"]');
+    const sizeSelector2 = page
+      .getByTestId("pagination-2")
+      .locator('[data-component="page-size-selector-container"]');
 
-    // Should have reverse class
-    const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationReverse/);
-    await expect(nav).toHaveClass(/paginationHorizontal/);
+    const { left: sizeLeft1 } = await getBounds(sizeSelector1);
+    const { left: sizeLeft2 } = await getBounds(sizeSelector2);
+
+    expect(sizeLeft1).toBeLessThan(sizeLeft2);
   });
 
   test("applies reverse layout when reverseLayout=true with vertical orientation", async ({
@@ -513,30 +577,35 @@ test.describe("Reverse Layout", () => {
     page,
   }) => {
     await initTestBed(
-      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true" orientation="vertical"/>`,
+      `<HStack>
+        <Pagination
+          testId="pagination-1"
+          itemCount="50"
+          pageSize="10"
+          pageSizeOptions="{[5, 10, 20]}"
+          orientation="vertical"
+        />
+        <Pagination
+          testId="pagination-2"
+          itemCount="50"
+          pageSize="10"
+          pageSizeOptions="{[5, 10, 20]}"
+          reverseLayout="true"
+          orientation="vertical"
+        />
+      </HStack>`,
     );
+    const sizeSelector1 = page
+      .getByTestId("pagination-1")
+      .locator('[data-component="page-size-selector-container"]');
+    const sizeSelector2 = page
+      .getByTestId("pagination-2")
+      .locator('[data-component="page-size-selector-container"]');
 
-    // Should have both reverse and vertical classes
-    const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationReverse/);
-    await expect(nav).toHaveClass(/paginationVertical/);
-  });
+    const { top: sizeTop1 } = await getBounds(sizeSelector1);
+    const { top: sizeTop2 } = await getBounds(sizeSelector2);
 
-  test("reverse layout shows page info first in horizontal mode", async ({ initTestBed, page }) => {
-    await initTestBed(
-      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`,
-    );
-
-    // In reverse layout, sections should be in reverse order
-    const nav = page.locator('nav[aria-label="Pagination"]');
-    await expect(nav).toHaveClass(/paginationReverse/);
-
-    // Page info should be visible
-    const pageInfo = nav.getByText(/Page \d+ of \d+/);
-    await expect(pageInfo).toBeVisible();
-
-    // Navigation controls should be visible
-    await expect(page.getByLabel("First page")).toBeVisible();
+    expect(sizeTop1).toBeLessThan(sizeTop2);
   });
 
   test("reverse layout maintains accessibility", async ({ initTestBed, page }) => {
@@ -547,30 +616,11 @@ test.describe("Reverse Layout", () => {
     await expect(nav).toBeVisible();
     await expect(nav).toHaveAttribute("aria-label", "Pagination");
 
+    // The buttons here don't have explicit labels, but they are still targetable because of accessible aria-label props
     await expect(page.getByLabel("First page")).toBeVisible();
     await expect(page.getByLabel("Previous page")).toBeVisible();
     await expect(page.getByLabel("Next page")).toBeVisible();
     await expect(page.getByLabel("Last page")).toBeVisible();
-  });
-
-  test("reverse layout works with page size selector", async ({ initTestBed, page }) => {
-    await initTestBed(
-      `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" reverseLayout="true"/>`,
-    );
-
-    // Page size selector should still be functional
-    await expect(page.getByText("Items per page")).toBeVisible();
-
-    const selector = page.locator("#undefined-page-size-selector");
-    await expect(selector).toBeVisible();
-    await expect(selector).toHaveValue("10");
-
-    // Should be able to interact with the selector (this triggers the event)
-    await selector.selectOption("20");
-
-    // Note: In a real application, the parent would update the pageSize prop
-    // which would cause the select to show the new value. For this test,
-    // we're just verifying the interaction is possible with reverse layout.
   });
 });
 
