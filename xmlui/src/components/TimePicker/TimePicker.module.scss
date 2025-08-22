@@ -1,0 +1,162 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "TimePicker";
+
+// --- CSS properties of a particular TimePicker variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
+  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
+  }
+
+  &:has(.reactTimePickerWrapper input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
+  }
+
+  .adornment {
+    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+  }
+}
+
+@layer components {
+  .timePicker {
+    display: flex;
+    align-items: center;
+    position: relative;
+    
+    &.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    &.readOnly {
+      .reactTimePickerWrapper input {
+        cursor: default;
+      }
+    }
+  }
+
+  .reactTimePickerWrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    transition: background-color ease-in 0.1s;
+    overflow: hidden;
+    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+
+    @include variant("default");
+
+    &.error {
+      @include variant("error");
+    }
+    &.warning {
+      @include variant("warning");
+    }
+    &.valid {
+      @include variant("success");
+    }
+
+    &:has(input:is(:disabled)) {
+      cursor: not-allowed;
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
+    
+    // Override react-time-picker internal styling
+    :global(.react-time-picker__wrapper) {
+      border: none !important;
+      background: none !important;
+      padding: 0 !important;
+    }
+    
+    :global(.react-time-picker__inputGroup) {
+      border: none !important;
+      background: none !important;
+      padding: 0 !important;
+    }
+    
+    input {
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      outline: none;
+      padding: 0;
+      margin: 0 0.125rem;
+      min-width: 2ch;
+      
+      &::placeholder {
+        color: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
+        font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
+      }
+      
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+    
+    button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      padding: 0.25rem;
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
+      
+      &:hover {
+        background-color: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+      }
+      
+      &:focus {
+        outline: 2px solid createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+        outline-offset: 2px;
+      }
+      
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

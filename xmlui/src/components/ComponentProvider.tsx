@@ -116,6 +116,8 @@ import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDa
 import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { timePickerComponentRenderer } from "./TimePicker/TimePicker";
+import { timePicker2ComponentRenderer } from "./TimePicker2/TimePicker2";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -536,6 +538,8 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
+      this.registerCoreComponent(timePickerComponentRenderer);
+      this.registerCoreComponent(timePicker2ComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
