@@ -22,10 +22,7 @@ export type ParserResult = {
   erroneousCompoundComponentName?: string;
 };
 
-export function xmlUiMarkupToComponent(
-  source: string,
-  fileId: string | number = 0,
-): ParserResult {
+export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (errors.length > 0) {
@@ -274,7 +271,7 @@ function createErrorReportComponent(
         currentPos = lineEnd + 1; // +1 for newline character
       }
       const errMsgComponenet = {
-        type: "HStack",
+        type: "VStack",
         props: { gap: "0" },
         children: [
           {
@@ -282,58 +279,95 @@ function createErrorReportComponent(
             props: {
               value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
               color: "$color-info",
+              maxWidth: "100%",
             },
           },
           {
             type: "Text",
-            props: { value: ` ${e.message}`, fontWeight: "bold" },
+            props: {
+              maxWidth: "100%",
+              padding: "0 0 0 8px",
+              value: ` ${e.message}`,
+              fontWeight: "bold",
+            },
           },
         ],
       };
       const context = {
-        type: "VStack",
+        type: "HStack",
         props: {
-          gap: "0",
-          padding: "$padding-normal",
-          backgroundColor: "$color-surface-variant",
+          width: "100%",
         },
-        children: contextChildren,
+        children: [
+          {
+            type: "VStack",
+            props: {
+              gap: "0",
+              padding: "$padding-normal",
+              backgroundColor: "$color-surface-variant",
+            },
+            children: contextChildren,
+          },
+        ],
       };
 
-      const errComponenet = {
+      const errComponent: ComponentDef = {
         type: "VStack",
         props: {
           gap: "$gap-none",
-          borderLeft: "1px solid black",
-          borderTop: "1px solid black",
-          width: "fit-content",
-          padding: "4px",
+          padding: "8px",
+          backgroundColor: "white",
+          borderRadius: "8px",
         },
         children: [errMsgComponenet],
       };
       if (!(e.contextSource === "" && e.pos === 0 && e.end === 0)) {
-        errComponenet.children.push(context);
+        errComponent.children.push(context);
       }
-      return errComponenet;
+      return errComponent;
     });
   const comp: ComponentDef = {
     type: "VStack",
-    props: { padding: "$padding-normal", gap: 0 },
+    props: {
+      padding: "5px 10px 10px 30px",
+      gap: 0,
+      backgroundColor: "#FFE3E8",
+      margin: "10px",
+      border: "2px solid #FFAFBD",
+      borderRadius: "6px",
+    },
     children: [
       {
-        type: "H1",
+        type: "HStack",
         props: {
-          value: `${errList.length} ${errList.length > 1 ? "Errors" : "Error"} found while processing XMLUI markup`,
-          padding: "$padding-normal",
-          backgroundColor: "$color-error",
-          color: "white",
+          verticalAlignment: "center",
+          marginLeft: "-20px",
+          padding: "15px 0px",
+          gap: "5px",
         },
+        children: [
+          {
+            type: "Icon",
+            props: {
+              name: "error",
+              size: "lg",
+              color: "$color-error",
+            },
+          },
+          {
+            type: "H2",
+            props: {
+              value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
+              fontWeight: "bold",
+              showAnchor: false,
+            },
+          },
+        ],
       },
       {
         type: "VStack",
         props: {
-          gap: "$gap-tight",
-          padding: "$padding-normal",
+          padding: "$padding-none",
         },
         children: errList,
       },
