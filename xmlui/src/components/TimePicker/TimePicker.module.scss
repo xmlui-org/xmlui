@@ -19,14 +19,13 @@ $textAlign-input-TimePicker: createThemeVar("textAlign-input-#{$componentName}")
 $fontSize-input-TimePicker: createThemeVar("fontSize-input-#{$componentName}");
 $borderRadius-input-TimePicker: createThemeVar("borderRadius-input-#{$componentName}");
 $backgroundColor-input-TimePicker-invalid: createThemeVar("backgroundColor-input-#{$componentName}-invalid");
-$temporaryInvalidBackground-input-TimePicker: createThemeVar("temporaryInvalidBackground-input-#{$componentName}");
 $padding-button-TimePicker: createThemeVar("padding-button-#{$componentName}");
 $borderRadius-button-TimePicker: createThemeVar("borderRadius-button-#{$componentName}");
 $hoverColor-button-TimePicker: createThemeVar("hoverColor-button-#{$componentName}");
 $disabledColor-button-TimePicker: createThemeVar("disabledColor-button-#{$componentName}");
-$focusOutlineColor-button-TimePicker: createThemeVar("focusOutlineColor-button-#{$componentName}");
-$focusOutlineWidth-button-TimePicker: createThemeVar("focusOutlineWidth-button-#{$componentName}");
-$focusOutlineOffset-button-TimePicker: createThemeVar("focusOutlineOffset-button-#{$componentName}");
+$outlineColor-button-TimePicker--focused: createThemeVar("outlineColor-button-#{$componentName}--focused");
+$outlineWidth-button-TimePicker--focused: createThemeVar("outlineWidth-button-#{$componentName}--focused");
+$outlineOffset-button-TimePicker--focused: createThemeVar("outlineOffset-button-#{$componentName}--focused");
 $minWidth-ampm-TimePicker: createThemeVar("minWidth-ampm-#{$componentName}");
 $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
 
@@ -292,8 +291,8 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     }
 
     &:focus {
-      outline: $focusOutlineWidth-button-TimePicker solid $focusOutlineColor-button-TimePicker;
-      outline-offset: $focusOutlineOffset-button-TimePicker;
+      outline: $outlineWidth-button-TimePicker--focused solid $outlineColor-button-TimePicker--focused;
+      outline-offset: $outlineOffset-button-TimePicker--focused;
     }
 
     svg {
