@@ -111,139 +111,69 @@ Copy/paste this command to create `src/HelloWorldNative.tsx` with the core React
 
 ```xmlui copy
 cat > src/HelloWorldNative.tsx << 'EOF'
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import classnames from "classnames";
-import { useEvent, RegisterComponentApiFn, UpdateStateFn } from "xmlui";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
- id?: string;
- message?: string;
- theme?: "default" | "success";
- registerComponentApi?: RegisterComponentApiFn;
- updateState?: UpdateStateFn;
- onDidClick?: (count: number) => void;
+  id?: string;
+  message?: string;
+  theme?: "default" | "success";
 };
 
 export const defaultProps = {
- message: "Hello, World!",
- theme: "default" as const,
+  message: "Hello, World!",
+  theme: "default" as const,
 };
 
 export function HelloWorld({
- id,
- message = defaultProps.message,
- theme = defaultProps.theme,
- registerComponentApi,
- updateState,
- onDidClick,
+  id,
+  message = defaultProps.message,
+  theme = defaultProps.theme,
 }: Props) {
- const [clickCount, setClickCount] = useState(0);
+  const [clickCount, setClickCount] = useState(0);
 
- const handleClick = useEvent(() => {
-   const newCount = clickCount + 1;
-   setClickCount(newCount);
-   onDidClick?.(newCount);
- });
+  const handleClick = () => {
+    setClickCount(clickCount + 1);
+  };
 
- useEffect(() => {
-   if (registerComponentApi) {
-     registerComponentApi({
-       getValue: () => clickCount,
-       setValue: (value: number) => setClickCount(value),
-     });
-   }
- }, [registerComponentApi, clickCount]);
-
- return (
-   <div className={classnames(styles.container, styles[theme])} id={id}>
-     <h2 className={styles.message}>{message}</h2>
-     <button className={styles.button} onClick={handleClick}>
-       Click me!
-     </button>
-     <div className={styles.counter}>Clicks: {clickCount}</div>
-   </div>
- );
+  return (
+    <div className={classnames(styles.container, styles[theme])} id={id}>
+      <h2 className={styles.message}>{message}</h2>
+      <button className={styles.button} onClick={handleClick}>
+        Click me!
+      </button>
+      <div className={styles.counter}>Clicks: {clickCount}</div>
+    </div>
+  );
 }
 EOF
 ```
 
-
 This creates the core React component with:
 
-- Props for customization (message, theme)
-- Click counter functionality
-- Event handling for user interactions
-- API methods for programmatic control
+- Essential props (message, theme, id)
+- Internal click counter
+- Theme variant support
+- Simple styling
 
 
-Key patterns:
-
-- **Props Interface**: Defines all component properties that XMLUI can set
-- **forwardRef**: Allows XMLUI to get a reference to the DOM element
-- **React State**: Uses `useState` for interactive behavior
-- **Event Handlers**: Standard React click handlers for interactivity
-- **Classnames**: Uses the `classnames` library for conditional CSS classes
-
-
-## Step 4: Create the component styles
-
-XMLUI's theming system lets your component adapt to different visual themes (light/dark mode, custom color schemes) automatically. Here's how it works:
-
--Component defines theme variables in SCSS.
--Component metadata provides default values.
--XMLUI generates CSS custom properties.
--Browser applies themed styles
-
-Every theme variable includes your component name to prevent conflicts.
-
-```xmlui
-$backgroundColor: createThemeVar("backgroundColor-HelloWorld");
-```
-
-This creates a CSS custom property: `--xmlui-backgroundColor-HelloWorld`.
-
-Instead of hardcoded colors, use XMLUI's design system tokens:
-
-- `$color-surface-100` - Light background colors
-- `$color-content-primary` - Main text color
-- `$color-primary-500` - Brand/accent colors
-- `$color-success-100` - Success state backgrounds
-
-These tokens automatically adapt to light/dark themes.
-
-Copy/paste these commands to create `HelloWorld.module.scss`.
+## Step 4: Create basic styles
 
 ```xmlui copy
 cat > src/HelloWorld.module.scss << 'EOF'
-@use "xmlui/themes.scss" as t;
-
-// Required boilerplate for theme system
-$themeVars: ();
-@function createThemeVar($componentVariable) {
-  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
-  @return t.getThemeVar($themeVars, $componentVariable);
-}
-
-$component: "HelloWorld";
-
-// Define your theme variables
-$backgroundColor: createThemeVar("backgroundColor-#{$component}");
-$color: createThemeVar("color-#{$component}");
-
 .container {
-  background-color: $backgroundColor;  // Uses theme variable
-  color: $color;                       // Uses theme variable
-  padding: 1rem;                       // Static value
-  border-radius: 8px;                  // Static value
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 1rem;
+  border-radius: 8px;
   text-align: center;
   display: inline-block;
   min-width: 200px;
 
-  // Theme variant for success state
   &.success {
-    background-color: createThemeVar("backgroundColor-#{$component}--success");
-    color: createThemeVar("color-#{$component}--success");
+    background-color: #d4edda;
+    color: #155724;
   }
 }
 
@@ -253,7 +183,7 @@ $color: createThemeVar("color-#{$component}");
 }
 
 .button {
-  background-color: #4a90e2;          // Static blue (not themed)
+  background-color: #4a90e2;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -271,12 +201,6 @@ $color: createThemeVar("color-#{$component}");
   font-size: 1.2rem;
   font-weight: bold;
 }
-
-// Required: Export theme variables for XMLUI
-:export {
-  themeVars: t.json-stringify($themeVars);
-}
-EOF
 ```
 
 ## Step 5: Create component metadata and renderer
@@ -286,51 +210,25 @@ Copy/paste these commands to create `HelloWorld.tsx`.
 ```bash
 cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
-import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { createComponentRenderer, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const HelloWorldMd = createMetadata({
-  description: "`HelloWorld` demonstrates basic theming with customizable colors.",
+  description: "`HelloWorld` is a demonstration component.",
   status: "experimental",
   props: {
     message: {
-      description: "The message to display in the component.",
+      description: "The message to display.",
       isRequired: false,
       type: "string",
       defaultValue: defaultProps.message,
     },
     theme: {
-      description: "The visual theme for the component.",
+      description: "Visual theme variant.",
       isRequired: false,
       type: "string",
       availableValues: ["default", "success"],
       defaultValue: defaultProps.theme,
-    },
-  },
-  events: {
-    didClick: {
-      description: "Fired when the button is clicked.",
-      isRequired: false,
-      type: "function",
-    },
-  },
-  // Tell XMLUI what theme variables this component uses
-  themeVars: parseScssVar(styles.themeVars),
-
-  // Provide default values for light and dark themes
-  defaultThemeVars: {
-    // Light theme defaults
-    [`backgroundColor-HelloWorld`]: "$color-surface-100",
-    [`color-HelloWorld`]: "$color-content-primary",
-    [`backgroundColor-HelloWorld--success`]: "$color-success-100",
-    [`color-HelloWorld--success`]: "$color-success-800",
-
-    // Dark theme overrides
-    dark: {
-      [`backgroundColor-HelloWorld`]: "$color-surface-300",
-      [`color-HelloWorld`]: "$color-content-primary",
-      [`backgroundColor-HelloWorld--success`]: "$color-success-300",
-      [`color-HelloWorld--success`]: "$color-success-900",
     },
   },
 });
@@ -338,16 +236,12 @@ const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   "HelloWorld",
   HelloWorldMd,
-  ({ node, extractValue, registerComponentApi, lookupEventHandler }) => {
-    const onDidClick = lookupEventHandler?.("didClick");
-
+  ({ node, extractValue }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props?.id)}
-        message={extractValue.asOptionalString(node.props?.message, defaultProps.message)}
-        theme={extractValue.asOptionalString(node.props?.theme, defaultProps.theme)}
-        registerComponentApi={registerComponentApi}
-        onDidClick={onDidClick}
+        message={extractValue.asOptionalString(node.props?.message)}
+        theme={extractValue.asOptionalString(node.props?.theme)}
       />
     );
   }
@@ -355,22 +249,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 EOF
 ```
 
-What happens at runtime:
-
-1. XMLUI read your theme variables from the SCSS export
-2. XMLUI applies the default values based on current theme (light/dark)
-3. XMLUI injects CSS custom properties into the page
-4. Your SCSS references these properties for dynamic theming
-
-Key concepts:
-
-- Theme variables are namespaced with your component name
-- Static values (like padding) don't need theming
-- XMLUI tokens (`$color-surface-100`) adapt to light/dark automatically
-- Variants (`--success`) override base theme variables
-- Dark theme values override light theme defaults
-
-This system ensures your component looks consistent with the host application's theme while remaining customizable.
 
 ## Step 6: Create the extension index
 
