@@ -395,25 +395,9 @@ function Hour12Input({
       })(),
   );
 
-  // Only convert if it's a valid 24-hour value, otherwise preserve raw input during typing
-  const value12 = (() => {
-    if (!value) return '';
-    const numValue = parseInt(value, 10);
-    if (isNaN(numValue)) return value;
-    
-    // If it's already a valid 12-hour value (1-12), keep it as is
-    if (numValue >= 1 && numValue <= 12) {
-      return value;
-    }
-    
-    // If it's a valid 24-hour value (0-23), convert it
-    if (numValue >= 0 && numValue <= 23) {
-      return convert24to12(value)[0].toString();
-    }
-    
-    // For invalid values (like 25, 99, etc.), preserve the raw input during typing
-    return value;
-  })();
+  // Always show the raw value during typing, no conversion
+  // This allows users to see invalid input like "23" before it gets normalized on blur
+  const value12 = value || '';
 
   const { className: originalClassName, ...restProps } = otherProps;
 
@@ -709,9 +693,9 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
         setAmPm(convert24to12(parsedHour)[1]);
       }
       
-      // For display purposes, show the hour in 12-hour format if needed
-      const displayHour = is12HourFormat ? convert24to12(parsedHour)[0] : parsedHour;
-      setHour(displayHour.toString().padStart(2, '0'));
+      // Set the raw hour value without any conversion - let the display logic handle 12/24 hour format
+      // This prevents interfering with user input during typing
+      setHour(parsedHour.toString().padStart(2, '0'));
       setMinute(parsedMinute.toString().padStart(2, '0'));
       setSecond(parsedSecond.toString().padStart(2, '0'));
     } else {
@@ -720,7 +704,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
       setMinute(null);
       setSecond(null);
     }
-  }, [localValue, is12HourFormat]);
+  }, [localValue]);
 
   // Debug logging
   console.log('TimePicker Debug:', { format, is12HourFormat, amPm, localValue });
