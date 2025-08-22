@@ -71,8 +71,7 @@ $componentName: "TimePicker";
   .reactTimePickerWrapper {
     display: flex;
     align-items: center;
-    flex: 1;
-    width: 100%;
+    width: fit-content;
     border-style: solid;
     border-width: 1px;
     transition: background-color ease-in 0.1s;

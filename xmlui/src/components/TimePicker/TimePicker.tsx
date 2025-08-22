@@ -150,13 +150,6 @@ export const timePickerComponentRenderer = createComponentRenderer(
     const extractedInitialValue = extractValue(node.props.initialValue);
     const stateValue = state?.value;
     
-    console.log('[TimePicker Renderer] Debug:', {
-      'node.props.initialValue': node.props.initialValue,
-      'extractedInitialValue': extractedInitialValue,
-      'state': state,
-      'stateValue': stateValue
-    });
-    
     return (
       <TimePickerNative
         {...node.props}
