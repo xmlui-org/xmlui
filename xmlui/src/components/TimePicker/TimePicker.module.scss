@@ -264,11 +264,85 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
   .amPm {
     min-width: $minWidth-ampm-TimePicker !important;
     width: auto !important;
+    height: 100% !important;
     font: inherit;
     font-size: $fontSize-ampm-TimePicker;
-    -webkit-appearance: menulist;
-    -moz-appearance: menulist;
-    appearance: menulist;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border: 0 !important;
+    border-radius: $borderRadius-input-TimePicker;
+    background: none !important;
+    padding: $padding-input-TimePicker !important;
+    cursor: pointer;
+    box-sizing: border-box;
+    color: currentColor;
+    position: relative;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+
+    &:focus {
+      outline: 2px solid #007acc;
+      outline-offset: -1px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .amPmValue {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .amPmIcon {
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+  .amPmContent {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    z-index: 1000;
+    overflow: auto;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 10px 38px -10px rgba(22, 23, 24, 0.35), 0 10px 20px -15px rgba(22, 23, 24, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    min-width: var(--radix-select-trigger-width);
+    max-width: var(--radix-select-content-available-width);
+  }
+
+  .amPmItem {
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    outline: none;
+    padding: 4px 8px;
+
+    &[data-highlighted] {
+      background-color: #f0f0f0;
+    }
+
+    &[data-state=checked] {
+      background-color: #e6f3ff;
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+      cursor: not-allowed;
+      font-style: italic;
+    }
   }
 
   .button {

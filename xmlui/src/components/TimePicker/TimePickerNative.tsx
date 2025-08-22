@@ -2,9 +2,20 @@ import { type CSSProperties } from "react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 import styles from "./TimePicker.module.scss";
+import {
+  Content as SelectContent,
+  Icon as SelectIcon,
+  Item as SelectItem,
+  ItemText as SelectItemText,
+  Portal as SelectPortal,
+  Root as SelectRoot,
+  SelectViewport,
+  Trigger as SelectTrigger,
+} from "@radix-ui/react-select";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -274,37 +285,57 @@ function AmPm({
   required,
   value,
 }: AmPmProps): React.ReactElement {
+  const { root } = useTheme();
   const amDisabled = minTime ? convert24to12(getHours(minTime))[1] === 'pm' : false;
   const pmDisabled = maxTime ? convert24to12(getHours(maxTime))[1] === 'am' : false;
 
-  const name = 'amPm';
   const [amLabel, pmLabel] = getAmPmLabels(locale);
 
+  // Debug logging
+  console.log('AmPm Debug:', { value, amLabel, pmLabel, disabled, amDisabled, pmDisabled });
+
+  // Convert the HTML select onChange to match Radix UI onValueChange
+  const handleValueChange = useCallback((newValue: string) => {
+    console.log('AmPm handleValueChange:', newValue);
+    if (onChange) {
+      // Create a synthetic event to match the expected onChange signature
+      const syntheticEvent = {
+        target: { value: newValue, name: 'amPm' }
+      } as React.ChangeEvent<HTMLSelectElement>;
+      onChange(syntheticEvent);
+    }
+  }, [onChange]);
+
   return (
-    <select
-      aria-label={ariaLabel}
-      // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
-      autoFocus={autoFocus}
-      className={classnames(styles.input, styles.amPm)}
-      data-input="true"
-      data-select="true"
-      disabled={disabled}
-      name={name}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      // Assertion is needed for React 18 compatibility
-      ref={inputRef as React.RefObject<HTMLSelectElement>}
-      required={required}
-      value={value !== null ? value : ''}
-    >
-      {!value && <option value="">--</option>}
-      <option disabled={amDisabled} value="am">
-        {amLabel}
-      </option>
-      <option disabled={pmDisabled} value="pm">
-        {pmLabel}
-      </option>
-    </select>
+    <SelectRoot value={value || undefined} onValueChange={handleValueChange}>
+      <SelectTrigger
+        aria-label={ariaLabel}
+        autoFocus={autoFocus}
+        className={classnames(styles.amPm, className)}
+        disabled={disabled}
+        // Note: inputRef is for HTML select element, but SelectTrigger is a button
+        // We'll skip the ref for now since the typing doesn't match
+      >
+        <div className={styles.amPmValue}>
+          {value ? (value === 'am' ? amLabel : pmLabel) : '--'}
+        </div>
+        <SelectIcon asChild className={styles.amPmIcon}>
+          <Icon name="chevrondown" />
+        </SelectIcon>
+      </SelectTrigger>
+      <SelectPortal container={root}>
+        <SelectContent className={styles.amPmContent} position="popper">
+          <SelectViewport>
+            <SelectItem value="am" disabled={amDisabled} className={styles.amPmItem}>
+              <SelectItemText>{amLabel}</SelectItemText>
+            </SelectItem>
+            <SelectItem value="pm" disabled={pmDisabled} className={styles.amPmItem}>
+              <SelectItemText>{pmLabel}</SelectItemText>
+            </SelectItem>
+          </SelectViewport>
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
   );
 }
 
@@ -668,6 +699,9 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const is12HourFormat = format && format.includes('a');
   const showSeconds = (format && format.includes('s')) || maxDetail === 'second';
   const showLeadingZeros = format && (format.includes('HH') || format.includes('mm') || format.includes('ss'));
+
+  // Debug logging
+  console.log('TimePicker Debug:', { format, is12HourFormat, amPm, localValue });
 
   // Initialize the related field with the input's initial value
   useEffect(() => {
