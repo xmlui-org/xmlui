@@ -9,6 +9,27 @@ $themeVars: ();
 
 $componentName: "TimePicker";
 
+// --- TimePicker specific theme variables
+$color-divider-TimePicker: createThemeVar("color-divider-#{$componentName}");
+$spacing-divider-TimePicker: createThemeVar("spacing-divider-#{$componentName}");
+$width-input-TimePicker: createThemeVar("width-input-#{$componentName}");
+$minWidth-input-TimePicker: createThemeVar("minWidth-input-#{$componentName}");
+$padding-input-TimePicker: createThemeVar("padding-input-#{$componentName}");
+$textAlign-input-TimePicker: createThemeVar("textAlign-input-#{$componentName}");
+$fontSize-input-TimePicker: createThemeVar("fontSize-input-#{$componentName}");
+$borderRadius-input-TimePicker: createThemeVar("borderRadius-input-#{$componentName}");
+$backgroundColor-input-TimePicker-invalid: createThemeVar("backgroundColor-input-#{$componentName}-invalid");
+$temporaryInvalidBackground-input-TimePicker: createThemeVar("temporaryInvalidBackground-input-#{$componentName}");
+$padding-button-TimePicker: createThemeVar("padding-button-#{$componentName}");
+$borderRadius-button-TimePicker: createThemeVar("borderRadius-button-#{$componentName}");
+$hoverColor-button-TimePicker: createThemeVar("hoverColor-button-#{$componentName}");
+$disabledColor-button-TimePicker: createThemeVar("disabledColor-button-#{$componentName}");
+$focusOutlineColor-button-TimePicker: createThemeVar("focusOutlineColor-button-#{$componentName}");
+$focusOutlineWidth-button-TimePicker: createThemeVar("focusOutlineWidth-button-#{$componentName}");
+$focusOutlineOffset-button-TimePicker: createThemeVar("focusOutlineOffset-button-#{$componentName}");
+$minWidth-ampm-TimePicker: createThemeVar("minWidth-ampm-#{$componentName}");
+$fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
+
 // --- CSS properties of a particular TimePicker variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
@@ -153,6 +174,150 @@ $componentName: "TimePicker";
       }
     }
   }
+
+  // TimePicker internal components styling (moved from TimePicker.css)
+  .wrapper {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+
+  .inputGroup {
+    min-width: calc((4px * 3) + 0.54em * 6 + 0.217em * 2);
+    flex-grow: 1;
+    padding: 0 2px;
+    box-sizing: content-box;
+  }
+
+  .divider {
+    padding: $spacing-divider-TimePicker;
+    white-space: pre;
+    display: inline-block;
+    font: inherit;
+    color: $color-divider-TimePicker;
+  }
+
+  .leadingZero {
+    display: inline-block;
+    font: inherit;
+  }
+
+  .input {
+    min-width: $minWidth-input-TimePicker;
+    height: 100%;
+    position: relative;
+    padding: $padding-input-TimePicker;
+    border: 0;
+    background: none;
+    color: currentColor;
+    font: inherit;
+    font-size: $fontSize-input-TimePicker;
+    box-sizing: content-box;
+    border-radius: $borderRadius-input-TimePicker;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    // Specific widths for different input types
+    &.hour,
+    &.hour12, 
+    &.hour24,
+    &.minute,
+    &.second {
+      width: $width-input-TimePicker !important;
+      min-width: $width-input-TimePicker !important;
+      max-width: $width-input-TimePicker !important;
+      text-align: $textAlign-input-TimePicker !important;
+      padding: $padding-input-TimePicker !important;
+      box-sizing: border-box !important;
+    }
+
+    // Hide spin buttons for number inputs
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      margin: 0 !important;
+      display: none !important;
+    }
+
+    // Hide spin buttons for Firefox
+    &[type="number"] {
+      -moz-appearance: textfield !important;
+      appearance: textfield !important;
+    }
+
+    &:invalid {
+      background: $backgroundColor-input-TimePicker-invalid;
+    }
+
+    .invalid {
+      color: $backgroundColor-input-TimePicker-invalid;
+    }
+
+    &.hasLeadingZero {
+      margin-left: -0.54em;
+      padding-left: calc(1px + 0.54em);
+    }
+  }
+
+  .amPm {
+    min-width: $minWidth-ampm-TimePicker !important;
+    width: auto !important;
+    font: inherit;
+    font-size: $fontSize-ampm-TimePicker;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance: menulist;
+  }
+
+  .button {
+    border: 0;
+    background: transparent;
+    padding: $padding-button-TimePicker;
+    border-radius: $borderRadius-button-TimePicker;
+
+    &:enabled {
+      cursor: pointer;
+
+      &:hover .buttonIcon,
+      &:focus .buttonIcon {
+        stroke: $hoverColor-button-TimePicker;
+      }
+    }
+
+    &:disabled .buttonIcon {
+      stroke: $disabledColor-button-TimePicker;
+    }
+
+    &:focus {
+      outline: $focusOutlineWidth-button-TimePicker solid $focusOutlineColor-button-TimePicker;
+      outline-offset: $focusOutlineOffset-button-TimePicker;
+    }
+
+    svg {
+      display: inherit;
+    }
+  }
+
+  .clearButton {
+    @extend .button;
+  }
+
+  .buttonIcon {
+    // Base styling for button icons
+    display: inherit;
+  }
+
+  .clearButtonIcon {
+    @extend .buttonIcon;
+  }
+}
+
+// Top-level invalid class for CSS modules export
+.invalid {
+  background: $backgroundColor-input-TimePicker-invalid;
 }
 
 // --- We export the theme variables to add them to the component renderer

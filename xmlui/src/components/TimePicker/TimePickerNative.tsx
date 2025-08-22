@@ -1,11 +1,7 @@
-import { type CSSProperties, useId, useLayoutEffect } from "react";
+import { type CSSProperties } from "react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
-import clsx from 'clsx';
 import styles from "./TimePicker.module.scss";
-
-// Import CSS for the TimePicker
-import "./TimePicker.css";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -15,18 +11,15 @@ import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
 // Import shared utilities and types
-import { getHours, getMinutes, getSeconds, getHoursMinutes, getHoursMinutesSeconds } from './shared/dateUtils';
-import { convert24to12, convert12to24 } from './shared/dates';
+import { getHours, getMinutes, getSeconds } from './shared/dateUtils';
+import { convert24to12 } from './shared/dates';
 import { getAmPmLabels, safeMax, safeMin } from './shared/utils';
-import { getFormatter, getNumberFormatter } from './shared/dateFormatter';
 import Divider from './Divider';
-import type { AmPmType, Detail, LooseValue, Value, LooseValuePiece, ClassName } from './shared/types';
+import type { AmPmType } from './shared/types';
 
 // Browser detection utilities
-const isBrowser = typeof window !== 'undefined';
-const useIsomorphicLayoutEffect = isBrowser ? useLayoutEffect : useEffect;
-const isIEOrEdgeLegacy = isBrowser && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
-const isFirefox = isBrowser && /Firefox/.test(navigator.userAgent);
+const isIEOrEdgeLegacy = typeof window !== 'undefined' && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
+const isFirefox = typeof window !== 'undefined' && /Firefox/.test(navigator.userAgent);
 
 // Input helper functions
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {
@@ -91,6 +84,75 @@ function makeOnKeyPress(maxLength: number | null) {
   };
 }
 
+// Normalization functions for smart auto-correction
+function normalizeHour(value: string | null, is24Hour: boolean): string | null {
+  if (!value || value === '') return null;
+  
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+  
+  if (is24Hour) {
+    // 24-hour format: 0-23
+    if (num >= 0 && num <= 23) {
+      return num.toString().padStart(2, '0');
+    } else {
+      // For out-of-range values, use value % 10
+      const corrected = num % 10;
+      return corrected.toString().padStart(2, '0');
+    }
+  } else {
+    // 12-hour format: 1-12
+    if (num >= 1 && num <= 12) {
+      return num.toString().padStart(2, '0');
+    } else if (num === 0) {
+      return '12'; // 0 becomes 12 in 12-hour format
+    } else {
+      // For out-of-range values, use value % 10, but ensure it's 1-12
+      let corrected = num % 10;
+      if (corrected === 0) corrected = 12; // 0 becomes 12 in 12-hour format
+      return corrected.toString().padStart(2, '0');
+    }
+  }
+}
+
+function normalizeMinuteOrSecond(value: string | null): string | null {
+  if (!value || value === '') return null;
+  
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+  
+  if (num >= 0 && num <= 59) {
+    return num.toString().padStart(2, '0');
+  } else {
+    // For out-of-range values, use value % 10
+    const corrected = num % 10;
+    return corrected.toString().padStart(2, '0');
+  }
+}
+
+// Helper functions to check if values are currently invalid (need normalization)
+function isHourInvalid(value: string | null, is24Hour: boolean): boolean {
+  if (!value || value === '') return false;
+  
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return true;
+  
+  if (is24Hour) {
+    return num < 0 || num > 23;
+  } else {
+    return num < 1 || num > 12;
+  }
+}
+
+function isMinuteOrSecondInvalid(value: string | null): boolean {
+  if (!value || value === '') return false;
+  
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return true;
+  
+  return num < 0 || num > 59;
+}
+
 // Input component types
 type InputProps = {
   ariaLabel?: string;
@@ -103,6 +165,7 @@ type InputProps = {
   name: string;
   nameForClass?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   placeholder?: string;
@@ -124,6 +187,7 @@ function Input({
   name,
   nameForClass,
   onChange,
+  onBlur,
   onKeyDown,
   onKeyUp,
   placeholder = '--',
@@ -147,10 +211,11 @@ function Input({
         autoComplete="off"
         // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
         autoFocus={autoFocus}
-        className={clsx(
-          `${className}__input`,
-          `${className}__${nameForClass || name}`,
-          hasLeadingZero && `${className}__input--hasLeadingZero`,
+        className={classnames(
+          styles.input,
+          styles[nameForClass || name],
+          hasLeadingZero && styles.hasLeadingZero,
+          className,
         )}
         style={{ width: '1.8em', textAlign: 'center', padding: '0 2px' }}
         data-input="true"
@@ -160,6 +225,7 @@ function Input({
         min={min}
         name={name}
         onChange={onChange}
+        onBlur={onBlur}
         onFocus={onFocus}
         onKeyDown={onKeyDown}
         onKeyPress={makeOnKeyPress(maxLength)}
@@ -219,7 +285,7 @@ function AmPm({
       aria-label={ariaLabel}
       // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
       autoFocus={autoFocus}
-      className={clsx(`${className}__input`, `${className}__${name}`)}
+      className={classnames(styles.input, styles.amPm)}
       data-input="true"
       data-select="true"
       disabled={disabled}
@@ -248,6 +314,7 @@ type Hour12InputProps = {
   maxTime?: string;
   minTime?: string;
   value?: string | null;
+  isInvalid?: boolean;
 } & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass'>;
 
 function Hour12Input({
@@ -255,8 +322,10 @@ function Hour12Input({
   maxTime,
   minTime,
   value,
+  isInvalid = false,
   ...otherProps
 }: Hour12InputProps): React.ReactElement {
+  console.log("render", isInvalid);
   const maxHour = safeMin(
     12,
     maxTime &&
@@ -291,7 +360,27 @@ function Hour12Input({
       })(),
   );
 
-  const value12 = value ? convert24to12(value)[0].toString() : '';
+  // Only convert if it's a valid 24-hour value, otherwise preserve raw input during typing
+  const value12 = (() => {
+    if (!value) return '';
+    const numValue = parseInt(value, 10);
+    if (isNaN(numValue)) return value;
+    
+    // If it's already a valid 12-hour value (1-12), keep it as is
+    if (numValue >= 1 && numValue <= 12) {
+      return value;
+    }
+    
+    // If it's a valid 24-hour value (0-23), convert it
+    if (numValue >= 0 && numValue <= 23) {
+      return convert24to12(value)[0].toString();
+    }
+    
+    // For invalid values (like 25, 99, etc.), preserve the raw input during typing
+    return value;
+  })();
+
+  const { className: originalClassName, ...restProps } = otherProps;
 
   return (
     <Input
@@ -300,7 +389,10 @@ function Hour12Input({
       name="hour12"
       nameForClass="hour"
       value={value12}
-      {...otherProps}
+      className={classnames(originalClassName, {
+        [styles.invalid]: isInvalid
+      })}
+      {...restProps}
     />
   );
 }
@@ -310,17 +402,34 @@ type Hour24InputProps = {
   maxTime?: string;
   minTime?: string;
   value?: string | null;
+  isInvalid?: boolean;
 } & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass'>;
 
 function Hour24Input({
   maxTime,
   minTime,
+  value,
+  isInvalid = false,
   ...otherProps
 }: Hour24InputProps): React.ReactElement {
   const maxHour = safeMin(23, maxTime && getHours(maxTime));
   const minHour = safeMax(0, minTime && getHours(minTime));
 
-  return <Input max={maxHour} min={minHour} name="hour24" nameForClass="hour" {...otherProps} />;
+  const { className: originalClassName, ...restProps } = otherProps;
+
+  return (
+    <Input 
+      max={maxHour} 
+      min={minHour} 
+      name="hour24" 
+      nameForClass="hour" 
+      value={value}
+      className={classnames(originalClassName, {
+        [styles.invalid]: isInvalid
+      })}
+      {...restProps} 
+    />
+  );
 }
 
 // MinuteInput component
@@ -329,13 +438,17 @@ type MinuteInputProps = {
   maxTime?: string;
   minTime?: string;
   showLeadingZeros?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name'>;
+  value?: string | null;
+  isInvalid?: boolean;
+} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'value'>;
 
 function MinuteInput({
   hour,
   maxTime,
   minTime,
   showLeadingZeros = true,
+  value,
+  isInvalid = false,
   ...otherProps
 }: MinuteInputProps): React.ReactElement {
   function isSameHour(date: string | Date) {
@@ -345,13 +458,19 @@ function MinuteInput({
   const maxMinute = safeMin(59, maxTime && isSameHour(maxTime) && getMinutes(maxTime));
   const minMinute = safeMax(0, minTime && isSameHour(minTime) && getMinutes(minTime));
 
+  const { className: originalClassName, ...restProps } = otherProps;
+
   return (
     <Input
       max={maxMinute}
       min={minMinute}
       name="minute"
       showLeadingZeros={showLeadingZeros}
-      {...otherProps}
+      value={value}
+      className={classnames(originalClassName, {
+        [styles.invalid]: isInvalid
+      })}
+      {...restProps}
     />
   );
 }
@@ -363,7 +482,9 @@ type SecondInputProps = {
   minTime?: string;
   minute?: string | null;
   showLeadingZeros?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name'>;
+  value?: string | null;
+  isInvalid?: boolean;
+} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'value'>;
 
 function SecondInput({
   hour,
@@ -371,6 +492,8 @@ function SecondInput({
   minTime,
   minute,
   showLeadingZeros = true,
+  value,
+  isInvalid = false,
   ...otherProps
 }: SecondInputProps): React.ReactElement {
   function isSameMinute(date: string | Date) {
@@ -380,96 +503,22 @@ function SecondInput({
   const maxSecond = safeMin(59, maxTime && isSameMinute(maxTime) && getSeconds(maxTime));
   const minSecond = safeMax(0, minTime && isSameMinute(minTime) && getSeconds(minTime));
 
+  const { className: originalClassName, ...restProps } = otherProps;
+
   return (
     <Input
       max={maxSecond}
       min={minSecond}
       name="second"
       showLeadingZeros={showLeadingZeros}
-      {...otherProps}
+      value={value}
+      className={classnames(originalClassName, {
+        [styles.invalid]: isInvalid
+      })}
+      {...restProps}
     />
   );
 }
-
-// NativeInput component
-type NativeInputProps = {
-  ariaLabel?: string;
-  disabled?: boolean;
-  maxTime?: string;
-  minTime?: string;
-  name?: string;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  value?: string | Date | null;
-  valueType: 'hour' | 'minute' | 'second';
-};
-
-function NativeInput({
-  ariaLabel,
-  disabled,
-  maxTime,
-  minTime,
-  name,
-  onChange,
-  required,
-  value,
-  valueType,
-}: NativeInputProps): React.ReactElement {
-  const nativeValueParser = (() => {
-    switch (valueType) {
-      case 'hour':
-        return (receivedValue: string | Date) => `${getHours(receivedValue)}:00`;
-      case 'minute':
-        return getHoursMinutes;
-      case 'second':
-        return getHoursMinutesSeconds;
-      default:
-        throw new Error('Invalid valueType');
-    }
-  })();
-
-  const step = (() => {
-    switch (valueType) {
-      case 'hour':
-        return 3600;
-      case 'minute':
-        return 60;
-      case 'second':
-        return 1;
-      default:
-        throw new Error('Invalid valueType');
-    }
-  })();
-
-  function stopPropagation(event: React.FocusEvent<HTMLInputElement>) {
-    event.stopPropagation();
-  }
-
-  return (
-    <input
-      aria-label={ariaLabel}
-      disabled={disabled}
-      hidden
-      max={maxTime ? nativeValueParser(maxTime) : undefined}
-      min={minTime ? nativeValueParser(minTime) : undefined}
-      name={name}
-      onChange={onChange}
-      onFocus={stopPropagation}
-      required={required}
-      step={step}
-      style={{
-        visibility: 'hidden',
-        position: 'absolute',
-        zIndex: '-999',
-      }}
-      type="time"
-      value={value ? nativeValueParser(value) : ''}
-    />
-  );
-}
-
-// TimePicker component constants
-const baseClassName = 'react-time-picker';
 
 // Available time formats
 export const TimePickerFormatValues = [
@@ -574,8 +623,6 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   },
   ref,
 ) {
-  const internalId = useId();
-  const componentId = id || internalId;
   const timePickerRef = useRef<HTMLDivElement>(null);
 
   // Local state management - sync with value prop (like TextBox and NumberBox)
@@ -586,6 +633,11 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const [hour, setHour] = useState<string | null>(null);
   const [minute, setMinute] = useState<string | null>(null);
   const [second, setSecond] = useState<string | null>(null);
+  
+  // State to track invalid status for visual feedback
+  const [isHourCurrentlyInvalid, setIsHourCurrentlyInvalid] = useState(false);
+  const [isMinuteCurrentlyInvalid, setIsMinuteCurrentlyInvalid] = useState(false);
+  const [isSecondCurrentlyInvalid, setIsSecondCurrentlyInvalid] = useState(false);
   
   useEffect(() => {
     // If there's no controlled value, use the initial value
@@ -601,9 +653,9 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
       const parsedSecond = getSeconds(localValue);
       
       setAmPm(convert24to12(parsedHour)[1]);
-      setHour(parsedHour.toString());
-      setMinute(parsedMinute.toString());
-      setSecond(parsedSecond.toString());
+      setHour(parsedHour.toString().padStart(2, '0'));
+      setMinute(parsedMinute.toString().padStart(2, '0'));
+      setSecond(parsedSecond.toString().padStart(2, '0'));
     } else {
       setAmPm(null);
       setHour(null);
@@ -635,30 +687,93 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const handleHourChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newHour = event.target.value;
     setHour(newHour);
+    // Update invalid state immediately for visual feedback
+    setIsHourCurrentlyInvalid(isHourInvalid(newHour, !is12HourFormat));
+    // Don't format/normalize during typing - only on blur
+  }, [is12HourFormat]);
+
+  const handleHourBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = event.target.value;
+    const normalizedHour = normalizeHour(currentValue, !is12HourFormat);
     
-    if (newHour && minute) {
-      const timeString = formatTimeValue(newHour, minute, second, amPm, is12HourFormat);
-      handleChange(timeString);
+    if (normalizedHour !== null && normalizedHour !== currentValue) {
+      setHour(normalizedHour);
+      setIsHourCurrentlyInvalid(false); // Clear invalid state after normalization
+      
+      if (minute) {
+        const timeString = formatTimeValue(normalizedHour, minute, second, amPm, is12HourFormat);
+        handleChange(timeString);
+      }
+    } else if (normalizedHour === null && currentValue !== '') {
+      // Reset to previous valid value or clear
+      setHour('');
+      setIsHourCurrentlyInvalid(false); // Clear invalid state
+      if (minute) {
+        const timeString = formatTimeValue('', minute, second, amPm, is12HourFormat);
+        handleChange(timeString);
+      }
     }
   }, [minute, second, amPm, is12HourFormat, handleChange]);
 
   const handleMinuteChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newMinute = event.target.value;
     setMinute(newMinute);
+    // Update invalid state immediately for visual feedback
+    setIsMinuteCurrentlyInvalid(isMinuteOrSecondInvalid(newMinute));
+    // Don't format/normalize during typing - only on blur
+  }, []);
+
+  const handleMinuteBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = event.target.value;
+    const normalizedMinute = normalizeMinuteOrSecond(currentValue);
     
-    if (hour && newMinute) {
-      const timeString = formatTimeValue(hour, newMinute, second, amPm, is12HourFormat);
-      handleChange(timeString);
+    if (normalizedMinute !== null && normalizedMinute !== currentValue) {
+      setMinute(normalizedMinute);
+      setIsMinuteCurrentlyInvalid(false); // Clear invalid state after normalization
+      
+      if (hour) {
+        const timeString = formatTimeValue(hour, normalizedMinute, second, amPm, is12HourFormat);
+        handleChange(timeString);
+      }
+    } else if (normalizedMinute === null && currentValue !== '') {
+      // Reset to previous valid value or clear
+      setMinute('');
+      setIsMinuteCurrentlyInvalid(false); // Clear invalid state
+      if (hour) {
+        const timeString = formatTimeValue(hour, '', second, amPm, is12HourFormat);
+        handleChange(timeString);
+      }
     }
   }, [hour, second, amPm, is12HourFormat, handleChange]);
 
   const handleSecondChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newSecond = event.target.value;
     setSecond(newSecond);
+    // Update invalid state immediately for visual feedback
+    setIsSecondCurrentlyInvalid(isMinuteOrSecondInvalid(newSecond));
+    // Don't format/normalize during typing - only on blur
+  }, []);
+
+  const handleSecondBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = event.target.value;
+    const normalizedSecond = normalizeMinuteOrSecond(currentValue);
     
-    if (hour && minute) {
-      const timeString = formatTimeValue(hour, minute, newSecond, amPm, is12HourFormat);
-      handleChange(timeString);
+    if (normalizedSecond !== null && normalizedSecond !== currentValue) {
+      setSecond(normalizedSecond);
+      setIsSecondCurrentlyInvalid(false); // Clear invalid state after normalization
+      
+      if (hour && minute) {
+        const timeString = formatTimeValue(hour, minute, normalizedSecond, amPm, is12HourFormat);
+        handleChange(timeString);
+      }
+    } else if (normalizedSecond === null && currentValue !== '') {
+      // Reset to previous valid value or clear
+      setSecond('');
+      setIsSecondCurrentlyInvalid(false); // Clear invalid state
+      if (hour && minute) {
+        const timeString = formatTimeValue(hour, minute, '', amPm, is12HourFormat);
+        handleChange(timeString);
+      }
     }
   }, [hour, minute, amPm, is12HourFormat, handleChange]);
 
@@ -767,7 +882,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
         stroke="currentColor"
         strokeWidth={2}
         aria-hidden="true"
-        className={`${baseClassName}__clear-button__icon ${baseClassName}__button__icon`}
+        className={classnames(styles.clearButtonIcon, styles.buttonIcon)}
       >
         <line x1="4" x2="15" y1="4" y2="15" />
         <line x1="15" x2="4" y1="4" y2="15" />
@@ -825,33 +940,37 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
           }
         )}
       >
-        <div className={`${baseClassName}__wrapper`}>
-          <div className={`${baseClassName}__inputGroup`}>
+        <div className={styles.wrapper}>
+          <div className={styles.inputGroup}>
             {/* Hour input */}
             {is12HourFormat ? (
               <Hour12Input
                 amPm={amPm}
                 autoFocus={autoFocus}
-                className={baseClassName}
+                className="timepicker"
                 disabled={!enabled}
                 maxTime={maxTime}
                 minTime={minTime}
                 onChange={handleHourChange}
+                onBlur={handleHourBlur}
                 required={required}
                 showLeadingZeros={showLeadingZeros}
                 value={hour}
+                isInvalid={isHourCurrentlyInvalid}
               />
             ) : (
               <Hour24Input
                 autoFocus={autoFocus}
-                className={baseClassName}
+                className="timepicker"
                 disabled={!enabled}
                 maxTime={maxTime}
                 minTime={minTime}
                 onChange={handleHourChange}
+                onBlur={handleHourBlur}
                 required={required}
                 showLeadingZeros={showLeadingZeros}
                 value={hour}
+                isInvalid={isHourCurrentlyInvalid}
               />
             )}
             
@@ -859,15 +978,17 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
             
             {/* Minute input */}
             <MinuteInput
-              className={baseClassName}
+              className="timepicker"
               disabled={!enabled}
               hour={hour}
               maxTime={maxTime}
               minTime={minTime}
               onChange={handleMinuteChange}
+              onBlur={handleMinuteBlur}
               required={required}
               showLeadingZeros={showLeadingZeros}
               value={minute}
+              isInvalid={isMinuteCurrentlyInvalid}
             />
             
             {/* Second input (if needed) */}
@@ -875,16 +996,18 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
               <>
                 <Divider>:</Divider>
                 <SecondInput
-                  className={baseClassName}
+                  className="timepicker"
                   disabled={!enabled}
                   hour={hour}
                   maxTime={maxTime}
                   minTime={minTime}
                   minute={minute}
                   onChange={handleSecondChange}
+                  onBlur={handleSecondBlur}
                   required={required}
                   showLeadingZeros={showLeadingZeros}
                   value={second}
+                  isInvalid={isSecondCurrentlyInvalid}
                 />
               </>
             )}
@@ -892,7 +1015,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
             {/* AM/PM selector (if 12-hour format) */}
             {is12HourFormat && (
               <AmPm
-                className={baseClassName}
+                className="timepicker"
                 disabled={!enabled}
                 maxTime={maxTime}
                 minTime={minTime}
@@ -905,7 +1028,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
           
           {clearable && (
             <button
-              className={`${baseClassName}__clear-button ${baseClassName}__button`}
+              className={classnames(styles.clearButton, styles.button)}
               disabled={!enabled}
               onClick={clear}
               onFocus={stopPropagation}
@@ -937,3 +1060,4 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   return timePickerComponent;
 });
+
