@@ -22,9 +22,6 @@ Extensions are the recommended approach for custom components that aren't needed
 - Defines event handlers
 - Provides callable methods
 
-> [!NOTE]
-> This page includes playground examples that use the HelloWorld component. They are available here because this site loads final extension package that you'll build. Since you'll be working in the same XMLUI repository that creates this site, you'll remove and then gradually recreate the HelloWorld component that's shown in its final form in playground examples here.
-
 
 ## XMLUI component architecture
 
@@ -56,20 +53,21 @@ rmdir /s /q src
 mkdir src
 ```
 
-** Mac / WSL / Linux **
+**Mac / WSL / Linux**
 
 ```xmlui copy
 cd packages/xmlui-hello-world
 rm -rf src/*
 ```
 
-This clears out the existing HelloWorld component files so you can build it from scratch. The `src/` directory will be empty and ready for your new implementation.
+This clears out the existing HelloWorld component files so you can build it from scratch.
 
-> [!NOTE] Don't worry about the live examples on this page - they'll continue to work because they use the final version of the component. You'll be building your own version in the standalone app.
+> [!INFO]
+> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you'll build. Rebooting the package will change how the examples would work in a local preview of the site, but you won't be doing a local preview, you will load the component as an extension into a standalone app and observe the progression of examples there.
 
 ## Step 2: Create the package configuration
 
-In `packages/xmlui-hello-world`, copy/paste this command to create `package.json`.
+Switch to `packages/xmlui-hello-world` and copy/paste this command to recreate `package.json`.
 
 ```xmlui copy
 cat > package.json << 'EOF'

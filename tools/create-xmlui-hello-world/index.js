@@ -102,12 +102,9 @@ console.log(`       └── xmlui-hello-world.js`);
 
 console.log(`\n To run the test app:`);
 console.log(`   cd ${projectPath}`);
-console.log(`   # If you have xmlui CLI installed globally:`);
-console.log(`   xmlui start`);
-console.log(`   # Or serve with any static server:`);
-console.log(`   python3 -m http.server 8000`);
-console.log(`   # Or with Node.js:`);
-console.log(`   npx serve .`);
+console.log(`   python3 -m http.server`);
+console.log(`   # Or`);
+console.log(`   npx serve`);
 
 if (!fs.existsSync(helloWorldSource)) {
   console.log(`\n  Note: HelloWorld extension needs to be built first. Run:`);
