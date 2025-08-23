@@ -57,13 +57,13 @@ Copy/paste this command to create a new directory for your component.
 
 **Windows**
 
-```xmlui
+```xmlui copy
 mkdir packages/xmlui-hello-world/src
 cd packages/xmlui-hello-world
 ```
 
 **Mac / WSL / Linux**
-```xmlui
+```xmlui copy
 mkdir -p packages/xmlui-hello-world/src
 cd packages/xmlui-hello-world
 ```
@@ -90,6 +90,13 @@ cat > package.json << 'EOF'
     "xmlui": "*"
   },
   "main": "./dist/xmlui-hello-world.js",
+  "module": "./dist/xmlui-hello-world.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-hello-world.mjs",
+      "require": "./dist/xmlui-hello-world.js"
+    }
+  },
   "files": [
     "dist"
   ]
@@ -97,11 +104,10 @@ cat > package.json << 'EOF'
 EOF
 ```
 
-This configuration:
+The build system will generate both:
 
-- Sets up the extension as an ES module
-- Defines the build script using XMLUI's build tools
-- Includes only the built dist folder when the package is distributed
+- xmlui-hello-world.js (CommonJS/UMD for browser script tags)
+- xmlui-hello-world.mjs (ES modules for import statements)
 
  `xmlui-hello-world.js` is the file you'll pull into a standalone XMLUI app using a `<script>` tag.
 
@@ -270,8 +276,6 @@ This creates the main entry point that exports your HelloWorld component under t
 ## Step 7: Build the extension
 
 
-First, build your HelloWorld extension.
-
 ```xmlui copy
 npm run build:extension
 ```
@@ -295,70 +299,75 @@ packages/xmlui-hello-world
 
 ## Step 8: Test the extension
 
-Copy/paste these commands to create a bare-bones XMLUI app outside the XMLUI repository.
+Since we've integrated it into the docs site, you can see it live right here.
 
-**Windows**
-
-```xmlui copy
-cd %USERPROFILE%
-mkdir test-hello-world
-cd test-hello-world
-mkdir xmlui
-copy %USERPROFILE%\xmlui\packages\xmlui-hello-world\dist\xmlui-hello-world.js xmlui\
-curl -L -o xmlui\xmlui.js https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.1/xmlui-latest.js
-```
-
-**Mac / WSL / Linux**
-
-```xmlui copy
-cd ~
-mkdir test-hello-world
-cd test-hello-world
-mkdir xmlui
-cp ~/xmlui/packages/xmlui-hello-world/dist/xmlui-hello-world.js xmlui/
-curl -L -o xmlui/xmlui.js https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.1/xmlui-latest.js
-```
-
-Create the test HTML page.
-
-```xmlui copy
-cat > index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HelloWorld Extension Test</title>
-  <script src="xmlui/xmlui-latest.js"></script>
-  <script src="xmlui/xmlui-hello-world.js"></script>
-</head>
-<body>
-</body>
-</html>
-EOF
-```
-
-Create a `Main.xmlui` that uses the component we built.
-
-```xmlui copy
-cat > Main.xmlui << 'EOF'
+```xmlui-pg display noHeader
+---app
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <Extensions:HelloWorld />
+  <VStack gap="2rem" padding="2rem">
+    <Heading>HelloWorld Component Live Demo</Heading>
+
+    <Card>
+      <Heading level="h2">Basic Usage</Heading>
+      <Extensions:HelloWorld message="Hello from the docs site!" />
+    </Card>
+
+    <Card>
+      <Heading level="h2">With Success Theme</Heading>
+      <Extensions:HelloWorld message="Success message" theme="success" />
+    </Card>
+  </VStack>
+</App>
+```
+
+But you will want to see it in a standalone app.
+
+
+Create a new test app to verify your component works independently:
+
+### Option 1: Use the create-xmlui-hello-world tool (Recommended)
+
+```bash
+node tools/create-xmlui-hello-world/index.js my-test-app
+cd my-test-app
+npm install
+npm run build:extension
+cd test-app
+xmlui start
+```
+
+This creates a complete test environment with all the files you need!
+
+### Option 2: Manual setup
+
+```xmlui copy
+cat > test-app/Main.xmlui << 'EOF'
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+  <VStack gap="2rem" padding="2rem">
+    <Heading>HelloWorld Component Test</Heading>
+
+    <Extensions:HelloWorld message="Hello from standalone app!" />
+
+    <Extensions:HelloWorld message="Success message" theme="success" />
+  </VStack>
 </App>
 EOF
 ```
 
-To run the app you'll need a local webserver. Here are two options.
+Add the component script to your test app's `index.html`:
 
-```xmlui
-python -m http.server # visit localhost:8000
+```html copy
+<script src="../../packages/xmlui-hello-world/dist/xmlui-hello-world.js"></script>
 ```
 
-If you have Node.js:
+Then start your test app:
 
-```xmlui
-npx serve # visit localhost:3000
+```bash
+cd test-app
+xmlui start
 ```
+
+Visit `http://localhost:5173` to see your HelloWorld component running in a standalone XMLUI application!
 
 
 ## Step 9: Add event handling
@@ -389,204 +398,158 @@ Now you can use the HelloWorld component with event handling.
 Clicking the button triggers `handleHelloClick` which logs and alerts.
 
 
-## Step 10: Enable the component API (exposed methods)
+## Step 10: Test the component
 
-Components can expose methods that allow XMLUI applications to interact with them programmatically. Let's enhance our HelloWorld component to support both API methods and XMLUI's state system.
+Now let's test our HelloWorld component to make sure everything works correctly.
 
-Update HelloWorldNative.tsx with full API support
-
-```xmlui copy
-cat > src/HelloWorldNative.tsx << 'EOF'
-import React, { useState, useEffect } from "react";
-import classnames from "classnames";
-import { useEvent, RegisterComponentApiFn, UpdateStateFn } from "xmlui";
-import styles from "./HelloWorld.module.scss";
-
-type Props = {
-  id?: string;
-  message?: string;
-  theme?: "default" | "success";
-  registerComponentApi?: RegisterComponentApiFn;
-  updateState?: UpdateStateFn;
-  onDidClick?: (count: number) => void;
-};
-
-export const defaultProps = {
-  message: "Hello, World!",
-  theme: "default" as const,
-};
-
-export function HelloWorld({
-  id,
-  message = defaultProps.message,
-  theme = defaultProps.theme,
-  registerComponentApi,
-  updateState,
-  onDidClick,
-}: Props) {
-  const [clickCount, setClickCount] = useState(0);
-
-  const setValue = useEvent((newCount: number) => {
-    setClickCount(newCount);
-    updateState?.({ value: newCount });
-  });
-
-  // Sync clickCount with XMLUI state system
-  useEffect(() => {
-    updateState?.({ value: clickCount });
-  }, [updateState, clickCount]);
-
-  useEffect(() => {
-    if (registerComponentApi) {
-      registerComponentApi({
-        getValue: () => clickCount,
-        setValue,
-      });
-    }
-  }, [registerComponentApi, setValue, clickCount]);
-
-  const handleClick = useEvent(() => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    updateState?.({ value: newCount });
-    onDidClick?.(newCount);
-  });
-
-  return (
-    <div className={classnames(styles.container, styles[theme])} id={id}>
-      <h2 className={styles.message}>{message}</h2>
-      <button className={styles.button} onClick={handleClick}>
-        Click me!
-      </button>
-      <div className={styles.counter}>Clicks: {clickCount}</div>
-    </div>
-  );
-}
-EOF
-```
-
-Update HelloWorld.tsx renderer to pass state management props.
-
-```xmlui copy
-cat > src/HelloWorld.tsx << 'EOF'
-import styles from "./HelloWorld.module.scss";
-import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
-import { HelloWorld, defaultProps } from "./HelloWorldNative";
-
-const HelloWorldMd = createMetadata({
-  description:
-    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns. " +
-    "It displays a customizable message, handles click events, and maintains internal state.",
-  status: "experimental",
-  props: {
-    message: {
-      description: "The message to display in the component.",
-      isRequired: false,
-      type: "string",
-      defaultValue: defaultProps.message,
-    },
-    theme: {
-      description: "The visual theme for the component.",
-      isRequired: false,
-      type: "string",
-      availableValues: ["default", "success"],
-      defaultValue: defaultProps.theme,
-    },
-  },
-  events: {
-    didClick: {
-      description: "Fired when the button is clicked. Receives the current click count.",
-      isRequired: false,
-      type: "function",
-    },
-  },
-  apis: {
-    getValue: {
-      description: "Returns the current click count.",
-      signature: "getValue(): number",
-    },
-    setValue: {
-      description: "Sets the click count.",
-      signature: "setValue(value: number): void",
-    },
-  },
-  themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {
-    [`backgroundColor-HelloWorld`]: "$color-surface-50",
-    [`textColor-HelloWorld`]: "$color-content-primary",
-    [`buttonBackgroundColor-HelloWorld`]: "$color-primary-500",
-    [`buttonTextColor-HelloWorld`]: "$color-content-onPrimary",
-    [`borderRadius-HelloWorld`]: "$borderRadius-md",
-    [`padding-HelloWorld`]: "$space-4",
-    [`backgroundColor-HelloWorld--success`]: "$color-success-50",
-    [`textColor-HelloWorld--success`]: "$color-success-700",
-    dark: {
-      [`backgroundColor-HelloWorld`]: "$color-surface-200",
-      [`textColor-HelloWorld`]: "$color-content-primary",
-      [`backgroundColor-HelloWorld--success`]: "$color-success-200",
-      [`textColor-HelloWorld--success`]: "$color-success-800",
-    },
-  },
-});
-
-export const helloWorldComponentRenderer = createComponentRenderer(
-  "HelloWorld",
-  HelloWorldMd,
-  ({ node, extractValue, registerComponentApi, lookupEventHandler, updateState }) => {
-    const onDidClick = lookupEventHandler?.("didClick");
-
-    return (
-      <HelloWorld
-        id={extractValue.asOptionalString(node.props?.id)}
-        message={extractValue.asOptionalString(node.props?.message, defaultProps.message)}
-        theme={extractValue.asOptionalString(node.props?.theme, defaultProps.theme)}
-        registerComponentApi={registerComponentApi}
-        updateState={updateState}
-        onDidClick={onDidClick}
-      />
-    );
-  }
-);
-EOF
-```
-
-
-Update your test app to demonstrate the component API.
+Update your test app to use the component:
 
 ```xmlui copy
 cat > Main.xmlui << 'EOF'
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
   <VStack gap="2rem" padding="2rem">
-    <Heading>HelloWorld API Demo</Heading>
+    <Heading>HelloWorld Demo</Heading>
 
-    <Extensions:HelloWorld id="demo" message="Click me or use the controls below" />
+    <Extensions:HelloWorld message="Hello from XMLUI!" />
 
-    <Card>
-      <Heading level="{2}">API Controls</Heading>
-      <HStack gap="1rem">
-        <Button onClick="console.log('Current count:', demo.getValue())">
-          Get Count
-        </Button>
-        <Button onClick="demo.setValue(5)">
-          Set to 5
-        </Button>
-        <Button onClick="demo.setValue(10)">
-          Set to 10
-        </Button>
-        <Button onClick="demo.setValue(0)">
-          Reset to 0
-        </Button>
-      </HStack>
-    </Card>
+    <Extensions:HelloWorld message="Success message" theme="success" />
 
-    <Card>
-      <Heading level="{2}">Test in Console</Heading>
-      <Text>Open browser console and try:</Text>
-      <Text variant="codefence">demo.getValue()</Text>
-      <Text variant="codefence">demo.setValue(42)</Text>
-    </Card>
+    <Extensions:HelloWorld id="demo" message="Click the button to see the counter!" />
   </VStack>
 </App>
 EOF
 ```
+
+## Step 11: Integrate into the XMLUI docs site
+
+Now that we have a working HelloWorld component, let's integrate it into the XMLUI docs site so it can be used alongside other components like Search and Playground.
+
+### Update package.json for docs integration
+
+First, let's update the package.json to include the scripts and configuration needed for docs integration:
+
+```xmlui copy
+cat > package.json << 'EOF'
+{
+  "name": "xmlui-hello-world",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-hello-world.js",
+  "module": "./dist/xmlui-hello-world.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-hello-world.mjs",
+      "require": "./dist/xmlui-hello-world.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
+EOF
+```
+
+### Add to docs extensions
+
+Add the HelloWorld component to the docs site by updating `docs/extensions.ts`:
+
+```xmlui copy
+cat > docs/extensions.ts << 'EOF'
+import playground from "xmlui-playground";
+import search from "xmlui-search";
+import helloWorld from "xmlui-hello-world";
+
+export default [playground, search, helloWorld];
+EOF
+```
+
+### Add as dependency
+
+Add the HelloWorld component as a dependency in `docs/package.json`:
+
+```xmlui copy
+cat > docs/package.json << 'EOF'
+{
+  "name": "xmlui-docs",
+  "private": true,
+  "version": "0.0.5",
+  "scripts": {
+    "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
+    "preview": "xmlui preview",
+    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
+    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
+    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && npm run gen:download-latest-xmlui-release",
+    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npx xmlui-optimizer",
+    "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
+  },
+  "dependencies": {
+    "@shikijs/langs": "3.4.2",
+    "shiki": "^3.3.0",
+    "xmlui": "*",
+    "xmlui-playground": "*",
+    "xmlui-search": "*",
+    "xmlui-hello-world": "*"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
+  "devDependencies": {
+    "@emotion/is-prop-valid": "^1.3.1",
+    "@octokit/rest": "^22.0.0",
+    "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
+    "strip-markdown": "6.0.0",
+    "unified": "11.0.5"
+  }
+}
+EOF
+```
+
+### Build and test
+
+Now build the component, install dependencies, and start the docs site:
+
+```xmlui copy
+npm run build:extension
+cd ../../docs
+npm install
+npm run start
+```
+
+Visit the docs site and you can now use the HelloWorld component in any XMLUI markup:
+
+```xmlui
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+  <Extensions:HelloWorld message="Hello from the docs site!" />
+</App>
+```
+
+The HelloWorld component is now fully integrated into the XMLUI ecosystem and can be used in:
+- Standalone XMLUI applications (via script tag)
+- The XMLUI docs site (via import)
+- Any other XMLUI project that imports the extension
 
