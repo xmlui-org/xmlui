@@ -143,7 +143,6 @@ export const build = async ({
       "process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter": JSON.stringify(process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter),
       "process.env.VITE_USED_COMPONENTS_Charts": JSON.stringify(process.env.VITE_USED_COMPONENTS_Charts),
       "process.env.VITE_INCLUDE_HTML_COMPONENTS": JSON.stringify(process.env.VITE_INCLUDE_HTML_COMPONENTS),
-      "process.env.VITE_USED_COMPONENTS_TableEditor": JSON.stringify(process.env.VITE_USED_COMPONENTS_TableEditor),
       "process.env.VITE_USED_COMPONENTS_DatePicker": JSON.stringify(process.env.VITE_USED_COMPONENTS_DatePicker),
       "process.env.VITE_USED_COMPONENTS_NavPanel": JSON.stringify(process.env.VITE_USED_COMPONENTS_NavPanel),
       "process.env.VITE_USED_COMPONENTS_Pages": JSON.stringify(process.env.VITE_USED_COMPONENTS_Pages),
