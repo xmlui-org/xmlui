@@ -158,13 +158,14 @@ This creates the core React component with:
 ```xmlui copy
 cat > src/HelloWorld.module.scss << 'EOF'
 // XMLUI provides great defaults - no custom styling needed!
+EOF
 ```
 
 ## Step 5: Create component metadata and renderer
 
 Copy/paste these commands to create `HelloWorld.tsx`.
 
-```bash
+```xmlui copy
 cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, createMetadata } from "xmlui";
@@ -260,8 +261,13 @@ Since we've integrated it into the docs site, you can see it live right here.
 
 But you will want to see it in a standalone app. Switch to the xmlui repo home and run this tool.
 
-```xmlui
+```xmlui copy
 node tools/create-xmlui-hello-world/index.js /path/to/test_folder
+```
+
+Then switch to that folder.
+
+```xmlui copy
 cd /path/to/test_folder
 ```
 
