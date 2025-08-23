@@ -1,17 +1,30 @@
-# Build a Hello World Component
+# Build a Hello World component
 
-This guide will walk you through creating a complete React-based component for XMLUI, from initial setup to registration and testing. We'll build a functional HelloWorld component that demonstrates the core patterns for XMLUI component development.
+In this tutorial we'll build a HelloWorld component that demonstrates the core patterns for XMLUI component development.
 
+The XMLUI repository contains two types of components:
 
-## What you'll build
+**Core components** are built into the main XMLUI library and available by default. Components like Button, Text, Card, and Stack live in `xmlui/xmlui/src/components/` and are always available in any XMLUI app.
 
-By the end of this guide, you'll have created a HelloWorld component that:
+**Extension packages** are standalone components that can be optionally included. They live in `xmlui/packages` and are built, distributed, and imported separately.
+
+We'll build an extension package so the HelloWorld component can:
+
+- Live separately from the core XMLUI library
+- Be optionally included in standalone apps
+- Be distributed and reused across different projects
+
+Extensions are the recommended approach for custom components that aren't needed by every XMLUI application. By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
 - Features an interactive click counter
 - Uses XMLUI's standard theming system
-- Can embed nested children
-- Follows all XMLUI patterns and conventions
+- Defines event handlers
+- Provides callable methods
+
+> [!NOTE]
+> This page includes playground examples that use the HelloWorld component. They are available here because this site loads final extension package that you'll build. Since you'll be working in the same XMLUI repository that creates this site, you'll remove and then gradually recreate the HelloWorld component that's shown in its final form in playground examples here.
+
 
 ## XMLUI component architecture
 
@@ -29,45 +42,30 @@ This separation allows XMLUI to understand your component's interface while main
 - Basic understanding of XMLUI markup
 - A local clone of [https://github.com/xmlui-org/xmlui](https://github.com/xmlui-org/xmlui)
 
-**Core components vs extensions**
+## Step 1: Prepare the workspace
 
-The XMLUI repository contains two types of components.
-
-**Core components** are built into the main XMLUI library and available by default. Components like Button, Text, Card, and Stack live in `xmlui/xmlui/src/components/` and are always available in any XMLUI app.
-
-**Extension packages** are standalone components that can be optionally included. They live in `xmlui/packages` and are built, distributed, and imported separately.
-
-We're building an extension package so the HelloWorld component can:
-
-- Live separately from the core XMLUI library
-- Be optionally included in standalone apps
-- Be distributed and reused across different projects
-
-Extensions are the recommended approach for custom components that aren't needed by every XMLUI application.
-
-## Step 1: Create the component's directory
+Since you'll be working in the same XMLUI repository that creates this site, you'll need to clear out the existing HelloWorld component to start fresh.
 
 Switch to the directory into which you cloned the XMLUI repo.
-
-Copy/paste this command to create a new directory for your component.
 
 **Windows**
 
 ```xmlui copy
-mkdir packages/xmlui-hello-world/src
 cd packages/xmlui-hello-world
+rmdir /s /q src
+mkdir src
 ```
 
-**Mac / WSL / Linux**
+** Mac / WSL / Linux **
+
 ```xmlui copy
-mkdir -p packages/xmlui-hello-world/src
 cd packages/xmlui-hello-world
+rm -rf src/*
 ```
 
-This creates:
+This clears out the existing HelloWorld component files so you can build it from scratch. The `src/` directory will be empty and ready for your new implementation.
 
-- packages/xmlui-hello-world/ (main package directory for your extension)
-- packages/xmlui-hello-world/src/ (source code for the HelloWorld component)
+> [!NOTE] Don't worry about the live examples on this page - they'll continue to work because they use the final version of the component. You'll be building your own version in the standalone app.
 
 ## Step 2: Create the package configuration
 
@@ -157,7 +155,40 @@ This creates the core React component with:
 
 ```xmlui copy
 cat > src/HelloWorld.module.scss << 'EOF'
-// XMLUI provides great defaults - no custom styling needed!
+.container {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.message {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.counter {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
 EOF
 ```
 
@@ -426,11 +457,6 @@ Let's see the updated component with custom theme variables.
     </Card>
 
     <Card>
-      <Heading level="h2">Custom Theme Variables</Heading>
-      <Extensions:HelloWorld message="Custom colors" />
-    </Card>
-
-    <Card>
       <Heading level="h2">Dynamic Theme Override</Heading>
       <Theme
         backgroundColor-HelloWorld="#ff6b6b"
@@ -444,14 +470,6 @@ Let's see the updated component with custom theme variables.
 ```
 
 Notice how the component now uses your custom theme variables. The earlier example in Step 8 continues to work unchanged - it just uses XMLUI's default semantic colors.
-
-**Understanding the three theming approaches**
-
-1. Default styling: Uses the component's default colors
-2. Custom theme variables: Your SCSS-defined colors (from the component)
-3. Dynamic theme override: Runtime color changes using the `<Theme>` component
-
-The `<Theme>` component allows you to override any CSS custom property at runtime, making your components incredibly flexible for different contexts and user preferences.
 
 ## Step 10: Add event handling
 
