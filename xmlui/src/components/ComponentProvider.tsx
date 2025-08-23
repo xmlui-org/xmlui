@@ -21,7 +21,6 @@ import { localLinkComponentRenderer } from "./Link/Link";
 import { treeComponentRenderer } from "./Tree/TreeComponent";
 import { treeDisplayComponentRenderer } from "./TreeDisplay/TreeDisplay";
 import { buttonComponentRenderer } from "./Button/Button";
-import { helloWorldComponentRenderer } from "./HelloWorld/HelloWorld";
 import {
   h1ComponentRenderer,
   h2ComponentRenderer,
@@ -401,9 +400,6 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
       this.registerCoreComponent(buttonComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
-      this.registerCoreComponent(helloWorldComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
       this.registerCoreComponent(editorComponentRenderer);
