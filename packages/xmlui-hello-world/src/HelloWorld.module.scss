@@ -8,7 +8,7 @@ $themeVars: ();
 
 $component: "HelloWorld";
 
-// Define only the essential theme variables
+// Define basic theme variables
 $backgroundColor: createThemeVar("backgroundColor-#{$component}");
 $textColor: createThemeVar("textColor-#{$component}");
 
@@ -20,11 +20,6 @@ $textColor: createThemeVar("textColor-#{$component}");
   text-align: center;
   display: inline-block;
   min-width: 200px;
-
-  &.success {
-    background-color: createThemeVar("backgroundColor-#{$component}--success");
-    color: createThemeVar("textColor-#{$component}--success");
-  }
 }
 
 .message {

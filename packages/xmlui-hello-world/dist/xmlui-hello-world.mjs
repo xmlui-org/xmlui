@@ -1,77 +1,33 @@
 import "./index.css";
-import { jsxs as m, jsx as u } from "react/jsx-runtime";
-import { createComponentRenderer as p, createMetadata as f, parseScssVar as h } from "xmlui";
-import { useState as C } from "react";
-const g = `'{"backgroundColor-HelloWorld": "var(--xmlui-backgroundColor-HelloWorld)", "textColor-HelloWorld": "var(--xmlui-textColor-HelloWorld)", "backgroundColor-HelloWorld--success": "var(--xmlui-backgroundColor-HelloWorld--success)", "textColor-HelloWorld--success": "var(--xmlui-textColor-HelloWorld--success)"}'`, W = "_container_mm3fe_13", H = "_success_mm3fe_22", b = "_message_mm3fe_27", x = "_button_mm3fe_32", _ = "_counter_mm3fe_46", a = {
-  themeVars: g,
-  container: W,
-  success: H,
-  message: b,
-  button: x,
-  counter: _
+import { jsxs as a, jsx as l } from "react/jsx-runtime";
+import { createComponentRenderer as i, createMetadata as d, parseScssVar as m } from "xmlui";
+import { useState as u } from "react";
+const p = `'{"backgroundColor-HelloWorld": "var(--xmlui-backgroundColor-HelloWorld)", "textColor-HelloWorld": "var(--xmlui-textColor-HelloWorld)"}'`, g = "_container_inos9_13", C = "_message_inos9_23", W = "_button_inos9_28", h = "_counter_inos9_42", e = {
+  themeVars: p,
+  container: g,
+  message: C,
+  button: W,
+  counter: h
+}, n = {
+  message: "Hello, World!"
 };
-function v(o) {
-  return o && o.__esModule && Object.prototype.hasOwnProperty.call(o, "default") ? o.default : o;
-}
-var d = { exports: {} };
-/*!
-	Copyright (c) 2018 Jed Watson.
-	Licensed under the MIT License (MIT), see
-	http://jedwatson.github.io/classnames
-*/
-(function(o) {
-  (function() {
-    var r = {}.hasOwnProperty;
-    function t() {
-      for (var e = "", s = 0; s < arguments.length; s++) {
-        var c = arguments[s];
-        c && (e = n(e, l(c)));
-      }
-      return e;
-    }
-    function l(e) {
-      if (typeof e == "string" || typeof e == "number")
-        return e;
-      if (typeof e != "object")
-        return "";
-      if (Array.isArray(e))
-        return t.apply(null, e);
-      if (e.toString !== Object.prototype.toString && !e.toString.toString().includes("[native code]"))
-        return e.toString();
-      var s = "";
-      for (var c in e)
-        r.call(e, c) && e[c] && (s = n(s, c));
-      return s;
-    }
-    function n(e, s) {
-      return s ? e ? e + " " + s : e + s : e;
-    }
-    o.exports ? (t.default = t, o.exports = t) : window.classNames = t;
-  })();
-})(d);
-var y = d.exports;
-const k = /* @__PURE__ */ v(y), i = {
-  message: "Hello, World!",
-  theme: "default"
-};
-function S({
-  id: o,
-  message: r = i.message,
-  theme: t = i.theme
+function H({
+  id: r,
+  message: s = n.message
 }) {
-  const [l, n] = C(0), e = () => {
-    n(l + 1);
+  const [o, t] = u(0), c = () => {
+    t(o + 1);
   };
-  return /* @__PURE__ */ m("div", { className: k(a.container, a[t]), id: o, children: [
-    /* @__PURE__ */ u("h2", { className: a.message, children: r }),
-    /* @__PURE__ */ u("button", { className: a.button, onClick: e, children: "Click me!" }),
-    /* @__PURE__ */ m("div", { className: a.counter, children: [
+  return /* @__PURE__ */ a("div", { className: e.container, id: r, children: [
+    /* @__PURE__ */ l("h2", { className: e.message, children: s }),
+    /* @__PURE__ */ l("button", { className: e.button, onClick: c, children: "Click me!" }),
+    /* @__PURE__ */ a("div", { className: e.counter, children: [
       "Clicks: ",
-      l
+      o
     ] })
   ] });
 }
-const V = f({
+const _ = d({
   description: "`HelloWorld` is a demonstration component.",
   status: "experimental",
   props: {
@@ -79,47 +35,35 @@ const V = f({
       description: "The message to display.",
       isRequired: !1,
       type: "string",
-      defaultValue: i.message
-    },
-    theme: {
-      description: "Visual theme variant.",
-      isRequired: !1,
-      type: "string",
-      availableValues: ["default", "success"],
-      defaultValue: i.theme
+      defaultValue: n.message
     }
   },
-  themeVars: h(a.themeVars),
+  themeVars: m(e.themeVars),
   defaultThemeVars: {
     "backgroundColor-HelloWorld": "$color-surface-50",
     "textColor-HelloWorld": "$color-content-primary",
-    "backgroundColor-HelloWorld--success": "$color-success-50",
-    "textColor-HelloWorld--success": "$color-success-700",
     dark: {
       "backgroundColor-HelloWorld": "$color-surface-200",
-      "textColor-HelloWorld": "$color-content-primary",
-      "backgroundColor-HelloWorld--success": "$color-success-200",
-      "textColor-HelloWorld--success": "$color-success-800"
+      "textColor-HelloWorld": "$color-content-primary"
     }
   }
-}), $ = p(
+}), f = i(
   "HelloWorld",
-  V,
-  ({ node: o, extractValue: r }) => {
-    var t, l, n;
-    return /* @__PURE__ */ u(
-      S,
+  _,
+  ({ node: r, extractValue: s }) => {
+    var o, t;
+    return /* @__PURE__ */ l(
+      H,
       {
-        id: r.asOptionalString((t = o.props) == null ? void 0 : t.id),
-        message: r.asOptionalString((l = o.props) == null ? void 0 : l.message, i.message),
-        theme: r.asOptionalString((n = o.props) == null ? void 0 : n.theme, i.theme)
+        id: s.asOptionalString((o = r.props) == null ? void 0 : o.id),
+        message: s.asOptionalString((t = r.props) == null ? void 0 : t.message, n.message)
       }
     );
   }
-), R = {
+), y = {
   namespace: "XMLUIExtensions",
-  components: [$]
+  components: [f]
 };
 export {
-  R as default
+  y as default
 };
