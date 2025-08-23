@@ -1,0 +1,15 @@
+{
+  "name": "create-xmlui-hello-world",
+  "version": "0.1.0",
+  "description": "Create a minimal HelloWorld XMLUI component",
+  "main": "index.js",
+  "bin": {
+    "create-xmlui-hello-world": "./index.js"
+  },
+  "scripts": {
+    "build": "node index.js"
+  },
+  "keywords": ["xmlui", "component", "hello-world"],
+  "author": "",
+  "license": "ISC"
+}

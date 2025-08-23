@@ -87,7 +87,7 @@ export default ({ mode }) => {
       },
     },
     build: {
-      // minify:false,
+      //minify:false,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib: lib,
