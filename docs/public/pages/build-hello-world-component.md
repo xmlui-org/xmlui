@@ -320,54 +320,24 @@ Since we've integrated it into the docs site, you can see it live right here.
 </App>
 ```
 
-But you will want to see it in a standalone app.
+But you will want to see it in a standalone app. Switch to the xmlui repo home and run this tool.
 
-
-Create a new test app to verify your component works independently:
-
-### Option 1: Use the create-xmlui-hello-world tool (Recommended)
-
-```bash
-node tools/create-xmlui-hello-world/index.js my-test-app
-cd my-test-app
-npm install
-npm run build:extension
-cd test-app
-xmlui start
+```xmlui
+node tools/create-xmlui-hello-world/index.js /path/to/test_folder
+cd /path/to/test_folder
 ```
 
-This creates a complete test environment with all the files you need!
-
-### Option 2: Manual setup
+To run the app with Python.
 
 ```xmlui copy
-cat > test-app/Main.xmlui << 'EOF'
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <VStack gap="2rem" padding="2rem">
-    <Heading>HelloWorld Component Test</Heading>
-
-    <Extensions:HelloWorld message="Hello from standalone app!" />
-
-    <Extensions:HelloWorld message="Success message" theme="success" />
-  </VStack>
-</App>
-EOF
+python -m http.server # visit 8000
 ```
 
-Add the component script to your test app's `index.html`:
+With Node.js.
 
-```html copy
-<script src="../../packages/xmlui-hello-world/dist/xmlui-hello-world.js"></script>
+```xmlui copy
+npx server # visit 3000
 ```
-
-Then start your test app:
-
-```bash
-cd test-app
-xmlui start
-```
-
-Visit `http://localhost:5173` to see your HelloWorld component running in a standalone XMLUI application!
 
 
 ## Step 9: Add event handling
@@ -398,158 +368,4 @@ Now you can use the HelloWorld component with event handling.
 Clicking the button triggers `handleHelloClick` which logs and alerts.
 
 
-## Step 10: Test the component
-
-Now let's test our HelloWorld component to make sure everything works correctly.
-
-Update your test app to use the component:
-
-```xmlui copy
-cat > Main.xmlui << 'EOF'
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <VStack gap="2rem" padding="2rem">
-    <Heading>HelloWorld Demo</Heading>
-
-    <Extensions:HelloWorld message="Hello from XMLUI!" />
-
-    <Extensions:HelloWorld message="Success message" theme="success" />
-
-    <Extensions:HelloWorld id="demo" message="Click the button to see the counter!" />
-  </VStack>
-</App>
-EOF
-```
-
-## Step 11: Integrate into the XMLUI docs site
-
-Now that we have a working HelloWorld component, let's integrate it into the XMLUI docs site so it can be used alongside other components like Search and Playground.
-
-### Update package.json for docs integration
-
-First, let's update the package.json to include the scripts and configuration needed for docs integration:
-
-```xmlui copy
-cat > package.json << 'EOF'
-{
-  "name": "xmlui-hello-world",
-  "version": "0.1.0",
-  "sideEffects": false,
-  "type": "module",
-  "scripts": {
-    "start": "xmlui start",
-    "preview": "xmlui preview",
-    "build:extension": "xmlui build-lib",
-    "build-watch": "xmlui build-lib --watch",
-    "build:demo": "xmlui build",
-    "build:meta": "xmlui build-lib --mode=metadata"
-  },
-  "devDependencies": {
-    "xmlui": "*"
-  },
-  "main": "./dist/xmlui-hello-world.js",
-  "module": "./dist/xmlui-hello-world.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-hello-world.mjs",
-      "require": "./dist/xmlui-hello-world.js"
-    },
-    "./*.css": {
-      "import": "./dist/*.css",
-      "require": "./dist/*.css"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": ""
-}
-EOF
-```
-
-### Add to docs extensions
-
-Add the HelloWorld component to the docs site by updating `docs/extensions.ts`:
-
-```xmlui copy
-cat > docs/extensions.ts << 'EOF'
-import playground from "xmlui-playground";
-import search from "xmlui-search";
-import helloWorld from "xmlui-hello-world";
-
-export default [playground, search, helloWorld];
-EOF
-```
-
-### Add as dependency
-
-Add the HelloWorld component as a dependency in `docs/package.json`:
-
-```xmlui copy
-cat > docs/package.json << 'EOF'
-{
-  "name": "xmlui-docs",
-  "private": true,
-  "version": "0.0.5",
-  "scripts": {
-    "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
-    "preview": "xmlui preview",
-    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
-    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
-    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && npm run gen:download-latest-xmlui-release",
-    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npx xmlui-optimizer",
-    "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
-  },
-  "dependencies": {
-    "@shikijs/langs": "3.4.2",
-    "shiki": "^3.3.0",
-    "xmlui": "*",
-    "xmlui-playground": "*",
-    "xmlui-search": "*",
-    "xmlui-hello-world": "*"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
-  },
-  "devDependencies": {
-    "@emotion/is-prop-valid": "^1.3.1",
-    "@octokit/rest": "^22.0.0",
-    "remark-parse": "11.0.0",
-    "remark-stringify": "11.0.0",
-    "strip-markdown": "6.0.0",
-    "unified": "11.0.5"
-  }
-}
-EOF
-```
-
-### Build and test
-
-Now build the component, install dependencies, and start the docs site:
-
-```xmlui copy
-npm run build:extension
-cd ../../docs
-npm install
-npm run start
-```
-
-Visit the docs site and you can now use the HelloWorld component in any XMLUI markup:
-
-```xmlui
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <Extensions:HelloWorld message="Hello from the docs site!" />
-</App>
-```
-
-The HelloWorld component is now fully integrated into the XMLUI ecosystem and can be used in:
-- Standalone XMLUI applications (via script tag)
-- The XMLUI docs site (via import)
-- Any other XMLUI project that imports the extension
-
+Step 10: Add 
