@@ -348,6 +348,19 @@ cat > Main.xmlui << 'EOF'
 EOF
 ```
 
+To run the app you'll need a local webserver. Here are two options.
+
+```xmlui
+python -m http.server # visit localhost:8000
+```
+
+If you have Node.js:
+
+```xmlui
+npx serve # visit localhost:3000
+```
+
+
 ## Step 9: Add event handling
 
 To demonstrate event handling, you need to define the event handler functions first. These functions can live in your `index.html` file, in [code-behind files](/code), or in [script tags](/helper-tags#script). Let's use the `index.html` approach. Add this function to your test app's `index.html`.
