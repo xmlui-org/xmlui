@@ -727,3 +727,176 @@ Now you can use the component with event handling.
 </App>
 ```
 
+## Step 11: Add component APIs (external methods)
+
+
+```xmlui copy
+cat > src/HelloWorldNative.tsx << 'EOF'
+import React, { useState, useEffect } from "react";
+import styles from "./HelloWorld.module.scss";
+import type { RegisterComponentApiFn } from "xmlui";
+
+type Props = {
+  id?: string;
+  message?: string;
+  className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+};
+
+export const defaultProps = {
+  message: "Hello, World!",
+};
+
+export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
+  function HelloWorld(
+    {
+      id,
+      message = defaultProps.message,
+      className,
+      onClick,
+      onReset,
+      registerComponentApi
+    },
+    ref
+  ) {
+    const [clickCount, setClickCount] = useState(0);
+
+    // Create setValue method for external API access
+    const setValue = (newCount: number) => {
+      setClickCount(newCount);
+    };
+
+    // Register component API
+    useEffect(() => {
+      registerComponentApi?.({
+        setValue,
+        value: clickCount,
+      });
+    }, [registerComponentApi, setValue, clickCount]);
+
+    const handleClick = (event: React.MouseEvent) => {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      onClick?.(event);
+    };
+
+    const handleReset = (event: React.MouseEvent) => {
+      setClickCount(0);
+      onReset?.(event);
+    };
+
+    return (
+      <div className={`${styles.container} ${className || ''}`} id={id} ref={ref}>
+        <h2 className={styles.message}>{message}</h2>
+        <button
+           className={styles.button}
+              onClick={handleClick}
+            >
+              Click me!
+            </button>
+            <div className={styles.counter}>
+              Clicks: <span className={styles.count}>{clickCount}</span>
+            </div>
+
+            {clickCount > 0 && (
+              <button
+                className={styles.button}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+    );
+  }
+);
+EOF
+```
+
+```xmlui copy
+cat > src/HelloWorld.tsx << 'EOF'
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description:
+    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The greeting message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  events: {
+    onClick: {
+      description:
+        "Triggered when the click button is pressed. " + "Receives the current click count.",
+      type: "function",
+    },
+    onReset: {
+      description:
+        "Triggered when the reset button is pressed. " + "Called when count is reset to 0.",
+      type: "function",
+    },
+  },
+  apis: {
+    value: {
+      description: "The current click count value.",
+      type: "number",
+    },
+    setValue: {
+      description: "Set the click count to a specific value.",
+      type: "function",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$color-content-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      // No textColor override needed - $color-content-primary should auto-adapt
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+
+  ({ node, extractValue, lookupEventHandler, className, registerComponentApi }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        className={className}
+        registerComponentApi={registerComponentApi}
+      />
+    );
+  },
+);
+EOF
+```
+
+```xmlui-pg
+---app display
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+
+    <Extensions:HelloWorld id="demo" message="API Demo" />
+
+    <CHStack>
+      <Button onClick="{ console.log('demo.value', demo.value) }">Get Count</Button>
+      <Button onClick="{ demo.setValue(5) }">Set to 5</Button>
+      <Button onClick="{ demo.setValue(0) }">Reset</Button>
+    </CHStack>
+
+</App>
+```
