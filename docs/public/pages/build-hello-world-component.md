@@ -504,13 +504,16 @@ import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
-const HelloWorldMd = createMetadata({
-  description: "`HelloWorld` is a demonstration component.",
+const COMP = "HelloWorld";
+
+export const HelloWorldMd = createMetadata({
+  description:
+    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns. " +
+    "It displays a customizable greeting message with an interactive click counter.",
   status: "experimental",
   props: {
     message: {
-      description: "The message to display.",
-      isRequired: false,
+      description: "The greeting message to display.",
       type: "string",
       defaultValue: defaultProps.message,
     },
@@ -522,27 +525,35 @@ const HelloWorldMd = createMetadata({
         "Receives the current click count.",
       type: "function",
     },
+    onReset: {
+      description:
+        "Triggered when the reset button is pressed. " +
+        "Called when count is reset to 0.",
+      type: "function",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-HelloWorld`]: "$color-surface-50",
-    [`textColor-HelloWorld`]: "$textColor-primary",
+    [`textColor-HelloWorld`]: "$color-content-primary",
     dark: {
       [`backgroundColor-HelloWorld`]: "$color-surface-800",
-      [`textColor-HelloWorld`]: "$color-surface-0",
+      // No textColor override needed - $color-content-primary should auto-adapt
     },
   },
 });
 
 export const helloWorldComponentRenderer = createComponentRenderer(
-  "HelloWorld",
+  COMP,
   HelloWorldMd,
-  ({ node, extractValue, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props?.id)}
         message={extractValue.asOptionalString(node.props?.message)}
-        onButtonClick={lookupEventHandler("click")}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        className={className}
       />
     );
   }
@@ -550,48 +561,76 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 EOF
 ```
 
-**Update the Native Component**
+**Update the native component**
 
-Update `src/HelloWorldNative.tsx` to accept and call the event handler:
+Update `src/HelloWorldNative.tsx` to accept and call the event handler.
 
 ```xmlui copy
 cat > src/HelloWorldNative.tsx << 'EOF'
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
   id?: string;
   message?: string;
-  onButtonClick?: (clickCount: number) => void;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
 };
 
 export const defaultProps = {
   message: "Hello, World!",
 };
 
-export function HelloWorld({
-  id,
-  message = defaultProps.message,
-  onButtonClick,
-}: Props) {
-  const [clickCount, setClickCount] = useState(0);
+export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
+  function HelloWorld(
+    {
+      id,
+      message = defaultProps.message,
+      onClick,
+      onReset
+    },
+    ref
+  ) {
+    const [clickCount, setClickCount] = useState(0);
 
-  const handleClick = () => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    onButtonClick?.(newCount);
-  };
+    const handleClick = (event: React.MouseEvent) => {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      onClick?.(event);
+    };
 
-  return (
-    <div className={styles.container} id={id}>
-      <h2 className={styles.message}>{message}</h2>
-      <button className={styles.button} onClick={handleClick}>
-        Click me!
-      </button>
-      <div className={styles.counter}>Clicks: {clickCount}</div>
+    const handleReset = (event: React.MouseEvent) => {
+      setClickCount(0);
+      onReset?.(event);
+    };
+
+    return (
+      <div className={styles.container} id={id}>
+        <h2 className={styles.message}>{message}</h2>
+        <button
+           className={styles.clickButton}
+           onClick={handleClick}
+        >
+          Click me!
+        </button>
+        <div className={styles.counter}>
+          Clicks: <span className={styles.count}>{clickCount}</span>
+        </div>
+
+        {clickCount > 0 && (
+          <button
+            className={styles.resetButton}
+            onClick={handleReset}
+          >
+            Reset
+          </button>
+        )}
+
     </div>
-  );
-}
+    );
+  }
+);
+
 EOF
 ```
 
