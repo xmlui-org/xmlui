@@ -406,7 +406,9 @@ Instead of hardcoded colors like `#f5f5f5` and `#333`, we now use:
 - `$backgroundColor` - Uses XMLUI's surface color tokens
 - `$textColor` - Uses XMLUI's content color tokens
 
-The `createThemeVar()` function registers these variables with XMLUI's theme system, making them available for customization.
+The `createThemeVar()` function registers these variables with XMLUI, making them available for customization via the `<Theme>` component and automatic light/dark mode adaptation.
+
+The `:export { themeVars: t.json-stringify($themeVars); }` exports the theme variables so XMLUI can read them.
 
 **Update component metadata**
 
@@ -504,16 +506,14 @@ import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
-const COMP = "HelloWorld";
-
-export const HelloWorldMd = createMetadata({
+const HelloWorldMd = createMetadata({
   description:
-    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns. " +
-    "It displays a customizable greeting message with an interactive click counter.",
+    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns.",
   status: "experimental",
   props: {
     message: {
       description: "The greeting message to display.",
+      isRequired: false,
       type: "string",
       defaultValue: defaultProps.message,
     },
@@ -542,7 +542,7 @@ export const HelloWorldMd = createMetadata({
 });
 
 export const helloWorldComponentRenderer = createComponentRenderer(
-  COMP,
+  "HelloWorld",
   HelloWorldMd,
 
   ({ node, extractValue, lookupEventHandler, className }) => {
