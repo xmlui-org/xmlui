@@ -490,11 +490,11 @@ Now your component uses XMLUI's theme system! It will automatically adapt to lig
 
 Notice how the component now uses theme variables instead of hardcoded colors. The `<Theme>` component allows you to override any theme variable at runtime, making your components incredibly flexible for different contexts and user preferences.
 
-## Step 10: Add Event Handling
+## Step 10: Add event handling
 
-Currently, our HelloWorld component has a simple internal click handler that increments a counter. To demonstrate proper XMLUI event handling, we need to add event definitions and expose the click event to parent components.
+The HelloWorld component has a click handler that increments a counter, and a reset that sets the count to zero. Let's add event definitions to signal parent components when these events happen.
 
-**Add Event Definitions**
+**Add event definitions**
 
 Update the component metadata in `src/HelloWorld.tsx`:
 
@@ -595,7 +595,7 @@ export function HelloWorld({
 EOF
 ```
 
-**Rebuild the Extension**
+**Rebuild the extension**
 
 ```xmlui copy
 npm run build:extension
@@ -608,29 +608,11 @@ Now you can use the component with event handling:
 ```xmlui-pg
 ---app display
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <VStack gap="2rem" padding="2rem">
-    <H1>Event Handling Example</H1>
-
-    <Card>
-      <H2>With Event Handler</H2>
-      <Extensions:HelloWorld
-        message="Click to trigger event!"
-        onClick="(count) => alert('Button clicked! Count: ' + count)"
-      />
-    </Card>
-
-    <Card>
-      <H2>Without Event Handler</H2>
-      <Extensions:HelloWorld message="Internal counter only" />
-    </Card>
-  </VStack>
+    <Extensions:HelloWorld
+          onClick="handleHelloClick"
+          onReset="handleHelloReset"
+        />
 </App>
 ```
-
-**What Happens:**
-
-- **With Event Handler**: Clicking the button increments the internal counter AND triggers the `onClick` event handler with the current click count
-- **Without Event Handler**: Clicking the button only increments the internal counter
-- The component maintains its internal state while also allowing parent components to respond to user interactions
 
 This demonstrates how XMLUI components can expose events while maintaining their own internal functionality.
