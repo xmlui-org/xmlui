@@ -490,32 +490,147 @@ Now your component uses XMLUI's theme system! It will automatically adapt to lig
 
 Notice how the component now uses theme variables instead of hardcoded colors. The `<Theme>` component allows you to override any theme variable at runtime, making your components incredibly flexible for different contexts and user preferences.
 
-## Step 10: Add event handling
+## Step 10: Add Event Handling
 
-To demonstrate event handling, you need to define the event handler functions first. These functions can live in your `index.html` file, in [code-behind files](/code), or in [script tags](/helper-tags#script). Let's use the `index.html` approach. Add this function to your test app's `index.html`.
+Currently, our HelloWorld component has a simple internal click handler that increments a counter. To demonstrate proper XMLUI event handling, we need to add event definitions and expose the click event to parent components.
 
+**Add Event Definitions**
+
+Update the component metadata in `src/HelloWorld.tsx`:
 
 ```xmlui copy
-<script>
-window.handleHelloClick = function(event) {
-  console.log('Hello World clicked!', event);
-  alert('Button clicked!');
-};
-</script>
+cat > src/HelloWorld.tsx << 'EOF'
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description: "`HelloWorld` is a demonstration component.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  events: {
+    onClick: {
+      description:
+        "Triggered when the click button is pressed. " +
+        "Receives the current click count.",
+      type: "function",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$textColor-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      [`textColor-HelloWorld`]: "$color-surface-0",
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+  ({ node, extractValue, lookupEventHandler }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+        onButtonClick={lookupEventHandler("click")}
+      />
+    );
+  }
+);
+EOF
 ```
 
-Now you can use the HelloWorld component with event handling.
+**Update the Native Component**
+
+Update `src/HelloWorldNative.tsx` to accept and call the event handler:
 
 ```xmlui copy
-<App>
-  <Extensions:HelloWorld
-    message="Event handling example"
-    onClick="handleHelloClick"
-  />
+cat > src/HelloWorldNative.tsx << 'EOF'
+import React, { useState } from "react";
+import styles from "./HelloWorld.module.scss";
+
+type Props = {
+  id?: string;
+  message?: string;
+  onButtonClick?: (clickCount: number) => void;
+};
+
+export const defaultProps = {
+  message: "Hello, World!",
+};
+
+export function HelloWorld({
+  id,
+  message = defaultProps.message,
+  onButtonClick,
+}: Props) {
+  const [clickCount, setClickCount] = useState(0);
+
+  const handleClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    onButtonClick?.(newCount);
+  };
+
+  return (
+    <div className={styles.container} id={id}>
+      <h2 className={styles.message}>{message}</h2>
+      <button className={styles.button} onClick={handleClick}>
+        Click me!
+      </button>
+      <div className={styles.counter}>Clicks: {clickCount}</div>
+    </div>
+  );
+}
+EOF
+```
+
+**Rebuild the Extension**
+
+```xmlui copy
+npm run build:extension
+```
+
+**Test Event Handling**
+
+Now you can use the component with event handling:
+
+```xmlui-pg
+---app display
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+  <VStack gap="2rem" padding="2rem">
+    <H1>Event Handling Example</H1>
+
+    <Card>
+      <H2>With Event Handler</H2>
+      <Extensions:HelloWorld
+        message="Click to trigger event!"
+        onClick="(count) => alert('Button clicked! Count: ' + count)"
+      />
+    </Card>
+
+    <Card>
+      <H2>Without Event Handler</H2>
+      <Extensions:HelloWorld message="Internal counter only" />
+    </Card>
+  </VStack>
 </App>
 ```
 
-Clicking the button triggers `handleHelloClick` which logs and alerts.
+**What Happens:**
 
+- **With Event Handler**: Clicking the button increments the internal counter AND triggers the `onClick` event handler with the current click count
+- **Without Event Handler**: Clicking the button only increments the internal counter
+- The component maintains its internal state while also allowing parent components to respond to user interactions
 
-Step 10: Add
+This demonstrates how XMLUI components can expose events while maintaining their own internal functionality.
