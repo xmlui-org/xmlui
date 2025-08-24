@@ -572,6 +572,7 @@ import styles from "./HelloWorld.module.scss";
 type Props = {
   id?: string;
   message?: string;
+  className?: string;
   onClick?: (event: React.MouseEvent) => void;
   onReset?: (event: React.MouseEvent) => void;
 };
@@ -585,6 +586,7 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     {
       id,
       message = defaultProps.message,
+      className,
       onClick,
       onReset
     },
@@ -604,32 +606,30 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     };
 
     return (
-      <div className={styles.container} id={id}>
+      <div className={`${styles.container} ${className || ''}`} id={id}>
         <h2 className={styles.message}>{message}</h2>
         <button
-           className={styles.clickButton}
-           onClick={handleClick}
-        >
-          Click me!
-        </button>
-        <div className={styles.counter}>
-          Clicks: <span className={styles.count}>{clickCount}</span>
-        </div>
+           className={styles.button}
+              onClick={handleClick}
+            >
+              Click me!
+            </button>
+            <div className={styles.counter}>
+              Clicks: <span className={styles.count}>{clickCount}</span>
+            </div>
 
-        {clickCount > 0 && (
-          <button
-            className={styles.resetButton}
-            onClick={handleReset}
-          >
-            Reset
-          </button>
-        )}
-
-    </div>
+            {clickCount > 0 && (
+              <button
+                className={styles.button}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            )}
+          </div>
     );
   }
 );
-
 EOF
 ```
 
