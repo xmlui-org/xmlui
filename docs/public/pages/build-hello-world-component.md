@@ -278,7 +278,7 @@ Since we've integrated it into the docs site, you can see it live right here.
 ---app display
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
   <VStack gap="2rem" padding="2rem">
-    <Heading>HelloWorld Component Live Demo</Heading>
+    <H1>HelloWorld Component Live Demo</H1>
 
     <Card>
       <Extensions:HelloWorld message="Hello from the docs site!" />
@@ -327,39 +327,24 @@ npx server # visit 3000
 ```
 
 
-## Step 9: Customize the theme
+## Step 9: Add theming support
 
-You might have noticed that the "success" theme works even though we didn't explicitly define those colors. This is because XMLUI's theming system automatically generates CSS variables for common semantic variants and provides default values.
+So far, our HelloWorld component uses hardcoded colors. Let's integrate it with XMLUI's theming system to make it more flexible and consistent with the rest of the UI.
 
-**How XMLUI's theme system works**
+**Understanding XMLUI's theme system**
 
-The SCSS file compiles to CSS variables:
+XMLUI provides a sophisticated theming system that:
+- Uses semantic design tokens (like `$color-surface-50`, `$color-content-primary`)
+- Automatically supports light and dark modes
+- Maintains consistency across all components
+- Allows runtime customization via the `<Theme>` component
 
-```xmlui
-&.success {
-  background-color: createThemeVar("backgroundColor-#{$component}--success");
-  color: createThemeVar("textColor-#{$component}--success");
-}
-```
+**Adding theme variables**
 
-Becomes:
-```xmlui
-._container_mm3fe_13._success_mm3fe_22{
-  background-color:var(--xmlui-backgroundColor-HelloWorld--success);
-  color:var(--xmlui-textColor-HelloWorld--success)
-}
-```
-
-XMLUI's theme system automatically provides values for these CSS variables, even without explicit definitions. The system has:
-- Default success colors: Green backgrounds, dark text
-- Semantic color mapping: `success` → green, `error` → red, etc.
-- Fallback values: Uses defaults when no specific theme is defined
-
-**Adding custom theme variables**
-
-Let's customize the component with our own colors. Update `HelloWorld.module.scss`:
+Let's update our SCSS to use XMLUI's theme system:
 
 ```xmlui copy
+cat > src/HelloWorld.module.scss << 'EOF'
 @use "xmlui/themes.scss" as t;
 
 $themeVars: ();
@@ -370,7 +355,7 @@ $themeVars: ();
 
 $component: "HelloWorld";
 
-// Define basic theme variables
+// Define theme variables for our component
 $backgroundColor: createThemeVar("backgroundColor-#{$component}");
 $textColor: createThemeVar("textColor-#{$component}");
 
@@ -412,62 +397,98 @@ $textColor: createThemeVar("textColor-#{$component}");
 :export {
   themeVars: t.json-stringify($themeVars);
 }
+EOF
 ```
 
-**Understanding the theme system**
+**What changed**
 
-The XMLUI theming system is sophisticated enough to:
+Instead of hardcoded colors like `#f5f5f5` and `#333`, we now use:
+- `$backgroundColor` - Uses XMLUI's surface color tokens
+- `$textColor` - Uses XMLUI's content color tokens
 
-1. Auto-generate CSS variables for component styling
-2. Provide semantic defaults for common design tokens
-3. Allow theme overrides when needed
-4. Maintain consistency across all components
+The `createThemeVar()` function registers these variables with XMLUI's theme system, making them available for customization.
 
-The component works because:
-- CSS variables exist: `--xmlui-backgroundColor-HelloWorld` and `--xmlui-textColor-HelloWorld`
-- XMLUI provides defaults: Surface background, primary text color
-- Theme system is comprehensive: Handles design tokens automatically
-- Fallback mechanism: If no specific theme is defined, use semantic defaults
+**Update component metadata**
 
-*Rebuild and test
+We also need to tell XMLUI about our theme variables. Update the metadata in `HelloWorld.tsx`:
 
-After updating the SCSS, rebuild the extension:
+```xmlui copy
+cat > src/HelloWorld.tsx << 'EOF'
+import styles from "./HelloWorld.module.scss";
+import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
+
+const HelloWorldMd = createMetadata({
+  description: "`HelloWorld` is a demonstration component.",
+  status: "experimental",
+  props: {
+    message: {
+      description: "The message to display.",
+      isRequired: false,
+      type: "string",
+      defaultValue: defaultProps.message,
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-HelloWorld`]: "$color-surface-50",
+    [`textColor-HelloWorld`]: "$color-content-primary",
+    dark: {
+      [`backgroundColor-HelloWorld`]: "$color-surface-200",
+      [`textColor-HelloWorld`]: "$color-content-primary",
+    },
+  },
+});
+
+export const helloWorldComponentRenderer = createComponentRenderer(
+  "HelloWorld",
+  HelloWorldMd,
+  ({ node, extractValue }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props?.id)}
+        message={extractValue.asOptionalString(node.props?.message)}
+      />
+    );
+  }
+);
+EOF
+```
+
+**Rebuild and test**
 
 ```xmlui copy
 npm run build:extension
 ```
 
-The component will now use your custom theme variables, but will fall back to XMLUI's semantic defaults if no specific values are provided.
+Now your component uses XMLUI's theme system! It will automatically adapt to light/dark modes and can be customized using the `<Theme>` component.
 
-**Test the customized theme**
-
-Let's see the updated component with custom theme variables.
+**Test the themed component**
 
 ```xmlui-pg
 ---app display
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
   <VStack gap="2rem" padding="2rem">
-    <Heading>HelloWorld with Custom Theme Variables</Heading>
+    <H1>HelloWorld with Theme Variables</H1>
+
+    <Extensions:HelloWorld message="Default styling" />
 
     <Card>
-      <Heading level="h2">Default Theme</Heading>
-      <Extensions:HelloWorld message="Default styling" />
-    </Card>
-
-    <Card>
-      <Heading level="h2">Dynamic Theme Override</Heading>
+      <H2>Custom Colors</H2>
       <Theme
         backgroundColor-HelloWorld="#ff6b6b"
         textColor-HelloWorld="#ffffff"
       >
-        <Extensions:HelloWorld message="Dynamically themed!" />
+        <Extensions:HelloWorld message="Custom colors!" />
       </Theme>
     </Card>
+
+    <ToneSwitch />
   </VStack>
 </App>
 ```
 
-Notice how the component now uses your custom theme variables. The earlier example in Step 8 continues to work unchanged - it just uses XMLUI's default semantic colors.
+Notice how the component now uses theme variables instead of hardcoded colors. The `<Theme>` component allows you to override any theme variable at runtime, making your components incredibly flexible for different contexts and user preferences.
 
 ## Step 10: Add event handling
 
