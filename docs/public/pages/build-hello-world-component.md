@@ -146,7 +146,7 @@ EOF
 
 This creates the core React component with:
 
-- Essential props (message, theme, id)
+- Essential props (id, message)
 - Internal click counter
 
 ## Step 4: Create basic styles
@@ -190,6 +190,15 @@ cat > src/HelloWorld.module.scss << 'EOF'
 EOF
 ```
 
+This SCSS module defines the basic visual styling for our HelloWorld component:
+- `.container` - Main wrapper with background, padding, and layout
+- `.message` - Styling for the greeting text
+- `.button` - Interactive button with hover effects
+- `.counter` - Display for the click count
+
+At this stage, we use hardcoded colors. In Step 9, we'll replace these theme variables.
+
+
 ## Step 5: Create component metadata and renderer
 
 Copy/paste these commands to create `HelloWorld.tsx`.
@@ -228,6 +237,30 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 EOF
 ```
 
+**What we're creating**
+
+This file bridges the gap between XMLUI markup and React components.
+
+- Metadata (`HelloWorldMd`) - Documents the component's props, behavior, and usage
+- Renderer (`helloWorldComponentRenderer`) - Converts XMLUI markup to React component calls
+
+**The renderer pattern**
+
+The renderer function receives XMLUI context (node, extractValue, etc.) and returns a React component.
+
+It:
+
+- Extracts prop values from XMLUI markup using `extractValue.asOptionalString()`
+- Passes them to the native React component
+- Handles optional props gracefully (undefined becomes default values)
+
+
+This pattern enables XMLUI to:
+
+- Validate markup against metadata
+- Provide IntelliSense and documentation
+- Handle prop type conversion automatically
+- Support XMLUI-specific features like theming (step 9) and event handling (Step 10)
 
 ## Step 6: Create the extension index
 
@@ -560,6 +593,15 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 EOF
 ```
 
+**New props**
+- `onClick?: (event: React.MouseEvent) => void` - Called when the click button is pressed
+- `onReset?: (event: React.MouseEvent) => void` - Called when the reset button is pressed
+
+**Event handler changes:**
+- `handleClick` now calls `onClick?.(event)` after updating internal state
+- `handleReset` now calls `onReset?.(event)` after resetting the counter
+- Both pass the DOM event object (not custom data) to match XMLUI's event system
+
 **Update the native component**
 
 Update `src/HelloWorldNative.tsx` to accept and call the event handler.
@@ -633,6 +675,21 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 EOF
 ```
 
+**Metadata changes:**
+- Added `events` section defining `onClick` and `onReset` event handlers
+- Each event includes description and type information for documentation
+
+**Renderer changes:**
+- Added `lookupEventHandler` to the renderer context
+- `lookupEventHandler("onClick")` and `lookupEventHandler("onReset")` convert XMLUI event bindings to function references
+- These function references are passed to the native React component
+
+**The event flow:**
+1. XMLUI markup: `<HelloWorld onClick="handleHelloClick" />`
+2. Renderer: `lookupEventHandler("onClick")` finds the `handleHelloClick` function
+3. Native component: Receives the function as `onClick` prop
+4. User interaction: Triggers the function with the DOM event
+
 **Rebuild the extension**
 
 ```xmlui copy
@@ -644,6 +701,7 @@ npm run build:extension
 This site's `index.html` defines these handler functions. For your standalone app you'll need to add them into its `index.html`.
 
 ```xmlui copy
+<script>
 window.handleHelloClick = function(event) {
   console.log('Hello World clicked!', event);
   alert('Button clicked!');
@@ -653,6 +711,7 @@ window.handleHelloReset = function(event) {
   console.log('Hello World reset!', event);
   alert('Counter was reset!');
 };
+</script>
 ```
 
 **Test event handling**
