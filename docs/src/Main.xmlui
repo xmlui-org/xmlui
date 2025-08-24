@@ -65,9 +65,6 @@
                 <NavLink
                     label="Build a HelloWorld Component"
                     to="/build-hello-world-component" />
-                <NavLink
-                    label="Build a TableEditor Component"
-                    to="/build-editor-component" />
                 <NavLink label="Hosted Deployment" to="/hosted-deployment" />
             </NavGroup>
             <NavGroup label="How To">
