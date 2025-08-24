@@ -63,7 +63,7 @@ rm -rf src/*
 This clears out the existing HelloWorld component files so you can build it from scratch.
 
 > [!INFO]
-> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you'll build. That means the live playground examples here reflect the final state, not the interim states described as we go along. But in the standalone app that you create you'll see the progression exactly as described here.
+> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you will build. That means the live playground examples here reflect the final state, not the interim states described as we go along. But in the standalone app that you'll create you will see the progression exactly as described here.
 
 ## Step 2: Create the package configuration
 
@@ -502,7 +502,7 @@ Now your component uses XMLUI's theme system! It will automatically adapt to lig
 Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui`.
 
 ```xmlui-pg
----app display
+---app display copy
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
   <VStack gap="2rem" padding="2rem">
     <H1>HelloWorld with Theme Variables</H1>
@@ -721,7 +721,7 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
 Now you can use the component with event handling.
 
 ```xmlui-pg
----app display
+---app display copy
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
     <Extensions:HelloWorld
           onClick="handleHelloClick"
@@ -927,7 +927,7 @@ npm run build:extension
 Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui` to see this final version.
 
 ```xmlui-pg
----app display
+---app display copy
 <App xmlns:Extensions="component-ns:XMLUIExtensions">
 
     <Extensions:HelloWorld id="demo" message="API Demo" />
