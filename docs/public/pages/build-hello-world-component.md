@@ -540,12 +540,11 @@ import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const HelloWorldMd = createMetadata({
-  description:
-    "`HelloWorld` is a demonstration component that shows basic XMLUI patterns.",
+  description:  "`HelloWorld` is a demonstration component.",
   status: "experimental",
   props: {
     message: {
-      description: "The greeting message to display.",
+      description: "The message to display.",
       isRequired: false,
       type: "string",
       defaultValue: defaultProps.message,
@@ -608,7 +607,7 @@ Update `src/HelloWorldNative.tsx` to accept and call the event handler.
 
 ```xmlui copy
 cat > src/HelloWorldNative.tsx << 'EOF'
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
