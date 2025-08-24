@@ -639,9 +639,25 @@ EOF
 npm run build:extension
 ```
 
-**Test Event Handling**
+**Define the handlers**
 
-Now you can use the component with event handling:
+This site's `index.html` defines these handler functions. For your standalone app you'll need to add them into its `index.html`.
+
+```xmlui copy
+window.handleHelloClick = function(event) {
+  console.log('Hello World clicked!', event);
+  alert('Button clicked!');
+};
+
+window.handleHelloReset = function(event) {
+  console.log('Hello World reset!', event);
+  alert('Counter was reset!');
+};
+```
+
+**Test event handling**
+
+Now you can use the component with event handling.
 
 ```xmlui-pg
 ---app display
@@ -653,4 +669,3 @@ Now you can use the component with event handling:
 </App>
 ```
 
-This demonstrates how XMLUI components can expose events while maintaining their own internal functionality.
