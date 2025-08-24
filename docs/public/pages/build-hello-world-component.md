@@ -434,8 +434,8 @@ const HelloWorldMd = createMetadata({
     [`backgroundColor-HelloWorld`]: "$color-surface-50",
     [`textColor-HelloWorld`]: "$color-content-primary",
     dark: {
-      [`backgroundColor-HelloWorld`]: "$color-surface-200",
-      [`textColor-HelloWorld`]: "$color-content-primary",
+      [`backgroundColor-HelloWorld`]: "$color-surface-800",
+      // No textColor override needed - $color-content-primary should auto-adapt
     },
   },
 });
@@ -476,8 +476,8 @@ Now your component uses XMLUI's theme system! It will automatically adapt to lig
     <Card>
       <H2>Custom Colors</H2>
       <Theme
-        backgroundColor-HelloWorld="#ff6b6b"
-        textColor-HelloWorld="#ffffff"
+        backgroundColor-HelloWorld="$color-warn-300"
+        textColor-HelloWorld="$textColor-primary"
       >
         <Extensions:HelloWorld message="Custom colors!" />
       </Theme>
