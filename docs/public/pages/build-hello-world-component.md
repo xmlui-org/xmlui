@@ -729,6 +729,8 @@ Now you can use the component with event handling.
 
 ## Step 11: Add component APIs (external methods)
 
+Update `src/HelloWorldNative.tsx`.
+
 
 ```xmlui copy
 cat > src/HelloWorldNative.tsx << 'EOF'
@@ -829,6 +831,8 @@ EOF
 
 This enables XMLUI markup to directly call `demo.setValue(5)` and read `demo.value`.
 
+Update `src/HelloWorldNative.tsx`.
+
 ```xmlui copy
 cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
@@ -926,4 +930,4 @@ EOF
     </CHStack>
 
 </App>
-```
+  ```
