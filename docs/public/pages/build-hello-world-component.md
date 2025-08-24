@@ -815,6 +815,20 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 EOF
 ```
 
+**New props**
+- `registerComponentApi?: RegisterComponentApiFn` - Function to register component APIs with XMLUI
+
+**New imports:**
+- `useEffect` from React - For API registration and state synchronization
+- `RegisterComponentApiFn` type from "xmlui" - Type for the API registration function
+
+**API registration:**
+- `setValue` method - Allows external code to set the click count
+- `useEffect` hook registers the API with XMLUI, exposing both `setValue` and `value`
+- API updates whenever `clickCount` changes, ensuring `value` is always current
+
+This enables XMLUI markup to directly call `demo.setValue(5)` and read `demo.value`.
+
 ```xmlui copy
 cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
@@ -885,6 +899,19 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 );
 EOF
 ```
+
+**Metadata**
+- Added `apis` section defining `value` (number) and `setValue` (function) APIs
+
+**Renderer Changes**
+- Added `registerComponentApi` to the renderer context
+- Passes `registerComponentApi` to the native component for API registration
+
+**The API flow:**
+1. XMLUI markup: `<HelloWorld id="demo" />` creates component with ID
+2. Renderer: Registers component APIs via `registerComponentApi`
+3. External access: `demo.setValue(5)` calls the component's setValue method
+4. State reading: `demo.value` returns the current click count
 
 ```xmlui-pg
 ---app display
