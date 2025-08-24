@@ -63,7 +63,7 @@ rm -rf src/*
 This clears out the existing HelloWorld component files so you can build it from scratch.
 
 > [!INFO]
-> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you'll build. Rebooting the package will change how the examples would work in a local preview of the site, but you won't be doing a local preview, you will load the component as an extension into a standalone app and observe the progression of examples there.
+> This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you'll build. That means the live playground examples here reflect the final state, not the interim states described as we go along. But in the standalone app that you create you'll see the progression exactly as described here.
 
 ## Step 2: Create the package configuration
 
@@ -359,7 +359,6 @@ With Node.js.
 npx server # visit 3000
 ```
 
-
 ## Step 9: Add theming support
 
 So far, our HelloWorld component uses hardcoded colors. Let's integrate it with XMLUI's theming system to make it more flexible and consistent with the rest of the UI.
@@ -499,6 +498,8 @@ npm run build:extension
 Now your component uses XMLUI's theme system! It will automatically adapt to light/dark modes and can be customized using the `<Theme>` component.
 
 **Test the themed component**
+
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui`.
 
 ```xmlui-pg
 ---app display
@@ -715,6 +716,8 @@ window.handleHelloReset = function(event) {
 
 **Test event handling**
 
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui`.
+
 Now you can use the component with event handling.
 
 ```xmlui-pg
@@ -916,6 +919,12 @@ EOF
 2. Renderer: Registers component APIs via `registerComponentApi`
 3. External access: `demo.setValue(5)` calls the component's setValue method
 4. State reading: `demo.value` returns the current click count
+
+```xmlui copy
+npm run build:extension
+```
+
+Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, and update its `Main.xmlui` to see this final version.
 
 ```xmlui-pg
 ---app display
