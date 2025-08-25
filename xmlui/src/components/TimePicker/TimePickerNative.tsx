@@ -735,10 +735,17 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const timePickerRef = useRef<HTMLDivElement>(null);
 
   // Stabilize initialValue to prevent unnecessary re-renders
-  const stableInitialValue = useMemo(() => initialValue, [initialValue]);
+  const stableInitialValue = useMemo(() => {
+    console.log('🔄 stableInitialValue computed:', initialValue);
+    return initialValue;
+  }, [initialValue]);
 
   // Local state management - sync with value prop (like TextBox and NumberBox)
-  const [localValue, setLocalValue] = useState<string | null>(controlledValue || stableInitialValue || null);
+  const [localValue, setLocalValue] = useState<string | null>(() => {
+    const initial = controlledValue || stableInitialValue || null;
+    console.log('🚀 Initial localValue:', initial, '(controlledValue:', controlledValue, ', stableInitialValue:', stableInitialValue, ')');
+    return initial;
+  });
 
   // Parse current value into individual components
   const [amPm, setAmPm] = useState<AmPmType | null>(null);
@@ -746,16 +753,43 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const [minute, setMinute] = useState<string | null>(null);
   const [second, setSecond] = useState<string | null>(null);
   
+  // Add effects to track field state changes
+  useEffect(() => {
+    console.log('🔢 Hour state changed to:', hour);
+  }, [hour]);
+  
+  useEffect(() => {
+    console.log('🔢 Minute state changed to:', minute);
+  }, [minute]);
+  
+  useEffect(() => {
+    console.log('🔢 Second state changed to:', second);
+  }, [second]);
+  
+  useEffect(() => {
+    console.log('🔢 AmPm state changed to:', amPm);
+  }, [amPm]);
+  
   // State to track invalid status for visual feedback
   const [isHourCurrentlyInvalid, setIsHourCurrentlyInvalid] = useState(false);
   const [isMinuteCurrentlyInvalid, setIsMinuteCurrentlyInvalid] = useState(false);
   const [isSecondCurrentlyInvalid, setIsSecondCurrentlyInvalid] = useState(false);
   
   useEffect(() => {
-    // Sync with controlled value if provided, otherwise use stable initialValue
-    const valueToUse = controlledValue !== undefined ? controlledValue : stableInitialValue;
-    setLocalValue(valueToUse || null);
-  }, [controlledValue, stableInitialValue]);
+    console.log('📡 Sync effect triggered - controlledValue:', controlledValue, ', localValue:', localValue, ', stableInitialValue:', stableInitialValue);
+    
+    // Initialize XMLUI state with initial value on first mount
+    if (updateState && stableInitialValue !== undefined && controlledValue === undefined) {
+      console.log('🔧 Initializing XMLUI state with:', stableInitialValue);
+      updateState({ value: stableInitialValue }, { initial: true });
+      return; // Don't sync on this first run, let the state update trigger a re-render
+    }
+    
+    // Sync with controlled value - always sync when controlledValue changes
+    const newLocalValue = controlledValue || null;
+    console.log('🔄 Syncing localValue from', localValue, 'to', newLocalValue);
+    setLocalValue(newLocalValue);
+  }, [controlledValue, stableInitialValue, updateState]);
 
   // Determine what components to show based on format
   const is12HourFormat = format && format.includes('a');
@@ -764,8 +798,11 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   // Parse value into individual components
   useEffect(() => {
+    console.log('🔍 Parse effect triggered - localValue:', localValue);
+    
     if (localValue) {
       const timeString = String(localValue).toLowerCase();
+      console.log('  📝 Parsing timeString:', timeString);
       
       // Check if the time string contains AM/PM
       const hasAmPm = timeString.includes('am') || timeString.includes('pm');
@@ -778,31 +815,54 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
       const parsedMinute = getMinutes(timePart);
       const parsedSecond = getSeconds(timePart);
       
+      console.log('  🔢 Parsed values - hour:', parsedHour, ', minute:', parsedMinute, ', second:', parsedSecond);
+      
       // Set AM/PM based on the actual string content or convert from 24-hour
       if (hasAmPm) {
-        setAmPm(isAmPmPm ? 'pm' : 'am');
+        const amPmValue = isAmPmPm ? 'pm' : 'am';
+        console.log('  🕒 Setting AM/PM from string:', amPmValue);
+        setAmPm(amPmValue);
       } else {
         // If no AM/PM in string, derive it from 24-hour format
-        setAmPm(convert24to12(parsedHour)[1]);
+        const amPmValue = convert24to12(parsedHour)[1];
+        console.log('  🕒 Setting AM/PM from 24-hour:', amPmValue);
+        setAmPm(amPmValue);
       }
       
       // Set the raw hour value without any conversion - let the display logic handle 12/24 hour format
       // This prevents interfering with user input during typing
-      setHour(parsedHour.toString().padStart(2, '0'));
-      setMinute(parsedMinute.toString().padStart(2, '0'));
-      setSecond(parsedSecond.toString().padStart(2, '0'));
+      const hourStr = parsedHour.toString().padStart(2, '0');
+      const minuteStr = parsedMinute.toString().padStart(2, '0');
+      const secondStr = parsedSecond.toString().padStart(2, '0');
+      
+      console.log('  ✅ Setting field values - hour:', hourStr, ', minute:', minuteStr, ', second:', secondStr);
+      setHour(hourStr);
+      setMinute(minuteStr);
+      setSecond(secondStr);
     } else {
+      console.log('  🧹 Clearing all field values');
       setAmPm(null);
       setHour(null);
       setMinute(null);
       setSecond(null);
     }
+    
+    // Add a delayed log to check if the state actually updated
+    setTimeout(() => {
+      console.log('  ⏰ After setState timeout - current field values:', { hour, minute, second, amPm });
+    }, 0);
   }, [localValue]);
 
   // Event handlers
   const handleChange = useEvent((newValue: string | null) => {
+    console.log('🔄 handleChange called with:', newValue);
+    
+    // Update local state immediately for immediate UI feedback
     setLocalValue(newValue);
+    
+    // Also update the XMLUI state
     if (updateState) {
+      console.log('  📤 Updating XMLUI state with:', newValue);
       updateState({ value: newValue });
     }
     onDidChange?.(newValue);
@@ -810,7 +870,12 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   // Helper function to format the complete time value
   const formatTimeValue = useCallback((h: string | null, m: string | null, s: string | null, ap: AmPmType | null, is12Hour: boolean): string | null => {
-    if (!h || !m) return null;
+    console.log('⚙️ formatTimeValue called - h:', h, ', m:', m, ', s:', s, ', ap:', ap, ', is12Hour:', is12Hour);
+    
+    if (!h || !m) {
+      console.log('  ❌ Missing hour or minute, returning null');
+      return null;
+    }
     
     let formattedTime = '';
     
@@ -844,6 +909,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   // Handle changes from individual inputs
   const handleHourChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newHour = event.target.value;
+    console.log('⌨️ handleHourChange called with:', newHour);
     setHour(newHour);
     // Update invalid state immediately for visual feedback
     setIsHourCurrentlyInvalid(isHourInvalid(newHour, !is12HourFormat));
@@ -852,22 +918,27 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleHourBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
     const currentValue = event.target.value;
+    console.log('👁️ handleHourBlur called with currentValue:', currentValue);
     const normalizedHour = normalizeHour(currentValue, !is12HourFormat);
     
     if (normalizedHour !== null && normalizedHour !== currentValue) {
+      console.log('  🔧 Normalizing hour from', currentValue, 'to', normalizedHour);
       setHour(normalizedHour);
       setIsHourCurrentlyInvalid(false); // Clear invalid state after normalization
       
       if (minute) {
         const timeString = formatTimeValue(normalizedHour, minute, second, amPm, is12HourFormat);
+        console.log('  📤 Calling handleChange from hour blur with:', timeString);
         handleChange(timeString);
       }
     } else if (normalizedHour === null && currentValue !== '') {
+      console.log('  🧹 Resetting invalid hour input');
       // Reset to previous valid value or clear
       setHour('');
       setIsHourCurrentlyInvalid(false); // Clear invalid state
       if (minute) {
         const timeString = formatTimeValue('', minute, second, amPm, is12HourFormat);
+        console.log('  📤 Calling handleChange from hour blur (reset) with:', timeString);
         handleChange(timeString);
       }
     }
@@ -875,6 +946,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleMinuteChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newMinute = event.target.value;
+    console.log('⌨️ handleMinuteChange called with:', newMinute);
     setMinute(newMinute);
     // Update invalid state immediately for visual feedback
     setIsMinuteCurrentlyInvalid(isMinuteOrSecondInvalid(newMinute));
@@ -883,22 +955,27 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleMinuteBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
     const currentValue = event.target.value;
+    console.log('👁️ handleMinuteBlur called with currentValue:', currentValue);
     const normalizedMinute = normalizeMinuteOrSecond(currentValue);
     
     if (normalizedMinute !== null && normalizedMinute !== currentValue) {
+      console.log('  🔧 Normalizing minute from', currentValue, 'to', normalizedMinute);
       setMinute(normalizedMinute);
       setIsMinuteCurrentlyInvalid(false); // Clear invalid state after normalization
       
       if (hour) {
         const timeString = formatTimeValue(hour, normalizedMinute, second, amPm, is12HourFormat);
+        console.log('  📤 Calling handleChange from minute blur with:', timeString);
         handleChange(timeString);
       }
     } else if (normalizedMinute === null && currentValue !== '') {
+      console.log('  🧹 Resetting invalid minute input');
       // Reset to previous valid value or clear
       setMinute('');
       setIsMinuteCurrentlyInvalid(false); // Clear invalid state
       if (hour) {
         const timeString = formatTimeValue(hour, '', second, amPm, is12HourFormat);
+        console.log('  📤 Calling handleChange from minute blur (reset) with:', timeString);
         handleChange(timeString);
       }
     }
@@ -937,17 +1014,80 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleAmPmChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     const newAmPm = event.target.value as AmPmType;
+    console.log('🔄 handleAmPmChange called with:', newAmPm);
     setAmPm(newAmPm);
     
     if (hour && minute) {
       const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
+      console.log('  📤 Calling handleChange from amPm change with:', timeString);
       handleChange(timeString);
     }
   }, [hour, minute, second, is12HourFormat, handleChange]); // Remove amPm from dependencies
 
   const clear = useCallback(() => {
-    handleChange(stableInitialValue || null);
-  }, [stableInitialValue, handleChange]);
+    console.log('🧹 Clear button clicked');
+    console.log('  📋 stableInitialValue:', stableInitialValue);
+    console.log('  📋 Current localValue:', localValue);
+    console.log('  📋 Current controlledValue:', controlledValue);
+    console.log('  📋 Current field states - hour:', hour, ', minute:', minute, ', second:', second, ', amPm:', amPm);
+    
+    // Reset to initial value if provided, otherwise null
+    const valueToReset = stableInitialValue !== undefined ? stableInitialValue : null;
+    console.log('  🎯 valueToReset:', valueToReset);
+    
+    // Parse the reset value and update field states directly
+    if (valueToReset) {
+      const timeString = String(valueToReset).toLowerCase();
+      console.log('  🔍 Parsing reset value:', timeString);
+      
+      // Check if the time string contains AM/PM
+      const hasAmPm = timeString.includes('am') || timeString.includes('pm');
+      const isAmPmPm = timeString.includes('pm');
+      
+      // Extract just the time part (remove AM/PM suffix)
+      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, '').trim();
+      
+      const parsedHour = getHours(timePart);
+      const parsedMinute = getMinutes(timePart);
+      const parsedSecond = getSeconds(timePart);
+      
+      console.log('  🔢 Parsed reset values - hour:', parsedHour, ', minute:', parsedMinute, ', second:', parsedSecond);
+      
+      // Set AM/PM based on the actual string content or convert from 24-hour
+      let amPmValue: AmPmType | null = null;
+      if (hasAmPm) {
+        amPmValue = isAmPmPm ? 'pm' : 'am';
+        console.log('  🕒 Setting AM/PM from string:', amPmValue);
+      } else {
+        // If no AM/PM in string, derive it from 24-hour format
+        amPmValue = convert24to12(parsedHour)[1];
+        console.log('  🕒 Setting AM/PM from 24-hour:', amPmValue);
+      }
+      
+      // Set the raw hour value without any conversion
+      const hourStr = parsedHour.toString().padStart(2, '0');
+      const minuteStr = parsedMinute.toString().padStart(2, '0');
+      const secondStr = parsedSecond.toString().padStart(2, '0');
+      
+      console.log('  ✅ Setting field values directly - hour:', hourStr, ', minute:', minuteStr, ', second:', secondStr, ', amPm:', amPmValue);
+      
+      setHour(hourStr);
+      setMinute(minuteStr);
+      setSecond(secondStr);
+      setAmPm(amPmValue);
+      
+      console.log('  ✅ Field states updated directly');
+    } else {
+      // Clear all fields
+      setHour(null);
+      setMinute(null);
+      setSecond(null);
+      setAmPm(null);
+      console.log('  🗑️ All fields cleared');
+    }
+    
+    handleChange(valueToReset);
+  }, [stableInitialValue, handleChange, localValue, controlledValue, hour, minute, second, amPm, setHour, setMinute, setSecond, setAmPm]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
