@@ -141,7 +141,7 @@ function createErrorReportComponent(
             props: {
               value: linePrefix,
               fontFamily: "monospace",
-              color: "$color-info",
+              color: "hsl(204, 30.3%, 45%)",
             },
           },
         ];
@@ -270,23 +270,19 @@ function createErrorReportComponent(
 
         currentPos = lineEnd + 1; // +1 for newline character
       }
-      const errMsgComponenet = {
-        type: "VStack",
-        props: { gap: "0" },
+      const errMsgComponenet: ComponentDef = {
+        type: "Text",
         children: [
           {
             type: "Text",
             props: {
-              value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
-              color: "$color-info",
-              maxWidth: "100%",
+              value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):`,
+              color: "hsl(204, 30.3%, 27%)",
             },
           },
           {
             type: "Text",
             props: {
-              maxWidth: "100%",
-              padding: "0 0 0 8px",
               value: ` ${e.message}`,
               fontWeight: "bold",
             },
@@ -315,7 +311,7 @@ function createErrorReportComponent(
         type: "VStack",
         props: {
           gap: "$gap-none",
-          padding: "8px",
+          padding: "16px",
           backgroundColor: "white",
           borderRadius: "8px",
         },
@@ -329,7 +325,7 @@ function createErrorReportComponent(
   const comp: ComponentDef = {
     type: "VStack",
     props: {
-      padding: "5px 10px 10px 30px",
+      padding: "5px 10px 10px 38px",
       gap: 0,
       backgroundColor: "#FFE3E8",
       margin: "10px",
@@ -341,16 +337,16 @@ function createErrorReportComponent(
         type: "HStack",
         props: {
           verticalAlignment: "center",
-          marginLeft: "-20px",
+          marginLeft: "-34px",
           padding: "15px 0px",
-          gap: "5px",
+          gap: "4px",
         },
         children: [
           {
             type: "Icon",
             props: {
               name: "error",
-              size: "lg",
+              size: "30px",
               color: "$color-error",
             },
           },
@@ -368,6 +364,7 @@ function createErrorReportComponent(
         type: "VStack",
         props: {
           padding: "$padding-none",
+          gap: "16px",
         },
         children: errList,
       },
