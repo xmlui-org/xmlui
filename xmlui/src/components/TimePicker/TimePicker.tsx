@@ -172,12 +172,36 @@ export const timePickerComponentRenderer = createComponentRenderer(
     
     return (
       <TimePickerNative
-        {...node.props}
         className={className}
         initialValue={extractedInitialValue}
         value={stateValue}
         updateState={updateState}
         registerComponentApi={registerComponentApi}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
+        placeholder={extractValue.asOptionalString(node.props.placeholder)}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, defaultProps.autoFocus)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly, defaultProps.readOnly)}
+        validationStatus={extractValue(node.props.validationStatus)}
+        format={extractValue(node.props.format)}
+        maxDetail={extractValue(node.props.maxDetail)}
+        minTime={extractValue(node.props.minTime)}
+        maxTime={extractValue(node.props.maxTime)}
+        clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
+        clearIcon={extractValue(node.props.clearIcon)}
+        required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
+        name={extractValue(node.props.name)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak, defaultProps.labelBreak)}
+        startText={extractValue(node.props.startText)}
+        startIcon={extractValue(node.props.startIcon)}
+        endText={extractValue(node.props.endText)}
+        endIcon={extractValue(node.props.endIcon)}
+        onDidChange={lookupEventHandler("didChange")}
+        onFocus={lookupEventHandler("gotFocus")}
+        onBlur={lookupEventHandler("lostFocus")}
+        onInvalidChange={lookupEventHandler("invalidTime")}
       />
     );
   },

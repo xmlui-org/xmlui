@@ -303,20 +303,20 @@ function AmPm({
 
   // Convert the HTML select onChange to match Radix UI onValueChange
   const handleValueChange = useCallback((newValue: string) => {
-    if (onChange) {
-      // Create a synthetic event to match the expected onChange signature
-      const syntheticEvent = {
-        target: { value: newValue, name: 'amPm' }
-      } as React.ChangeEvent<HTMLSelectElement>;
-      onChange(syntheticEvent);
-    }
-  }, [onChange]); // Remove value from dependencies - it's not used in the function
+    if (disabled || !onChange) return; // Prevent onChange when disabled
+    
+    // Create a synthetic event to match the expected onChange signature
+    const syntheticEvent = {
+      target: { value: newValue, name: 'amPm' }
+    } as React.ChangeEvent<HTMLSelectElement>;
+    onChange(syntheticEvent);
+  }, [disabled, onChange]); // Add disabled to dependencies
 
   // Ensure we have a stable value for Radix UI
   const selectValue = value || undefined;
 
   return (
-    <SelectRoot value={selectValue} onValueChange={handleValueChange}>
+    <SelectRoot value={selectValue} onValueChange={handleValueChange} disabled={disabled}>
       <SelectTrigger
         aria-label={ariaLabel}
         autoFocus={autoFocus}

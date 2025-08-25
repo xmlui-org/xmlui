@@ -299,9 +299,11 @@ $outlineOffset-ampm-TimePicker--focused: createThemeVar("outlineOffset-ampm-#{$c
       outline-offset: $outlineOffset-ampm-TimePicker--focused;
     }
 
-    &:disabled {
+    &:disabled,
+    &[data-disabled] {
       cursor: not-allowed;
       opacity: $opacity-TimePicker--disabled;
+      pointer-events: none;
     }
   }
 
