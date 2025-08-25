@@ -1,4 +1,4 @@
-import styles from "./TimePicker.module.scss";
+import styles from "./TimeInput.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -24,17 +24,17 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import {
-  TimePickerNative,
-  TimePickerFormatValues,
+  TimeInputNative,
+  TimeInputFormatValues,
   defaultProps,
-} from "./TimePickerNative";
+} from "./TimeInputNative";
 
-const COMP = "TimePicker";
+const COMP = "TimeInput";
 
-export const TimePickerMd = createMetadata({
+export const TimeInputMd = createMetadata({
   status: "experimental",
   description:
-    "`TimePicker` provides time input with support for 12-hour and 24-hour formats " +
+    "`TimeInput` provides time input with support for 12-hour and 24-hour formats " +
     "and configurable precision for hours, minutes, and seconds.",
   props: {
     initialValue: dInitialValue(),
@@ -50,7 +50,7 @@ export const TimePickerMd = createMetadata({
       description: "Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a",
       valueType: "string",
       defaultValue: defaultProps.format,
-      availableValues: TimePickerFormatValues,
+      availableValues: TimeInputFormatValues,
     },
     minTime: {
       description: "Minimum time that the user can select",
@@ -125,7 +125,7 @@ export const TimePickerMd = createMetadata({
     // Error styling following TextBox pattern
     [`Input:backgroundColor-${COMP}-error`]: "rgba(220, 53, 69, 0.15)",
     [`Input:borderColor-${COMP}-error`]: "$color-danger-500",
-    // TimePicker specific theme variables
+    // TimeInput specific theme variables
     [`color-divider-${COMP}`]: "$textColor-secondary",
     [`spacing-divider-${COMP}`]: "1px 0",
     [`width-input-${COMP}`]: "1.8em",
@@ -147,9 +147,9 @@ export const TimePickerMd = createMetadata({
   },
 });
 
-export const timePickerComponentRenderer = createComponentRenderer(
+export const timeInputComponentRenderer = createComponentRenderer(
   COMP,
-  TimePickerMd,
+  TimeInputMd,
   ({
     node,
     state,
@@ -163,7 +163,7 @@ export const timePickerComponentRenderer = createComponentRenderer(
     const stateValue = state?.value;
     
     return (
-      <TimePickerNative
+      <TimeInputNative
         className={className}
         initialValue={extractedInitialValue}
         value={stateValue}

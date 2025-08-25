@@ -21,7 +21,7 @@
       label="Remove Time"
       onClick="picker.setValue('')" />
   </HStack>
-  <TimePicker id="picker" />
+  <TimeInput id="picker" />
 </App>
 ```
 
@@ -31,7 +31,7 @@
 
 ```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
-  <TimePicker initialValue="14:30:15" />
+  <TimeInput initialValue="14:30:15" />
 </App>  
 ```
 
@@ -41,7 +41,7 @@
 
 ```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
-  <TimePicker placeholder="Select a time" />
+  <TimeInput placeholder="Select a time" />
 </App>  
 ```
 
@@ -51,7 +51,7 @@
 
 ```xmlui-pg copy display name="Example: enabled" height="120px"
 <App>
-  <TimePicker enabled="false" initialValue="14:30" />
+  <TimeInput enabled="false" initialValue="14:30" />
 </App>  
 ```
 
@@ -67,9 +67,9 @@
 
 ```xmlui-pg copy display name="Example: validationStatus"
 <App>
-  <TimePicker validationStatus="valid" initialValue="11:30" />
-  <TimePicker validationStatus="warning" initialValue="11:30" />
-  <TimePicker validationStatus="error" initialValue="11:30" />
+  <TimeInput validationStatus="valid" initialValue="11:30" />
+  <TimeInput validationStatus="warning" initialValue="11:30" />
+  <TimeInput validationStatus="error" initialValue="11:30" />
 </App>
 ```
 
@@ -88,10 +88,10 @@ The `format` prop controls how time is displayed and which parts are editable. B
 
 ```xmlui-pg copy display name="Example: format"
 <App>
-  <TimePicker format="H:mm" initialValue="14:30" />
-  <TimePicker format="h:mm a" initialValue="14:30" />
-  <TimePicker format="HH:mm:ss" initialValue="14:30:15" />
-  <TimePicker format="HH:mm:ss a" initialValue="14:30:15" />
+  <TimeInput format="H:mm" initialValue="14:30" />
+  <TimeInput format="h:mm a" initialValue="14:30" />
+  <TimeInput format="HH:mm:ss" initialValue="14:30:15" />
+  <TimeInput format="HH:mm:ss a" initialValue="14:30:15" />
 </App>
 ```
 
@@ -103,8 +103,8 @@ When enabled, it displays a clear button that allows users to reset the time pic
 
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
-  <TimePicker initialValue="11:30" />
-  <TimePicker clearable="false" initialValue="10:20" />
+  <TimeInput initialValue="11:30" />
+  <TimeInput clearable="false" initialValue="10:20" />
 </App>
 ```
 
@@ -114,7 +114,7 @@ When enabled, it displays a clear button that allows users to reset the time pic
 
 ```xmlui-pg copy display name="Example: clearIcon" /clearIcon/
 <App>
-  <TimePicker initialValue="11:30" clearIcon="trash" />
+  <TimeInput initialValue="11:30" clearIcon="trash" />
 </App>
 ```
 
@@ -126,7 +126,7 @@ Marks the time input as required for form validation.
 
 ```xmlui-pg copy display name="Example: required" height="120px"
 <App>
-  <TimePicker required="true" />
+  <TimeInput required="true" />
 </App>
 ```
 
@@ -138,7 +138,7 @@ Makes the time picker read-only. Users can see the value but cannot modify it.
 
 ```xmlui-pg copy display name="Example: readOnly" height="120px"
 <App>
-  <TimePicker readOnly="true" initialValue="14:30" />
+  <TimeInput readOnly="true" initialValue="14:30" />
 </App>
 ```
 
@@ -153,7 +153,7 @@ Fired when the time value changes. Receives the new time value as a parameter.
 ```xmlui-pg copy {2} display name="Example: didChange" height="180px"
 <App var.selectedTime="No time selected">
   <Text value="{selectedTime}" />
-  <TimePicker 
+  <TimeInput 
     format="h:m:s a"
     initialValue="07:30:05" 
     onDidChange="(time) => selectedTime = time" />
@@ -169,9 +169,9 @@ Fired when the time picker receives focus.
 ```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
 <App var.isFocused="{false}">
   <Text value="{isFocused 
-    ? 'TimePicker focused' : 'TimePicker lost focus'}" 
+    ? 'TimeInput focused' : 'TimeInput lost focus'}" 
   />
-  <TimePicker
+  <TimeInput
     format="HH:mm:ss a"
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false"
@@ -189,7 +189,7 @@ Fired when the user enters an invalid time value.
 ```xmlui-pg copy {2} display name="Example: invalidTime"
 <App var.errorMessage="">
   <Text value="{errorMessage}" />
-  <TimePicker 
+  <TimeInput 
     onInvalidTime="(error) => errorMessage = 'Invalid time entered'"
     onDidChange="errorMessage = ''" />
 </App>

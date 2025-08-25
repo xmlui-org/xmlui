@@ -1,7 +1,7 @@
-<!-- Test file to verify TimePicker invalidTime event -->
+<!-- Test file to verify TimeInput invalidTime event -->
 <Template>
   <VStack gap="10" padding="20">
-    <Text>TimePicker Invalid Time Event Test</Text>
+    <Text>TimeInput Invalid Time Event Test</Text>
     
     <HStack gap="10">
       <Text width="150">Error Message:</Text>
@@ -10,8 +10,8 @@
     
     <HStack gap="10">
       <Text width="150">Test Input:</Text>
-      <TimePicker 
-        id="testTimePicker"
+      <TimeInput 
+        id="testTimeInput"
         format="HH:mm:ss"
         label="Test Time"
         onInvalidTime="(error) => setErrorMessage('Invalid time entered')"

@@ -1,4 +1,4 @@
-// Merged utility functions for TimePicker component
+// Merged utility functions for TimeInput component
 import getUserLocale from 'get-user-locale';
 
 // ============================================================================

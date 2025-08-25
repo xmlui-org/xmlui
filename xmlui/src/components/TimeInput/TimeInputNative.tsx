@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import classnames from "classnames";
-import styles from "./TimePicker.module.scss";
+import styles from "./TimeInput.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -515,7 +515,7 @@ function SecondInput({
 }
 
 // Available time formats
-export const TimePickerFormatValues = [
+export const TimeInputFormatValues = [
   "h:m:s a", // 12-hour with seconds
   "h:m a", // 12-hour without seconds
   "HH:mm:ss", // 24-hour with seconds
@@ -524,7 +524,7 @@ export const TimePickerFormatValues = [
   "H:m", // 24-hour without seconds (no leading zeros)
 ] as const;
 
-type TimePickerFormat = (typeof TimePickerFormatValues)[number];
+type TimeInputFormat = (typeof TimeInputFormatValues)[number];
 
 type Props = {
   id?: string;
@@ -540,7 +540,7 @@ type Props = {
   onInvalidChange?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
-  format?: TimePickerFormat;
+  format?: TimeInputFormat;
   minTime?: string;
   maxTime?: string;
   clearable?: boolean;
@@ -562,7 +562,7 @@ type Props = {
 export const defaultProps = {
   enabled: true,
   validationStatus: "none" as ValidationStatus,
-  format: "HH:mm" as TimePickerFormat,
+  format: "HH:mm" as TimeInputFormat,
   clearable: true,
   required: false,
   labelPosition: "top",
@@ -571,7 +571,7 @@ export const defaultProps = {
   labelBreak: false,
 };
 
-export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimePickerNative(
+export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeInputNative(
   {
     id,
     initialValue,
@@ -607,7 +607,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   },
   ref,
 ) {
-  const timePickerRef = useRef<HTMLDivElement>(null);
+  const timeInputRef = useRef<HTMLDivElement>(null);
 
   // Refs for auto-tabbing between inputs
   const hourInputRef = useRef<HTMLInputElement>(null);
@@ -915,7 +915,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   // Focus method
   const focus = useCallback(() => {
-    const input = timePickerRef.current?.querySelector(
+    const input = timeInputRef.current?.querySelector(
       'input[type="time"], input[name*="hour"], input[name*="minute"]',
     ) as HTMLInputElement;
     input?.focus();
@@ -932,7 +932,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   // Custom blur handler that only fires lostFocus when focus leaves the entire component
   const handleComponentBlur = useCallback((event: React.FocusEvent<HTMLDivElement>) => {
-    // Check if the new focus target is still within this TimePicker component
+    // Check if the new focus target is still within this TimeInput component
     const relatedTarget = event.relatedTarget as HTMLElement;
     const currentTarget = event.currentTarget;
     
@@ -994,7 +994,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   });
 
   // Component API registration
-  useImperativeHandle(ref, () => timePickerRef.current as HTMLDivElement);
+  useImperativeHandle(ref, () => timeInputRef.current as HTMLDivElement);
 
   useEffect(() => {
     if (registerComponentApi) {
@@ -1042,11 +1042,11 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     return null;
   }, [endIcon, endText]);
 
-  const timePickerComponent = (
+  const timeInputComponent = (
     <div
-      ref={timePickerRef}
+      ref={timeInputRef}
       className={classnames(
-        styles.timePickerWrapper,
+        styles.timeInputWrapper,
         {
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
@@ -1068,7 +1068,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
           <HourInput
             amPm={amPm}
             autoFocus={autoFocus}
-            className="timepicker"
+            className="timeinput"
             disabled={!enabled}
             inputRef={hourInputRef}
             nextInputRef={minuteInputRef}
@@ -1087,7 +1087,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
           {/* Minute input */}
           <MinuteInput
-            className="timepicker"
+            className="timeinput"
             disabled={!enabled}
             hour={hour}
             inputRef={minuteInputRef}
@@ -1108,7 +1108,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
             <>
               <Divider>:</Divider>
               <SecondInput
-                className="timepicker"
+                className="timeinput"
                 disabled={!enabled}
                 hour={hour}
                 inputRef={secondInputRef}
@@ -1129,7 +1129,7 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
           {/* AM/PM selector (if 12-hour format) */}
           {is12HourFormat && (
             <AmPmButton
-              className="timepicker"
+              className="timeinput"
               disabled={!enabled}
               buttonRef={amPmButtonRef}
               maxTime={maxTime}
@@ -1168,11 +1168,11 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
         required={required}
       >
         {startAdornment}
-        {timePickerComponent}
+        {timeInputComponent}
         {endAdornment}
       </ItemWithLabel>
     );
   }
 
-  return timePickerComponent;
+  return timeInputComponent;
 });

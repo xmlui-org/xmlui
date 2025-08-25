@@ -201,7 +201,7 @@ import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
-import { TimePickerMd } from "./TimePicker/TimePicker";
+import { TimeInputMd } from "./TimeInput/TimeInput";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -400,7 +400,7 @@ export const collectedComponentMetadata = {
   TextBox: TextBoxMd,
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
-  TimePicker: TimePickerMd,
+  TimeInput: TimeInputMd,
   ToneChangerButton: ToneChangerButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
