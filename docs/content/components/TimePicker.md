@@ -123,25 +123,9 @@ This property sets the width of the `TimePicker` component's label. If not defin
 
 Maximum time that the user can select
 
-Sets the maximum selectable time. Times after this value will be invalid.
-
-```xmlui-pg copy display name="Example: maxTime" height="120px"
-<App>
-  <TimePicker maxTime="17:00" initialValue="18:30" />
-</App>
-```
-
 ### `minTime` [#mintime]
 
 Minimum time that the user can select
-
-Sets the minimum selectable time. Times before this value will be invalid.
-
-```xmlui-pg copy display name="Example: minTime" height="120px"
-<App>
-  <TimePicker minTime="09:00" initialValue="08:30" />
-</App>
-```
 
 ### `readOnly` (default: false) [#readonly-default-false]
 
@@ -276,7 +260,7 @@ This method sets the current value of the TimePicker.
 
 - `value`: The new time value to set for the time picker.
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="500px"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue"
 <App>
   <HStack>
     <Button

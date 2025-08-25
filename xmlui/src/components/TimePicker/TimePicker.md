@@ -11,7 +11,7 @@
 
 %-API-START setValue
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="500px"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue"
 <App>
   <HStack>
     <Button
@@ -92,30 +92,6 @@ The `format` prop controls how time is displayed and which parts are editable. B
   <TimePicker format="h:mm a" initialValue="14:30" />
   <TimePicker format="HH:mm:ss" initialValue="14:30:15" />
   <TimePicker format="HH:mm:ss a" initialValue="14:30:15" />
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START minTime
-
-Sets the minimum selectable time. Times before this value will be invalid.
-
-```xmlui-pg copy display name="Example: minTime" height="120px"
-<App>
-  <TimePicker minTime="09:00" initialValue="08:30" />
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START maxTime
-
-Sets the maximum selectable time. Times after this value will be invalid.
-
-```xmlui-pg copy display name="Example: maxTime" height="120px"
-<App>
-  <TimePicker maxTime="17:00" initialValue="18:30" />
 </App>
 ```
 
