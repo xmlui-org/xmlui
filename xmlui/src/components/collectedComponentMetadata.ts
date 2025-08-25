@@ -198,11 +198,10 @@ import { LabelListMd } from "./Charts/LabelList/LabelList";
 import { LegendMd } from "./Charts/Legend/Legend";
 import { LineChartMd } from "./Charts/LineChart/LineChart";
 import { PieChartMd } from "./Charts/PieChart/PieChart";
-import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
-import { Tooltip } from "@radix-ui/react-tooltip";
 import { TooltipMd } from "./Tooltip/Tooltip";
+import { TimePickerMd } from "./TimePicker/TimePicker";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -401,6 +400,7 @@ export const collectedComponentMetadata = {
   TextBox: TextBoxMd,
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
+  TimePicker: TimePickerMd,
   ToneChangerButton: ToneChangerButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,

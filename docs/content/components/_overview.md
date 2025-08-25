@@ -93,6 +93,7 @@
 | [TextArea](./TextArea) | `TextArea` provides a multiline text input area. |
 | [TextBox](./TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
 | [Theme](./Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
+| [TimePicker](./TimePicker) | `TimePicker` provides an interactive time selection interface using the extracted react-time-picker source code directly. Users can input time values via keyboard with support for various time formats including 12-hour and 24-hour displays and configurable precision levels. This version does not include the clock popup. |
 | [ToneChangerButton](./ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
 | [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
 | [Tooltip](./Tooltip) | A tooltip component that displays text when hovering over trigger content. |

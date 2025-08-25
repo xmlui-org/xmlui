@@ -36,10 +36,8 @@ const COMP = "TimePicker";
 export const TimePickerMd = createMetadata({
   status: "experimental",
   description:
-    "`TimePicker` provides an interactive time selection interface using the extracted " +
-    "react-time-picker source code directly. Users can input time values via keyboard " +
-    "with support for various time formats including 12-hour and 24-hour displays " +
-    "and configurable precision levels. This version does not include the clock popup.",
+    "`TimePicker` provides time input with support for 12-hour and 24-hour formats " +
+    "and configurable precision for hours, minutes, and seconds.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -79,6 +77,11 @@ export const TimePickerMd = createMetadata({
     clearIcon: {
       description: "Content of the clear button. Set to null to hide the icon", 
       valueType: "string",
+    },
+    resetOnClear: {
+      description: "When false (default), clear button clears the value completely. When true, resets to initialValue",
+      valueType: "boolean",
+      defaultValue: defaultProps.resetOnClear,
     },
     required: {
       description: "Whether the time input should be required",

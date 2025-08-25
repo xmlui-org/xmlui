@@ -21,12 +21,22 @@ import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
-// Import shared utilities and types
-import { getHours, getMinutes, getSeconds } from './shared/dateUtils';
-import { convert24to12 } from './shared/dates';
-import { getAmPmLabels, safeMax, safeMin } from './shared/utils';
-import Divider from './Divider';
-import type { AmPmType } from './shared/types';
+// Import utilities and types from merged utils file
+import { 
+  getHours, 
+  getMinutes, 
+  getSeconds, 
+  convert24to12, 
+  getAmPmLabels, 
+  safeMax, 
+  safeMin,
+  type AmPmType 
+} from './utils';
+
+// Simple divider component for time separators
+function Divider({ children }: { children?: React.ReactNode }): React.ReactElement {
+  return <span className={styles.divider}>{children}</span>;
+}
 
 // Browser detection utilities
 const isIEOrEdgeLegacy = typeof window !== 'undefined' && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
@@ -291,12 +301,8 @@ function AmPm({
 
   const [amLabel, pmLabel] = getAmPmLabels(locale);
 
-  // Debug logging
-  console.log('AmPm Debug:', { value, amLabel, pmLabel, disabled, amDisabled, pmDisabled });
-
   // Convert the HTML select onChange to match Radix UI onValueChange
   const handleValueChange = useCallback((newValue: string) => {
-    console.log('AmPm handleValueChange:', { newValue, currentValue: value });
     if (onChange) {
       // Create a synthetic event to match the expected onChange signature
       const syntheticEvent = {
@@ -304,11 +310,10 @@ function AmPm({
       } as React.ChangeEvent<HTMLSelectElement>;
       onChange(syntheticEvent);
     }
-  }, [onChange, value]);
+  }, [onChange]); // Remove value from dependencies - it's not used in the function
 
   // Ensure we have a stable value for Radix UI
   const selectValue = value || undefined;
-  console.log('AmPm SelectRoot value:', selectValue);
 
   return (
     <SelectRoot value={selectValue} onValueChange={handleValueChange}>
@@ -343,7 +348,93 @@ function AmPm({
   );
 }
 
-// Hour12Input component
+// HourInput component (unified for both 12-hour and 24-hour formats)
+type HourInputProps = {
+  amPm?: AmPmType | null;
+  maxTime?: string;
+  minTime?: string;
+  value?: string | null;
+  isInvalid?: boolean;
+  is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
+} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass' | 'value'>;
+
+function HourInput({
+  amPm,
+  maxTime,
+  minTime,
+  value,
+  isInvalid = false,
+  is24Hour = false,
+  ...otherProps
+}: HourInputProps): React.ReactElement {
+  // Calculate min/max based on format
+  const { minHour, maxHour } = (() => {
+    if (is24Hour) {
+      // 24-hour format: 0-23
+      return {
+        maxHour: safeMin(23, maxTime && getHours(maxTime)),
+        minHour: safeMax(0, minTime && getHours(minTime))
+      };
+    } else {
+      // 12-hour format: 1-12
+      const maxHour = safeMin(
+        12,
+        maxTime &&
+          (() => {
+            const [maxHourResult, maxAmPm] = convert24to12(getHours(maxTime));
+
+            if (maxAmPm !== amPm) {
+              // pm is always after am, so we should ignore validation
+              return null;
+            }
+
+            return maxHourResult;
+          })(),
+      );
+
+      const minHour = safeMax(
+        1,
+        minTime &&
+          (() => {
+            const [minHourResult, minAmPm] = convert24to12(getHours(minTime));
+
+            if (
+              // pm is always after am, so we should ignore validation
+              minAmPm !== amPm ||
+              // If minHour is 12 am/pm, user should be able to enter 12, 1, ..., 11.
+              minHourResult === 12
+            ) {
+              return null;
+            }
+
+            return minHourResult;
+          })(),
+      );
+
+      return { maxHour, minHour };
+    }
+  })();
+
+  // Always show the raw value during typing, no conversion
+  // This allows users to see invalid input like "23" before it gets normalized on blur
+  const displayValue = value || '';
+
+  const { className: originalClassName, ...restProps } = otherProps;
+
+  return (
+    <Input
+      max={maxHour}
+      min={minHour}
+      name={is24Hour ? "hour24" : "hour12"}
+      nameForClass="hour"
+      value={displayValue}
+      className={classnames(originalClassName, {
+        [styles.invalid]: isInvalid
+      })}
+      {...restProps}
+    />
+  );
+}
 type Hour12InputProps = {
   amPm: AmPmType | null;
   maxTime?: string;
@@ -360,7 +451,6 @@ function Hour12Input({
   isInvalid = false,
   ...otherProps
 }: Hour12InputProps): React.ReactElement {
-  console.log("render", isInvalid);
   const maxHour = safeMin(
     12,
     maxTime &&
@@ -644,8 +734,11 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 ) {
   const timePickerRef = useRef<HTMLDivElement>(null);
 
+  // Stabilize initialValue to prevent unnecessary re-renders
+  const stableInitialValue = useMemo(() => initialValue, [initialValue]);
+
   // Local state management - sync with value prop (like TextBox and NumberBox)
-  const [localValue, setLocalValue] = useState<string | null>(controlledValue || null);
+  const [localValue, setLocalValue] = useState<string | null>(controlledValue || stableInitialValue || null);
 
   // Parse current value into individual components
   const [amPm, setAmPm] = useState<AmPmType | null>(null);
@@ -659,10 +752,10 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const [isSecondCurrentlyInvalid, setIsSecondCurrentlyInvalid] = useState(false);
   
   useEffect(() => {
-    // If there's no controlled value, use the initial value
-    const valueToUse = (controlledValue === null || controlledValue === undefined) ? initialValue : controlledValue;
+    // Sync with controlled value if provided, otherwise use stable initialValue
+    const valueToUse = controlledValue !== undefined ? controlledValue : stableInitialValue;
     setLocalValue(valueToUse || null);
-  }, [controlledValue, initialValue]);
+  }, [controlledValue, stableInitialValue]);
 
   // Determine what components to show based on format
   const is12HourFormat = format && format.includes('a');
@@ -706,14 +799,6 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     }
   }, [localValue]);
 
-  // Debug logging
-  console.log('TimePicker Debug:', { format, is12HourFormat, amPm, localValue });
-
-  // Initialize the related field with the input's initial value
-  useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
-  }, [initialValue, updateState]);
-
   // Event handlers
   const handleChange = useEvent((newValue: string | null) => {
     setLocalValue(newValue);
@@ -722,6 +807,39 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     }
     onDidChange?.(newValue);
   });
+
+  // Helper function to format the complete time value
+  const formatTimeValue = useCallback((h: string | null, m: string | null, s: string | null, ap: AmPmType | null, is12Hour: boolean): string | null => {
+    if (!h || !m) return null;
+    
+    let formattedTime = '';
+    
+    if (is12Hour) {
+      // 12-hour format
+      const hour12 = h.padStart(2, '0');
+      const minute12 = m.padStart(2, '0');
+      formattedTime = `${hour12}:${minute12}`;
+      
+      if (s && showSeconds) {
+        formattedTime += `:${s.padStart(2, '0')}`;
+      }
+      
+      if (ap) {
+        formattedTime += ` ${ap}`;
+      }
+    } else {
+      // 24-hour format
+      const hour24 = h.padStart(2, '0');
+      const minute24 = m.padStart(2, '0');
+      formattedTime = `${hour24}:${minute24}`;
+      
+      if (s && showSeconds) {
+        formattedTime += `:${s.padStart(2, '0')}`;
+      }
+    }
+    
+    return formattedTime;
+  }, [showSeconds]);
 
   // Handle changes from individual inputs
   const handleHourChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -819,61 +937,21 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   const handleAmPmChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     const newAmPm = event.target.value as AmPmType;
-    console.log('handleAmPmChange:', { oldAmPm: amPm, newAmPm, hour, minute, second });
     setAmPm(newAmPm);
     
     if (hour && minute) {
       const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
-      console.log('handleAmPmChange - calling handleChange with:', timeString);
       handleChange(timeString);
     }
-  }, [hour, minute, second, is12HourFormat, handleChange, amPm]);
+  }, [hour, minute, second, is12HourFormat, handleChange]); // Remove amPm from dependencies
 
-  // Helper function to format the complete time value
-  function formatTimeValue(h: string | null, m: string | null, s: string | null, ap: AmPmType | null, is12Hour: boolean): string | null {
-    if (!h || !m) return null;
-    
-    let formattedTime = '';
-    
-    if (is12Hour) {
-      // 12-hour format
-      const hour12 = h.padStart(2, '0');
-      const minute12 = m.padStart(2, '0');
-      formattedTime = `${hour12}:${minute12}`;
-      
-      if (s && showSeconds) {
-        formattedTime += `:${s.padStart(2, '0')}`;
-      }
-      
-      if (ap) {
-        formattedTime += ` ${ap}`;
-      }
-    } else {
-      // 24-hour format
-      const hour24 = h.padStart(2, '0');
-      const minute24 = m.padStart(2, '0');
-      formattedTime = `${hour24}:${minute24}`;
-      
-      if (s && showSeconds) {
-        formattedTime += `:${s.padStart(2, '0')}`;
-      }
-    }
-    
-    return formattedTime;
-  }
-
-  function clear() {
-    handleChange(null);
-  }
+  const clear = useCallback(() => {
+    handleChange(stableInitialValue || null);
+  }, [stableInitialValue, handleChange]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
   }
-
-  // Initialize the related field with the input's initial value
-  useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
-  }, [initialValue, updateState]);
 
   const handleFocus = useEvent((event: React.FocusEvent<HTMLDivElement>) => {
     onFocus?.(event);
@@ -985,36 +1063,21 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
         <div className={styles.wrapper}>
           <div className={styles.inputGroup}>
             {/* Hour input */}
-            {is12HourFormat ? (
-              <Hour12Input
-                amPm={amPm}
-                autoFocus={autoFocus}
-                className="timepicker"
-                disabled={!enabled}
-                maxTime={maxTime}
-                minTime={minTime}
-                onChange={handleHourChange}
-                onBlur={handleHourBlur}
-                required={required}
-                showLeadingZeros={showLeadingZeros}
-                value={hour}
-                isInvalid={isHourCurrentlyInvalid}
-              />
-            ) : (
-              <Hour24Input
-                autoFocus={autoFocus}
-                className="timepicker"
-                disabled={!enabled}
-                maxTime={maxTime}
-                minTime={minTime}
-                onChange={handleHourChange}
-                onBlur={handleHourBlur}
-                required={required}
-                showLeadingZeros={showLeadingZeros}
-                value={hour}
-                isInvalid={isHourCurrentlyInvalid}
-              />
-            )}
+            <HourInput
+              amPm={amPm}
+              autoFocus={autoFocus}
+              className="timepicker"
+              disabled={!enabled}
+              maxTime={maxTime}
+              minTime={minTime}
+              onChange={handleHourChange}
+              onBlur={handleHourBlur}
+              required={required}
+              showLeadingZeros={showLeadingZeros}
+              value={hour}
+              isInvalid={isHourCurrentlyInvalid}
+              is24Hour={!is12HourFormat}
+            />
             
             <Divider>:</Divider>
             

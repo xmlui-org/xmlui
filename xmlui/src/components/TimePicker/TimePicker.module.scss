@@ -29,6 +29,25 @@ $outlineOffset-button-TimePicker--focused: createThemeVar("outlineOffset-button-
 $minWidth-ampm-TimePicker: createThemeVar("minWidth-ampm-#{$componentName}");
 $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
 
+// New theme variables for better theming
+$opacity-TimePicker--disabled: createThemeVar("opacity-#{$componentName}--disabled");
+$backgroundColor-TimePicker--hover: createThemeVar("backgroundColor-#{$componentName}--hover");
+$margin-input-TimePicker: createThemeVar("margin-input-#{$componentName}");
+$transition-background-TimePicker: createThemeVar("transition-background-#{$componentName}");
+$backgroundColor-menu-TimePicker: createThemeVar("backgroundColor-menu-#{$componentName}");
+$borderRadius-menu-TimePicker: createThemeVar("borderRadius-menu-#{$componentName}");
+$boxShadow-menu-TimePicker: createThemeVar("boxShadow-menu-#{$componentName}");
+$borderColor-menu-TimePicker: createThemeVar("borderColor-menu-#{$componentName}");
+$backgroundColor-item-TimePicker--hover: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+$backgroundColor-item-TimePicker--active: createThemeVar("backgroundColor-item-#{$componentName}--active");
+$maxHeight-menu-TimePicker: createThemeVar("maxHeight-menu-#{$componentName}");
+$padding-item-TimePicker: createThemeVar("padding-item-#{$componentName}");
+$opacity-item-TimePicker--disabled: createThemeVar("opacity-item-#{$componentName}--disabled");
+$margin-icon-TimePicker: createThemeVar("margin-icon-#{$componentName}");
+$outlineColor-ampm-TimePicker--focused: createThemeVar("outlineColor-ampm-#{$componentName}--focused");
+$outlineWidth-ampm-TimePicker--focused: createThemeVar("outlineWidth-ampm-#{$componentName}--focused");
+$outlineOffset-ampm-TimePicker--focused: createThemeVar("outlineOffset-ampm-#{$componentName}--focused");
+
 // --- CSS properties of a particular TimePicker variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
@@ -77,7 +96,7 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     position: relative;
     
     &.disabled {
-      opacity: 0.6;
+      opacity: $opacity-TimePicker--disabled;
       pointer-events: none;
     }
     
@@ -94,7 +113,7 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     width: fit-content;
     border-style: solid;
     border-width: 1px;
-    transition: background-color ease-in 0.1s;
+    transition: $transition-background-TimePicker;
     overflow: hidden;
     gap: createThemeVar("Input:gap-adornment-#{$componentName}");
 
@@ -117,19 +136,6 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
     }
     
-    // Override react-time-picker internal styling
-    :global(.react-time-picker__wrapper) {
-      border: none !important;
-      background: none !important;
-      padding: 0 !important;
-    }
-    
-    :global(.react-time-picker__inputGroup) {
-      border: none !important;
-      background: none !important;
-      padding: 0 !important;
-    }
-    
     input {
       border: none;
       background: none;
@@ -137,7 +143,7 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
       font: inherit;
       outline: none;
       padding: 0;
-      margin: 0 0.125rem;
+      margin: $margin-input-TimePicker;
       min-width: 2ch;
       
       &::placeholder {
@@ -155,11 +161,11 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
       border: none;
       cursor: pointer;
       color: inherit;
-      padding: 0.25rem;
+      padding: $padding-button-TimePicker;
       border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
       
       &:hover {
-        background-color: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+        background-color: $backgroundColor-TimePicker--hover;
       }
       
       &:focus {
@@ -169,7 +175,7 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
       
       &:disabled {
         cursor: not-allowed;
-        opacity: 0.6;
+        opacity: $opacity-TimePicker--disabled;
       }
     }
   }
@@ -182,10 +188,13 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
   }
 
   .inputGroup {
-    min-width: calc((4px * 3) + 0.54em * 6 + 0.217em * 2);
+    display: flex;
+    align-items: center;
     flex-grow: 1;
-    padding: 0 2px;
-    box-sizing: content-box;
+    min-width: 0; // Allow shrinking
+    gap: 0; // Remove gap since dividers handle spacing
+    padding: 0 0.125rem; // Use rem for consistent padding
+    box-sizing: border-box;
   }
 
   .divider {
@@ -223,10 +232,11 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     &.hour24,
     &.minute,
     &.second {
-      width: $width-input-TimePicker !important;
-      min-width: $width-input-TimePicker !important;
-      max-width: $width-input-TimePicker !important;
-      text-align: $textAlign-input-TimePicker !important;
+      // Use character-based width for better font-size independence
+      width: 2.5ch;
+      min-width: 2.5ch;
+      max-width: 2.5ch;
+      text-align: center;
       padding: $padding-input-TimePicker !important;
       box-sizing: border-box !important;
     }
@@ -256,14 +266,15 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     }
 
     &.hasLeadingZero {
-      margin-left: -0.54em;
-      padding-left: calc(1px + 0.54em);
+      // Use character-based width for more predictable sizing with digits
+      min-width: 2.5ch; // Enough space for 2 digits + padding
+      text-align: center;
     }
   }
 
   .amPm {
     min-width: $minWidth-ampm-TimePicker !important;
-    width: auto !important;
+    width: 4ch !important; // Fixed width to accommodate both AM and PM
     height: 100% !important;
     font: inherit;
     font-size: $fontSize-ampm-TimePicker;
@@ -280,17 +291,17 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     position: relative;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.05) !important;
+      background-color: $backgroundColor-TimePicker--hover !important;
     }
 
     &:focus {
-      outline: 2px solid #007acc;
-      outline-offset: -1px;
+      outline: $outlineWidth-ampm-TimePicker--focused solid $outlineColor-ampm-TimePicker--focused;
+      outline-offset: $outlineOffset-ampm-TimePicker--focused;
     }
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.6;
+      opacity: $opacity-TimePicker--disabled;
     }
   }
 
@@ -300,22 +311,22 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
   }
 
   .amPmIcon {
-    margin-left: 0.25rem;
+    margin-left: $margin-icon-TimePicker;
     flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    width: 1em; // Scale with font size
+    height: 1em; // Scale with font size
   }
 
   .amPmContent {
     position: relative;
     width: 100%;
-    max-height: 280px;
+    max-height: $maxHeight-menu-TimePicker;
     z-index: 1000;
     overflow: auto;
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 10px 38px -10px rgba(22, 23, 24, 0.35), 0 10px 20px -15px rgba(22, 23, 24, 0.2);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: $backgroundColor-menu-TimePicker;
+    border-radius: $borderRadius-menu-TimePicker;
+    box-shadow: $boxShadow-menu-TimePicker;
+    border: 1px solid $borderColor-menu-TimePicker;
     min-width: var(--radix-select-trigger-width);
     max-width: var(--radix-select-content-available-width);
   }
@@ -327,19 +338,19 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
     user-select: none;
     align-items: center;
     outline: none;
-    padding: 4px 8px;
+    padding: $padding-item-TimePicker;
 
     &[data-highlighted] {
-      background-color: #f0f0f0;
+      background-color: $backgroundColor-item-TimePicker--hover;
     }
 
     &[data-state=checked] {
-      background-color: #e6f3ff;
+      background-color: $backgroundColor-item-TimePicker--active;
     }
 
     &[data-disabled] {
       pointer-events: none;
-      opacity: 0.5;
+      opacity: $opacity-item-TimePicker--disabled;
       cursor: not-allowed;
       font-style: italic;
     }
@@ -381,6 +392,8 @@ $fontSize-ampm-TimePicker: createThemeVar("fontSize-ampm-#{$componentName}");
   .buttonIcon {
     // Base styling for button icons
     display: inherit;
+    width: 1em; // Scale with font size
+    height: 1em; // Scale with font size
   }
 
   .clearButtonIcon {
