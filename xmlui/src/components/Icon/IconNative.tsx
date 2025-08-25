@@ -53,7 +53,7 @@ export const Icon = forwardRef(function Icon(
     return null;
   }
 
-  return <span ref={ref} style={{ display: "contents" }}>{renderedIcon}</span>;
+  return <span ref={ref} style={{ display: "inline-block" }}>{renderedIcon}</span>;
 });
 
 const CustomIcon = forwardRef(function CustomIcon(

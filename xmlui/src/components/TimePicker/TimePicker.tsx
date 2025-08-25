@@ -19,7 +19,6 @@ import {
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -27,7 +26,6 @@ import {
 import {
   TimePickerNative,
   TimePickerFormatValues,
-  TimePickerMaxDetailValues,
   defaultProps,
 } from "./TimePickerNative";
 
@@ -39,7 +37,6 @@ export const TimePickerMd = createMetadata({
     "`TimePicker` provides time input with support for 12-hour and 24-hour formats " +
     "and configurable precision for hours, minutes, and seconds.",
   props: {
-    placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
@@ -55,12 +52,6 @@ export const TimePickerMd = createMetadata({
       defaultValue: defaultProps.format,
       availableValues: TimePickerFormatValues,
     },
-    maxDetail: {
-      description: "How detailed time picking shall be. Controls the precision of time selection",
-      valueType: "string",
-      availableValues: TimePickerMaxDetailValues,
-      defaultValue: defaultProps.maxDetail,
-    },
     minTime: {
       description: "Minimum time that the user can select",
       valueType: "string",
@@ -75,7 +66,7 @@ export const TimePickerMd = createMetadata({
       defaultValue: defaultProps.clearable,
     },
     clearIcon: {
-      description: "Content of the clear button. Set to null to hide the icon", 
+      description: "The icon to display in the clear button.",
       valueType: "string",
     },
     required: {
@@ -83,15 +74,16 @@ export const TimePickerMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.required,
     },
-    name: {
-      description: "Input name attribute",
-      valueType: "string",
-      defaultValue: defaultProps.name,
-    },
     startText: dStartText(),
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
+    gap: {
+      description:
+        "This property defines the gap between the adornments and the input area. If not " +
+        "set, the gap declared by the current theme is used.",
+      valueType: "string",
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -150,7 +142,7 @@ export const TimePickerMd = createMetadata({
     [`outlineColor-button-${COMP}--focused`]: "$color-accent-500",
     [`outlineWidth-button-${COMP}--focused`]: "2px",
     [`outlineOffset-button-${COMP}--focused`]: "2px",
-    [`minWidth-ampm-${COMP}`]: "3em",
+    [`minWidth-ampm-${COMP}`]: "2em",
     [`fontSize-ampm-${COMP}`]: "inherit",
   },
 });
@@ -178,18 +170,15 @@ export const timePickerComponentRenderer = createComponentRenderer(
         updateState={updateState}
         registerComponentApi={registerComponentApi}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, defaultProps.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly, defaultProps.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}
         format={extractValue(node.props.format)}
-        maxDetail={extractValue(node.props.maxDetail)}
         minTime={extractValue(node.props.minTime)}
         maxTime={extractValue(node.props.maxTime)}
         clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
         clearIcon={extractValue(node.props.clearIcon)}
         required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
-        name={extractValue(node.props.name)}
         label={extractValue(node.props.label)}
         labelPosition={extractValue(node.props.labelPosition)}
         labelWidth={extractValue(node.props.labelWidth)}
@@ -198,6 +187,7 @@ export const timePickerComponentRenderer = createComponentRenderer(
         startIcon={extractValue(node.props.startIcon)}
         endText={extractValue(node.props.endText)}
         endIcon={extractValue(node.props.endIcon)}
+        gap={extractValue.asOptionalString(node.props.gap)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}

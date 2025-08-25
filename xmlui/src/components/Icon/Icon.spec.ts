@@ -199,7 +199,7 @@ test.describe("size Property", () => {
     await initTestBed(`<Icon testId="icon" name="home" size="invalid-size"/>`);
     const iconDrv = await createIconDriver("icon");
     const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
+    await expect(icon).not.toBeVisible();
   });
 
   test("handles negative size value", async ({ initTestBed, createIconDriver }) => {

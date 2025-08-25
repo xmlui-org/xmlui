@@ -90,24 +90,7 @@ $outlineOffset-ampm-TimePicker--focused: createThemeVar("outlineOffset-ampm-#{$c
 }
 
 @layer components {
-  .timePicker {
-    display: flex;
-    align-items: center;
-    position: relative;
-    
-    &.disabled {
-      opacity: $opacity-TimePicker--disabled;
-      pointer-events: none;
-    }
-    
-    &.readOnly {
-      .reactTimePickerWrapper input {
-        cursor: default;
-      }
-    }
-  }
-
-  .reactTimePickerWrapper {
+  .timePickerWrapper {
     display: flex;
     align-items: center;
     width: fit-content;
@@ -116,6 +99,17 @@ $outlineOffset-ampm-TimePicker--focused: createThemeVar("outlineOffset-ampm-#{$c
     transition: $transition-background-TimePicker;
     overflow: hidden;
     gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+
+        &.disabled {
+      opacity: $opacity-TimePicker--disabled;
+      pointer-events: none;
+    }
+    
+    &.readOnly {
+      .timePickerWrapper input {
+        cursor: default;
+      }
+    }
 
     @include variant("default");
 
@@ -307,8 +301,42 @@ $outlineOffset-ampm-TimePicker--focused: createThemeVar("outlineOffset-ampm-#{$c
     }
   }
 
+  // New button-based AM/PM selector
+  .amPmButton {
+    min-width: $minWidth-ampm-TimePicker !important;
+    height: 100% !important;
+    font: inherit;
+    font-size: $fontSize-ampm-TimePicker;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 0 !important;
+    border-radius: $borderRadius-input-TimePicker;
+    background: none !important;
+    padding: $padding-input-TimePicker !important;
+    cursor: pointer;
+    box-sizing: border-box;
+    color: currentColor;
+    position: relative;
+
+    &:hover {
+      background-color: $backgroundColor-TimePicker--hover !important;
+    }
+
+    &:focus {
+      outline: $outlineWidth-ampm-TimePicker--focused solid $outlineColor-ampm-TimePicker--focused;
+      outline-offset: $outlineOffset-ampm-TimePicker--focused;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: $opacity-TimePicker--disabled;
+      pointer-events: none;
+    }
+  }
+
   .amPmValue {
-    flex: 1;
+    display: flex;
     min-width: 0;
   }
 

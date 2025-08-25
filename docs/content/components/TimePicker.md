@@ -19,17 +19,24 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 Whether to show a clear button that allows clearing the selected time
 
-When enabled, shows a clear button (×) that allows users to reset the time value to empty.
+When enabled, it displays a clear button that allows users to reset the time picker back to its initial value. Change the time value in this app and then click the clear button:
 
-```xmlui-pg copy display name="Example: clearable" height="120px"
+```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
-  <TimePicker clearable="true" initialValue="14:30" />
+  <TimePicker initialValue="11:30" />
+  <TimePicker clearable="false" initialValue="10:20" />
 </App>
 ```
 
 ### `clearIcon` [#clearicon]
 
-Content of the clear button. Set to null to hide the icon
+The icon to display in the clear button.
+
+```xmlui-pg copy display name="Example: clearIcon" /clearIcon/
+<App>
+  <TimePicker initialValue="11:30" clearIcon="trash" />
+</App>
+```
 
 ### `enabled` (default: true) [#enabled-default-true]
 
@@ -45,25 +52,9 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
-Adds an icon at the end (right side) of the time picker input.
-
-```xmlui-pg copy display name="Example: endIcon" height="120px"
-<App>
-  <TimePicker endIcon="clock" initialValue="14:30" />
-</App>
-```
-
 ### `endText` [#endtext]
 
 This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
-
-Adds text at the end (right side) of the time picker input.
-
-```xmlui-pg copy display name="Example: endText" height="120px"
-<App>
-  <TimePicker endText="hrs" initialValue="14:30" />
-</App>
-```
 
 ### `format` (default: "HH:mm") [#format-default-hh-mm]
 
@@ -80,13 +71,18 @@ The `format` prop controls how time is displayed and which parts are editable. B
 | `h:mm a` | 12-hour format with AM/PM | 2:30 PM |
 | `hh:mm:ss a` | 12-hour format with seconds and AM/PM | 02:30:15 PM |
 
-```xmlui-pg copy display name="Example: format" height="200px"
+```xmlui-pg copy display name="Example: format"
 <App>
   <TimePicker format="H:mm" initialValue="14:30" />
   <TimePicker format="h:mm a" initialValue="14:30" />
   <TimePicker format="HH:mm:ss" initialValue="14:30:15" />
+  <TimePicker format="HH:mm:ss a" initialValue="14:30:15" />
 </App>
 ```
+
+### `gap` [#gap]
+
+This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
 
 ### `initialValue` [#initialvalue]
 
@@ -123,28 +119,6 @@ Available values:
 
 This property sets the width of the `TimePicker` component's label. If not defined, the label's width will be determined by its content and the available space.
 
-### `maxDetail` (default: "minute") [#maxdetail-default-minute]
-
-How detailed time picking shall be. Controls the precision of time selection
-
-Available values: `hour`, `minute` **(default)**, `second`
-
-Controls the precision of time selection and which input fields are shown.
-
-| Value    | Description                          | Displayed Fields |
-| :------- | :----------------------------------- | :--------------- |
-| `hour`   | Only hours are editable              | Hours only       |
-| `minute` | Hours and minutes are editable       | Hours, Minutes   |
-| `second` | Hours, minutes, and seconds editable | Hours, Minutes, Seconds |
-
-```xmlui-pg copy display name="Example: maxDetail" height="200px"
-<App>
-  <TimePicker maxDetail="hour" initialValue="14:30:15" />
-  <TimePicker maxDetail="minute" initialValue="14:30:15" />
-  <TimePicker maxDetail="second" initialValue="14:30:15" />
-</App>
-```
-
 ### `maxTime` [#maxtime]
 
 Maximum time that the user can select
@@ -167,20 +141,6 @@ Sets the minimum selectable time. Times before this value will be invalid.
 <App>
   <TimePicker minTime="09:00" initialValue="08:30" />
 </App>
-```
-
-### `name` (default: "time") [#name-default-time]
-
-Input name attribute
-
-### `placeholder` [#placeholder]
-
-An optional placeholder text that is visible in the input field when its empty.
-
-```xmlui-pg copy display name="Example: placeholder" height="120px"
-<App>
-  <TimePicker placeholder="Select a time" />
-</App>  
 ```
 
 ### `readOnly` (default: false) [#readonly-default-false]
@@ -211,25 +171,9 @@ Marks the time input as required for form validation.
 
 This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
-Adds an icon at the start (left side) of the time picker input.
-
-```xmlui-pg copy display name="Example: startIcon" height="120px"
-<App>
-  <TimePicker startIcon="clock" initialValue="14:30" />
-</App>
-```
-
 ### `startText` [#starttext]
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
-
-Adds text at the start (left side) of the time picker input.
-
-```xmlui-pg copy display name="Example: startText" height="120px"
-<App>
-  <TimePicker startText="Time:" initialValue="14:30" />
-</App>
-```
 
 ### `validationStatus` (default: "none") [#validationstatus-default-none]
 
@@ -249,11 +193,11 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui-pg copy display name="Example: validationStatus" height="200px"
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
-  <TimePicker validationStatus="valid" initialValue="14:30" />
-  <TimePicker validationStatus="warning" initialValue="14:30" />
-  <TimePicker validationStatus="error" initialValue="14:30" />
+  <TimePicker validationStatus="valid" initialValue="11:30" />
+  <TimePicker validationStatus="warning" initialValue="11:30" />
+  <TimePicker validationStatus="error" initialValue="11:30" />
 </App>
 ```
 
@@ -265,12 +209,15 @@ This event is triggered when value of TimePicker has changed.
 
 Fired when the time value changes. Receives the new time value as a parameter.
 
+> [!INFO] The time value changes when the edited input part (hour, minute, second) loses focus or the AM/PM selectro changes.
+
 ```xmlui-pg copy {2} display name="Example: didChange" height="180px"
 <App var.selectedTime="No time selected">
   <Text value="{selectedTime}" />
   <TimePicker 
-    initialValue="14:30" 
-    onDidChange="(time) => selectedTime = time || 'No time selected'" />
+    format="h:m:s a"
+    initialValue="07:30:05" 
+    onDidChange="(time) => selectedTime = time" />
 </App>
 ```
 
@@ -280,12 +227,13 @@ This event is triggered when the TimePicker has received the focus.
 
 Fired when the time picker receives focus.
 
-```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="180px"
-<App var.isFocused="false">
-  <Text value="{isFocused === true 
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
+<App var.isFocused="{false}">
+  <Text value="{isFocused 
     ? 'TimePicker focused' : 'TimePicker lost focus'}" 
   />
   <TimePicker
+    format="HH:mm:ss a"
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false"
     initialValue="14:30"
@@ -299,7 +247,7 @@ Fired when the user enters an invalid time
 
 Fired when the user enters an invalid time value.
 
-```xmlui-pg copy {2} display name="Example: invalidTime" height="180px"
+```xmlui-pg copy {2} display name="Example: invalidTime"
 <App var.errorMessage="">
   <Text value="{errorMessage}" />
   <TimePicker 
@@ -428,7 +376,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [margin](../styles-and-themes/common-units/#size)-icon-TimePicker | *none* | *none* |
 | [margin](../styles-and-themes/common-units/#size)-input-TimePicker | *none* | *none* |
 | [maxHeight](../styles-and-themes/common-units/#size)-menu-TimePicker | *none* | *none* |
-| [minWidth](../styles-and-themes/common-units/#size)-ampm-TimePicker | 3em | 3em |
+| [minWidth](../styles-and-themes/common-units/#size)-ampm-TimePicker | 2em | 2em |
 | [minWidth](../styles-and-themes/common-units/#size)-input-TimePicker | 0.54em | 0.54em |
 | [opacity](../styles-and-themes/common-units/#opacity)-item-TimePicker--disabled | *none* | *none* |
 | [opacity](../styles-and-themes/common-units/#opacity)-TimePicker--disabled | *none* | *none* |

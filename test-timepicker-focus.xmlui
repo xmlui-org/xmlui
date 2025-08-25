@@ -1,0 +1,44 @@
+<!-- Test file to verify TimePicker gotFocus and lostFocus events -->
+<Template>
+  <VStack gap="10" padding="20">
+    <Text>TimePicker Focus Events Test</Text>
+    
+    <HStack gap="10">
+      <Text width="150">Event Log:</Text>
+      <Text id="eventLog" fontWeight="bold" color="blue">No events yet</Text>
+    </HStack>
+    
+    <HStack gap="10">
+      <Text width="150">Focus Target:</Text>
+      <TimePicker 
+        id="testTimePicker"
+        format="HH:mm:ss"
+        label="Test Time"
+        clearable="true"
+        initialValue="10:30:45"
+        gotFocus="() => setEventLog('TimePicker got focus at ' + new Date().toLocaleTimeString())"
+        lostFocus="() => setEventLog('TimePicker lost focus at ' + new Date().toLocaleTimeString())"
+      />
+    </HStack>
+    
+    <Text fontSize="14" color="gray">
+      Instructions: 
+      1. Click on the TimePicker inputs to focus them
+      2. Use Tab to navigate between hour, minute, second, AM/PM button, and clear button (×)
+      3. Use Shift+Tab to navigate backwards - especially test Shift+Tab from outside to reach the clear button
+      4. The "got focus" event should fire when ANY part of the TimePicker receives focus (including the clear button)
+      5. The "lost focus" event should only fire when you tab completely away from the TimePicker
+      6. Test clicking the clear button - it should focus back to the hour input
+    </Text>
+    
+    <HStack gap="10">
+      <Text width="150">Focus away:</Text>
+      <Button onClick="() => {}">Click me to focus away</Button>
+    </HStack>
+    
+  </VStack>
+</Template>
+
+<Script>
+  const [eventLog, setEventLog] = useState("No events yet");
+</Script>

@@ -1,37 +1,34 @@
 import { type CSSProperties } from "react";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classnames from "classnames";
 import styles from "./TimePicker.module.scss";
-import {
-  Content as SelectContent,
-  Icon as SelectIcon,
-  Item as SelectItem,
-  ItemText as SelectItemText,
-  Portal as SelectPortal,
-  Root as SelectRoot,
-  SelectViewport,
-  Trigger as SelectTrigger,
-} from "@radix-ui/react-select";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
 // Import utilities and types from merged utils file
-import { 
-  getHours, 
-  getMinutes, 
-  getSeconds, 
-  convert24to12, 
-  getAmPmLabels, 
-  safeMax, 
+import {
+  getHours,
+  getMinutes,
+  getSeconds,
+  convert24to12,
+  getAmPmLabels,
+  safeMax,
   safeMin,
-  type AmPmType 
-} from './utils';
+  type AmPmType,
+} from "./utils";
 
 // Simple divider component for time separators
 function Divider({ children }: { children?: React.ReactNode }): React.ReactElement {
@@ -39,8 +36,9 @@ function Divider({ children }: { children?: React.ReactNode }): React.ReactEleme
 }
 
 // Browser detection utilities
-const isIEOrEdgeLegacy = typeof window !== 'undefined' && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
-const isFirefox = typeof window !== 'undefined' && /Firefox/.test(navigator.userAgent);
+const isIEOrEdgeLegacy =
+  typeof window !== "undefined" && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
+const isFirefox = typeof window !== "undefined" && /Firefox/.test(navigator.userAgent);
 
 // Input helper functions
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {
@@ -53,125 +51,83 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
   }
 }
 
-function getSelectionString(input: HTMLInputElement) {
-  /**
-   * window.getSelection().toString() returns empty string in IE11 and Firefox,
-   * so alternatives come first.
-   */
-  if (
-    input &&
-    'selectionStart' in input &&
-    input.selectionStart !== null &&
-    'selectionEnd' in input &&
-    input.selectionEnd !== null
-  ) {
-    return input.value.slice(input.selectionStart, input.selectionEnd);
-  }
-
-  if ('getSelection' in window) {
-    const selection = window.getSelection();
-    return selection?.toString();
-  }
-
-  return null;
-}
-
-function makeOnKeyPress(maxLength: number | null) {
-  if (maxLength === null) {
-    return undefined;
-  }
-
-  /**
-   * Prevents keystrokes that would not produce a number or when value after keystroke would
-   * exceed maxLength.
-   */
-  return function onKeyPress(
-    event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement },
-  ) {
-    if (isFirefox) {
-      // See https://github.com/wojtekmaj/react-time-picker/issues/92
-      return;
-    }
-
-    const { key, target: input } = event;
-    const { value } = input;
-
-    const isNumberKey = key.length === 1 && /\d/.test(key);
-    const selection = getSelectionString(input);
-
-    if (!isNumberKey || !(selection || value.length < maxLength)) {
-      event.preventDefault();
-    }
-  };
-}
-
 // Normalization functions for smart auto-correction
 function normalizeHour(value: string | null, is24Hour: boolean): string | null {
-  if (!value || value === '') return null;
-  
+  if (!value || value === "") return null;
+
   const num = parseInt(value, 10);
   if (isNaN(num)) return null;
-  
+
   if (is24Hour) {
     // 24-hour format: 0-23
     if (num >= 0 && num <= 23) {
-      return num.toString().padStart(2, '0');
+      return num.toString().padStart(2, "0");
     } else {
       // For out-of-range values, use value % 10
       const corrected = num % 10;
-      return corrected.toString().padStart(2, '0');
+      return corrected.toString().padStart(2, "0");
     }
   } else {
     // 12-hour format: 1-12
     if (num >= 1 && num <= 12) {
-      return num.toString().padStart(2, '0');
+      return num.toString().padStart(2, "0");
     } else if (num === 0) {
-      return '12'; // 0 becomes 12 in 12-hour format
+      return "12"; // 0 becomes 12 in 12-hour format
     } else {
       // For out-of-range values, use value % 10, but ensure it's 1-12
       let corrected = num % 10;
       if (corrected === 0) corrected = 12; // 0 becomes 12 in 12-hour format
-      return corrected.toString().padStart(2, '0');
+      return corrected.toString().padStart(2, "0");
     }
   }
 }
 
 function normalizeMinuteOrSecond(value: string | null): string | null {
-  if (!value || value === '') return null;
-  
+  if (!value || value === "") return null;
+
   const num = parseInt(value, 10);
   if (isNaN(num)) return null;
-  
+
   if (num >= 0 && num <= 59) {
-    return num.toString().padStart(2, '0');
+    return num.toString().padStart(2, "0");
   } else {
     // For out-of-range values, use value % 10
     const corrected = num % 10;
-    return corrected.toString().padStart(2, '0');
+    return corrected.toString().padStart(2, "0");
   }
 }
 
 // Helper functions to check if values are currently invalid (need normalization)
 function isHourInvalid(value: string | null, is24Hour: boolean): boolean {
-  if (!value || value === '') return false;
-  
+  if (!value || value === "") return false;
+
   const num = parseInt(value, 10);
-  if (isNaN(num)) return true;
-  
-  if (is24Hour) {
-    return num < 0 || num > 23;
-  } else {
-    return num < 1 || num > 12;
+  if (isNaN(num)) {
+    console.log("    🔍 isHourInvalid - NaN for value:", value);
+    return true;
   }
+
+  const invalid = is24Hour ? (num < 0 || num > 23) : (num < 1 || num > 12);
+  if (invalid) {
+    console.log("    🔍 isHourInvalid - out of range:", value, "->", num, "is24Hour:", is24Hour);
+  }
+  return invalid;
 }
 
 function isMinuteOrSecondInvalid(value: string | null): boolean {
-  if (!value || value === '') return false;
-  
+  if (!value || value === "") return false;
+
   const num = parseInt(value, 10);
-  if (isNaN(num)) return true;
-  
-  return num < 0 || num > 59;
+  if (isNaN(num)) {
+    console.log("    🔍 isMinuteOrSecondInvalid - NaN for value:", value);
+    return true;
+  }
+
+  const invalid = num < 0 || num > 59;
+  if (invalid) {
+    console.log("    🔍 isMinuteOrSecondInvalid - out of range:", value, "->", num);
+  }
+  return invalid;
 }
 
 // Input component types
@@ -211,22 +167,14 @@ function Input({
   onBlur,
   onKeyDown,
   onKeyUp,
-  placeholder = '--',
+  placeholder = "--",
   required,
   showLeadingZeros,
   step,
   value,
 }: InputProps): React.ReactElement {
-  const hasLeadingZero =
-    showLeadingZeros &&
-    value &&
-    Number(value) < 10 &&
-    (value === '0' || !value.toString().startsWith('0'));
-  const maxLength = max ? max.toString().length : null;
-
   return (
     <>
-      {hasLeadingZero ? <span className={`${className}__leadingZero`}>0</span> : null}
       <input
         aria-label={ariaLabel}
         autoComplete="off"
@@ -235,10 +183,9 @@ function Input({
         className={classnames(
           styles.input,
           styles[nameForClass || name],
-          hasLeadingZero && styles.hasLeadingZero,
           className,
         )}
-        style={{ width: '1.8em', textAlign: 'center', padding: '0 2px' }}
+        style={{ width: "1.8em", textAlign: "center", padding: "0 2px" }}
         data-input="true"
         disabled={disabled}
         inputMode="numeric"
@@ -249,7 +196,6 @@ function Input({
         onBlur={onBlur}
         onFocus={onFocus}
         onKeyDown={onKeyDown}
-        onKeyPress={makeOnKeyPress(maxLength)}
         onKeyUp={onKeyUp}
         placeholder={placeholder}
         // Assertion is needed for React 18 compatibility
@@ -257,7 +203,7 @@ function Input({
         required={required}
         step={step}
         type="text"
-        value={value !== null ? value : ''}
+        value={value !== null ? value : ""}
       />
     </>
   );
@@ -269,82 +215,66 @@ type AmPmProps = {
   autoFocus?: boolean;
   className: string;
   disabled?: boolean;
-  inputRef?: React.RefObject<HTMLSelectElement | null>;
   locale?: string;
   maxTime?: string;
   minTime?: string;
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement> & { target: HTMLSelectElement }) => void;
-  onKeyDown?: (
-    event: React.KeyboardEvent<HTMLSelectElement> & { target: HTMLSelectElement },
-  ) => void;
+  onClick?: () => void;
+  onAmPmSet?: (amPm: AmPmType) => void;
   required?: boolean;
   value?: string | null;
 };
 
-function AmPm({
+function AmPmButton({
   ariaLabel,
   autoFocus,
   className,
   disabled,
-  inputRef,
   locale,
   maxTime,
   minTime,
-  onChange,
-  onKeyDown,
-  required,
+  onClick,
+  onAmPmSet,
   value,
 }: AmPmProps): React.ReactElement {
-  const { root } = useTheme();
-  const amDisabled = minTime ? convert24to12(getHours(minTime))[1] === 'pm' : false;
-  const pmDisabled = maxTime ? convert24to12(getHours(maxTime))[1] === 'am' : false;
+  const amDisabled = minTime ? convert24to12(getHours(minTime))[1] === "pm" : false;
+  const pmDisabled = maxTime ? convert24to12(getHours(maxTime))[1] === "am" : false;
 
   const [amLabel, pmLabel] = getAmPmLabels(locale);
 
-  // Convert the HTML select onChange to match Radix UI onValueChange
-  const handleValueChange = useCallback((newValue: string) => {
-    if (disabled || !onChange) return; // Prevent onChange when disabled
-    
-    // Create a synthetic event to match the expected onChange signature
-    const syntheticEvent = {
-      target: { value: newValue, name: 'amPm' }
-    } as React.ChangeEvent<HTMLSelectElement>;
-    onChange(syntheticEvent);
-  }, [disabled, onChange]); // Add disabled to dependencies
+  // Determine if the button should be disabled based on time constraints
+  const isDisabled = disabled || (value === "am" && pmDisabled) || (value === "pm" && amDisabled);
 
-  // Ensure we have a stable value for Radix UI
-  const selectValue = value || undefined;
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled || !onAmPmSet) return;
+
+    const key = event.key.toLowerCase();
+    
+    // Handle 'a' or 'A' to set AM
+    if (key === 'a' && !amDisabled && value !== 'am') {
+      event.preventDefault();
+      onAmPmSet('am');
+    }
+    // Handle 'p' or 'P' to set PM  
+    else if (key === 'p' && !pmDisabled && value !== 'pm') {
+      event.preventDefault();
+      onAmPmSet('pm');
+    }
+  }, [disabled, onAmPmSet, value, amDisabled, pmDisabled]);
 
   return (
-    <SelectRoot value={selectValue} onValueChange={handleValueChange} disabled={disabled}>
-      <SelectTrigger
-        aria-label={ariaLabel}
-        autoFocus={autoFocus}
-        className={classnames(styles.amPm, className)}
-        disabled={disabled}
-        // Note: inputRef is for HTML select element, but SelectTrigger is a button
-        // We'll skip the ref for now since the typing doesn't match
-      >
-        <div className={styles.amPmValue}>
-          {value ? (value === 'am' ? amLabel : pmLabel) : '--'}
-        </div>
-        <SelectIcon asChild className={styles.amPmIcon}>
-          <Icon name="chevrondown" />
-        </SelectIcon>
-      </SelectTrigger>
-      <SelectPortal container={root}>
-        <SelectContent className={styles.amPmContent} position="popper">
-          <SelectViewport>
-            <SelectItem value="am" disabled={amDisabled} className={styles.amPmItem}>
-              <SelectItemText>{amLabel}</SelectItemText>
-            </SelectItem>
-            <SelectItem value="pm" disabled={pmDisabled} className={styles.amPmItem}>
-              <SelectItemText>{pmLabel}</SelectItemText>
-            </SelectItem>
-          </SelectViewport>
-        </SelectContent>
-      </SelectPortal>
-    </SelectRoot>
+    <button
+      type="button"
+      aria-label={ariaLabel || "Toggle AM/PM (Press A for AM, P for PM)"}
+      autoFocus={autoFocus}
+      className={classnames(styles.amPmButton, styles.button, className)}
+      disabled={isDisabled}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+    >
+      <span className={styles.amPmValue}>
+        {value ? (value === "am" ? amLabel : pmLabel) : "--"}
+      </span>
+    </button>
   );
 }
 
@@ -356,7 +286,7 @@ type HourInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass' | 'value'>;
+} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
   amPm,
@@ -373,7 +303,7 @@ function HourInput({
       // 24-hour format: 0-23
       return {
         maxHour: safeMin(23, maxTime && getHours(maxTime)),
-        minHour: safeMax(0, minTime && getHours(minTime))
+        minHour: safeMax(0, minTime && getHours(minTime)),
       };
     } else {
       // 12-hour format: 1-12
@@ -417,7 +347,7 @@ function HourInput({
 
   // Always show the raw value during typing, no conversion
   // This allows users to see invalid input like "23" before it gets normalized on blur
-  const displayValue = value || '';
+  const displayValue = value || "";
 
   const { className: originalClassName, ...restProps } = otherProps;
 
@@ -429,114 +359,9 @@ function HourInput({
       nameForClass="hour"
       value={displayValue}
       className={classnames(originalClassName, {
-        [styles.invalid]: isInvalid
+        [styles.invalid]: isInvalid,
       })}
       {...restProps}
-    />
-  );
-}
-type Hour12InputProps = {
-  amPm: AmPmType | null;
-  maxTime?: string;
-  minTime?: string;
-  value?: string | null;
-  isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass'>;
-
-function Hour12Input({
-  amPm,
-  maxTime,
-  minTime,
-  value,
-  isInvalid = false,
-  ...otherProps
-}: Hour12InputProps): React.ReactElement {
-  const maxHour = safeMin(
-    12,
-    maxTime &&
-      (() => {
-        const [maxHourResult, maxAmPm] = convert24to12(getHours(maxTime));
-
-        if (maxAmPm !== amPm) {
-          // pm is always after am, so we should ignore validation
-          return null;
-        }
-
-        return maxHourResult;
-      })(),
-  );
-
-  const minHour = safeMax(
-    1,
-    minTime &&
-      (() => {
-        const [minHourResult, minAmPm] = convert24to12(getHours(minTime));
-
-        if (
-          // pm is always after am, so we should ignore validation
-          minAmPm !== amPm ||
-          // If minHour is 12 am/pm, user should be able to enter 12, 1, ..., 11.
-          minHourResult === 12
-        ) {
-          return null;
-        }
-
-        return minHourResult;
-      })(),
-  );
-
-  // Always show the raw value during typing, no conversion
-  // This allows users to see invalid input like "23" before it gets normalized on blur
-  const value12 = value || '';
-
-  const { className: originalClassName, ...restProps } = otherProps;
-
-  return (
-    <Input
-      max={maxHour}
-      min={minHour}
-      name="hour12"
-      nameForClass="hour"
-      value={value12}
-      className={classnames(originalClassName, {
-        [styles.invalid]: isInvalid
-      })}
-      {...restProps}
-    />
-  );
-}
-
-// Hour24Input component
-type Hour24InputProps = {
-  maxTime?: string;
-  minTime?: string;
-  value?: string | null;
-  isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'nameForClass'>;
-
-function Hour24Input({
-  maxTime,
-  minTime,
-  value,
-  isInvalid = false,
-  ...otherProps
-}: Hour24InputProps): React.ReactElement {
-  const maxHour = safeMin(23, maxTime && getHours(maxTime));
-  const minHour = safeMax(0, minTime && getHours(minTime));
-
-  const { className: originalClassName, ...restProps } = otherProps;
-
-  return (
-    <Input 
-      max={maxHour} 
-      min={minHour} 
-      name="hour24" 
-      nameForClass="hour" 
-      value={value}
-      className={classnames(originalClassName, {
-        [styles.invalid]: isInvalid
-      })}
-      {...restProps} 
     />
   );
 }
@@ -549,7 +374,7 @@ type MinuteInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'value'>;
+} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
 
 function MinuteInput({
   hour,
@@ -577,7 +402,7 @@ function MinuteInput({
       showLeadingZeros={showLeadingZeros}
       value={value}
       className={classnames(originalClassName, {
-        [styles.invalid]: isInvalid
+        [styles.invalid]: isInvalid,
       })}
       {...restProps}
     />
@@ -593,7 +418,7 @@ type SecondInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, 'max' | 'min' | 'name' | 'value'>;
+} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
 
 function SecondInput({
   hour,
@@ -622,7 +447,7 @@ function SecondInput({
       showLeadingZeros={showLeadingZeros}
       value={value}
       className={classnames(originalClassName, {
-        [styles.invalid]: isInvalid
+        [styles.invalid]: isInvalid,
       })}
       {...restProps}
     />
@@ -632,25 +457,20 @@ function SecondInput({
 // Available time formats
 export const TimePickerFormatValues = [
   "h:m:s a", // 12-hour with seconds
-  "h:m a",   // 12-hour without seconds
+  "h:m a", // 12-hour without seconds
   "HH:mm:ss", // 24-hour with seconds
-  "HH:mm",   // 24-hour without seconds
-  "H:m:s",   // 24-hour with seconds (no leading zeros)
-  "H:m",     // 24-hour without seconds (no leading zeros)
+  "HH:mm", // 24-hour without seconds
+  "H:m:s", // 24-hour with seconds (no leading zeros)
+  "H:m", // 24-hour without seconds (no leading zeros)
 ] as const;
 
 type TimePickerFormat = (typeof TimePickerFormatValues)[number];
-
-// Available detail levels
-export const TimePickerMaxDetailValues = ["hour", "minute", "second"] as const;
-type TimePickerMaxDetail = (typeof TimePickerMaxDetailValues)[number];
 
 type Props = {
   id?: string;
   initialValue?: string;
   value?: string;
   enabled?: boolean;
-  placeholder?: string;
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
@@ -661,17 +481,16 @@ type Props = {
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   format?: TimePickerFormat;
-  maxDetail?: TimePickerMaxDetail;
   minTime?: string;
   maxTime?: string;
   clearable?: boolean;
   clearIcon?: string;
   required?: boolean;
-  name?: string;
   startText?: string;
   startIcon?: string;
   endText?: string;
   endIcon?: string;
+  gap?: string;
   label?: string;
   labelPosition?: string;
   labelWidth?: string;
@@ -684,10 +503,8 @@ export const defaultProps = {
   enabled: true,
   validationStatus: "none" as ValidationStatus,
   format: "HH:mm" as TimePickerFormat,
-  maxDetail: "minute" as TimePickerMaxDetail,
   clearable: true,
   required: false,
-  name: "time",
   labelPosition: "top",
   readOnly: false,
   autoFocus: false,
@@ -700,7 +517,6 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     initialValue,
     value: controlledValue,
     enabled = defaultProps.enabled,
-    placeholder,
     updateState,
     style,
     className,
@@ -711,17 +527,16 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     format = defaultProps.format,
-    maxDetail = defaultProps.maxDetail,
     minTime,
     maxTime,
     clearable = defaultProps.clearable,
     clearIcon,
     required = defaultProps.required,
-    name = defaultProps.name,
     startText,
     startIcon,
     endText,
     endIcon,
+    gap,
     label,
     labelPosition = defaultProps.labelPosition,
     labelWidth,
@@ -736,14 +551,22 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
 
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
-    console.log('🔄 stableInitialValue computed:', initialValue);
+    console.log("🔄 stableInitialValue computed:", initialValue);
     return initialValue;
   }, [initialValue]);
 
   // Local state management - sync with value prop (like TextBox and NumberBox)
   const [localValue, setLocalValue] = useState<string | null>(() => {
     const initial = controlledValue || stableInitialValue || null;
-    console.log('🚀 Initial localValue:', initial, '(controlledValue:', controlledValue, ', stableInitialValue:', stableInitialValue, ')');
+    console.log(
+      "🚀 Initial localValue:",
+      initial,
+      "(controlledValue:",
+      controlledValue,
+      ", stableInitialValue:",
+      stableInitialValue,
+      ")",
+    );
     return initial;
   });
 
@@ -752,364 +575,528 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   const [hour, setHour] = useState<string | null>(null);
   const [minute, setMinute] = useState<string | null>(null);
   const [second, setSecond] = useState<string | null>(null);
-  
+
+  // Track whether the component currently has focus
+  const [componentHasFocus, setComponentHasFocus] = useState(false);
+
   // Add effects to track field state changes
   useEffect(() => {
-    console.log('🔢 Hour state changed to:', hour);
+    console.log("🔢 Hour state changed to:", hour);
   }, [hour]);
-  
+
   useEffect(() => {
-    console.log('🔢 Minute state changed to:', minute);
+    console.log("🔢 Minute state changed to:", minute);
   }, [minute]);
-  
+
   useEffect(() => {
-    console.log('🔢 Second state changed to:', second);
+    console.log("🔢 Second state changed to:", second);
   }, [second]);
-  
+
   useEffect(() => {
-    console.log('🔢 AmPm state changed to:', amPm);
+    console.log("🔢 AmPm state changed to:", amPm);
   }, [amPm]);
-  
+
   // State to track invalid status for visual feedback
   const [isHourCurrentlyInvalid, setIsHourCurrentlyInvalid] = useState(false);
   const [isMinuteCurrentlyInvalid, setIsMinuteCurrentlyInvalid] = useState(false);
   const [isSecondCurrentlyInvalid, setIsSecondCurrentlyInvalid] = useState(false);
-  
+
   useEffect(() => {
-    console.log('📡 Sync effect triggered - controlledValue:', controlledValue, ', localValue:', localValue, ', stableInitialValue:', stableInitialValue);
-    
+    console.log(
+      "📡 Sync effect triggered - controlledValue:",
+      controlledValue,
+      ", localValue:",
+      localValue,
+      ", stableInitialValue:",
+      stableInitialValue,
+    );
+
     // Initialize XMLUI state with initial value on first mount
     if (updateState && stableInitialValue !== undefined && controlledValue === undefined) {
-      console.log('🔧 Initializing XMLUI state with:', stableInitialValue);
+      console.log("🔧 Initializing XMLUI state with:", stableInitialValue);
       updateState({ value: stableInitialValue }, { initial: true });
       return; // Don't sync on this first run, let the state update trigger a re-render
     }
-    
+
     // Sync with controlled value - always sync when controlledValue changes
     const newLocalValue = controlledValue || null;
-    console.log('🔄 Syncing localValue from', localValue, 'to', newLocalValue);
+    console.log("🔄 Syncing localValue from", localValue, "to", newLocalValue);
     setLocalValue(newLocalValue);
   }, [controlledValue, stableInitialValue, updateState]);
 
   // Determine what components to show based on format
-  const is12HourFormat = format && format.includes('a');
-  const showSeconds = (format && format.includes('s')) || maxDetail === 'second';
-  const showLeadingZeros = format && (format.includes('HH') || format.includes('mm') || format.includes('ss'));
+  const is12HourFormat = format && format.includes("a");
+  const showSeconds = (format && format.includes("s"));
+  const showLeadingZeros =
+    format && (format.includes("HH") || format.includes("mm") || format.includes("ss"));
 
   // Parse value into individual components
   useEffect(() => {
-    console.log('🔍 Parse effect triggered - localValue:', localValue);
-    
+    console.log("🔍 Parse effect triggered - localValue:", localValue);
+
     if (localValue) {
       const timeString = String(localValue).toLowerCase();
-      console.log('  📝 Parsing timeString:', timeString);
-      
+      console.log("  📝 Parsing timeString:", timeString);
+
       // Check if the time string contains AM/PM
-      const hasAmPm = timeString.includes('am') || timeString.includes('pm');
-      const isAmPmPm = timeString.includes('pm');
-      
+      const hasAmPm = timeString.includes("am") || timeString.includes("pm");
+      const isAmPmPm = timeString.includes("pm");
+
       // Extract just the time part (remove AM/PM suffix)
-      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, '').trim();
-      
+      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, "").trim();
+
       const parsedHour = getHours(timePart);
       const parsedMinute = getMinutes(timePart);
       const parsedSecond = getSeconds(timePart);
-      
-      console.log('  🔢 Parsed values - hour:', parsedHour, ', minute:', parsedMinute, ', second:', parsedSecond);
-      
+
+      console.log(
+        "  🔢 Parsed values - hour:",
+        parsedHour,
+        ", minute:",
+        parsedMinute,
+        ", second:",
+        parsedSecond,
+      );
+
       // Set AM/PM based on the actual string content or convert from 24-hour
       if (hasAmPm) {
-        const amPmValue = isAmPmPm ? 'pm' : 'am';
-        console.log('  🕒 Setting AM/PM from string:', amPmValue);
+        const amPmValue = isAmPmPm ? "pm" : "am";
+        console.log("  🕒 Setting AM/PM from string:", amPmValue);
         setAmPm(amPmValue);
       } else {
         // If no AM/PM in string, derive it from 24-hour format
         const amPmValue = convert24to12(parsedHour)[1];
-        console.log('  🕒 Setting AM/PM from 24-hour:', amPmValue);
+        console.log("  🕒 Setting AM/PM from 24-hour:", amPmValue);
         setAmPm(amPmValue);
       }
-      
+
       // Set the raw hour value without any conversion - let the display logic handle 12/24 hour format
       // This prevents interfering with user input during typing
-      const hourStr = parsedHour.toString().padStart(2, '0');
-      const minuteStr = parsedMinute.toString().padStart(2, '0');
-      const secondStr = parsedSecond.toString().padStart(2, '0');
-      
-      console.log('  ✅ Setting field values - hour:', hourStr, ', minute:', minuteStr, ', second:', secondStr);
+      const hourStr = parsedHour.toString().padStart(2, "0");
+      const minuteStr = parsedMinute.toString().padStart(2, "0");
+      const secondStr = parsedSecond.toString().padStart(2, "0");
+
+      console.log(
+        "  ✅ Setting field values - hour:",
+        hourStr,
+        ", minute:",
+        minuteStr,
+        ", second:",
+        secondStr,
+      );
       setHour(hourStr);
       setMinute(minuteStr);
       setSecond(secondStr);
     } else {
-      console.log('  🧹 Clearing all field values');
+      console.log("  🧹 Clearing all field values");
       setAmPm(null);
       setHour(null);
       setMinute(null);
       setSecond(null);
     }
-    
-    // Add a delayed log to check if the state actually updated
-    setTimeout(() => {
-      console.log('  ⏰ After setState timeout - current field values:', { hour, minute, second, amPm });
-    }, 0);
   }, [localValue]);
 
   // Event handlers
   const handleChange = useEvent((newValue: string | null) => {
-    console.log('🔄 handleChange called with:', newValue);
-    
+    console.log("🔄 handleChange called with:", newValue);
+
     // Update local state immediately for immediate UI feedback
     setLocalValue(newValue);
-    
+
     // Also update the XMLUI state
     if (updateState) {
-      console.log('  📤 Updating XMLUI state with:', newValue);
+      console.log("  📤 Updating XMLUI state with:", newValue);
       updateState({ value: newValue });
     }
     onDidChange?.(newValue);
+    console.log("  ✅ onDidChange callback invoked", newValue);
   });
 
   // Helper function to format the complete time value
-  const formatTimeValue = useCallback((h: string | null, m: string | null, s: string | null, ap: AmPmType | null, is12Hour: boolean): string | null => {
-    console.log('⚙️ formatTimeValue called - h:', h, ', m:', m, ', s:', s, ', ap:', ap, ', is12Hour:', is12Hour);
-    
-    if (!h || !m) {
-      console.log('  ❌ Missing hour or minute, returning null');
-      return null;
-    }
-    
-    let formattedTime = '';
-    
-    if (is12Hour) {
-      // 12-hour format
-      const hour12 = h.padStart(2, '0');
-      const minute12 = m.padStart(2, '0');
-      formattedTime = `${hour12}:${minute12}`;
-      
-      if (s && showSeconds) {
-        formattedTime += `:${s.padStart(2, '0')}`;
+  const formatTimeValue = useCallback(
+    (
+      h: string | null,
+      m: string | null,
+      s: string | null,
+      ap: AmPmType | null,
+      is12Hour: boolean,
+    ): string | null => {
+      console.log(
+        "⚙️ formatTimeValue called - h:",
+        h,
+        ", m:",
+        m,
+        ", s:",
+        s,
+        ", ap:",
+        ap,
+        ", is12Hour:",
+        is12Hour,
+      );
+
+      if (!h || !m) {
+        console.log("  ❌ Missing hour or minute, returning null");
+        return null;
       }
-      
-      if (ap) {
-        formattedTime += ` ${ap}`;
+
+      let formattedTime = "";
+
+      if (is12Hour) {
+        // 12-hour format
+        const hour12 = h.padStart(2, "0");
+        const minute12 = m.padStart(2, "0");
+        formattedTime = `${hour12}:${minute12}`;
+
+        if (s && showSeconds) {
+          formattedTime += `:${s.padStart(2, "0")}`;
+        }
+
+        if (ap) {
+          formattedTime += ` ${ap}`;
+        }
+      } else {
+        // 24-hour format
+        const hour24 = h.padStart(2, "0");
+        const minute24 = m.padStart(2, "0");
+        formattedTime = `${hour24}:${minute24}`;
+
+        if (s && showSeconds) {
+          formattedTime += `:${s.padStart(2, "0")}`;
+        }
       }
-    } else {
-      // 24-hour format
-      const hour24 = h.padStart(2, '0');
-      const minute24 = m.padStart(2, '0');
-      formattedTime = `${hour24}:${minute24}`;
-      
-      if (s && showSeconds) {
-        formattedTime += `:${s.padStart(2, '0')}`;
-      }
-    }
-    
-    return formattedTime;
-  }, [showSeconds]);
+
+      return formattedTime;
+    },
+    [showSeconds],
+  );
 
   // Handle changes from individual inputs
-  const handleHourChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newHour = event.target.value;
-    console.log('⌨️ handleHourChange called with:', newHour);
-    setHour(newHour);
-    // Update invalid state immediately for visual feedback
-    setIsHourCurrentlyInvalid(isHourInvalid(newHour, !is12HourFormat));
-    // Don't format/normalize during typing - only on blur
-  }, [is12HourFormat]);
+  const handleHourChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newHour = event.target.value;
+      console.log("⌨️ handleHourChange called with:", newHour);
+      setHour(newHour);
+      // Update invalid state immediately for visual feedback
+      const isInvalid = isHourInvalid(newHour, !is12HourFormat);
+      console.log("  🔍 Hour validation - value:", newHour, ", is24Hour:", !is12HourFormat, ", isInvalid:", isInvalid);
+      setIsHourCurrentlyInvalid(isInvalid);
+      // Fire invalidTime event if the value is invalid
+      if (isInvalid) {
+        console.log("  🚨 Firing onInvalidChange for hour");
+        onInvalidChange?.();
+      }
+      // Don't format/normalize during typing - only on blur
+    },
+    [is12HourFormat, onInvalidChange],
+  );
 
-  const handleHourBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = event.target.value;
-    console.log('👁️ handleHourBlur called with currentValue:', currentValue);
-    const normalizedHour = normalizeHour(currentValue, !is12HourFormat);
-    
-    if (normalizedHour !== null && normalizedHour !== currentValue) {
-      console.log('  🔧 Normalizing hour from', currentValue, 'to', normalizedHour);
-      setHour(normalizedHour);
-      setIsHourCurrentlyInvalid(false); // Clear invalid state after normalization
-      
-      if (minute) {
+  const handleHourBlur = useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      const currentValue = event.target.value;
+      console.log("👁️ handleHourBlur called with currentValue:", currentValue);
+      const normalizedHour = normalizeHour(currentValue, !is12HourFormat);
+
+      if (normalizedHour !== null && normalizedHour !== currentValue) {
+        console.log("  🔧 Normalizing hour from", currentValue, "to", normalizedHour);
+        setHour(normalizedHour);
+        setIsHourCurrentlyInvalid(false); // Clear invalid state after normalization
+
+        // Always call handleChange to update the time value
         const timeString = formatTimeValue(normalizedHour, minute, second, amPm, is12HourFormat);
-        console.log('  📤 Calling handleChange from hour blur with:', timeString);
+        console.log("  📤 Calling handleChange from hour blur with:", timeString);
+        handleChange(timeString);
+      } else if (normalizedHour === null && currentValue !== "") {
+        console.log("  🧹 Resetting invalid hour input");
+        // Reset to previous valid value or clear
+        setHour("");
+        setIsHourCurrentlyInvalid(false); // Clear invalid state
+        // Always call handleChange to update the time value (likely to null)
+        const timeString = formatTimeValue("", minute, second, amPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from hour blur (reset) with:", timeString);
+        handleChange(timeString);
+      } else if (normalizedHour !== null) {
+        // Value didn't need normalization, but still update the complete time
+        const timeString = formatTimeValue(normalizedHour, minute, second, amPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from hour blur (no change needed) with:", timeString);
         handleChange(timeString);
       }
-    } else if (normalizedHour === null && currentValue !== '') {
-      console.log('  🧹 Resetting invalid hour input');
-      // Reset to previous valid value or clear
-      setHour('');
-      setIsHourCurrentlyInvalid(false); // Clear invalid state
-      if (minute) {
-        const timeString = formatTimeValue('', minute, second, amPm, is12HourFormat);
-        console.log('  📤 Calling handleChange from hour blur (reset) with:', timeString);
-        handleChange(timeString);
-      }
-    }
-  }, [minute, second, amPm, is12HourFormat, handleChange]);
+    },
+    [minute, second, amPm, is12HourFormat, handleChange],
+  );
 
   const handleMinuteChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newMinute = event.target.value;
-    console.log('⌨️ handleMinuteChange called with:', newMinute);
+    console.log("⌨️ handleMinuteChange called with:", newMinute);
     setMinute(newMinute);
     // Update invalid state immediately for visual feedback
-    setIsMinuteCurrentlyInvalid(isMinuteOrSecondInvalid(newMinute));
-    // Don't format/normalize during typing - only on blur
-  }, []);
-
-  const handleMinuteBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = event.target.value;
-    console.log('👁️ handleMinuteBlur called with currentValue:', currentValue);
-    const normalizedMinute = normalizeMinuteOrSecond(currentValue);
-    
-    if (normalizedMinute !== null && normalizedMinute !== currentValue) {
-      console.log('  🔧 Normalizing minute from', currentValue, 'to', normalizedMinute);
-      setMinute(normalizedMinute);
-      setIsMinuteCurrentlyInvalid(false); // Clear invalid state after normalization
-      
-      if (hour) {
-        const timeString = formatTimeValue(hour, normalizedMinute, second, amPm, is12HourFormat);
-        console.log('  📤 Calling handleChange from minute blur with:', timeString);
-        handleChange(timeString);
-      }
-    } else if (normalizedMinute === null && currentValue !== '') {
-      console.log('  🧹 Resetting invalid minute input');
-      // Reset to previous valid value or clear
-      setMinute('');
-      setIsMinuteCurrentlyInvalid(false); // Clear invalid state
-      if (hour) {
-        const timeString = formatTimeValue(hour, '', second, amPm, is12HourFormat);
-        console.log('  📤 Calling handleChange from minute blur (reset) with:', timeString);
-        handleChange(timeString);
-      }
+    const isInvalid = isMinuteOrSecondInvalid(newMinute);
+    console.log("  🔍 Minute validation - value:", newMinute, ", isInvalid:", isInvalid);
+    setIsMinuteCurrentlyInvalid(isInvalid);
+    // Fire invalidTime event if the value is invalid
+    if (isInvalid) {
+      console.log("  🚨 Firing onInvalidChange for minute");
+      onInvalidChange?.();
     }
-  }, [hour, second, amPm, is12HourFormat, handleChange]);
+    // Don't format/normalize during typing - only on blur
+  }, [onInvalidChange]);
+
+  const handleMinuteBlur = useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      const currentValue = event.target.value;
+      console.log("👁️ handleMinuteBlur called with currentValue:", currentValue);
+      const normalizedMinute = normalizeMinuteOrSecond(currentValue);
+
+      if (normalizedMinute !== null && normalizedMinute !== currentValue) {
+        console.log("  🔧 Normalizing minute from", currentValue, "to", normalizedMinute);
+        setMinute(normalizedMinute);
+        setIsMinuteCurrentlyInvalid(false); // Clear invalid state after normalization
+
+        // Always call handleChange to update the time value
+        const timeString = formatTimeValue(hour, normalizedMinute, second, amPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from minute blur with:", timeString);
+        handleChange(timeString);
+      } else if (normalizedMinute === null && currentValue !== "") {
+        console.log("  🧹 Resetting invalid minute input");
+        // Reset to previous valid value or clear
+        setMinute("");
+        setIsMinuteCurrentlyInvalid(false); // Clear invalid state
+        // Always call handleChange to update the time value (likely to null)
+        const timeString = formatTimeValue(hour, "", second, amPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from minute blur (reset) with:", timeString);
+        handleChange(timeString);
+      } else if (normalizedMinute !== null) {
+        // Value didn't need normalization, but still update the complete time
+        const timeString = formatTimeValue(hour, normalizedMinute, second, amPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from minute blur (no change needed) with:", timeString);
+        handleChange(timeString);
+      }
+    },
+    [hour, second, amPm, is12HourFormat, handleChange],
+  );
 
   const handleSecondChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newSecond = event.target.value;
     setSecond(newSecond);
     // Update invalid state immediately for visual feedback
-    setIsSecondCurrentlyInvalid(isMinuteOrSecondInvalid(newSecond));
+    const isInvalid = isMinuteOrSecondInvalid(newSecond);
+    console.log("  🔍 Second validation - value:", newSecond, ", isInvalid:", isInvalid);
+    setIsSecondCurrentlyInvalid(isInvalid);
+    // Fire invalidTime event if the value is invalid
+    if (isInvalid) {
+      console.log("  🚨 Firing onInvalidChange for second");
+      onInvalidChange?.();
+    }
     // Don't format/normalize during typing - only on blur
-  }, []);
+  }, [onInvalidChange]);
 
-  const handleSecondBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = event.target.value;
-    const normalizedSecond = normalizeMinuteOrSecond(currentValue);
-    
-    if (normalizedSecond !== null && normalizedSecond !== currentValue) {
-      setSecond(normalizedSecond);
-      setIsSecondCurrentlyInvalid(false); // Clear invalid state after normalization
-      
-      if (hour && minute) {
+  const handleSecondBlur = useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      const currentValue = event.target.value;
+      const normalizedSecond = normalizeMinuteOrSecond(currentValue);
+
+      if (normalizedSecond !== null && normalizedSecond !== currentValue) {
+        setSecond(normalizedSecond);
+        setIsSecondCurrentlyInvalid(false); // Clear invalid state after normalization
+
+        // Always call handleChange to update the time value
+        const timeString = formatTimeValue(hour, minute, normalizedSecond, amPm, is12HourFormat);
+        handleChange(timeString);
+      } else if (normalizedSecond === null && currentValue !== "") {
+        // Reset to previous valid value or clear
+        setSecond("");
+        setIsSecondCurrentlyInvalid(false); // Clear invalid state
+        // Always call handleChange to update the time value
+        const timeString = formatTimeValue(hour, minute, "", amPm, is12HourFormat);
+        handleChange(timeString);
+      } else if (normalizedSecond !== null) {
+        // Value didn't need normalization, but still update the complete time
         const timeString = formatTimeValue(hour, minute, normalizedSecond, amPm, is12HourFormat);
         handleChange(timeString);
       }
-    } else if (normalizedSecond === null && currentValue !== '') {
-      // Reset to previous valid value or clear
-      setSecond('');
-      setIsSecondCurrentlyInvalid(false); // Clear invalid state
+    },
+    [hour, minute, amPm, is12HourFormat, handleChange],
+  );
+
+  const handleAmPmChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const newAmPm = event.target.value as AmPmType;
+      console.log("🔄 handleAmPmChange called with:", newAmPm);
+      setAmPm(newAmPm);
+
       if (hour && minute) {
-        const timeString = formatTimeValue(hour, minute, '', amPm, is12HourFormat);
+        const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
+        console.log("  📤 Calling handleChange from amPm change with:", timeString);
         handleChange(timeString);
       }
-    }
-  }, [hour, minute, amPm, is12HourFormat, handleChange]);
+    },
+    [hour, minute, second, is12HourFormat, handleChange],
+  ); // Remove amPm from dependencies
 
-  const handleAmPmChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newAmPm = event.target.value as AmPmType;
-    console.log('🔄 handleAmPmChange called with:', newAmPm);
+  const handleAmPmToggle = useCallback(() => {
+    const newAmPm: AmPmType = amPm === "am" ? "pm" : "am";
+    console.log("🔄 handleAmPmToggle called, switching from", amPm, "to", newAmPm);
     setAmPm(newAmPm);
+
+    // Always call handleChange to update the time value
+    const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
+    console.log("  📤 Calling handleChange from amPm toggle with:", timeString);
+    handleChange(timeString);
+  }, [amPm, hour, minute, second, is12HourFormat, handleChange]);
+
+  const handleAmPmSet = useCallback((targetAmPm: AmPmType) => {
+    if (amPm === targetAmPm) return; // No change needed
     
-    if (hour && minute) {
-      const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
-      console.log('  📤 Calling handleChange from amPm change with:', timeString);
-      handleChange(timeString);
+    console.log("🔄 handleAmPmSet called, setting to", targetAmPm);
+    setAmPm(targetAmPm);
+
+    // Always call handleChange to update the time value
+    const timeString = formatTimeValue(hour, minute, second, targetAmPm, is12HourFormat);
+    console.log("  📤 Calling handleChange from amPm set with:", timeString);
+    handleChange(timeString);
+  }, [amPm, hour, minute, second, is12HourFormat, handleChange]);
+
+  // Focus method
+  const focus = useCallback(() => {
+    const input = timePickerRef.current?.querySelector(
+      'input[type="time"], input[name*="hour"], input[name*="minute"]',
+    ) as HTMLInputElement;
+    input?.focus();
+  }, []);
+
+  // Custom focus handler that fires gotFocus when component gains focus
+  const handleComponentFocus = useCallback((event: React.FocusEvent<HTMLDivElement>) => {
+    // If component didn't have focus before, fire gotFocus
+    if (!componentHasFocus) {
+      setComponentHasFocus(true);
+      onFocus?.(event);
     }
-  }, [hour, minute, second, is12HourFormat, handleChange]); // Remove amPm from dependencies
+  }, [componentHasFocus, onFocus]);
+
+  // Custom blur handler that only fires lostFocus when focus leaves the entire component
+  const handleComponentBlur = useCallback((event: React.FocusEvent<HTMLDivElement>) => {
+    // Check if the new focus target is still within this TimePicker component
+    const relatedTarget = event.relatedTarget as HTMLElement;
+    const currentTarget = event.currentTarget;
+    
+    // If there's no related target, or the related target is not within this component, fire lostFocus
+    if (!relatedTarget || !currentTarget.contains(relatedTarget)) {
+      setComponentHasFocus(false);
+      onBlur?.(event);
+    }
+  }, [onBlur]);
 
   const clear = useCallback(() => {
-    console.log('🧹 Clear button clicked');
-    console.log('  📋 stableInitialValue:', stableInitialValue);
-    console.log('  📋 Current localValue:', localValue);
-    console.log('  📋 Current controlledValue:', controlledValue);
-    console.log('  📋 Current field states - hour:', hour, ', minute:', minute, ', second:', second, ', amPm:', amPm);
-    
+    console.log("🧹 Clear button clicked");
+    console.log("  📋 stableInitialValue:", stableInitialValue);
+    console.log("  📋 Current localValue:", localValue);
+    console.log("  📋 Current controlledValue:", controlledValue);
+    console.log(
+      "  📋 Current field states - hour:",
+      hour,
+      ", minute:",
+      minute,
+      ", second:",
+      second,
+      ", amPm:",
+      amPm,
+    );
+
     // Reset to initial value if provided, otherwise null
     const valueToReset = stableInitialValue !== undefined ? stableInitialValue : null;
-    console.log('  🎯 valueToReset:', valueToReset);
-    
+    console.log("  🎯 valueToReset:", valueToReset);
+
     // Parse the reset value and update field states directly
     if (valueToReset) {
       const timeString = String(valueToReset).toLowerCase();
-      console.log('  🔍 Parsing reset value:', timeString);
-      
+      console.log("  🔍 Parsing reset value:", timeString);
+
       // Check if the time string contains AM/PM
-      const hasAmPm = timeString.includes('am') || timeString.includes('pm');
-      const isAmPmPm = timeString.includes('pm');
-      
+      const hasAmPm = timeString.includes("am") || timeString.includes("pm");
+      const isAmPmPm = timeString.includes("pm");
+
       // Extract just the time part (remove AM/PM suffix)
-      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, '').trim();
-      
+      const timePart = timeString.replace(/\s*(am|pm)\s*$/i, "").trim();
+
       const parsedHour = getHours(timePart);
       const parsedMinute = getMinutes(timePart);
       const parsedSecond = getSeconds(timePart);
-      
-      console.log('  🔢 Parsed reset values - hour:', parsedHour, ', minute:', parsedMinute, ', second:', parsedSecond);
-      
+
+      console.log(
+        "  🔢 Parsed reset values - hour:",
+        parsedHour,
+        ", minute:",
+        parsedMinute,
+        ", second:",
+        parsedSecond,
+      );
+
       // Set AM/PM based on the actual string content or convert from 24-hour
       let amPmValue: AmPmType | null = null;
       if (hasAmPm) {
-        amPmValue = isAmPmPm ? 'pm' : 'am';
-        console.log('  🕒 Setting AM/PM from string:', amPmValue);
+        amPmValue = isAmPmPm ? "pm" : "am";
+        console.log("  🕒 Setting AM/PM from string:", amPmValue);
       } else {
         // If no AM/PM in string, derive it from 24-hour format
         amPmValue = convert24to12(parsedHour)[1];
-        console.log('  🕒 Setting AM/PM from 24-hour:', amPmValue);
+        console.log("  🕒 Setting AM/PM from 24-hour:", amPmValue);
       }
-      
+
       // Set the raw hour value without any conversion
-      const hourStr = parsedHour.toString().padStart(2, '0');
-      const minuteStr = parsedMinute.toString().padStart(2, '0');
-      const secondStr = parsedSecond.toString().padStart(2, '0');
-      
-      console.log('  ✅ Setting field values directly - hour:', hourStr, ', minute:', minuteStr, ', second:', secondStr, ', amPm:', amPmValue);
-      
+      const hourStr = parsedHour.toString().padStart(2, "0");
+      const minuteStr = parsedMinute.toString().padStart(2, "0");
+      const secondStr = parsedSecond.toString().padStart(2, "0");
+
+      console.log(
+        "  ✅ Setting field values directly - hour:",
+        hourStr,
+        ", minute:",
+        minuteStr,
+        ", second:",
+        secondStr,
+        ", amPm:",
+        amPmValue,
+      );
+
       setHour(hourStr);
       setMinute(minuteStr);
       setSecond(secondStr);
       setAmPm(amPmValue);
-      
-      console.log('  ✅ Field states updated directly');
+
+      console.log("  ✅ Field states updated directly");
     } else {
       // Clear all fields
       setHour(null);
       setMinute(null);
       setSecond(null);
       setAmPm(null);
-      console.log('  🗑️ All fields cleared');
+      console.log("  🗑️ All fields cleared");
     }
-    
+
     handleChange(valueToReset);
-  }, [stableInitialValue, handleChange, localValue, controlledValue, hour, minute, second, amPm, setHour, setMinute, setSecond, setAmPm]);
+    
+    // Focus the component after clearing
+    setTimeout(() => {
+      focus();
+    }, 0);
+  }, [
+    stableInitialValue,
+    handleChange,
+    localValue,
+    controlledValue,
+    hour,
+    minute,
+    second,
+    amPm,
+    setHour,
+    setMinute,
+    setSecond,
+    setAmPm,
+    focus,
+  ]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
   }
-
-  const handleFocus = useEvent((event: React.FocusEvent<HTMLDivElement>) => {
-    onFocus?.(event);
-  });
-
-  const handleBlur = useEvent((event: React.FocusEvent<HTMLDivElement>) => {
-    onBlur?.(event);
-  });
-
-  const handleInvalidChange = useEvent(() => {
-    onInvalidChange?.();
-  });
-
-  // Focus method
-  const focus = useCallback(() => {
-    const input = timePickerRef.current?.querySelector('input[type="time"], input[name*="hour"], input[name*="minute"]') as HTMLInputElement;
-    input?.focus();
-  }, []);
 
   const setValue = useEvent((newValue: string | null) => {
     handleChange(newValue);
@@ -1152,24 +1139,14 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
   // Adornments
   const startAdornment = useMemo(() => {
     if (startIcon || startText) {
-      return (
-        <Adornment
-          iconName={startIcon}
-          text={startText}
-        />
-      );
+      return <Adornment iconName={startIcon} text={startText} className={styles.adornment} />;
     }
     return null;
   }, [startIcon, startText]);
 
   const endAdornment = useMemo(() => {
     if (endIcon || endText) {
-      return (
-        <Adornment
-          iconName={endIcon}
-          text={endText}
-        />
-      );
+      return <Adornment iconName={endIcon} text={endText} className={styles.adornment} />;
     }
     return null;
   }, [endIcon, endText]);
@@ -1178,110 +1155,104 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     <div
       ref={timePickerRef}
       className={classnames(
-        styles.timePicker,
+        styles.timePickerWrapper,
         {
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
           [styles.disabled]: !enabled,
           [styles.readOnly]: readOnly,
         },
         className,
       )}
-      style={style}
+      style={{ ...style, gap }}
+      onFocusCapture={handleComponentFocus}
+      onBlur={handleComponentBlur}
       {...rest}
     >
       {startAdornment}
-      <div
-        className={classnames(
-          styles.reactTimePickerWrapper,
-          {
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          }
-        )}
-      >
-        <div className={styles.wrapper}>
-          <div className={styles.inputGroup}>
-            {/* Hour input */}
-            <HourInput
-              amPm={amPm}
-              autoFocus={autoFocus}
-              className="timepicker"
-              disabled={!enabled}
-              maxTime={maxTime}
-              minTime={minTime}
-              onChange={handleHourChange}
-              onBlur={handleHourBlur}
-              required={required}
-              showLeadingZeros={showLeadingZeros}
-              value={hour}
-              isInvalid={isHourCurrentlyInvalid}
-              is24Hour={!is12HourFormat}
-            />
-            
-            <Divider>:</Divider>
-            
-            {/* Minute input */}
-            <MinuteInput
-              className="timepicker"
-              disabled={!enabled}
-              hour={hour}
-              maxTime={maxTime}
-              minTime={minTime}
-              onChange={handleMinuteChange}
-              onBlur={handleMinuteBlur}
-              required={required}
-              showLeadingZeros={showLeadingZeros}
-              value={minute}
-              isInvalid={isMinuteCurrentlyInvalid}
-            />
-            
-            {/* Second input (if needed) */}
-            {showSeconds && (
-              <>
-                <Divider>:</Divider>
-                <SecondInput
-                  className="timepicker"
-                  disabled={!enabled}
-                  hour={hour}
-                  maxTime={maxTime}
-                  minTime={minTime}
-                  minute={minute}
-                  onChange={handleSecondChange}
-                  onBlur={handleSecondBlur}
-                  required={required}
-                  showLeadingZeros={showLeadingZeros}
-                  value={second}
-                  isInvalid={isSecondCurrentlyInvalid}
-                />
-              </>
-            )}
-            
-            {/* AM/PM selector (if 12-hour format) */}
-            {is12HourFormat && (
-              <AmPm
+      <div className={styles.wrapper}>
+        <div className={styles.inputGroup}>
+          {/* Hour input */}
+          <HourInput
+            amPm={amPm}
+            autoFocus={autoFocus}
+            className="timepicker"
+            disabled={!enabled}
+            maxTime={maxTime}
+            minTime={minTime}
+            onChange={handleHourChange}
+            onBlur={handleHourBlur}
+            required={required}
+            showLeadingZeros={showLeadingZeros}
+            value={hour}
+            isInvalid={isHourCurrentlyInvalid}
+            is24Hour={!is12HourFormat}
+          />
+
+          <Divider>:</Divider>
+
+          {/* Minute input */}
+          <MinuteInput
+            className="timepicker"
+            disabled={!enabled}
+            hour={hour}
+            maxTime={maxTime}
+            minTime={minTime}
+            onChange={handleMinuteChange}
+            onBlur={handleMinuteBlur}
+            required={required}
+            showLeadingZeros={showLeadingZeros}
+            value={minute}
+            isInvalid={isMinuteCurrentlyInvalid}
+          />
+
+          {/* Second input (if needed) */}
+          {showSeconds && (
+            <>
+              <Divider>:</Divider>
+              <SecondInput
                 className="timepicker"
                 disabled={!enabled}
+                hour={hour}
                 maxTime={maxTime}
                 minTime={minTime}
-                onChange={handleAmPmChange}
+                minute={minute}
+                onChange={handleSecondChange}
+                onBlur={handleSecondBlur}
                 required={required}
-                value={amPm}
+                showLeadingZeros={showLeadingZeros}
+                value={second}
+                isInvalid={isSecondCurrentlyInvalid}
               />
-            )}
-          </div>
-          
-          {clearable && (
-            <button
-              className={classnames(styles.clearButton, styles.button)}
+            </>
+          )}
+
+          {/* AM/PM selector (if 12-hour format) */}
+          {is12HourFormat && (
+            <AmPmButton
+              className="timepicker"
               disabled={!enabled}
-              onClick={clear}
-              onFocus={stopPropagation}
-              type="button"
-            >
-              {clearIconElement}
-            </button>
+              maxTime={maxTime}
+              minTime={minTime}
+              onClick={handleAmPmToggle}
+              onAmPmSet={handleAmPmSet}
+              value={amPm}
+            />
           )}
         </div>
+
+        {clearable && (
+          <button
+            className={classnames(styles.clearButton, styles.button)}
+            disabled={!enabled}
+            onClick={clear}
+            onFocus={stopPropagation}
+            type="button"
+          >
+            {clearIconElement}
+          </button>
+        )}
       </div>
       {endAdornment}
     </div>
@@ -1297,11 +1268,12 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
         labelBreak={labelBreak}
         required={required}
       >
+        {startAdornment}
         {timePickerComponent}
+        {endAdornment}
       </ItemWithLabel>
     );
   }
 
   return timePickerComponent;
 });
-
