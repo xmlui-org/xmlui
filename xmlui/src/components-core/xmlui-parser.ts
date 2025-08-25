@@ -21,6 +21,9 @@ export type ParserResult = {
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 };
+const COLOR_DANER_100 = "hsl(356, 100%, 91%)";
+const COLOR_DANER_300 = "hsl(356, 100%, 70%)";
+const SPACE_2 = "0.5rem";
 
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
@@ -173,7 +176,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                backgroundColor: COLOR_DANER_100,
               },
             });
           }
@@ -196,7 +199,7 @@ function createErrorReportComponent(
               fontFamily: "monospace",
               textDecorationLine: "underline",
               textDecorationColor: "$color-error",
-              backgroundColor: "rgb(from $color-error r g b / 0.1)",
+              backgroundColor: COLOR_DANER_100,
             },
           });
         } else if (
@@ -216,7 +219,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                backgroundColor: COLOR_DANER_100,
               },
             });
           }
@@ -247,7 +250,7 @@ function createErrorReportComponent(
               textDecorationLine: "underline",
               fontFamily: "monospace",
               fontWeight: "bold",
-              backgroundColor: "rgb(from $color-error r g b / 0.1)",
+              backgroundColor: COLOR_DANER_100,
               color: "$color-error",
             },
           });
@@ -313,7 +316,7 @@ function createErrorReportComponent(
           gap: "$gap-none",
           padding: "16px",
           backgroundColor: "white",
-          borderRadius: "8px",
+          borderRadius: SPACE_2,
         },
         children: [errMsgComponenet],
       };
@@ -327,10 +330,10 @@ function createErrorReportComponent(
     props: {
       padding: "5px 10px 10px 38px",
       gap: 0,
-      backgroundColor: "#FFE3E8",
+      backgroundColor: COLOR_DANER_100,
       margin: "10px",
-      border: "2px solid #FFAFBD",
-      borderRadius: "6px",
+      border: "2px solid " + COLOR_DANER_300,
+      borderRadius: SPACE_2,
     },
     children: [
       {
