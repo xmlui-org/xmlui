@@ -78,11 +78,6 @@ export const TimePickerMd = createMetadata({
       description: "Content of the clear button. Set to null to hide the icon", 
       valueType: "string",
     },
-    resetOnClear: {
-      description: "When false (default), clear button clears the value completely. When true, resets to initialValue",
-      valueType: "boolean",
-      defaultValue: defaultProps.resetOnClear,
-    },
     required: {
       description: "Whether the time input should be required",
       valueType: "boolean",

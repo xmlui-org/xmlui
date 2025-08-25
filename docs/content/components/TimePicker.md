@@ -1,6 +1,6 @@
 # TimePicker [#timepicker]
 
-`TimePicker` provides an interactive time selection interface using the extracted react-time-picker source code directly. Users can input time values via keyboard with support for various time formats including 12-hour and 24-hour displays and configurable precision levels. This version does not include the clock popup.
+`TimePicker` provides time input with support for 12-hour and 24-hour formats and configurable precision for hours, minutes, and seconds.
 
 **Key features:**
 - **Time format support**: 12-hour and 24-hour formats with customizable display

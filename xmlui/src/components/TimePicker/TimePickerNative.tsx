@@ -971,6 +971,10 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     input?.focus();
   }, []);
 
+  const setValue = useEvent((newValue: string | null) => {
+    handleChange(newValue);
+  });
+
   // Component API registration
   useImperativeHandle(ref, () => timePickerRef.current as HTMLDivElement);
 
@@ -978,15 +982,10 @@ export const TimePickerNative = forwardRef<HTMLDivElement, Props>(function TimeP
     if (registerComponentApi) {
       registerComponentApi({
         focus,
-        get value() {
-          return localValue;
-        },
-        set value(newValue: string | null) {
-          handleChange(newValue);
-        },
+        setValue,
       });
     }
-  }, [registerComponentApi, focus, localValue, handleChange]);
+  }, [registerComponentApi, focus, setValue]);
 
   // Custom clear icon
   const clearIconElement = useMemo(() => {
