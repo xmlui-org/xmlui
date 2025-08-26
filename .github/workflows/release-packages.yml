@@ -100,7 +100,6 @@ jobs:
         if: steps.changesets_publish.outputs.published
         run: |
           XMLUI_VSCODE_VERSION=$(jq -r .version tools/vscode/package.json)
-          echo "version=$XMLUI_VSCODE_VERSION" >> $GITHUB_OUTPUT
 
           XMLUI_VSCODE_TAG="xmlui-vscode@${XMLUI_VSCODE_VERSION}"
           echo "tag=$XMLUI_VSCODE_TAG" >> $GITHUB_OUTPUT
@@ -134,6 +133,5 @@ jobs:
             --packagePath *.vsix \
             --no-git-tag-version \
             --no-update-package-json \
-            ${{ steps.xmlui_vscode_info.outputs.version }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
