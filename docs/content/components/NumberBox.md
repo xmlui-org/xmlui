@@ -470,10 +470,13 @@ See an example in the `setValue` API method.
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-warning--focus | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-NumberBox-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-NumberBox-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-NumberBox-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-NumberBox-warning | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-NumberBox | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-NumberBox | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-NumberBox | $space-2 | $space-2 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-NumberBox | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-NumberBox | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-NumberBox | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-NumberBox | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NumberBox-default--focus | *none* | *none* |

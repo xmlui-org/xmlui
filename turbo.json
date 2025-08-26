@@ -47,6 +47,9 @@
       "env": ["GITHUB_TOKEN", "DOCS_XMLUI_MAX_RELEASES_LENGTH"],
       "outputs": ["public/resources/files/releases.json"]
     },
+    "gen:download-latest-xmlui-release": {
+      "outputs": ["public/resources/files/for-download/xmlui/xmlui-standalone.umd.js"]
+    },
     "generate-docs": {
       "outputs": ["scripts/generate-docs/metadata/**", "$TURBO_ROOT$/docs/content/**"],
       "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
@@ -58,7 +61,7 @@
       "dependsOn": ["generate-docs"]
     },
     "build:docs": {
-      "dependsOn": ["^build:extension", "^build:xmlui", "gen:releases", "gen:get-latest-release", "gen:download-latest-xmlui-release", "generate-docs-summaries"],
+      "dependsOn": ["^build:extension", "^build:xmlui", "gen:releases", "gen:download-latest-xmlui-release", "generate-docs-summaries"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {

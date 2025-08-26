@@ -15,7 +15,7 @@
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: true) [#clearable-default-true]
+### `clearable` (default: false) [#clearable-default-false]
 
 Whether to show a clear button that allows clearing the selected time
 
@@ -279,6 +279,16 @@ This method sets the current value of the TimeInput.
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 **Signature**: `get value(): any`
+
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`ampm`**: The AM/PM indicator.
+- **`clearButton`**: The button to clear the time input.
+- **`hour`**: The hour input field.
+- **`minute`**: The minute input field.
+- **`second`**: The second input field.
 
 ## Styling [#styling]
 
