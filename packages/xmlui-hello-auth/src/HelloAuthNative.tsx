@@ -80,9 +80,24 @@ type Endpoints = {
   end_session_endpoint?: string;
 };
 type ErrorShape = {
-  code: "config_missing" | "discovery_failed" | "redirect_state_mismatch" | "unknown";
+  code:
+    | "config_missing"
+    | "discovery_failed"
+    | "redirect_state_mismatch"
+    | "token_exchange_failed" // NEW
+    | "cors_blocked" // NEW (if proxy still blocks)
+    | "unknown";
   message: string;
   details?: any;
+};
+
+type Tokens = {
+  access_token?: string;
+  id_token?: string;
+  refresh_token?: string;
+  token_type?: string;
+  scope?: string;
+  expires_in?: number; // seconds (as returned)
 };
 
 /* -------------------- component -------------------- */
@@ -99,25 +114,26 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     registerComponentApi,
     updateState,
   },
-  _ref
+  _ref,
 ) {
   const [status] = useState<"idle">("idle");
   const [lastPokeAt, setLastPokeAt] = useState<string | undefined>(undefined);
   const [endpoints, setEndpoints] = useState<Endpoints | undefined>(undefined);
   const [error, setError] = useState<ErrorShape | undefined>(undefined);
   const [temp, setTemp] = useState<Temp | undefined>(undefined);
+  const [tokens, setTokens] = useState<Tokens | undefined>(undefined);
 
   const storageKey = useMemo(
     () => `xmlui.auth:${issuer || "unknown"}:${client_id || "unknown"}`,
-    [issuer, client_id]
+    [issuer, client_id],
   );
   const echo: Echo = useMemo(
     () => ({ issuer, client_id, redirect_uri, scopes, storage, autoLogin, proxy_base_url }),
-    [issuer, client_id, redirect_uri, scopes, storage, autoLogin, proxy_base_url]
+    [issuer, client_id, redirect_uri, scopes, storage, autoLogin, proxy_base_url],
   );
 
   function publish() {
-    const snapshot = { status, echo, endpoints, error, temp, lastPokeAt };
+    const snapshot = { status, echo, endpoints, error, temp, tokens, lastPokeAt };
     if (debug) console.debug("[HelloAuth] publish →", snapshot);
     updateState?.(snapshot);
   }
@@ -170,6 +186,69 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, storage, debug]);
+
+  // --- Step 4: token exchange (via proxy) ---
+  useEffect(() => {
+    (async () => {
+      if (!temp?.code || !endpoints?.token_endpoint || !client_id || !redirect_uri) return;
+
+      try {
+        // Build proxied token URL
+        const baseProxy = proxy_base_url?.replace(/\/+$/, "");
+        const tokenPath = endpoints.token_endpoint.replace(/^https?:\/\//, "");
+        const tokenUrl = baseProxy ? `${baseProxy}/${tokenPath}` : endpoints.token_endpoint;
+
+        const body = new URLSearchParams({
+          grant_type: "authorization_code",
+          code: temp.code,
+          client_id,
+          redirect_uri,
+          code_verifier: temp.code_verifier || "", // required for PKCE
+        });
+
+        if (debug) {
+          console.debug("[HelloAuth] token POST →", tokenUrl);
+          console.debug("[HelloAuth] token body →", Object.fromEntries(body.entries()));
+        }
+
+        const res = await fetch(tokenUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body,
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status} ${res.statusText} :: ${text}`);
+        }
+
+        const json = (await res.json()) as Tokens;
+        setTokens(json);
+        setError(undefined);
+
+        if (debug) console.debug("[HelloAuth] token ✓", json);
+
+        // optional: clear the PKCE stash now that we've used it
+        const kv = getKV(storage as any);
+        try {
+          kv.removeItem(storageKey);
+        } catch {}
+        setTimeout(publish, 0);
+      } catch (err: any) {
+        const msg = String(err?.message || err);
+        const shaped: ErrorShape = {
+          code: msg.includes("CORS") ? "cors_blocked" : "token_exchange_failed",
+          message: "Failed to exchange authorization code for tokens",
+          details: msg,
+        };
+        if (debug) console.warn("[HelloAuth] token ✗", shaped);
+        setTokens(undefined);
+        setError(shaped);
+        setTimeout(publish, 0);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [temp?.code, endpoints?.token_endpoint, client_id, redirect_uri, proxy_base_url]);
 
   /* -------------------- Step 1: discovery (proxy-aware) -------------------- */
   const discoveryAbort = useRef<AbortController | null>(null);
@@ -256,7 +335,13 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
       const nonceStr = randomString(16);
 
       const kv = getKV(storage as any);
-      const stash = { code_verifier: verifier, state: stateStr, nonce: nonceStr, redirect_uri, client_id };
+      const stash = {
+        code_verifier: verifier,
+        state: stateStr,
+        nonce: nonceStr,
+        redirect_uri,
+        client_id,
+      };
       kv.setItem(storageKey, JSON.stringify(stash));
 
       const url = new URL(endpoints.authorization_endpoint);
@@ -288,7 +373,16 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
 
     registerComponentApi?.({ poke, login });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registerComponentApi, endpoints, client_id, redirect_uri, scopes, storage, storageKey, debug]);
+  }, [
+    registerComponentApi,
+    endpoints,
+    client_id,
+    redirect_uri,
+    scopes,
+    storage,
+    storageKey,
+    debug,
+  ]);
 
   /* -------------------- headless -------------------- */
   return null;
