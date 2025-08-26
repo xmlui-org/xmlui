@@ -1,0 +1,38 @@
+{
+  "name": "xmlui-hello-auth",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-hello-auth.js",
+  "module": "./dist/xmlui-hello-auth.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-hello-auth.mjs",
+      "require": "./dist/xmlui-hello-auth.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
