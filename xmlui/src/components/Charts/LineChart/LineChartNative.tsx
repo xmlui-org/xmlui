@@ -207,6 +207,8 @@ export const LineChart = forwardRef(function LineChart({
           ref={containerRef}
           width="100%"
           height="100%"
+          minWidth={60}
+          minHeight={60}
           debounce={100}
         >
           <RLineChart
