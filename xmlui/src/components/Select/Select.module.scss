@@ -1,8 +1,10 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
 $animDuration: 0.1s;
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -10,6 +12,7 @@ $animDuration: 0.1s;
 
 $componentName: "Select";
 $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 
 // --- CSS properties of a particular Select variant
@@ -46,11 +49,11 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 }
 
 @mixin valueVariant($variantName) {
-  & > span {
+  &>span {
     font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
     color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
 
-    & > div {
+    &>div {
       color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
       font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
     }
@@ -77,7 +80,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   .selectTrigger {
     min-height: 2.6rem;
     display: flex;
-    padding: t.$space-1 t.$space-2;
+    @include t.paddingVars($themeVars, $componentName);
     width: 100%;
     align-items: center;
     justify-content: space-between;
@@ -107,7 +110,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     }
   }
 
-  .selectTrigger > span {
+  .selectTrigger>span {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
@@ -398,6 +401,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -407,6 +411,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       opacity: 1;
     }
+
     to {
       opacity: 0;
     }
@@ -416,6 +421,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: scale(0.95);
     }
+
     to {
       transform: scale(1);
     }
@@ -425,6 +431,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: scale(1);
     }
+
     to {
       transform: scale(0.95);
     }
@@ -434,6 +441,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: translateY(-0.75rem);
     }
+
     to {
       transform: translateY(0);
     }
@@ -443,6 +451,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: translateY(0.75rem);
     }
+
     to {
       transform: translateY(0);
     }
@@ -452,6 +461,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: translateX(-100%);
     }
+
     to {
       transform: translateX(0);
     }
@@ -461,6 +471,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     from {
       transform: translateX(100%);
     }
+
     to {
       transform: translateX(0);
     }
@@ -471,4 +482,3 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-
