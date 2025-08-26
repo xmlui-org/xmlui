@@ -1,13 +1,16 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $componentName: "DatePicker";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -18,12 +21,10 @@ $componentName: "DatePicker";
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar(
-      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
     );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
@@ -47,9 +48,8 @@ $componentName: "DatePicker";
 }
 
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$backgroundColor-item-DatePicker--hover: createThemeVar(
-  "Input:backgroundColor-item-DatePicker--hover"
-);
+$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover"
+  );
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
@@ -72,6 +72,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     overflow: hidden;
     gap: t.$space-2;
     font-size: createThemeVar("Input:fontSize-DatePicker");
+    @include t.paddingVars($themeVars, $componentName);
 
     @include variant("default");
 
@@ -135,53 +136,83 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   /* Variables declaration */
   /* prettier-ignore */
   .root {
-  --rdp-day-height: 44px; /* The height of the day cells. */
-  --rdp-day-width: 44px; /* The width of the day cells. */
+    --rdp-day-height: 44px;
+    /* The height of the day cells. */
+    --rdp-day-width: 44px;
+    /* The width of the day cells. */
 
-  --rdp-day_button-border-radius: 100%; /* The border radius of the day cells. */
-  --rdp-day_button-border: 2px solid transparent; /* The border of the day cells. */
-  --rdp-day_button-height: 42px; /* The height of the day cells. */
-  --rdp-day_button-width: 42px; /* The width of the day cells. */
+    --rdp-day_button-border-radius: 100%;
+    /* The border radius of the day cells. */
+    --rdp-day_button-border: 2px solid transparent;
+    /* The border of the day cells. */
+    --rdp-day_button-height: 42px;
+    /* The height of the day cells. */
+    --rdp-day_button-width: 42px;
+    /* The width of the day cells. */
 
-  --rdp-disabled-opacity: 0.5; /* The opacity of the disabled days. */
-  --rdp-outside-opacity: 0.75; /* The opacity of the days outside the current month. */
+    --rdp-disabled-opacity: 0.5;
+    /* The opacity of the disabled days. */
+    --rdp-outside-opacity: 0.75;
+    /* The opacity of the days outside the current month. */
 
-  --rdp-dropdown-gap: 0.5rem;/* The gap between the dropdowns used in the month captons. */
+    --rdp-dropdown-gap: 0.5rem;
+    /* The gap between the dropdowns used in the month captons. */
 
-  --rdp-months-gap: 2rem; /* The gap between the months in the multi-month view. */
+    --rdp-months-gap: 2rem;
+    /* The gap between the months in the multi-month view. */
 
-  --rdp-nav_button-disabled-opacity: 0.5; /* The opacity of the disabled navigation buttons. */
-  --rdp-nav_button-height: 2.25rem; /* The height of the navigation buttons. */
-  --rdp-nav_button-width: 2.25rem; /* The width of the navigation buttons. */
-  --rdp-nav-height: 2.75rem; /* The height of the navigation bar. */
+    --rdp-nav_button-disabled-opacity: 0.5;
+    /* The opacity of the disabled navigation buttons. */
+    --rdp-nav_button-height: 2.25rem;
+    /* The height of the navigation buttons. */
+    --rdp-nav_button-width: 2.25rem;
+    /* The width of the navigation buttons. */
+    --rdp-nav-height: 2.75rem;
+    /* The height of the navigation bar. */
 
-  --rdp-range_middle-color: inherit;/* The color of the range text. */
+    --rdp-range_middle-color: inherit;
+    /* The color of the range text. */
 
-  --rdp-range_start-color: white; /* The color of the range text. */
-  --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, $backgroundColor-item-DatePicker--hover 50%); /* Used for the background of the start of the selected range. */
-  --rdp-range_start-date-background-color: $rdp-accent-color; /* The background color of the date when at the start of the selected range. */
+    --rdp-range_start-color: white;
+    /* The color of the range text. */
+    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, $backgroundColor-item-DatePicker--hover 50%);
+    /* Used for the background of the start of the selected range. */
+    --rdp-range_start-date-background-color: $rdp-accent-color;
+    /* The background color of the date when at the start of the selected range. */
 
-  --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--rdp-range_middle-background-color) 50%, transparent 50%); /* Used for the background of the end of the selected range. */
-  --rdp-range_end-color: white;/* The color of the range text. */
-  --rdp-range_end-date-background-color: $rdp-accent-color; /* The background color of the date when at the end of the selected range. */
+    --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--rdp-range_middle-background-color) 50%, transparent 50%);
+    /* Used for the background of the end of the selected range. */
+    --rdp-range_end-color: white;
+    /* The color of the range text. */
+    --rdp-range_end-date-background-color: $rdp-accent-color;
+    /* The background color of the date when at the end of the selected range. */
 
-  --rdp-week_number-border-radius: 100%; /* The border radius of the week number. */
-  --rdp-week_number-border: 2px solid transparent; /* The border of the week number. */
+    --rdp-week_number-border-radius: 100%;
+    /* The border radius of the week number. */
+    --rdp-week_number-border: 2px solid transparent;
+    /* The border of the week number. */
 
-  --rdp-week_number-height: var(--rdp-day-height); /* The height of the week number cells. */
-  --rdp-week_number-opacity: 0.75; /* The opacity of the week number. */
-  --rdp-week_number-width: var(--rdp-day-width); /* The width of the week number cells. */
-  --rdp-weeknumber-text-align: center; /* The text alignment of the weekday cells. */
+    --rdp-week_number-height: var(--rdp-day-height);
+    /* The height of the week number cells. */
+    --rdp-week_number-opacity: 0.75;
+    /* The opacity of the week number. */
+    --rdp-week_number-width: var(--rdp-day-width);
+    /* The width of the week number cells. */
+    --rdp-weeknumber-text-align: center;
+    /* The text alignment of the weekday cells. */
 
-  --rdp-weekday-opacity: 0.75; /* The opacity of the weekday. */
-  --rdp-weekday-padding: 0.5rem 0rem; /* The padding of the weekday. */
-  --rdp-weekday-text-align: center; /* The text alignment of the weekday cells. */
+    --rdp-weekday-opacity: 0.75;
+    /* The opacity of the weekday. */
+    --rdp-weekday-padding: 0.5rem 0rem;
+    /* The padding of the weekday. */
+    --rdp-weekday-text-align: center;
+    /* The text alignment of the weekday cells. */
 
-  --rdp-gradient-direction: 90deg;
+    --rdp-gradient-direction: 90deg;
 
-  --rdp-animation_duration: 0.3s;
-  --rdp-animation_timing: cubic-bezier(0.4, 0, 0.2, 1);
-}
+    --rdp-animation_duration: 0.3s;
+    --rdp-animation_timing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   .root[dir="rtl"] {
     --rdp-gradient-direction: -90deg;
@@ -193,7 +224,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   /* Root of the component. */
   .root {
-    position: relative; /* Required to position the navigation toolbar. */
+    position: relative;
+    /* Required to position the navigation toolbar. */
     box-sizing: border-box;
   }
 
@@ -245,7 +277,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     border: 0;
   }
 
-  .dropdown:focus-visible ~ .caption_label {
+  .dropdown:focus-visible~.caption_label {
     outline: 5px auto t.$outlineColor--focus;
   }
 
@@ -299,6 +331,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     align-items: center;
     gap: 0;
   }
+
   .dropdown {
     z-index: 2;
 
@@ -489,6 +522,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     0% {
       transform: translateX(-100%);
     }
+
     100% {
       transform: translateX(0);
     }
@@ -498,6 +532,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     0% {
       transform: translateX(100%);
     }
+
     100% {
       transform: translateX(0);
     }
@@ -507,6 +542,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     0% {
       transform: translateX(0);
     }
+
     100% {
       transform: translateX(-100%);
     }
@@ -516,6 +552,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     0% {
       transform: translateX(0);
     }
+
     100% {
       transform: translateX(100%);
     }
@@ -534,8 +571,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .weeks_after_exit {
-    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing)
-      forwards;
+    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
   }
 
   .root[dir="rtl"] .weeks_after_enter {
@@ -543,8 +579,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .root[dir="rtl"] .weeks_before_exit {
-    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing)
-      forwards;
+    animation: rdp-slide_out_right var(--rdp-animation_duration) var(--rdp-animation_timing) forwards;
   }
 
   .root[dir="rtl"] .weeks_before_enter {
@@ -559,6 +594,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -568,6 +604,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     from {
       opacity: 1;
     }
+
     to {
       opacity: 0;
     }

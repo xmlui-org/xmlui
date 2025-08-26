@@ -124,6 +124,10 @@ export const NumberBoxMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`paddingVertical-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+  },
 });
 
 export const numberBoxComponentRenderer = createComponentRenderer(

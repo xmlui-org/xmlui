@@ -812,7 +812,7 @@ test.describe("Theme Variables", () => {
 
   test("padding applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "padding-NumberBox-default": "15px" },
+      testThemeVars: { "padding-NumberBox": "15px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("padding", "15px");
   });

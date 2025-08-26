@@ -436,8 +436,8 @@ test.describe("Visual States", () => {
   test("component applies theme variables correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" />`, {
       testThemeVars: {
-        "backgroundColor-Textarea-default": "rgb(255, 0, 0)",
-        "textColor-Textarea-default": "rgb(0, 255, 0)",
+        "backgroundColor-TextArea-default": "rgb(255, 0, 0)",
+        "textColor-TextArea-default": "rgb(0, 255, 0)",
       },
     });
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");
@@ -462,9 +462,9 @@ test.describe("Visual States", () => {
   test("component handles disabled visual state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea enabled="false" />`, {
       testThemeVars: {
-        "backgroundColor-Textarea--disabled": "rgb(255, 0, 0)",
-        "textColor-Textarea--disabled": "rgb(0, 255, 0)",
-        "borderColor-Textarea--disabled": "rgb(0, 0, 255)"
+        "backgroundColor-TextArea--disabled": "rgb(255, 0, 0)",
+        "textColor-TextArea--disabled": "rgb(0, 255, 0)",
+        "borderColor-TextArea--disabled": "rgb(0, 0, 255)"
       },
     });
     const textarea = page.getByRole("textbox");
@@ -477,9 +477,9 @@ test.describe("Visual States", () => {
   test("component handles focus state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`, {
       testThemeVars: {
-        "borderColor-Textarea--focus": "rgb(255, 0, 0)",
-        "backgroundColor-Textarea--focus": "rgb(0, 255, 0)",
-        "textColor-Textarea--focus": "rgb(0, 0, 255)",
+        "borderColor-TextArea--focus": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--focus": "rgb(0, 255, 0)",
+        "textColor-TextArea--focus": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");
@@ -494,9 +494,9 @@ test.describe("Visual States", () => {
   test("component handles hover state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`, {
       testThemeVars: {
-        "borderColor-Textarea--hover": "rgb(255, 0, 0)",
-        "backgroundColor-Textarea--hover": "rgb(0, 255, 0)",
-        "textColor-Textarea--hover": "rgb(0, 0, 255)",
+        "borderColor-TextArea--hover": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--hover": "rgb(0, 255, 0)",
+        "textColor-TextArea--hover": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");

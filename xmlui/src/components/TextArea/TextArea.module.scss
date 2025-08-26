@@ -1,13 +1,16 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "Textarea";
+$componentName: "TextArea";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // --- CSS properties of a particular Textarea variant
 @mixin variant($variantName) {
@@ -16,7 +19,6 @@ $componentName: "Textarea";
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
@@ -24,8 +26,7 @@ $componentName: "Textarea";
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar(
-      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
     );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
@@ -33,8 +34,7 @@ $componentName: "Textarea";
 
   &:focus-within {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar(
-      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
     );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
@@ -66,15 +66,17 @@ $componentName: "Textarea";
       border 0.1s ease-in-out,
       box-shadow 0.1s ease-in-out,
       background 0.1s ease-in-out;
-
+    @include t.paddingVars($themeVars, $componentName);
     @include variant("default");
 
     &.error {
       @include variant("error");
     }
+
     &.warning {
       @include variant("warning");
     }
+
     &.valid {
       @include variant("success");
     }
@@ -90,9 +92,11 @@ $componentName: "Textarea";
   .resizeHorizontal {
     resize: horizontal;
   }
+
   .resizeVertical {
     resize: vertical;
   }
+
   .resizeBoth {
     resize: both;
   }
