@@ -100,6 +100,8 @@ jobs:
         if: steps.changesets_publish.outputs.published
         run: |
           XMLUI_VSCODE_VERSION=$(jq -r .version tools/vscode/package.json)
+          echo "version=$XMLUI_VSCODE_VERSION" >> $GITHUB_OUTPUT
+
           XMLUI_VSCODE_TAG="xmlui-vscode@${XMLUI_VSCODE_VERSION}"
           echo "tag=$XMLUI_VSCODE_TAG" >> $GITHUB_OUTPUT
 
@@ -123,3 +125,15 @@ jobs:
           files: "tools/vscode/*.vsix"
           tag_name: ${{ steps.xmlui_vscode_info.outputs.tag }}
           fail_on_unmatched_files: true
+      - name: Publish VSCode Extension to Marketplace
+        if: success() && steps.xmlui_vscode_info.outputs.tagExists == 'false'
+        run: |
+          cd tools/vscode
+          npx vsce publish --packagePath *.vsix
+          npx vsce publish \
+            --packagePath *.vsix \
+            --no-git-tag-version \
+            --no-update-package-json \
+            ${{ steps.xmlui_vscode_info.outputs.version }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
