@@ -93,6 +93,7 @@
 | [TextArea](./TextArea) | `TextArea` provides a multiline text input area. |
 | [TextBox](./TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
 | [Theme](./Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
+| [TimeInput](./TimeInput) | `TimeInput` provides time input with support for 12-hour and 24-hour formats and configurable precision for hours, minutes, and seconds. |
 | [ToneChangerButton](./ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
 | [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
 | [Tooltip](./Tooltip) | A tooltip component that displays text when hovering over trigger content. |

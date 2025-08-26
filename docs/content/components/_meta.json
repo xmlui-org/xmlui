@@ -91,6 +91,7 @@
   "TextArea": "TextArea",
   "TextBox": "TextBox",
   "Theme": "Theme",
+  "TimeInput": "TimeInput",
   "ToneChangerButton": "ToneChangerButton",
   "ToneSwitch": "ToneSwitch",
   "Tooltip": "Tooltip",

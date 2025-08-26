@@ -61,6 +61,7 @@ import {
   SpinnerDriver,
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
+import { TimeInputDriver } from "./drivers/TimeInputDriver";
 
 export { expect } from "./assertions";
 
@@ -526,6 +527,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
+  createTimeInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TimeInputDriver, testIdOrLocator);
+    });
+  }
 });
 
 // --- Types
@@ -598,4 +604,5 @@ type TestDriverExtenderProps = {
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
+  createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
 };

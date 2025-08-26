@@ -182,6 +182,7 @@
                     <NavLink label="TextArea" to="/components/TextArea" />
                     <NavLink label="TextBox" to="/components/TextBox" />
                     <NavLink label="Theme" to="/components/Theme" />
+                    <NavLink label="TimeInput" to="/components/TimeInput" />
                     <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
                     <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
                     <NavLink label="Tooltip" to="/components/Tooltip" />
