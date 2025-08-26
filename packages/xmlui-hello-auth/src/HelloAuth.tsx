@@ -1,4 +1,3 @@
-// src/HelloAuth.tsx
 import { createComponentRenderer, createMetadata } from "xmlui";
 import { HelloAuth, defaultProps } from "./HelloAuthNative";
 
@@ -33,6 +32,12 @@ const HelloAuthMd = createMetadata({
       isRequired: false,
       defaultValue: defaultProps.debug,
     },
+    proxy_base_url: {
+      description:
+        "Optional proxy base, e.g. 'http://localhost:8080/proxy/'. If present, discovery and (later) token calls go through it.",
+      type: "string",
+      isRequired: false,
+    },
     id: { description: "Component id.", type: "string", isRequired: false },
   },
   events: {},
@@ -54,6 +59,7 @@ export const helloAuthComponentRenderer = createComponentRenderer(
       storage={extractValue.asOptionalString(node.props?.storage)}
       autoLogin={extractValue.asOptionalBoolean(node.props?.autoLogin)}
       debug={extractValue.asOptionalBoolean(node.props?.debug)}
+      proxy_base_url={extractValue.asOptionalString(node.props?.proxy_base_url)}
       registerComponentApi={registerComponentApi}
       updateState={updateState}
     />
