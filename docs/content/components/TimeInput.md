@@ -24,7 +24,7 @@ When enabled, it displays a clear button that allows users to reset the time pic
 ```xmlui-pg copy display name="Example: clearable" /clearable/
 <App>
   <TimeInput initialValue="11:30" />
-  <TimeInput clearable="false" initialValue="10:20" />
+  <TimeInput clearable="true" initialValue="10:20" />
 </App>
 ```
 

@@ -33,7 +33,7 @@ export function parseScssVar(scssStr: any) {
           .replace(/: ?([^,}]+)([,}])/g, ': "$1"$2')
           // JSON keys: space/bracket/comma as first character, not already a string, anything not colon or
           // space (rules out JSON values), ended by colon
-          .replace(/([\s{,])(?!")([^:\s]+)+:/g, '$1"$2":')
+          .replace(/([\s{,])(?!")([^:\s]+)+:/g, '$1"$2":'),
       );
     } catch (errorParsingScssStringLiteral) {
       return jsValue;

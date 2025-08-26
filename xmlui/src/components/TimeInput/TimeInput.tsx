@@ -17,17 +17,12 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLostFocus,
-  dPlaceholder,
   dReadonly,
   dStartIcon,
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import {
-  TimeInputNative,
-  TimeInputFormatValues,
-  defaultProps,
-} from "./TimeInputNative";
+import { TimeInputNative, TimeInputFormatValues, defaultProps } from "./TimeInputNative";
 
 const COMP = "TimeInput";
 
@@ -36,6 +31,23 @@ export const TimeInputMd = createMetadata({
   description:
     "`TimeInput` provides time input with support for 12-hour and 24-hour formats " +
     "and configurable precision for hours, minutes, and seconds.",
+  parts: {
+    hour: {
+      description: "The hour input field.",
+    },
+    minute: {
+      description: "The minute input field.",
+    },
+    second: {
+      description: "The second input field.",
+    },
+    ampm: {
+      description: "The AM/PM indicator.",
+    },
+    clearButton: {
+      description: "The button to clear the time input.",
+    },
+  },
   props: {
     initialValue: dInitialValue(),
     autoFocus: dAutoFocus(),
@@ -47,7 +59,8 @@ export const TimeInputMd = createMetadata({
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     format: {
-      description: "Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a",
+      description:
+        "Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a",
       valueType: "string",
       defaultValue: defaultProps.format,
       availableValues: TimeInputFormatValues,
@@ -57,7 +70,7 @@ export const TimeInputMd = createMetadata({
       valueType: "string",
     },
     maxTime: {
-      description: "Maximum time that the user can select", 
+      description: "Maximum time that the user can select",
       valueType: "string",
     },
     clearable: {
@@ -161,7 +174,7 @@ export const timeInputComponentRenderer = createComponentRenderer(
   }) => {
     const extractedInitialValue = extractValue(node.props.initialValue);
     const stateValue = state?.value;
-    
+
     return (
       <TimeInputNative
         className={className}

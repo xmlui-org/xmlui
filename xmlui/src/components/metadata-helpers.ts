@@ -303,3 +303,7 @@ export function dOrientation(defaultValue: string, isRequired = false): Componen
     isRequired,
   };
 }
+
+export function partClassName(name: string): string {
+  return `_PART_${name}_`;
+}
