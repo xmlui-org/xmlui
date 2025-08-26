@@ -186,32 +186,6 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     updateState?.(snapshot);
   }
 
-  /* -------------------- Step 2: session restoration -------------------- */
-  useEffect(() => {
-    if (!issuer || !client_id) return;
-    
-    const kv = getKV(storage as any);
-    try {
-      const raw = kv.getItem(`${storageKey}:session`);
-      if (raw) {
-        const session = JSON.parse(raw);
-        if (session.expires_at && session.expires_at > Date.now()) {
-          setTokens(session.tokens);
-          setClaims(session.claims);
-          setUser(session.user);
-          setExpiresAt(session.expires_at);
-          if (debug) console.debug('[HelloAuth] restored session:', session.user);
-          setTimeout(publish, 0);
-        } else {
-          if (debug) console.debug('[HelloAuth] expired session removed');
-          kv.removeItem(`${storageKey}:session`);
-        }
-      }
-    } catch (e) {
-      if (debug) console.warn('[HelloAuth] session restore failed:', e);
-    }
-  }, [storageKey, issuer, client_id, storage, debug]);
-
   /* -------------------- Step 3: callback handling -------------------- */
   useEffect(() => {
     try {
