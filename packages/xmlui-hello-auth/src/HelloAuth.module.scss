@@ -1,0 +1,52 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "HelloAuth";
+
+// Define basic theme variables
+$backgroundColor: createThemeVar("backgroundColor-#{$component}");
+$textColor: createThemeVar("textColor-#{$component}");
+
+.container {
+  background-color: $backgroundColor;
+  color: $textColor;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.message {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.counter {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
