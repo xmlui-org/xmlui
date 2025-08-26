@@ -2,6 +2,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "xmlui";
 
 /* -------------------- PKCE + helpers (TS/DOM safe) -------------------- */
+function b64urlToJson<T = any>(seg: string): T {
+  const pad = seg.length % 4 ? 4 - (seg.length % 4) : 0;
+  const base64 = seg.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad);
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function splitJwt(token: string): { header: IdHeader; payload: IdClaims } {
+  const [h, p] = token.split(".");
+  return { header: b64urlToJson<IdHeader>(h), payload: b64urlToJson<IdClaims>(p) };
+}
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
@@ -91,13 +103,35 @@ type ErrorShape = {
   details?: any;
 };
 
+type IdHeader = { alg: string; kid?: string; typ?: string };
+type IdClaims = {
+  iss: string;
+  aud: string | string[];
+  exp: number;
+  iat?: number;
+  nonce?: string;
+  sub: string;
+  email?: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  preferred_username?: string;
+  picture?: string;
+  [k: string]: any;
+};
+type User = {
+  sub: string;
+  email?: string;
+  name?: string;
+  picture?: string;
+};
 type Tokens = {
   access_token?: string;
   id_token?: string;
   refresh_token?: string;
   token_type?: string;
   scope?: string;
-  expires_in?: number; // seconds (as returned)
+  expires_in?: number;
 };
 
 /* -------------------- component -------------------- */
@@ -122,6 +156,9 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
   const [error, setError] = useState<ErrorShape | undefined>(undefined);
   const [temp, setTemp] = useState<Temp | undefined>(undefined);
   const [tokens, setTokens] = useState<Tokens | undefined>(undefined);
+  const [claims, setClaims] = useState<IdClaims | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [expiresAt, setExpiresAt] = useState<number | undefined>(undefined);
 
   const storageKey = useMemo(
     () => `xmlui.auth:${issuer || "unknown"}:${client_id || "unknown"}`,
@@ -133,10 +170,47 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
   );
 
   function publish() {
-    const snapshot = { status, echo, endpoints, error, temp, tokens, lastPokeAt };
+    const snapshot = {
+      status,
+      echo,
+      endpoints,
+      error,
+      temp,
+      tokens,
+      claims,
+      user,
+      expiresAt,
+      lastPokeAt,
+    };
     if (debug) console.debug("[HelloAuth] publish →", snapshot);
     updateState?.(snapshot);
   }
+
+  /* -------------------- Step 2: session restoration -------------------- */
+  useEffect(() => {
+    if (!issuer || !client_id) return;
+    
+    const kv = getKV(storage as any);
+    try {
+      const raw = kv.getItem(`${storageKey}:session`);
+      if (raw) {
+        const session = JSON.parse(raw);
+        if (session.expires_at && session.expires_at > Date.now()) {
+          setTokens(session.tokens);
+          setClaims(session.claims);
+          setUser(session.user);
+          setExpiresAt(session.expires_at);
+          if (debug) console.debug('[HelloAuth] restored session:', session.user);
+          setTimeout(publish, 0);
+        } else {
+          if (debug) console.debug('[HelloAuth] expired session removed');
+          kv.removeItem(`${storageKey}:session`);
+        }
+      }
+    } catch (e) {
+      if (debug) console.warn('[HelloAuth] session restore failed:', e);
+    }
+  }, [storageKey, issuer, client_id, storage, debug]);
 
   /* -------------------- Step 3: callback handling -------------------- */
   useEffect(() => {
@@ -249,6 +323,84 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [temp?.code, endpoints?.token_endpoint, client_id, redirect_uri, proxy_base_url]);
+
+  // --- Step 5: verify id_token & hydrate user/session ---
+  useEffect(() => {
+    (async () => {
+      if (!tokens?.id_token) return;
+
+      try {
+        // Parse header/payload (no signature verification in this step)
+        const { header, payload } = splitJwt(tokens.id_token);
+        if (debug) console.debug("[HelloAuth] id_token header/payload", header, payload);
+
+        // Basic claim checks
+        if (endpoints?.issuer && payload.iss !== endpoints.issuer) {
+          throw new Error(`iss mismatch: ${payload.iss} !== ${endpoints.issuer}`);
+        }
+        if (client_id) {
+          const audOk = Array.isArray(payload.aud)
+            ? payload.aud.includes(client_id)
+            : payload.aud === client_id;
+          if (!audOk) throw new Error(`aud mismatch`);
+        }
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp <= now) {
+          throw new Error(`id_token expired: exp=${payload.exp}, now=${now}`);
+        }
+        if (temp?.nonce && payload.nonce && payload.nonce !== temp.nonce) {
+          throw new Error(`nonce mismatch`);
+        }
+
+        // Derive user + expiry
+        const derivedUser: User = {
+          sub: payload.sub,
+          email: payload.email,
+          name:
+            payload.name ||
+            payload.preferred_username ||
+            [payload.given_name, payload.family_name].filter(Boolean).join(" ") ||
+            undefined,
+          picture: payload.picture,
+        };
+        const ea =
+          typeof tokens.expires_in === "number"
+            ? Date.now() + tokens.expires_in * 1000
+            : payload.exp
+              ? payload.exp * 1000
+              : undefined;
+
+        setClaims(payload);
+        setUser(derivedUser);
+        setExpiresAt(ea);
+        setError(undefined);
+
+        // Persist a minimal session bundle
+        const kv = getKV(storage as any);
+        try {
+          kv.setItem(
+            `${storageKey}:session`,
+            JSON.stringify({ tokens, claims: payload, user: derivedUser, expires_at: ea }),
+          );
+        } catch {}
+
+        setTimeout(publish, 0);
+      } catch (err: any) {
+        const shaped: ErrorShape = {
+          code: "unknown",
+          message: "ID token claim verification failed",
+          details: String(err?.message || err),
+        };
+        if (debug) console.warn("[HelloAuth] verify ✗", shaped);
+        setError(shaped);
+        setClaims(undefined);
+        setUser(undefined);
+        setExpiresAt(undefined);
+        setTimeout(publish, 0);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokens?.id_token, endpoints?.issuer, client_id, temp?.nonce, storageKey, storage, debug]);
 
   /* -------------------- Step 1: discovery (proxy-aware) -------------------- */
   const discoveryAbort = useRef<AbortController | null>(null);
