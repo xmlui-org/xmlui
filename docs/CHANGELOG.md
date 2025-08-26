@@ -1,5 +1,14 @@
 # xmlui-docs
 
+## 0.0.6
+
+### Patch Changes
+
+- 1451a94: feat: make input padding configurable via theme variables
+- Updated dependencies [ff14e15]
+- Updated dependencies [1451a94]
+  - xmlui@0.10.2
+
 ## 0.0.5
 
 ### Patch Changes
