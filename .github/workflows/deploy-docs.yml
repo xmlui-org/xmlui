@@ -23,13 +23,10 @@ jobs:
           cache: "npm"
           registry-url: https://registry.npmjs.org/
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.2.1
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+          max-age: 1mo
 
       - run: npm ci --prefer-offline
 
