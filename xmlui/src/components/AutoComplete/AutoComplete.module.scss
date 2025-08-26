@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -9,6 +11,7 @@ $themeVars: ();
 
 $component: "AutoComplete";
 $themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -47,8 +50,9 @@ $themeVars: t.composeBorderVars($themeVars, $component);
     width: 100%;
     gap: t.$space-1;
     display: flex;
-    padding: t.$space-1 t.$space-2;
-    min-height: 2.5rem; /* h-12 */
+    @include t.paddingVars($themeVars, $component);
+    min-height: 2.5rem;
+    /* h-12 */
 
     @include variant("default");
 
@@ -92,9 +96,8 @@ $themeVars: t.composeBorderVars($themeVars, $component);
     width: fit-content;
     height: fit-content;
     min-width: 0;
-    padding: createThemeVar("paddingVertical-#{$component}-badge")
-      createThemeVar("paddingHorizontal-#{$component}-badge");
-    border-radius: t.$borderRadius;
+    padding: createThemeVar("paddingVertical-#{$component}-badge") createThemeVar("paddingHorizontal-#{$component}-badge");
+    border-radius: createThemeVar("borderRadius-#{$component}-badge");
     transition:
       color 0.2s,
       background-color 0.2s;
@@ -132,6 +135,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
     &::placeholder {
       color: createThemeVar("Input:textColor-placeholder-#{$component}");
     }
+
     &:focus-within {
       outline: none;
     }
@@ -167,7 +171,8 @@ $themeVars: t.composeBorderVars($themeVars, $component);
     background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
     border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
     box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
-    animation: fade-in 0.3s ease-in-out; /* animate-in */
+    animation: fade-in 0.3s ease-in-out;
+    /* animate-in */
   }
 
   .autoCompleteOption {
