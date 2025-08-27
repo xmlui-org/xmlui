@@ -107,12 +107,10 @@ export function formSubmitted() {
   };
 }
 
-export function formReset(originalSubject) {
+export function formReset() {
   return {
     type: FormActionKind.RESET,
-    payload: {
-      originalSubject,
-    },
+    payload: {},
   };
 }
 

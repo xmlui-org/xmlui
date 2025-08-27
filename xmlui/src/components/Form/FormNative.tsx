@@ -177,10 +177,8 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.RESET: {
-      const { originalSubject } = action.payload;
       return {
         ...initialState,
-        subject: originalSubject,
         resetVersion: (state.resetVersion ?? 0) + 1,
       };
     }
@@ -417,7 +415,7 @@ const Form = forwardRef(function (
   });
 
   const doReset = useEvent(() => {
-    dispatch(formReset(initialValue));
+    dispatch(formReset());
     onReset?.();
   });
 
