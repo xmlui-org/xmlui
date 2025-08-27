@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.10.2
+
+### Patch Changes
+
+- ff14e15: fix: LineChart - sizing issue
+- 1451a94: feat: make input padding configurable via theme variables
+
 ## 0.10.1
 
 ### Patch Changes

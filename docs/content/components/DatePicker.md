@@ -466,10 +466,13 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DatePicker-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DatePicker-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DatePicker-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-DatePicker | $space-2 | $space-2 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-DatePicker | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-DatePicker | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DatePicker-default--hover | *none* | *none* |

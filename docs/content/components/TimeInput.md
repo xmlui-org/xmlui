@@ -280,6 +280,16 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 **Signature**: `get value(): any`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`ampm`**: The AM/PM indicator.
+- **`clearButton`**: The button to clear the time input.
+- **`hour`**: The hour input field.
+- **`minute`**: The minute input field.
+- **`second`**: The second input field.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

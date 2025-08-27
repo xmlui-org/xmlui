@@ -150,6 +150,8 @@ export const SelectMd = createMetadata({
     [`borderRadius-${COMP}-badge`]: "$borderRadius",
     [`paddingHorizontal-item-${COMP}`]: "$space-2",
     [`paddingVertical-item-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",
     [`opacity-${COMP}--disabled`]: "0.5",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",

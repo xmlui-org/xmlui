@@ -29,13 +29,10 @@ jobs:
           cache: "npm"
       - name: Install node dependencies
         run: npm ci --prefer-offline
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.2.1
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+          max-age: 1mo
       - name: Store Playwright's Version
         run: |
           PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)

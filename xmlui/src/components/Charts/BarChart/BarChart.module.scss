@@ -1,7 +1,9 @@
 @use "xmlui/themes.scss" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -11,10 +13,9 @@ $componentName: "BarChart";
 
 @layer components {
 
-  .wrapper{
+  .wrapper {
     width: 100%;
     height: 100%;
-    flex: 1;
     min-height: 0;
   }
 }

@@ -42,24 +42,25 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.2.1
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+          max-age: 1mo
+
       - name: Store Playwright's Version
         run: |
           PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
           echo "Playwright's Version: $PLAYWRIGHT_VERSION"
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+
       - name: Cache Playwright Browsers for Playwright's Version
         id: cache-playwright-browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+
       - name: Install Playwright Browsers
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
@@ -72,34 +73,38 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
+
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
         run: |
           echo "Packages published: ${{ steps.changesets_publish.outputs.publishedPackages }}"
 
       - name: Prepare standalone js file
+        id: prepare_standalone
         if: steps.changesets_publish.outputs.published == 'true' && contains(fromJSON(steps.changesets_publish.outputs.publishedPackages).*.name, 'xmlui')
         run: |
           XMLUI_VERSION=$(jq -r .version xmlui/package.json)
           STANDALONE_FILENAME="xmlui-${XMLUI_VERSION}.js"
           cp xmlui/dist/standalone/xmlui-standalone.umd.js $STANDALONE_FILENAME
-          echo "XMLUI_VERSION=$XMLUI_VERSION" >> $GITHUB_ENV
-          echo "STANDALONE_FILENAME=$STANDALONE_FILENAME" >> $GITHUB_ENV
+          echo "version=$XMLUI_VERSION" >> $GITHUB_OUTPUT
+          echo "filename=$STANDALONE_FILENAME" >> $GITHUB_OUTPUT
 
           echo "prepared xmlui-standalone.umd.js for release with filename: $STANDALONE_FILENAME"
+
       - name: Upload standalone js file
-        if: env.STANDALONE_FILENAME != ''
+        if: steps.prepare_standalone.outputs.filename != ''
         uses: softprops/action-gh-release@v1
         with:
-          files: "${{ env.STANDALONE_FILENAME }}"
-          tag_name: xmlui@${{ env.XMLUI_VERSION }}
+          files: "${{ steps.prepare_standalone.outputs.filename }}"
+          tag_name: xmlui@${{ steps.prepare_standalone.outputs.version }}
           fail_on_unmatched_files: true
 
       - name: Get VSCode Extension release info
         id: xmlui_vscode_info
-        if: steps.changesets_publish.outputs.published
+        if: steps.changesets_publish.outputs.published == 'true'
         run: |
           XMLUI_VSCODE_VERSION=$(jq -r .version tools/vscode/package.json)
+
           XMLUI_VSCODE_TAG="xmlui-vscode@${XMLUI_VSCODE_VERSION}"
           echo "tag=$XMLUI_VSCODE_TAG" >> $GITHUB_OUTPUT
 
@@ -113,13 +118,27 @@ jobs:
           echo "current VSCode extension version: $XMLUI_VSCODE_VERSION"
           echo "release tag for VSCode extension: $XMLUI_VSCODE_TAG"
           echo "tag already exists: $TAG_EXISTS"
+
       - name: Build VSCode extension
-        if: success() && steps.xmlui_vscode_info.outputs.tagExists == 'false'
+        if: steps.changesets_publish.outputs.published == 'true' && steps.xmlui_vscode_info.outputs.tagExists == 'false'
         run: npm run build-vscode-extension
+
       - name: Upload VSIX to Release
-        if: success() && steps.xmlui_vscode_info.outputs.tagExists == 'false'
+        if: steps.changesets_publish.outputs.published == 'true' && steps.xmlui_vscode_info.outputs.tagExists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: "tools/vscode/*.vsix"
           tag_name: ${{ steps.xmlui_vscode_info.outputs.tag }}
           fail_on_unmatched_files: true
+
+      - name: Publish VSCode Extension to Marketplace
+        if: steps.changesets_publish.outputs.published == 'true' && steps.xmlui_vscode_info.outputs.tagExists == 'false'
+        run: |
+          cd tools/vscode
+          npx vsce publish --packagePath *.vsix
+          npx vsce publish \
+            --packagePath *.vsix \
+            --no-git-tag-version \
+            --no-update-package-json \
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}

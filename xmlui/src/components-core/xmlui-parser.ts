@@ -21,11 +21,11 @@ export type ParserResult = {
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 };
+const COLOR_DANER_100 = "hsl(356, 100%, 91%)";
+const COLOR_DANER_300 = "hsl(356, 100%, 70%)";
+const SPACE_2 = "0.5rem";
 
-export function xmlUiMarkupToComponent(
-  source: string,
-  fileId: string | number = 0,
-): ParserResult {
+export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (errors.length > 0) {
@@ -144,7 +144,7 @@ function createErrorReportComponent(
             props: {
               value: linePrefix,
               fontFamily: "monospace",
-              color: "$color-info",
+              color: "hsl(204, 30.3%, 45%)",
             },
           },
         ];
@@ -176,7 +176,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                backgroundColor: COLOR_DANER_100,
               },
             });
           }
@@ -199,7 +199,7 @@ function createErrorReportComponent(
               fontFamily: "monospace",
               textDecorationLine: "underline",
               textDecorationColor: "$color-error",
-              backgroundColor: "rgb(from $color-error r g b / 0.1)",
+              backgroundColor: COLOR_DANER_100,
             },
           });
         } else if (
@@ -219,7 +219,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: "rgb(from $color-error r g b / 0.1)",
+                backgroundColor: COLOR_DANER_100,
               },
             });
           }
@@ -250,7 +250,7 @@ function createErrorReportComponent(
               textDecorationLine: "underline",
               fontFamily: "monospace",
               fontWeight: "bold",
-              backgroundColor: "rgb(from $color-error r g b / 0.1)",
+              backgroundColor: COLOR_DANER_100,
               color: "$color-error",
             },
           });
@@ -273,67 +273,101 @@ function createErrorReportComponent(
 
         currentPos = lineEnd + 1; // +1 for newline character
       }
-      const errMsgComponenet = {
-        type: "HStack",
-        props: { gap: "0" },
+      const errMsgComponenet: ComponentDef = {
+        type: "Text",
         children: [
           {
             type: "Text",
             props: {
-              value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):\xa0`,
-              color: "$color-info",
+              value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):`,
+              color: "hsl(204, 30.3%, 27%)",
             },
           },
           {
             type: "Text",
-            props: { value: ` ${e.message}`, fontWeight: "bold" },
+            props: {
+              value: ` ${e.message}`,
+              fontWeight: "bold",
+            },
           },
         ],
       };
       const context = {
-        type: "VStack",
+        type: "HStack",
         props: {
-          gap: "0",
-          padding: "$padding-normal",
-          backgroundColor: "$color-surface-variant",
+          width: "100%",
         },
-        children: contextChildren,
+        children: [
+          {
+            type: "VStack",
+            props: {
+              gap: "0",
+              padding: "$padding-normal",
+              backgroundColor: "$color-surface-variant",
+            },
+            children: contextChildren,
+          },
+        ],
       };
 
-      const errComponenet = {
+      const errComponent: ComponentDef = {
         type: "VStack",
         props: {
           gap: "$gap-none",
-          borderLeft: "1px solid black",
-          borderTop: "1px solid black",
-          width: "fit-content",
-          padding: "4px",
+          padding: "16px",
+          backgroundColor: "white",
+          borderRadius: SPACE_2,
         },
         children: [errMsgComponenet],
       };
       if (!(e.contextSource === "" && e.pos === 0 && e.end === 0)) {
-        errComponenet.children.push(context);
+        errComponent.children.push(context);
       }
-      return errComponenet;
+      return errComponent;
     });
   const comp: ComponentDef = {
     type: "VStack",
-    props: { padding: "$padding-normal", gap: 0 },
+    props: {
+      padding: "5px 10px 10px 38px",
+      gap: 0,
+      backgroundColor: COLOR_DANER_100,
+      margin: "10px",
+      border: "2px solid " + COLOR_DANER_300,
+      borderRadius: SPACE_2,
+    },
     children: [
       {
-        type: "H1",
+        type: "HStack",
         props: {
-          value: `${errList.length} ${errList.length > 1 ? "Errors" : "Error"} found while processing XMLUI markup`,
-          padding: "$padding-normal",
-          backgroundColor: "$color-error",
-          color: "white",
+          verticalAlignment: "center",
+          marginLeft: "-34px",
+          padding: "15px 0px",
+          gap: "4px",
         },
+        children: [
+          {
+            type: "Icon",
+            props: {
+              name: "error",
+              size: "30px",
+              color: "$color-error",
+            },
+          },
+          {
+            type: "H2",
+            props: {
+              value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
+              fontWeight: "bold",
+              showAnchor: false,
+            },
+          },
+        ],
       },
       {
         type: "VStack",
         props: {
-          gap: "$gap-tight",
-          padding: "$padding-normal",
+          padding: "$padding-none",
+          gap: "16px",
         },
         children: errList,
       },

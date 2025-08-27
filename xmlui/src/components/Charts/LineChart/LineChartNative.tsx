@@ -7,9 +7,9 @@ import {
   Legend as RLegend,
   YAxis,
 } from "recharts";
-import type { ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
@@ -49,7 +49,7 @@ export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip
   tickFormatterY: (value) => value,
 };
 
-export function LineChart({
+export const LineChart = forwardRef(function LineChart({
   data,
   dataKeys = [],
   nameKey,
@@ -65,7 +65,7 @@ export function LineChart({
   children,
   showLegend = defaultProps.showLegend,
   tooltipRenderer,
-}: LineChartProps) {
+}: LineChartProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -199,6 +199,7 @@ export function LineChart({
           : null}
       </div>
       <div
+        ref={forwardedRef}
         className={classnames(className, styles.wrapper)}
         style={style}
       >
@@ -206,6 +207,8 @@ export function LineChart({
           ref={containerRef}
           width="100%"
           height="100%"
+          minWidth={60}
+          minHeight={60}
           debounce={100}
         >
           <RLineChart
@@ -259,4 +262,4 @@ export function LineChart({
       </div>
     </ChartProvider>
   );
-}
+});

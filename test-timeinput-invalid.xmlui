@@ -1,0 +1,43 @@
+<!-- Test file to verify TimeInput invalidTime event -->
+<Template>
+  <VStack gap="10" padding="20">
+    <Text>TimeInput Invalid Time Event Test</Text>
+    
+    <HStack gap="10">
+      <Text width="150">Error Message:</Text>
+      <Text id="errorMessage" fontWeight="bold" color="red">{errorMessage}</Text>
+    </HStack>
+    
+    <HStack gap="10">
+      <Text width="150">Test Input:</Text>
+      <TimeInput 
+        id="testTimeInput"
+        format="HH:mm:ss"
+        label="Test Time"
+        onInvalidTime="(error) => setErrorMessage('Invalid time entered')"
+        onDidChange="errorMessage = ''"
+      />
+    </HStack>
+    
+    <Text fontSize="14" color="gray">
+      Instructions: 
+      1. Try entering invalid values in the time inputs:
+         - Hour: Enter 25, 34, -1, 99, or abc (should be 0-23)
+         - Minute: Enter 60, 75, -1, or abc (should be 0-59)
+         - Second: Enter 60, 99, -1, or abc (should be 0-59)
+      2. The "Error Message" should show immediately when you type invalid values
+      3. The error should clear when you enter valid values or when the field value changes
+      4. Test both single digits and multi-digit invalid values
+      5. Try typing slowly: "3" then "4" - the second keystroke should trigger the error
+    </Text>
+    
+    <Text fontSize="12" color="gray">
+      Valid ranges: Hour (0-23), Minute (0-59), Second (0-59)
+    </Text>
+    
+  </VStack>
+</Template>
+
+<Script>
+  const [errorMessage, setErrorMessage] = useState("");
+</Script>
