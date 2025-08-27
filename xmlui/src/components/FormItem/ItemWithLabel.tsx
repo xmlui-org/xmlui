@@ -7,11 +7,9 @@ import styles from "./FormItem.module.scss";
 
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
-import { partClassName } from "../metadata-helpers";
+import { PART_LABELED_ITEM, PART_LABEL, partClassName } from "../../components-core/parts";
 
 // Component part names
-const PART_LABEL = "label";
-const PART_LABELED_ITEM = "labeledItem";
 
 type ItemWithLabelProps = {
   id?: string;

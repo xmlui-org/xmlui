@@ -31,6 +31,12 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import {
+  PART_END_ADORNMENT,
+  PART_INPUT,
+  PART_START_ADORNMENT,
+  partClassName,
+} from "../../components-core/parts";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -430,14 +436,20 @@ export const NumberBox = forwardRef(function NumberBox(
         onFocus={() => {
           inputRef.current?.focus();
         }}
-        style={{gap}}
+        style={{ gap }}
       >
-        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <Adornment
+          text={startText}
+          iconName={startIcon}
+          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+        />
         <input
           id={id}
           type="text"
           inputMode="numeric"
-          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          className={classnames(partClassName(PART_INPUT), styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
           disabled={!enabled}
           value={valueStrRep}
           step={step}
@@ -453,7 +465,11 @@ export const NumberBox = forwardRef(function NumberBox(
           maxLength={maxLength}
           required={required}
         />
-        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        <Adornment
+          text={endText}
+          iconName={endIcon}
+          className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
+        />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
@@ -480,7 +496,11 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={downButton}
             >
-              <Icon name={spinnerDownIcon || "spinnerDown:NumberBox"} fallback="chevrondown" size="sm" />
+              <Icon
+                name={spinnerDownIcon || "spinnerDown:NumberBox"}
+                fallback="chevrondown"
+                size="sm"
+              />
             </Button>
           </div>
         )}

@@ -8,7 +8,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -44,11 +43,17 @@ export const TextBoxMd = createMetadata({
     label: {
       description: "The label displayed for the text box.",
     },
-    item: {
+    startAdornment: {
+      description: "The adornment displayed at the start of the text box.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the text box.",
+    },
+    input: {
       description: "The text box input area.",
     }
   },
-  defaultPart: "item",
+  defaultPart: "input",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {

@@ -29,7 +29,7 @@ import {
   safeMin,
   type AmPmType,
 } from "./utils";
-import { partClassName } from "../metadata-helpers";
+import { partClassName } from "../../components-core/parts";
 
 // Component part names
 const PART_HOUR = "hour";

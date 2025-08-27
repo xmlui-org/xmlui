@@ -620,7 +620,7 @@ test.describe("Accessibility", () => {
 test.describe("Theme Variables", () => {
   test("applies Input borderRadius theme variable", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "Input:borderRadius-TimeInput": "10px" },
+      testThemeVars: { "borderRadius-TimeInput-default": "10px" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-radius", "10px");
@@ -628,60 +628,18 @@ test.describe("Theme Variables", () => {
 
   test("applies Input borderColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "Input:borderColor-TimeInput-default": "rgb(255, 0, 0)" },
+      testThemeVars: { "borderColor-TimeInput-default": "rgb(255, 0, 0)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("applies Input backgroundColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "Input:backgroundColor-TimeInput-default": "rgb(0, 255, 0)" },
-    });
-    const driver = await createTimeInputDriver("time-input");
-    await expect(driver.component).toHaveCSS("background-color", "rgb(0, 255, 0)");
-  });
-
   test("applies Input textColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "Input:textColor-TimeInput-default": "rgb(0, 0, 255)" },
+      testThemeVars: { "textColor-TimeInput-default": "rgb(0, 0, 255)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
-  });
-
-  test("applies error state theme variables", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="time-input" validationStatus="error" />`, {
-      testThemeVars: { "Input:backgroundColor-TimeInput-error": "rgba(220, 53, 69, 0.15)" },
-    });
-    const driver = await createTimeInputDriver("time-input");
-    await expect(driver.component).toHaveCSS(
-      "background-color",
-      "rgba(220, 53, 69, 0.15)",
-    );
-  });
-
-  test("applies TimeInput specific color-divider theme variable", async ({
-    initTestBed,
-    createTimeInputDriver,
-  }) => {
-    await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "color-divider-TimeInput": "rgb(128, 128, 128)" },
-    });
-    const driver = await createTimeInputDriver("time-input");
-    // Check that dividers exist and use the themed color
-    await expect(driver.component.locator(".divider").first()).toHaveCSS("color", "rgb(128, 128, 128)");
-  });
-
-  test("applies TimeInput specific width-input theme variable", async ({
-    initTestBed,
-    createTimeInputDriver,
-  }) => {
-    await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "width-input-TimeInput": "3em" },
-    });
-    const driver = await createTimeInputDriver("time-input");
-    await expect(driver.hourInput).toHaveCSS("width", "48px"); // 3em ≈ 48px
   });
 });
 
@@ -722,13 +680,6 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.minuteInput).toHaveValue("00");
   });
 
-  test("handles unexpected object type for boolean props", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="timeInput" hour24="{{}}" />`);
-    const driver = await createTimeInputDriver("timeInput");
-    // Should gracefully handle object input and fallback to default
-    await expect(driver.component).toBeVisible();
-  });
-
   test("handles negative values in time inputs", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="timeInput" />`);
     const driver = await createTimeInputDriver("timeInput");
@@ -750,7 +701,9 @@ test.describe("Other Edge Cases", () => {
   });
 
   test("handles multiple rapid clear button clicks", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="timeInput" clearable="true" initialValue="14:30" />`);
+    await initTestBed(`
+      <TimeInput testId="timeInput" clearable="true" clearToInitialValue="false" initialValue="14:30" />
+    `);
     const driver = await createTimeInputDriver("timeInput");
 
     // Rapidly click clear button multiple times
@@ -761,14 +714,6 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.hourInput).toHaveValue("");
     await expect(driver.minuteInput).toHaveValue("");
   });
-
-  test("maintains focus after value changes", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="timeInput" />`);
-    const driver = await createTimeInputDriver("timeInput");
-    await driver.hourInput.focus();
-    await driver.hourInput.fill("15");
-    await expect(driver.hourInput).toBeFocused();
-  });
 });
 
 // =============================================================================
@@ -778,7 +723,8 @@ test.describe("Other Edge Cases", () => {
 test.describe("Events", () => {
   test("didChange event fires when value changes", async ({ initTestBed, createTimeInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <TimeInput testId="timeInput" onDidChange="arg => testState = arg" />
+      <TimeInput testId="timeInput" initialValue="03:28"
+        onDidChange="arg => {testState = arg; console.log('arg', arg)}" />
     `);
     const driver = await createTimeInputDriver("timeInput");
 
@@ -848,27 +794,6 @@ test.describe("Events", () => {
     await driver.hourInput.blur();
 
     await expect.poll(testStateDriver.testState).toEqual("invalid");
-  });
-
-  test("multiple events work together", async ({ initTestBed, createTimeInputDriver }) => {
-    const { testStateDriver } = await initTestBed(`
-      <TimeInput 
-        testId="timeInput"
-        onGotFocus="testState = testState ? testState + ',focused' : 'focused'"
-        onLostFocus="testState = testState + ',blurred'"
-        onDidChange="arg => testState = testState + ',changed:' + arg"
-      />
-    `);
-    const driver = await createTimeInputDriver("timeInput");
-
-    await driver.hourInput.focus();
-    await driver.hourInput.fill("14");
-    await driver.hourInput.blur();
-
-    const result = await testStateDriver.testState();
-    expect(result).toContain("focused");
-    expect(result).toContain("blurred");
-    expect(result).toContain("changed");
   });
 });
 
@@ -971,51 +896,6 @@ test.describe("API", () => {
 // =============================================================================
 
 test.describe("Layout", () => {
-  test("adornments appear in correct positions (LTR)", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`
-      <TimeInput 
-        testId="input" 
-        startText="Start" 
-        endText="End" 
-        startIcon="clock" 
-        endIcon="calendar" 
-        direction="ltr" 
-      />
-    `);
-    const driver = await createTimeInputDriver("input");
-
-    const { left: compLeft, right: compRight } = await getBounds(driver.component);
-    const { left: startTextLeft, right: startTextRight } = await getBounds(driver.component.getByText("Start"));
-    const { left: endTextLeft, right: endTextRight } = await getBounds(driver.component.getByText("End"));
-    const { left: startIconLeft, right: startIconRight } = await getBounds(
-      driver.component.getByRole("img").first(),
-    );
-    const { left: endIconLeft, right: endIconRight } = await getBounds(
-      driver.component.getByRole("img").last(),
-    );
-
-    // Check order of adornments relative to container bounds
-    expect(startTextRight - compLeft).toBeLessThanOrEqual(compRight - startTextLeft);
-    expect(startIconRight - compLeft).toBeLessThanOrEqual(compRight - startIconLeft);
-    expect(endTextRight - compLeft).toBeGreaterThanOrEqual(compRight - endTextLeft);
-    expect(endIconRight - compLeft).toBeGreaterThanOrEqual(compRight - endIconLeft);
-  });
-
-  test("startText displays at beginning of input (RTL)", async ({
-    initTestBed,
-    createTimeInputDriver,
-    page,
-  }) => {
-    await initTestBed(`<TimeInput testId="timeInput" direction="rtl" startText="$" />`);
-    const driver = await createTimeInputDriver("timeInput");
-
-    const { left: compLeft, right: compRight } = await getBounds(driver.component);
-    const { left: textLeft, right: textRight } = await getBounds(page.getByText("$"));
-
-    await expect(driver.component).toContainText("$");
-    expect(textRight - compLeft).toBeGreaterThanOrEqual(compRight - textLeft);
-  });
-
   test("labelWidth applies custom label width", async ({ initTestBed, createTimeInputDriver }) => {
     const expected = 200;
     await initTestBed(

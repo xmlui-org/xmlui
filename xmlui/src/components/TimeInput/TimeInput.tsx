@@ -131,21 +131,6 @@ export const TimeInputMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`Input:borderRadius-${COMP}-default`]: "$borderRadius",
-    [`Input:borderColor-${COMP}-default`]: "$borderColor-input",
-    [`Input:borderWidth-${COMP}-default`]: "1px",
-    [`Input:borderStyle-${COMP}-default`]: "solid",
-    [`Input:backgroundColor-${COMP}-default`]: "$color-surface-50",
-    [`Input:boxShadow-${COMP}-default`]: "none",
-    [`Input:textColor-${COMP}-default`]: "$textColor-primary",
-    [`Input:padding-${COMP}-default`]: "$space-2 $space-3",
-    [`Input:gap-adornment-${COMP}`]: "$space-2",
-    [`Input:textColor-placeholder-${COMP}-default`]: "$textColor-tertiary",
-    [`Input:fontSize-placeholder-${COMP}-default`]: "inherit",
-    [`Input:color-adornment-${COMP}-default`]: "$textColor-secondary",
-    // Error styling following TextBox pattern
-    [`Input:backgroundColor-${COMP}-error`]: "rgba(220, 53, 69, 0.15)",
-    [`Input:borderColor-${COMP}-error`]: "$color-danger-500",
     // TimeInput specific theme variables
     [`color-divider-${COMP}`]: "$textColor-secondary",
     [`spacing-divider-${COMP}`]: "1px 0",
