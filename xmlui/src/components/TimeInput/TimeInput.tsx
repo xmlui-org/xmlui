@@ -22,7 +22,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TimeInputNative, TimeInputFormatValues, defaultProps } from "./TimeInputNative";
+import { TimeInputNative, defaultProps } from "./TimeInputNative";
 
 const COMP = "TimeInput";
 
@@ -58,12 +58,15 @@ export const TimeInputMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-    format: {
-      description:
-        "Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a",
-      valueType: "string",
-      defaultValue: defaultProps.format,
-      availableValues: TimeInputFormatValues,
+    hour24: {
+      description: "Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)",
+      valueType: "boolean",
+      defaultValue: defaultProps.hour24,
+    },
+    seconds: {
+      description: "Whether to show and allow input of seconds",
+      valueType: "boolean", 
+      defaultValue: defaultProps.seconds,
     },
     minTime: {
       description: "Minimum time that the user can select",
@@ -81,6 +84,11 @@ export const TimeInputMd = createMetadata({
     clearIcon: {
       description: "The icon to display in the clear button.",
       valueType: "string",
+    },
+    clearToInitialValue: {
+      description: "Whether the clear button resets the time input to its initial value",
+      valueType: "boolean",
+      defaultValue: defaultProps.clearToInitialValue,
     },
     required: {
       description: "Whether the time input should be required",
@@ -186,11 +194,13 @@ export const timeInputComponentRenderer = createComponentRenderer(
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, defaultProps.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly, defaultProps.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}
-        format={extractValue(node.props.format)}
+        hour24={extractValue.asOptionalBoolean(node.props.hour24, defaultProps.hour24)}
+        seconds={extractValue.asOptionalBoolean(node.props.seconds, defaultProps.seconds)}
         minTime={extractValue(node.props.minTime)}
         maxTime={extractValue(node.props.maxTime)}
         clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
         clearIcon={extractValue(node.props.clearIcon)}
+        clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
         label={extractValue(node.props.label)}
         labelPosition={extractValue(node.props.labelPosition)}

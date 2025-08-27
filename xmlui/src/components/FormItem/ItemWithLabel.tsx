@@ -7,6 +7,11 @@ import styles from "./FormItem.module.scss";
 
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
+import { partClassName } from "../metadata-helpers";
+
+// Component part names
+const PART_LABEL = "label";
+const PART_LABELED_ITEM = "labeledItem";
 
 type ItemWithLabelProps = {
   id?: string;
@@ -60,7 +65,13 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
     return (
-      <Slot {...rest} style={style} className={className} id={inputId} ref={ref}>
+      <Slot
+        {...rest}
+        style={style}
+        className={classnames(partClassName(PART_LABELED_ITEM), className)}
+        id={inputId}
+        ref={ref}
+      >
         {children}
       </Slot>
     );
@@ -93,7 +104,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
               flexShrink: labelWidth !== undefined ? 0 : undefined,
             }}
-            className={classnames(styles.inputLabel, {
+            className={classnames(partClassName(PART_LABEL), styles.inputLabel, {
               [styles.required]: required,
               [styles.disabled]: !enabled,
               [styles.labelBreak]: labelBreak,
@@ -107,7 +118,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot id={!isInputTemplateUsed ? inputId : undefined}>{children}</Slot>
+        <Slot
+          className={partClassName(PART_LABELED_ITEM)}
+          id={!isInputTemplateUsed ? inputId : undefined}
+        >
+          {children}
+        </Slot>
       </div>
       {validationResult}
     </div>

@@ -1,26 +1,23 @@
-import { ComponentDriver } from "../ComponentDrivers";
+import { InputComponentDriver } from "../ComponentDrivers";
 
-export class TimeInputDriver extends ComponentDriver {
-  /**
-   * Get the input component representing the hour part
-   */
-  getHourInput() {
+export class TimeInputDriver extends InputComponentDriver {
+  get hourInput() {
     return this.getByPartName("hour");
   }
 
-  getMinuteInput() {
+  get minuteInput() {
     return this.getByPartName("minute");
   }
 
-  getSecondInput() {
+  get secondInput() {
     return this.getByPartName("second");
   }
 
-  getAmPmInput() {
+  get amPmInput() {
     return this.getByPartName("ampm");
   } 
 
-  getClearButton() {
+  get clearButton() {
     return this.getByPartName("clearButton");
   }
 }

@@ -72,11 +72,11 @@ export class ComponentDriver {
 
 export class InputComponentDriver extends ComponentDriver {
   get field() {
-    return this.component.locator("input");
+    return this.getByPartName("labeledItem");
   }
 
   get label() {
-    return this.component.locator("label");
+    return this.getByPartName("label");
   }
 
   get placeholder() {

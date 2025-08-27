@@ -12,7 +12,7 @@
       <Text width="150">Focus Target:</Text>
       <TimeInput 
         id="testTimeInput"
-        format="HH:mm:ss"
+        seconds="true"
         label="Test Time"
         clearable="true"
         initialValue="10:30:45"
