@@ -8,7 +8,6 @@ import {
   dDidChange,
   dEnabled,
   dGotFocus,
-  dIndeterminate,
   dInitialValue,
   dInternal,
   dLabel,
@@ -18,9 +17,7 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValueApi,
 } from "../metadata-helpers";
 import { defaultProps, Toggle } from "../Toggle/Toggle";
 
@@ -29,6 +26,14 @@ const COMP = "Switch";
 export const SwitchMd = createMetadata({
   status: "stable",
   description: "`Switch` enables users to toggle between two states: on and off.",
+  parts: {
+    label: {
+      description: "The label displayed for the switch.",
+    },
+    input: {
+      description: "The switch input area.",
+    },
+  },
   props: {
     label: dLabel(),
     labelPosition: dLabelPosition("end"),
