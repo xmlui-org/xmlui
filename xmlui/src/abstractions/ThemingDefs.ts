@@ -106,7 +106,7 @@ export type FontDef =
   | string;
 
 export interface ThemeDefinitionDetails {
-  themeVars?: Record<string, string | Record<string, string>>;
+  themeVars?: Record<string, string>;
   resources?: Record<string, string | FontDef>;
 }
 
