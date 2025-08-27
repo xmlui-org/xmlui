@@ -61,7 +61,7 @@ export const FileUploadDropZoneMd = createMetadata({
 export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
   COMP,
   FileUploadDropZoneMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, registerComponentApi, className }) => {
+  ({ node, extractValue, updateState, renderChild, lookupEventHandler, registerComponentApi, className }) => {
     return (
       <FileUploadDropZone
         onUpload={lookupEventHandler("upload")!}
@@ -71,6 +71,7 @@ export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
         allowPaste={extractValue(node.props.allowPaste)}
         text={extractValue(node.props.text)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+        updateState={updateState}
       >
         {renderChild(node.children, { type: "Stack" })}
       </FileUploadDropZone>
