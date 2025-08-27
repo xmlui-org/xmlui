@@ -414,6 +414,117 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("emptyCharacter property", () => {
+    test("uses default '--' placeholder when no emptyCharacter is specified", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("uses custom emptyCharacter for placeholders", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="*" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "**");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "**");
+    });
+
+    test("applies emptyCharacter to all inputs when seconds enabled", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="•" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "••");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "••");
+      await expect(driver.secondInput).toHaveAttribute("placeholder", "••");
+    });
+
+    test("uses first character when emptyCharacter is multi-character", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="abc" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "aa");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "aa");
+    });
+
+    test("defaults to dash when emptyCharacter is empty string", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("handles null emptyCharacter", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="{null}" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("handles undefined emptyCharacter", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="{undefined}" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("works with special characters", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="@" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "@@");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "@@");
+    });
+
+    test("works with unicode characters", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="⏰" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "⏰⏰");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "⏰⏰");
+    });
+
+    test("placeholder visible when fields are empty", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="#" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveValue("");
+      await expect(driver.minuteInput).toHaveValue("");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "##");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "##");
+    });
+
+    test("shows values instead of placeholder when initialValue provided", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="#" initialValue="14:30" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveValue("14");
+      await expect(driver.minuteInput).toHaveValue("30");
+    });
+
+    test("works with 12-hour format", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="○" hour24="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "○○");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "○○");
+      await expect(driver.amPmInput).toBeVisible();
+    });
+  });
+
   test.describe("User Interactions", () => {
     test("allows typing in hour input", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" />`);

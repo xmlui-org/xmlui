@@ -17,7 +17,6 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLostFocus,
-  dPlaceholder,
   dReadonly,
   dSetValueApi,
   dStartIcon,
@@ -55,7 +54,6 @@ export const DateInputMd = createMetadata({
     },
   },
   props: {
-    placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
@@ -240,7 +238,6 @@ export const dateInputComponentRenderer = createComponentRenderer(
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}

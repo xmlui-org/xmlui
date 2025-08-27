@@ -110,6 +110,11 @@ export const TimeInputMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.mute,
     },
+    emptyCharacter: {
+      description: "Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'",
+      valueType: "string",
+      defaultValue: defaultProps.emptyCharacter,
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -203,6 +208,7 @@ export const timeInputComponentRenderer = createComponentRenderer(
         endIcon={extractValue(node.props.endIcon)}
         gap={extractValue.asOptionalString(node.props.gap)}
         mute={extractValue.asOptionalBoolean(node.props.mute, defaultProps.mute)}
+        emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}

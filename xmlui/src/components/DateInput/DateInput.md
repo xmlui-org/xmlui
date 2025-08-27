@@ -37,16 +37,6 @@
 
 %-PROP-END
 
-%-PROP-START placeholder
-
-```xmlui-pg copy display name="Example: placeholder" height="120px"
-<App>
-  <DateInput placeholder="Select a date" />
-</App>  
-```
-
-%-PROP-END
-
 %-PROP-START enabled
 
 ```xmlui-pg copy display name="Example: enabled" height="120px"
@@ -78,6 +68,8 @@
 %-PROP-START dateFormat
 
 The `dateFormat` prop controls how dates are displayed and entered. Different formats change the order and separators of day, month, and year fields.
+
+> [!NOTE] Regardless of the dateFormat, the year input field always accepts and displays 4-digit years. When entering a 2-digit year, it will be automatically normalized to a 4-digit year.
 
 | Format | Description | Example |
 | :----- | :---------- | :------ |
@@ -175,6 +167,20 @@ Makes the date input read-only. Users can see the value but cannot modify it.
 %-PROP-START mute
 
 When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
+
+%-PROP-END
+
+%-PROP-START emptyCharacter
+
+Character to use as placeholder for empty date values. If longer than 1 character, uses the first character. Defaults to '-'.
+
+```xmlui-pg copy display name="Example: emptyCharacter"
+<App>
+  <DateInput emptyCharacter="." />
+  <DateInput emptyCharacter="*" />
+  <DateInput emptyCharacter="abc" />
+</App>
+```
 
 %-PROP-END
 

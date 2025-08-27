@@ -70,7 +70,6 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
-  placeholder?: string;
   onDidChange?: (newValue: string | null) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -102,6 +101,7 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   mute?: boolean;
+  emptyCharacter?: string;
 };
 
 export const defaultProps = {
@@ -120,6 +120,7 @@ export const defaultProps = {
   autoFocus: false,
   labelBreak: false,
   mute: false,
+  emptyCharacter: "-",
 };
 
 export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNative(
@@ -131,7 +132,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     updateState,
     style,
     className,
-    placeholder,
     onDidChange,
     onFocus,
     onBlur,
@@ -163,6 +163,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     mute = defaultProps.mute,
+    emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
   ref,
@@ -173,6 +174,17 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   const dayInputRef = useRef<HTMLInputElement>(null);
   const monthInputRef = useRef<HTMLInputElement>(null);
   const yearInputRef = useRef<HTMLInputElement>(null);
+
+  // Process emptyCharacter according to requirements
+  const processedEmptyCharacter = useMemo(() => {
+    if (!emptyCharacter || emptyCharacter.length === 0) {
+      return "-";
+    }
+    if (emptyCharacter.length > 1) {
+      return emptyCharacter.charAt(0);
+    }
+    return emptyCharacter;
+  }, [emptyCharacter]);
 
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
@@ -748,7 +760,6 @@ type InputProps = {
   onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
   step?: number;
@@ -774,7 +785,6 @@ function Input({
   onBlur,
   onKeyDown,
   onKeyUp,
-  placeholder = "--",
   readOnly,
   required,
   step,
@@ -837,7 +847,6 @@ function Input({
         onFocus={onFocus}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
-        placeholder={placeholder}
         readOnly={readOnly}
         // Assertion is needed for React 18 compatibility
         ref={inputRef as React.RefObject<HTMLInputElement>}
@@ -959,13 +968,12 @@ function YearInput({
   onBeep,
   ...otherProps
 }: YearInputProps): React.ReactElement {
-  // Determine if this is a 2-digit or 4-digit year format
-  const is2DigitYear = dateFormat.includes('yy') && !dateFormat.includes('yyyy');
-  const maxLength = is2DigitYear ? 2 : 4;
+  // Always use 4-digit year format
+  const maxLength = 4;
   
   const currentYear = new Date().getFullYear();
-  const min = is2DigitYear ? 0 : 1900;
-  const max = is2DigitYear ? 99 : currentYear + 100;
+  const min = 1900;
+  const max = currentYear + 100;
 
   const { className: originalClassName, ...restProps } = otherProps;
 

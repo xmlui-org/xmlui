@@ -84,6 +84,7 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   mute?: boolean;
+  emptyCharacter?: string;
 };
 
 export const defaultProps = {
@@ -99,6 +100,7 @@ export const defaultProps = {
   autoFocus: false,
   labelBreak: false,
   mute: false,
+  emptyCharacter: "-",
 };
 
 export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeInputNative(
@@ -137,6 +139,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     mute = defaultProps.mute,
+    emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
   ref,
@@ -148,6 +151,17 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   const minuteInputRef = useRef<HTMLInputElement>(null);
   const secondInputRef = useRef<HTMLInputElement>(null);
   const amPmButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Process emptyCharacter according to requirements
+  const processedEmptyCharacter = useMemo(() => {
+    if (!emptyCharacter || emptyCharacter.length === 0) {
+      return "-";
+    }
+    if (emptyCharacter.length > 1) {
+      return emptyCharacter.charAt(0);
+    }
+    return emptyCharacter;
+  }, [emptyCharacter]);
 
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
@@ -594,6 +608,9 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     return null;
   }, [endIcon, endText]);
 
+  // Create placeholder using processed empty character
+  const placeholder = processedEmptyCharacter.repeat(2);
+
   const timeInputComponent = (
     <div
       ref={timeInputRef}
@@ -633,6 +650,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={hour}
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
+            placeholder={placeholder}
             onBeep={handleBeep}
           />
 
@@ -655,6 +673,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             showLeadingZeros={showLeadingZeros}
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
+            placeholder={placeholder}
             onBeep={handleBeep}
           />
 
@@ -678,6 +697,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 showLeadingZeros={showLeadingZeros}
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
+                placeholder={placeholder}
                 onBeep={handleBeep}
               />
             </>
