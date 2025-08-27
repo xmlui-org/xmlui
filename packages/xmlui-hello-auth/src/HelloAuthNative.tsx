@@ -497,7 +497,43 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
       window.location.assign(authUrl);
     };
 
-    registerComponentApi?.({ poke, login });
+    const logout = async () => {
+      if (debug) console.debug("[HelloAuth] logout()");
+
+      // Clear local state
+      setTokens(undefined);
+      setClaims(undefined);
+      setUser(undefined);
+      setExpiresAt(undefined);
+      setError(undefined);
+      setTemp(undefined);
+
+      // Clear storage
+      const kv = getKV(storage as any);
+      try {
+        kv.removeItem(storageKey);
+        kv.removeItem(`${storageKey}:session`);
+      } catch {}
+
+      // If we have an end session endpoint, redirect to it
+      if (endpoints?.end_session_endpoint && tokens?.id_token) {
+        const url = new URL(endpoints.end_session_endpoint);
+        const params = new URLSearchParams({
+          id_token_hint: tokens.id_token,
+          post_logout_redirect_uri: redirect_uri || window.location.origin,
+        });
+        url.search = params.toString();
+        const logoutUrl = url.toString();
+
+        if (debug) console.debug("[HelloAuth] logout redirect →", logoutUrl);
+        window.location.assign(logoutUrl);
+      } else {
+        // Just clear state and stay on current page
+        setTimeout(publish, 0);
+      }
+    };
+
+    registerComponentApi?.({ poke, login, logout });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     registerComponentApi,
