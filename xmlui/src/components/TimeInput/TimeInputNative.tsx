@@ -13,6 +13,7 @@ import styles from "./TimeInput.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
+import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -60,6 +61,7 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
+  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
@@ -81,6 +83,7 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
+  mute?: boolean;
 };
 
 export const defaultProps = {
@@ -95,6 +98,7 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
+  mute: false,
 };
 
 export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeInputNative(
@@ -110,6 +114,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onFocus,
     onBlur,
     onInvalidChange,
+    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     hour24 = defaultProps.hour24,
@@ -131,6 +136,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
+    mute = defaultProps.mute,
     ...rest
   },
   ref,
@@ -219,6 +225,16 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onDidChange?.(newValue);
   });
 
+  // Method to handle beeping - both sound and event
+  const handleBeep = useCallback(() => {
+    // Play the beep sound only if not muted
+    if (!mute) {
+      beep(440, 50);
+    }
+    // Always fire the beep event for alternative implementations
+    onBeep?.();
+  }, [onBeep, mute]);
+
   // Helper function to format the complete time value
   const formatTimeValue = useCallback(
     (
@@ -297,6 +313,14 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         const currentValue = event.target.value;
         const normalizedValue = normalizeFn(currentValue);
 
+        // Check if the current value was invalid (needed normalization or couldn't be normalized)
+        const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+        
+        if (wasInvalid) {
+          // Play beep sound and fire beep event when manually tabbing out of invalid input
+          handleBeep();
+        }
+
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
           setInvalid(false); // Clear invalid state after normalization
@@ -341,7 +365,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange],
+    [hour, minute, second, amPm, is12HourFormat, handleChange, handleBeep],
   );
 
   // Handle changes from individual inputs
@@ -609,6 +633,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={hour}
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
+            onBeep={handleBeep}
           />
 
           <Divider>:</Divider>
@@ -630,6 +655,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             showLeadingZeros={showLeadingZeros}
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
+            onBeep={handleBeep}
           />
 
           {/* Second input (if needed) */}
@@ -652,6 +678,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 showLeadingZeros={showLeadingZeros}
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
+                onBeep={handleBeep}
               />
             </>
           )}
@@ -739,6 +766,8 @@ type InputProps = {
   required?: boolean;
   step?: number;
   value?: string | null;
+  validateFn?: (value: string) => boolean; // Function to validate the current input value
+  onBeep?: () => void; // Function to handle beep sound and event
 };
 
 // Input component
@@ -762,6 +791,8 @@ function Input({
   required,
   step,
   value,
+  validateFn, // Function to validate the current input value
+  onBeep, // Function to handle beep sound and event
 }: InputProps): React.ReactElement {
   // Handle input changes with auto-tabbing logic
   const handleInputChange = useCallback(
@@ -775,20 +806,28 @@ function Input({
 
       // Auto-tab to next input or button if we have exactly 2 digits
       if (newValue.length === 2 && /^\d{2}$/.test(newValue)) {
-        // Small delay to ensure the current input is properly updated
-        setTimeout(() => {
-          if (nextInputRef?.current) {
-            // Tab to next input field
-            nextInputRef.current.focus();
-            nextInputRef.current.select();
-          } else if (nextButtonRef?.current) {
-            // Tab to AM/PM button
-            nextButtonRef.current.focus();
-          }
-        }, 0);
+        // Check if the new value is valid before auto-tabbing
+        const isValueInvalid = validateFn ? validateFn(newValue) : false;
+        
+        if (!isValueInvalid) {
+          // Small delay to ensure the current input is properly updated
+          setTimeout(() => {
+            if (nextInputRef?.current) {
+              // Tab to next input field
+              nextInputRef.current.focus();
+              nextInputRef.current.select();
+            } else if (nextButtonRef?.current) {
+              // Tab to AM/PM button
+              nextButtonRef.current.focus();
+            }
+          }, 0);
+        } else {
+          // Input is ready for auto-tab but invalid - play beep sound and fire event
+          onBeep?.();
+        }
       }
     },
-    [onChange, nextInputRef, nextButtonRef],
+    [onChange, nextInputRef, nextButtonRef, validateFn, onBeep],
   );
 
   return (
@@ -908,6 +947,7 @@ type HourInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
+  onBeep?: () => void;
 } & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
@@ -917,6 +957,7 @@ function HourInput({
   value,
   isInvalid = false,
   is24Hour = false,
+  onBeep,
   ...otherProps
 }: HourInputProps): React.ReactElement {
   // Calculate min/max based on format
@@ -979,6 +1020,8 @@ function HourInput({
       min={minHour}
       name={is24Hour ? "hour24" : "hour12"}
       value={displayValue}
+      validateFn={(val) => isHourInvalid(val, is24Hour)}
+      onBeep={onBeep}
       className={classnames(partClassName(PART_HOUR), originalClassName, {
         [styles.invalid]: isInvalid,
       })}
@@ -995,6 +1038,7 @@ type MinuteInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
+  onBeep?: () => void;
 } & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
 
 function MinuteInput({
@@ -1004,6 +1048,7 @@ function MinuteInput({
   showLeadingZeros = true,
   value,
   isInvalid = false,
+  onBeep,
   ...otherProps
 }: MinuteInputProps): React.ReactElement {
   function isSameHour(date: string | Date) {
@@ -1021,6 +1066,8 @@ function MinuteInput({
       min={minMinute}
       name="minute"
       value={value}
+      validateFn={isMinuteOrSecondInvalid}
+      onBeep={onBeep}
       className={classnames(partClassName(PART_MINUTE), originalClassName, {
         [styles.invalid]: isInvalid,
       })}
@@ -1038,6 +1085,7 @@ type SecondInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
+  onBeep?: () => void;
 } & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
 
 function SecondInput({
@@ -1048,6 +1096,7 @@ function SecondInput({
   showLeadingZeros = true,
   value,
   isInvalid = false,
+  onBeep,
   ...otherProps
 }: SecondInputProps): React.ReactElement {
   function isSameMinute(date: string | Date) {
@@ -1065,6 +1114,8 @@ function SecondInput({
       min={minSecond}
       name="second"
       value={value}
+      validateFn={isMinuteOrSecondInvalid}
+      onBeep={onBeep}
       className={classnames(partClassName(PART_SECOND), originalClassName, {
         [styles.invalid]: isInvalid,
       })}

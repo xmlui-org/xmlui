@@ -192,6 +192,13 @@ This property holds the current value of the Switch, which can be either "true" 
 
 **Signature**: `get value():boolean`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`input`**: The switch input area.
+- **`label`**: The label displayed for the switch.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

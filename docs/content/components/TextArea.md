@@ -300,6 +300,15 @@ In the example below, typing in the `TextArea` will also display the length of t
 </App>
 ```
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`endAdornment`**: The adornment displayed at the end of the text area.
+- **`input`**: The text area input.
+- **`label`**: The label displayed for the text area.
+- **`startAdornment`**: The adornment displayed at the start of the text area.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

@@ -538,6 +538,101 @@ test.describe("Basic Functionality", () => {
 
     
   });
+
+  test("fires beep event when invalid value prevents auto-tab", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    
+    // Type invalid hour (25) - should not auto-tab and should fire beep
+    await page.keyboard.type("25");
+    
+    // Verify hour input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.hourInput).toHaveValue("25");
+    await expect(driver.hourInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event when manually tabbing out with invalid value", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input and enter invalid value
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    await page.keyboard.type("99");
+    
+    // Manually tab out
+    await page.keyboard.press("Tab");
+    
+    // Verify we moved to minute input
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event for invalid minute values", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on minute input
+    await driver.minuteInput.focus();
+    await driver.minuteInput.selectText();
+    
+    // Type invalid minute (70) - should not auto-tab and should fire beep
+    await page.keyboard.type("70");
+    
+    // Verify minute input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.minuteInput).toHaveValue("70");
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event for invalid second values", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" seconds mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on second input
+    await driver.secondInput.focus();
+    await driver.secondInput.selectText();
+    
+    // Type invalid second (90) - should not auto-tab and should fire beep
+    await page.keyboard.type("90");
+    
+    // Verify second input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.secondInput).toHaveValue("90");
+    await expect(driver.secondInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("does not fire beep event for valid values that auto-tab", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    
+    // Type valid hour (14) - should auto-tab without beep
+    await page.keyboard.type("14");
+    
+    // Verify hour input has the valid value and minute input is focused (auto-tab occurred)
+    await expect(driver.hourInput).toHaveValue("14");
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify no beep event was fired (testState should still be null)
+    await expect.poll(testStateDriver.testState).toBe(null);
+  });
 });
 
 // =============================================================================
