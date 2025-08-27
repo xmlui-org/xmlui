@@ -43,7 +43,8 @@ const HelloAuthMd = createMetadata({
   events: {},
   apis: {
     poke:  { description: "Update lastPokeAt in state.", type: "function" },
-    login: { description: "Start OIDC Authorization Code + PKCE redirect.", type: "function" }, 
+    login: { description: "Start OIDC Authorization Code + PKCE redirect.", type: "function" },
+    logout: { description: "Clear auth state and optionally redirect to end session endpoint.", type: "function" },
   },
 });
 
