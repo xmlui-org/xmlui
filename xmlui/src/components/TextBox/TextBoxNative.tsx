@@ -10,6 +10,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
+import { partClassName, PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -137,18 +138,18 @@ export const TextBox = forwardRef(function TextBox(
   const _id = useId();
   id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   // State to control password visibility
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Determine the actual input type based on the password visibility toggle
-  const actualType = (type === "password" && showPassword) ? "text" : type;
-  
+  const actualType = type === "password" && showPassword ? "text" : type;
+
   // Toggle password visibility
   const togglePasswordVisibility = useCallback(() => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   }, []);
-  
+
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -239,11 +240,17 @@ export const TextBox = forwardRef(function TextBox(
         onFocus={focus}
         style={{ gap }}
       >
-        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <Adornment
+          text={startText}
+          iconName={startIcon}
+          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+        />
         <input
           id={id}
           type={actualType}
-          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          className={classnames(partClassName(PART_INPUT), styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
           disabled={!enabled}
           value={localValue}
           maxLength={maxLength}
@@ -260,12 +267,20 @@ export const TextBox = forwardRef(function TextBox(
         />
         {type === "password" && showPasswordToggle ? (
           <Adornment
-            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon} 
-            className={classnames(styles.adornment, styles.passwordToggle)}
+            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+            className={classnames(
+              partClassName(PART_END_ADORNMENT),
+              styles.adornment,
+              styles.passwordToggle,
+            )}
             onClick={togglePasswordVisibility}
           />
         ) : (
-          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+          <Adornment
+            text={endText}
+            iconName={endIcon}
+            className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
+          />
         )}
       </div>
     </ItemWithLabel>

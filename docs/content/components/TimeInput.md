@@ -15,7 +15,7 @@
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: false) [#clearable-default-false]
+### `clearable` (default: true) [#clearable-default-true]
 
 Whether to show a clear button that allows clearing the selected time
 

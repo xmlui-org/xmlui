@@ -38,6 +38,20 @@ export const resizeOptionsMd: PropertyValueDescription[] = [
 export const TextAreaMd = createMetadata({
   status: "stable",
   description: "`TextArea` provides a multiline text input area.",
+  parts: {
+    label: {
+      description: "The label displayed for the text area.",
+    },
+    startAdornment: {
+      description: "The adornment displayed at the start of the text area.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the text area.",
+    },
+    input: {
+      description: "The text area input.",
+    },
+  },
   props: {
     enterSubmits: {
       description:

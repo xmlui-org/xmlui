@@ -37,6 +37,14 @@ export const CheckboxMd = createMetadata({
     "`Checkbox` allows users to make binary choices with a clickable box that shows " +
     "checked/unchecked states. It's essential for settings, preferences, multi-select " +
     "lists, and accepting terms or conditions.",
+  parts: {
+    label: {
+      description: "The label displayed for the checkbox.",
+    },
+    input: {
+      description: "The checkbox input area.",
+    },
+  },
   props: {
     indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
     label: dLabel(),
@@ -53,9 +61,7 @@ export const CheckboxMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-    inputTemplate: dComponent(
-      "This property is used to define a custom checkbox input template"
-    ),
+    inputTemplate: dComponent("This property is used to define a custom checkbox input template"),
   },
   childrenAsTemplate: "inputTemplate",
   events: {

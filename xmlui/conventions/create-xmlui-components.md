@@ -6,18 +6,19 @@ This document outlines the conventions, patterns, and best practices for creatin
 
 1. [Component Structure](#component-structure)
 2. [Component Metadata](#component-metadata)
-3. [Component Renderers](#component-renderers)
-4. [Theme and Styling](#theme-and-styling)
-5. [Component Implementation](#component-implementation)
-6. [Testing](#testing)
-7. [Component Implementation Patterns](#component-implementation-patterns)
-8. [Default Values Pattern](#default-values-pattern)
-9. [ForwardRef Pattern](#forwardref-pattern)
-10. [State Management Patterns](#state-management-patterns)
-11. [Event Handling Patterns](#event-handling-patterns)
-12. [API Registration and Programmatic Control Patterns](#api-registration-and-programmatic-control-patterns)
-13. [XMLUI Renderer Patterns](#xmlui-renderer-patterns)
-14. [Performance Patterns](#performance-patterns)
+3. [Component Parts Pattern](#component-parts-pattern)
+4. [Component Renderers](#component-renderers)
+5. [Theme and Styling](#theme-and-styling)
+6. [Component Implementation](#component-implementation)
+7. [Testing](#testing)
+8. [Component Implementation Patterns](#component-implementation-patterns)
+9. [Default Values Pattern](#default-values-pattern)
+10. [ForwardRef Pattern](#forwardref-pattern)
+11. [State Management Patterns](#state-management-patterns)
+12. [Event Handling Patterns](#event-handling-patterns)
+13. [API Registration and Programmatic Control Patterns](#api-registration-and-programmatic-control-patterns)
+14. [XMLUI Renderer Patterns](#xmlui-renderer-patterns)
+15. [Performance Patterns](#performance-patterns)
 
 ## Component Structure
 
@@ -169,6 +170,129 @@ export const ComponentNameMd = createMetadata({
 - `dGotFocus(componentName)` - Focus event descriptor
 - `dLostFocus(componentName)` - Blur event descriptor
 - `dInternal(description?)` - Internal-only property descriptor
+
+## Component Parts Pattern
+
+The **parts pattern** is a metadata-driven approach that allows referencing and styling nested sub-components within complex XMLUI components. This pattern adds metadata to components that enables targeting specific parts for testing, styling, and layout applications.
+
+### Parts Metadata Structure
+
+Components that use the parts pattern define a `parts` object in their metadata, where each part has a descriptive name and description:
+
+```typescript
+export const ComponentNameMd = createMetadata({
+  // ... other metadata
+  parts: {
+    label: {
+      description: "The label displayed for the component.",
+    },
+    input: {
+      description: "The main input area.",
+    },
+    startAdornment: {
+      description: "The adornment displayed at the start of the component.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the component.",
+    },
+  },
+  defaultPart: "input", // Optional: specifies which part receives layout properties by default
+  // ... rest of metadata
+});
+```
+
+### Part Implementation in Native Components
+
+Parts are implemented in native components by applying CSS classes that mark specific DOM elements as parts. This is done using the `partClassName` function from the parts infrastructure:
+
+```typescript
+import { partClassName, PART_INPUT, PART_START_ADORNMENT, PART_END_ADORNMENT } from "../../components-core/parts";
+
+export const ComponentNative = forwardRef(function ComponentNative(props, ref) {
+  return (
+    <div className={styles.container}>
+      {/* Start adornment part */}
+      {startAdornment && (
+        <div className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}>
+          {startAdornment}
+        </div>
+      )}
+      
+      {/* Main input part */}
+      <input
+        className={classnames(partClassName(PART_INPUT), styles.input)}
+        {...inputProps}
+      />
+      
+      {/* End adornment part */}
+      {endAdornment && (
+        <div className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}>
+          {endAdornment}
+        </div>
+      )}
+    </div>
+  );
+});
+```
+
+### Standard Part Names
+
+XMLUI defines common part constants for consistency across components:
+
+- `PART_LABEL` - For component labels
+- `PART_INPUT` - For main input areas
+- `PART_START_ADORNMENT` - For decorative elements at the start
+- `PART_END_ADORNMENT` - For decorative elements at the end
+
+### Component Examples Using Parts
+
+#### TextBox Component Parts
+```typescript
+parts: {
+  label: { description: "The label displayed for the text box." },
+  startAdornment: { description: "The adornment displayed at the start of the text box." },
+  endAdornment: { description: "The adornment displayed at the end of the text box." },
+  input: { description: "The text box input area." }
+},
+defaultPart: "input"
+```
+
+#### TimeInput Component Parts
+```typescript
+parts: {
+  hour: { description: "The hour input field." },
+  minute: { description: "The minute input field." },
+  second: { description: "The second input field." },
+  ampm: { description: "The AM/PM indicator." },
+  clearButton: { description: "The button to clear the time input." }
+}
+```
+
+#### Checkbox Component Parts
+```typescript
+parts: {
+  label: { description: "The label displayed for the checkbox." },
+  input: { description: "The checkbox input area." }
+}
+```
+
+### Benefits of the Parts Pattern
+
+1. **Testing**: Parts provide stable selectors for automated testing by generating predictable CSS classes like `_PART_input_`
+2. **Styling**: Theme variables and CSS can target specific parts of complex components
+3. **Layout**: Layout properties can be applied to specific parts rather than the entire component
+4. **Documentation**: Auto-generated documentation includes part descriptions for better developer understanding
+5. **Consistency**: Standardized part names create consistent patterns across the component library
+
+### When to Use Parts
+
+Use the parts pattern for components that:
+- Have multiple distinct visual elements that users might want to style separately
+- Contain input elements alongside labels, adornments, or other decorative elements
+- Have complex internal structure that benefits from targeted styling or testing
+- Need fine-grained control over layout application to sub-elements
+
+Simple components with a single visual element typically don't need the parts pattern.
 
 ## Component Renderers
 

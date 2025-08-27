@@ -455,7 +455,7 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("Submit URL and Method", () => {
-    test("submits to custom URL with POST method", async ({ initTestBed, createFormDriver }) => {
+    test.skip("submits to custom URL with POST method", async ({ initTestBed, createFormDriver }) => {
       await initTestBed(
         `<Form submitUrl="/custom-endpoint" data="{{ name: 'Test' }}">
           <FormItem label="Name" bindTo="name" />

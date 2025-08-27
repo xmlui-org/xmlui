@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { getPseudoStyles } from "./component-test-helpers";
-import { partClassName } from "../components/metadata-helpers";
+import { partClassName } from "../components-core/parts";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -72,11 +72,11 @@ export class ComponentDriver {
 
 export class InputComponentDriver extends ComponentDriver {
   get field() {
-    return this.component.locator("input");
+    return this.getByPartName("input");
   }
 
   get label() {
-    return this.component.locator("label");
+    return this.getByPartName("label");
   }
 
   get placeholder() {
@@ -775,9 +775,6 @@ export class TextBoxDriver extends InputComponentDriver {}
 // --- TextArea
 
 export class TextAreaDriver extends InputComponentDriver {
-  get field() {
-    return this.component.locator("textarea").or(this.component).last();
-  }
 }
 
 // --- ProgressBar

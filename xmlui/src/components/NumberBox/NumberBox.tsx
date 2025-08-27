@@ -10,7 +10,6 @@ import {
   dEnabled,
   dEndIcon,
   dEndText,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,
@@ -37,6 +36,20 @@ export const NumberBoxMd = createMetadata({
     "validation, spinner buttons, and flexible formatting options. It supports both " +
     "integer and floating-point numbers, handles empty states as null values, and " +
     "integrates seamlessly with form validation.",
+  parts: {
+    label: {
+      description: "The label displayed for the text box.",
+    },
+    startAdornment: {
+      description: "The adornment displayed at the start of the text box.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the text box.",
+    },
+    input: {
+      description: "The text box input area.",
+    },
+  },
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -92,13 +105,15 @@ export const NumberBoxMd = createMetadata({
       defaultValue: defaultProps.zeroOrPositive,
     },
     minValue: {
-      description: "The minimum value the input field allows. Can be a float or an integer if " +
+      description:
+        "The minimum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no minimum value check is done.",
       defaultValue: defaultProps.min,
     },
     maxValue: {
-      description: "The maximum value the input field allows. Can be a float or an integer if " +
+      description:
+        "The maximum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no maximum value check is done.",
       defaultValue: defaultProps.max,

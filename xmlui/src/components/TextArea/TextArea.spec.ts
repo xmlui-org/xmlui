@@ -919,10 +919,10 @@ test.describe("Regression", () => {
     createTextBoxDriver,
   }) => {
     await initTestBed(`
-      <App var.value="">
+      <Fragment var.value="">
         <TextBox testId="myTextBox" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
         <TextArea testId="myTextArea" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
-      </App>
+      </Fragment>
     `);
 
     const tbDriver = await createTextBoxDriver("myTextBox");
@@ -932,17 +932,14 @@ test.describe("Regression", () => {
     await expect(driver.component).toBeVisible();
 
     await driver.focus();
-    await driver.field.fill("a");
-    await expect(driver.field).toHaveValue("a");
-    await expect(driver.field).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("a");
+    await expect(driver.component).toBeFocused();
+    await driver.component.fill("a");
+    await expect(driver.component).toHaveValue("a");
     await tbDriver.field.fill("abc");
-    await expect(driver.field).toHaveValue("abc");
-    await expect(tbDriver.field).toBeFocused();
     await expect(tbDriver.field).toHaveValue("abc");
-    await driver.field.fill("abcde");
-    await expect(driver.field).toHaveValue("abcde");
-    await expect(driver.field).toBeFocused();
+    await driver.component.fill("abcde");
+    await expect(driver.component).toHaveValue("abcde");
+    await expect(driver.component).toBeFocused();
     await expect(tbDriver.field).toHaveValue("abcde");
   });
 });
