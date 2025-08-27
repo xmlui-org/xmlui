@@ -238,7 +238,7 @@ export function NestedApp({
               interceptor={mock}
               waitForApiInterceptor={true}
             >
-              <NestedAppRoot themeStylesToReset={theme.themeStyles}>
+              <NestedAppRoot themeStylesToReset={theme.themeStyles} height={height}>
                 <AppRoot
                   onInit={onInit}
                   isNested={true}
@@ -317,7 +317,7 @@ export function NestedApp({
   );
 }
 
-function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; themeStylesToReset?: Record<string, string>}) {
+function NestedAppRoot({children, themeStylesToReset, height}: {children: ReactNode; themeStylesToReset?: Record<string, string>; height?: string | number}) {
   // css variables are leaking into to shadow dom, so we reset them here
   const themeVarReset = useMemo(() => {
     const vars = {};
@@ -329,7 +329,7 @@ function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; the
 
   const resetClassName = useStyles(themeVarReset, { prepend: true });
 
-  return <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>
+  return <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"} style={{height}}>
     {children}
   </div>
 }

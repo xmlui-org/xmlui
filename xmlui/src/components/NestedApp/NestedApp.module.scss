@@ -50,6 +50,7 @@ $borderRadius-button-splitView-NestedApp: createThemeVar("borderRadius-button-sp
 $borderColor-button-splitView-NestedApp: createThemeVar("borderColor-button-splitView-#{$component}"
   );
 $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
+$border-NestedApp: createThemeVar("border-#{$component}");
 
 @layer components {
   .nestedAppPlaceholder {
@@ -143,7 +144,6 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
   // --- End of theme variables collection
 
   .nestedAppContainer {
-    @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
 
     //https://stackoverflow.com/a/70422489
@@ -158,12 +158,14 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     width: 100%;
     height: fit-content;
     display: flex;
+    border: $border-NestedApp;
     border-radius: $bordRadius-NestedApp;
     flex-direction: column;
     gap: $gap-frame-NestedApp;
     background-color: $backgroundColor-frame-NestedApp;
     align-content: center;
     box-shadow: $boxShadow-NestedApp;
+    padding-bottom: 8px;
 
     .contentContainer {
       width: 100%;
@@ -273,6 +275,7 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     height: 100%;
     position: relative;
     isolation: isolate;
+    background-color: transparent;
   }
 }
 

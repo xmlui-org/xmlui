@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
@@ -68,6 +68,7 @@ export function AppWithCodeViewNative({
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
   const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
+  const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
@@ -168,7 +169,7 @@ export function AppWithCodeViewNative({
               </div>
             </div>
           )}
-          <div className={styles.contentContainer}>
+          <div className={styles.contentContainer} ref={contentContainerRef}>
             <Markdown
               className={classnames(styles.splitViewMarkdown, { [styles.hidden]: !showCode })}
             >
@@ -176,7 +177,7 @@ export function AppWithCodeViewNative({
             </Markdown>
             <IndexAwareNestedApp
               className={classnames({ [styles.hidden]: showCode })}
-              height={"100%"}
+              height={contentContainerRef.current?.clientHeight || "100%"}
               app={app}
               api={api}
               components={components}
