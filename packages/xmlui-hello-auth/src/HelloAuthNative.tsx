@@ -2,6 +2,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "xmlui";
 
 /* -------------------- PKCE + helpers (TS/DOM safe) -------------------- */
+function parseJwt(token: string): Record<string, any> | null {
+  try {
+    const base64 = token.split('.')[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch (e) {
+    console.warn('Failed to parse ID token', e);
+    return null;
+  }
+}
 function b64urlToJson<T = any>(seg: string): T {
   const pad = seg.length % 4 ? 4 - (seg.length % 4) : 0;
   const base64 = seg.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad);
@@ -272,6 +284,19 @@ export const HelloAuth = React.forwardRef<HTMLDivElement, Props>(function HelloA
 
         const json = (await res.json()) as Tokens;
         setTokens(json);
+        // Decode id_token payload (no verification)
+        if (json.id_token) {
+          const decoded = parseJwt(json.id_token);
+          if (decoded) {
+            setUser({
+              sub: decoded.sub,
+              email: decoded.email,
+              name: decoded.name,
+              picture: decoded.picture,
+            });
+          }
+        }
+
         setError(undefined);
 
         if (debug) console.debug("[HelloAuth] token ✓", json);
