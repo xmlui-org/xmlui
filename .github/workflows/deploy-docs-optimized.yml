@@ -9,6 +9,10 @@ on:
         required: false
         default: 10
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -61,3 +65,13 @@ jobs:
           package: "docs/ui-optimized.zip"
           app-name: xmlui-docs
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_DOCS }}
+      - name: Create Pull Request for generated releases.json
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: "docs/public/resources/files/releases.json"
+          commit-message: "chore: update generated releases.json"
+          title: "docs: Update generated releases.json"
+          body: "This PR was automatically opened by the **Deploy docs (optimized)** workflow, which generates the `releases.json` file with data about the latest releases."
+          branch: "automated/update-releases"
+          delete-branch: true # Clean up the temp branch after merge
+          labels: automated
