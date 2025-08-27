@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -16,17 +18,14 @@ $gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
 $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
-$backgroundColor-viewControls-NestedApp: createThemeVar(
-  "backgroundColor-viewControls-#{$component}"
-);
+$backgroundColor-viewControls-NestedApp: createThemeVar("backgroundColor-viewControls-#{$component}"
+  );
 $bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
-$paddingVertical-viewControls-button-NestedApp: createThemeVar(
-  "paddingVertical-viewControls-button-#{$component}"
-);
-$paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
-  "paddingHorizontal-viewControls-button-#{$component}"
-);
+$paddingVertical-viewControls-button-NestedApp: createThemeVar("paddingVertical-viewControls-button-#{$component}"
+  );
+$paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizontal-viewControls-button-#{$component}"
+  );
 $bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 $height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
@@ -36,31 +35,24 @@ $width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
 // --- Split view styles
 $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
-$height-button-splitView-NestedApp: createThemeVar(
-  "height-button-splitView-#{$component}"
-);
-$backgroundColor-code-splitView-NestedApp: createThemeVar(
-  "backgroundColor-code-splitView-#{$component}"
-);
-$backgroundColor-button-splitView-NestedApp--active: createThemeVar(
-  "backgroundColor-button-splitView-#{$component}--active"
-);
-$color-button-splitView-NestedApp: createThemeVar(
-  "color-button-splitView-#{$component}"
-);
-$color-button-splitView-NestedApp--active: createThemeVar(
-  "color-button-splitView-#{$component}--active"
-);
-$borderRadius-button-splitView-NestedApp: createThemeVar(
-  "borderRadius-button-splitView-#{$component}"
-);
-$borderColor-button-splitView-NestedApp: createThemeVar(
-  "borderColor-button-splitView-#{$component}"
-);
+$height-button-splitView-NestedApp: createThemeVar("height-button-splitView-#{$component}"
+  );
+$backgroundColor-code-splitView-NestedApp: createThemeVar("backgroundColor-code-splitView-#{$component}"
+  );
+$backgroundColor-button-splitView-NestedApp--active: createThemeVar("backgroundColor-button-splitView-#{$component}--active"
+  );
+$color-button-splitView-NestedApp: createThemeVar("color-button-splitView-#{$component}"
+  );
+$color-button-splitView-NestedApp--active: createThemeVar("color-button-splitView-#{$component}--active"
+  );
+$borderRadius-button-splitView-NestedApp: createThemeVar("borderRadius-button-splitView-#{$component}"
+  );
+$borderColor-button-splitView-NestedApp: createThemeVar("borderColor-button-splitView-#{$component}"
+  );
 $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
 
 @layer components {
-  .nestedAppPlaceholder{
+  .nestedAppPlaceholder {
     width: 100%;
     height: 100%;
     background-color: t.$backgroundColor;
@@ -71,10 +63,12 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     position: absolute;
     left: 50%;
     top: calc(50% - 25px);
-    transform: translateX(-50%); /* Center perfectly on the X axis */
+    transform: translateX(-50%);
+    /* Center perfectly on the X axis */
     display: flex;
     align-items: center;
-    justify-content: center; /* Center the content horizontally */
+    justify-content: center;
+    /* Center the content horizontally */
     width: 300px;
     height: 50px;
   }
@@ -83,7 +77,8 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     width: 50px;
     height: 50px;
     transform: translateZ(0);
-    .animatedLogoPath{
+
+    .animatedLogoPath {
       will-change: stroke-dashoffset, stroke-dasharray;
       /* The total length of the rectangle path is ~82. */
       stroke-dasharray: 82;
@@ -97,7 +92,8 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
   .loadingText {
     margin-right: 12px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 16px; /* Increased by 20% from 16px */
+    font-size: 16px;
+    /* Increased by 20% from 16px */
     font-weight: 500;
     color: $color-loadingText-NestedApp;
     text-align: right;
@@ -105,33 +101,39 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
 
   /* Defines the animation steps */
   @keyframes draw-loop {
+
     /* At the start, the path is not drawn */
     0% {
       stroke-dashoffset: 82;
     }
+
     /* Animate to fully drawn over 40% of the duration */
     40% {
       stroke-dashoffset: 0;
     }
+
     /* Hold the fully drawn state until the end */
     100% {
       stroke-dashoffset: 0;
     }
   }
 
-  .nestedAppRoot{
+  .nestedAppRoot {
     width: 100%;
     height: 100%;
     position: relative;
     isolation: isolate;
     background-color: t.$backgroundColor;
-    &.shouldAnimate{
+
+    &.shouldAnimate {
       transition: clip-path 1s, opacity 1s;
       clip-path: inset(50% round 50%);
-      &:not(.initialized){
+
+      &:not(.initialized) {
         opacity: 0;
       }
-      &.initialized{
+
+      &.initialized {
         opacity: 1;
         clip-path: inset(0% round 0%);
       }
@@ -162,18 +164,17 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     background-color: $backgroundColor-frame-NestedApp;
     align-content: center;
     box-shadow: $boxShadow-NestedApp;
-    overflow: hidden;
 
     .contentContainer {
       width: 100%;
       height: 100%;
-      overflow: auto;
       display: flex;
       align-items: center;
 
-      .splitViewMarkdown{
+      .splitViewMarkdown {
         height: 100%;
-        :global(.global-codeBlock){
+
+        :global(.global-codeBlock) {
           background-color: $backgroundColor-code-splitView-NestedApp;
           height: 100%;
           border: none;
@@ -183,7 +184,7 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     }
   }
 
-  .hidden{
+  .hidden {
     display: none;
   }
 
@@ -222,12 +223,15 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     &.show {
       background-color: $backgroundColor-button-splitView-NestedApp--active;
       color: $color-button-splitView-NestedApp--active !important;
+
       &:hover {
         background-color: $backgroundColor-button-splitView-NestedApp--active !important;
       }
     }
+
     &.hide {
       background-color: transparent;
+
       &:hover {
         background-color: transparent !important;
       }
@@ -262,7 +266,7 @@ $color-loadingText-NestedApp: createThemeVar("color-loadingText-#{$component}");
     width: $width-controls-NestedApp;
   }
 
-  .shadowRoot{
+  .shadowRoot {
     // "My solution was to add a dummy transform property so that all elements with fixed position got attached to their parent div." see: https://stackoverflow.com/a/70422489
     transform: scale(1);
     width: 100%;
