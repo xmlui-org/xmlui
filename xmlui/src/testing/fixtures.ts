@@ -62,6 +62,7 @@ import {
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
+import { DateInputDriver } from "./drivers/DateInputDriver";
 
 export { expect } from "./assertions";
 
@@ -531,6 +532,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(TimeInputDriver, testIdOrLocator);
     });
+  },
+  createDateInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(DateInputDriver, testIdOrLocator);
+    });
   }
 });
 
@@ -605,4 +611,5 @@ type TestDriverExtenderProps = {
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
   createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
+  createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
 };

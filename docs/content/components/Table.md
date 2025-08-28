@@ -46,6 +46,12 @@ This property indicates when the row selection header is displayed. When the val
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `cellVerticalAlign` (default: "center") [#cellverticalalign-default-center]
+
+This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.
+
+Available values: `top`, `center` **(default)**, `bottom`
+
 ### `data` [#data]
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.

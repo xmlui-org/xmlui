@@ -100,7 +100,6 @@ Available values:
 | `caption` | Represents the caption (or title) of a table |
 | `cite` | Is used to mark up the title of a cited work |
 | `code` | Represents a line of code |
-| `codefence` | Handles the display of code blocks if combined with a `code` variant |
 | `deleted` | Represents text that has been deleted |
 | `em` | Marks text to stress emphasis |
 | `inherit` | Represents text that inherits the style from its parent element |
@@ -380,24 +379,16 @@ This component does not expose any methods.
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
@@ -420,8 +411,6 @@ This component does not expose any methods.
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
-| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
-| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |

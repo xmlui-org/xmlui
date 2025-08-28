@@ -313,7 +313,6 @@ const TextVariantKeys = [
   "abbr", // use <abbr>
   "cite", // use <cite>
   "code", // use <code>
-  "codefence", // use uniquely styled <![CDATA[
   "deleted", // use <del>
   "inherit",
   "inserted", // use <ins>
@@ -367,7 +366,6 @@ export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   abbr: "abbr",
   cite: "cite",
   code: "code",
-  codefence: "pre",
   deleted: "del",
   inherit: "span",
   inserted: "ins",
@@ -396,10 +394,6 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "caption", description: "Represents the caption (or title) of a table" },
   { value: "cite", description: "Is used to mark up the title of a cited work" },
   { value: "code", description: "Represents a line of code" },
-  {
-    value: "codefence",
-    description: "Handles the display of code blocks if combined with a `code` variant",
-  },
   { value: "deleted", description: "Represents text that has been deleted" },
   { value: "em", description: "Marks text to stress emphasis" },
   {

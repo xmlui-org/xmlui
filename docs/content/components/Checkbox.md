@@ -251,6 +251,13 @@ You can query this read-only API property to query the checkbox's current value 
 
 See an example in the `setValue` API method.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`input`**: The checkbox input area.
+- **`label`**: The label displayed for the checkbox.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

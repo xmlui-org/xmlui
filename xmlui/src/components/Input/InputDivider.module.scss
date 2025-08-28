@@ -1,0 +1,9 @@
+/* InputDivider base styles - only non-conflicting defaults */
+@layer components {
+  .inputDivider {
+    white-space: pre;
+    display: inline-block;
+    font: inherit;
+    user-select: none;
+  }
+}

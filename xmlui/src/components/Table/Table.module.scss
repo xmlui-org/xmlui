@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -45,7 +47,8 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   }
 
 
-  .headerWrapper, .tableBody {
+  .headerWrapper,
+  .tableBody {
     display: inline-block;
     min-width: 100%;
     background-color: $backgroundColor-Table;
@@ -103,20 +106,34 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     background-color: $backgroundColor-heading-Table;
   }
 
-  .columnCell, .cell{
+  .columnCell,
+  .cell {
     display: flex;
     align-items: center;
     white-space: nowrap;
     text-overflow: ellipsis;
     user-select: text;
     overflow: hidden;
+
+    &.alignTop {
+      align-items: flex-start;
+    }
+
+    &.alignCenter {
+      align-items: center;
+    }
+
+    &.alignBottom {
+      align-items: flex-end;
+    }
   }
 
   .table {
     display: block;
     color: $textColor-Table;
 
-    .row, .headerRow {
+    .row,
+    .headerRow {
       display: flex;
       flex-direction: row;
       border-bottom: createThemeVar("borderBottom-cell-Table");
@@ -146,7 +163,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
           padding-left: $paddingHorizontal-cell-first-Table;
         }
 
-        > button {
+        >button {
           padding-left: $paddingHorizontal-cell-first-Table;
 
           .headerContent {
@@ -160,7 +177,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
           padding-right: $paddingHorizontal-cell-last-Table;
         }
 
-        > button {
+        >button {
           padding-right: $paddingHorizontal-cell-last-Table;
 
           .headerContent {
@@ -170,7 +187,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
       }
 
       .cell:first-child {
-        .cellContent{
+        .cellContent {
           padding-left: $paddingHorizontal-cell-first-Table;
           border-left: 0;
         }
@@ -178,7 +195,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
       }
 
       .cell:last-child {
-        .cellContent{
+        .cellContent {
           padding-right: $paddingHorizontal-cell-last-Table;
           border-right: 0;
         }
@@ -330,17 +347,19 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    &:before{
+
+    &:before {
       content: '';
       width: 1px;
       height: 100%;
-      background:createThemeVar("borderColor-cell-Table");
+      background: createThemeVar("borderColor-cell-Table");
     }
   }
 
   .resizer.isResizing {
     opacity: 1;
-    &:before{
+
+    &:before {
       box-shadow: t.$boxShadow;
     }
   }
@@ -350,7 +369,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
       opacity: 0;
     }
 
-    *:hover > .resizer {
+    *:hover>.resizer {
       opacity: 1;
     }
   }
@@ -360,5 +379,3 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-
-

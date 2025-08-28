@@ -115,9 +115,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
           break;
-        default:
+        case SyntaxKind.CloseNodeStart: {
           const errNode = errNodeUntil(RECOVER_FILE);
           errorAt(DIAGS.unexpectedCloseTag, errNode!.pos, errNode!.end);
+          break;
+        }
+        default:
+          const errNode = errNodeUntil(RECOVER_FILE);
+          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end);
           break;
       }
     }

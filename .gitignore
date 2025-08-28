@@ -1,4 +1,5 @@
 node_modules
+test-results
 .vs
 .idea
 .windsurf
@@ -10,8 +11,8 @@ __deploy
 test-results
 coverage
 .next
-tests
 xmlui-optimized-output
 xmlui-temp-build
+tests
 
 docs/scripts/component-metadata.json
