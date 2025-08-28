@@ -43,6 +43,7 @@ export interface PartialInputProps {
   name: string;
   ariaLabel?: string;
   className?: string;
+  invalidClassName?: string;
   
   // Standard props (can vary per input)
   disabled?: boolean;
@@ -90,6 +91,7 @@ export function PartialInput({
   name,
   ariaLabel,
   className,
+  invalidClassName,
   disabled,
   readOnly,
   required,
@@ -216,7 +218,9 @@ export function PartialInput({
       autoComplete="off"
       // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
       autoFocus={autoFocus}
-      className={classnames(styles.partialInput, className)}
+      className={classnames(styles.partialInput, className, {
+        [invalidClassName]: isInvalid,
+      })}
       data-input="true"
       disabled={disabled}
       inputMode="numeric"

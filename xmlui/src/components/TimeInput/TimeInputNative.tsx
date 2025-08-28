@@ -11,6 +11,7 @@ import {
 import classnames from "classnames";
 import styles from "./TimeInput.module.scss";
 import { PartialInput } from "../Input/PartialInput";
+import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -703,7 +704,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             onBeep={handleBeep}
           />
 
-          <Divider>:</Divider>
+          <InputDivider separator=":" className={styles.divider} />
 
           {/* Minute input */}
           <MinuteInput
@@ -729,7 +730,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           {/* Second input (if needed) */}
           {showSeconds && (
             <>
-              <Divider>:</Divider>
+              <InputDivider separator=":" className={styles.divider} />
               <SecondInput
                 disabled={!enabled}
                 hour={hour}
@@ -809,11 +810,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
 
   return timeInputComponent;
 });
-
-// Simple divider component for time separators
-function Divider({ children }: { children?: React.ReactNode }): React.ReactElement {
-  return <span className={styles.divider}>{children}</span>;
-}
 
 // AmPm component types and implementation
 type AmPmProps = {
@@ -1009,9 +1005,8 @@ function HourInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_HOUR), "timeinput", {
-        [styles.invalid]: isInvalid,
-      })}
+      className={classnames(partClassName(PART_HOUR), styles.input, styles.hour)}
+      invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
       required={otherProps.required}
@@ -1075,9 +1070,8 @@ function MinuteInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_MINUTE), "timeinput", {
-        [styles.invalid]: isInvalid,
-      })}
+      className={classnames(partClassName(PART_MINUTE), styles.input, styles.minute)}
+      invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
       required={otherProps.required}
@@ -1142,9 +1136,8 @@ function SecondInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_SECOND), "timeinput", {
-        [styles.invalid]: isInvalid,
-      })}
+      className={classnames(partClassName(PART_SECOND), styles.input, styles.second)}
+      invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
       required={otherProps.required}

@@ -2,56 +2,58 @@
 // These styles contain only the shared patterns from multi-field input components
 // Component-specific styling (including widths) should be applied via className prop
 
-.partialInput {
-  // Base layout and sizing
-  height: 100%;
-  position: relative;
-  border: 0;
-  background: none;
-  color: currentColor;
-  font: inherit;
-  box-sizing: border-box;
-  text-align: center;
-  
-  // Remove browser default styling
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  appearance: textfield;
-  
-  // Hide spin buttons for number inputs (all browsers)
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    margin: 0 !important;
-    display: none !important;
-  }
+@layer components {
+  .partialInput {
+    // Base layout and sizing
+    height: 100%;
+    position: relative;
+    border: 0;
+    background: none;
+    color: currentColor;
+    font: inherit;
+    box-sizing: border-box;
+    text-align: center;
 
-  // Hide spin buttons for Firefox specifically
-  &[type="number"] {
-    -moz-appearance: textfield !important;
-    appearance: textfield !important;
-  }
-  
-  // Focus state
-  &:focus {
-    outline: none; // Component-specific focus styling should be applied by parent
-  }
-  
-  // Disabled state
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  // Read-only state
-  &[readonly] {
-    cursor: default;
-  }
-  
-  // Common placeholder styling
-  &::placeholder {
-    opacity: 0.6;
+    // Remove browser default styling
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    // Hide spin buttons for number inputs (all browsers)
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      margin: 0 !important;
+      display: none !important;
+    }
+
+    // Hide spin buttons for Firefox specifically
+    &[type="number"] {
+      -moz-appearance: textfield !important;
+      appearance: textfield !important;
+    }
+
+    // Focus state
+    &:focus {
+      outline: none; // Component-specific focus styling should be applied by parent
+    }
+
+    // Disabled state
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    // Read-only state
+    &[readonly] {
+      cursor: default;
+    }
+
+    // Common placeholder styling
+    &::placeholder {
+      opacity: 0.6;
+    }
   }
 }

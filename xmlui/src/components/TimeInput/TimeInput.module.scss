@@ -18,14 +18,22 @@ $padding-input-TimeInput: createThemeVar("padding-input-#{$componentName}");
 $textAlign-input-TimeInput: createThemeVar("textAlign-input-#{$componentName}");
 $fontSize-input-TimeInput: createThemeVar("fontSize-input-#{$componentName}");
 $borderRadius-input-TimeInput: createThemeVar("borderRadius-input-#{$componentName}");
-$backgroundColor-input-TimeInput-invalid: createThemeVar("backgroundColor-input-#{$componentName}-invalid");
+$backgroundColor-input-TimeInput-invalid: createThemeVar(
+  "backgroundColor-input-#{$componentName}-invalid"
+);
 $padding-button-TimeInput: createThemeVar("padding-button-#{$componentName}");
 $borderRadius-button-TimeInput: createThemeVar("borderRadius-button-#{$componentName}");
 $hoverColor-button-TimeInput: createThemeVar("hoverColor-button-#{$componentName}");
 $disabledColor-button-TimeInput: createThemeVar("disabledColor-button-#{$componentName}");
-$outlineColor-button-TimeInput--focused: createThemeVar("outlineColor-button-#{$componentName}--focused");
-$outlineWidth-button-TimeInput--focused: createThemeVar("outlineWidth-button-#{$componentName}--focused");
-$outlineOffset-button-TimeInput--focused: createThemeVar("outlineOffset-button-#{$componentName}--focused");
+$outlineColor-button-TimeInput--focused: createThemeVar(
+  "outlineColor-button-#{$componentName}--focused"
+);
+$outlineWidth-button-TimeInput--focused: createThemeVar(
+  "outlineWidth-button-#{$componentName}--focused"
+);
+$outlineOffset-button-TimeInput--focused: createThemeVar(
+  "outlineOffset-button-#{$componentName}--focused"
+);
 $minWidth-ampm-TimeInput: createThemeVar("minWidth-ampm-#{$componentName}");
 $fontSize-ampm-TimeInput: createThemeVar("fontSize-ampm-#{$componentName}");
 
@@ -38,15 +46,25 @@ $backgroundColor-menu-TimeInput: createThemeVar("backgroundColor-menu-#{$compone
 $borderRadius-menu-TimeInput: createThemeVar("borderRadius-menu-#{$componentName}");
 $boxShadow-menu-TimeInput: createThemeVar("boxShadow-menu-#{$componentName}");
 $borderColor-menu-TimeInput: createThemeVar("borderColor-menu-#{$componentName}");
-$backgroundColor-item-TimeInput--hover: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-$backgroundColor-item-TimeInput--active: createThemeVar("backgroundColor-item-#{$componentName}--active");
+$backgroundColor-item-TimeInput--hover: createThemeVar(
+  "backgroundColor-item-#{$componentName}--hover"
+);
+$backgroundColor-item-TimeInput--active: createThemeVar(
+  "backgroundColor-item-#{$componentName}--active"
+);
 $maxHeight-menu-TimeInput: createThemeVar("maxHeight-menu-#{$componentName}");
 $padding-item-TimeInput: createThemeVar("padding-item-#{$componentName}");
 $opacity-item-TimeInput--disabled: createThemeVar("opacity-item-#{$componentName}--disabled");
 $margin-icon-TimeInput: createThemeVar("margin-icon-#{$componentName}");
-$outlineColor-ampm-TimeInput--focused: createThemeVar("outlineColor-ampm-#{$componentName}--focused");
-$outlineWidth-ampm-TimeInput--focused: createThemeVar("outlineWidth-ampm-#{$componentName}--focused");
-$outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$componentName}--focused");
+$outlineColor-ampm-TimeInput--focused: createThemeVar(
+  "outlineColor-ampm-#{$componentName}--focused"
+);
+$outlineWidth-ampm-TimeInput--focused: createThemeVar(
+  "outlineWidth-ampm-#{$componentName}--focused"
+);
+$outlineOffset-ampm-TimeInput--focused: createThemeVar(
+  "outlineOffset-ampm-#{$componentName}--focused"
+);
 
 // --- CSS properties of a particular TimeInput variant
 @mixin variant($variantName) {
@@ -100,11 +118,11 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
     overflow: hidden;
     gap: createThemeVar("Input:gap-adornment-#{$componentName}");
 
-        &.disabled {
+    &.disabled {
       opacity: $opacity-TimeInput--disabled;
       pointer-events: none;
     }
-    
+
     &.readOnly {
       .timeInputWrapper input {
         cursor: default;
@@ -129,7 +147,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
       color: createThemeVar("Input:textColor-#{$componentName}--disabled");
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
     }
-    
+
     input {
       border: none;
       background: none;
@@ -139,17 +157,17 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
       padding: 0;
       margin: $margin-input-TimeInput;
       min-width: 2ch;
-      
+
       &::placeholder {
         color: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
         font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
       }
-      
+
       &:disabled {
         cursor: not-allowed;
       }
     }
-    
+
     button {
       background: transparent;
       border: none;
@@ -157,16 +175,16 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
       color: inherit;
       padding: $padding-button-TimeInput;
       border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
-      
+
       &:hover {
         background-color: $backgroundColor-TimeInput--hover;
       }
-      
+
       &:focus {
         outline: 2px solid createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
         outline-offset: 2px;
       }
-      
+
       &:disabled {
         cursor: not-allowed;
         opacity: $opacity-TimeInput--disabled;
@@ -222,7 +240,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
 
     // Specific widths for different input types
     &.hour,
-    &.hour12, 
+    &.hour12,
     &.hour24,
     &.minute,
     &.second {
@@ -255,8 +273,8 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
       background: $backgroundColor-input-TimeInput-invalid;
     }
 
-    .invalid {
-      color: $backgroundColor-input-TimeInput-invalid;
+    &.invalid {
+      background-color: $backgroundColor-input-TimeInput-invalid;
     }
 
     &.hasLeadingZero {
@@ -374,7 +392,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
       background-color: $backgroundColor-item-TimeInput--hover;
     }
 
-    &[data-state=checked] {
+    &[data-state="checked"] {
       background-color: $backgroundColor-item-TimeInput--active;
     }
 
@@ -431,12 +449,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar("outlineOffset-ampm-#{$co
   }
 }
 
-// Top-level invalid class for CSS modules export
-.invalid {
-  background: $backgroundColor-input-TimeInput-invalid;
-}
-
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
