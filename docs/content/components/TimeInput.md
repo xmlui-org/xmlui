@@ -15,7 +15,7 @@
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: true) [#clearable-default-true]
+### `clearable` (default: false) [#clearable-default-false]
 
 Whether to show a clear button that allows clearing the selected time
 
@@ -38,6 +38,10 @@ The icon to display in the clear button.
 </App>
 ```
 
+### `clearToInitialValue` (default: true) [#cleartoinitialvalue-default-true]
+
+Whether the clear button resets the time input to its initial value
+
 ### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
@@ -56,33 +60,13 @@ This property sets an optional icon to appear on the end (right side when the le
 
 This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-### `format` (default: "HH:mm") [#format-default-hh-mm]
-
-Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a
-
-Available values: `h:m:s a`, `h:m a`, `HH:mm:ss`, `HH:mm` **(default)**, `H:m:s`, `H:m`
-
-The `format` prop controls how time is displayed and which parts are editable. Based on Unicode Technical Standard #35.
-
-| Format | Description | Example |
-| :----- | :---------- | :------ |
-| `H:mm` | 24-hour format with hours and minutes | 14:30 |
-| `HH:mm:ss` | 24-hour format with hours, minutes, seconds | 14:30:15 |
-| `h:mm a` | 12-hour format with AM/PM | 2:30 PM |
-| `hh:mm:ss a` | 12-hour format with seconds and AM/PM | 02:30:15 PM |
-
-```xmlui-pg copy display name="Example: format"
-<App>
-  <TimeInput format="H:mm" initialValue="14:30" />
-  <TimeInput format="h:mm a" initialValue="14:30" />
-  <TimeInput format="HH:mm:ss" initialValue="14:30:15" />
-  <TimeInput format="HH:mm:ss a" initialValue="14:30:15" />
-</App>
-```
-
 ### `gap` [#gap]
 
 This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
+
+### `hour24` (default: true) [#hour24-default-true]
+
+Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)
 
 ### `initialValue` [#initialvalue]
 
@@ -127,6 +111,10 @@ Maximum time that the user can select
 
 Minimum time that the user can select
 
+### `mute` (default: false) [#mute-default-false]
+
+Whether to mute the beep sound while still firing the beep event
+
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
@@ -150,6 +138,10 @@ Marks the time input as required for form validation.
   <TimeInput required="true" />
 </App>
 ```
+
+### `seconds` (default: false) [#seconds-default-false]
+
+Whether to show and allow input of seconds
 
 ### `startIcon` [#starticon]
 
@@ -186,6 +178,10 @@ Available values:
 ```
 
 ## Events [#events]
+
+### `beep` [#beep]
+
+Fired when a beep sound is played due to invalid input, allowing custom feedback implementations
 
 ### `didChange` [#didchange]
 

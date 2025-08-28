@@ -385,6 +385,15 @@ You can query this read-only API property to get the input component's current v
 
 See an example in the `setValue` API method.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`endAdornment`**: The adornment displayed at the end of the text box.
+- **`input`**: The text box input area.
+- **`label`**: The label displayed for the text box.
+- **`startAdornment`**: The adornment displayed at the start of the text box.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

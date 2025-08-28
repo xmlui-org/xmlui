@@ -141,10 +141,12 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 The component has some parts that can be styled through layout properties and theme variables separately:
 
-- **`item`**: The text box input area.
+- **`endAdornment`**: The adornment displayed at the end of the text box.
+- **`input`**: The text box input area.
 - **`label`**: The label displayed for the text box.
+- **`startAdornment`**: The adornment displayed at the start of the text box.
 
-**Default part**: `item`
+**Default part**: `input`
 
 ## Styling [#styling]
 
