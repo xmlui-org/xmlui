@@ -71,12 +71,11 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   if (!highlighterResult) {
     return defaultCodefence;
   }
+  
   return (
     <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-      <Text
+      <CodeText
         uid={id}
-        variant="codefence"
-        syntaxHighlightClasses={highlighterResult.classNames}
         dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
       />
     </CodeBlock>
