@@ -181,10 +181,17 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       return "-";
     }
     if (emptyCharacter.length > 1) {
-      return emptyCharacter.charAt(0);
+      // Use proper unicode-aware character extraction
+      const firstChar = [...emptyCharacter][0];
+      return firstChar;
     }
     return emptyCharacter;
   }, [emptyCharacter]);
+
+  // Create placeholders using processed empty character
+  const dayPlaceholder = useMemo(() => processedEmptyCharacter.repeat(2), [processedEmptyCharacter]);
+  const monthPlaceholder = useMemo(() => processedEmptyCharacter.repeat(2), [processedEmptyCharacter]);
+  const yearPlaceholder = useMemo(() => processedEmptyCharacter.repeat(4), [processedEmptyCharacter]);
 
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
@@ -622,6 +629,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 month={month}
                 year={year}
                 onBeep={handleBeep}
+                placeholder={dayPlaceholder}
               />
               {getSeparator() && <Divider>{getSeparator()}</Divider>}
             </React.Fragment>
@@ -644,6 +652,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 value={month}
                 isInvalid={isMonthCurrentlyInvalid}
                 onBeep={handleBeep}
+                placeholder={monthPlaceholder}
               />
               {getSeparator() && <Divider>{getSeparator()}</Divider>}
             </React.Fragment>
@@ -667,6 +676,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 isInvalid={isYearCurrentlyInvalid}
                 dateFormat={dateFormat}
                 onBeep={handleBeep}
+                placeholder={yearPlaceholder}
               />
               {getSeparator() && <Divider>{getSeparator()}</Divider>}
             </React.Fragment>
@@ -760,6 +770,7 @@ type InputProps = {
   onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
   step?: number;
@@ -785,6 +796,7 @@ function Input({
   onBlur,
   onKeyDown,
   onKeyUp,
+  placeholder,
   readOnly,
   required,
   step,
@@ -847,6 +859,7 @@ function Input({
         onFocus={onFocus}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
+        placeholder={placeholder || "--"}
         readOnly={readOnly}
         // Assertion is needed for React 18 compatibility
         ref={inputRef as React.RefObject<HTMLInputElement>}

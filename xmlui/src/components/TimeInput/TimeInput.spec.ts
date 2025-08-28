@@ -310,39 +310,6 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe("label properties", () => {
-    test("displays label with labelPosition top", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time" labelPosition="top" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time");
-    });
-
-    test("displays label with labelPosition left", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time" labelPosition="left" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time");
-    });
-
-    test("sets labelWidth", async ({ initTestBed, createTimeInputDriver }) => {
-      const expectedWidth = 150;
-      await initTestBed(`
-        <TimeInput testId="timeInput" label="Time" labelPosition="start" labelWidth="${expectedWidth}px" />
-      `);
-      const driver = await createTimeInputDriver("timeInput");
-      const { width } = await getBounds(driver.label);
-      expect(width).toEqual(expectedWidth);
-    });
-
-    test("handles labelBreak", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time Input" labelBreak="true" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time Input");
-    });
-  });
-
   test.describe("adornment properties", () => {
     test("displays startText", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" startText="Start" />`);

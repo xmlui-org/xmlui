@@ -75,6 +75,11 @@ export const DateInputMd = createMetadata({
       defaultValue: defaultProps.dateFormat,
       availableValues: dateFormats,
     },
+    emptyCharacter: {
+      description: "Character used to create placeholder text for empty input fields",
+      valueType: "string",
+      defaultValue: defaultProps.emptyCharacter,
+    },
     showWeekNumber: {
       description: "Whether to show the week number (compatibility with DatePicker, not used in DateInput)",
       valueType: "boolean",
@@ -268,6 +273,7 @@ export const dateInputComponentRenderer = createComponentRenderer(
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         gap={extractValue.asOptionalString(node.props.gap)}
         mute={extractValue.asOptionalBoolean(node.props.mute, defaultProps.mute)}
+        emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
       />
     );
   },
