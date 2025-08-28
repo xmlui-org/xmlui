@@ -148,26 +148,6 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
     }
 
-    input {
-      border: none;
-      background: none;
-      color: inherit;
-      font: inherit;
-      outline: none;
-      padding: 0;
-      margin: $margin-input-TimeInput;
-      min-width: 2ch;
-
-      &::placeholder {
-        color: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
-        font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
-      }
-
-      &:disabled {
-        cursor: not-allowed;
-      }
-    }
-
     button {
       background: transparent;
       border: none;

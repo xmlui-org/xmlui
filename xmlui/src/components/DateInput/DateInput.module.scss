@@ -119,26 +119,6 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
     }
     
-    input {
-      border: none;
-      background: none;
-      color: inherit;
-      font: inherit;
-      outline: none;
-      padding: 0;
-      margin: $margin-input-DateInput;
-      min-width: 2ch;
-      
-      &::placeholder {
-        color: createThemeVar("Input:textColor-placeholder-#{$componentName}-default");
-        font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}-default");
-      }
-      
-      &:disabled {
-        cursor: not-allowed;
-      }
-    }
-    
     button {
       background: transparent;
       border: none;
@@ -218,9 +198,9 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
     }
 
     &.year {
-      width: 5ch;
-      min-width: 5ch;
-      max-width: 5ch;
+      width: 4.5ch;
+      min-width: 4.5ch;
+      max-width: 4.5ch;
     }
 
     // Hide spin buttons for number inputs
@@ -240,91 +220,13 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
     }
 
     &:invalid {
-      background: $backgroundColor-input-DateInput-invalid;
+      background-color: $backgroundColor-input-DateInput-invalid;
     }
 
-    .invalid {
-      color: $backgroundColor-input-DateInput-invalid;
+    &.invalid {
+      background-color: $backgroundColor-input-DateInput-invalid;
     }
   }
-
-  // Individual classes for day, month, year with consistent width
-  .day {
-    // Consistent width following TimeInput pattern
-    width: 2.5ch;
-    min-width: 2.5ch;
-    max-width: 2.5ch;
-    text-align: center;
-    padding: 0.125rem 0.25rem;
-    box-sizing: border-box !important;
-  }
-
-  .month {
-    // Consistent width following TimeInput pattern
-    width: 2.5ch;
-    min-width: 2.5ch;
-    max-width: 2.5ch;
-    text-align: center;
-    padding: 0.125rem 0.25rem;
-    box-sizing: border-box !important;
-  }
-
-  .year {
-    // Consistent width following TimeInput pattern
-    width: 2.5ch;
-    min-width: 2.5ch;
-    max-width: 2.5ch;
-    text-align: center;
-    padding: 0.125rem 0.25rem;
-    box-sizing: border-box !important;
-  }
-
-  .button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-    padding: $padding-button-DateInput;
-    border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
-    
-    &:hover {
-      background-color: $backgroundColor-DateInput--hover;
-    }
-    
-    &:focus {
-      outline: 2px solid createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
-      outline-offset: 2px;
-    }
-    
-    &:disabled {
-      cursor: not-allowed;
-      opacity: $opacity-DateInput--disabled;
-    }
-  }
-
-  .clearButton {
-    @extend .button;
-    margin-left: 0.25rem;
-  }
-
-  .clearButtonIcon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .buttonIcon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}-default");
-  }
-}
-
-// Top-level invalid class for CSS modules export
-.invalid {
-  background: $backgroundColor-input-DateInput-invalid;
 }
 
 // Export theme variables for consumption by the component definition

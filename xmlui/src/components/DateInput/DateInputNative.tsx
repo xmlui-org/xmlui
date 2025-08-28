@@ -11,6 +11,8 @@ import {
 import classnames from "classnames";
 import styles from "./DateInput.module.scss";
 import { format, parse, isValid } from "date-fns";
+import { PartialInput, type BlurDirection } from "../Input/PartialInput";
+import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -188,11 +190,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     return emptyCharacter;
   }, [emptyCharacter]);
 
-  // Create placeholders using processed empty character
-  const dayPlaceholder = useMemo(() => processedEmptyCharacter.repeat(2), [processedEmptyCharacter]);
-  const monthPlaceholder = useMemo(() => processedEmptyCharacter.repeat(2), [processedEmptyCharacter]);
-  const yearPlaceholder = useMemo(() => processedEmptyCharacter.repeat(4), [processedEmptyCharacter]);
-
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
     return initialValue;
@@ -232,20 +229,20 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   // Get the order of date inputs based on the format
   const dateOrder = useMemo(() => {
     const format = dateFormat.toLowerCase();
-    
+
     // Determine the order based on the format pattern
-    if (format.startsWith('mm') || format.startsWith('m')) {
-      if (format.includes('/dd/yyyy') || format.includes('-dd-yyyy')) {
-        return ['month', 'day', 'year']; // MM/dd/yyyy or MM-dd-yyyy
+    if (format.startsWith("mm") || format.startsWith("m")) {
+      if (format.includes("/dd/yyyy") || format.includes("-dd-yyyy")) {
+        return ["month", "day", "year"]; // MM/dd/yyyy or MM-dd-yyyy
       } else {
-        return ['month', 'day', 'year']; // MMddyyyy
+        return ["month", "day", "year"]; // MMddyyyy
       }
-    } else if (format.startsWith('yyyy')) {
-      return ['year', 'month', 'day']; // yyyy/MM/dd or yyyy-MM-dd
-    } else if (format.startsWith('dd')) {
-      return ['day', 'month', 'year']; // dd/MM/yyyy or dd-MM-yyyy
+    } else if (format.startsWith("yyyy")) {
+      return ["year", "month", "day"]; // yyyy/MM/dd or yyyy-MM-dd
+    } else if (format.startsWith("dd")) {
+      return ["day", "month", "year"]; // dd/MM/yyyy or dd-MM-yyyy
     } else {
-      return ['month', 'day', 'year']; // fallback
+      return ["month", "day", "year"]; // fallback
     }
   }, [dateFormat]);
 
@@ -310,11 +307,13 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       try {
         // Create date object (month is 0-indexed in Date constructor)
         const date = new Date(yearNum, monthNum - 1, dayNum);
-        
+
         // Validate the date
-        if (date.getFullYear() !== yearNum || 
-            date.getMonth() !== monthNum - 1 || 
-            date.getDate() !== dayNum) {
+        if (
+          date.getFullYear() !== yearNum ||
+          date.getMonth() !== monthNum - 1 ||
+          date.getDate() !== dayNum
+        ) {
           return null;
         }
 
@@ -357,13 +356,14 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       setInvalid: (invalid: boolean) => void,
       normalizeFn: (value: string) => string | null,
     ) =>
-      (event: React.FocusEvent<HTMLInputElement>) => {
+      (direction: BlurDirection, event: React.FocusEvent<HTMLInputElement>) => {
         const currentValue = event.target.value;
         const normalizedValue = normalizeFn(currentValue);
 
         // Check if the current value was invalid (needed normalization or couldn't be normalized)
-        const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
-        
+        const wasInvalid =
+          currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+
         if (wasInvalid) {
           // Play beep sound and fire beep event when manually tabbing out of invalid input
           handleBeep();
@@ -376,11 +376,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           // Always call handleChange to update the date value
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
-          const dateString = formatDateValue(
-            dateValues.day,
-            dateValues.month,
-            dateValues.year,
-          );
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
           handleChange(dateString);
         } else if (normalizedValue === null && currentValue !== "") {
           // Reset to previous valid value or clear
@@ -389,21 +385,13 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           // Always call handleChange to update the date value (likely to null)
           const dateValues = { day, month, year };
           dateValues[field] = "";
-          const dateString = formatDateValue(
-            dateValues.day,
-            dateValues.month,
-            dateValues.year,
-          );
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
           handleChange(dateString);
         } else if (normalizedValue !== null) {
           // Value didn't need normalization, but still update the complete date
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
-          const dateString = formatDateValue(
-            dateValues.day,
-            dateValues.month,
-            dateValues.year,
-          );
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
           handleChange(dateString);
         }
       },
@@ -428,32 +416,28 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   );
 
   const handleMonthChange = useMemo(
-    () =>
-      createInputChangeHandler("month", setMonth, setIsMonthCurrentlyInvalid, isMonthInvalid),
+    () => createInputChangeHandler("month", setMonth, setIsMonthCurrentlyInvalid, isMonthInvalid),
     [createInputChangeHandler],
   );
 
   const handleMonthBlur = useMemo(
-    () =>
-      createInputBlurHandler("month", setMonth, setIsMonthCurrentlyInvalid, normalizeMonth),
+    () => createInputBlurHandler("month", setMonth, setIsMonthCurrentlyInvalid, normalizeMonth),
     [createInputBlurHandler],
   );
 
   const handleYearChange = useMemo(
-    () =>
-      createInputChangeHandler("year", setYear, setIsYearCurrentlyInvalid, isYearInvalid),
+    () => createInputChangeHandler("year", setYear, setIsYearCurrentlyInvalid, isYearInvalid),
     [createInputChangeHandler],
   );
 
   const handleYearBlur = useMemo(
-    () =>
-      createInputBlurHandler("year", setYear, setIsYearCurrentlyInvalid, normalizeYear),
+    () => createInputBlurHandler("year", setYear, setIsYearCurrentlyInvalid, normalizeYear),
     [createInputBlurHandler],
   );
 
   // Focus method
   const focus = useCallback(() => {
-    const firstInput = dateInputRef.current?.querySelector('input') as HTMLInputElement;
+    const firstInput = dateInputRef.current?.querySelector("input") as HTMLInputElement;
     firstInput?.focus();
   }, []);
 
@@ -489,11 +473,11 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   const createArrowKeyHandler = useCallback(() => {
     return (event: React.KeyboardEvent<HTMLInputElement>) => {
       const { key } = event;
-      
+
       if (key === "ArrowRight") {
         event.preventDefault();
         const currentTarget = event.target as HTMLInputElement;
-        
+
         // Determine next input based on current input
         if (currentTarget === monthInputRef.current && dayInputRef.current) {
           dayInputRef.current.focus();
@@ -505,7 +489,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       } else if (key === "ArrowLeft") {
         event.preventDefault();
         const currentTarget = event.target as HTMLInputElement;
-        
+
         // Determine previous input based on current input
         if (currentTarget === dayInputRef.current && monthInputRef.current) {
           monthInputRef.current.focus();
@@ -553,13 +537,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     setTimeout(() => {
       focus();
     }, 0);
-  }, [
-    stableInitialValue,
-    handleChange,
-    dateFormat,
-    clearToInitialValue,
-    focus,
-  ]);
+  }, [stableInitialValue, handleChange, dateFormat, clearToInitialValue, focus]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
@@ -625,32 +603,31 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       month: monthInputRef,
       year: yearInputRef,
     };
-    return dateOrder.map(field => refs[field as keyof typeof refs]);
+    return dateOrder.map((field) => refs[field as keyof typeof refs]);
   }, [dateOrder]);
 
   // Helper function to create input components in the right order
   const createDateInputs = () => {
     const inputRefs = getInputRefs();
-    
+
     return dateOrder.map((field, index) => {
       const nextRef = index < inputRefs.length - 1 ? inputRefs[index + 1] : undefined;
-      
+
       const getSeparator = () => {
         if (index === dateOrder.length - 1) return null;
-        
+
         // Get separator based on format
-        if (dateFormat.includes('/')) return '/';
-        if (dateFormat.includes('-')) return '-';
-        return '';
+        if (dateFormat.includes("/")) return "/";
+        if (dateFormat.includes("-")) return "-";
+        return "";
       };
 
       switch (field) {
-        case 'day':
+        case "day":
           return (
             <React.Fragment key="day">
               <DayInput
                 autoFocus={autoFocus && index === 0}
-                className="dateinput"
                 disabled={!enabled}
                 inputRef={dayInputRef}
                 nextInputRef={nextRef}
@@ -666,17 +643,16 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 month={month}
                 year={year}
                 onBeep={handleBeep}
-                placeholder={dayPlaceholder}
+                emptyCharacter={processedEmptyCharacter}
               />
-              {getSeparator() && <Divider>{getSeparator()}</Divider>}
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
             </React.Fragment>
           );
-        case 'month':
+        case "month":
           return (
             <React.Fragment key="month">
               <MonthInput
                 autoFocus={autoFocus && index === 0}
-                className="dateinput"
                 disabled={!enabled}
                 inputRef={monthInputRef}
                 nextInputRef={nextRef}
@@ -690,17 +666,16 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 value={month}
                 isInvalid={isMonthCurrentlyInvalid}
                 onBeep={handleBeep}
-                placeholder={monthPlaceholder}
+                emptyCharacter={processedEmptyCharacter}
               />
-              {getSeparator() && <Divider>{getSeparator()}</Divider>}
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
             </React.Fragment>
           );
-        case 'year':
+        case "year":
           return (
             <React.Fragment key="year">
               <YearInput
                 autoFocus={autoFocus && index === 0}
-                className="dateinput"
                 disabled={!enabled}
                 inputRef={yearInputRef}
                 nextInputRef={nextRef}
@@ -715,9 +690,9 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 isInvalid={isYearCurrentlyInvalid}
                 dateFormat={dateFormat}
                 onBeep={handleBeep}
-                placeholder={yearPlaceholder}
+                emptyCharacter={processedEmptyCharacter}
               />
-              {getSeparator() && <Divider>{getSeparator()}</Divider>}
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
             </React.Fragment>
           );
         default:
@@ -748,9 +723,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     >
       {startAdornment}
       <div className={styles.wrapper}>
-        <div className={styles.inputGroup}>
-          {createDateInputs()}
-        </div>
+        <div className={styles.inputGroup}>{createDateInputs()}</div>
 
         {clearable && (
           <button
@@ -789,11 +762,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
 
   return dateInputComponent;
 });
-
-// Simple divider component for date separators
-function Divider({ children }: { children?: React.ReactNode }): React.ReactElement {
-  return <span className={styles.divider}>{children}</span>;
-}
 
 // Input component types
 type InputProps = {
@@ -860,7 +828,7 @@ function Input({
       if (newValue.length === maxLength && /^\d+$/.test(newValue)) {
         // Check if the new value is valid before auto-tabbing
         const isValueInvalid = validateFn ? validateFn(newValue) : false;
-        
+
         if (!isValueInvalid) {
           // Small delay to ensure the current input is properly updated
           setTimeout(() => {
@@ -921,7 +889,18 @@ type DayInputProps = {
   month?: string | null;
   year?: string | null;
   onBeep?: () => void;
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value" | "maxLength">;
+  emptyCharacter?: string;
+} & Omit<
+  React.ComponentProps<typeof PartialInput>,
+  | "max"
+  | "min"
+  | "name"
+  | "value"
+  | "maxLength"
+  | "validateFn"
+  | "emptyCharacter"
+  | "placeholderLength"
+>;
 
 function DayInput({
   minValue,
@@ -931,6 +910,7 @@ function DayInput({
   month,
   year,
   onBeep,
+  emptyCharacter = "-",
   ...otherProps
 }: DayInputProps): React.ReactElement {
   // Calculate max days for the current month/year
@@ -945,22 +925,36 @@ function DayInput({
     return 31; // Default to 31 if month/year not available
   }, [month, year]);
 
-  const { className: originalClassName, ...restProps } = otherProps;
-
   return (
-    <Input
+    <PartialInput
+      value={value}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={2}
       max={Math.min(maxDay, 31)}
       min={1}
-      name="day"
-      value={value}
-      isInvalid={isInvalid}
+      maxLength={2}
       validateFn={(val) => isDayInvalid(val, month, year)}
       onBeep={onBeep}
-      className={classnames(partClassName(PART_DAY), styles.day, originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
-      maxLength={2}
-      {...restProps}
+      onChange={otherProps.onChange}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but current onBlur expects just event
+        if (otherProps.onBlur) {
+          // Provide both direction and event to match the expected signature
+          otherProps.onBlur(direction, event);
+        }
+      }}
+      onKeyDown={otherProps.onKeyDown}
+      className={classnames(partClassName(PART_DAY), styles.input, styles.day)}
+      invalidClassName={styles.invalid}
+      disabled={otherProps.disabled}
+      readOnly={otherProps.readOnly}
+      required={otherProps.required}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      name="day"
+      ariaLabel={otherProps.ariaLabel}
+      isInvalid={isInvalid}
     />
   );
 }
@@ -972,7 +966,8 @@ type MonthInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   onBeep?: () => void;
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value" | "maxLength">;
+  emptyCharacter?: string;
+} & Omit<React.ComponentProps<typeof PartialInput>, "max" | "min" | "name" | "value" | "maxLength">;
 
 function MonthInput({
   minValue,
@@ -980,24 +975,31 @@ function MonthInput({
   value,
   isInvalid = false,
   onBeep,
+  emptyCharacter = "-",
   ...otherProps
 }: MonthInputProps): React.ReactElement {
-  const { className: originalClassName, ...restProps } = otherProps;
-
   return (
-    <Input
+    <PartialInput
       max={12}
       min={1}
       name="month"
       value={value}
+      invalidClassName={styles.invalid}
       isInvalid={isInvalid}
       validateFn={isMonthInvalid}
       onBeep={onBeep}
-      className={classnames(partClassName(PART_MONTH), styles.month, originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
+      onChange={otherProps.onChange}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={2}
+      className={classnames(partClassName(PART_MONTH), styles.input, styles.month)}
       maxLength={2}
-      {...restProps}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but current onBlur expects just event
+        if (otherProps.onBlur) {
+          // Provide both direction and event to match the expected signature
+          otherProps.onBlur(direction, event);
+        }
+      }}
     />
   );
 }
@@ -1010,7 +1012,8 @@ type YearInputProps = {
   isInvalid?: boolean;
   dateFormat?: DateFormat;
   onBeep?: () => void;
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value" | "maxLength">;
+  emptyCharacter?: string;
+} & Omit<React.ComponentProps<typeof PartialInput>, "max" | "min" | "name" | "value" | "maxLength">;
 
 function YearInput({
   minValue,
@@ -1019,11 +1022,12 @@ function YearInput({
   isInvalid = false,
   dateFormat = "MM/dd/yyyy",
   onBeep,
+  emptyCharacter = "-",
   ...otherProps
 }: YearInputProps): React.ReactElement {
   // Always use 4-digit year format
   const maxLength = 4;
-  
+
   const currentYear = new Date().getFullYear();
   const min = 1900;
   const max = currentYear + 100;
@@ -1031,18 +1035,26 @@ function YearInput({
   const { className: originalClassName, ...restProps } = otherProps;
 
   return (
-    <Input
+    <PartialInput
       max={max}
       min={min}
       name="year"
       value={value}
       isInvalid={isInvalid}
+      invalidClassName={styles.invalid}
       validateFn={isYearInvalid}
       onBeep={onBeep}
-      className={classnames(partClassName(PART_YEAR), styles.year, originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={4}
+      className={classnames(partClassName(PART_YEAR), styles.input, styles.year, originalClassName)}
       maxLength={maxLength}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but current onBlur expects just event
+        if (otherProps.onBlur) {
+          // Provide both direction and event to match the expected signature
+          otherProps.onBlur(direction, event);
+        }
+      }}
       {...restProps}
     />
   );
@@ -1064,14 +1076,14 @@ function parseDateString(dateString: string, dateFormat: DateFormat) {
   try {
     // Try to parse the date using the specified format
     const parsedDate = parse(dateString, dateFormat, new Date());
-    
+
     if (!isValid(parsedDate)) {
       return null;
     }
 
     return {
-      day: parsedDate.getDate().toString().padStart(2, '0'),
-      month: (parsedDate.getMonth() + 1).toString().padStart(2, '0'),
+      day: parsedDate.getDate().toString().padStart(2, "0"),
+      month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
       year: parsedDate.getFullYear().toString(),
     };
   } catch (error) {
@@ -1080,7 +1092,11 @@ function parseDateString(dateString: string, dateFormat: DateFormat) {
 }
 
 // Normalize functions
-function normalizeDay(value: string | null, month: string | null, year: string | null): string | null {
+function normalizeDay(
+  value: string | null,
+  month: string | null,
+  year: string | null,
+): string | null {
   if (!value || value === "") return null;
 
   const num = parseInt(value, 10);
@@ -1142,7 +1158,7 @@ function normalizeYear(value: string | null): string | null {
     const currentYear = new Date().getFullYear();
     const candidate20 = 2000 + lastTwoDigits;
     const candidate19 = 1900 + lastTwoDigits;
-    
+
     // Use "20" if the resulting year is not in the future; otherwise, use "19"
     if (candidate20 <= currentYear) {
       return candidate20.toString();
