@@ -57,14 +57,22 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
       color="black"
       preserveLinebreaks="true"
       value="(preserve) This long text
+
       with several line breaks
+
+
               does not fit into a viewport with a 200-pixel width." />
     <Text
       width="250px"
       backgroundColor="cyan"
       color="black"
+      preserveLinebreaks="false"
       value="(don't preserve) This long text
+
+
       with several line breaks
+
+      
               does not fit into a viewport with a 200-pixel width." />
   </HStack>
 </App>

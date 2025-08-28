@@ -25,7 +25,7 @@ $component: "Text";
 
 @layer components {
   .text {
-    //display: inline;
+    display: inline;
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
@@ -239,7 +239,7 @@ $component: "Text";
 
   .preserveLinebreaks {
     white-space: pre-wrap;
-    //display: block;
+    display: inline-block;
   }
 
   .noEllipsis {

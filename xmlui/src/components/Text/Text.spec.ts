@@ -111,14 +111,14 @@ test.describe("Basic Functionality", () => {
 
   test("supports preserveLinebreaks prop", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-    <Fragment>
+    <VStack>
       <Text testId="textShort">Short</Text>
       <Text testId="textLong" preserveLinebreaks="true"
         value="Though this long
 text does not fit into a single line,
 please do not break it!"
       />
-    </Fragment>
+    </VStack>
     `);
     const { height: heightTextShort } = await getBounds(await createTextDriver("textShort"));
     const { height: heightTextLong } = await getBounds(await createTextDriver("textLong"));
@@ -208,12 +208,12 @@ test.describe("Visual States", () => {
 
   test("constrains text to maxLines", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Fragment>
+      <VStack>
         <Text testId="textShort" width="200px">Short</Text>
         <Text testId="textLong" width="200px" maxLines="2">
           Though this long text does not fit into a single line, please do not break it!
         </Text>
-      </Fragment>
+      </VStack>
     `);
     const shortText = await createTextDriver("textShort");
     const longText = await createTextDriver("textLong");
@@ -226,12 +226,12 @@ test.describe("Visual States", () => {
 
   test("breaks long text when constrained by width", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Fragment>
+      <VStack>
         <Text testId="textShort" width="200px">Short</Text>
         <Text testId="textLong" width="200px">
           This long text does not fit into a viewport with a 200-pixel width.
         </Text>
-      </Fragment>
+      </VStack>
     `);
     const shortText = await createTextDriver("textShort");
     const longText = await createTextDriver("textLong");
