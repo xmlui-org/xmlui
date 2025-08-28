@@ -524,6 +524,122 @@ test.describe("Basic Functionality", () => {
       await expect(driver.secondInput).toBeFocused();
     });
 
+    test("navigates between inputs with arrow keys - 24-hour format with seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → Second
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate left: Second → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 24-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute (skip seconds since disabled)
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 12-hour format with seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → Second
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate right: Second → AM/PM
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.amPmInput).toBeFocused();
+
+      // Navigate left: AM/PM → Second
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate left: Second → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 12-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → AM/PM (skip seconds since disabled)
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.amPmInput).toBeFocused();
+
+      // Navigate left: AM/PM → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
     test("changes AM/PM with click", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" hour24="false" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
