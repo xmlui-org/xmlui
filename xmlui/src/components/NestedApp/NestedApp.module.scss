@@ -20,13 +20,13 @@ $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
 $backgroundColor-viewControls-NestedApp: createThemeVar("backgroundColor-viewControls-#{$component}"
   );
-$bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
+$borderRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
 $paddingVertical-viewControls-button-NestedApp: createThemeVar("paddingVertical-viewControls-button-#{$component}"
   );
 $paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizontal-viewControls-button-#{$component}"
   );
-$bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
+$borderRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 $height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
 $width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
@@ -159,7 +159,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     height: fit-content;
     display: flex;
     border: $border-NestedApp;
-    border-radius: $bordRadius-NestedApp;
+    border-radius: $borderRadius-NestedApp;
     flex-direction: column;
     gap: $gap-frame-NestedApp;
     background-color: $backgroundColor-frame-NestedApp;
@@ -206,7 +206,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     align-items: center;
     padding: $padding-viewControls-NestedApp;
     background-color: $backgroundColor-viewControls-NestedApp;
-    border-radius: $bordRadius-viewControls-NestedApp;
+    border-radius: $borderRadius-viewControls-NestedApp;
   }
 
   .logo {
