@@ -336,17 +336,6 @@ const TextVariantKeys = [
   "secondary", // use a secondary text style
 ] as const;
 export type TextVariant = (typeof TextVariantKeys)[number];
-
-// --- overflow behavior for text components
-const OverflowBehaviorKeys = [
-  "wrap", // Wraps text naturally at word boundaries (like white-space: normal)
-  "none", // No wrapping, text stays on a single line (like white-space: nowrap)
-  "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
-  "scroll", // Enables horizontal scrolling (overflow: auto)
-  "fade", // Uses a fading effect at the end of the text instead of an ellipsis
-] as const;
-export type OverflowBehavior = (typeof OverflowBehaviorKeys)[number];
-
 type TextPropertyValueDescription = PropertyValueDescription & {
   value: TextVariant;
   description: string;

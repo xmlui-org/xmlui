@@ -2,7 +2,7 @@ import styles from "./Text.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowBehavior } from "../abstractions";
+import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
 import { createMetadata, d } from "../metadata-helpers";
 
@@ -42,22 +42,6 @@ export const TextMd = createMetadata({
         "cropped (\`true\`) or not (\`false\`).",
       valueType: "boolean",
       defaultValue: defaultProps.ellipses,
-    },
-    overflowBehavior: {
-      description:
-        "This property controls how text overflow is handled. " +
-        "`wrap` allows natural text wrapping, `none` prevents wrapping and shows no overflow indicator, " +
-        "`ellipsis` shows ellipses when text is truncated, `scroll` enables horizontal scrolling, " +
-        "and `fade` applies a fade-out effect at the text boundary. When not specified, uses the default text behavior.",
-      valueType: "string",
-      defaultValue: "not specified",
-      availableValues: [
-        { value: "wrap", description: "Wraps text naturally at word boundaries" },
-        { value: "none", description: "No wrapping, text stays on a single line with no overflow indicator" },
-        { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
-        { value: "scroll", description: "Enables horizontal scrolling" },
-        { value: "fade", description: "Uses a fading effect at the end of the text" },
-      ],
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -140,7 +124,7 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, className, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, ellipses, overflowBehavior, value, ...variantSpecific } =
+    const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
       node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
@@ -159,7 +143,6 @@ export const textComponentRenderer = createComponentRenderer(
           defaultProps.preserveLinebreaks,
         )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
-        overflowBehavior={extractValue(overflowBehavior) as OverflowBehavior | undefined}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

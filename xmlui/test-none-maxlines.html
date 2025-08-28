@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test overflowBehavior="none" with maxLines</title>
+    <style>
+        .container {
+            width: 200px;
+            border: 1px solid #ccc;
+            margin: 20px;
+            padding: 10px;
+        }
+        
+        /* Simulating the CSS that would be applied */
+        .text-none-maxlines {
+            /* Base text styles */
+            display: inline;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: fit-content;
+            
+            /* truncateOverflow class styles */
+            overflow: hidden;
+            overflow-wrap: break-word;
+            white-space: nowrap;
+            max-width: 100%;
+            
+            /* noEllipsis class styles */
+            text-overflow: clip;
+            
+            /* Inline styles from getMaxLinesStyle for maxLines=2 */
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            box-orient: vertical;
+            white-space: initial;
+        }
+    </style>
+</head>
+<body>
+    <h2>Testing overflowBehavior="none" with maxLines="2"</h2>
+    
+    <div class="container">
+        <div class="text-none-maxlines">
+            This is a long-long-long text that should be simply cut at the end of the second line.
+        </div>
+    </div>
+    
+    <p>Expected behavior: Text should wrap to 2 lines and be clipped (no ellipsis) at the end of the second line.</p>
+</body>
+</html>
