@@ -25,6 +25,7 @@ import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
+import { CodeText } from "./CodeText";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -56,9 +57,9 @@ function PreTagComponent({ id, children, codeHighlighter }) {
 
   const defaultCodefence = (
     <CodeBlock>
-      <Text uid={id} variant="codefence">
+      <CodeText uid={id}>
         {children}
-      </Text>
+      </CodeText>
     </CodeBlock>
   );
 
