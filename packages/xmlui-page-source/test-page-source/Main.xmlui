@@ -1,0 +1,17 @@
+<App>
+
+<PageSource id="sourceCode" />
+
+<Text>
+  { sourceCode.value }
+</Text>
+
+  <NavPanel>
+    <NavLink label="Test" to="/test" />
+  </NavPanel>
+  <Pages>
+    <Page url="/test">
+      <Test />
+    </Page>
+  </Pages>
+</App>
