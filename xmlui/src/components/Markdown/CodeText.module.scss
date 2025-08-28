@@ -1,0 +1,103 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Text";
+
+@mixin textVariant($variant) {
+  $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
+  $themeVars: t.composePaddingVars($themeVars, $variantName);
+  $themeVars: t.composeBorderVars($themeVars, $variantName);
+  $themeVars: t.composeTextVars($themeVars, $variantName, $component);
+  @include t.paddingVars($themeVars, $variantName);
+  @include t.borderVars($themeVars, $variantName);
+  @include t.textVars($themeVars, $variantName);
+  margin-top: createThemeVar("marginTop-#{$variantName}");
+  margin-bottom: createThemeVar("marginBottom-#{$variantName}");
+  margin-left: createThemeVar("marginLeft-#{$variantName}");
+  margin-right: createThemeVar("marginRight-#{$variantName}");
+  vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
+}
+
+@layer components {
+  .codeText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
+    min-height: fit-content;
+
+    // --- Styling <pre><code> elements
+
+    // codefence/<pre> elements are block level by default, even in another text element
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
+    .text.codefence {
+      display: block;
+      margin-top: createThemeVar("marginTop-#{$component}-codefence");
+      margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
+      height: 100%;
+    }
+
+    // For inline code
+    :not(.text.codefence) > &.code,
+    :not(.text.codefence) > &code {
+      @include textVariant("code");
+    }
+
+    // For code blocks using <![CDATA[ + <code> tags
+    &.codefence:has(> .text.code),
+    &.codefence:has(> code) {
+      @include textVariant("codefence");
+      // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
+      overflow-x: auto;
+      text-overflow: initial;
+    }
+
+    // TEMP: experimental - may be removed
+    &.codefence:has(> code > span) {
+      padding-inline: 0;
+    }
+    &.codefence > code > span:not([class*="numbered"]) {
+      padding-inline: t.$space-3;
+    }
+
+    &.codefence > code {
+      font-family: createThemeVar("fontFamily-#{$component}-codefence");
+      //white-space: pre-wrap;
+      font-family: createThemeVar("fontFamily-#{$component}-codefence");
+      //display: inline-block;
+      width: 100%;
+    }
+
+    &.codefence > code::before {
+      counter-reset: listing;
+    }
+
+    &.codefence > code > span {
+      display: inline-block;
+      width: 100%;
+    }
+    &.codefence > code > span[class*="numbered"] {
+      counter-increment: listing;
+    }
+
+    &.codefence > code > span[class*="numbered"]::before {
+      content: counter(listing);
+      display: inline-block;
+      width: t.$space-12;
+      padding-left: auto;
+      padding-right: t.$space-5;
+      margin-left: auto;
+      text-align: right;
+      color: t.$textColor-secondary;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

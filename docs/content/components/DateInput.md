@@ -59,6 +59,8 @@ Available values: `MM/dd/yyyy` **(default)**, `MM-dd-yyyy`, `yyyy/MM/dd`, `yyyy-
 
 The `dateFormat` prop controls how dates are displayed and entered. Different formats change the order and separators of day, month, and year fields.
 
+> [!NOTE] Regardless of the dateFormat, the year input field always accepts and displays 4-digit years. When entering a 2-digit year, it will be automatically normalized to a 4-digit year.
+
 | Format | Description | Example |
 | :----- | :---------- | :------ |
 | `MM/dd/yyyy` | US format with slashes | 05/25/2024 |
@@ -82,6 +84,20 @@ The `dateFormat` prop controls how dates are displayed and entered. Different fo
 ### `disabledDates` [#disableddates]
 
 An optional array of dates that are disabled (compatibility with DatePicker, not used in DateInput)
+
+### `emptyCharacter` (default: "-") [#emptycharacter-default-]
+
+Character used to create placeholder text for empty input fields
+
+Character to use as placeholder for empty date values. If longer than 1 character, uses the first character. Defaults to '-'.
+
+```xmlui-pg copy display name="Example: emptyCharacter"
+<App>
+  <DateInput emptyCharacter="." />
+  <DateInput emptyCharacter="*" />
+  <DateInput emptyCharacter="abc" />
+</App>
+```
 
 ### `enabled` (default: true) [#enabled-default-true]
 
@@ -170,16 +186,6 @@ Available values:
 Whether to mute the beep sound while still firing the beep event
 
 When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
-
-### `placeholder` [#placeholder]
-
-An optional placeholder text that is visible in the input field when its empty.
-
-```xmlui-pg copy display name="Example: placeholder" height="120px"
-<App>
-  <DateInput placeholder="Select a date" />
-</App>  
-```
 
 ### `readOnly` (default: false) [#readonly-default-false]
 
@@ -463,7 +469,6 @@ The component has some parts that can be styled through layout properties and th
 | disabledColor-button-DateInput | $textColor-disabled | $textColor-disabled |
 | [fontSize](../styles-and-themes/common-units/#size)-ampm-DateInput | inherit | inherit |
 | [fontSize](../styles-and-themes/common-units/#size)-input-DateInput | inherit | inherit |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-DateInput-default | *none* | *none* |
 | [gap](../styles-and-themes/common-units/#size)-adornment-DateInput | *none* | *none* |
 | hoverColor-button-DateInput | $color-surface-800 | $color-surface-800 |
 | [margin](../styles-and-themes/common-units/#size)-input-DateInput | *none* | *none* |
@@ -517,6 +522,5 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](../styles-and-themes/common-units/#color)-DateInput-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DateInput-warning--focus | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-DateInput-warning--hover | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-DateInput-default | *none* | *none* |
 | [transition](../styles-and-themes/common-units/#transition)-background-DateInput | *none* | *none* |
 | [width](../styles-and-themes/common-units/#size)-input-DateInput | 1.8em | 1.8em |
