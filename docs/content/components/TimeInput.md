@@ -42,6 +42,20 @@ The icon to display in the clear button.
 
 Whether the clear button resets the time input to its initial value
 
+### `emptyCharacter` (default: "-") [#emptycharacter-default-]
+
+Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'
+
+Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'.
+
+```xmlui-pg copy display name="Example: emptyCharacter"
+<App>
+  <TimeInput emptyCharacter="." />
+  <TimeInput emptyCharacter="*" />
+  <TimeInput emptyCharacter="abc" />
+</App>
+```
+
 ### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
@@ -111,17 +125,15 @@ Maximum time that the user can select
 
 Minimum time that the user can select
 
+### `mute` (default: false) [#mute-default-false]
+
+Whether to mute the beep sound while still firing the beep event
+
+When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
+
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
-
-Makes the time picker read-only. Users can see the value but cannot modify it.
-
-```xmlui-pg copy display name="Example: readOnly" height="120px"
-<App>
-  <TimeInput readOnly="true" initialValue="14:30" />
-</App>
-```
 
 ### `required` (default: false) [#required-default-false]
 
@@ -174,6 +186,10 @@ Available values:
 ```
 
 ## Events [#events]
+
+### `beep` [#beep]
+
+Fired when a beep sound is played due to invalid input, allowing custom feedback implementations
 
 ### `didChange` [#didchange]
 
@@ -352,7 +368,6 @@ The component has some parts that can be styled through layout properties and th
 | disabledColor-button-TimeInput | $textColor-disabled | $textColor-disabled |
 | [fontSize](../styles-and-themes/common-units/#size)-ampm-TimeInput | inherit | inherit |
 | [fontSize](../styles-and-themes/common-units/#size)-input-TimeInput | inherit | inherit |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TimeInput-default | *none* | *none* |
 | [gap](../styles-and-themes/common-units/#size)-adornment-TimeInput | *none* | *none* |
 | hoverColor-button-TimeInput | $color-surface-800 | $color-surface-800 |
 | [margin](../styles-and-themes/common-units/#size)-icon-TimeInput | *none* | *none* |
@@ -393,7 +408,6 @@ The component has some parts that can be styled through layout properties and th
 | [padding](../styles-and-themes/common-units/#size)-TimeInput-warning | *none* | *none* |
 | spacing-divider-TimeInput | 1px 0 | 1px 0 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-input-TimeInput | center | center |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-TimeInput-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput-default--focus | *none* | *none* |

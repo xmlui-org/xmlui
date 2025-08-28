@@ -112,6 +112,7 @@
                     <NavLink label="Column" to="/components/Column" />
                     <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
                     <NavLink label="DataSource" to="/components/DataSource" />
+                    <NavLink label="DateInput" to="/components/DateInput" />
                     <NavLink label="DatePicker" to="/components/DatePicker" />
                     <NavLink label="DonutChart" to="/components/DonutChart" />
                     <NavLink label="DropdownMenu" to="/components/DropdownMenu" />

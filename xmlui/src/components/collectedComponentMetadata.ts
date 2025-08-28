@@ -202,6 +202,8 @@ import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
 import { TimeInputMd } from "./TimeInput/TimeInput";
+import { DateInput } from "./DateInput/DateInputNative";
+import { DateInputMd } from "./DateInput/DateInput";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -327,6 +329,7 @@ export const collectedComponentMetadata = {
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
+  DateInput: DateInputMd,
   DropdownMenu: DropdownMenuMd,
   EM: HtmlEMMd,
   Fragment: FragmentMd,

@@ -21,6 +21,7 @@
   "Column": "Column",
   "ContentSeparator": "ContentSeparator",
   "DataSource": "DataSource",
+  "DateInput": "DateInput",
   "DatePicker": "DatePicker",
   "DonutChart": "DonutChart",
   "DropdownMenu": "DropdownMenu",

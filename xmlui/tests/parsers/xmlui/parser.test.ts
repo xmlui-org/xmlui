@@ -402,6 +402,17 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodes.uppercaseAttr);
   });
 
+  it("Text after root element", () => {
+    const { errors } = parseSource("<A></A>ABC");
+    expect(errors[0].code).toBe(ErrCodes.expTagOpen);
+  });
+
+  it("Only text as source", () => {
+    const { errors } = parseSource("ABC");
+    console.log(errors)
+    expect(errors[0].code).toBe(ErrCodes.expTagOpen);
+  });
+
   it("no name for tag", () => {
     const src = "<>";
     const { errors } = parseSource(src);
@@ -487,7 +498,6 @@ describe("Xmlui parser - expected parser errors", () => {
 
   it("namespace without attribute name", () => {
     const { errors } = parseSource("<A ns:='hi' enabled/>");
-    console.log(errors);
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
   });
