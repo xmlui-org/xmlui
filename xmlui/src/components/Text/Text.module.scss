@@ -25,6 +25,7 @@ $component: "Text";
 
 @layer components {
   .text {
+    //display: inline;
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
@@ -37,11 +38,6 @@ $component: "Text";
 
     &.inherit {
       @include t.ignoreTextVars();
-    }
-
-    &.markdown {
-      @include textVariant("markdown");
-      overflow: visible;
     }
 
     &.abbr {
@@ -243,6 +239,7 @@ $component: "Text";
 
   .preserveLinebreaks {
     white-space: pre-wrap;
+    //display: block;
   }
 
   .noEllipsis {

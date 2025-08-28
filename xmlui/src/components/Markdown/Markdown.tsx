@@ -87,6 +87,11 @@ export const MarkdownMd = createMetadata({
     "marginLeft-Image-markdown": "$space-0",
     "marginRight-Image-markdown": "$space-0",
 
+    "marginTop-Text-markdown": "$space-3",
+    "marginBottom-Text-markdown": "$space-6",
+    "fontSize-Text-markdown": "fontSize-${COMP}",
+    "fontWeight-Text-markdown": "fontWeight-Text",
+
     light: {
       // --- No light-specific theme vars
     },
@@ -146,57 +151,62 @@ type TransformedMarkdownProps = {
   showHeadingAnchors?: boolean;
 };
 
-const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(({
-  children,
-  removeIndents,
-  className,
-  extractValue,
-  codeHighlighter,
-  showHeadingAnchors,
-}: TransformedMarkdownProps, ref) => {
-  const markdownContent = useMemo(() => {
-    if (typeof children !== "string") {
-      return null;
-    }
+const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
+  (
+    {
+      children,
+      removeIndents,
+      className,
+      extractValue,
+      codeHighlighter,
+      showHeadingAnchors,
+    }: TransformedMarkdownProps,
+    ref,
+  ) => {
+    const markdownContent = useMemo(() => {
+      if (typeof children !== "string") {
+        return null;
+      }
 
-    // --- Resolve binding expression values
-    // --- Resolve xmlui playground definitions
+      // --- Resolve binding expression values
+      // --- Resolve xmlui playground definitions
 
-    let resolvedMd = children;
-    while (true) {
-      const nextPlayground = observePlaygroundPattern(resolvedMd);
-      if (!nextPlayground) break;
+      let resolvedMd = children;
+      while (true) {
+        const nextPlayground = observePlaygroundPattern(resolvedMd);
+        if (!nextPlayground) break;
 
-      resolvedMd =
-        resolvedMd.slice(0, nextPlayground[0]) +
-        convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
-        resolvedMd.slice(nextPlayground[1]);
-    }
+        resolvedMd =
+          resolvedMd.slice(0, nextPlayground[0]) +
+          convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
+          resolvedMd.slice(nextPlayground[1]);
+      }
 
-    while (true) {
-      const nextTreeDisplay = observeTreeDisplay(resolvedMd);
-      if (!nextTreeDisplay) break;
-      resolvedMd =
-        resolvedMd.slice(0, nextTreeDisplay[0]) +
-        convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
-        resolvedMd.slice(nextTreeDisplay[1]);
-    }
+      while (true) {
+        const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+        if (!nextTreeDisplay) break;
+        resolvedMd =
+          resolvedMd.slice(0, nextTreeDisplay[0]) +
+          convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+          resolvedMd.slice(nextTreeDisplay[1]);
+      }
 
-    resolvedMd = parseBindingExpression(resolvedMd, extractValue);
-    return resolvedMd;
-  }, [children, extractValue]);
+      resolvedMd = parseBindingExpression(resolvedMd, extractValue);
+      return resolvedMd;
+    }, [children, extractValue]);
 
-  return (
-    <Markdown
-      ref={ref}
-      removeIndents={removeIndents}
-      codeHighlighter={codeHighlighter}
-      className={className}
-      showHeadingAnchors={showHeadingAnchors}
-    >
-      {markdownContent}
-    </Markdown>
-  );
-});
+    return (
+      <Markdown
+        ref={ref}
+        removeIndents={removeIndents}
+        codeHighlighter={codeHighlighter}
+        className={className}
+        showHeadingAnchors={showHeadingAnchors}
+      >
+        {markdownContent}
+      </Markdown>
+    );
+  },
+);
 
 export { Markdown } from "./MarkdownNative";

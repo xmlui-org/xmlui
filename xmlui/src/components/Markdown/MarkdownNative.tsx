@@ -223,7 +223,7 @@ export const Markdown = memo(
             },
             p({ id, children }) {
               return (
-                <Text uid={id} variant="markdown">
+                <Text className={styles.markdown} uid={id} >
                   {children}
                 </Text>
               );

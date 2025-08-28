@@ -2,7 +2,7 @@
 
 The `Text` component displays textual information in a number of optional styles and variants.
 
-You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
+You can learn more about this component in the [Working with Text](/working-with-text) article.
 
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
@@ -150,20 +150,6 @@ Available values:
     </Text>
   </HStack>
   <HStack>
-    <Text width="150px">codefence:</Text>
-    <Text variant="codefence">
-      This is an example text
-    </Text>
-  </HStack>
-  <HStack>
-    <Text width="150px">codefence + code:</Text>
-    <Text variant="codefence">
-      <Text variant="code">
-        This is an example text
-      </Text>
-    </Text>
-  </HStack>
-  <HStack>
     <Text width="150px">deleted:</Text>
     <Text variant="deleted">
       This is an example text
@@ -291,7 +277,6 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 | `abbr`      | abbr      |
 | `cite`      | cite      |
 | `code`      | code      |
-| `codefence` | pre       |
 | `deleted`   | del       |
 | `inserted`  | ins       |
 | `keyboard`  | kbd       |

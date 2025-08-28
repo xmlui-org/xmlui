@@ -35,7 +35,6 @@ $marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
 $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
-
 @layer components {
   .markdownContent {
     padding-top: $paddingTop-MarkDown;
@@ -44,6 +43,23 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     min-width: 0;
     width: 100%;
     @include t.textVars($themeVars, "Text");
+
+    .markdown {
+      $component: "Text";
+      $variantName: "Text-markdown";
+      $themeVars: t.composePaddingVars($themeVars, variantName);
+      $themeVars: t.composeBorderVars($themeVars, $variantName);
+      $themeVars: t.composeTextVars($themeVars, $variantName, $component);
+      @include t.paddingVars($themeVars, $variantName);
+      @include t.borderVars($themeVars, $variantName);
+      @include t.textVars($themeVars, $variantName);
+      margin-top: createThemeVar("marginTop-#{$variantName}");
+      margin-bottom: createThemeVar("marginBottom-#{$variantName}");
+      margin-left: createThemeVar("marginLeft-#{$variantName}");
+      margin-right: createThemeVar("marginRight-#{$variantName}");
+      overflow: visible;
+      display: block;
+    }
 
     // --- Additional Heading styles
     h1 {
