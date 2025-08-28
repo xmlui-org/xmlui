@@ -628,6 +628,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       style={{ ...style, gap }}
       onFocusCapture={handleComponentFocus}
       onBlur={handleComponentBlur}
+      data-validation-status={validationStatus}
       {...rest}
     >
       {startAdornment}

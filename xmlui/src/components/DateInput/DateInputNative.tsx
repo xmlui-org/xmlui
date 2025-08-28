@@ -485,6 +485,42 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     [onBlur],
   );
 
+  // Arrow key navigation handler
+  const createArrowKeyHandler = useCallback(() => {
+    return (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const { key } = event;
+      
+      if (key === "ArrowRight") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement;
+        
+        // Determine next input based on current input
+        if (currentTarget === monthInputRef.current && dayInputRef.current) {
+          dayInputRef.current.focus();
+          dayInputRef.current.select();
+        } else if (currentTarget === dayInputRef.current && yearInputRef.current) {
+          yearInputRef.current.focus();
+          yearInputRef.current.select();
+        }
+      } else if (key === "ArrowLeft") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement;
+        
+        // Determine previous input based on current input
+        if (currentTarget === dayInputRef.current && monthInputRef.current) {
+          monthInputRef.current.focus();
+          monthInputRef.current.select();
+        } else if (currentTarget === yearInputRef.current && dayInputRef.current) {
+          dayInputRef.current.focus();
+          dayInputRef.current.select();
+        }
+      }
+    };
+  }, []);
+
+  // Create the arrow key handler instance
+  const handleArrowKeys = createArrowKeyHandler();
+
   const clear = useCallback(() => {
     // Reset to initial value if provided, otherwise null
     let valueToReset = clearToInitialValue
@@ -622,6 +658,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 maxValue={maxValue}
                 onChange={handleDayChange}
                 onBlur={handleDayBlur}
+                onKeyDown={handleArrowKeys}
                 readOnly={readOnly}
                 required={required}
                 value={day}
@@ -647,6 +684,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 maxValue={maxValue}
                 onChange={handleMonthChange}
                 onBlur={handleMonthBlur}
+                onKeyDown={handleArrowKeys}
                 readOnly={readOnly}
                 required={required}
                 value={month}
@@ -670,6 +708,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 maxValue={maxValue}
                 onChange={handleYearChange}
                 onBlur={handleYearBlur}
+                onKeyDown={handleArrowKeys}
                 readOnly={readOnly}
                 required={required}
                 value={year}
@@ -704,6 +743,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       style={{ ...style, gap }}
       onFocusCapture={handleComponentFocus}
       onBlur={handleComponentBlur}
+      data-validation-status={validationStatus}
       {...rest}
     >
       {startAdornment}
