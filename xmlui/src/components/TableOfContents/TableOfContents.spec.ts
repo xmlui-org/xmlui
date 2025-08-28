@@ -830,5 +830,139 @@ test.describe("Other Edge Cases", () => {
 });
 
 test.describe("Interactions with Bookmark props", () => {
-  // TODO
+  test("uses bookmark title fallback when title and content is empty", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark id="fallback-test" title=""/>
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const tocItem = page.getByRole("link", { name: "fallback-test" });
+    await expect(tocItem).toBeVisible();
+  });
+
+  test("uses bookmark id as fallback when both title and content are empty", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark id="id-fallback" title="" />
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const tocItem = page.getByRole("link", { name: "id-fallback" });
+    await expect(tocItem).toBeVisible();
+  });
+
+  test("excludes bookmarks with omitFromToc=true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark id="visible" title="Visible Bookmark">
+              visible content
+            </Bookmark>
+            <Bookmark id="hidden" title="Hidden Bookmark" omitFromToc="{true}">
+              hidden content
+            </Bookmark>
+            <Bookmark id="also-visible" title="Also Visible">
+              also visible content
+            </Bookmark>
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const visibleItem = page.getByRole("link", { name: "Visible Bookmark" });
+    const hiddenItem = page.getByRole("link", { name: "Hidden Bookmark" });
+    const alsoVisibleItem = page.getByRole("link", { name: "Also Visible" });
+
+    await expect(visibleItem).toBeVisible();
+    await expect(hiddenItem).not.toBeVisible();
+    await expect(alsoVisibleItem).toBeVisible();
+  });
+
+  test("handles bookmarks without id gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark title="No ID Bookmark">
+              content without id
+            </Bookmark>
+            <Bookmark id="with-id" title="With ID">
+              content with id
+            </Bookmark>
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const noIdItem = page.getByRole("link", { name: "No ID Bookmark" });
+    const withIdItem = page.getByRole("link", { name: "With ID" });
+
+    await expect(noIdItem).not.toBeVisible();
+    await expect(withIdItem).toBeVisible();
+  });
+
+  test("respects bookmark level in omitH1 filtering", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark id="level1" title="Level 1 Bookmark" level="{1}">
+              level 1 content
+            </Bookmark>
+            <Bookmark id="level2" title="Level 2 Bookmark" level="{2}">
+              level 2 content
+            </Bookmark>
+          </VStack>
+          <TableOfContents omitH1="{true}" />
+        </HStack>
+      </Page>
+    `);
+
+    const level1Item = page.getByRole("link", { name: "Level 1 Bookmark" });
+    const level2Item = page.getByRole("link", { name: "Level 2 Bookmark" });
+
+    await expect(level1Item).not.toBeVisible();
+    await expect(level2Item).toBeVisible();
+  });
+
+  test("uses content text as title over id when title is undefined", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Bookmark id="content-text">
+              Content as title text
+            </Bookmark>
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const tocItem = page.getByRole("link", { name: "Content as title text" });
+    await expect(tocItem).toBeVisible();
+  });
 });
