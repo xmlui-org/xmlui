@@ -1,6 +1,6 @@
 %-DESC-START
 
-You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
+You can learn more about this component in the [Working with Text](/working-with-text) article.
 
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
@@ -57,14 +57,22 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
       color="black"
       preserveLinebreaks="true"
       value="(preserve) This long text
+
       with several line breaks
+
+
               does not fit into a viewport with a 200-pixel width." />
     <Text
       width="250px"
       backgroundColor="cyan"
       color="black"
+      preserveLinebreaks="false"
       value="(don't preserve) This long text
+
+
       with several line breaks
+
+      
               does not fit into a viewport with a 200-pixel width." />
   </HStack>
 </App>

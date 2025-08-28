@@ -161,7 +161,9 @@ Sometimes you want to preserve line breaks, as when inspecting a JSON object.
     }
   }"
 >
-
+  <Text preserveLinebreaks="false">
+    { JSON.stringify(data, null, 2) }
+  </Text>
   <Text preserveLinebreaks="true">
     { JSON.stringify(data, null, 2) }
   </Text>
