@@ -31,6 +31,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
+import { componentSourceComponentRenderer } from "./ComponentSource/ComponentSource";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
@@ -418,6 +419,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ComponentSource !== "false") {
+      this.registerCoreComponent(componentSourceComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);

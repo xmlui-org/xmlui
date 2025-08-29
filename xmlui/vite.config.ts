@@ -32,7 +32,7 @@ export default ({ mode }) => {
           VITE_USED_COMPONENTS_Tree: "false",
           VITE_USED_COMPONENTS_TableEditor: "false",
           // VITE_USED_COMPONENTS_Charts: "false",
-          // VITE_USER_COMPONENTS_Inspect: "false",
+          VITE_USER_COMPONENTS_Inspect: "true",
           VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
         },
       };

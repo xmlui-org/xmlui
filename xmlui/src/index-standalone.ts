@@ -5,6 +5,7 @@ import ReactDOM from "react-dom";
 import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import * as xmluiExports from "./index";
+import { componentSourceComponentRenderer } from "./components/ComponentSource/ComponentSource";
 
 const Xmlui = new StandaloneExtensionManager();
 
@@ -15,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     div.id = 'root';
     document.getElementsByTagName('body')[0].appendChild(div);
   }
+  // Register ComponentSource component
+  Xmlui.registerExtension({
+    components: [componentSourceComponentRenderer]
+  });
   startApp(undefined, undefined, Xmlui);
 });
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useDevTools } from "xmlui";
 
 export interface ComponentSourceProps {
   autoLoad?: boolean;
@@ -25,114 +26,121 @@ export function ComponentSource({
   const [error, setError] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Try to use the inspector's dev tools, but fall back gracefully if not available
+  let sources, projectCompilation;
+  try {
+    const devTools = useDevTools();
+    sources = devTools.sources;
+    projectCompilation = devTools.projectCompilation;
+  } catch (error) {
+    console.log('ComponentSource: Inspector not available, falling back to file-based approach');
+    sources = null;
+    projectCompilation = null;
+  }
+
+  // Function to extract source code using inspector's logic
+  const extractSourceCode = useMemo(() => {
+    if (!sources || !projectCompilation) {
+      return "";
+    }
+
+    // Try to find the component by name in the project compilation
+    let targetComponent = null;
+
+    if (componentName) {
+      // Look for the specific component by name
+      targetComponent = projectCompilation.components.find(comp =>
+        comp.name === componentName || comp.markupSource.includes(`<Component name="${componentName}">`)
+      );
+    } else {
+      // Try to determine from uid context
+      if (uid && uid.includes('app')) {
+        // For App context, look for the main App component
+        targetComponent = projectCompilation.components.find(comp =>
+          comp.markupSource.includes('<App>') && !comp.markupSource.includes('<Component name=')
+        );
+      } else if (uid) {
+        // Extract component name from uid (e.g., "testSourceCode" -> "Test")
+        const uidParts = uid.replace('SourceCode', '').split(/(?=[A-Z])/);
+        const possibleName = uidParts[uidParts.length - 1]; // Get the last part
+        if (possibleName) {
+          targetComponent = projectCompilation.components.find(comp =>
+            comp.name === possibleName || comp.markupSource.includes(`<Component name="${possibleName}">`)
+          );
+        }
+      }
+    }
+
+    if (!targetComponent) {
+      console.log('ComponentSource: No target component found');
+      return "";
+    }
+
+    console.log('ComponentSource: Found target component:', targetComponent.name);
+
+    // Use the inspector's source extraction logic
+    const compSrc = targetComponent.debug?.source;
+    if (!compSrc) {
+      console.log('ComponentSource: No debug source info found');
+      return targetComponent.markupSource; // Fallback to full markup
+    }
+
+    const { start, end, fileId } = compSrc;
+    const slicedSrc = sources[fileId].slice(start, end);
+
+    // Apply the inspector's formatting logic
+    let dropEmptyLines = true;
+    const prunedLines: Array<string> = [];
+    let trimBeginCount: number | undefined = undefined;
+
+    slicedSrc.split("\n").forEach((line) => {
+      if (line.trim() === "" && dropEmptyLines) {
+        // Drop empty lines from the beginning
+        return;
+      } else {
+        dropEmptyLines = false;
+        prunedLines.push(line);
+        const startingWhiteSpaces = line.search(/\S|$/);
+        if (
+          line.trim() !== "" &&
+          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
+        ) {
+          trimBeginCount = startingWhiteSpaces;
+        }
+      }
+    });
+
+    const formattedSource = prunedLines
+      .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
+      .join("\n");
+
+    console.log('ComponentSource: Extracted source length:', formattedSource.length);
+    return formattedSource;
+  }, [sources, projectCompilation, componentName, uid]);
+
   const fetchSourceCode = async () => {
-    console.log('ComponentSource fetchSourceCode - trying to find current context source');
+    console.log('ComponentSource fetchSourceCode - using inspector source extraction');
     setIsLoading(true);
     setError("");
 
     try {
-      // Get the container element and traverse up the DOM tree to find context
-      const containerElement = containerRef.current;
-      if (!containerElement) {
-        throw new Error('Container element not found');
+      const sourceCode = extractSourceCode;
+
+      if (!sourceCode) {
+        throw new Error('Could not extract source code for current context');
       }
 
-      // Debug: Log the container element and its immediate parent
-      console.log('ComponentSource container element:', containerElement);
-      console.log('ComponentSource container parent:', containerElement.parentElement);
-      console.log('ComponentSource container parent class:', containerElement.parentElement?.className);
-      console.log('ComponentSource container parent attributes:', containerElement.parentElement?.getAttributeNames());
-
-      // Traverse up the DOM tree and log all elements and their attributes
-      let currentElement = containerElement.parentElement;
-      let depth = 0;
-      while (currentElement && depth < 10) {
-        console.log(`ComponentSource DOM level ${depth}:`, currentElement.tagName, currentElement.className);
-        console.log(`ComponentSource DOM level ${depth} attributes:`, currentElement.getAttributeNames());
-        currentElement.getAttributeNames().forEach(attr => {
-          console.log(`  - ${attr}:`, currentElement.getAttribute(attr));
-        });
-        currentElement = currentElement.parentElement;
-        depth++;
-      }
-
-      // Try different selectors to find XMLUI components
-      console.log('ComponentSource trying different selectors:');
-      console.log('- [data-xmlui-component]:', document.querySelectorAll('[data-xmlui-component]').length);
-      console.log('- [data-component]:', document.querySelectorAll('[data-component]').length);
-      console.log('- [data-name]:', document.querySelectorAll('[data-name]').length);
-      console.log('- [class*="xmlui"]:', document.querySelectorAll('[class*="xmlui"]').length);
-      console.log('- [class*="component"]:', document.querySelectorAll('[class*="component"]').length);
-      console.log('- [class*="page"]:', document.querySelectorAll('[class*="page"]').length);
-      console.log('- [class*="app"]:', document.querySelectorAll('[class*="app"]').length);
-
-      // Traverse up the DOM tree from the container to find Page, Component, and App ancestors using CSS classes
-      const pageAncestor = containerElement.closest('[class*="xmlui-page"], [class*="page-root"], [class*="page"]');
-      const componentAncestor = containerElement.closest('[class*="xmlui-component"], [class*="component-root"], [class*="component"]');
-      const appAncestor = containerElement.closest('[class*="xmlui-app"], [class*="app-root"], [class*="app"]');
-
-      console.log('ComponentSource context check:');
-      console.log('- Page ancestor found:', !!pageAncestor);
-      console.log('- Component ancestor found:', !!componentAncestor);
-      console.log('- App ancestor found:', !!appAncestor);
-
-      let sourceUrl = "";
-
-      // If componentName is provided, use it directly
-      if (componentName) {
-        console.log('ComponentSource using provided component name:', componentName);
-        sourceUrl = `components/${componentName}.xmlui`;
-      } else {
-        // Try to determine context from uid
-        console.log('ComponentSource uid:', uid);
-
-        // If we have a specific uid that indicates we're in a component context
-        if (uid && uid.includes('test')) {
-          // We're in the Test component context
-          sourceUrl = 'components/Test.xmlui';
-          console.log('ComponentSource using Test component source URL based on uid:', sourceUrl);
-        } else if (uid && uid.includes('home')) {
-          // We're in the Home component context
-          sourceUrl = 'components/Home.xmlui';
-          console.log('ComponentSource using Home component source URL based on uid:', sourceUrl);
-        } else if (uid && uid.includes('app')) {
-          // We're in the App context
-          sourceUrl = 'Main.xmlui';
-          console.log('ComponentSource using App source URL:', sourceUrl);
-        } else {
-          // Default to Main.xmlui
-          sourceUrl = 'Main.xmlui';
-          console.log('ComponentSource using Main.xmlui source URL:', sourceUrl);
-        }
-      }
-
-      if (!sourceUrl) {
-        throw new Error('Could not determine source URL for current context');
-      }
-
-      console.log('ComponentSource final source URL:', sourceUrl);
-
-      const response = await fetch(sourceUrl);
-      console.log('ComponentSource response status:', response.status);
-      console.log('ComponentSource response URL:', response.url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const text = await response.text();
-      console.log('ComponentSource fetched content length:', text.length);
-      console.log('ComponentSource fetched content preview:', text.substring(0, 100));
+      console.log('ComponentSource: Successfully extracted source code');
 
       // Update the component state so it's available through the id binding
-      updateState?.({ value: text, isLoading: false, error: "" });
-      onSourceLoaded?.(text);
+      updateState?.({ value: sourceCode, isLoading: false, error: "" });
+      onSourceLoaded?.(sourceCode);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load source code';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to extract source code';
       setError(errorMessage);
       updateState?.({ error: errorMessage, isLoading: false });
       onError?.(errorMessage);
-      console.error('Error loading source code:', err);
+      console.error('Error extracting source code:', err);
     } finally {
       setIsLoading(false);
     }
