@@ -1,11 +1,11 @@
 <Component name="Test">
 
+<PageSource id="sourceCode" />
+
 In Test
 
-<PageSource id="testSourceCode" />
-
-<Text>
-  { testSourceCode.value || 'Loading Test component source code...' }
+<Text preserveLinebreaks="true">
+ { sourceCode.value }
 </Text>
 
 </Component>

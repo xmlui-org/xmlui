@@ -1,17 +1,13 @@
 <App>
 
+In Main
+
 <PageSource id="sourceCode" />
 
-<Text>
-  { sourceCode.value }
+<Text preserveLinebreaks="true">
+ { sourceCode.value }
 </Text>
 
-  <NavPanel>
-    <NavLink label="Test" to="/test" />
-  </NavPanel>
-  <Pages>
-    <Page url="/test">
-      <Test />
-    </Page>
-  </Pages>
+<Test />
+
 </App>
