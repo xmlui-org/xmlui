@@ -1,6 +1,8 @@
-<App>
+<App layout="vertical">
 
 <ComponentSource id="appSourceCode" />
+
+In Main with `ComponentSource`.
 
 <Card>
 <Text preserveLinebreaks="true">

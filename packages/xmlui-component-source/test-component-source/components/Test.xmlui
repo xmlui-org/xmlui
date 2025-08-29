@@ -2,14 +2,12 @@
 
 <ComponentSource id="testSourceCode" />
 
-In Test
+In Test with `ComponentSource`.
 
-<!--
 <Card>
 <Text preserveLinebreaks="true">
  { testSourceCode.value }
 </Text>
 </Card>
--->
 
 </Component>

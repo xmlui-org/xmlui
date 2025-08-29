@@ -2,14 +2,6 @@
 
 <ComponentSource id="homeSourceCode" />
 
-In Home
-
-<!--
-<Card>
-<Text preserveLinebreaks="true">
- { homeSourceCode.value }
-</Text>
-</Card>
--->
+In Home with no `ComponentSource`.
 
 </Component>
