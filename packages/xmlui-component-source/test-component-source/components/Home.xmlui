@@ -1,7 +1,0 @@
-<Component name="Home">
-
-<ComponentSource id="homeSourceCode" />
-
-In Home with no `ComponentSource`.
-
-</Component>
