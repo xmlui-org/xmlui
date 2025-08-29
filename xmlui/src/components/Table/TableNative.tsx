@@ -93,6 +93,8 @@ export type TablePaginationControlsLocation =
 // =====================================================================================================================
 // React Table component implementation
 
+type CellVerticalAlign = "top" | "center" | "bottom";
+
 type TableProps = {
   data: any[];
   columns?: OurColumnMetadata[];
@@ -124,6 +126,7 @@ type TableProps = {
   alwaysShowSelectionHeader?: boolean;
   registerComponentApi: RegisterComponentApiFn;
   noBottomBorder?: boolean;
+  cellVerticalAlign?: CellVerticalAlign;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -190,6 +193,7 @@ export const Table = forwardRef(
       onSelectionDidChange,
       noBottomBorder = defaultProps.noBottomBorder,
       paginationControlsLocation = defaultProps.paginationControlsLocation,
+      cellVerticalAlign = defaultProps.cellVerticalAlign,
       ...rest
       // cols
     }: TableProps,
@@ -633,10 +637,13 @@ export const Table = forwardRef(
                   {headerGroup.headers.map((header, headerIndex) => {
                     const { width, ...style } = header.column.columnDef.meta?.style || {};
                     const size = header.getSize();
+                    const alignmentClass = cellVerticalAlign === "top" ? styles.alignTop : 
+                                         cellVerticalAlign === "bottom" ? styles.alignBottom : 
+                                         styles.alignCenter;
                     return (
                       <th
                         key={`${header.id}-${headerIndex}`}
-                        className={styles.columnCell}
+                        className={classnames(styles.columnCell, alignmentClass)}
                         colSpan={header.colSpan}
                         style={{
                           position: "relative",
@@ -748,9 +755,12 @@ export const Table = forwardRef(
                     {row.getVisibleCells().map((cell, i) => {
                       const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
                       const size = cell.column.getSize();
+                      const alignmentClass = cellVerticalAlign === "top" ? styles.alignTop : 
+                                           cellVerticalAlign === "bottom" ? styles.alignBottom : 
+                                           styles.alignCenter;
                       return (
                         <td
-                          className={styles.cell}
+                          className={classnames(styles.cell, alignmentClass)}
                           key={`${cell.id}-${i}`}
                           style={{
                             // width: size,
@@ -878,4 +888,5 @@ export const defaultProps = {
   alwaysShowSelectionHeader: false,
   noBottomBorder: false,
   paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
+  cellVerticalAlign: "center" as CellVerticalAlign,
 };

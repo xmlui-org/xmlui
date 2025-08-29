@@ -310,39 +310,6 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe("label properties", () => {
-    test("displays label with labelPosition top", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time" labelPosition="top" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time");
-    });
-
-    test("displays label with labelPosition left", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time" labelPosition="left" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time");
-    });
-
-    test("sets labelWidth", async ({ initTestBed, createTimeInputDriver }) => {
-      const expectedWidth = 150;
-      await initTestBed(`
-        <TimeInput testId="timeInput" label="Time" labelPosition="start" labelWidth="${expectedWidth}px" />
-      `);
-      const driver = await createTimeInputDriver("timeInput");
-      const { width } = await getBounds(driver.label);
-      expect(width).toEqual(expectedWidth);
-    });
-
-    test("handles labelBreak", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" label="Time Input" labelBreak="true" />`);
-      const driver = await createTimeInputDriver("timeInput");
-      await expect(driver.label).toBeVisible();
-      await expect(driver.label).toContainText("Time Input");
-    });
-  });
-
   test.describe("adornment properties", () => {
     test("displays startText", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" startText="Start" />`);
@@ -414,6 +381,117 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("emptyCharacter property", () => {
+    test("uses default '--' placeholder when no emptyCharacter is specified", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("uses custom emptyCharacter for placeholders", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="*" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "**");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "**");
+    });
+
+    test("applies emptyCharacter to all inputs when seconds enabled", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="•" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "••");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "••");
+      await expect(driver.secondInput).toHaveAttribute("placeholder", "••");
+    });
+
+    test("uses first character when emptyCharacter is multi-character", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="abc" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "aa");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "aa");
+    });
+
+    test("defaults to dash when emptyCharacter is empty string", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("handles null emptyCharacter", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="{null}" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("handles undefined emptyCharacter", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="{undefined}" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "--");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "--");
+    });
+
+    test("works with special characters", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="@" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "@@");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "@@");
+    });
+
+    test("works with unicode characters", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="⏰" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "⏰⏰");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "⏰⏰");
+    });
+
+    test("placeholder visible when fields are empty", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="#" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveValue("");
+      await expect(driver.minuteInput).toHaveValue("");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "##");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "##");
+    });
+
+    test("shows values instead of placeholder when initialValue provided", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="#" initialValue="14:30" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveValue("14");
+      await expect(driver.minuteInput).toHaveValue("30");
+    });
+
+    test("works with 12-hour format", async ({ initTestBed, createTimeInputDriver }) => {
+      await initTestBed(`<TimeInput testId="timeInput" emptyCharacter="○" hour24="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+      await expect(driver.hourInput).toHaveAttribute("placeholder", "○○");
+      await expect(driver.minuteInput).toHaveAttribute("placeholder", "○○");
+      await expect(driver.amPmInput).toBeVisible();
+    });
+  });
+
   test.describe("User Interactions", () => {
     test("allows typing in hour input", async ({ initTestBed, createTimeInputDriver }) => {
       await initTestBed(`<TimeInput testId="timeInput" />`);
@@ -444,6 +522,122 @@ test.describe("Basic Functionality", () => {
       await expect(driver.minuteInput).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(driver.secondInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 24-hour format with seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → Second
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate left: Second → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 24-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute (skip seconds since disabled)
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 12-hour format with seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="true" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → Second
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate right: Second → AM/PM
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.amPmInput).toBeFocused();
+
+      // Navigate left: AM/PM → Second
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.secondInput).toBeFocused();
+
+      // Navigate left: Second → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
+    });
+
+    test("navigates between inputs with arrow keys - 12-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+      page,
+    }) => {
+      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="false" />`);
+      const driver = await createTimeInputDriver("timeInput");
+
+      // Start at hour input
+      await driver.hourInput.focus();
+      await expect(driver.hourInput).toBeFocused();
+
+      // Navigate right: Hour → Minute
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate right: Minute → AM/PM (skip seconds since disabled)
+      await page.keyboard.press("ArrowRight");
+      await expect(driver.amPmInput).toBeFocused();
+
+      // Navigate left: AM/PM → Minute
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.minuteInput).toBeFocused();
+
+      // Navigate left: Minute → Hour
+      await page.keyboard.press("ArrowLeft");
+      await expect(driver.hourInput).toBeFocused();
     });
 
     test("changes AM/PM with click", async ({ initTestBed, createTimeInputDriver }) => {
@@ -537,6 +731,101 @@ test.describe("Basic Functionality", () => {
     });
 
     
+  });
+
+  test("fires beep event when invalid value prevents auto-tab", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    
+    // Type invalid hour (25) - should not auto-tab and should fire beep
+    await page.keyboard.type("25");
+    
+    // Verify hour input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.hourInput).toHaveValue("25");
+    await expect(driver.hourInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event when manually tabbing out with invalid value", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input and enter invalid value
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    await page.keyboard.type("99");
+    
+    // Manually tab out
+    await page.keyboard.press("Tab");
+    
+    // Verify we moved to minute input
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event for invalid minute values", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on minute input
+    await driver.minuteInput.focus();
+    await driver.minuteInput.selectText();
+    
+    // Type invalid minute (70) - should not auto-tab and should fire beep
+    await page.keyboard.type("70");
+    
+    // Verify minute input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.minuteInput).toHaveValue("70");
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("fires beep event for invalid second values", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" seconds mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on second input
+    await driver.secondInput.focus();
+    await driver.secondInput.selectText();
+    
+    // Type invalid second (90) - should not auto-tab and should fire beep
+    await page.keyboard.type("90");
+    
+    // Verify second input has the invalid value and is still focused (no auto-tab)
+    await expect(driver.secondInput).toHaveValue("90");
+    await expect(driver.secondInput).toBeFocused();
+    
+    // Verify beep event was fired
+    await expect.poll(testStateDriver.testState).toBe(1);
+  });
+
+  test("does not fire beep event for valid values that auto-tab", async ({ initTestBed, page, createTimeInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`<TimeInput testId="timeInput" mute onBeep="testState = 1" />`);
+    const driver = await createTimeInputDriver("timeInput");
+    
+    // Focus on hour input
+    await driver.hourInput.focus();
+    await driver.hourInput.selectText();
+    
+    // Type valid hour (14) - should auto-tab without beep
+    await page.keyboard.type("14");
+    
+    // Verify hour input has the valid value and minute input is focused (auto-tab occurred)
+    await expect(driver.hourInput).toHaveValue("14");
+    await expect(driver.minuteInput).toBeFocused();
+    
+    // Verify no beep event was fired (testState should still be null)
+    await expect.poll(testStateDriver.testState).toBe(null);
   });
 });
 

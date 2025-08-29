@@ -2,7 +2,13 @@ import styles from "./Text.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
+import {
+  variantOptionsMd,
+  type VariantProps,
+  VariantPropsKeys,
+  type OverflowMode,
+  type BreakMode,
+} from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
 import { createMetadata, d } from "../metadata-helpers";
 
@@ -42,6 +48,48 @@ export const TextMd = createMetadata({
         "cropped (\`true\`) or not (\`false\`).",
       valueType: "boolean",
       defaultValue: defaultProps.ellipses,
+    },
+    breakMode: {
+      description:
+        "This property controls how text breaks into multiple lines. " +
+        "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
+        "`anywhere` breaks at any character, `keep` prevents word breaking, " +
+        "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
+      valueType: "string",
+      defaultValue: "normal",
+      availableValues: [
+        { value: "normal", description: "Uses standard word boundaries for breaking" },
+        { value: "word", description: "Breaks long words when necessary to prevent overflow" },
+        { value: "anywhere", description: "Breaks at any character if needed to fit content" },
+        { value: "keep", description: "Prevents breaking within words entirely" },
+        { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
+      ],
+    },
+    overflowMode: {
+      description:
+        "This property controls how text overflow is handled. " +
+        "`none` prevents wrapping and shows no overflow indicator, " +
+        "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
+        "and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). " +
+        "When not specified, uses the default text behavior.",
+      valueType: "string",
+      defaultValue: "not specified",
+      availableValues: [
+        {
+          value: "none",
+          description: "No wrapping, text stays on a single line with no overflow indicator",
+        },
+        { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
+        {
+          value: "scroll",
+          description: "Forces single line with horizontal scrolling when content overflows",
+        },
+        {
+          value: "flow",
+          description:
+            "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)",
+        },
+      ],
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -104,11 +152,6 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}-tableheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
 
-    [`marginTop-${COMP}-markdown`]: "$space-3",
-    [`marginBottom-${COMP}-markdown`]: "$space-6",
-    [`fontSize-${COMP}-markdown`]: `fontSize-${COMP}`,
-    [`fontWeight-${COMP}-markdown`]: `fontWeight-${COMP}`,
-
     [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
     [`borderColor-${COMP}-code`]: "$color-surface-100",
     [`backgroundColor-${COMP}-keyboard`]: "rgb(from $color-surface-100 r g b / 0.4)",
@@ -129,8 +172,16 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, className, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
-      node.props;
+    const {
+      variant,
+      maxLines,
+      preserveLinebreaks,
+      ellipses,
+      overflowMode,
+      breakMode,
+      value,
+      ...variantSpecific
+    } = node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)
@@ -148,6 +199,8 @@ export const textComponentRenderer = createComponentRenderer(
           defaultProps.preserveLinebreaks,
         )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
+        overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(breakMode) as BreakMode | undefined}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

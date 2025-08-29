@@ -121,6 +121,13 @@ export const TableMd = createMetadata({
       availableValues: TablePaginationControlsLocationValues,
       defaultValue: defaultProps.paginationControlsLocation,
     },
+    cellVerticalAlign: {
+      description: `This property controls the vertical alignment of cell content. ` +
+      `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
+      valueType: "string",
+      availableValues: ["top", "center", "bottom"],
+      defaultValue: "center",
+    },
   },
   events: {
     sortingDidChange: d(
@@ -333,6 +340,7 @@ const TableWithColumns = forwardRef(
           paginationControlsLocation={extractValue.asOptionalString(
             node.props.paginationControlsLocation,
           )}
+          cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
         />
       </>
     );

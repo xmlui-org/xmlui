@@ -105,12 +105,23 @@ export const TimeInputMd = createMetadata({
         "set, the gap declared by the current theme is used.",
       valueType: "string",
     },
+    mute: {
+      description: "Whether to mute the beep sound while still firing the beep event",
+      valueType: "boolean",
+      defaultValue: defaultProps.mute,
+    },
+    emptyCharacter: {
+      description: "Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'",
+      valueType: "string",
+      defaultValue: defaultProps.emptyCharacter,
+    },
   },
   events: {
     didChange: dDidChange(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     invalidTime: d("Fired when the user enters an invalid time"),
+    beep: d("Fired when a beep sound is played due to invalid input, allowing custom feedback implementations"),
   },
   apis: {
     focus: {
@@ -196,10 +207,13 @@ export const timeInputComponentRenderer = createComponentRenderer(
         endText={extractValue(node.props.endText)}
         endIcon={extractValue(node.props.endIcon)}
         gap={extractValue.asOptionalString(node.props.gap)}
+        mute={extractValue.asOptionalBoolean(node.props.mute, defaultProps.mute)}
+        emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         onInvalidChange={lookupEventHandler("invalidTime")}
+        onBeep={lookupEventHandler("beep")}
       />
     );
   },

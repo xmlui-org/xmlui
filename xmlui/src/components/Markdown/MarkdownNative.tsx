@@ -25,6 +25,7 @@ import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
+import { CodeText } from "./CodeText";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -56,9 +57,9 @@ function PreTagComponent({ id, children, codeHighlighter }) {
 
   const defaultCodefence = (
     <CodeBlock>
-      <Text uid={id} variant="codefence">
+      <CodeText uid={id}>
         {children}
-      </Text>
+      </CodeText>
     </CodeBlock>
   );
 
@@ -70,12 +71,11 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   if (!highlighterResult) {
     return defaultCodefence;
   }
+  
   return (
     <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-      <Text
+      <CodeText
         uid={id}
-        variant="codefence"
-        syntaxHighlightClasses={highlighterResult.classNames}
         dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
       />
     </CodeBlock>
@@ -223,7 +223,7 @@ export const Markdown = memo(
             },
             p({ id, children }) {
               return (
-                <Text uid={id} variant="markdown">
+                <Text className={styles.markdown} uid={id} >
                   {children}
                 </Text>
               );

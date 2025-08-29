@@ -579,3 +579,101 @@ test.describe("Theme Variables and Styling", () => {
     }
   );
 });
+
+// =============================================================================
+// CELL VERTICAL ALIGNMENT TESTS
+// =============================================================================
+
+test.describe("Cell Vertical Alignment", () => {
+  test("applies center alignment by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    
+    // Check header cells have center alignment class
+    const headerCell = page.locator("th").first();
+    await expect(headerCell).toHaveClass(/alignCenter/);
+    
+    // Check data cells have center alignment class
+    const dataCell = page.locator("td").first();
+    await expect(dataCell).toHaveClass(/alignCenter/);
+  });
+
+  test("applies top alignment when cellVerticalAlign='top'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="top" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    
+    // Check header cells have top alignment class
+    const headerCell = page.locator("th").first();
+    await expect(headerCell).toHaveClass(/alignTop/);
+    
+    // Check data cells have top alignment class
+    const dataCell = page.locator("td").first();
+    await expect(dataCell).toHaveClass(/alignTop/);
+  });
+
+  test("applies bottom alignment when cellVerticalAlign='bottom'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="bottom" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    
+    // Check header cells have bottom alignment class
+    const headerCell = page.locator("th").first();
+    await expect(headerCell).toHaveClass(/alignBottom/);
+    
+    // Check data cells have bottom alignment class
+    const dataCell = page.locator("td").first();
+    await expect(dataCell).toHaveClass(/alignBottom/);
+  });
+
+  test("applies center alignment when cellVerticalAlign='center'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="center" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `);
+    
+    // Check header cells have center alignment class
+    const headerCell = page.locator("th").first();
+    await expect(headerCell).toHaveClass(/alignCenter/);
+    
+    // Check data cells have center alignment class
+    const dataCell = page.locator("td").first();
+    await expect(dataCell).toHaveClass(/alignCenter/);
+  });
+
+  test("applies alignment to all cells consistently", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="top" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+        <Column bindTo="category" header="Category"/>
+      </Table>
+    `);
+    
+    // Check all header cells have the same alignment
+    const headerCells = page.locator("th");
+    const headerCount = await headerCells.count();
+    for (let i = 0; i < headerCount; i++) {
+      await expect(headerCells.nth(i)).toHaveClass(/alignTop/);
+    }
+    
+    // Check all data cells have the same alignment
+    const dataCells = page.locator("td");
+    const dataCount = await dataCells.count();
+    for (let i = 0; i < dataCount; i++) {
+      await expect(dataCells.nth(i)).toHaveClass(/alignTop/);
+    }
+  });
+});

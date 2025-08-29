@@ -15,7 +15,7 @@
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `clearable` (default: true) [#clearable-default-true]
+### `clearable` (default: false) [#clearable-default-false]
 
 Whether to show a clear button that allows clearing the selected time
 
@@ -38,6 +38,24 @@ The icon to display in the clear button.
 </App>
 ```
 
+### `clearToInitialValue` (default: true) [#cleartoinitialvalue-default-true]
+
+Whether the clear button resets the time input to its initial value
+
+### `emptyCharacter` (default: "-") [#emptycharacter-default-]
+
+Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'
+
+Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'.
+
+```xmlui-pg copy display name="Example: emptyCharacter"
+<App>
+  <TimeInput emptyCharacter="." />
+  <TimeInput emptyCharacter="*" />
+  <TimeInput emptyCharacter="abc" />
+</App>
+```
+
 ### `enabled` (default: true) [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
@@ -56,33 +74,13 @@ This property sets an optional icon to appear on the end (right side when the le
 
 This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-### `format` (default: "HH:mm") [#format-default-hh-mm]
-
-Time format based on Unicode Technical Standard #35. Supported values include H, HH, h, hh, m, mm, s, ss, a
-
-Available values: `h:m:s a`, `h:m a`, `HH:mm:ss`, `HH:mm` **(default)**, `H:m:s`, `H:m`
-
-The `format` prop controls how time is displayed and which parts are editable. Based on Unicode Technical Standard #35.
-
-| Format | Description | Example |
-| :----- | :---------- | :------ |
-| `H:mm` | 24-hour format with hours and minutes | 14:30 |
-| `HH:mm:ss` | 24-hour format with hours, minutes, seconds | 14:30:15 |
-| `h:mm a` | 12-hour format with AM/PM | 2:30 PM |
-| `hh:mm:ss a` | 12-hour format with seconds and AM/PM | 02:30:15 PM |
-
-```xmlui-pg copy display name="Example: format"
-<App>
-  <TimeInput format="H:mm" initialValue="14:30" />
-  <TimeInput format="h:mm a" initialValue="14:30" />
-  <TimeInput format="HH:mm:ss" initialValue="14:30:15" />
-  <TimeInput format="HH:mm:ss a" initialValue="14:30:15" />
-</App>
-```
-
 ### `gap` [#gap]
 
 This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
+
+### `hour24` (default: true) [#hour24-default-true]
+
+Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)
 
 ### `initialValue` [#initialvalue]
 
@@ -127,17 +125,15 @@ Maximum time that the user can select
 
 Minimum time that the user can select
 
+### `mute` (default: false) [#mute-default-false]
+
+Whether to mute the beep sound while still firing the beep event
+
+When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
+
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
-
-Makes the time picker read-only. Users can see the value but cannot modify it.
-
-```xmlui-pg copy display name="Example: readOnly" height="120px"
-<App>
-  <TimeInput readOnly="true" initialValue="14:30" />
-</App>
-```
 
 ### `required` (default: false) [#required-default-false]
 
@@ -150,6 +146,10 @@ Marks the time input as required for form validation.
   <TimeInput required="true" />
 </App>
 ```
+
+### `seconds` (default: false) [#seconds-default-false]
+
+Whether to show and allow input of seconds
 
 ### `startIcon` [#starticon]
 
@@ -186,6 +186,10 @@ Available values:
 ```
 
 ## Events [#events]
+
+### `beep` [#beep]
+
+Fired when a beep sound is played due to invalid input, allowing custom feedback implementations
 
 ### `didChange` [#didchange]
 
@@ -364,7 +368,6 @@ The component has some parts that can be styled through layout properties and th
 | disabledColor-button-TimeInput | $textColor-disabled | $textColor-disabled |
 | [fontSize](../styles-and-themes/common-units/#size)-ampm-TimeInput | inherit | inherit |
 | [fontSize](../styles-and-themes/common-units/#size)-input-TimeInput | inherit | inherit |
-| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TimeInput-default | *none* | *none* |
 | [gap](../styles-and-themes/common-units/#size)-adornment-TimeInput | *none* | *none* |
 | hoverColor-button-TimeInput | $color-surface-800 | $color-surface-800 |
 | [margin](../styles-and-themes/common-units/#size)-icon-TimeInput | *none* | *none* |
@@ -405,7 +408,6 @@ The component has some parts that can be styled through layout properties and th
 | [padding](../styles-and-themes/common-units/#size)-TimeInput-warning | *none* | *none* |
 | spacing-divider-TimeInput | 1px 0 | 1px 0 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-input-TimeInput | center | center |
-| [textColor](../styles-and-themes/common-units/#color)-placeholder-TimeInput-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput-default | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput-default--focus | *none* | *none* |

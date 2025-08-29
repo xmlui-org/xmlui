@@ -10,9 +10,12 @@ import {
 } from "react";
 import classnames from "classnames";
 import styles from "./TimeInput.module.scss";
+import { PartialInput } from "../Input/PartialInput";
+import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
+import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -39,9 +42,6 @@ const PART_AMPM = "ampm";
 const PART_CLEAR_BUTTON = "clearButton";
 
 // Browser compatibility checks
-const isIEOrEdgeLegacy =
-  typeof window !== "undefined" && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
-
 // Time format configuration flags
 export type TimeInputConfig = {
   hour24: boolean;
@@ -60,6 +60,7 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
+  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
@@ -81,6 +82,8 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
+  mute?: boolean;
+  emptyCharacter?: string;
 };
 
 export const defaultProps = {
@@ -95,6 +98,8 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
+  mute: false,
+  emptyCharacter: "-",
 };
 
 export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeInputNative(
@@ -110,6 +115,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onFocus,
     onBlur,
     onInvalidChange,
+    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     hour24 = defaultProps.hour24,
@@ -131,6 +137,8 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
+    mute = defaultProps.mute,
+    emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
   ref,
@@ -142,6 +150,17 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   const minuteInputRef = useRef<HTMLInputElement>(null);
   const secondInputRef = useRef<HTMLInputElement>(null);
   const amPmButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Process emptyCharacter according to requirements
+  const processedEmptyCharacter = useMemo(() => {
+    if (!emptyCharacter || emptyCharacter.length === 0) {
+      return "-";
+    }
+    if (emptyCharacter.length > 1) {
+      return emptyCharacter.charAt(0);
+    }
+    return emptyCharacter;
+  }, [emptyCharacter]);
 
   // Stabilize initialValue to prevent unnecessary re-renders
   const stableInitialValue = useMemo(() => {
@@ -218,6 +237,16 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     }
     onDidChange?.(newValue);
   });
+
+  // Method to handle beeping - both sound and event
+  const handleBeep = useCallback(() => {
+    // Play the beep sound only if not muted
+    if (!mute) {
+      beep(440, 50);
+    }
+    // Always fire the beep event for alternative implementations
+    onBeep?.();
+  }, [onBeep, mute]);
 
   // Helper function to format the complete time value
   const formatTimeValue = useCallback(
@@ -297,6 +326,14 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         const currentValue = event.target.value;
         const normalizedValue = normalizeFn(currentValue);
 
+        // Check if the current value was invalid (needed normalization or couldn't be normalized)
+        const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+        
+        if (wasInvalid) {
+          // Play beep sound and fire beep event when manually tabbing out of invalid input
+          handleBeep();
+        }
+
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
           setInvalid(false); // Clear invalid state after normalization
@@ -341,7 +378,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange],
+    [hour, minute, second, amPm, is12HourFormat, handleChange, handleBeep],
   );
 
   // Handle changes from individual inputs
@@ -463,6 +500,56 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     [onBlur],
   );
 
+  // Arrow key navigation handler
+  const createArrowKeyHandler = useCallback(() => {
+    return (event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) => {
+      const { key } = event;
+      
+      if (key === "ArrowRight") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
+        
+        // Determine next input based on current input
+        if (currentTarget === hourInputRef.current && minuteInputRef.current) {
+          minuteInputRef.current.focus();
+          minuteInputRef.current.select();
+        } else if (currentTarget === minuteInputRef.current) {
+          if (showSeconds && secondInputRef.current) {
+            secondInputRef.current.focus();
+            secondInputRef.current.select();
+          } else if (!showSeconds && is12HourFormat && amPmButtonRef.current) {
+            amPmButtonRef.current.focus();
+          }
+        } else if (currentTarget === secondInputRef.current && is12HourFormat && amPmButtonRef.current) {
+          amPmButtonRef.current.focus();
+        }
+      } else if (key === "ArrowLeft") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
+        
+        // Determine previous input based on current input
+        if (currentTarget === minuteInputRef.current && hourInputRef.current) {
+          hourInputRef.current.focus();
+          hourInputRef.current.select();
+        } else if (currentTarget === secondInputRef.current && minuteInputRef.current) {
+          minuteInputRef.current.focus();
+          minuteInputRef.current.select();
+        } else if (currentTarget === amPmButtonRef.current) {
+          if (showSeconds && secondInputRef.current) {
+            secondInputRef.current.focus();
+            secondInputRef.current.select();
+          } else if (!showSeconds && minuteInputRef.current) {
+            minuteInputRef.current.focus();
+            minuteInputRef.current.select();
+          }
+        }
+      }
+    };
+  }, [showSeconds, is12HourFormat]);
+
+  // Create the arrow key handler instance
+  const handleArrowKeys = createArrowKeyHandler();
+
   const clear = useCallback(() => {
     // Reset to initial value if provided, otherwise null
     let valueToReset = clearToInitialValue
@@ -570,6 +657,9 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     return null;
   }, [endIcon, endText]);
 
+  // Create placeholder using processed empty character
+  const placeholder = processedEmptyCharacter.repeat(2);
+
   const timeInputComponent = (
     <div
       ref={timeInputRef}
@@ -587,6 +677,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       style={{ ...style, gap }}
       onFocusCapture={handleComponentFocus}
       onBlur={handleComponentBlur}
+      data-validation-status={validationStatus}
       {...rest}
     >
       {startAdornment}
@@ -596,7 +687,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           <HourInput
             amPm={amPm}
             autoFocus={autoFocus}
-            className="timeinput"
             disabled={!enabled}
             inputRef={hourInputRef}
             nextInputRef={minuteInputRef}
@@ -604,18 +694,20 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             minTime={minTime}
             onChange={handleHourChange}
             onBlur={handleHourBlur}
+            onKeyDown={handleArrowKeys}
             readOnly={readOnly}
             required={required}
             value={hour}
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
+            emptyCharacter={processedEmptyCharacter}
+            onBeep={handleBeep}
           />
 
-          <Divider>:</Divider>
+          <InputDivider separator=":" className={styles.divider} />
 
           {/* Minute input */}
           <MinuteInput
-            className="timeinput"
             disabled={!enabled}
             hour={hour}
             inputRef={minuteInputRef}
@@ -625,19 +717,21 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             minTime={minTime}
             onChange={handleMinuteChange}
             onBlur={handleMinuteBlur}
+            onKeyDown={handleArrowKeys}
             readOnly={readOnly}
             required={required}
             showLeadingZeros={showLeadingZeros}
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
+            emptyCharacter={processedEmptyCharacter}
+            onBeep={handleBeep}
           />
 
           {/* Second input (if needed) */}
           {showSeconds && (
             <>
-              <Divider>:</Divider>
+              <InputDivider separator=":" className={styles.divider} />
               <SecondInput
-                className="timeinput"
                 disabled={!enabled}
                 hour={hour}
                 inputRef={secondInputRef}
@@ -647,11 +741,14 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 minute={minute}
                 onChange={handleSecondChange}
                 onBlur={handleSecondBlur}
+                onKeyDown={handleArrowKeys}
                 readOnly={readOnly}
                 required={required}
                 showLeadingZeros={showLeadingZeros}
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
+                emptyCharacter={processedEmptyCharacter}
+                onBeep={handleBeep}
               />
             </>
           )}
@@ -666,6 +763,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
               minTime={minTime}
               onClick={handleAmPmToggle}
               onAmPmSet={handleAmPmSet}
+              onKeyDown={handleArrowKeys}
               value={amPm}
             />
           )}
@@ -713,118 +811,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   return timeInputComponent;
 });
 
-// Simple divider component for time separators
-function Divider({ children }: { children?: React.ReactNode }): React.ReactElement {
-  return <span className={styles.divider}>{children}</span>;
-}
-
-// Input component types
-type InputProps = {
-  ariaLabel?: string;
-  autoFocus?: boolean;
-  className?: string;
-  disabled?: boolean;
-  inputRef?: React.RefObject<HTMLInputElement | null>;
-  max: number;
-  min: number;
-  name: string;
-  nextInputRef?: React.RefObject<HTMLInputElement | null>; // For auto-tabbing to next input
-  nextButtonRef?: React.RefObject<HTMLButtonElement | null>; // For auto-tabbing to AM/PM button
-  onChange?: (event: React.ChangeEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  placeholder?: string;
-  readOnly?: boolean;
-  required?: boolean;
-  step?: number;
-  value?: string | null;
-};
-
-// Input component
-function Input({
-  ariaLabel,
-  autoFocus,
-  className,
-  disabled,
-  inputRef,
-  max,
-  min,
-  name,
-  nextInputRef, // For auto-tabbing to next input
-  nextButtonRef, // For auto-tabbing to AM/PM button
-  onChange,
-  onBlur,
-  onKeyDown,
-  onKeyUp,
-  placeholder = "--",
-  readOnly,
-  required,
-  step,
-  value,
-}: InputProps): React.ReactElement {
-  // Handle input changes with auto-tabbing logic
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value;
-
-      // Call the original onChange handler
-      if (onChange) {
-        onChange(event);
-      }
-
-      // Auto-tab to next input or button if we have exactly 2 digits
-      if (newValue.length === 2 && /^\d{2}$/.test(newValue)) {
-        // Small delay to ensure the current input is properly updated
-        setTimeout(() => {
-          if (nextInputRef?.current) {
-            // Tab to next input field
-            nextInputRef.current.focus();
-            nextInputRef.current.select();
-          } else if (nextButtonRef?.current) {
-            // Tab to AM/PM button
-            nextButtonRef.current.focus();
-          }
-        }, 0);
-      }
-    },
-    [onChange, nextInputRef, nextButtonRef],
-  );
-
-  return (
-    <>
-      <input
-        aria-label={ariaLabel}
-        autoComplete="off"
-        // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
-        autoFocus={autoFocus}
-        className={classnames(styles.input, className)}
-        style={{ width: "1.8em", textAlign: "center", padding: "0 2px" }}
-        data-input="true"
-        disabled={disabled}
-        inputMode="numeric"
-        max={max}
-        maxLength={2}
-        min={min}
-        name={name}
-        onChange={handleInputChange}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        onKeyDown={onKeyDown}
-        onKeyUp={onKeyUp}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        // Assertion is needed for React 18 compatibility
-        ref={inputRef as React.RefObject<HTMLInputElement>}
-        required={required}
-        step={step}
-        type="text"
-        value={value !== null ? value : ""}
-      />
-    </>
-  );
-}
-
 // AmPm component types and implementation
 type AmPmProps = {
   ariaLabel?: string;
@@ -836,6 +822,7 @@ type AmPmProps = {
   minTime?: string;
   onClick?: () => void;
   onAmPmSet?: (amPm: AmPmType) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   buttonRef?: React.RefObject<HTMLButtonElement | null>;
   required?: boolean;
   value?: string | null;
@@ -851,6 +838,7 @@ function AmPmButton({
   minTime,
   onClick,
   onAmPmSet,
+  onKeyDown,
   buttonRef,
   value,
 }: AmPmProps): React.ReactElement {
@@ -864,22 +852,28 @@ function AmPmButton({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
-      if (disabled || !onAmPmSet) return;
+      // First call the external key handler (for arrow navigation)
+      if (onKeyDown) {
+        onKeyDown(event);
+      }
+
+      // If the event was handled (preventDefault called), don't process further
+      if (event.defaultPrevented || disabled) return;
 
       const key = event.key.toLowerCase();
 
       // Handle 'a' or 'A' to set AM
-      if (key === "a" && !amDisabled && value !== "am") {
+      if (key === "a" && !amDisabled && value !== "am" && onAmPmSet) {
         event.preventDefault();
         onAmPmSet("am");
       }
       // Handle 'p' or 'P' to set PM
-      else if (key === "p" && !pmDisabled && value !== "pm") {
+      else if (key === "p" && !pmDisabled && value !== "pm" && onAmPmSet) {
         event.preventDefault();
         onAmPmSet("pm");
       }
     },
-    [disabled, onAmPmSet, value, amDisabled, pmDisabled],
+    [onKeyDown, disabled, onAmPmSet, value, amDisabled, pmDisabled],
   );
 
   return (
@@ -901,6 +895,24 @@ function AmPmButton({
 }
 
 // HourInput component (unified for both 12-hour and 24-hour formats)
+// Generic input properties used by time input components
+type TimeInputElementProps = {
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  disabled?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  nextInputRef?: React.RefObject<HTMLInputElement | null>;
+  nextButtonRef?: React.RefObject<HTMLButtonElement | null>;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  placeholder?: string;
+  readOnly?: boolean;
+  required?: boolean;
+  step?: number;
+};
+
+// HourInput component
 type HourInputProps = {
   amPm?: AmPmType | null;
   maxTime?: string;
@@ -908,7 +920,9 @@ type HourInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "nameForClass" | "value">;
+  emptyCharacter?: string;
+  onBeep?: () => void;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
   amPm,
@@ -917,6 +931,8 @@ function HourInput({
   value,
   isInvalid = false,
   is24Hour = false,
+  emptyCharacter = "-",
+  onBeep,
   ...otherProps
 }: HourInputProps): React.ReactElement {
   // Calculate min/max based on format
@@ -971,18 +987,36 @@ function HourInput({
   // This allows users to see invalid input like "23" before it gets normalized on blur
   const displayValue = value || "";
 
-  const { className: originalClassName, ...restProps } = otherProps;
-
   return (
-    <Input
+    <PartialInput
+      value={displayValue}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={2}
       max={maxHour}
       min={minHour}
+      maxLength={2}
+      validateFn={(val) => isHourInvalid(val, is24Hour)}
+      onBeep={onBeep}
+      onChange={otherProps.onChange}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but the current onBlur expects just the event
+        if (otherProps.onBlur) {
+          otherProps.onBlur(event);
+        }
+      }}
+      onKeyDown={otherProps.onKeyDown}
+      className={classnames(partClassName(PART_HOUR), styles.input, styles.hour)}
+      invalidClassName={styles.invalid}
+      disabled={otherProps.disabled}
+      readOnly={otherProps.readOnly}
+      required={otherProps.required}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      nextButtonRef={otherProps.nextButtonRef}
       name={is24Hour ? "hour24" : "hour12"}
-      value={displayValue}
-      className={classnames(partClassName(PART_HOUR), originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
-      {...restProps}
+      ariaLabel={otherProps.ariaLabel}
+      isInvalid={isInvalid}
     />
   );
 }
@@ -995,7 +1029,9 @@ type MinuteInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
+  emptyCharacter?: string;
+  onBeep?: () => void;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function MinuteInput({
   hour,
@@ -1004,6 +1040,8 @@ function MinuteInput({
   showLeadingZeros = true,
   value,
   isInvalid = false,
+  emptyCharacter = "-",
+  onBeep,
   ...otherProps
 }: MinuteInputProps): React.ReactElement {
   function isSameHour(date: string | Date) {
@@ -1013,18 +1051,36 @@ function MinuteInput({
   const maxMinute = safeMin(59, maxTime && isSameHour(maxTime) && getMinutes(maxTime));
   const minMinute = safeMax(0, minTime && isSameHour(minTime) && getMinutes(minTime));
 
-  const { className: originalClassName, ...restProps } = otherProps;
-
   return (
-    <Input
+    <PartialInput
       max={maxMinute}
       min={minMinute}
       name="minute"
       value={value}
-      className={classnames(partClassName(PART_MINUTE), originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
-      {...restProps}
+      validateFn={isMinuteOrSecondInvalid}
+      onBeep={onBeep}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={2}
+      maxLength={2}
+      onChange={otherProps.onChange}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but the current onBlur expects just the event
+        if (otherProps.onBlur) {
+          otherProps.onBlur(event);
+        }
+      }}
+      onKeyDown={otherProps.onKeyDown}
+      className={classnames(partClassName(PART_MINUTE), styles.input, styles.minute)}
+      invalidClassName={styles.invalid}
+      disabled={otherProps.disabled}
+      readOnly={otherProps.readOnly}
+      required={otherProps.required}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      nextButtonRef={otherProps.nextButtonRef}
+      ariaLabel={otherProps.ariaLabel}
+      isInvalid={isInvalid}
     />
   );
 }
@@ -1038,7 +1094,9 @@ type SecondInputProps = {
   showLeadingZeros?: boolean;
   value?: string | null;
   isInvalid?: boolean;
-} & Omit<React.ComponentProps<typeof Input>, "max" | "min" | "name" | "value">;
+  emptyCharacter?: string;
+  onBeep?: () => void;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function SecondInput({
   hour,
@@ -1048,6 +1106,8 @@ function SecondInput({
   showLeadingZeros = true,
   value,
   isInvalid = false,
+  emptyCharacter = "-",
+  onBeep,
   ...otherProps
 }: SecondInputProps): React.ReactElement {
   function isSameMinute(date: string | Date) {
@@ -1057,31 +1117,38 @@ function SecondInput({
   const maxSecond = safeMin(59, maxTime && isSameMinute(maxTime) && getSeconds(maxTime));
   const minSecond = safeMax(0, minTime && isSameMinute(minTime) && getSeconds(minTime));
 
-  const { className: originalClassName, ...restProps } = otherProps;
-
   return (
-    <Input
+    <PartialInput
       max={maxSecond}
       min={minSecond}
       name="second"
       value={value}
-      className={classnames(partClassName(PART_SECOND), originalClassName, {
-        [styles.invalid]: isInvalid,
-      })}
-      {...restProps}
+      validateFn={isMinuteOrSecondInvalid}
+      onBeep={onBeep}
+      emptyCharacter={emptyCharacter}
+      placeholderLength={2}
+      maxLength={2}
+      onChange={otherProps.onChange}
+      onBlur={(direction, event) => {
+        // PartialInput provides direction, but the current onBlur expects just the event
+        if (otherProps.onBlur) {
+          otherProps.onBlur(event);
+        }
+      }}
+      onKeyDown={otherProps.onKeyDown}
+      className={classnames(partClassName(PART_SECOND), styles.input, styles.second)}
+      invalidClassName={styles.invalid}
+      disabled={otherProps.disabled}
+      readOnly={otherProps.readOnly}
+      required={otherProps.required}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      nextButtonRef={otherProps.nextButtonRef}
+      ariaLabel={otherProps.ariaLabel}
+      isInvalid={isInvalid}
     />
   );
-}
-
-// Input helper functions
-function onFocus(event: React.FocusEvent<HTMLInputElement>) {
-  const { target } = event;
-
-  if (isIEOrEdgeLegacy) {
-    requestAnimationFrame(() => target.select());
-  } else {
-    target.select();
-  }
 }
 
 // Utility function to parse time string into components

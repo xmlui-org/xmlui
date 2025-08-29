@@ -1,5 +1,105 @@
 [
   {
+    "tag_name": "xmlui@0.10.2",
+    "published_at": "2025-08-26T14:36:22Z",
+    "changes": [
+      {
+        "description": "fix: LineChart - sizing issue",
+        "commit_sha": "ff14e15"
+      },
+      {
+        "description": "feat: make input padding configurable via theme variables",
+        "commit_sha": "1451a94"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.2.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.2/xmlui-0.10.2.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.1",
+    "published_at": "2025-08-21T12:44:50Z",
+    "changes": [
+      {
+        "description": "Refactor visual components to allow tooltip",
+        "commit_sha": "442416b"
+      },
+      {
+        "description": "feat: add custom tooltip template support for Bar and Line charts",
+        "commit_sha": "a018431"
+      },
+      {
+        "description": "Pagination component now handles itemCount being undefined/null. Introduced hasPrevPage and hasNextPage props to toggle button disabled state.",
+        "commit_sha": "33cb547"
+      },
+      {
+        "description": "Enhance the disabledDates property of DatePicker",
+        "commit_sha": "b5d7537"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.1.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.1/xmlui-0.10.1.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.0",
+    "published_at": "2025-08-19T12:16:45Z",
+    "changes": [
+      {
+        "description": "Add tooltip behavior to visible components",
+        "commit_sha": "000a311"
+      },
+      {
+        "description": "Rework inline styling system, prepare for responsive styling",
+        "commit_sha": "eb8b958"
+      },
+      {
+        "description": "Added features to the Pagination component: page size selector dropdown control. Also added the following props: layout orientation and layout order reversal.",
+        "commit_sha": "6d0ce52"
+      },
+      {
+        "description": "feat: add theme variable support for LineChart stroke width",
+        "commit_sha": "8c98f33"
+      },
+      {
+        "description": "feat: add didChange event handler to Tabs component",
+        "commit_sha": "ef86593"
+      },
+      {
+        "description": "test: create e2e tests for chart components",
+        "commit_sha": "da5f4e7"
+      },
+      {
+        "description": "Integrated the new Pagination component with Table.",
+        "commit_sha": "47c7a2d"
+      },
+      {
+        "description": "Add \"activated\" event to TabItem",
+        "commit_sha": "740f904"
+      },
+      {
+        "description": "Add \"parts\" to component metadata",
+        "commit_sha": "5009c52"
+      },
+      {
+        "description": "Remove \"from\" from the list or reserved script keywords, as no longer used",
+        "commit_sha": "2f5ec32"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.0.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.0/xmlui-0.10.0.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.9.98",
     "published_at": "2025-08-12T04:31:18Z",
     "changes": [
@@ -168,54 +268,6 @@
       {
         "name": "xmlui-0.9.92.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.92/xmlui-0.9.92.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.90",
-    "published_at": "2025-07-30T16:33:19Z",
-    "changes": [
-      {
-        "description": "Remove Spinner tests",
-        "commit_sha": "4b57f7e"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.90.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.90/xmlui-0.9.90.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.88",
-    "published_at": "2025-07-29T09:37:35Z",
-    "changes": [
-      {
-        "description": "Fix flaky Checkbox e2e tests",
-        "commit_sha": "b79d7d8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.88.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.88/xmlui-0.9.88.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.87",
-    "published_at": "2025-07-28T05:22:00Z",
-    "changes": [
-      {
-        "description": "Fix ios regex failure",
-        "commit_sha": "33846c2"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.87.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.87/xmlui-0.9.87.js"
       }
     ]
   }

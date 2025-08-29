@@ -2,12 +2,93 @@
 
 The `Text` component displays textual information in a number of optional styles and variants.
 
-You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
+You can learn more about this component in the [Working with Text](/working-with-text) article.
 
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
 
 ## Properties [#properties]
+
+### `breakMode` (default: "not specified") [#breakmode-default-not-specified]
+
+This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `normal` | Uses standard word boundaries for breaking |
+| `word` | Breaks long words when necessary to prevent overflow |
+| `anywhere` | Breaks at any character if needed to fit content |
+| `keep` | Prevents breaking within words entirely |
+| `hyphenate` | Uses automatic hyphenation when breaking words |
+
+```xmlui-pg copy display name="Example: breakMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="normal" (default)</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightblue"
+        padding="8px"
+        breakMode="normal">
+        This text uses standardwordbreaking at natural boundaries 
+        like spaces and hyphens.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="word"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        breakMode="word">
+        This text will breakverylongwordswhenneeded to prevent 
+        overflow while preserving readability.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="anywhere"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        breakMode="anywhere">
+        Thistext willbreakanywhereif neededtofit thecontainer 
+        eveninthe middleofwords.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="keep"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        breakMode="keep">
+        This text will keep verylongwords intact and prevent 
+        breaking within words entirely.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="hyphenate"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lavender"
+        padding="8px"
+        breakMode="hyphenate"
+        lang="en">
+        This text uses automatic hyphenation for 
+        supercalifragilisticexpialidocious words.
+      </Text>
+    </VStack>
+  </VStack>
+</App>
+```
 
 ### `ellipses` (default: true) [#ellipses-default-true]
 
@@ -48,6 +129,93 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
+### `overflowMode` (default: "not specified") [#overflowmode-default-not-specified]
+
+This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `none` | No wrapping, text stays on a single line with no overflow indicator |
+| `ellipsis` | Truncates with an ellipsis (default) |
+| `scroll` | Forces single line with horizontal scrolling when content overflows |
+| `flow` | Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines) |
+
+```xmlui-pg copy display name="Example: overflowMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="none"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        overflowMode="none"
+        maxLines="2">
+        This is a very long text that will be clipped cleanly without 
+        any overflow indicator when it exceeds the specified lines.
+      </Text>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="ellipsis" (default)</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightblue"
+        padding="8px"
+        overflowMode="ellipsis"
+        maxLines="1">
+        This is a very long text that will show ellipsis when it 
+        overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="scroll"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        overflowMode="scroll">
+        This is a very long text that will enable horizontal scrolling 
+        when it overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow"</Text>
+      <Text
+        width="200px"
+        height="100px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        overflowMode="flow">
+        This is a very long text that will wrap to multiple lines and show 
+        a vertical scrollbar when the content exceeds the container height. 
+        This mode ignores maxLines and allows unlimited text wrapping with 
+        vertical scrolling when needed.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow" (no height constraint)</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightpink"
+        padding="8px"
+        overflowMode="flow">
+        This is a very long text that demonstrates flow mode without a 
+        height constraint. The text will wrap to multiple lines naturally 
+        and the container will grow to accommodate all the content. No 
+        scrollbar will appear since there's no height limitation - the text 
+        flows freely across as many lines as needed.
+      </Text>
+    </VStack>
+  </VStack>
+</App>
+```
+
 ### `preserveLinebreaks` (default: false) [#preservelinebreaks-default-false]
 
 This property indicates if linebreaks should be preserved when displaying text.
@@ -61,14 +229,19 @@ This property indicates if linebreaks should be preserved when displaying text.
       color="black"
       preserveLinebreaks="true"
       value="(preserve) This long text
+
       with several line breaks
+
               does not fit into a viewport with a 200-pixel width." />
     <Text
       width="250px"
       backgroundColor="cyan"
       color="black"
+      preserveLinebreaks="false"
       value="(don't preserve) This long text
+
       with several line breaks
+
               does not fit into a viewport with a 200-pixel width." />
   </HStack>
 </App>
@@ -100,7 +273,6 @@ Available values:
 | `caption` | Represents the caption (or title) of a table |
 | `cite` | Is used to mark up the title of a cited work |
 | `code` | Represents a line of code |
-| `codefence` | Handles the display of code blocks if combined with a `code` variant |
 | `deleted` | Represents text that has been deleted |
 | `em` | Marks text to stress emphasis |
 | `inherit` | Represents text that inherits the style from its parent element |
@@ -148,20 +320,6 @@ Available values:
     <Text width="150px">code:</Text>
     <Text variant="code">
       This is an example text
-    </Text>
-  </HStack>
-  <HStack>
-    <Text width="150px">codefence:</Text>
-    <Text variant="codefence">
-      This is an example text
-    </Text>
-  </HStack>
-  <HStack>
-    <Text width="150px">codefence + code:</Text>
-    <Text variant="codefence">
-      <Text variant="code">
-        This is an example text
-      </Text>
     </Text>
   </HStack>
   <HStack>
@@ -292,7 +450,6 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 | `abbr`      | abbr      |
 | `cite`      | cite      |
 | `code`      | code      |
-| `codefence` | pre       |
 | `deleted`   | del       |
 | `inserted`  | ins       |
 | `keyboard`  | kbd       |
@@ -348,7 +505,6 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | fontSize-Text | fontSize-Text |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-smaller | $fontSize-smaller |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
@@ -369,7 +525,6 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-markdown | fontWeight-Text | fontWeight-Text |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
@@ -380,25 +535,13 @@ This component does not expose any methods.
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
@@ -420,9 +563,6 @@ This component does not expose any methods.
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
-| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
-| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
-| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |

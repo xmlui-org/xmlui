@@ -132,13 +132,21 @@ Marks the time input as required for form validation.
 
 %-PROP-END
 
-%-PROP-START readOnly
+%-PROP-START mute
 
-Makes the time picker read-only. Users can see the value but cannot modify it.
+When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
 
-```xmlui-pg copy display name="Example: readOnly" height="120px"
+%-PROP-END
+
+%-PROP-START emptyCharacter
+
+Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'.
+
+```xmlui-pg copy display name="Example: emptyCharacter"
 <App>
-  <TimeInput readOnly="true" initialValue="14:30" />
+  <TimeInput emptyCharacter="." />
+  <TimeInput emptyCharacter="*" />
+  <TimeInput emptyCharacter="abc" />
 </App>
 ```
 

@@ -115,6 +115,7 @@ import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDa
 import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
@@ -529,6 +530,7 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
+      this.registerCoreComponent(dateInputComponentRenderer);
       this.registerCoreComponent(timeInputComponentRenderer);
     }
 
