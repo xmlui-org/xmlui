@@ -239,7 +239,8 @@ export type AppContextObject = {
   forceRefreshAnchorScroll: () => void;
 };
 
-export type MediaBreakpointType = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+export const MediaBreakpointKeys = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
+export type MediaBreakpointType = (typeof MediaBreakpointKeys)[number];
 
 export type MediaSize = {
   phone: boolean;
