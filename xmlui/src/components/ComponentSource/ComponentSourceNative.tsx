@@ -32,23 +32,22 @@ export function ComponentSource({
     return null; // Will be handled in fetchSourceCode
   }, [componentName, uid]);
 
-    // Function to extract component source from file content using the XMLUI parser
+    // Function to extract component source from file content
   const extractComponentFromFile = (fileContent: string, componentName: string): string => {
-    console.log('ComponentSource: Extracting component from file using XMLUI parser:', componentName);
+    console.log('ComponentSource: Extracting component from file:', componentName);
 
     // For Main.xmlui, return the whole file
     if (componentName === 'Main' || componentName === 'App') {
       return fileContent;
     }
 
+    // Validate XMLUI syntax first using the parser
     try {
-      // Use the actual XMLUI parser to parse the file
       const { component, errors } = xmlUiMarkupToComponent(fileContent);
 
       if (errors.length > 0) {
-        console.log('ComponentSource: Parser errors:', errors);
-        // Fall back to regex if parser fails
-        return extractComponentWithRegex(fileContent, componentName);
+        console.log('ComponentSource: XMLUI syntax errors:', errors);
+        // Continue with regex extraction even if there are syntax errors
       }
 
       // Check if it's a compound component (has a name property)
@@ -57,20 +56,18 @@ export function ComponentSource({
         return fileContent;
       }
 
-      // For compound components, we need to extract the specific component by name
-      // The parser gives us the whole file, so we need to find the specific component
-      // Let's use the regex approach for now since the parser doesn't give us individual components
-      console.log('ComponentSource: Compound component found, using regex to extract specific component');
-      return extractComponentWithRegex(fileContent, componentName);
+      console.log('ComponentSource: XMLUI syntax validated, extracting component content');
     } catch (error) {
-      console.log('ComponentSource: Parser error, falling back to regex:', error);
-      return extractComponentWithRegex(fileContent, componentName);
+      console.log('ComponentSource: Parser error, continuing with extraction:', error);
     }
+
+    // Extract the specific component content using regex
+    return extractComponentContent(fileContent, componentName);
   };
 
-  // Fallback regex-based extraction
-  const extractComponentWithRegex = (fileContent: string, componentName: string): string => {
-    console.log('ComponentSource: Using regex fallback for:', componentName);
+  // Extract component content using regex
+  const extractComponentContent = (fileContent: string, componentName: string): string => {
+    console.log('ComponentSource: Extracting component content for:', componentName);
 
     const startTag = new RegExp(`<Component\\s+name="${componentName}"[^>]*>`, 'i');
     const startMatch = fileContent.match(startTag);
@@ -104,7 +101,7 @@ export function ComponentSource({
 
       if (depth === 0) {
         const content = fileContent.substring(startIndex, endIndex);
-        console.log('ComponentSource: Found component via regex, content length:', content.length);
+        console.log('ComponentSource: Found component content, length:', content.length);
         return content;
       }
     }
