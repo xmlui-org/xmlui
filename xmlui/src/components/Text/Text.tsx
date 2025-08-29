@@ -46,13 +46,12 @@ export const TextMd = createMetadata({
     overflowBehavior: {
       description:
         "This property controls how text overflow is handled. " +
-        "`wrap` allows natural text wrapping, `none` prevents wrapping and shows no overflow indicator, " +
+        "`none` prevents wrapping and shows no overflow indicator, " +
         "`ellipsis` shows ellipses when text is truncated, `scroll` enables horizontal scrolling, " +
         "and `fade` applies a fade-out effect at the text boundary. When not specified, uses the default text behavior.",
       valueType: "string",
       defaultValue: "not specified",
       availableValues: [
-        { value: "wrap", description: "Wraps text naturally at word boundaries" },
         { value: "none", description: "No wrapping, text stays on a single line with no overflow indicator" },
         { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
         { value: "scroll", description: "Enables horizontal scrolling" },

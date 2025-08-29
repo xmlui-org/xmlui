@@ -247,13 +247,6 @@ $component: "Text";
   }
 
   // --- Overflow behavior classes
-  .overflowWrap {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    max-width: none;
-  }
-
   .overflowNone {
     // Allow normal wrapping
     white-space: normal;
@@ -288,29 +281,37 @@ $component: "Text";
   }
 
   .overflowFade {
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: unset;
     max-width: 100%;
     position: relative;
     
+    // Create a fade effect using a pseudo-element that matches the background
+    // Position it only at the bottom-right to affect only the last line
     &::after {
       content: '';
       position: absolute;
-      top: 0;
+      bottom: 0; // Position at bottom
       right: 0;
-      width: 20px;
-      height: 100%;
-      background: linear-gradient(to right, transparent, var(--fade-color, currentColor));
+      width: 60px; // Fade area width
+      height: 1.2em; // Only affect last line height
+      background: linear-gradient(to left, 
+        var(--fade-background-color, lightgreen) 0%, 
+        var(--fade-background-color, lightgreen) 30%,
+        transparent 100%
+      );
       pointer-events: none;
-      opacity: 0.8;
+      z-index: 1; // Ensure it's above the text
     }
     
     // RTL support for fade effect
     [dir="rtl"] &::after {
       right: unset;
       left: 0;
-      background: linear-gradient(to left, transparent, var(--fade-color, currentColor));
+      background: linear-gradient(to right, 
+        var(--fade-background-color, lightgreen) 0%, 
+        var(--fade-background-color, lightgreen) 30%,
+        transparent 100%
+      );
     }
   }
 }

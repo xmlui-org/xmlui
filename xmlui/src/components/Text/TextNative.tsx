@@ -47,6 +47,17 @@ export const Text = forwardRef(function Text(
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
+  // For fade behavior, dynamically set the CSS custom property from computed styles
+  useLayoutEffect(() => {
+    if (overflowBehavior === "fade" && innerRef.current) {
+      const computedStyle = window.getComputedStyle(innerRef.current);
+      const backgroundColor = computedStyle.backgroundColor;
+      if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") {
+        innerRef.current.style.setProperty("--fade-background-color", backgroundColor);
+      }
+    }
+  }, [overflowBehavior]);
+
     // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props
   const { syntaxHighlightClasses, ...restVariantSpecificProps } = variantSpecificProps;
@@ -68,9 +79,6 @@ export const Text = forwardRef(function Text(
     }
     
     switch (overflowBehavior) {
-      case "wrap":
-        classes[styles.overflowWrap] = true;
-        break;
       case "none":
         // For "none" behavior, use simple overflow settings
         classes[styles.overflowNone] = true;
@@ -135,7 +143,9 @@ export const Text = forwardRef(function Text(
           )}
           style={{
             ...style,
-            ...getMaxLinesStyle(maxLines),
+            // Apply maxLines style for "ellipsis" and "fade" behaviors, and default behavior
+            // "none" and "scroll" should ignore maxLines
+            ...(overflowBehavior === "ellipsis" || overflowBehavior === "fade" || (!overflowBehavior && maxLines) ? getMaxLinesStyle(maxLines) : {}),
           }}
         >
           {children}

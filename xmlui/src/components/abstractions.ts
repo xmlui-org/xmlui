@@ -339,10 +339,9 @@ export type TextVariant = (typeof TextVariantKeys)[number];
 
 // --- overflow behavior for text components
 const OverflowBehaviorKeys = [
-  "wrap", // Wraps text naturally at word boundaries (like white-space: normal)
-  "none", // No wrapping, text stays on a single line (like white-space: nowrap)
+  "none", // Clips text cleanly without ellipsis when maxLines is reached
   "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
-  "scroll", // Enables horizontal scrolling (overflow: auto)
+  "scroll", // Enables horizontal scrolling (overflow: auto), ignores maxLines
   "fade", // Uses a fading effect at the end of the text instead of an ellipsis
 ] as const;
 export type OverflowBehavior = (typeof OverflowBehaviorKeys)[number];

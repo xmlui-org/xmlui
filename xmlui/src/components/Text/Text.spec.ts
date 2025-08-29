@@ -283,18 +283,6 @@ test.describe("Visual States", () => {
 // =============================================================================
 
 test.describe("Overflow Behavior", () => {
-  test('overflowBehavior="wrap" allows natural text wrapping', async ({ initTestBed, createTextDriver }) => {
-    await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="wrap">
-        This is a very long text that should wrap naturally across multiple lines when the container is narrow.
-      </Text>
-    `);
-    const driver = await createTextDriver("text");
-    
-    await expect(driver.component).toHaveCSS("white-space", "normal");
-    await expect(driver.component).toHaveCSS("overflow", "visible");
-  });
-
   test('overflowBehavior="none" allows wrapping with no overflow indicator', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowBehavior="none">
@@ -357,38 +345,89 @@ test.describe("Overflow Behavior", () => {
 
   test('overflowBehavior="fade" applies fade effect', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="fade">
-        This is a very long text that should show a fade effect when it overflows.
+      <Text testId="text" width="200px" overflowBehavior="fade" maxLines="2" backgroundColor="lightblue">
+        This is a very long text that should show a fade effect at the end when it overflows across multiple lines.
       </Text>
     `);
     const driver = await createTextDriver("text");
     
-    await expect(driver.component).toHaveCSS("white-space", "nowrap");
+    // Should allow normal text wrapping and hide overflow
     await expect(driver.component).toHaveCSS("overflow", "hidden");
     await expect(driver.component).toHaveCSS("position", "relative");
+    
+    // Should have the correct background color applied
+    await expect(driver.component).toHaveCSS("background-color", "lightblue");
+    
+    // Verify the pseudo-element exists (indirectly by checking for fade styles)
+    const computedStyle = await driver.component.evaluate(el => {
+      const afterStyle = getComputedStyle(el, '::after');
+      return afterStyle.content;
+    });
+    expect(computedStyle).toBe('""'); // Empty string content means pseudo-element exists
+    
+    // Check that the CSS custom property is set dynamically
+    const fadeColor = await driver.component.evaluate(el => {
+      // Wait a bit for useLayoutEffect to run
+      return new Promise(resolve => {
+        setTimeout(() => {
+          const computedValue = getComputedStyle(el).getPropertyValue('--fade-background-color');
+          resolve(computedValue);
+        }, 100);
+      });
+    });
+    expect(fadeColor).toContain("lightblue");
   });
 
   test("overflowBehavior works with maxLines", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
-        <Text testId="wrapText" width="200px" overflowBehavior="wrap" maxLines="2">
-          This is a very long text that should wrap naturally but be limited to 2 lines with line-clamp.
+        <Text testId="ellipsisText" width="200px" overflowBehavior="ellipsis" maxLines="2">
+          This is a very long text that should be limited to 2 lines with line-clamp and show ellipsis.
         </Text>
-        <Text testId="scrollText" width="200px" overflowBehavior="scroll" maxLines="2">
-          This is a very long text that should scroll horizontally but be limited to 2 lines vertically.
+        <Text testId="fadeText" width="200px" overflowBehavior="fade" maxLines="2">
+          This is a very long text that should be limited to 2 lines with line-clamp and show fade effect.
         </Text>
       </VStack>
     `);
-    const wrapDriver = await createTextDriver("wrapText");
-    const scrollDriver = await createTextDriver("scrollText");
+    const ellipsisDriver = await createTextDriver("ellipsisText");
+    const fadeDriver = await createTextDriver("fadeText");
     
-    // Both should respect maxLines with line-clamp
-    await expect(wrapDriver.component).toHaveCSS("-webkit-line-clamp", "2");
-    await expect(scrollDriver.component).toHaveCSS("-webkit-line-clamp", "2");
+    // Both ellipsis and fade should respect maxLines with line-clamp
+    await expect(ellipsisDriver.component).toHaveCSS("-webkit-line-clamp", "2");
+    await expect(fadeDriver.component).toHaveCSS("-webkit-line-clamp", "2");
     
-    // But different overflow behaviors
-    await expect(wrapDriver.component).toHaveCSS("white-space", "normal");
-    await expect(scrollDriver.component).toHaveCSS("overflow-x", "auto");
+    // Different overflow behaviors
+    await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(fadeDriver.component).toHaveCSS("position", "relative");
+  });
+
+  test("overflowBehavior='scroll' ignores maxLines", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="scrollWithMaxLines" width="150px" overflowBehavior="scroll" maxLines="2">
+          This is a very long text that should scroll horizontally and completely ignore the maxLines property.
+        </Text>
+        <Text testId="scrollWithoutMaxLines" width="150px" overflowBehavior="scroll">
+          This is a very long text that should scroll horizontally without any maxLines property.
+        </Text>
+      </VStack>
+    `);
+    const scrollWithMaxLinesDriver = await createTextDriver("scrollWithMaxLines");
+    const scrollWithoutMaxLinesDriver = await createTextDriver("scrollWithoutMaxLines");
+    
+    // Both should have the same behavior - no line-clamp applied
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    
+    // Both should have scroll behavior
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
+    
+    // Neither should use text-overflow ellipsis
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
   });
 
   test("overflowBehavior respects ellipses property for ellipsis behavior", async ({ initTestBed, createTextDriver }) => {
