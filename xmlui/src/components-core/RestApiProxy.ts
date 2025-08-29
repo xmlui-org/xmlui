@@ -110,6 +110,20 @@ function appendFormFieldValue(
   }
 }
 
+
+const origin = typeof window !== "undefined" && (window.location.href || 'http://localhost');
+const originUrl = new URL(origin);
+function isURLSameOrigin(url: string): boolean {
+  const urlObj = new URL(url, origin);
+
+  return (
+    originUrl.protocol === urlObj.protocol &&
+    originUrl.host === urlObj.host &&
+    originUrl.port === urlObj.port
+  );
+  
+}
+
 export default class RestApiProxy {
   private config: RestAPIAdapterPropsV2;
   private appContext?: AppContextObject;
@@ -121,20 +135,11 @@ export default class RestApiProxy {
     this.appContext = appContext;
     this.apiInstance = apiInstance;
 
-    // const xsrfToken = readCookie("XSRF-TOKEN");
-    const xsrfHeaders =
-      // xsrfToken
-      // ? {
-      //     "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
-      //   }
-      // :
-      {};
     this.config = {
       apiUrl,
       errorResponseTransform,
       headers: {
         ...appContext?.appGlobals?.headers,
-        ...xsrfHeaders,
       },
     };
   }
@@ -382,12 +387,21 @@ export default class RestApiProxy {
   }) => {
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
+    let url = this.generateFullApiUrl(relativePath, queryParams);
+
     const aggregatedHeaders = omitBy(
       { ...(body ? this.getHeaders() : headersWithoutContentType), ...headers },
       isUndefined,
     ) as Record<string, string>;
     if (includeClientTxId) {
       aggregatedHeaders["x-ue-client-tx-id"] = transactionId;
+    }
+
+    if (this.appContext.appGlobals?.withXSRFToken !== false && isURLSameOrigin(url)) {
+      const xsrfToken = readCookie("XSRF-TOKEN");
+      if(xsrfToken) {
+        aggregatedHeaders["X-XSRF-TOKEN"] = readCookie("XSRF-TOKEN");
+      }
     }
 
     let requestBody;
@@ -419,7 +433,6 @@ export default class RestApiProxy {
       signal: abortSignal,
       body: requestBody,
     };
-    let url = this.generateFullApiUrl(relativePath, queryParams);
     if (onUploadProgress) {
       console.log("Falling back to axios. Reason: onUploadProgress specified");
       const axios = (await import("axios")).default;
@@ -444,7 +457,7 @@ export default class RestApiProxy {
       }
     } else {
       let response;
-      if(this.apiInstance && this.apiInstance.hasMockForRequest(url, options)){
+      if (this.apiInstance && this.apiInstance.hasMockForRequest(url, options)) {
         response = await this.apiInstance.executeMockedFetch(url, options);
       } else {
         response = await fetch(url, options);

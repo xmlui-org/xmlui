@@ -4,7 +4,7 @@ import * as dropzone from "react-dropzone";
 import styles from "./FileUploadDropZone.module.scss";
 import classnames from "classnames";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { asyncNoop } from "../../components-core/constants";
 import { Icon } from "../Icon/IconNative";
@@ -25,6 +25,7 @@ type Props = {
   allowPaste?: boolean;
   text?: string;
   disabled?: boolean;
+  updateState?: UpdateStateFn;
 };
 
 export const defaultProps: Pick<Props, "onUpload" | "uid" | "allowPaste" | "text" | "disabled"> = {
@@ -46,6 +47,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     allowPaste = defaultProps.allowPaste,
     text = defaultProps.text,
     disabled = defaultProps.disabled,
+    updateState,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -55,9 +57,12 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
       if (!acceptedFiles.length) {
         return;
       }
+      updateState?.({
+        value: acceptedFiles,
+      });
       onUpload?.(acceptedFiles);
     },
-    [onUpload],
+    [onUpload, updateState],
   );
 
   const { getRootProps, getInputProps, isDragActive, open, inputRef } = useDropzone({

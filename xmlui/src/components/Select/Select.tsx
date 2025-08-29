@@ -44,6 +44,10 @@ export const SelectMd = createMetadata({
       defaultValue: defaultProps.placeholder,
     },
     initialValue: dInitialValue(),
+    value: {
+      description: "This property sets the current value of the component.",
+      isInternal: true  //TODO illesg temp
+    },
     autoFocus: {
       ...dAutoFocus(),
       defaultValue: defaultProps.autoFocus,
@@ -182,6 +186,7 @@ export const selectComponentRenderer = createComponentRenderer(
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
 
+    const isControlled = node.props.value !== undefined;
     return (
       <Select
         multiSelect={multiSelect}
@@ -191,10 +196,10 @@ export const selectComponentRenderer = createComponentRenderer(
           node.props.inProgressNotificationMessage,
         )}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        updateState={updateState}
+        updateState={isControlled ? undefined : updateState}
         searchable={searchable}
         initialValue={extractValue(node.props.initialValue)}
-        value={state?.value}
+        value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
