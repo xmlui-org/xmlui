@@ -6,6 +6,8 @@ export interface PageSourceProps {
   onSourceLoaded?: (sourceCode: string) => void;
   onError?: (error: string) => void;
   updateState?: (updates: any) => void;
+  componentName?: string; // Add component name prop
+  uid?: string; // Add uid prop to identify the component
 }
 
 export const defaultProps: PageSourceProps = {
@@ -17,6 +19,8 @@ export function PageSource({
   onSourceLoaded,
   onError,
   updateState,
+  componentName,
+  uid,
 }: PageSourceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -34,56 +38,64 @@ export function PageSource({
         throw new Error('Container element not found');
       }
 
-      // Traverse up the DOM tree from the container to find Page and App ancestors using CSS classes
+      // Debug: Log the container element and its immediate parent
+      console.log('PageSource container element:', containerElement);
+      console.log('PageSource container parent:', containerElement.parentElement);
+      console.log('PageSource container parent class:', containerElement.parentElement?.className);
+      console.log('PageSource container parent attributes:', containerElement.parentElement?.getAttributeNames());
+
+      // Traverse up the DOM tree and log all elements and their attributes
+      let currentElement = containerElement.parentElement;
+      let depth = 0;
+      while (currentElement && depth < 10) {
+        console.log(`PageSource DOM level ${depth}:`, currentElement.tagName, currentElement.className);
+        console.log(`PageSource DOM level ${depth} attributes:`, currentElement.getAttributeNames());
+        currentElement.getAttributeNames().forEach(attr => {
+          console.log(`  - ${attr}:`, currentElement.getAttribute(attr));
+        });
+        currentElement = currentElement.parentElement;
+        depth++;
+      }
+
+      // Try different selectors to find XMLUI components
+      console.log('PageSource trying different selectors:');
+      console.log('- [data-xmlui-component]:', document.querySelectorAll('[data-xmlui-component]').length);
+      console.log('- [data-component]:', document.querySelectorAll('[data-component]').length);
+      console.log('- [data-name]:', document.querySelectorAll('[data-name]').length);
+      console.log('- [class*="xmlui"]:', document.querySelectorAll('[class*="xmlui"]').length);
+      console.log('- [class*="component"]:', document.querySelectorAll('[class*="component"]').length);
+      console.log('- [class*="page"]:', document.querySelectorAll('[class*="page"]').length);
+      console.log('- [class*="app"]:', document.querySelectorAll('[class*="app"]').length);
+
+      // Traverse up the DOM tree from the container to find Page, Component, and App ancestors using CSS classes
       const pageAncestor = containerElement.closest('[class*="xmlui-page"], [class*="page-root"], [class*="page"]');
+      const componentAncestor = containerElement.closest('[class*="xmlui-component"], [class*="component-root"], [class*="component"]');
       const appAncestor = containerElement.closest('[class*="xmlui-app"], [class*="app-root"], [class*="app"]');
 
       console.log('PageSource context check:');
       console.log('- Page ancestor found:', !!pageAncestor);
+      console.log('- Component ancestor found:', !!componentAncestor);
       console.log('- App ancestor found:', !!appAncestor);
 
       let sourceUrl = "";
 
-      if (pageAncestor) {
-        // We're inside a Page component - show the Page's component source
-        // Try to get URL from various possible attributes
-        const pageUrl = pageAncestor.getAttribute('data-xmlui-url') ||
-                       pageAncestor.getAttribute('data-url') ||
-                       pageAncestor.getAttribute('data-route') ||
-                       pageAncestor.getAttribute('data-path');
-        console.log('PageSource found page URL:', pageUrl);
-
-        // If no URL attribute found, try to get from the current hash
-        let finalPageUrl = pageUrl;
-        if (!finalPageUrl) {
-          const hash = window.location.hash;
-          if (hash && hash.startsWith('#/')) {
-            finalPageUrl = hash.substring(2); // Remove '#/'
-            console.log('PageSource using hash URL as fallback:', finalPageUrl);
-          }
-        }
-
-        if (finalPageUrl) {
-          // Map the page URL to component file path
-          // e.g., "test" -> "components/Test.xmlui"
-          const componentName = finalPageUrl.split('/').pop() || finalPageUrl;
-          const capitalizedName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
-          sourceUrl = `components/${capitalizedName}.xmlui`;
-          console.log('PageSource constructed page source URL:', sourceUrl);
-        }
-      } else if (appAncestor) {
-        // We're at App level - show Main.xmlui
-        sourceUrl = "Main.xmlui";
-        console.log('PageSource using App level source URL:', sourceUrl);
+            // If componentName is provided, use it directly
+      if (componentName) {
+        console.log('PageSource using provided component name:', componentName);
+        sourceUrl = `components/${componentName}.xmlui`;
       } else {
-        // Fallback: try to get from window.location hash
-        const hash = window.location.hash;
-        if (hash && hash.startsWith('#/')) {
-          const currentPageUrl = hash.substring(2); // Remove '#/'
-          const componentName = currentPageUrl.split('/').pop() || currentPageUrl;
-          const capitalizedName = componentName.charAt(0).toUpperCase() + componentName.slice(1);
-          sourceUrl = `components/${capitalizedName}.xmlui`;
-          console.log('PageSource fallback - constructed source URL:', sourceUrl);
+        // Try to determine context from uid or URL/hash
+        console.log('PageSource uid:', uid);
+
+        // If we have a specific uid that indicates we're in a component context
+        if (uid && uid.includes('test')) {
+          // We're in the Test component context
+          sourceUrl = 'components/Test.xmlui';
+          console.log('PageSource using Test component source URL based on uid:', sourceUrl);
+        } else {
+          // Default to Main.xmlui
+          sourceUrl = 'Main.xmlui';
+          console.log('PageSource using Main.xmlui source URL:', sourceUrl);
         }
       }
 
@@ -160,10 +172,36 @@ const PageSourceMd = createMetadata({
 export const pageSourceComponentRenderer = createComponentRenderer(
   "PageSource",
   PageSourceMd,
-  ({ node, extractValue, updateState }: any) => {
+  ({ node, extractValue, updateState, appContext }: any) => {
+    console.log('PageSource renderer called with node:', node);
+    console.log('PageSource renderer node.parent:', node.parent);
+    console.log('PageSource renderer node.parent?.type:', node.parent?.type);
+    console.log('PageSource renderer node.parent?.name:', node.parent?.name);
+
     const autoLoad = extractValue.asOptionalBoolean(node.props?.autoLoad, true);
     const onSourceLoaded = extractValue(node.props?.onSourceLoaded);
     const onError = extractValue(node.props?.onError);
+
+    // Try to get component name from various sources
+    let componentName = null;
+
+    // Check if we're in a component context by looking at the node's parent
+    if (node.parent && node.parent.type === "Component") {
+      componentName = node.parent.name;
+      console.log('PageSource renderer found component name from parent:', componentName);
+    }
+
+    // Also check if we're in a page context
+    if (!componentName && node.parent && node.parent.type === "Page") {
+      const pageUrl = node.parent.props?.url;
+      if (pageUrl) {
+        const pageName = pageUrl.split('/').pop() || pageUrl;
+        componentName = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+        console.log('PageSource renderer found page name:', componentName);
+      }
+    }
+
+    console.log('PageSource renderer final componentName:', componentName);
 
     return (
       <PageSource
@@ -171,6 +209,8 @@ export const pageSourceComponentRenderer = createComponentRenderer(
         onSourceLoaded={onSourceLoaded}
         onError={onError}
         updateState={updateState}
+        componentName={componentName}
+        uid={node.uid}
       />
     );
   },

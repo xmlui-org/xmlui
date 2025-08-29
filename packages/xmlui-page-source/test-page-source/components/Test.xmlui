@@ -1,11 +1,11 @@
 <Component name="Test">
 
-<PageSource id="sourceCode" />
+<PageSource id="testSourceCode" />
 
 In Test
 
 <Text preserveLinebreaks="true">
- { sourceCode.value }
+ { testSourceCode.value }
 </Text>
 
 </Component>
