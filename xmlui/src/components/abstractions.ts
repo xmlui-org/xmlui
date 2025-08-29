@@ -337,14 +337,14 @@ const TextVariantKeys = [
 ] as const;
 export type TextVariant = (typeof TextVariantKeys)[number];
 
-// --- overflow behavior for text components
-const OverflowBehaviorKeys = [
+// --- overflow mode for text components
+const OverflowModeKeys = [
   "none", // Clips text cleanly without ellipsis when maxLines is reached
   "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
   "scroll", // Enables horizontal scrolling (overflow: auto), ignores maxLines
   "fade", // Uses a fading effect at the end of the text instead of an ellipsis
 ] as const;
-export type OverflowBehavior = (typeof OverflowBehaviorKeys)[number];
+export type OverflowMode = (typeof OverflowModeKeys)[number];
 
 type TextPropertyValueDescription = PropertyValueDescription & {
   value: TextVariant;

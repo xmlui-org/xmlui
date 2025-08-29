@@ -291,28 +291,43 @@ $component: "Text";
       content: '';
       position: absolute;
       bottom: 0; // Position at bottom
-      right: 0;
+      right: 0; // Default LTR position
       width: 60px; // Fade area width
       height: 1.2em; // Only affect last line height
+      pointer-events: none;
+      z-index: 1; // Ensure it's above the text
+      
+      // Default LTR gradient
       background: linear-gradient(to left, 
         var(--fade-background-color, lightgreen) 0%, 
         var(--fade-background-color, lightgreen) 30%,
         transparent 100%
       );
-      pointer-events: none;
-      z-index: 1; // Ensure it's above the text
     }
     
-    // RTL support for fade effect
-    [dir="rtl"] &::after {
-      right: unset;
-      left: 0;
+    // RTL support using data attribute set by JavaScript
+    &[data-fade-direction="rtl"]::after {
+      right: auto !important;
+      left: 0 !important;
       background: linear-gradient(to right, 
         var(--fade-background-color, lightgreen) 0%, 
         var(--fade-background-color, lightgreen) 30%,
         transparent 100%
-      );
+      ) !important;
     }
+  }
+  
+  // Additional RTL support selectors as fallback
+  :global([dir="rtl"]) .overflowFade::after,
+  :global(.rtl) .overflowFade::after,
+  .overflowFade:global([dir="rtl"])::after {
+    right: auto !important;
+    left: 0 !important;
+    background: linear-gradient(to right, 
+      var(--fade-background-color, lightgreen) 0%, 
+      var(--fade-background-color, lightgreen) 30%,
+      transparent 100%
+    ) !important;
   }
 }
 

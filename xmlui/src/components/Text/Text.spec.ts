@@ -279,13 +279,13 @@ test.describe("Visual States", () => {
 });
 
 // =============================================================================
-// OVERFLOW BEHAVIOR TESTS
+// OVERFLOW MODE TESTS
 // =============================================================================
 
-test.describe("Overflow Behavior", () => {
-  test('overflowBehavior="none" allows wrapping with no overflow indicator', async ({ initTestBed, createTextDriver }) => {
+test.describe("Overflow Mode", () => {
+  test('overflowMode="none" allows wrapping with no overflow indicator', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="none">
+      <Text testId="text" width="200px" overflowMode="none">
         This is a very long text that should wrap naturally and show no ellipsis.
       </Text>
     `);
@@ -296,9 +296,9 @@ test.describe("Overflow Behavior", () => {
     await expect(driver.component).toHaveCSS("overflow", "hidden");
   });
 
-  test('overflowBehavior="none" with maxLines clips text at specified line count', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="none" with maxLines clips text at specified line count', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="none" maxLines="2">
+      <Text testId="text" width="200px" overflowMode="none" maxLines="2">
         This is a long-long-long text that should be simply cut at the end of the second line without any ellipsis or other overflow indicator.
       </Text>
     `);
@@ -318,9 +318,9 @@ test.describe("Overflow Behavior", () => {
     await expect(driver.component).toContainText("This is a long-long-long text");
   });
 
-  test('overflowBehavior="ellipsis" shows ellipsis when text overflows (default)', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="ellipsis" shows ellipsis when text overflows (default)', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="ellipsis" maxLines="1">
+      <Text testId="text" width="200px" overflowMode="ellipsis" maxLines="1">
         This is a very long text that should show ellipsis when it overflows.
       </Text>
     `);
@@ -330,9 +330,9 @@ test.describe("Overflow Behavior", () => {
     await expect(driver.component).toHaveCSS("overflow", "hidden");
   });
 
-  test('overflowBehavior="scroll" enables horizontal scrolling', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="scroll" enables horizontal scrolling', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="scroll">
+      <Text testId="text" width="200px" overflowMode="scroll">
         This is a very long text that should enable horizontal scrolling when it overflows the container width.
       </Text>
     `);
@@ -343,9 +343,9 @@ test.describe("Overflow Behavior", () => {
     await expect(driver.component).toHaveCSS("overflow-y", "hidden");
   });
 
-  test('overflowBehavior="fade" applies fade effect', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="fade" applies fade effect', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
-      <Text testId="text" width="200px" overflowBehavior="fade" maxLines="2" backgroundColor="lightblue">
+      <Text testId="text" width="200px" overflowMode="fade" maxLines="2" backgroundColor="lightblue">
         This is a very long text that should show a fade effect at the end when it overflows across multiple lines.
       </Text>
     `);
@@ -356,7 +356,7 @@ test.describe("Overflow Behavior", () => {
     await expect(driver.component).toHaveCSS("position", "relative");
     
     // Should have the correct background color applied
-    await expect(driver.component).toHaveCSS("background-color", "lightblue");
+    await expect(driver.component).toHaveCSS("background-color", "rgb(173, 216, 230)"); // lightblue in RGB
     
     // Verify the pseudo-element exists (indirectly by checking for fade styles)
     const computedStyle = await driver.component.evaluate(el => {
@@ -375,16 +375,16 @@ test.describe("Overflow Behavior", () => {
         }, 100);
       });
     });
-    expect(fadeColor).toContain("lightblue");
+    expect(fadeColor).toContain("rgb(173, 216, 230)"); // lightblue in RGB
   });
 
-  test("overflowBehavior works with maxLines", async ({ initTestBed, createTextDriver }) => {
+  test("overflowMode works with maxLines", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
-        <Text testId="ellipsisText" width="200px" overflowBehavior="ellipsis" maxLines="2">
+        <Text testId="ellipsisText" width="200px" overflowMode="ellipsis" maxLines="2">
           This is a very long text that should be limited to 2 lines with line-clamp and show ellipsis.
         </Text>
-        <Text testId="fadeText" width="200px" overflowBehavior="fade" maxLines="2">
+        <Text testId="fadeText" width="200px" overflowMode="fade" maxLines="2">
           This is a very long text that should be limited to 2 lines with line-clamp and show fade effect.
         </Text>
       </VStack>
@@ -401,13 +401,13 @@ test.describe("Overflow Behavior", () => {
     await expect(fadeDriver.component).toHaveCSS("position", "relative");
   });
 
-  test("overflowBehavior='scroll' ignores maxLines", async ({ initTestBed, createTextDriver }) => {
+  test("overflowMode='scroll' ignores maxLines", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
-        <Text testId="scrollWithMaxLines" width="150px" overflowBehavior="scroll" maxLines="2">
+        <Text testId="scrollWithMaxLines" width="150px" overflowMode="scroll" maxLines="2">
           This is a very long text that should scroll horizontally and completely ignore the maxLines property.
         </Text>
-        <Text testId="scrollWithoutMaxLines" width="150px" overflowBehavior="scroll">
+        <Text testId="scrollWithoutMaxLines" width="150px" overflowMode="scroll">
           This is a very long text that should scroll horizontally without any maxLines property.
         </Text>
       </VStack>
@@ -430,13 +430,13 @@ test.describe("Overflow Behavior", () => {
     await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
   });
 
-  test("overflowBehavior respects ellipses property for ellipsis behavior", async ({ initTestBed, createTextDriver }) => {
+  test("overflowMode respects ellipses property for ellipsis behavior", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
-        <Text testId="withEllipses" width="200px" overflowBehavior="ellipsis" ellipses="true" maxLines="1">
+        <Text testId="withEllipses" width="200px" overflowMode="ellipsis" ellipses="true" maxLines="1">
           This text should show ellipses.
         </Text>
-        <Text testId="withoutEllipses" width="200px" overflowBehavior="ellipsis" ellipses="false" maxLines="1">
+        <Text testId="withoutEllipses" width="200px" overflowMode="ellipsis" ellipses="false" maxLines="1">
           This text should not show ellipses.
         </Text>
       </VStack>
@@ -448,13 +448,13 @@ test.describe("Overflow Behavior", () => {
     await expect(withoutEllipsesDriver.component).toHaveCSS("text-overflow", "clip");
   });
 
-  test('overflowBehavior="ellipsis" works with multi-line text (maxLines > 1)', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="ellipsis" works with multi-line text (maxLines > 1)', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
-        <Text testId="singleLine" width="150px" overflowBehavior="ellipsis" maxLines="1">
+        <Text testId="singleLine" width="150px" overflowMode="ellipsis" maxLines="1">
           This is a very long text that should be truncated to a single line with ellipsis.
         </Text>
-        <Text testId="multiLine" width="150px" overflowBehavior="ellipsis" maxLines="2">
+        <Text testId="multiLine" width="150px" overflowMode="ellipsis" maxLines="2">
           This is a very long text that should wrap to exactly two lines and then be truncated with ellipsis if there's more content that doesn't fit.
         </Text>
       </VStack>
@@ -528,9 +528,11 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toContainText("Mixed content:");
   });
 
-  // TODO: create tests with multiple variants
-  test.skip("nested Texts", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {
-    await initTestBed(`<Text><Text></Text></Text>`);
+  test("nested Texts", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text>abc<Text>def</Text>ghi</Text>`);
+    
+    // Check if the page displays the combined text "abcdefghi"
+    await expect(page.locator('body')).toContainText("abcdefghi");
   });
 });
 

@@ -7,7 +7,7 @@ import classnames from "classnames";
 import styles from "./Text.module.scss";
 
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
-import { type TextVariant, TextVariantElement, type OverflowBehavior } from "../abstractions";
+import { type TextVariant, TextVariantElement, type OverflowMode } from "../abstractions";
 
 type TextProps = {
   uid?: string;
@@ -16,7 +16,7 @@ type TextProps = {
   maxLines?: number;
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
-  overflowBehavior?: OverflowBehavior;
+  overflowMode?: OverflowMode;
   style?: CSSProperties;
   className?: string;
   [variantSpecificProps: string]: any;
@@ -26,7 +26,7 @@ export const defaultProps = {
   maxLines: 0,
   preserveLinebreaks: false,
   ellipses: true,
-  overflowBehavior: undefined as OverflowBehavior | undefined,
+  overflowMode: undefined as OverflowMode | undefined,
 };
 
 export const Text = forwardRef(function Text(
@@ -39,7 +39,7 @@ export const Text = forwardRef(function Text(
     children,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
-    overflowBehavior = defaultProps.overflowBehavior,
+    overflowMode = defaultProps.overflowMode,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef,
@@ -47,16 +47,22 @@ export const Text = forwardRef(function Text(
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
-  // For fade behavior, dynamically set the CSS custom property from computed styles
+  // For fade mode, dynamically set the CSS custom property from computed styles
   useLayoutEffect(() => {
-    if (overflowBehavior === "fade" && innerRef.current) {
+    if (overflowMode === "fade" && innerRef.current) {
       const computedStyle = window.getComputedStyle(innerRef.current);
       const backgroundColor = computedStyle.backgroundColor;
       if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") {
         innerRef.current.style.setProperty("--fade-background-color", backgroundColor);
       }
+      
+      // Also detect RTL direction and add a data attribute for CSS targeting
+      const direction = computedStyle.direction || 
+                       getComputedStyle(document.documentElement).direction ||
+                       'ltr';
+      innerRef.current.dataset.fadeDirection = direction;
     }
-  }, [overflowBehavior]);
+  }, [overflowMode]);
 
     // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props
@@ -67,20 +73,20 @@ export const Text = forwardRef(function Text(
     return TextVariantElement[variant];
   }, [variant]);
 
-  // Determine overflow behavior classes based on overflowBehavior and existing props
+  // Determine overflow mode classes based on overflowMode and existing props
   const overflowClasses = useMemo(() => {
     const classes: Record<string, boolean> = {};
     
-    // If overflowBehavior is not explicitly set, use original behavior
-    if (!overflowBehavior) {
+    // If overflowMode is not explicitly set, use original behavior
+    if (!overflowMode) {
       classes[styles.truncateOverflow] = maxLines > 0;
       classes[styles.noEllipsis] = !ellipses;
       return classes;
     }
     
-    switch (overflowBehavior) {
+    switch (overflowMode) {
       case "none":
-        // For "none" behavior, use simple overflow settings
+        // For "none" mode, use simple overflow settings
         classes[styles.overflowNone] = true;
         break;
       case "scroll":
@@ -97,12 +103,12 @@ export const Text = forwardRef(function Text(
     }
     
     return classes;
-  }, [overflowBehavior, maxLines, ellipses]);
+  }, [overflowMode, maxLines, ellipses]);
 
   return (
     <>
-      {overflowBehavior === "none" && maxLines && maxLines > 0 ? (
-        // Wrapper for "none" behavior with maxLines for precise height control
+      {overflowMode === "none" && maxLines && maxLines > 0 ? (
+        // Wrapper for "none" mode with maxLines for precise height control
         <div
           style={{
             maxHeight: `${maxLines * 1.5}em`, // Use a more generous multiplier
@@ -143,9 +149,9 @@ export const Text = forwardRef(function Text(
           )}
           style={{
             ...style,
-            // Apply maxLines style for "ellipsis" and "fade" behaviors, and default behavior
+            // Apply maxLines style for "ellipsis" and "fade" modes, and default behavior
             // "none" and "scroll" should ignore maxLines
-            ...(overflowBehavior === "ellipsis" || overflowBehavior === "fade" || (!overflowBehavior && maxLines) ? getMaxLinesStyle(maxLines) : {}),
+            ...(overflowMode === "ellipsis" || overflowMode === "fade" || (!overflowMode && maxLines) ? getMaxLinesStyle(maxLines) : {}),
           }}
         >
           {children}

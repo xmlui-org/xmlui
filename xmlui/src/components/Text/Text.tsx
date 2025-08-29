@@ -2,7 +2,7 @@ import styles from "./Text.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowBehavior } from "../abstractions";
+import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowMode } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
 import { createMetadata, d } from "../metadata-helpers";
 
@@ -43,7 +43,7 @@ export const TextMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.ellipses,
     },
-    overflowBehavior: {
+    overflowMode: {
       description:
         "This property controls how text overflow is handled. " +
         "`none` prevents wrapping and shows no overflow indicator, " +
@@ -139,7 +139,7 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, className, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, ellipses, overflowBehavior, value, ...variantSpecific } =
+    const { variant, maxLines, preserveLinebreaks, ellipses, overflowMode, value, ...variantSpecific } =
       node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
@@ -158,7 +158,7 @@ export const textComponentRenderer = createComponentRenderer(
           defaultProps.preserveLinebreaks,
         )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
-        overflowBehavior={extractValue(overflowBehavior) as OverflowBehavior | undefined}
+        overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}
