@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.10.3
+
+### Patch Changes
+
+- 2e512bb: Add solid overflow handling modes to Text
+- 46d1d18: Remove the "codefence" Text variant
+- 6bc9ed1: feat: support aligning cells in a Table row vertically
+- 0b1f983: Add new, compound layout property name parsing
+- a2637f3: Text is displayed as inline (you can nest Text into Text)
+- eb4d592: Adding the "part" concept to native components
+
 ## 0.10.2
 
 ### Patch Changes
