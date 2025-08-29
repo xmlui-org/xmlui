@@ -265,3 +265,152 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 | `paragraph` | p         |
 
 %-PROP-END
+
+%-PROP-START overflowMode
+
+```xmlui-pg copy display name="Example: overflowMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="none"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        overflowMode="none"
+        maxLines="2">
+        This is a very long text that will be clipped cleanly without 
+        any overflow indicator when it exceeds the specified lines.
+      </Text>
+    </VStack>
+
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="ellipsis" (default)</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightblue"
+        padding="8px"
+        overflowMode="ellipsis"
+        maxLines="1">
+        This is a very long text that will show ellipsis when it 
+        overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="scroll"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        overflowMode="scroll">
+        This is a very long text that will enable horizontal scrolling 
+        when it overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow"</Text>
+      <Text
+        width="200px"
+        height="100px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        overflowMode="flow">
+        This is a very long text that will wrap to multiple lines and show 
+        a vertical scrollbar when the content exceeds the container height. 
+        This mode ignores maxLines and allows unlimited text wrapping with 
+        vertical scrolling when needed.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="flow" (no height constraint)</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightpink"
+        padding="8px"
+        overflowMode="flow">
+        This is a very long text that demonstrates flow mode without a 
+        height constraint. The text will wrap to multiple lines naturally 
+        and the container will grow to accommodate all the content. No 
+        scrollbar will appear since there's no height limitation - the text 
+        flows freely across as many lines as needed.
+      </Text>
+    </VStack>
+  </VStack>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START breakMode
+
+```xmlui-pg copy display name="Example: breakMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="normal" (default)</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightblue"
+        padding="8px"
+        breakMode="normal">
+        This text uses standardwordbreaking at natural boundaries 
+        like spaces and hyphens.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="word"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        breakMode="word">
+        This text will breakverylongwordswhenneeded to prevent 
+        overflow while preserving readability.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="anywhere"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        breakMode="anywhere">
+        Thistext willbreakanywhereif neededtofit thecontainer 
+        eveninthe middleofwords.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="keep"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        breakMode="keep">
+        This text will keep verylongwords intact and prevent 
+        breaking within words entirely.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="hyphenate"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lavender"
+        padding="8px"
+        breakMode="hyphenate"
+        lang="en">
+        This text uses automatic hyphenation for 
+        supercalifragilisticexpialidocious words.
+      </Text>
+    </VStack>
+  </VStack>
+</App>
+```
+
+%-PROP-END

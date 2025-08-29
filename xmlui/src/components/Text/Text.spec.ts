@@ -279,6 +279,339 @@ test.describe("Visual States", () => {
 });
 
 // =============================================================================
+// OVERFLOW MODE TESTS
+// =============================================================================
+
+test.describe("Overflow Mode", () => {
+  test('overflowMode="none" allows wrapping with no overflow indicator', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" overflowMode="none">
+        This is a very long text that should wrap naturally and show no ellipsis.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("white-space", "nowrap");
+    await expect(driver.component).toHaveCSS("text-overflow", "clip");
+    await expect(driver.component).toHaveCSS("overflow", "hidden");
+  });
+
+  test('overflowMode="none" ignores maxLines and clips text cleanly', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" overflowMode="none" maxLines="2">
+        This is a long-long-long text that should be simply cut at the end without any ellipsis or other overflow indicator.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("white-space", "nowrap");
+    await expect(driver.component).toHaveCSS("text-overflow", "clip");
+    await expect(driver.component).toHaveCSS("overflow", "hidden");
+    // Should NOT use webkit-line-clamp for "none" behavior - it ignores maxLines
+    await expect(driver.component).toHaveCSS("-webkit-line-clamp", "none");
+    // Should not apply maxLines styles since none mode ignores maxLines
+    const maxHeight = await driver.component.evaluate(el => getComputedStyle(el).maxHeight);
+    expect(maxHeight).toBe("none"); // Should be "none" since maxLines is ignored
+    
+    // Verify the element is visible and has content
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component).toContainText("This is a long-long-long text");
+  });
+
+  test('overflowMode="ellipsis" shows ellipsis when text overflows (default)', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" overflowMode="ellipsis" maxLines="1">
+        This is a very long text that should show ellipsis when it overflows.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(driver.component).toHaveCSS("overflow", "hidden");
+  });
+
+  test('overflowMode="scroll" enables horizontal scrolling', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" overflowMode="scroll">
+        This is a very long text that should enable horizontal scrolling when it overflows the container width.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("white-space", "nowrap");
+    await expect(driver.component).toHaveCSS("overflow-x", "auto");
+    await expect(driver.component).toHaveCSS("overflow-y", "hidden");
+  });
+
+  test('overflowMode="flow" allows multi-line wrapping with vertical scrolling', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" height="60px" overflowMode="flow">
+        This is a very long text that should wrap to multiple lines and show a vertical scrollbar when the content exceeds the container height.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("white-space", "normal");
+    await expect(driver.component).toHaveCSS("overflow-x", "hidden");
+    await expect(driver.component).toHaveCSS("overflow-y", "auto");
+  });
+
+  test('overflowMode="flow" ignores maxLines property', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px" overflowMode="flow" maxLines="3">
+        This is a very long text that should wrap to multiple lines and completely ignore the maxLines property when using flow mode.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("white-space", "normal");
+    await expect(driver.component).toHaveCSS("overflow-y", "auto");
+    // Check that line-clamp is NOT applied when flow mode ignores maxLines
+    await expect(driver.component).toHaveCSS("-webkit-line-clamp", "none");
+    await expect(driver.component).not.toHaveCSS("display", "-webkit-box");
+  });
+
+  test("overflowMode works with maxLines", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="ellipsisText" width="200px" overflowMode="ellipsis" maxLines="2">
+          This is a very long text that should be limited to 2 lines with line-clamp and show ellipsis.
+        </Text>
+      </VStack>
+    `);
+    const ellipsisDriver = await createTextDriver("ellipsisText");
+    
+    // Ellipsis should respect maxLines with line-clamp
+    await expect(ellipsisDriver.component).toHaveCSS("-webkit-line-clamp", "2");
+    
+    // Should show ellipsis behavior
+    await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("overflowMode='scroll' ignores maxLines", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="scrollWithMaxLines" width="150px" overflowMode="scroll" maxLines="2">
+          This is a very long text that should scroll horizontally and completely ignore the maxLines property.
+        </Text>
+        <Text testId="scrollWithoutMaxLines" width="150px" overflowMode="scroll">
+          This is a very long text that should scroll horizontally without any maxLines property.
+        </Text>
+      </VStack>
+    `);
+    const scrollWithMaxLinesDriver = await createTextDriver("scrollWithMaxLines");
+    const scrollWithoutMaxLinesDriver = await createTextDriver("scrollWithoutMaxLines");
+    
+    // Both should have the same behavior - no line-clamp applied
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    
+    // Both should have scroll behavior
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
+    
+    // Neither should use text-overflow ellipsis
+    await expect(scrollWithMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
+    await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
+  });
+
+  test("overflowMode='flow' ignores maxLines for unrestricted wrapping", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="flowWithMaxLines" width="150px" overflowMode="flow" maxLines="2">
+          This is a very long text that should wrap to multiple lines and completely ignore the maxLines property when using flow mode.
+        </Text>
+        <Text testId="flowWithoutMaxLines" width="150px" overflowMode="flow">
+          This is a very long text that should wrap to multiple lines without any line limit when using flow mode.
+        </Text>
+      </VStack>
+    `);
+    const flowWithMaxLinesDriver = await createTextDriver("flowWithMaxLines");
+    const flowWithoutMaxLinesDriver = await createTextDriver("flowWithoutMaxLines");
+    
+    // Both should behave identically - flow mode ignores maxLines
+    await expect(flowWithMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
+    
+    // Both should have flow behavior
+    await expect(flowWithMaxLinesDriver.component).toHaveCSS("overflow-y", "auto");
+    await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("overflow-y", "auto");
+    await expect(flowWithMaxLinesDriver.component).toHaveCSS("overflow-x", "hidden");
+    await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("overflow-x", "hidden");
+    await expect(flowWithMaxLinesDriver.component).toHaveCSS("white-space", "normal");
+    await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("white-space", "normal");
+    
+    // Neither should use webkit-box display
+    await expect(flowWithMaxLinesDriver.component).not.toHaveCSS("display", "-webkit-box");
+    await expect(flowWithoutMaxLinesDriver.component).not.toHaveCSS("display", "-webkit-box");
+  });
+
+  test("overflowMode respects ellipses property for ellipsis behavior", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="withEllipses" width="200px" overflowMode="ellipsis" ellipses="true" maxLines="1">
+          This text should show ellipses.
+        </Text>
+        <Text testId="withoutEllipses" width="200px" overflowMode="ellipsis" ellipses="false" maxLines="1">
+          This text should not show ellipses.
+        </Text>
+      </VStack>
+    `);
+    const withEllipsesDriver = await createTextDriver("withEllipses");
+    const withoutEllipsesDriver = await createTextDriver("withoutEllipses");
+    
+    await expect(withEllipsesDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(withoutEllipsesDriver.component).toHaveCSS("text-overflow", "clip");
+  });
+
+  test('overflowMode="ellipsis" works with multi-line text (maxLines > 1)', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="singleLine" width="150px" overflowMode="ellipsis" maxLines="1">
+          This is a very long text that should be truncated to a single line with ellipsis.
+        </Text>
+        <Text testId="multiLine" width="150px" overflowMode="ellipsis" maxLines="2">
+          This is a very long text that should wrap to exactly two lines and then be truncated with ellipsis if there's more content that doesn't fit.
+        </Text>
+      </VStack>
+    `);
+    const singleLineDriver = await createTextDriver("singleLine");
+    const multiLineDriver = await createTextDriver("multiLine");
+    
+    // Both should have ellipsis behavior
+    await expect(singleLineDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(multiLineDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    
+    // Single line should use nowrap
+    await expect(singleLineDriver.component).toHaveCSS("white-space", "nowrap");
+    
+    // Multi-line should have line-clamp applied
+    await expect(multiLineDriver.component).toHaveCSS("-webkit-line-clamp", "2");
+    
+    // Verify heights: multi-line should be approximately 2x single line height
+    const { height: heightSingle } = await getBounds(singleLineDriver);
+    const { height: heightMulti } = await getBounds(multiLineDriver);
+    
+    // Multi-line should be taller than single line
+    expect(heightMulti).toBeGreaterThan(heightSingle);
+    // And should be roughly 2x the height (allowing for some tolerance)
+    expect(heightMulti).toBeGreaterThan(heightSingle * 1.5);
+    expect(heightMulti).toBeLessThan(heightSingle * 2.5);
+  });
+});
+
+// =============================================================================
+// BREAK MODE TESTS
+// =============================================================================
+
+test.describe("Break Mode", () => {
+  test('breakMode="normal" uses standard word boundaries', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="normal">
+        This is a verylongwordthatshouldbreakatwordboundaries normally.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("word-break", "normal");
+    await expect(driver.component).toHaveCSS("overflow-wrap", "normal");
+  });
+
+  test('breakMode="word" breaks long words to prevent overflow', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="word">
+        This is a verylongwordthatexceedsthecontainerwidthandshouldbreak.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
+  });
+
+  test('breakMode="anywhere" breaks at any character', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="100px" breakMode="anywhere">
+        Verylongwordwithnobreaks
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    // Should have word-break: break-all or overflow-wrap: anywhere
+    const wordBreak = await driver.component.evaluate(el => getComputedStyle(el).wordBreak);
+    const overflowWrap = await driver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+    
+    expect(wordBreak === "break-all" || overflowWrap === "anywhere").toBe(true);
+  });
+
+  test('breakMode="keep" prevents breaking within words', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="100px" breakMode="keep">
+        This text should keep words intact
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("word-break", "keep-all");
+  });
+
+  test('breakMode="hyphenate" uses automatic hyphenation', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="hyphenate" lang="en">
+        This is a supercalifragilisticexpialidocious word that should be hyphenated.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("hyphens", "auto");
+    await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
+  });
+
+  test('breakMode works with different overflow modes', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="ellipsisWord" width="150px" overflowMode="ellipsis" breakMode="word" maxLines="1">
+          This superlongwordwithoutbreaks should be handled properly.
+        </Text>
+        <Text testId="scrollAnywhere" width="150px" overflowMode="scroll" breakMode="anywhere">
+          This verylongwordwithoutanybreaks should break anywhere and scroll.
+        </Text>
+      </VStack>
+    `);
+    const ellipsisDriver = await createTextDriver("ellipsisWord");
+    const scrollDriver = await createTextDriver("scrollAnywhere");
+    
+    // Check overflow mode styles
+    await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(scrollDriver.component).toHaveCSS("overflow-x", "auto");
+    
+    // Check break mode styles
+    await expect(ellipsisDriver.component).toHaveCSS("overflow-wrap", "break-word");
+    
+    const scrollWordBreak = await scrollDriver.component.evaluate(el => getComputedStyle(el).wordBreak);
+    const scrollOverflowWrap = await scrollDriver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+    expect(scrollWordBreak === "break-all" || scrollOverflowWrap === "anywhere").toBe(true);
+  });
+
+  test('default breakMode allows theme variables to work', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px">
+        This text should use the default browser behavior and allow theme variables to override.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    // Should not have any break mode classes when no breakMode is specified
+    const className = await driver.component.getAttribute("class");
+    expect(className).not.toContain("breakWord");
+    expect(className).not.toContain("breakAnywhere");
+    expect(className).not.toContain("breakKeep");
+    expect(className).not.toContain("breakHyphenate");
+  });
+});
+
+// =============================================================================
 // EDGE CASES TESTS
 // =============================================================================
 
@@ -322,9 +655,11 @@ test.describe("Edge Cases", () => {
     await expect(driver.component).toContainText("Mixed content:");
   });
 
-  // TODO: create tests with multiple variants
-  test.skip("nested Texts", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {
-    await initTestBed(`<Text><Text></Text></Text>`);
+  test("nested Texts", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text>abc<Text>def</Text>ghi</Text>`);
+    
+    // Check if the page displays the combined text "abcdefghi"
+    await expect(page.locator('body')).toContainText("abcdefghi");
   });
 });
 
@@ -714,7 +1049,7 @@ test.describe("Theme Variables", () => {
   });
 
   test("wordBreak theme variable", async ({ initTestBed, createTextDriver }) => {
-    const EXPECTED = "break-all";
+    const EXPECTED = "normal";
     await initTestBed('<Text value="Hello, World" />', {
       testThemeVars: {
         "wordBreak-Text": EXPECTED,

@@ -245,6 +245,97 @@ $component: "Text";
   .noEllipsis {
     text-overflow: clip;
   }
+
+  // --- Overflow behavior classes
+  .overflowNone {
+    // Force single line as per metadata: "No wrapping, text stays on a single line"
+    white-space: nowrap;
+    // Hide overflow content
+    overflow: hidden;
+    // Use clip instead of ellipsis
+    text-overflow: clip;
+    // Constrain width
+    max-width: 100%;
+  }
+
+  .overflowScroll {
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: unset;
+    max-width: 100%;
+    
+    // Ensure scrollbar is visible when needed
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+  }
+
+  .overflowFlow {
+    // Allow text to wrap to multiple lines
+    white-space: normal;
+    // Hide horizontal overflow, show vertical scrollbar when needed
+    overflow-x: hidden;
+    overflow-y: auto;
+    // Disable text-overflow ellipsis since we want wrapping
+    text-overflow: unset;
+    // Constrain width but allow height to grow
+    max-width: 100%;
+    // Change display to block to respect width/height constraints
+    display: block;
+    // Ensure height constraint is respected in flex contexts
+    flex-shrink: 0;
+    flex-grow: 0;
+    // Use min-height instead of height to avoid conflicts
+    min-height: 0;
+    
+    // Style vertical scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+  }
+}
+
+// --- Break mode classes
+.breakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.breakWord {
+  overflow-wrap: break-word;
+}
+
+.breakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.breakKeep {
+  word-break: keep-all;
+}
+
+.breakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 :export {

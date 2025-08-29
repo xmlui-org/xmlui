@@ -336,6 +336,26 @@ const TextVariantKeys = [
   "secondary", // use a secondary text style
 ] as const;
 export type TextVariant = (typeof TextVariantKeys)[number];
+
+// --- overflow mode for text components
+const OverflowModeKeys = [
+  "none", // Clips text cleanly without ellipsis when maxLines is reached
+  "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
+  "scroll", // Enables horizontal scrolling (overflow: auto), ignores maxLines
+  "flow", // Breaks text into multiple lines with vertical scrolling when needed
+] as const;
+export type OverflowMode = (typeof OverflowModeKeys)[number];
+
+// --- break mode for text components
+const BreakModeKeys = [
+  "normal", // Uses standard word boundaries for breaking
+  "word", // Breaks long words when necessary to prevent overflow
+  "anywhere", // Breaks at any character if needed to fit content
+  "keep", // Prevents breaking within words entirely
+  "hyphenate", // Uses automatic hyphenation when breaking words
+] as const;
+export type BreakMode = (typeof BreakModeKeys)[number];
+
 type TextPropertyValueDescription = PropertyValueDescription & {
   value: TextVariant;
   description: string;
