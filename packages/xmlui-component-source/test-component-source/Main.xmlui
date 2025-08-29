@@ -1,5 +1,13 @@
 <App>
 
+<ComponentSource id="appSourceCode" />
+
+<Card>
+<Text preserveLinebreaks="true">
+ { appSourceCode.value }
+</Text>
+</Card>
+
 <NavPanel>
   <NavLink label="Home" to="/" />
   <NavLink label="Test" to="/test" />

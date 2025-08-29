@@ -83,7 +83,7 @@ export function ComponentSource({
         console.log('ComponentSource using provided component name:', componentName);
         sourceUrl = `components/${componentName}.xmlui`;
       } else {
-        // Try to determine context from uid or URL/hash
+        // Try to determine context from uid
         console.log('ComponentSource uid:', uid);
 
         // If we have a specific uid that indicates we're in a component context
@@ -91,6 +91,14 @@ export function ComponentSource({
           // We're in the Test component context
           sourceUrl = 'components/Test.xmlui';
           console.log('ComponentSource using Test component source URL based on uid:', sourceUrl);
+        } else if (uid && uid.includes('home')) {
+          // We're in the Home component context
+          sourceUrl = 'components/Home.xmlui';
+          console.log('ComponentSource using Home component source URL based on uid:', sourceUrl);
+        } else if (uid && uid.includes('app')) {
+          // We're in the App context
+          sourceUrl = 'Main.xmlui';
+          console.log('ComponentSource using App source URL:', sourceUrl);
         } else {
           // Default to Main.xmlui
           sourceUrl = 'Main.xmlui';
