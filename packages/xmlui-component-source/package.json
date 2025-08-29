@@ -1,5 +1,5 @@
 {
-  "name": "xmlui-page-source",
+  "name": "xmlui-component-source",
   "version": "0.1.0",
   "sideEffects": false,
   "type": "module",
@@ -14,12 +14,12 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "main": "./dist/xmlui-page-source.js",
-  "module": "./dist/xmlui-page-source.mjs",
+  "main": "./dist/xmlui-component-source.js",
+  "module": "./dist/xmlui-component-source.mjs",
   "exports": {
     ".": {
-      "import": "./dist/xmlui-page-source.mjs",
-      "require": "./dist/xmlui-page-source.js"
+      "import": "./dist/xmlui-component-source.mjs",
+      "require": "./dist/xmlui-component-source.js"
     },
     "./*.css": {
       "import": "./dist/*.css",
@@ -34,5 +34,5 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "PageSource component for XMLUI"
+  "description": "ComponentSource component for XMLUI"
 }

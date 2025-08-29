@@ -1,6 +1,6 @@
 <Component name="Test">
 
-<PageSource id="testSourceCode" />
+<ComponentSource id="testSourceCode" />
 
 In Test
 
