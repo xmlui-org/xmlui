@@ -4,8 +4,10 @@
 
 In Test
 
+<Card>
 <Text preserveLinebreaks="true">
  { testSourceCode.value }
 </Text>
+</Card>
 
 </Component>

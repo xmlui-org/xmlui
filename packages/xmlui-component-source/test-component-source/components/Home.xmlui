@@ -1,0 +1,13 @@
+<Component name="Home">
+
+<ComponentSource id="homeSourceCode" />
+
+In Home
+
+<Card>
+<Text preserveLinebreaks="true">
+ { homeSourceCode.value }
+</Text>
+</Card>
+
+</Component>

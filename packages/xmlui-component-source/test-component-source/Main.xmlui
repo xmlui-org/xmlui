@@ -1,13 +1,16 @@
 <App>
 
-In Main
-
-<ComponentSource id="sourceCode" />
-
-<Text preserveLinebreaks="true">
- { sourceCode.value }
-</Text>
-
-<Test />
+<NavPanel>
+  <NavLink label="Home" to="/" />
+  <NavLink label="Test" to="/test" />
+</NavPanel>
+<Pages>
+  <Page url="/">
+    <Home />
+  </Page>
+  <Page url="/test">
+    <Test />
+  </Page>
+</Pages>
 
 </App>
