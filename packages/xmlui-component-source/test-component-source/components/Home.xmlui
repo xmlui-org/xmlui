@@ -4,10 +4,12 @@
 
 In Home
 
+<!--
 <Card>
 <Text preserveLinebreaks="true">
  { homeSourceCode.value }
 </Text>
 </Card>
+-->
 
 </Component>
