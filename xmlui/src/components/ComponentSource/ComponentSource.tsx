@@ -8,8 +8,7 @@ export const ComponentSourceMd = createMetadata({
   status: "experimental",
   description:
     `The \`${COMP}\` component extracts and provides the source code of XMLUI components. ` +
-    `It uses the inspector's source extraction mechanisms to get the exact source code ` +
-    `of the current component or a specified component.`,
+    `It uses a naming convention to determine which component's source to extract.`,
   props: {
     autoLoad: {
       description: `Determines whether the component should automatically load the source code when mounted.`,
@@ -24,11 +23,6 @@ export const ComponentSourceMd = createMetadata({
       `Callback function that is called when an error occurs while loading the source code. ` +
       `Receives the error message as a parameter.`,
     ),
-    componentName: {
-      description: `The name of the component whose source code should be extracted. ` +
-        `If not provided, the component will try to determine the context from its uid.`,
-      valueType: "string",
-    },
   },
 });
 
@@ -78,3 +72,4 @@ export const componentSourceComponentRenderer = createComponentRenderer(
     );
   },
 );
+

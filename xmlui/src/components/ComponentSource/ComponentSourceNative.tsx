@@ -30,7 +30,7 @@ export function ComponentSource({
   const extractSourceCode = useMemo(() => {
     console.log('ComponentSource: Using file-based approach');
     return null; // Will be handled in fetchSourceCode
-  }, [componentName, uid]);
+  }, [componentName]);
 
     // Function to extract component source from file content
   const extractComponentFromFile = (fileContent: string, componentName: string): string => {
@@ -120,17 +120,17 @@ export function ComponentSource({
       // Determine which component to fetch
       let targetComponentName = componentName;
 
-              if (!targetComponentName) {
-          if (uid && uid.includes('app')) {
-            targetComponentName = 'Main';
-          } else if (uid) {
-            // Extract component name from uid (e.g., "testSourceCode" -> "Test")
-            const uidParts = uid.replace('SourceCode', '').split(/(?=[A-Z])/);
-            const lastPart = uidParts[uidParts.length - 1]; // Get the last part
-            // Capitalize the first letter to match the actual component name
-            targetComponentName = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
-          }
+      if (!targetComponentName) {
+        if (uid && (uid.includes('app') || uid.includes('App'))) {
+          targetComponentName = 'Main';
+        } else if (uid) {
+          // Extract component name from uid (e.g., "TestSourceCode" -> "Test")
+          const uidParts = uid.replace('SourceCode', '').split(/(?=[A-Z])/);
+          const lastPart = uidParts[uidParts.length - 1]; // Get the last part
+          // The component name should already be properly capitalized
+          targetComponentName = lastPart;
         }
+      }
 
       if (!targetComponentName) {
         throw new Error('Could not determine component name from context');

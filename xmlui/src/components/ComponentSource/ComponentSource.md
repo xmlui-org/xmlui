@@ -1,21 +1,21 @@
 # ComponentSource
 
-The `ComponentSource` component extracts and provides the source code of XMLUI components. It uses the inspector's source extraction mechanisms to get the exact source code of the current component or a specified component.
+The `ComponentSource` component extracts and provides the source code of XMLUI components. It uses a naming convention to determine which component's source to extract.
 
 ## Usage
 
 ```xmlui
 <App>
-  <!-- Display the current component's source -->
-  <ComponentSource id="sourceCode" />
+  <!-- Display the app source -->
+  <ComponentSource id="AppSourceCode" />
   <Text preserveLinebreaks="true">
-    { sourceCode.value }
+    { AppSourceCode.value }
   </Text>
 
-  <!-- Display a specific component's source -->
-  <ComponentSource id="testSource" componentName="Test" />
+  <!-- Display the test component source -->
+  <ComponentSource id="TestSourceCode" />
   <Text preserveLinebreaks="true">
-    { testSource.value }
+    { TestSourceCode.value }
   </Text>
 </App>
 ```
@@ -27,41 +27,46 @@ The `ComponentSource` component extracts and provides the source code of XMLUI c
 | `autoLoad` | `boolean` | `true` | Determines whether the component should automatically load the source code when mounted |
 | `onSourceLoaded` | `function` | - | Callback function called when source code is successfully loaded |
 | `onError` | `function` | - | Callback function called when an error occurs |
-| `componentName` | `string` | - | The name of the component whose source code should be extracted |
 
 ## Behavior
 
-- **Context Detection**: If no `componentName` is provided, the component tries to determine the context from its `uid` or parent component
+- **Naming Convention**: The component uses the ID pattern to determine which component to extract. Use `id="componentNameSourceCode"` where `componentName` is the name of the component whose source you want to extract.
 - **Source Extraction**: Uses the inspector's robust source extraction logic to get exact component boundaries
 - **Formatting**: Applies the same formatting as the inspector (removes empty lines, trims indentation, removes `inspect="true"`)
 - **Non-visual**: This component doesn't render anything visible, it only provides data through the binding system
+
+## Naming Convention
+
+The ComponentSource uses a simple naming convention to determine which component's source to extract:
+
+- `id="AppSourceCode"` → extracts Main.xmlui (the whole app)
+- `id="TestSourceCode"` → extracts Test component source
+- `id="HomeSourceCode"` → extracts Home component source
+- `id="MyComponentSourceCode"` → extracts MyComponent source
+
+The pattern is: `id="ComponentNameSourceCode"` where `ComponentName` is the name of the component whose source you want to extract (with proper capitalization).
 
 ## Examples
 
 ### Display App Source
 ```xmlui
-<ComponentSource id="appSource" />
+<ComponentSource id="AppSourceCode" />
 <Card>
   <Text preserveLinebreaks="true">
-    { appSource.value }
+    { AppSourceCode.value }
   </Text>
 </Card>
 ```
 
 ### Display Component Source
 ```xmlui
-<Component name="MyComponent">
-  <ComponentSource id="mySource" />
+<ComponentSource id="TestSourceCode" />
+<Card>
   <Text preserveLinebreaks="true">
-    { mySource.value }
+    { TestSourceCode.value }
   </Text>
-</Component>
+</Card>
 ```
 
-### Manual Component Specification
-```xmlui
-<ComponentSource id="otherSource" componentName="OtherComponent" />
-<Text preserveLinebreaks="true">
-  { otherSource.value }
-</Text>
-```
+
+
