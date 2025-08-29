@@ -330,7 +330,9 @@ function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; the
   const resetClassName = useStyles(themeVarReset, { prepend: true });
 
   return <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>
-    {children}
+    <div className={styles.content}>
+      {children}
+    </div>
   </div>
 }
 
