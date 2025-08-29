@@ -343,62 +343,21 @@ test.describe("Overflow Mode", () => {
     await expect(driver.component).toHaveCSS("overflow-y", "hidden");
   });
 
-  test('overflowMode="fade" applies fade effect', async ({ initTestBed, createTextDriver }) => {
-    await initTestBed(`
-      <Text testId="text" width="200px" overflowMode="fade" maxLines="2" backgroundColor="lightblue">
-        This is a very long text that should show a fade effect at the end when it overflows across multiple lines.
-      </Text>
-    `);
-    const driver = await createTextDriver("text");
-    
-    // Should allow normal text wrapping and hide overflow
-    await expect(driver.component).toHaveCSS("overflow", "hidden");
-    await expect(driver.component).toHaveCSS("position", "relative");
-    
-    // Should have the correct background color applied
-    await expect(driver.component).toHaveCSS("background-color", "rgb(173, 216, 230)"); // lightblue in RGB
-    
-    // Verify the pseudo-element exists (indirectly by checking for fade styles)
-    const computedStyle = await driver.component.evaluate(el => {
-      const afterStyle = getComputedStyle(el, '::after');
-      return afterStyle.content;
-    });
-    expect(computedStyle).toBe('""'); // Empty string content means pseudo-element exists
-    
-    // Check that the CSS custom property is set dynamically
-    const fadeColor = await driver.component.evaluate(el => {
-      // Wait a bit for useLayoutEffect to run
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const computedValue = getComputedStyle(el).getPropertyValue('--fade-background-color');
-          resolve(computedValue);
-        }, 100);
-      });
-    });
-    expect(fadeColor).toContain("rgb(173, 216, 230)"); // lightblue in RGB
-  });
-
   test("overflowMode works with maxLines", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <VStack>
         <Text testId="ellipsisText" width="200px" overflowMode="ellipsis" maxLines="2">
           This is a very long text that should be limited to 2 lines with line-clamp and show ellipsis.
         </Text>
-        <Text testId="fadeText" width="200px" overflowMode="fade" maxLines="2">
-          This is a very long text that should be limited to 2 lines with line-clamp and show fade effect.
-        </Text>
       </VStack>
     `);
     const ellipsisDriver = await createTextDriver("ellipsisText");
-    const fadeDriver = await createTextDriver("fadeText");
     
-    // Both ellipsis and fade should respect maxLines with line-clamp
+    // Ellipsis should respect maxLines with line-clamp
     await expect(ellipsisDriver.component).toHaveCSS("-webkit-line-clamp", "2");
-    await expect(fadeDriver.component).toHaveCSS("-webkit-line-clamp", "2");
     
-    // Different overflow behaviors
+    // Should show ellipsis behavior
     await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
-    await expect(fadeDriver.component).toHaveCSS("position", "relative");
   });
 
   test("overflowMode='scroll' ignores maxLines", async ({ initTestBed, createTextDriver }) => {
@@ -556,24 +515,24 @@ test.describe("Break Mode", () => {
         <Text testId="ellipsisWord" width="150px" overflowMode="ellipsis" breakMode="word" maxLines="1">
           This superlongwordwithoutbreaks should be handled properly.
         </Text>
-        <Text testId="fadeAnywhere" width="150px" overflowMode="fade" breakMode="anywhere" maxLines="2">
-          This verylongwordwithoutanybreaks should break anywhere and fade.
+        <Text testId="scrollAnywhere" width="150px" overflowMode="scroll" breakMode="anywhere">
+          This verylongwordwithoutanybreaks should break anywhere and scroll.
         </Text>
       </VStack>
     `);
     const ellipsisDriver = await createTextDriver("ellipsisWord");
-    const fadeDriver = await createTextDriver("fadeAnywhere");
+    const scrollDriver = await createTextDriver("scrollAnywhere");
     
     // Check overflow mode styles
     await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
-    await expect(fadeDriver.component).toHaveCSS("position", "relative");
+    await expect(scrollDriver.component).toHaveCSS("overflow-x", "auto");
     
     // Check break mode styles
     await expect(ellipsisDriver.component).toHaveCSS("overflow-wrap", "break-word");
     
-    const fadeWordBreak = await fadeDriver.component.evaluate(el => getComputedStyle(el).wordBreak);
-    const fadeOverflowWrap = await fadeDriver.component.evaluate(el => getComputedStyle(el).overflowWrap);
-    expect(fadeWordBreak === "break-all" || fadeOverflowWrap === "anywhere").toBe(true);
+    const scrollWordBreak = await scrollDriver.component.evaluate(el => getComputedStyle(el).wordBreak);
+    const scrollOverflowWrap = await scrollDriver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+    expect(scrollWordBreak === "break-all" || scrollOverflowWrap === "anywhere").toBe(true);
   });
 
   test('default breakMode allows theme variables to work', async ({ initTestBed, createTextDriver }) => {

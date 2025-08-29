@@ -342,7 +342,6 @@ const OverflowModeKeys = [
   "none", // Clips text cleanly without ellipsis when maxLines is reached
   "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
   "scroll", // Enables horizontal scrolling (overflow: auto), ignores maxLines
-  "fade", // Uses a fading effect at the end of the text instead of an ellipsis
 ] as const;
 export type OverflowMode = (typeof OverflowModeKeys)[number];
 

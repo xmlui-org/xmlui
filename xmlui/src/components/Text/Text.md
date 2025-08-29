@@ -297,19 +297,6 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
     </VStack>
     
     <VStack gap="8px">
-      <Text variant="strong">overflowMode="fade"</Text>
-      <Text
-        width="200px"
-        backgroundColor="lightyellow"
-        padding="8px"
-        overflowMode="fade"
-        maxLines="2">
-        This is a very long text that will show a fade effect at the 
-        end when it overflows across multiple lines.
-      </Text>
-    </VStack>
-    
-    <VStack gap="8px">
       <Text variant="strong">overflowMode="none"</Text>
       <Text
         width="200px"

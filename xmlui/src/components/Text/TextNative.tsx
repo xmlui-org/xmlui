@@ -7,7 +7,12 @@ import classnames from "classnames";
 import styles from "./Text.module.scss";
 
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
-import { type TextVariant, TextVariantElement, type OverflowMode, type BreakMode } from "../abstractions";
+import {
+  type TextVariant,
+  TextVariantElement,
+  type OverflowMode,
+  type BreakMode,
+} from "../abstractions";
 
 type TextProps = {
   uid?: string;
@@ -50,25 +55,9 @@ export const Text = forwardRef(function Text(
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
-  // For fade mode, dynamically set the CSS custom property from computed styles
+  // For dynamic CSS properties that require DOM access
   useLayoutEffect(() => {
-    if (overflowMode === "fade" && innerRef.current) {
-      const computedStyle = window.getComputedStyle(innerRef.current);
-      const backgroundColor = computedStyle.backgroundColor;
-      
-      // Fade effect requires matching the background color for seamless blending
-      // Dynamically detects parent background and applies it to CSS custom property
-      if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") {
-        innerRef.current.style.setProperty("--fade-background-color", backgroundColor);
-      }
-      
-      // RTL support: detects text direction for proper fade gradient positioning
-      // Uses data attribute for reliable CSS targeting across different RTL implementations
-      const direction = computedStyle.direction || 
-                       getComputedStyle(document.documentElement).direction ||
-                       'ltr';
-      innerRef.current.dataset.fadeDirection = direction;
-    }
+    // Note: No special handling needed for current overflow modes
   }, [overflowMode]);
 
   // NOTE: This is to accept syntax highlight classes coming from shiki
@@ -83,14 +72,14 @@ export const Text = forwardRef(function Text(
   // Determine overflow mode classes based on overflowMode and existing props
   const overflowClasses = useMemo(() => {
     const classes: Record<string, boolean> = {};
-    
+
     // If overflowMode is not explicitly set, use original behavior
     if (!overflowMode) {
       classes[styles.truncateOverflow] = maxLines > 0;
       classes[styles.noEllipsis] = !ellipses;
       return classes;
     }
-    
+
     switch (overflowMode) {
       case "none":
         // CSS: overflow: hidden + text-overflow: clip + normal wrapping
@@ -102,11 +91,6 @@ export const Text = forwardRef(function Text(
         // Effect: Forces single line, enables horizontal scrollbar when content overflows
         classes[styles.overflowScroll] = true;
         break;
-      case "fade":
-        // CSS: position: relative + overflow: hidden + ::after pseudo-element with gradient
-        // Effect: Creates fade-to-background gradient overlay at text end using dynamic background detection
-        classes[styles.overflowFade] = true;
-        break;
       case "ellipsis":
         // CSS: Uses -webkit-line-clamp for multi-line or white-space: nowrap + text-overflow: ellipsis for single line
         // Effect: Shows "..." when text is truncated, respects maxLines for multi-line truncation
@@ -114,14 +98,14 @@ export const Text = forwardRef(function Text(
         classes[styles.noEllipsis] = !ellipses;
         break;
     }
-    
+
     return classes;
   }, [overflowMode, maxLines, ellipses]);
 
   // Determine break mode classes
   const breakClasses = useMemo(() => {
     const classes: Record<string, boolean> = {};
-    
+
     // Only apply break mode classes if explicitly set (preserves theme variable support)
     if (breakMode) {
       switch (breakMode) {
@@ -152,7 +136,7 @@ export const Text = forwardRef(function Text(
           break;
       }
     }
-    
+
     return classes;
   }, [breakMode]);
 
@@ -202,9 +186,12 @@ export const Text = forwardRef(function Text(
           )}
           style={{
             ...style,
-            // Apply maxLines style for "ellipsis" and "fade" modes, and default behavior
+            // Apply maxLines style for "ellipsis" mode and default behavior
             // "none" and "scroll" should ignore maxLines
-            ...(overflowMode === "ellipsis" || overflowMode === "fade" || (!overflowMode && maxLines) ? getMaxLinesStyle(maxLines) : {}),
+            ...(overflowMode === "ellipsis" ||
+            (!overflowMode && maxLines)
+              ? getMaxLinesStyle(maxLines)
+              : {}),
           }}
         >
           {children}
