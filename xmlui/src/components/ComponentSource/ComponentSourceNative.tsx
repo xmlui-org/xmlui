@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 
 export interface ComponentSourceProps {
   autoLoad?: boolean;
@@ -31,22 +32,81 @@ export function ComponentSource({
     return null; // Will be handled in fetchSourceCode
   }, [componentName, uid]);
 
-  // Function to extract component source from file content
+    // Function to extract component source from file content using the XMLUI parser
   const extractComponentFromFile = (fileContent: string, componentName: string): string => {
-    console.log('ComponentSource: Extracting component from file:', componentName);
+    console.log('ComponentSource: Extracting component from file using XMLUI parser:', componentName);
 
     // For Main.xmlui, return the whole file
     if (componentName === 'Main' || componentName === 'App') {
       return fileContent;
     }
 
-    // For component files, look for the Component definition
-    const componentPattern = new RegExp(`<Component\\s+name="${componentName}"[^>]*>([\\s\\S]*?)</Component>`, 'i');
-    const match = fileContent.match(componentPattern);
+    try {
+      // Use the actual XMLUI parser to parse the file
+      const { component, errors } = xmlUiMarkupToComponent(fileContent);
 
-    if (match) {
-      console.log('ComponentSource: Found component in file');
-      return match[1]; // Return the component content
+      if (errors.length > 0) {
+        console.log('ComponentSource: Parser errors:', errors);
+        // Fall back to regex if parser fails
+        return extractComponentWithRegex(fileContent, componentName);
+      }
+
+      // Check if it's a compound component (has a name property)
+      if (!component || !('name' in component)) {
+        console.log('ComponentSource: Not a compound component, returning whole file');
+        return fileContent;
+      }
+
+      // For compound components, we need to extract the specific component by name
+      // The parser gives us the whole file, so we need to find the specific component
+      // Let's use the regex approach for now since the parser doesn't give us individual components
+      console.log('ComponentSource: Compound component found, using regex to extract specific component');
+      return extractComponentWithRegex(fileContent, componentName);
+    } catch (error) {
+      console.log('ComponentSource: Parser error, falling back to regex:', error);
+      return extractComponentWithRegex(fileContent, componentName);
+    }
+  };
+
+  // Fallback regex-based extraction
+  const extractComponentWithRegex = (fileContent: string, componentName: string): string => {
+    console.log('ComponentSource: Using regex fallback for:', componentName);
+
+    const startTag = new RegExp(`<Component\\s+name="${componentName}"[^>]*>`, 'i');
+    const startMatch = fileContent.match(startTag);
+
+    if (startMatch) {
+      const startIndex = startMatch.index! + startMatch[0].length;
+      let depth = 1;
+      let endIndex = startIndex;
+
+      // Find the matching closing tag by counting opening/closing tags
+      for (let i = startIndex; i < fileContent.length; i++) {
+        const char = fileContent[i];
+        if (char === '<') {
+          const tagStart = i;
+          const tagEnd = fileContent.indexOf('>', tagStart);
+          if (tagEnd === -1) break;
+
+          const tag = fileContent.substring(tagStart, tagEnd + 1);
+
+          if (tag.match(/<Component[^>]*>/i)) {
+            depth++;
+          } else if (tag.match(/<\/Component>/i)) {
+            depth--;
+            if (depth === 0) {
+              endIndex = tagStart;
+              break;
+            }
+          }
+        }
+      }
+
+      if (depth === 0) {
+        const content = fileContent.substring(startIndex, endIndex);
+        console.log('ComponentSource: Found component via regex, content length:', content.length);
+        return content;
+      }
     }
 
     // If no Component tag found, return the whole file
@@ -63,15 +123,17 @@ export function ComponentSource({
       // Determine which component to fetch
       let targetComponentName = componentName;
 
-      if (!targetComponentName) {
-        if (uid && uid.includes('app')) {
-          targetComponentName = 'Main';
-        } else if (uid) {
-          // Extract component name from uid (e.g., "testSourceCode" -> "Test")
-          const uidParts = uid.replace('SourceCode', '').split(/(?=[A-Z])/);
-          targetComponentName = uidParts[uidParts.length - 1]; // Get the last part
+              if (!targetComponentName) {
+          if (uid && uid.includes('app')) {
+            targetComponentName = 'Main';
+          } else if (uid) {
+            // Extract component name from uid (e.g., "testSourceCode" -> "Test")
+            const uidParts = uid.replace('SourceCode', '').split(/(?=[A-Z])/);
+            const lastPart = uidParts[uidParts.length - 1]; // Get the last part
+            // Capitalize the first letter to match the actual component name
+            targetComponentName = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
+          }
         }
-      }
 
       if (!targetComponentName) {
         throw new Error('Could not determine component name from context');
