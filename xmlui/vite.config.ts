@@ -85,7 +85,18 @@ export default ({ mode = "lib" }) => {
             'src/**/*.scss',
             '!src/**/*.module.scss'
           ],
-          dest: 'dist/lib'
+          dest: 'dist/lib/scss',
+          rename: (name, extension, fullPath) => {
+            //we do this to preserve the folder structure of the scss files
+            // e.g. src/components/button/Button.scss should be copied to dist/lib/scss/components/button/Button.scss
+            // and not to dist/lib/scss/Button.scss
+            // fullPath will be something like 'src/components/button/Button.scss'
+            // We want to remove the 'src/' prefix to get the relative path
+            const relativePath = fullPath.replace('src/', '');
+
+            // This returns 'components/button/Button.scss'
+            return relativePath;
+          }
         }
       ]
     }));
