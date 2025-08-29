@@ -397,7 +397,7 @@ export default class RestApiProxy {
       aggregatedHeaders["x-ue-client-tx-id"] = transactionId;
     }
 
-    if (this.appContext.appGlobals.withXSRFToken !== false && isURLSameOrigin(url)) {
+    if (this.appContext.appGlobals?.withXSRFToken !== false && isURLSameOrigin(url)) {
       const xsrfToken = readCookie("XSRF-TOKEN");
       if(xsrfToken) {
         aggregatedHeaders["X-XSRF-TOKEN"] = readCookie("XSRF-TOKEN");
