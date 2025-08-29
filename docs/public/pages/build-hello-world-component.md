@@ -31,6 +31,10 @@ XMLUI components are made of three main parts:
 2. Component metadata (`HelloWorld.tsx`) - Describes props and integrates with XMLUI
 3. Component registration (`ComponentProvider.tsx`) - Registers the component with XMLUI
 
+> [!WARNING]
+> I think we don't need this. They don't have to know about the ComponentProvider
+> But, we need the HelloWorld.module.scss file
+
 This separation allows XMLUI to understand your component's interface while maintaining clean React code.
 
 ## Prerequisites
@@ -38,6 +42,9 @@ This separation allows XMLUI to understand your component's interface while main
 - Familiarity with React and TypeScript
 - Basic understanding of XMLUI markup
 - A local clone of [https://github.com/xmlui-org/xmlui](https://github.com/xmlui-org/xmlui)
+
+> [!WARNING]
+> We don't need this. You can use the local installed xmlui npm package, it has binaries (it contains the build-lib bin)
 
 ## Step 1: Prepare the workspace
 
@@ -321,6 +328,10 @@ Since we've integrated it into the docs site, you can see it live right here.
 </App>
 ```
 
+> [!WARNING]
+> we could mention that the XMLUIExtensions namespace is optional
+
+
 But you will want to see it in a standalone app. Switch to the xmlui repo home and run this tool.
 
 ```xmlui copy
@@ -432,6 +443,9 @@ $textColor: createThemeVar("textColor-#{$component}");
 EOF
 ```
 
+> [!WARNING]
+> we should include all classes in @layer components{...}
+
 **What changed**
 
 Instead of hardcoded colors like `#f5f5f5` and `#333`, we now use:
@@ -526,9 +540,17 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
 
 Notice how the component now uses theme variables instead of hardcoded colors. The `<Theme>` component allows you to override any theme variable at runtime, making your components incredibly flexible for different contexts and user preferences.
 
+
+## MISSING PIECE
+> [!WARNING]
+> we provide a className in the renderer. This classname contains all the styles that comes from inline styling. The component developer should pass it to the right component inside.
+
 ## Step 10: Add event handling
 
 The HelloWorld component has a click handler that increments a counter, and a reset that sets the count to zero. Let's add event definitions to signal parent components when these events happen.
+
+> [!WARNING]
+> basic mouse event handling is automatically assigned to components, so you don't need explicit lookupEventHandler for onClick (but you do for onReset)
 
 **Add event definitions**
 
@@ -713,6 +735,9 @@ window.handleHelloReset = function(event) {
 };
 </script>
 ```
+
+> [!WARNING]
+> I think we should just simply inline the event handlers, not put them to the index.html
 
 **Test event handling**
 
@@ -940,3 +965,23 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
 
 </App>
   ```
+
+
+## ALTERNATIVE
+- you can use extensions without building them
+    - -> IN PROGRESS have an extensions folder in the src, if it's not a standalone app, it will work
+    - right now, if you are using as a react component, instantiate StandaloneExtensionManager and register it there, OR
+    - if you are using create-xmlui-app, you can just simply use the second parameter of startApp in index
+- we could have template project for extensions (if they want to publish), similar to create-xmlui-app
+
+
+I think the simplest way would be right now to demonstrate how to do local extension, and then there could be an extra step, if you want to publish it, or have a standalone build for distribution
+
+steps (RIGHT NOW):
+1. npx create-xmlui-app
+1. create the extension
+1. use import them to index.ts, or separate extensions ts, and use it as the second parameter
+
+steps (IDEAL?):
+1. npx create-xmlui-app
+1. create the extension in the extensions folder
