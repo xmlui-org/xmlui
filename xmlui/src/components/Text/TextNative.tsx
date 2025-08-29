@@ -33,7 +33,7 @@ export const defaultProps = {
   preserveLinebreaks: false,
   ellipses: true,
   overflowMode: undefined as OverflowMode | undefined,
-  breakMode: undefined as BreakMode | undefined,
+  breakMode: "normal" as BreakMode | undefined,
 };
 
 export const Text = forwardRef(function Text(
@@ -97,6 +97,12 @@ export const Text = forwardRef(function Text(
         classes[styles.truncateOverflow] = true;
         classes[styles.noEllipsis] = !ellipses;
         break;
+      case "flow":
+        // CSS: white-space: normal + overflow-y: auto + overflow-x: hidden
+        // Effect: Text wraps to multiple lines with vertical scrolling when needed, no horizontal scrollbar
+        // Note: Flow mode ignores maxLines to allow unlimited text wrapping
+        classes[styles.overflowFlow] = true;
+        break;
     }
 
     return classes;
@@ -141,62 +147,30 @@ export const Text = forwardRef(function Text(
   }, [breakMode]);
 
   return (
-    <>
-      {overflowMode === "none" && maxLines && maxLines > 0 ? (
-        // Wrapper for "none" mode with maxLines for precise height control
-        <div
-          style={{
-            maxHeight: `${maxLines * 1.5}em`, // Use a more generous multiplier
-            overflow: "hidden",
-          }}
-        >
-          <Element
-            {...restVariantSpecificProps}
-            ref={ref as any}
-            className={classnames(
-              syntaxHighlightClasses,
-              styles.text,
-              styles[variant || "default"],
-              {
-                [styles.preserveLinebreaks]: preserveLinebreaks,
-                ...overflowClasses,
-                ...breakClasses,
-              },
-              className,
-            )}
-            style={style}
-          >
-            {children}
-          </Element>
-        </div>
-      ) : (
-        <Element
-          {...restVariantSpecificProps}
-          ref={ref as any}
-          className={classnames(
-            syntaxHighlightClasses,
-            styles.text,
-            styles[variant || "default"],
-            {
-              [styles.preserveLinebreaks]: preserveLinebreaks,
-              ...overflowClasses,
-              ...breakClasses,
-            },
-            className,
-          )}
-          style={{
-            ...style,
-            // Apply maxLines style for "ellipsis" mode and default behavior
-            // "none" and "scroll" should ignore maxLines
-            ...(overflowMode === "ellipsis" ||
-            (!overflowMode && maxLines)
-              ? getMaxLinesStyle(maxLines)
-              : {}),
-          }}
-        >
-          {children}
-        </Element>
+    <Element
+      {...restVariantSpecificProps}
+      ref={ref as any}
+      className={classnames(
+        syntaxHighlightClasses,
+        styles.text,
+        styles[variant || "default"],
+        {
+          [styles.preserveLinebreaks]: preserveLinebreaks,
+          ...overflowClasses,
+          ...breakClasses,
+        },
+        className,
       )}
-    </>
+      style={{
+        ...style,
+        // Apply maxLines style for "ellipsis" mode and default behavior
+        // "none", "scroll", and "flow" modes ignore maxLines for predictable, reliable behavior
+        ...(overflowMode === "ellipsis" || (!overflowMode && maxLines)
+          ? getMaxLinesStyle(maxLines)
+          : {}),
+      }}
+    >
+      {children}
+    </Element>
   );
 });

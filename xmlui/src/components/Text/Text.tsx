@@ -2,7 +2,13 @@ import styles from "./Text.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowMode, type BreakMode } from "../abstractions";
+import {
+  variantOptionsMd,
+  type VariantProps,
+  VariantPropsKeys,
+  type OverflowMode,
+  type BreakMode,
+} from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
 import { createMetadata, d } from "../metadata-helpers";
 
@@ -50,7 +56,7 @@ export const TextMd = createMetadata({
         "`anywhere` breaks at any character, `keep` prevents word breaking, " +
         "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
       valueType: "string",
-      defaultValue: "not specified",
+      defaultValue: "normal",
       availableValues: [
         { value: "normal", description: "Uses standard word boundaries for breaking" },
         { value: "word", description: "Breaks long words when necessary to prevent overflow" },
@@ -63,14 +69,26 @@ export const TextMd = createMetadata({
       description:
         "This property controls how text overflow is handled. " +
         "`none` prevents wrapping and shows no overflow indicator, " +
-        "`ellipsis` shows ellipses when text is truncated, and `scroll` enables horizontal scrolling. " +
+        "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
+        "and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). " +
         "When not specified, uses the default text behavior.",
       valueType: "string",
       defaultValue: "not specified",
       availableValues: [
-        { value: "none", description: "No wrapping, text stays on a single line with no overflow indicator" },
+        {
+          value: "none",
+          description: "No wrapping, text stays on a single line with no overflow indicator",
+        },
         { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
-        { value: "scroll", description: "Enables horizontal scrolling" },
+        {
+          value: "scroll",
+          description: "Forces single line with horizontal scrolling when content overflows",
+        },
+        {
+          value: "flow",
+          description:
+            "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)",
+        },
       ],
     },
   },
@@ -154,8 +172,16 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, className, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, ellipses, overflowMode, breakMode, value, ...variantSpecific } =
-      node.props;
+    const {
+      variant,
+      maxLines,
+      preserveLinebreaks,
+      ellipses,
+      overflowMode,
+      breakMode,
+      value,
+      ...variantSpecific
+    } = node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)

@@ -131,7 +131,7 @@ This property determines the maximum number of lines the component can wrap to. 
 
 ### `overflowMode` (default: "not specified") [#overflowmode-default-not-specified]
 
-This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` enables horizontal scrolling, and `fade` applies a fade-out effect at the text boundary. When not specified, uses the default text behavior.
+This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.
 
 Available values:
 
@@ -139,12 +139,25 @@ Available values:
 | --- | --- |
 | `none` | No wrapping, text stays on a single line with no overflow indicator |
 | `ellipsis` | Truncates with an ellipsis (default) |
-| `scroll` | Enables horizontal scrolling |
-| `fade` | Uses a fading effect at the end of the text |
+| `scroll` | Forces single line with horizontal scrolling when content overflows |
+| `flow` | Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines) |
 
 ```xmlui-pg copy display name="Example: overflowMode"
 <App>
   <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="none"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        overflowMode="none"
+        maxLines="2">
+        This is a very long text that will be clipped cleanly without 
+        any overflow indicator when it exceeds the specified lines.
+      </Text>
+    </VStack>
+
     <VStack gap="8px">
       <Text variant="strong">overflowMode="ellipsis" (default)</Text>
       <Text
@@ -171,28 +184,32 @@ Available values:
     </VStack>
     
     <VStack gap="8px">
-      <Text variant="strong">overflowMode="fade"</Text>
+      <Text variant="strong">overflowMode="flow"</Text>
       <Text
         width="200px"
+        height="100px"
         backgroundColor="lightyellow"
         padding="8px"
-        overflowMode="fade"
-        maxLines="2">
-        This is a very long text that will show a fade effect at the 
-        end when it overflows across multiple lines.
+        overflowMode="flow">
+        This is a very long text that will wrap to multiple lines and show 
+        a vertical scrollbar when the content exceeds the container height. 
+        This mode ignores maxLines and allows unlimited text wrapping with 
+        vertical scrolling when needed.
       </Text>
     </VStack>
     
     <VStack gap="8px">
-      <Text variant="strong">overflowMode="none"</Text>
+      <Text variant="strong">overflowMode="flow" (no height constraint)</Text>
       <Text
         width="200px"
-        backgroundColor="lightcoral"
+        backgroundColor="lightpink"
         padding="8px"
-        overflowMode="none"
-        maxLines="2">
-        This is a very long text that will be clipped cleanly without 
-        any overflow indicator when it exceeds the specified lines.
+        overflowMode="flow">
+        This is a very long text that demonstrates flow mode without a 
+        height constraint. The text will wrap to multiple lines naturally 
+        and the container will grow to accommodate all the content. No 
+        scrollbar will appear since there's no height limitation - the text 
+        flows freely across as many lines as needed.
       </Text>
     </VStack>
   </VStack>
