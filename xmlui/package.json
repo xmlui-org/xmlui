@@ -144,6 +144,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "prettier": "^3.3.3",
     "rimraf": "6.0.1",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-visualizer": "5.8.3",
     "serve": "14.2.0",
     "typescript": "5.7.3",
@@ -197,8 +198,12 @@
           "require": "./dist/lib/*.css"
         },
         "./index.scss": {
-          "import": "./src/index.scss",
-          "require": "./src/index.scss"
+          "import": "./dist/lib/index.scss",
+          "require": "./dist/lib/index.scss"
+        },
+        "./themes.scss": {
+          "import": "./dist/lib/_themes.scss",
+          "require": "./dist/lib/_themes.scss"
         },
         "./vite-xmlui-plugin": {
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
