@@ -68,7 +68,6 @@ export function AppWithCodeViewNative({
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
   const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
-  const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
@@ -169,7 +168,7 @@ export function AppWithCodeViewNative({
               </div>
             </div>
           )}
-          <div className={styles.contentContainer} ref={contentContainerRef}>
+          <div className={styles.contentContainer}>
             <Markdown
               className={classnames(styles.splitViewMarkdown, { [styles.hidden]: !showCode })}
             >
@@ -177,7 +176,7 @@ export function AppWithCodeViewNative({
             </Markdown>
             <IndexAwareNestedApp
               className={classnames({ [styles.hidden]: showCode })}
-              height={contentContainerRef.current?.clientHeight || "100%"}
+              height="100%"
               app={app}
               api={api}
               components={components}

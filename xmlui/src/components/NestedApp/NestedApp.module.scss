@@ -58,6 +58,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     height: 100%;
     background-color: t.$backgroundColor;
     position: relative;
+    border-radius: $borderRadius-NestedApp;
   }
 
   .loadingContainer {
@@ -125,6 +126,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: t.$backgroundColor;
+    border-radius: 0 0 $borderRadius-NestedApp $borderRadius-NestedApp;
 
     &.shouldAnimate {
       transition: clip-path 1s, opacity 1s;
@@ -165,11 +167,11 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     background-color: $backgroundColor-frame-NestedApp;
     align-content: center;
     box-shadow: $boxShadow-NestedApp;
-    padding-bottom: 8px;
 
     .contentContainer {
       width: 100%;
-      height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       align-items: center;
 
@@ -276,6 +278,14 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: transparent;
+    border-radius: $borderRadius-NestedApp;
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: $borderRadius-NestedApp;
   }
 }
 
