@@ -198,12 +198,12 @@
           "require": "./dist/lib/*.css"
         },
         "./index.scss": {
-          "import": "./dist/lib/index.scss",
-          "require": "./dist/lib/index.scss"
+          "import": "./dist/lib/scss/index.scss",
+          "require": "./dist/lib/scss/index.scss"
         },
         "./themes.scss": {
-          "import": "./dist/lib/_themes.scss",
-          "require": "./dist/lib/_themes.scss"
+          "import": "./dist/lib/scss/components-core/theming/_themes.scss",
+          "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
