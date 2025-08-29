@@ -71,11 +71,11 @@ test("component has correct accessibility structure", async ({ initTestBed, crea
 test("component supports keyboard interaction through children", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
   await initTestBed(`
     <FileUploadDropZone>
-      <Button>Browse Files</Button>
+      <Button testId="customButton">Browse Files</Button>
     </FileUploadDropZone>
   `);
   const driver = await createFileUploadDropZoneDriver();
-  const button = driver.component.getByRole('button');
+  const button = driver.component.getByTestId('customButton');
   await expect(button).toBeVisible();
   await button.focus();
   await expect(button).toBeFocused();

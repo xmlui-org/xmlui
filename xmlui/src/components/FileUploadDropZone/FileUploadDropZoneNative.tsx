@@ -57,7 +57,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
       if (!acceptedFiles.length) {
         return;
       }
-      updateState({
+      updateState?.({
         value: acceptedFiles,
       });
       onUpload?.(acceptedFiles);
