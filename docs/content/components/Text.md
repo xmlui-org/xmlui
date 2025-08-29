@@ -9,6 +9,87 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties [#properties]
 
+### `breakMode` (default: "not specified") [#breakmode-default-not-specified]
+
+This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `normal` | Uses standard word boundaries for breaking |
+| `word` | Breaks long words when necessary to prevent overflow |
+| `anywhere` | Breaks at any character if needed to fit content |
+| `keep` | Prevents breaking within words entirely |
+| `hyphenate` | Uses automatic hyphenation when breaking words |
+
+```xmlui-pg copy display name="Example: breakMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="normal" (default)</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightblue"
+        padding="8px"
+        breakMode="normal">
+        This text uses standardwordbreaking at natural boundaries 
+        like spaces and hyphens.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="word"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        breakMode="word">
+        This text will breakverylongwordswhenneeded to prevent 
+        overflow while preserving readability.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="anywhere"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        breakMode="anywhere">
+        Thistext willbreakanywhereif neededtofit thecontainer 
+        eveninthe middleofwords.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="keep"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        breakMode="keep">
+        This text will keep verylongwords intact and prevent 
+        breaking within words entirely.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">breakMode="hyphenate"</Text>
+      <Text
+        width="150px"
+        backgroundColor="lavender"
+        padding="8px"
+        breakMode="hyphenate"
+        lang="en">
+        This text uses automatic hyphenation for 
+        supercalifragilisticexpialidocious words.
+      </Text>
+    </VStack>
+  </VStack>
+</App>
+```
+
 ### `ellipses` (default: true) [#ellipses-default-true]
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
@@ -45,6 +126,76 @@ This property determines the maximum number of lines the component can wrap to. 
     color="black"
     value="A long text that will likely overflow"
     maxLines="2" />
+</App>
+```
+
+### `overflowMode` (default: "not specified") [#overflowmode-default-not-specified]
+
+This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` enables horizontal scrolling, and `fade` applies a fade-out effect at the text boundary. When not specified, uses the default text behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `none` | No wrapping, text stays on a single line with no overflow indicator |
+| `ellipsis` | Truncates with an ellipsis (default) |
+| `scroll` | Enables horizontal scrolling |
+| `fade` | Uses a fading effect at the end of the text |
+
+```xmlui-pg copy display name="Example: overflowMode"
+<App>
+  <VStack gap="16px">
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="ellipsis" (default)</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightblue"
+        padding="8px"
+        overflowMode="ellipsis"
+        maxLines="1">
+        This is a very long text that will show ellipsis when it 
+        overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="scroll"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightgreen"
+        padding="8px"
+        overflowMode="scroll">
+        This is a very long text that will enable horizontal scrolling 
+        when it overflows the container width.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="fade"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightyellow"
+        padding="8px"
+        overflowMode="fade"
+        maxLines="2">
+        This is a very long text that will show a fade effect at the 
+        end when it overflows across multiple lines.
+      </Text>
+    </VStack>
+    
+    <VStack gap="8px">
+      <Text variant="strong">overflowMode="none"</Text>
+      <Text
+        width="200px"
+        backgroundColor="lightcoral"
+        padding="8px"
+        overflowMode="none"
+        maxLines="2">
+        This is a very long text that will be clipped cleanly without 
+        any overflow indicator when it exceeds the specified lines.
+      </Text>
+    </VStack>
+  </VStack>
 </App>
 ```
 

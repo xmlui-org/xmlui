@@ -346,6 +346,16 @@ const OverflowModeKeys = [
 ] as const;
 export type OverflowMode = (typeof OverflowModeKeys)[number];
 
+// --- break mode for text components
+const BreakModeKeys = [
+  "normal", // Uses standard word boundaries for breaking
+  "word", // Breaks long words when necessary to prevent overflow
+  "anywhere", // Breaks at any character if needed to fit content
+  "keep", // Prevents breaking within words entirely
+  "hyphenate", // Uses automatic hyphenation when breaking words
+] as const;
+export type BreakMode = (typeof BreakModeKeys)[number];
+
 type TextPropertyValueDescription = PropertyValueDescription & {
   value: TextVariant;
   description: string;

@@ -2,7 +2,7 @@ import styles from "./Text.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowMode } from "../abstractions";
+import { variantOptionsMd, type VariantProps, VariantPropsKeys, type OverflowMode, type BreakMode } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
 import { createMetadata, d } from "../metadata-helpers";
 
@@ -42,6 +42,22 @@ export const TextMd = createMetadata({
         "cropped (\`true\`) or not (\`false\`).",
       valueType: "boolean",
       defaultValue: defaultProps.ellipses,
+    },
+    breakMode: {
+      description:
+        "This property controls how text breaks into multiple lines. " +
+        "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
+        "`anywhere` breaks at any character, `keep` prevents word breaking, " +
+        "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
+      valueType: "string",
+      defaultValue: "not specified",
+      availableValues: [
+        { value: "normal", description: "Uses standard word boundaries for breaking" },
+        { value: "word", description: "Breaks long words when necessary to prevent overflow" },
+        { value: "anywhere", description: "Breaks at any character if needed to fit content" },
+        { value: "keep", description: "Prevents breaking within words entirely" },
+        { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
+      ],
     },
     overflowMode: {
       description:
@@ -139,7 +155,7 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, className, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, ellipses, overflowMode, value, ...variantSpecific } =
+    const { variant, maxLines, preserveLinebreaks, ellipses, overflowMode, breakMode, value, ...variantSpecific } =
       node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
@@ -159,6 +175,7 @@ export const textComponentRenderer = createComponentRenderer(
         )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(breakMode) as BreakMode | undefined}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

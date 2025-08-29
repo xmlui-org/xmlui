@@ -7,7 +7,7 @@ import classnames from "classnames";
 import styles from "./Text.module.scss";
 
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
-import { type TextVariant, TextVariantElement, type OverflowMode } from "../abstractions";
+import { type TextVariant, TextVariantElement, type OverflowMode, type BreakMode } from "../abstractions";
 
 type TextProps = {
   uid?: string;
@@ -17,6 +17,7 @@ type TextProps = {
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
   overflowMode?: OverflowMode;
+  breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
   [variantSpecificProps: string]: any;
@@ -27,6 +28,7 @@ export const defaultProps = {
   preserveLinebreaks: false,
   ellipses: true,
   overflowMode: undefined as OverflowMode | undefined,
+  breakMode: undefined as BreakMode | undefined,
 };
 
 export const Text = forwardRef(function Text(
@@ -40,6 +42,7 @@ export const Text = forwardRef(function Text(
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
     overflowMode = defaultProps.overflowMode,
+    breakMode = defaultProps.breakMode,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef,
@@ -52,11 +55,15 @@ export const Text = forwardRef(function Text(
     if (overflowMode === "fade" && innerRef.current) {
       const computedStyle = window.getComputedStyle(innerRef.current);
       const backgroundColor = computedStyle.backgroundColor;
+      
+      // Fade effect requires matching the background color for seamless blending
+      // Dynamically detects parent background and applies it to CSS custom property
       if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") {
         innerRef.current.style.setProperty("--fade-background-color", backgroundColor);
       }
       
-      // Also detect RTL direction and add a data attribute for CSS targeting
+      // RTL support: detects text direction for proper fade gradient positioning
+      // Uses data attribute for reliable CSS targeting across different RTL implementations
       const direction = computedStyle.direction || 
                        getComputedStyle(document.documentElement).direction ||
                        'ltr';
@@ -64,12 +71,12 @@ export const Text = forwardRef(function Text(
     }
   }, [overflowMode]);
 
-    // NOTE: This is to accept syntax highlight classes coming from shiki
+  // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props
   const { syntaxHighlightClasses, ...restVariantSpecificProps } = variantSpecificProps;
 
   const Element = useMemo(() => {
-    if (!variant || !TextVariantElement[variant]) return "div"; //todo illesg, could be a span?
+    if (!variant || !TextVariantElement[variant]) return "div";
     return TextVariantElement[variant];
   }, [variant]);
 
@@ -86,17 +93,23 @@ export const Text = forwardRef(function Text(
     
     switch (overflowMode) {
       case "none":
-        // For "none" mode, use simple overflow settings
+        // CSS: overflow: hidden + text-overflow: clip + normal wrapping
+        // Effect: Text wraps normally but clips cleanly at container boundaries without ellipsis
         classes[styles.overflowNone] = true;
         break;
       case "scroll":
+        // CSS: white-space: nowrap + overflow-x: auto + overflow-y: hidden
+        // Effect: Forces single line, enables horizontal scrollbar when content overflows
         classes[styles.overflowScroll] = true;
         break;
       case "fade":
+        // CSS: position: relative + overflow: hidden + ::after pseudo-element with gradient
+        // Effect: Creates fade-to-background gradient overlay at text end using dynamic background detection
         classes[styles.overflowFade] = true;
         break;
       case "ellipsis":
-        // For explicit ellipsis, apply truncation for both single line and multi-line
+        // CSS: Uses -webkit-line-clamp for multi-line or white-space: nowrap + text-overflow: ellipsis for single line
+        // Effect: Shows "..." when text is truncated, respects maxLines for multi-line truncation
         classes[styles.truncateOverflow] = true;
         classes[styles.noEllipsis] = !ellipses;
         break;
@@ -104,6 +117,44 @@ export const Text = forwardRef(function Text(
     
     return classes;
   }, [overflowMode, maxLines, ellipses]);
+
+  // Determine break mode classes
+  const breakClasses = useMemo(() => {
+    const classes: Record<string, boolean> = {};
+    
+    // Only apply break mode classes if explicitly set (preserves theme variable support)
+    if (breakMode) {
+      switch (breakMode) {
+        case "normal":
+          // CSS: word-break: normal + overflow-wrap: normal
+          // Effect: Standard word breaking at natural boundaries (spaces, hyphens)
+          classes[styles.breakNormal] = true;
+          break;
+        case "word":
+          // CSS: overflow-wrap: break-word
+          // Effect: Breaks long words only when necessary to prevent overflow, preserves word boundaries when possible
+          classes[styles.breakWord] = true;
+          break;
+        case "anywhere":
+          // CSS: word-break: break-all + overflow-wrap: anywhere
+          // Effect: Most aggressive breaking - allows breaking between any characters to fit container
+          classes[styles.breakAnywhere] = true;
+          break;
+        case "keep":
+          // CSS: word-break: keep-all
+          // Effect: Prevents breaking within words entirely (useful for CJK text or technical terms)
+          classes[styles.breakKeep] = true;
+          break;
+        case "hyphenate":
+          // CSS: hyphens: auto + overflow-wrap: break-word
+          // Effect: Uses browser's hyphenation dictionary to break words with proper hyphens
+          classes[styles.breakHyphenate] = true;
+          break;
+      }
+    }
+    
+    return classes;
+  }, [breakMode]);
 
   return (
     <>
@@ -125,6 +176,7 @@ export const Text = forwardRef(function Text(
               {
                 [styles.preserveLinebreaks]: preserveLinebreaks,
                 ...overflowClasses,
+                ...breakClasses,
               },
               className,
             )}
@@ -144,6 +196,7 @@ export const Text = forwardRef(function Text(
             {
               [styles.preserveLinebreaks]: preserveLinebreaks,
               ...overflowClasses,
+              ...breakClasses,
             },
             className,
           )}

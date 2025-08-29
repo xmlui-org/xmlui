@@ -485,6 +485,116 @@ test.describe("Overflow Mode", () => {
 });
 
 // =============================================================================
+// BREAK MODE TESTS
+// =============================================================================
+
+test.describe("Break Mode", () => {
+  test('breakMode="normal" uses standard word boundaries', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="normal">
+        This is a verylongwordthatshouldbreakatwordboundaries normally.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("word-break", "normal");
+    await expect(driver.component).toHaveCSS("overflow-wrap", "normal");
+  });
+
+  test('breakMode="word" breaks long words to prevent overflow', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="word">
+        This is a verylongwordthatexceedsthecontainerwidthandshouldbreak.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
+  });
+
+  test('breakMode="anywhere" breaks at any character', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="100px" breakMode="anywhere">
+        Verylongwordwithnobreaks
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    // Should have word-break: break-all or overflow-wrap: anywhere
+    const wordBreak = await driver.component.evaluate(el => getComputedStyle(el).wordBreak);
+    const overflowWrap = await driver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+    
+    expect(wordBreak === "break-all" || overflowWrap === "anywhere").toBe(true);
+  });
+
+  test('breakMode="keep" prevents breaking within words', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="100px" breakMode="keep">
+        This text should keep words intact
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("word-break", "keep-all");
+  });
+
+  test('breakMode="hyphenate" uses automatic hyphenation', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="150px" breakMode="hyphenate" lang="en">
+        This is a supercalifragilisticexpialidocious word that should be hyphenated.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    await expect(driver.component).toHaveCSS("hyphens", "auto");
+    await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
+  });
+
+  test('breakMode works with different overflow modes', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Text testId="ellipsisWord" width="150px" overflowMode="ellipsis" breakMode="word" maxLines="1">
+          This superlongwordwithoutbreaks should be handled properly.
+        </Text>
+        <Text testId="fadeAnywhere" width="150px" overflowMode="fade" breakMode="anywhere" maxLines="2">
+          This verylongwordwithoutanybreaks should break anywhere and fade.
+        </Text>
+      </VStack>
+    `);
+    const ellipsisDriver = await createTextDriver("ellipsisWord");
+    const fadeDriver = await createTextDriver("fadeAnywhere");
+    
+    // Check overflow mode styles
+    await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
+    await expect(fadeDriver.component).toHaveCSS("position", "relative");
+    
+    // Check break mode styles
+    await expect(ellipsisDriver.component).toHaveCSS("overflow-wrap", "break-word");
+    
+    const fadeWordBreak = await fadeDriver.component.evaluate(el => getComputedStyle(el).wordBreak);
+    const fadeOverflowWrap = await fadeDriver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+    expect(fadeWordBreak === "break-all" || fadeOverflowWrap === "anywhere").toBe(true);
+  });
+
+  test('default breakMode allows theme variables to work', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text testId="text" width="200px">
+        This text should use the default browser behavior and allow theme variables to override.
+      </Text>
+    `);
+    const driver = await createTextDriver("text");
+    
+    // Should not have any break mode classes when no breakMode is specified
+    const className = await driver.component.getAttribute("class");
+    expect(className).not.toContain("breakNormal");
+    expect(className).not.toContain("breakWord");
+    expect(className).not.toContain("breakAnywhere");
+    expect(className).not.toContain("breakKeep");
+    expect(className).not.toContain("breakHyphenate");
+  });
+});
+
+// =============================================================================
 // EDGE CASES TESTS
 // =============================================================================
 

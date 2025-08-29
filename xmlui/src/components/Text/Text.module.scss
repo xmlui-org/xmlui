@@ -331,6 +331,30 @@ $component: "Text";
   }
 }
 
+// --- Break mode classes
+.breakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.breakWord {
+  overflow-wrap: break-word;
+}
+
+.breakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.breakKeep {
+  word-break: keep-all;
+}
+
+.breakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
 :export {
   themeVars: t.json-stringify($themeVars);
 }
