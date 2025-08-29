@@ -6,10 +6,11 @@ import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
+import copy from 'rollup-plugin-copy';
 // @ts-ignore
 import * as packageJson from "./package.json";
 
-export default ({ mode }) => {
+export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
   let define;
@@ -71,6 +72,24 @@ export default ({ mode }) => {
       };
     }
   }
+  let plugins = mode === "metadata"
+    ? []
+    : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })];
+
+  if(mode === "lib"){
+    plugins.push(copy({
+      hook: 'writeBundle',
+      targets: [
+        {
+          src: [
+            'src/**/*.scss',
+            '!src/**/*.module.scss'
+          ],
+          dest: 'dist/lib'
+        }
+      ]
+    }));
+  }
   return defineConfig({
     resolve: {
       alias: {
@@ -106,9 +125,6 @@ export default ({ mode }) => {
         },
       },
     },
-    plugins:
-      mode === "metadata"
-        ? []
-        : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
+    plugins: plugins
   });
 };
