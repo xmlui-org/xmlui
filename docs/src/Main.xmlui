@@ -1,9 +1,17 @@
 <Fragment>
     <App
+        layout="vertical-full-header"
         noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}"
+        when="{!window.location.hash.includes('/playground')}a"
         var.blogTitles="{
-            {blog1: 'Welcome to the XMLUI blog!'}
+            {blog1:
+              'Welcome to the XMLUI blog!'}
+            }"
+        var.pageUrls="{
+            {blog1: '/blog-1'}
+            }"
+        var.blogUrls="{
+            {blog1: '/blog/1.md'}
             }"
     >
         <AppHeader>
@@ -446,7 +454,7 @@
                 <PageNotFound />
             </Page>
         </Pages>
-        <Footer>z
+        <Footer>
             <CHStack width="*">
                 This site is an XMLUI™ app.
                 <SpaceFiller />

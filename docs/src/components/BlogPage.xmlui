@@ -1,5 +1,5 @@
 <Component name="BlogPage">
-  <VStack height="300px" width="{$props.width ? $props.width : '85%'}">
+  <VStack width="85%">
     <VStack>
       <H1>{$props.title}</H1>
       <HStack gap="$space-2">
