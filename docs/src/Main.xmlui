@@ -1,6 +1,5 @@
 <Fragment>
     <App
-        layout="vertical-full-header"
         noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}"
         var.blogTitles="{
@@ -285,7 +284,7 @@
                     url="/blog/1.md"
                     title="{blogTitles.blog1}"
                     author="Jon Udell"
-                    date="2025-08-29" />
+                    date="2025-08-30" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPageNoTOC url="/pages/app-structure.md" />
@@ -447,7 +446,7 @@
                 <PageNotFound />
             </Page>
         </Pages>
-        <Footer>
+        <Footer>z
             <CHStack width="*">
                 This site is an XMLUI™ app.
                 <SpaceFiller />
