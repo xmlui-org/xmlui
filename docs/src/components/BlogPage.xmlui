@@ -1,10 +1,10 @@
 <Component name="BlogPage">
-  <VStack width="{$props.width ? $props.width : '85%'}">
+  <VStack height="300px" width="{$props.width ? $props.width : '85%'}">
     <VStack>
       <H1>{$props.title}</H1>
       <HStack gap="$space-2">
         <Text>{$props.date}</Text>
-        <Text>•</Text>
+        <Text> - </Text>
         <Text>{$props.author}</Text>
       </HStack>
     </VStack>
