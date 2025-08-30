@@ -2,16 +2,21 @@
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}a"
+        when="{!window.location.hash.includes('/playground')}"
         var.blogTitles="{
-            {blog1:
-              'Welcome to the XMLUI blog!'}
+            {blog1: 'Welcome to the XMLUI blog!'}
             }"
-        var.pageUrls="{
-            {blog1: '/blog-1'}
+        var.blogSlugs="{
+            {blog1: '/welcome-to-the-xmlui-blog'}
             }"
-        var.blogUrls="{
+        var.blogPaths="{
             {blog1: '/blog/1.md'}
+            }"
+        var.blogAuthors="{
+            {blog1: 'Jon Udell'}
+            }"
+        var.blogDates="{
+            {blog1: '2025-08-30'}
             }"
     >
         <AppHeader>
@@ -55,7 +60,7 @@
                 <NavLink label="Settings" to="/tutorial-12" />
             </NavGroup>
             <NavGroup label="Blog">
-                <NavLink label="{blogTitles.blog1}" to="/blog-1" />
+                <NavLink label="{blogTitles.blog1}" to="{blogSlugs.blog1}" />
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
@@ -287,12 +292,13 @@
             <Page url="/tutorial-12">
                 <DocumentPageNoTOC url="/pages/tutorial-12.md" />
             </Page>
-            <Page url="/blog-1">
+            <Page url="{blogSlugs.blog1}">
                 <BlogPage
-                    url="/blog/1.md"
+                    url="{blogPaths.blog1}"
                     title="{blogTitles.blog1}"
-                    author="Jon Udell"
-                    date="2025-08-30" />
+                    author="{blogAuthors.blog1}"
+                    date="{blogDates.blog1}"
+                 />
             </Page>
             <Page url="/app-structure">
                 <DocumentPageNoTOC url="/pages/app-structure.md" />
