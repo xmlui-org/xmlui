@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.10.4
+
+### Patch Changes
+
+- 43fd8c5: small fixes: Avatar, FileUploadDropzone, auto xsrf token handling
+- 1df8e5d: Autocomplete: initiallyOpen prop
+- 0d5d9d1: Reworked Pagination layout strategy. Provided props to better control layout: pageSizeSelectorPosition, pageInfoPosition, buttonRowPosition. These props are available in Table pagination as well.
+- 3def673: DropdownMenu doesn't cooperate with Fragment triggerTemplate
+- 428ebea: include themes.scss file in lib dist
+- a12ce66: FileUploadDropZone fixes (dropPlaceholder disappeared)
+
 ## 0.10.3
 
 ### Patch Changes
