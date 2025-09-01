@@ -284,7 +284,7 @@
             <Page url="/blog">
                 <BlogOverview posts="{posts}" />
             </Page>
-            <Page url="{posts.p1.slug}">
+            <Page url="/blog/{posts.p1.slug}">
                 <BlogPage post="{posts.p1}" />
             </Page>
             <Page url="/app-structure">
