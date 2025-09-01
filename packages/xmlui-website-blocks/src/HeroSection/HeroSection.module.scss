@@ -1,0 +1,45 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+@layer components {
+  .heroWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .headline {
+    font-size: 4em;
+  }
+
+  .subheadline {
+    font-size: 2em;
+  }
+
+  .textWrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .text {
+    font-size: 1.5em;
+  }
+
+  .ctaButtonWrapper {
+    margin-top: t.$space-16;
+  }
+
+  .ctaButton {
+    font-size: 1.5em;
+  }
+}
+
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

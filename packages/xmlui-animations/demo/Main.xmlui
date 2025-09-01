@@ -1,5 +1,4 @@
 <App>
-  <ComponentSection heading="Animation with config - scale">
     <Button onClick="demo_1.start()">Start</Button>
     <Animation id="demo_1" animation="{{
             from: {
@@ -16,28 +15,21 @@
       <Image src="https://www.industrialempathy.com/img/remote/ZiClJf-1920w.jpg"
              width="500"/>
     </Animation>
-  </ComponentSection>
 
-  <ComponentSection heading="FadeIn animation">
     <Button onClick="demo_2.start()">Start</Button>
     <FadeInAnimation id="demo_2" duration="500">
       <Image src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
              width="500"/>
     </FadeInAnimation>
-  </ComponentSection>
 
-  <ComponentSection heading="SlideIn animation">
     <Button onClick="demo_3.start()">Start</Button>
     <SlideInAnimation id="demo_3" duration="1000" direction="right">
       <Card title="Hello demo" subtitle="Some text..." />
     </SlideInAnimation>
-  </ComponentSection>
 
-  <ComponentSection heading="Slide animation when component is in viewport">
     <SlideInAnimation id="demo_4" animateWhenInView="true" direction="left" duration="100">
       <Image src="https://images.unsplash.com/photo-1612899326681-66508905b4ce?ixlib=rb-4.0.3"
              width="500"/>
     </SlideInAnimation>
 
-  </ComponentSection>
 </App>
