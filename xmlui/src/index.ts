@@ -52,7 +52,12 @@ import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
-import { createMetadata, d } from "./components/metadata-helpers";
+import {
+  createMetadata,
+  d,
+  dComponent,
+} from "./components/metadata-helpers";
+import { partClassName } from "./components-core/parts";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -78,6 +83,7 @@ export {
   createComponentRenderer,
   createMetadata,
   d,
+  dComponent,
   parseScssVar,
   startApp,
   useTheme,
@@ -113,5 +119,6 @@ export {
   StyleProvider,
   StyleRegistry,
   useEvent,
+  partClassName,
   StandaloneComponent,
 };

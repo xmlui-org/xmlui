@@ -1,5 +1,5 @@
 {
-  "name": "xmlui-websites",
+  "name": "xmlui-website-blocks",
   "version": "0.1.0",
   "sideEffects": false,
   "type": "module",
@@ -17,12 +17,12 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "main": "./dist/xmlui-websites.js",
-  "module": "./dist/xmlui-websites.mjs",
+  "main": "./dist/xmlui-website-blocks.js",
+  "module": "./dist/xmlui-website-blocks.mjs",
   "exports": {
     ".": {
-      "import": "./dist/xmlui-websites.mjs",
-      "require": "./dist/xmlui-websites.js"
+      "import": "./dist/xmlui-website-blocks.mjs",
+      "require": "./dist/xmlui-website-blocks.js"
     },
     "./*.css": {
       "import": "./dist/*.css",
