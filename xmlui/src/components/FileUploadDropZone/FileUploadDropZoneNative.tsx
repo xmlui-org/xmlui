@@ -1,4 +1,6 @@
-import { CSSProperties, ForwardedRef, forwardRef, ReactNode, useCallback, useEffect } from "react";
+import type * as React from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
+import { forwardRef, useCallback, useEffect } from "react";
 import * as dropzone from "react-dropzone";
 
 import styles from "./FileUploadDropZone.module.scss";
@@ -8,6 +10,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import { asyncNoop } from "../../components-core/constants";
 import { Icon } from "../Icon/IconNative";
+import { getComposedRef } from "../component-utils";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -26,6 +29,8 @@ type Props = {
   text?: string;
   disabled?: boolean;
   updateState?: UpdateStateFn;
+  acceptedFileTypes?: string;
+  maxFiles?: number;
 };
 
 export const defaultProps: Pick<Props, "onUpload" | "uid" | "allowPaste" | "text" | "disabled"> = {
@@ -48,10 +53,17 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     text = defaultProps.text,
     disabled = defaultProps.disabled,
     updateState,
+    acceptedFileTypes,
+    maxFiles,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+
+  //accept is in the format {'image/*': [], 'video/*': []} see https://react-dropzone.js.org/#section-accepting-specific-file-types
+  const accept = acceptedFileTypes
+    ? acceptedFileTypes.split(",").reduce((acc, type) => ({ ...acc, [type.trim()]: [] }), {})
+    : undefined;
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) {
@@ -65,12 +77,14 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     [onUpload, updateState],
   );
 
-  const { getRootProps, getInputProps, isDragActive, open, inputRef } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open, inputRef, isDragAccept } = useDropzone({
     onDrop,
     noClick: true,
     noKeyboard: true,
     noDragEventsBubbling: true,
     disabled,
+    accept,
+    maxFiles
   });
 
   const doOpen = useEvent(() => {
@@ -117,18 +131,19 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     });
   }, [doOpen, registerComponentApi, uid]);
 
+  const { ref, ...rootProps } = getRootProps({
+    ...rest,
+    style,
+    className: classnames(styles.wrapper, className),
+    onPaste: handleOnPaste,
+  } as React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>);
+
+  const rootRef = getComposedRef(ref, forwardedRef);
   return (
-    <div
-      {...getRootProps()}
-      {...rest}
-      style={style}
-      className={classnames(styles.wrapper, className)}
-      onPaste={handleOnPaste}
-      ref={forwardedRef}
-    >
+    <div {...rootProps} ref={rootRef}>
       <input {...getInputProps()} />
       {children}
-      {isDragActive && (
+      {(isDragActive && isDragAccept) && (
         <div className={styles.dropPlaceholder}>
           <Icon name={"upload"}></Icon>
           {text}
