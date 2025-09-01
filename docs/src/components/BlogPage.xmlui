@@ -1,16 +1,13 @@
 <Component name="BlogPage">
-  <VStack width="85%">
+  <VStack width="{$props.width ? $props.width : '85%'}">
     <VStack>
-      <H1>{$props.title}</H1>
+      <H1>{$props.post.title}</H1>
       <HStack gap="$space-2">
-        <Text>{$props.date}</Text>
-        <Text> - </Text>
-        <Text>{$props.author}</Text>
+        <Text>{$props.post.date}</Text>
+        <Text>-</Text>
+        <Text>{$props.post.author}</Text>
       </HStack>
     </VStack>
-    <Markdown
-      content="{$props.content}"
-      data="{$props.url}" />
-    <Slot />
+    <Markdown data="/blog/{$props.post.slug}.md" />
   </VStack>
 </Component>
