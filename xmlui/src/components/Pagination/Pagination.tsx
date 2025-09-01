@@ -2,6 +2,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled } from "../metadata-helpers";
 import {
+  PositionValues,
   defaultProps,
   type PageNumber,
   PageNumberValues,
@@ -76,11 +77,23 @@ export const PaginationMd = createMetadata({
       availableValues: orientationOptionMd,
       default: defaultProps.orientation,
     },
-    reverseLayout: d(
-      "Whether to reverse the order of pagination sections",
-      undefined,
-      "boolean",
-      defaultProps.reverseLayout,
+    pageSizeSelectorPosition: {
+      description: "Determines where to place the page size selector in the layout.",
+      options: PositionValues,
+      type: "string",
+      default: defaultProps.pageSizeSelectorPosition,
+    },
+    pageInfoPosition: {
+      description: "Determines where to place the page information in the layout.",
+      options: PositionValues,
+      type: "string",
+      default: defaultProps.pageInfoPosition,
+    },
+    buttonRowPosition: d(
+      "Determines where to place the pagination button row in the layout.",
+      PositionValues,
+      "string",
+      defaultProps.buttonRowPosition,
     ),
   },
   events: {
@@ -113,15 +126,14 @@ export const PaginationMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "gap-Pagination": "$space-2",
     "padding-Pagination": "$space-4",
-    "alignment-Pagination": "center",
     "backgroundColor-Pagination": "transparent",
     "borderColor-Pagination": "$color-gray-300",
     "textColor-Pagination": "$color-gray-600",
     "backgroundColor-selector-Pagination": "transparent",
     "textColor-selector-Pagination": "$color-gray-600",
     "borderRadius-selector-Pagination": "$borderRadius",
+    "gap-buttonRow-Pagination": "$space-2",
   },
 });
 
@@ -174,9 +186,17 @@ export const paginationComponentRenderer = createComponentRenderer(
         maxVisiblePages={maxVisiblePages as PageNumber}
         pageSizeOptions={extractValue(node.props.pageSizeOptions) as number[] | undefined}
         orientation={orientation as OrientationOptions}
-        reverseLayout={extractValue.asOptionalBoolean(
-          node.props.reverseLayout,
-          defaultProps.reverseLayout,
+        buttonRowPosition={extractValue.asOptionalString(
+          node.props.buttonRowPosition,
+          defaultProps.buttonRowPosition,
+        )}
+        pageSizeSelectorPosition={extractValue.asOptionalString(
+          node.props.pageSizeSelectorPosition,
+          defaultProps.pageSizeSelectorPosition,
+        )}
+        pageInfoPosition={extractValue.asOptionalString(
+          node.props.pageInfoPosition,
+          defaultProps.pageInfoPosition,
         )}
         onPageDidChange={lookupEventHandler("pageDidChange")}
         onPageSizeDidChange={lookupEventHandler("pageSizeDidChange")}

@@ -16,6 +16,7 @@ import {
 } from "../SelectionStore/SelectionStoreNative";
 import { Table, TablePaginationControlsLocationValues, defaultProps } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
+import { PositionValues } from "../Pagination/PaginationNative";
 
 const COMP = "Table";
 
@@ -52,6 +53,42 @@ export const TableMd = createMetadata({
         "This property holds an array of page sizes (numbers) the user can select for " +
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
     },
+    showPageInfo: d(
+      "Whether to show page information",
+      undefined,
+      "boolean",
+      defaultProps.showPageInfo,
+    ),
+    showPageSizeSelector: d(
+      "Whether to show the page size selector",
+      undefined,
+      "boolean",
+      defaultProps.showPageSizeSelector,
+    ),
+    showCurrentPage: d(
+      "Whether to show the current page indicator",
+      undefined,
+      "boolean",
+      defaultProps.showCurrentPage,
+    ),
+    pageSizeSelectorPosition: {
+      description: "Determines where to place the page size selector in the layout.",
+      options: PositionValues,
+      type: "string",
+      default: defaultProps.pageSizeSelectorPosition,
+    },
+    pageInfoPosition: {
+      description: "Determines where to place the page information in the layout.",
+      options: PositionValues,
+      type: "string",
+      default: defaultProps.pageInfoPosition,
+    },
+    buttonRowPosition: d(
+      "Determines where to place the pagination button row in the layout.",
+      PositionValues,
+      "string",
+      defaultProps.buttonRowPosition,
+    ),
     rowDisabledPredicate: d(
       `This property defines a predicate function with a return value that determines if the ` +
         `row should be disabled. The function retrieves the item to display and should return ` +
@@ -115,15 +152,17 @@ export const TableMd = createMetadata({
       defaultValue: false,
     },
     paginationControlsLocation: {
-      description: `This property determines the location of the pagination controls.` +
-      ` It can be set to \`top\`, \`bottom\`, or \`both\`.`,
+      description:
+        `This property determines the location of the pagination controls.` +
+        ` It can be set to \`top\`, \`bottom\`, or \`both\`.`,
       valueType: "string",
       availableValues: TablePaginationControlsLocationValues,
       defaultValue: defaultProps.paginationControlsLocation,
     },
     cellVerticalAlign: {
-      description: `This property controls the vertical alignment of cell content. ` +
-      `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
+      description:
+        `This property controls the vertical alignment of cell content. ` +
+        `It can be set to \`top\`, \`center\`, or \`bottom\`.`,
       valueType: "string",
       availableValues: ["top", "center", "bottom"],
       defaultValue: "center",
@@ -341,6 +380,12 @@ const TableWithColumns = forwardRef(
             node.props.paginationControlsLocation,
           )}
           cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
+          buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
+          pageSizeSelectorPosition={extractValue.asOptionalString(node.props.pageSizeSelectorPosition)}
+          pageInfoPosition={extractValue.asOptionalString(node.props.pageInfoPosition)}
+          showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
+          showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
+          showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
         />
       </>
     );
