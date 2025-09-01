@@ -1,23 +1,30 @@
 <Component name="BlogOverview">
   <Stack width="85%">
-      <H1>XMLUI Blog</H1>
+    <H1>XMLUI Blog</H1>
+    <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
+  </Stack>
+  <List
+    data="{
+      Object.keys($props.posts)
+        .map(function(key) {
+          return Object.assign({}, $props.posts[key], { key: key });
+        })
+        .sort(function(a, b) {
+          return b.date - a.date;
+      })
+    }">
+    <VStack gap="$space-1" width="90%">
+      <Link to="/{$item.slug}">
+        <Text>
+          {$item.title}
+        </Text>
+      </Link>
       <Text>
-        Latest updates, tutorials, and insights for building with XMLUI
+        {$item.date} - {$item.author}
       </Text>
-    </Stack>
-
-    <List data="{convertPostsToArray($props.posts)}">
-        <VStack gap="$space-1" width="90%">
-            <Link to="/{$item.slug}" >
-              <Text>{$item.title}</Text>
-            </Link>
-            <Text>
-              {$item.date} - {$item.author}
-            </Text>
-          <Link to="/{$item.slug}" >
-            <Image src="/blog/images/{$item.image}" />
-          </Link>
-        </VStack>
-    </List>
-
+      <Link to="/{$item.slug}">
+        <Image src="/blog/images/{$item.image}" />
+      </Link>
+    </VStack>
+  </List>
 </Component>
