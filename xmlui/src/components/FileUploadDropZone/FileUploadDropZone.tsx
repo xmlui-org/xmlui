@@ -34,6 +34,8 @@ export const FileUploadDropZoneMd = createMetadata({
       "boolean",
       true,
     ),
+    acceptedFileTypes: d(`Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.`),
+    maxFiles: d(`The maximum number of files that can be selected.`),
   },
   events: {
     upload: d(
@@ -72,6 +74,8 @@ export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
         text={extractValue(node.props.text)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         updateState={updateState}
+        acceptedFileTypes={extractValue.asOptionalString(node.props.acceptedFileTypes)}
+        maxFiles={extractValue.asOptionalNumber(node.props.maxFiles)}
       >
         {renderChild(node.children, { type: "Stack" })}
       </FileUploadDropZone>
