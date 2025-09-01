@@ -1,42 +1,61 @@
 const fs = require('fs');
 const path = require('path');
 
-// Extract blog titles from Main.xmlui
-function extractBlogTitles(content) {
+// Extract blog posts data from Main.xmlui's var.posts definition
+function extractBlogPosts() {
+  const mainXmluiPath = path.join(__dirname, '../src/Main.xmlui');
+  const content = fs.readFileSync(mainXmluiPath, 'utf8');
+
   try {
-    // Find the blogTitles variable definition - extract content between outer braces
-    const blogTitlesMatch = content.match(/var\.blogTitles="\s*\{\s*(\{[^}]*\})\s*\}"/);
-    if (blogTitlesMatch) {
-      const blogTitlesJson = blogTitlesMatch[1];
-      // Convert XMLUI object syntax to JSON
-      const jsonString = blogTitlesJson
-        .replace(/(\w+):\s*'([^']*)'/g, '"$1": "$2"') // Convert 'key': 'value' to "key": "value"
-        .replace(/(\w+):\s*"([^"]*)"/g, '"$1": "$2"'); // Convert 'key': "value" to "key": "value"
-      return JSON.parse(jsonString);
+    // Find the var.posts definition - extract content between backticks
+    const postsMatch = content.match(/var\.posts\s*=\s*`\{\{([^`]*)\}\}`/s);
+    if (!postsMatch) {
+      console.warn('No var.posts found in Main.xmlui');
+      return [];
     }
-    return {};
+
+    const postsContent = postsMatch[1].trim();
+    const blogPosts = [];
+
+    // Parse each post entry (p1: {...}, p2: {...}, etc.)
+    const postMatches = postsContent.match(/(\w+):\s*\{([^}]*)\}/g);
+    
+    if (postMatches) {
+      postMatches.forEach(postMatch => {
+        const [, postKey] = postMatch.match(/(\w+):/);
+        
+        // Extract properties from the post object
+        const titleMatch = postMatch.match(/title:\s*"([^"]*)"/);
+        const slugMatch = postMatch.match(/slug:\s*"([^"]*)"/);
+        const authorMatch = postMatch.match(/author:\s*"([^"]*)"/);
+        const dateMatch = postMatch.match(/date:\s*"([^"]*)"/);
+
+        if (titleMatch && slugMatch && authorMatch && dateMatch) {
+          blogPosts.push({
+            key: postKey,
+            title: titleMatch[1],
+            slug: slugMatch[1],
+            author: authorMatch[1],
+            date: dateMatch[1]
+          });
+        }
+      });
+    }
+
+    return blogPosts;
   } catch (error) {
-    console.error('Error extracting blog titles:', error.message);
-    return {};
+    console.error('Error extracting blog posts:', error.message);
+    return [];
   }
 }
 
-// Resolve blog title references in a string
-function resolveBlogTitles(str, blogTitles) {
-  return str.replace(/\{blogTitles\.(\w+)\}/g, (match, varName) => {
-    return blogTitles[varName] || match;
-  });
-}
-
-// Read blog post content and extract first 250 characters
-function getPostDescription(url) {
+// Read blog post content and extract description
+function getPostDescription(slug) {
   try {
-    // Convert /blog/1.md to public/blog/1.md
-    const publicPath = url.replace('/blog/', 'public/blog/');
-    const postPath = path.join(__dirname, '..', publicPath);
+    const postPath = path.join(__dirname, '../public/blog', `${slug}.md`);
     const content = fs.readFileSync(postPath, 'utf8');
 
-    // Strip markdown formatting (basic cleanup)
+    // Strip markdown formatting for description
     let plainText = content
       .replace(/^#+\s+/gm, '') // Remove headers
       .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
@@ -49,50 +68,16 @@ function getPostDescription(url) {
       .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
 
-    // Take first 250 characters, add ellipsis if truncated
+    // Take first 250 characters for description
     if (plainText.length > 250) {
-      return plainText.substring(0, 250) + '...';
+      return plainText.substring(0, 250).trim() + '...';
     }
 
     return plainText;
   } catch (error) {
-    console.warn(`Warning: Could not read post content for ${url}:`, error.message);
-    return '';
+    console.warn(`Warning: Could not read post content for ${slug}:`, error.message);
+    return 'Blog post content not available.';
   }
-}
-
-// Read Main.xmlui and extract blog post metadata
-function extractBlogPosts() {
-  const mainXmluiPath = path.join(__dirname, '../src/Main.xmlui');
-  const content = fs.readFileSync(mainXmluiPath, 'utf8');
-
-  const blogTitles = extractBlogTitles(content);
-  const blogPosts = [];
-
-  // Find all BlogPage components with their props
-  const blogPageRegex = /<BlogPage\s+([^>]*)\s*\/>/g;
-  let match;
-
-  while ((match = blogPageRegex.exec(content)) !== null) {
-    const props = match[1];
-
-    // Extract props using regex
-    const titleMatch = props.match(/title="([^"]*)"/);
-    const authorMatch = props.match(/author="([^"]*)"/);
-    const dateMatch = props.match(/date="([^"]*)"/);
-    const urlMatch = props.match(/url="([^"]*)"/);
-
-    if (titleMatch && authorMatch && dateMatch && urlMatch) {
-      blogPosts.push({
-        title: resolveBlogTitles(titleMatch[1], blogTitles),
-        author: authorMatch[1],
-        date: dateMatch[1],
-        url: urlMatch[1]
-      });
-    }
-  }
-
-  return blogPosts;
 }
 
 // Convert date string to RFC 822 format for RSS
@@ -109,7 +94,7 @@ function generateRSS(blogPosts) {
 <rss version="2.0">
   <channel>
     <title>XMLUI Blog</title>
-    <link>https://docs.xmlui.org/blog</link>
+    <link>https://docs.xmlui.org</link>
     <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
     <language>en</language>
     <lastBuildDate>${now}</lastBuildDate>
@@ -118,24 +103,21 @@ function generateRSS(blogPosts) {
   // Sort posts by date (newest first)
   blogPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      blogPosts.forEach(post => {
-      const pubDate = formatDate(post.date);
-      // Extract the blog post number from the URL and create the proper blog URL
-      const blogNumber = post.url.match(/\/blog\/(\d+)\.md/)?.[1] || '1';
-      const postUrl = `https://docs.xmlui.org/blog-${blogNumber}`;
+  blogPosts.forEach(post => {
+    const pubDate = formatDate(post.date);
+    const postUrl = `https://docs.xmlui.org/${post.slug}`;
+    const description = getPostDescription(post.slug);
 
-      // Get the actual post description
-      const description = getPostDescription(post.url);
-
-      rss += `
-      <item>
-        <title>${escapeXml(post.title)}</title>
-        <link>${postUrl}</link>
-        <description>${escapeXml(description)}</description>
-        <pubDate>${pubDate}</pubDate>
-        <author>${escapeXml(post.author)}</author>
-      </item>`;
-    });
+    rss += `
+    <item>
+      <title>${escapeXml(post.title)}</title>
+      <link>${postUrl}</link>
+      <description>${escapeXml(description)}</description>
+      <pubDate>${pubDate}</pubDate>
+      <author>support@xmlui.org (${escapeXml(post.author)})</author>
+      <guid>${postUrl}</guid>
+    </item>`;
+  });
 
   rss += `
   </channel>
@@ -146,6 +128,9 @@ function generateRSS(blogPosts) {
 
 // Escape XML special characters
 function escapeXml(text) {
+  if (typeof text !== 'string') {
+    text = String(text);
+  }
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -160,13 +145,28 @@ function main() {
     console.log('Generating RSS feed...');
 
     const blogPosts = extractBlogPosts();
-    console.log(`Found ${blogPosts.length} blog posts`);
+    console.log(`Found ${blogPosts.length} blog post(s)`);
+    
+    if (blogPosts.length === 0) {
+      console.warn('No blog posts found, creating empty RSS feed');
+    } else {
+      blogPosts.forEach(post => {
+        console.log(`  - "${post.title}" by ${post.author} (${post.date})`);
+      });
+    }
 
     const rssContent = generateRSS(blogPosts);
     const outputPath = path.join(__dirname, '../public/feed.rss');
 
+    // Ensure the public directory exists
+    const publicDir = path.dirname(outputPath);
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+
     fs.writeFileSync(outputPath, rssContent);
-    console.log(`RSS feed generated at: ${outputPath}`);
+    console.log(`RSS feed generated successfully: ${outputPath}`);
+    console.log(`Feed will be available at: https://docs.xmlui.org/feed.rss`);
 
   } catch (error) {
     console.error('Error generating RSS feed:', error);
@@ -179,4 +179,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { extractBlogPosts, generateRSS };
+module.exports = { extractBlogPosts, generateRSS, getPostDescription };
