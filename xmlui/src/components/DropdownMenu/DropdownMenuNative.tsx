@@ -1,5 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
 
@@ -69,6 +69,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     registerComponentApi?.({
@@ -77,17 +78,39 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     });
   }, [registerComponentApi]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <ReactDropdownMenu.Root
       open={open}
       onOpenChange={async (isOpen) => {
         if (isOpen) {
+          // Clear any pending close timeout when opening
+          if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+          }
+          
           const willOpenResult = await onWillOpen?.();
           if (willOpenResult === false) {
             return;
           }
+          setOpen(isOpen);
+        } else {
+          // When closing, add a small delay to allow child components (like Select)
+          // to handle their click-outside events first before the DropdownMenu closes
+          closeTimeoutRef.current = setTimeout(() => {
+            setOpen(false);
+            closeTimeoutRef.current = undefined;
+          }, 0);
         }
-        setOpen(isOpen);
       }}
     >
       <ReactDropdownMenu.Trigger {...rest} asChild disabled={disabled} ref={ref as any}>
