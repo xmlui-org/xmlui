@@ -14,7 +14,7 @@
       })
     }">
     <VStack gap="$space-1" width="90%">
-      <Link to="/{$item.slug}">
+      <Link to="/blog/{$item.slug}">
         <Text>
           {$item.title}
         </Text>
@@ -22,7 +22,7 @@
       <Text>
         {$item.date} - {$item.author}
       </Text>
-      <Link to="/{$item.slug}">
+      <Link to="/blog/{$item.slug}">
         <Image src="/blog/images/{$item.image}" />
       </Link>
     </VStack>
