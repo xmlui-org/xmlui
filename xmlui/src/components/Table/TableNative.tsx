@@ -51,7 +51,7 @@ import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { PaginationNative } from "../Pagination/PaginationNative";
+import { type Position, PaginationNative } from "../Pagination/PaginationNative";
 
 // =====================================================================================================================
 // Helper types
@@ -127,6 +127,12 @@ type TableProps = {
   registerComponentApi: RegisterComponentApiFn;
   noBottomBorder?: boolean;
   cellVerticalAlign?: CellVerticalAlign;
+  showPageInfo?: boolean;
+  showPageSizeSelector?: boolean;
+  showCurrentPage?: boolean;
+  buttonRowPosition?: Position;
+  pageSizeSelectorPosition?: Position;
+  pageInfoPosition?: Position;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -194,6 +200,12 @@ export const Table = forwardRef(
       noBottomBorder = defaultProps.noBottomBorder,
       paginationControlsLocation = defaultProps.paginationControlsLocation,
       cellVerticalAlign = defaultProps.cellVerticalAlign,
+      buttonRowPosition = defaultProps.buttonRowPosition,
+      pageSizeSelectorPosition = defaultProps.pageSizeSelectorPosition,
+      pageInfoPosition = defaultProps.pageInfoPosition,
+      showCurrentPage = defaultProps.showCurrentPage,
+      showPageInfo = defaultProps.showPageInfo,
+      showPageSizeSelector = defaultProps.showPageSizeSelector,
       ...rest
       // cols
     }: TableProps,
@@ -601,6 +613,12 @@ export const Table = forwardRef(
         pageSizeOptions={pageSizeOptions}
         onPageDidChange={(page) => table.setPageIndex(page)}
         onPageSizeDidChange={(size) => table.setPageSize(size)}
+        showCurrentPage={showCurrentPage}
+        showPageInfo={showPageInfo}
+        showPageSizeSelector={showPageSizeSelector}
+        buttonRowPosition={buttonRowPosition}
+        pageInfoPosition={pageInfoPosition}
+        pageSizeSelectorPosition={pageSizeSelectorPosition}
       />
     );
 
@@ -889,4 +907,10 @@ export const defaultProps = {
   noBottomBorder: false,
   paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
   cellVerticalAlign: "center" as CellVerticalAlign,
+  showPageInfo: true,
+  showPageSizeSelector: true,
+  showCurrentPage: true,
+  buttonRowPosition: "center" as Position,
+  pageSizeSelectorPosition: "start" as Position,
+  pageInfoPosition: "end" as Position,
 };
