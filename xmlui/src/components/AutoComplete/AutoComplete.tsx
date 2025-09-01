@@ -57,6 +57,12 @@ export const AutoCompleteMd = createMetadata({
       ...dEnabled(),
       defaultValue: defaultProps.enabled,
     },
+    initiallyOpen: d(
+      `This property determines whether the dropdown list is open when the component is first rendered.`,
+      null,
+      "boolean",
+      defaultProps.initiallyOpen,
+    ),
     creatable: d(
       `This property allows the user to create new items that are not present in the list of options.`,
       null,
@@ -181,6 +187,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {

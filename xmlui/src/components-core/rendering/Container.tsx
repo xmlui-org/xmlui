@@ -243,7 +243,7 @@ export const Container = memo(
             dispatch({
               type: ContainerActionKind.EVENT_HANDLER_STARTED,
               payload: {
-                uid: componentUid.description,
+                uid: componentUid,
                 eventName: options.eventName,
               },
             });
@@ -313,7 +313,7 @@ export const Container = memo(
             dispatch({
               type: ContainerActionKind.EVENT_HANDLER_COMPLETED,
               payload: {
-                uid: componentUid.description,
+                uid: componentUid,
                 eventName: options.eventName,
               },
             });
@@ -333,7 +333,7 @@ export const Container = memo(
             dispatch({
               type: ContainerActionKind.EVENT_HANDLER_ERROR,
               payload: {
-                uid: componentUid.description,
+                uid: componentUid,
                 eventName: options.eventName,
                 error: e,
               },
