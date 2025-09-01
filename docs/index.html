@@ -209,26 +209,6 @@
       alert('Counter was reset!');
     };
 
-    window.convertPostsToArray = function(posts) {
-      if (!posts) return [];
-
-      return Object.keys(posts)
-        .map(function(key) {
-          var post = posts[key];
-          return {
-            key: key,
-            title: post.title,
-            slug: post.slug,
-            author: post.author,
-            date: post.date,
-            image: post.image
-          };
-        })
-        .sort(function(a, b) {
-          return new Date(b.date) - new Date(a.date);
-        });
-    };
-
 
   </script>
 </body>

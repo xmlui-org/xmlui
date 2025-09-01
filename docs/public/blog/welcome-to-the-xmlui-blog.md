@@ -1,6 +1,11 @@
 
-In this inaugural post we'll explore the simple blog engine created for this series of posts. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. This whole site, of which the blog is now a part, is an XMLUI app built with components including [NavPanel](/components/NavPanel), [NavLink](/components/NavLink), [Pages](/components/Pages), [Page](/components/Page), and [Markdown](/components/Markdown). Here was the initial blog prototype.
+In this inaugural post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. The whole site, of which the blog is now a part, is an XMLUI app built with components including [NavPanel](/components/NavPanel), [NavLink](/components/NavLink), [Pages](/components/Pages), [Page](/components/Page), and [Markdown](/components/Markdown).
 
+Let's see how it evolved.
+
+## The simplest possible thing
+
+We started with the simplest possible approach: post metadata and data as literal strings.
 
 ```xmlui-pg name="XMLUI blog v1"
 ---app
@@ -46,7 +51,7 @@ In this inaugural post we'll explore the simple blog engine created for this ser
 
 You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes.
 
-  This is a pretty good start! We can write posts in Markdown, arrange them in reverse chronological order, and hey, it's the essence of a blog. Since it's a blog about XMLUI the live playground is a nice bonus that any XMLUI app might put to good use. The user interfaces that you build with XMLUI will require some explaining, it's handy to explain with working examples as well as images, text, and video.
+This is a pretty good start! We can write posts, arrange them in reverse chronological order, and hey, it's the essence of a blog. Since it's a blog about XMLUI the live playground is a nice bonus that any XMLUI app might put to good use. The user interfaces that you build with XMLUI will require some explaining, it's handy to explain with working examples as well as images, text, and video.
 
 Let's unpack how this works, there isn't much to it. The `App` declared in `Main.xmlui` sets up navigation.
 
@@ -93,6 +98,8 @@ Here's how the prototype `BlogPage` assembles data and metadata to create a post
   </VStack>
 </Component>
 ```
+
+## Use Markdown files
 
 So far the post content exists only as the `content` property passed to the `BlogPage` component. For the real blog we'll want to manage it as a set of Markdown files. This version enables that.
 
@@ -203,10 +210,82 @@ And the `Page` passes the complete post object to `BlogPage`. In v1 we used the 
 </Component>
 ```
 
-Are we done yet? Not quite. We can't call it a blog unless it provides an RSS feed. For that we've added a simple feed generator that reads the metadata and writes `/feed.rss` which is then served statically by the webserver that hosts the site. And we've added feed autodiscovery to the site's `index.htm`.
+## Create an RSS feed
+
+We can't call it a blog unless it provides an RSS feed. For that we've added a simple feed generator that reads the metadata and writes `/feed.rss` which is then served statically by the webserver that hosts the site. And we've added feed autodiscovery to the site's `index.htm`.
 
 ```xmlui
 <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
 ```
 
-It would also be nice to have a blog overview page. Let's prototype 
+It would also be nice to have a blog overview page. Let's prototype
+
+## Create the overview page
+
+Although it's feasible to use a `NavGroup` to list the posts, a blog should really have an overview page. Let's add another user-defined component for that.
+
+```xmlui
+<Component name="BlogOverview">
+  <Stack width="85%">
+    <H1>XMLUI Blog</H1>
+    <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
+  </Stack>
+  <List
+    data="{
+      Object.keys($props.posts)
+        .map(function(key) {
+          return Object.assign({}, $props.posts[key], { key: key });
+        })
+        .sort(function(a, b) {
+          return b.date - a.date;
+      })
+    }">
+    <VStack gap="$space-1" width="90%">
+      <Link to="/{$item.slug}">
+        <Text>
+          {$item.title}
+        </Text>
+      </Link>
+      <Text>
+        {$item.date} - {$item.author}
+      </Text>
+      <Link to="/{$item.slug}">
+        <Image src="/blog/images/{$item.image}" />
+      </Link>
+    </VStack>
+  </List>
+</Component>
+```
+
+We've upgraded the metadata to include an image for each post, served from `/blog/images`.
+
+```xmlui
+var.posts = `{{
+  p1: {
+        title: "Welcome to the XMLUI blog!",
+        slug: "welcome-to-the-xmlui-blog",
+        author: "Jon Udell",
+        date: "2025-09-01",
+        image: "blog-page-component.png"
+      }
+}}`
+```
+
+The `NavGroup` now just becomes a `NavLink`.
+
+```xmlui
+<NavLink label="Blog" to="/blog" />
+```
+
+We refer to the overview in `Pages` along with the same `Page` used for the intro post.
+
+```xmlui
+<Page url="/blog">
+    <BlogOverview posts="{posts}" />
+</Page>
+<Page url="{posts.p1.slug}">
+    <BlogPage post="{posts.p1}" />
+</Page>
+```
+
+And that's it!
