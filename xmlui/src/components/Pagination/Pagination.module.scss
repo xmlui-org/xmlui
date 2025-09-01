@@ -17,30 +17,130 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
 
 @layer components {
   .pagination {
-    display: flex;
-    align-items: createThemeVar("alignment-Pagination");
+    display: grid;
+    align-items: center;
     padding: createThemeVar("padding-Pagination");
     gap: t.$space-4;
-  }
-
-  .paginationHorizontal {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .paginationVertical {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .paginationReverse {
-    &.paginationHorizontal {
-      flex-direction: row-reverse;
-    }
-
+    
+    // Default 3-column layout
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: "a b c";
+    
+    // Vertical layout (3 rows)
     &.paginationVertical {
-      flex-direction: column-reverse;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas: "a" "b" "c";
+      
+      // 2-row layout when only start and end slots are present
+      &:has(.startSlot):has(.endSlot):not(:has(.centerSlot)) {
+        grid-template-rows: auto auto;
+        grid-template-areas: "a" "c";
+      }
+      
+      // 1-row layout when only one slot is present
+      &:has(.startSlot):not(:has(.centerSlot)):not(:has(.endSlot)) {
+        grid-template-rows: auto;
+        grid-template-areas: "a";
+      }
+      
+      &:has(.centerSlot):not(:has(.startSlot)):not(:has(.endSlot)) {
+        grid-template-rows: auto;
+        grid-template-areas: "b";
+      }
+      
+      &:has(.endSlot):not(:has(.startSlot)):not(:has(.centerSlot)) {
+        grid-template-rows: auto;
+        grid-template-areas: "c";
+      }
+      
+      // 2-row layout for start + center
+      &:has(.startSlot):has(.centerSlot):not(:has(.endSlot)) {
+        grid-template-rows: auto auto;
+        grid-template-areas: "a" "b";
+      }
+      
+      // 2-row layout for center + end
+      &:has(.centerSlot):has(.endSlot):not(:has(.startSlot)) {
+        grid-template-rows: auto auto;
+        grid-template-areas: "b" "c";
+      }
+    }
+    
+    // Horizontal layout variations (keep existing)
+    &:not(.paginationVertical) {
+      // 2-column layout when only start and end slots are present
+      &:has(.startSlot):has(.endSlot):not(:has(.centerSlot)) {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "a c";
+      }
+      
+      // 1-column layout when only one slot is present
+      &:has(.startSlot):not(:has(.centerSlot)):not(:has(.endSlot)) {
+        grid-template-columns: 1fr;
+        grid-template-areas: "a";
+      }
+      
+      &:has(.centerSlot):not(:has(.startSlot)):not(:has(.endSlot)) {
+        grid-template-columns: 1fr;
+        grid-template-areas: "b";
+      }
+      
+      &:has(.endSlot):not(:has(.startSlot)):not(:has(.centerSlot)) {
+        grid-template-columns: 1fr;
+        grid-template-areas: "c";
+      }
+      
+      // 2-column layout for start + center
+      &:has(.startSlot):has(.centerSlot):not(:has(.endSlot)) {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "a b";
+      }
+      
+      // 2-column layout for center + end
+      &:has(.centerSlot):has(.endSlot):not(:has(.startSlot)) {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "b c";
+      }
+    }
+  }
+
+  .slot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: t.$space-6;
+    flex-direction: row;
+    
+    .paginationVertical & {
+      flex-direction: column;
+    }
+  }
+
+  .startSlot {
+    grid-area: a;
+    justify-self: start;
+
+    .paginationVertical & {
+      justify-self: stretch;
+    }
+  }
+
+  .centerSlot {
+    grid-area: b;
+    justify-self: center;
+
+    .paginationVertical & {
+      justify-self: stretch;
+    }
+  }
+
+  .endSlot {
+    grid-area: c;
+    justify-self: end;
+
+    .paginationVertical & {
+      justify-self: stretch;
     }
   }
 
@@ -64,9 +164,17 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     padding: t.$space-1 t.$space-2;
     font-size: t.$fontSize-small;
 
+    .paginationVertical & {
+      align-self: center;
+    }
+
     &:focus {
       //outline: 2px solid t.$color-primary-400;
       outline-offset: 2px;
+    }
+
+    &:not([disabled]):hover {
+      cursor: pointer;
     }
 
     &:disabled {
@@ -75,14 +183,13 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     }
   }
 
-  .paginationList {
+  .buttonRow {
     list-style: none;
     padding: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: createThemeVar("alignment-Pagination");
-    gap: createThemeVar("gap-Pagination");
+    gap: createThemeVar("gap-buttonRow-Pagination");
 
     li {
       margin: 0;
