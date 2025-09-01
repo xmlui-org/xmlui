@@ -6,15 +6,16 @@ import { parseLayoutProperty } from "./parse-layout-props";
 export type ResolvedComponentLayout = Record<string, ResolvedPartLayout>;
 
 export type ResolvedPartLayout = {
-  baseStyles: CssPropsWithStates;
-  responsiveStyles: Record<string, CssPropsWithStates>;
+  baseStyles?: CssPropsWithStates;
+  responsiveStyles?: Record<string, CssPropsWithStates>;
 };
 
 export type CssPropsWithStates = CSSProperties & {
-  states: Record<string, CSSProperties>;
+  states?: Record<string, CSSProperties>;
 };
 
 export const THEME_VAR_PREFIX = "xmlui";
+export const BASE_COMPONENT_PART = "_base_";
 const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-_]*)/g;
 const starSizeRegex = /^\d*\*$/;
 
@@ -25,7 +26,7 @@ export function resolveComponentLayoutProps(
   const result: ResolvedComponentLayout = {};
 
   for (const [key, value] of Object.entries(layoutProps)) {
-    const parsed = parseLayoutProperty(key);
+    const parsed = parseLayoutProperty(key, false);
 
     if (typeof parsed === "string") {
       // --- Ignore failed properties
@@ -39,13 +40,39 @@ export function resolveComponentLayoutProps(
       ?.replace(themeVarCapturesRegex, (match: string) => toCssVar(match.trim()));
 
     // --- Some properties may need transformation
-    const cssProps =
+    const cssProps: CSSProperties =
       cssPropName in specialResolvers
-        ? specialResolvers[cssPropName](appliedValue)
+        ? specialResolvers[cssPropName](appliedValue, layoutContext)
         : { [cssPropName]: appliedValue };
+
+    // --- Check if the property belongs to one or more states
+    const stateName = parsed.states && parsed.states.length > 0 ? parsed.states.join("&") : null;
+
+    // --- Prepare the place to store the styles. It belongs to the specified part.
+    const partName = parsed.part ? parsed.part : BASE_COMPONENT_PART;
+    let propertyTarget: any = (result[partName] ??= {});
+    if (parsed.screenSizes && parsed.screenSizes.length > 0) {
+      propertyTarget.responsiveStyles ??= {};
+      propertyTarget.responsiveStyles = {
+        ...propertyTarget.responsiveStyles,
+        [parsed.screenSizes.join("&")]: cssProps,
+      };
+    } else {
+      // --- No screen sizes specified, the property belongs to the base styles
+      propertyTarget.baseStyles ??= {};
+      if (stateName) {
+        propertyTarget.baseStyles.states ??= {};
+        propertyTarget.baseStyles.states = {
+          ...propertyTarget.baseStyles.states,
+          [stateName]: { ...propertyTarget.baseStyles.states[stateName], ...cssProps },
+        };
+      } else {
+        propertyTarget.baseStyles = { ...propertyTarget.baseStyles, ...cssProps };
+      }
+    }
   }
 
-  // --- Temporary result
+  // --- Done
   return result;
 }
 
@@ -90,7 +117,7 @@ function toCssVar(c: string): string {
   return `var(--${THEME_VAR_PREFIX}-${c.substring(1)})`;
 }
 
-type SpecialResolver = (propValue: any) => CSSProperties;
+type SpecialResolver = (propValue: any, layoutContext?: LayoutContext) => CSSProperties;
 
 const specialResolvers: Record<string, SpecialResolver> = {
   paddingHorizontal: (propValue) => ({
@@ -123,4 +150,28 @@ const specialResolvers: Record<string, SpecialResolver> = {
   canShrink: (propValue) => ({
     flexShrink: propValue === "true" ? 1 : 0,
   }),
+  width: (propValue, layoutContext) => {
+    const horizontalStarSize = getHorizontalStarSize(propValue, layoutContext);
+    const result: CSSProperties = {};
+    if (horizontalStarSize !== null) {
+      // --- We use "flex" when width is in start-size and allow shrinking
+      result.flex = horizontalStarSize;
+      result.flexShrink = 1;
+    } else {
+      result.width = propValue;
+    }
+    return result;
+  },
+  height: (propValue, layoutContext) => {
+    const verticalStarSize = getVerticalStarSize(propValue, layoutContext);
+    const result: CSSProperties = {};
+    if (verticalStarSize !== null) {
+      // --- We use "flex" when height is in start-size and allow shrinking
+      result.flex = verticalStarSize;
+      result.flexShrink = 1;
+    } else {
+      result.height = propValue;
+    }
+    return result;
+  },
 };

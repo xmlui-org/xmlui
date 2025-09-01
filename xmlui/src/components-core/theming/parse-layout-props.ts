@@ -8,7 +8,7 @@ export type ParsedLayout = {
   states?: string[];
 }
 
-export function parseLayoutProperty(prop: string): ParsedLayout | string {
+export function parseLayoutProperty(prop: string, parseComponent: boolean = false): ParsedLayout | string {
   if (!prop || typeof prop !== 'string') {
     return "Property string cannot be empty";
   }
@@ -66,6 +66,9 @@ export function parseLayoutProperty(prop: string): ParsedLayout | string {
 
     // Check if it's a component name (starts with uppercase)
     if (isComponentName(segment)) {
+      if (!parseComponent) {
+        return `Component names are not allowed when parseComponent is false: ${segment}`;
+      }
       if (result.component) {
         return "Multiple component names found";
       }
