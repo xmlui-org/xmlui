@@ -61,6 +61,7 @@ type AutoCompleteProps = {
   required?: boolean;
   readOnly?: boolean;
   creatable?: boolean;
+  initiallyOpen?: boolean;
 };
 
 function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
@@ -81,6 +82,7 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   onDidChange: noop,
   onFocus: noop,
   onBlur: noop,
+  initiallyOpen: false,
 };
 
 export const AutoComplete = forwardRef(function AutoComplete(
@@ -111,13 +113,14 @@ export const AutoComplete = forwardRef(function AutoComplete(
     required = defaultProps.required,
     creatable = defaultProps.creatable,
     optionRenderer,
+    initiallyOpen = defaultProps.initiallyOpen,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initiallyOpen);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [options, setOptions] = useState(new Set<Option>());
   const [inputValue, setInputValue] = useState("");
