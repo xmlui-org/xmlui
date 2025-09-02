@@ -219,7 +219,7 @@ export const Toggle = forwardRef(function Toggle(
       ref={forwardedRef}
       id={inputId}
       label={label}
-      style={{ ...style, width: "fit-content" }}
+      style={style}
       className={className}
       labelPosition={labelPosition}
       labelWidth={labelWidth}
@@ -227,7 +227,6 @@ export const Toggle = forwardRef(function Toggle(
       required={required}
       enabled={enabled}
       isInputTemplateUsed={!!inputRenderer}
-      shrinkToLabel={true}
       labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
       // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
       // --- By setting pointerEvents we kind of 'disable' the label click, too

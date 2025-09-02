@@ -9,7 +9,14 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { CSSProperties, ReactNode, useEffect, useRef, useState, useCallback } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -62,6 +69,11 @@ export const defaultProps: Pick<
   showLegend: false,
 };
 
+const defaultChartParams = {
+  chartWidth: 800,
+  chartHeight: 300,
+};
+
 export function BarChart({
   data = [],
   layout = defaultProps.layout,
@@ -82,12 +94,12 @@ export function BarChart({
   tooltipRenderer,
 }: BarChartProps) {
   // Validate and normalize data
-  const validData = Array.isArray(data) ? data : [];
+  const validData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
   const { getThemeVar } = useTheme();
 
   const safeTooltipRenderer = useCallback(
     (props: any) => {
-      if (!tooltipRenderer) return <TooltipContent {...props}/>;
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
 
       // Extract tooltip data from Recharts props
       const tooltipData = {
@@ -98,7 +110,7 @@ export function BarChart({
 
       return tooltipRenderer(tooltipData);
     },
-    [tooltipRenderer]
+    [tooltipRenderer],
   );
 
   const colorValues = useMemo(() => {
@@ -173,7 +185,9 @@ export function BarChart({
 
   useEffect(() => {
     const calc = () => {
-      const width = containerRef?.current?.offsetWidth || 800;
+      const chartWidth = containerRef?.current?.offsetWidth || defaultChartParams.chartWidth;
+      const chartHeight = containerRef?.current?.offsetHeight || defaultChartParams.chartHeight;
+
       const spans = labelsRef.current?.querySelectorAll("span") || [];
       const yTicks = Array.from(
         document.querySelectorAll(".recharts-y-axis .recharts-layer tspan"),
@@ -189,14 +203,14 @@ export function BarChart({
       let leftMargin = Math.ceil(maxWidth / 3);
       let rightMargin = Math.ceil(maxWidth / 3);
       let xAxisH = Math.ceil(fontSize * 1.2);
-      let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+      let maxTicks = Math.max(1, Math.floor(chartWidth / minTickSpacing));
       let skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
       if (skip > 0) {
         angle = -60;
         anchor = "end";
         rad = (Math.abs(angle) * Math.PI) / 180;
         minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
-        maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+        maxTicks = Math.max(1, Math.floor(chartWidth / minTickSpacing));
         skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
         leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
@@ -218,32 +232,29 @@ export function BarChart({
       }
       setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: bottomMargin });
 
-      const chartHeight = containerRef?.current?.offsetHeight || 300;
       const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
       setYTickCount(maxYTicks);
       setXAxisHeight(Math.ceil(fontSize));
-      const containerHeight = containerRef?.current?.offsetHeight || 0;
-      const containerWidth = containerRef?.current?.offsetWidth || 0;
       const neededHeight = 10 + xAxisHeight + 10 + 32;
       const neededWidth = chartMargin.left + chartMargin.right + yAxisWidth + 32;
-      setMiniMode(neededHeight > containerHeight || neededWidth > containerWidth);
+      setMiniMode(neededHeight > chartHeight || neededWidth > chartWidth);
     };
 
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data]);
+  }, [data, chartMargin.left, chartMargin.right, layout, validData.length, yAxisWidth, xAxisHeight]);
 
   const content = useMemo(() => {
     const chart = (
-      <div className={classnames(className, styles.wrapper)} style={style} ref={wrapperRef}>
+      <div className={classnames(className, styles.wrapper)} style={{ flexGrow: 1, ...style}} ref={wrapperRef}>
         <ResponsiveContainer
           ref={containerRef}
           minWidth={60}
           minHeight={60}
           debounce={100}
-          width={"100%"}
-          height={"100%"}
+          width="100%"
+          height="100%"
         >
           <RBarChart
             accessibilityLayer
@@ -296,23 +307,18 @@ export function BarChart({
                 />
               </>
             )}
-            {!miniMode && !hideTooltip && (
-              <Tooltip
-                content={
-                  safeTooltipRenderer
-                }
-              />
-            )}
-            {validData.length > 0 && Object.keys(config).map((key, index) => (
-              <Bar
-                key={index}
-                dataKey={key}
-                fill={config[key].color}
-                radius={stacked ? 0 : 8}
-                stackId={stacked ? "stacked" : undefined}
-                strokeWidth={1}
-              />
-            ))}
+            {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
+            {validData.length > 0 &&
+              Object.keys(config).map((key, index) => (
+                <Bar
+                  key={index}
+                  dataKey={key}
+                  fill={config[key].color}
+                  radius={stacked ? 0 : 8}
+                  stackId={stacked ? "stacked" : undefined}
+                  strokeWidth={1}
+                />
+              ))}
             {showLegend && (
               <RLegend
                 wrapperStyle={{
@@ -334,7 +340,6 @@ export function BarChart({
   }, [
     chartMargin,
     config,
-    data,
     hideTickX,
     hideTickY,
     hideX,
@@ -354,6 +359,8 @@ export function BarChart({
     xAxisHeight,
     yTickCount,
     safeTooltipRenderer,
+    hideTooltip,
+    validData,
   ]);
 
   return (
