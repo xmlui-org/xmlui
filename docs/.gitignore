@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 ui-optimized.zip
+
+# Generated files
+public/feed.rss
+public/blog-search-data.json
