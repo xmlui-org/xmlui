@@ -49,6 +49,10 @@ export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip
   tickFormatterY: (value) => value,
 };
 
+const defaultChartParams = {
+  chartWidth: 800,
+};
+
 export const LineChart = forwardRef(function LineChart({
   data,
   dataKeys = [],
@@ -141,7 +145,7 @@ export const LineChart = forwardRef(function LineChart({
 
   useEffect(() => {
     const calc = () => {
-      const width = containerRef.current?.offsetWidth || 800;
+      const width = containerRef.current?.offsetWidth || defaultChartParams.chartWidth;
       const spans = labelsRef.current?.querySelectorAll("span") || [];
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
@@ -176,7 +180,7 @@ export const LineChart = forwardRef(function LineChart({
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data, nameKey, xAxisHeight]);
+  }, [data, nameKey, xAxisHeight, safeData.length, fontSize]);
   
   // The stroke width of the lines
   const strokeWidth = getThemeVar("width-line-LineChart");
@@ -201,14 +205,14 @@ export const LineChart = forwardRef(function LineChart({
       <div
         ref={forwardedRef}
         className={classnames(className, styles.wrapper)}
-        style={style}
+        style={{ flexGrow: 1, ...style}} 
       >
         <ResponsiveContainer
           ref={containerRef}
           width="100%"
           height="100%"
           minWidth={60}
-          minHeight={60}
+          minHeight={30}
           debounce={100}
         >
           <RLineChart
