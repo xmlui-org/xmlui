@@ -8,7 +8,7 @@ function extractBlogPosts() {
 
   try {
     // Find the var.posts definition - extract content between backticks
-    const postsMatch = content.match(/var\.posts\s*=\s*`\{\{([^`]*)\}\}`/s);
+    const postsMatch = content.match(/var\.posts\s*=\s*`\{([^`]*)\}`/s);
     if (!postsMatch) {
       console.warn('No var.posts found in Main.xmlui');
       return [];
@@ -17,30 +17,35 @@ function extractBlogPosts() {
     const postsContent = postsMatch[1].trim();
     const blogPosts = [];
 
-    // Parse each post entry (p1: {...}, p2: {...}, etc.)
-    const postMatches = postsContent.match(/(\w+):\s*\{([^}]*)\}/g);
+    // Parse array format: [{...}, {...}]
+    // Remove outer brackets and split by object boundaries
+    const cleanContent = postsContent.replace(/^\[|\]$/g, '').trim();
 
-    if (postMatches) {
-      postMatches.forEach(postMatch => {
-        const [, postKey] = postMatch.match(/(\w+):/);
+    // Split by object boundaries (looking for }, { pattern)
+    const objectStrings = cleanContent.split(/\},\s*\{/);
 
-        // Extract properties from the post object
-        const titleMatch = postMatch.match(/title:\s*"([^"]*)"/);
-        const slugMatch = postMatch.match(/slug:\s*"([^"]*)"/);
-        const authorMatch = postMatch.match(/author:\s*"([^"]*)"/);
-        const dateMatch = postMatch.match(/date:\s*"([^"]*)"/);
+    objectStrings.forEach((objStr, index) => {
+      // Add back the braces that were split off
+      if (index === 0) objStr = objStr + '}';
+      else if (index === objectStrings.length - 1) objStr = '{' + objStr;
+      else objStr = '{' + objStr + '}';
 
-        if (titleMatch && slugMatch && authorMatch && dateMatch) {
-          blogPosts.push({
-            key: postKey,
-            title: titleMatch[1],
-            slug: slugMatch[1],
-            author: authorMatch[1],
-            date: dateMatch[1]
-          });
-        }
-      });
-    }
+      // Extract properties from the post object
+      const titleMatch = objStr.match(/title:\s*"([^"]*)"/);
+      const slugMatch = objStr.match(/slug:\s*"([^"]*)"/);
+      const authorMatch = objStr.match(/author:\s*"([^"]*)"/);
+      const dateMatch = objStr.match(/date:\s*"([^"]*)"/);
+
+      if (titleMatch && slugMatch && authorMatch && dateMatch) {
+        blogPosts.push({
+          key: `post${index + 1}`, // Generate a key for compatibility
+          title: titleMatch[1],
+          slug: slugMatch[1],
+          author: authorMatch[1],
+          date: dateMatch[1]
+        });
+      }
+    });
 
     return blogPosts;
   } catch (error) {
