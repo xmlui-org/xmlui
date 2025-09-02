@@ -267,4 +267,187 @@ We can't call it a blog unless it provides an RSS feed. For that we've added a s
 <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
 ```
 
-It would also be nice to have a blog overview page. Let's prototype
+## Add search
+
+The XMLUI repo has a build process that makes documentation available to the search function on this site. We've updated the build to include blog posts.
+
+![blog search](/blog/images/integrated-blog-search.png)
+
+## Deploy standalone
+
+The details of the search mechanism are specific to the XMLUI monorepo. Suppose you wanted to decouple the blog engine from the monorepo and use it standalone? Let's start with this footprint.
+
+
+```
+├── Main.xmlui
+├── blog
+│   ├── images
+│   │   ├── blog-page-component.png
+│   │   └── lorem-ipsum.png
+│   ├── lorem-ipsum.md
+│   └── welcome-to-the-xmlui-blog.md
+├── components
+│   ├── BlogOverview.xmlui
+│   ├── BlogPage.xmlui
+├── index.html
+└── xmlui
+    ├── xmlui-playground.js
+    └── xmlui-standalone.umd.js
+```
+
+Here's the `index.html`.
+
+```xmlui
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XMLUI blog test</title>
+  <script src="xmlui/xmlui-standalone.umd.js"></script>
+  <script src="xmlui/xmlui-playground.js"></script>
+<script>
+</script>
+</head>
+<body>
+</body>
+</html>
+```
+
+And here's `Main.xmlui`.
+
+```xmlui
+<Fragment>
+    <App
+        when="{!window.location.hash.includes('/playground')}"
+        var.posts = `{[
+          {
+            title: "Welcome to the XMLUI blog!",
+            slug: "welcome-to-the-xmlui-blog",
+            author: "Jon Udell",
+            date: "2025-09-01",
+            image: "blog-page-component.png"
+          },
+          {
+            title: "Lorem Ipsum!",
+            slug: "lorem-ipsum",
+            author: "H. Rackham",
+            date: "1914-06-03",
+            image: "lorem-ipsum.png"
+          }
+        ]}`
+        >
+        <AppHeader>
+            <property name="logoTemplate">
+                <Link to="https://xmlui.org/">
+                    <Logo height="$space-8" />
+                </Link>
+            </property>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" />
+          <NavLink label="Blog" to="/blog" />
+        </NavPanel>
+        <Pages fallbackPath="/404">
+           <Page url="/">
+             <Text>Test of XMLUI blog</Text>
+           </Page>
+           <Page url="/blog">
+             <BlogOverview posts="{posts}" />
+           </Page>
+           <Page url="/blog/{posts[0].slug}">
+             <BlogPage post="{posts[0]}" />
+            </Page>
+           <Page url="/blog/{posts[1].slug}">
+             <BlogPage post="{posts[1]}" />
+            </Page>
+        </Pages>
+        <Footer>
+            <ToneSwitch />
+        </Footer>
+    </App>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
+</Fragment>
+```
+
+That's all you need to run the blog. Note that we include `xmlui-playground.js`. The live playgrounds you can use here are provided by an extension, and a standalone app can use that extension in the same way our main site does. So when you serve the blog from a static webserver, the playground examples work the same way.
+
+You can host the standalone blog on any static webserver. We'll do that, but first let's create a search mechanism that's decoupled from the monorepo's build and works entirely client-side. We'll create two user-defined components: `SearchPrep` and `BlogSearch`.
+
+```xmlui
+<Page url="/search">
+  <SearchPrep posts="{posts}" />
+  <BlogSearch posts="{posts}" searchIndex="{window.getblogPosts()}" />
+</Page>
+```
+
+Here is `SearchPrep`. It uses `DataSource` in a `List` to read posts, and calls global functions to process them.
+
+```xmlui
+<Component name="SearchPrep" var.count="{0}">
+
+    <List when="{count <= $props.posts.length}" data="{$props.posts}">
+        <DataSource
+          url="/blog/{$item.slug}.md"
+          onLoaded="(data) => {
+            // Set indexing state on first load;
+            if (window.blogIsIndexing === '') {
+              window.setBlogIndexing();
+            }
+
+            window.setBlogSearchEntry('/blog/' + $item.slug, $item.title + '\n' + data);
+            console.log('Added to blogPosts:', '/blog/' + $item.slug);
+            count++;
+
+            if (window.getBlogSearchCount() >= $props.posts.length) {
+              window.stopBlogIndexing();
+              console.log('Blog indexing complete!');
+
+            }
+          }" />
+
+    </List>
+
+</Component>
+```
+
+Here is `BlogSearch`. It provides a reactive search box so as you type, another global function finds fragments in posts that match your current query.
+
+```xmlui
+<Component name="BlogSearch">
+  <VStack gap="$space-4">
+    <TextBox
+      id="searchQuery"
+      placeholder="Search blog posts..."
+      width="15rem"
+    />
+    <List data="{
+      window.searchBlogPosts($props.posts, $props.searchIndex, searchQuery.value)
+    }">
+      <VStack gap="$space-2">
+        <Link to="/blog/{$item.post.slug}">
+          <H2 value="{$item.post.title}" />
+        </Link>
+        <List data="{$item.matches}">
+          <Card>
+            <Text backgroundColor="$color-warn-100" value="{$item.context}" />
+          </Card>
+        </List>
+      </VStack>
+    </List>
+  </VStack>
+</Component>
+```
+
+With these ingredients in place, I dragged the folder containing the standalone app onto Netlify's drop target. Check it out!
+
+[https://test-xmlui-blog.netlify.app/](https://test-xmlui-blog.netlify.app/)
+
+## Next steps
+
+There's always more to do. For example, we should probably explore what's possible with XMLUI [Themes](/themes-intro). But this is plenty for now. The engine described here evolved during the course of writing this post, it's not yet merged into the site, once that's done and we've sanded off the rough edges we can think about enhancements.
+
+Blog engines are a dime a dozen, and creating a new one is a cliché. We made this one because XMLUI was already a strong publishing system that we use for this site, the [demo site](https://demo.xmlui.org), and the [landing page](https//xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do, and we think it's pretty easy to create an engine that's easy for authors and readers.
+
+
+
