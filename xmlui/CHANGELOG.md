@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.10.6
+
+### Patch Changes
+
+- 6464ec8: fix ssr
+
 ## 0.10.5
 
 ### Patch Changes
