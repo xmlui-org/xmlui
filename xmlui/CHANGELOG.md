@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.10.5
+
+### Patch Changes
+
+- d38351d: fix missing dependency
+
 ## 0.10.4
 
 ### Patch Changes
