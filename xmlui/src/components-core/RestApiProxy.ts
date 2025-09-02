@@ -400,7 +400,7 @@ export default class RestApiProxy {
     if (this.appContext.appGlobals?.withXSRFToken !== false && isURLSameOrigin(url)) {
       const xsrfToken = readCookie("XSRF-TOKEN");
       if(xsrfToken) {
-        aggregatedHeaders["X-XSRF-TOKEN"] = readCookie("XSRF-TOKEN");
+        aggregatedHeaders["X-XSRF-TOKEN"] = xsrfToken;
       }
     }
 
