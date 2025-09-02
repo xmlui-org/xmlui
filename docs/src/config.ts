@@ -84,6 +84,12 @@ const metaJsons: Record<string, MetaJson> = import.meta.glob(`/content/**/_meta.
   eager: true,
 });
 
+// @ts-ignore
+const blogSearchData: Record<string, any> = import.meta.glob(`/public/blog-search-data.json`, {
+  eager: true,
+  query: "?raw",
+});
+
 const content: Record<string, any> = {};
 const plainTextContent: Record<string, string> = {};
 const navPanelContent: any[] = [];
@@ -95,6 +101,20 @@ Object.keys(contentRuntime).map((filePath) => {
   );
   navPanelContent.push(urlFragment);
 });
+
+// Add blog content to search index
+let blogContent: Record<string, string> = {};
+try {
+  if (blogSearchData['/public/blog-search-data.json']) {
+    blogContent = JSON.parse(blogSearchData['/public/blog-search-data.json'].default);
+    console.log(`Loaded ${Object.keys(blogContent).length} blog posts for search indexing`);
+  }
+} catch (error) {
+  console.warn('Could not load blog search data:', error);
+}
+
+// Merge blog content into plainTextContent
+Object.assign(plainTextContent, blogContent);
 
 const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
   eager: true,

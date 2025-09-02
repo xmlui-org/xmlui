@@ -80,6 +80,18 @@ function getPostDescription(slug) {
   }
 }
 
+// Read blog post content for search indexing
+function getPostContent(slug) {
+  try {
+    const postPath = path.join(__dirname, '../public/blog', `${slug}.md`);
+    const content = fs.readFileSync(postPath, 'utf8');
+    return content;
+  } catch (error) {
+    console.warn(`Warning: Could not read post content for ${slug}:`, error.message);
+    return '';
+  }
+}
+
 // Convert date string to RFC 822 format for RSS
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -126,6 +138,26 @@ function generateRSS(blogPosts) {
   return rss;
 }
 
+// Generate search data for blog posts
+function generateSearchData(blogPosts) {
+  const searchData = {};
+
+  blogPosts.forEach(post => {
+    const content = getPostContent(post.slug);
+    if (content) {
+      // Use the title from metadata, not from first line of content
+      const title = post.title;
+      const contentWithoutTitle = content.trim();
+
+      // Create search entry with blog post URL
+      // Format: first line is title, rest is content (matching search system expectations)
+      searchData[`/blog/${post.slug}`] = `${title}\n${contentWithoutTitle}`;
+    }
+  });
+
+  return searchData;
+}
+
 // Escape XML special characters
 function escapeXml(text) {
   if (typeof text !== 'string') {
@@ -142,7 +174,7 @@ function escapeXml(text) {
 // Main execution
 function main() {
   try {
-    console.log('Generating RSS feed...');
+    console.log('Generating blog content...');
 
     const blogPosts = extractBlogPosts();
     console.log(`Found ${blogPosts.length} blog post(s)`);
@@ -155,21 +187,32 @@ function main() {
       });
     }
 
+    // Generate RSS feed
     const rssContent = generateRSS(blogPosts);
-    const outputPath = path.join(__dirname, '../public/feed.rss');
+    const rssOutputPath = path.join(__dirname, '../public/feed.rss');
+
+    // Generate search data
+    const searchData = generateSearchData(blogPosts);
+    const searchOutputPath = path.join(__dirname, '../public/blog-search-data.json');
 
     // Ensure the public directory exists
-    const publicDir = path.dirname(outputPath);
+    const publicDir = path.dirname(rssOutputPath);
     if (!fs.existsSync(publicDir)) {
       fs.mkdirSync(publicDir, { recursive: true });
     }
 
-    fs.writeFileSync(outputPath, rssContent);
-    console.log(`RSS feed generated successfully: ${outputPath}`);
+    // Write RSS feed
+    fs.writeFileSync(rssOutputPath, rssContent);
+    console.log(`RSS feed generated successfully: ${rssOutputPath}`);
     console.log(`Feed will be available at: https://docs.xmlui.org/feed.rss`);
 
+    // Write search data
+    fs.writeFileSync(searchOutputPath, JSON.stringify(searchData, null, 2));
+    console.log(`Search data generated successfully: ${searchOutputPath}`);
+    console.log(`Search data contains ${Object.keys(searchData).length} blog posts`);
+
   } catch (error) {
-    console.error('Error generating RSS feed:', error);
+    console.error('Error generating blog content:', error);
     process.exit(1);
   }
 }
@@ -179,4 +222,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { extractBlogPosts, generateRSS, getPostDescription };
+module.exports = { extractBlogPosts, generateRSS, generateSearchData, getPostDescription, getPostContent };
