@@ -194,7 +194,16 @@ export function BarChart({
       ) as SVGGraphicsElement[];
       const maxYTickWidth =
         yTicks.length > 0 ? Math.max(...yTicks.map((t) => t.getBBox().width)) : 40;
-      setYAxisWidth(maxYTickWidth);
+      
+      // Only update if the value actually changed
+      // NOTE: This might cause recursive calls along with setting the state in here directly. Fix if necessary.
+      setYAxisWidth((prev) => {
+        // Add a small tolerance to prevent micro-adjustments
+        if (Math.abs(maxYTickWidth - prev) > 1) {
+          return maxYTickWidth;
+        }
+        return prev;
+      });
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
       let anchor: "end" | "middle" = "middle";
@@ -243,7 +252,9 @@ export function BarChart({
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data, chartMargin.left, chartMargin.right, layout, validData.length, yAxisWidth, xAxisHeight]);
+    // See note above: leaving out yAxisWidth may stop recursive calls but is hacky
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
   const content = useMemo(() => {
     const chart = (
