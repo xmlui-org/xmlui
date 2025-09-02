@@ -89,6 +89,7 @@
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.0.19",
     "react-rnd": "^10.5.2",
+    "react-router-dom": "6.26.2",
     "react-select": "5.7.4",
     "react-sticky-el": "^2.1.1",
     "react-textarea-autosize": "8.5.3",
