@@ -111,7 +111,7 @@ function appendFormFieldValue(
 }
 
 
-const origin = typeof window !== "undefined" && (window.location.href || 'http://localhost');
+const origin = (typeof window !== "undefined" && window.location?.href) || 'http://localhost';
 const originUrl = new URL(origin);
 function isURLSameOrigin(url: string): boolean {
   const urlObj = new URL(url, origin);
