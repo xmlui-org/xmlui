@@ -194,7 +194,7 @@ export function BarChart({
       ) as SVGGraphicsElement[];
       const maxYTickWidth =
         yTicks.length > 0 ? Math.max(...yTicks.map((t) => t.getBBox().width)) : 40;
-      
+
       // Only update if the value actually changed
       // NOTE: This might cause recursive calls along with setting the state in here directly. Fix if necessary.
       setYAxisWidth((prev) => {
@@ -257,8 +257,60 @@ export function BarChart({
   }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
   const content = useMemo(() => {
+    // NOTE: Had to place props separately since, for some reason, Recharts cannot handle
+    // if the axes are placed in a React.Fragment. Unsure why, because this worked before.
+
+    const xAxisProps: Record<string, any> =
+      layout === "vertical"
+        ? {
+            type: "number",
+            axisLine: false,
+            hide: miniMode || hideX,
+            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          }
+        : {
+            type: "category",
+            dataKey: nameKey,
+            interval: interval,
+            tickLine: false,
+            angle: tickAngle,
+            textAnchor: tickAnchor,
+            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+            height: miniMode || hideX ? 0 : xAxisHeight,
+            hide: miniMode || hideX,
+            
+          };
+
+    const yAxisProps: Record<string, any> =
+      layout === "vertical"
+        ? {
+            type: "category",
+            dataKey: nameKey,
+            hide: miniMode || hideY,
+            interval: "equidistantPreserveStart",
+            tickLine: false,
+            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+            width: miniMode || hideY || hideTickY ? 0 : yAxisWidth,
+          }
+        : {
+            type: "number",
+            axisLine: false,
+            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+            hide: miniMode || hideY,
+            tickCount: yTickCount,
+            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+            width: miniMode || hideY || hideTickY ? 0 : yAxisWidth,
+          };
+
     const chart = (
-      <div className={classnames(className, styles.wrapper)} style={{ flexGrow: 1, ...style}} ref={wrapperRef}>
+      <div
+        className={classnames(className, styles.wrapper)}
+        style={{ flexGrow: 1, ...style }}
+        ref={wrapperRef}
+      >
         <ResponsiveContainer
           ref={containerRef}
           minWidth={60}
@@ -274,50 +326,8 @@ export function BarChart({
             margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
           >
             <CartesianGrid vertical={true} strokeDasharray="3 3" />
-            {layout === "vertical" ? (
-              <>
-                <XAxis
-                  type="number"
-                  axisLine={false}
-                  hide={miniMode || hideX}
-                  tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
-                  tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
-                />
-                <YAxis
-                  hide={miniMode || hideY}
-                  dataKey={nameKey}
-                  type="category"
-                  interval={"equidistantPreserveStart"}
-                  tickLine={false}
-                  tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
-                  tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
-                />
-              </>
-            ) : (
-              <>
-                <XAxis
-                  dataKey={nameKey}
-                  type="category"
-                  interval={interval}
-                  tickLine={false}
-                  angle={tickAngle}
-                  textAnchor={tickAnchor}
-                  tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
-                  tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
-                  height={miniMode || hideX ? 0 : xAxisHeight}
-                  hide={miniMode || hideX}
-                />
-                <YAxis
-                  type="number"
-                  axisLine={false}
-                  tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
-                  hide={miniMode || hideY}
-                  tickCount={yTickCount}
-                  tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
-                  width={miniMode || hideY || hideTickY ? 0 : 40}
-                />
-              </>
-            )}
+            <XAxis {...xAxisProps} />
+            <YAxis {...yAxisProps} />
             {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {validData.length > 0 &&
               Object.keys(config).map((key, index) => (
@@ -368,6 +378,7 @@ export function BarChart({
     tickFormatterX,
     tickFormatterY,
     xAxisHeight,
+    yAxisWidth,
     yTickCount,
     safeTooltipRenderer,
     hideTooltip,
