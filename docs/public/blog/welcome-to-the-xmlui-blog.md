@@ -447,7 +447,7 @@ With these ingredients in place, I dragged the folder containing the standalone 
 
 There's always more to do. For example, we should probably explore what's possible with XMLUI [Themes](/themes-intro). But this is plenty for now. The engine described here evolved during the course of writing this post, it's not yet merged into the site, once that's done and we've sanded off the rough edges we can think about enhancements.
 
-And yeah, we know, blog engines are a dime a dozen. We made this one because XMLUI was already a strong publishing system  — we use it this site, the [demo site](https://demo.xmlui.org), and the [landing page](https//xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do. We think it's pretty easy to create a competent engine that makes life easy for authors and readers. 
+And yeah, we know, blog engines are a dime a dozen. We made this one because XMLUI was already a strong publishing system  — we use it this site, the [demo site](https://demo.xmlui.org), and the [landing page](https://xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do. We think it's pretty easy to create a competent engine that makes life easy for authors and readers.
 
 
 
