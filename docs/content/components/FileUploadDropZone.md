@@ -24,6 +24,10 @@ You can also paste files from the clipboard: click the drop zone (cyan area) and
 
 ## Properties [#properties]
 
+### `acceptedFileTypes` [#acceptedfiletypes]
+
+Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'.
+
 ### `allowPaste` (default: true) [#allowpaste-default-true]
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
@@ -47,6 +51,10 @@ Try it! When you copy a file to a clipboard, you cannot paste it with the keyboa
 ### `enabled` (default: true) [#enabled-default-true]
 
 If set to `false`, the drop zone will be disabled and users will not be able to upload files.
+
+### `maxFiles` [#maxfiles]
+
+The maximum number of files that can be selected.
 
 ### `text` (default: "Drop files here") [#text-default-drop-files-here]
 

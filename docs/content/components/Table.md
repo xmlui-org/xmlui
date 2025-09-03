@@ -46,6 +46,12 @@ This property indicates when the row selection header is displayed. When the val
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `buttonRowPosition` (default: "center") [#buttonrowposition-default-center]
+
+Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).
+
+Available values: `start`, `center` **(default)**, `end`
+
 ### `cellVerticalAlign` (default: "center") [#cellverticalalign-default-center]
 
 This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.
@@ -719,6 +725,10 @@ A property to customize what to display if the table does not contain any data.
 </App>
 ```
 
+### `pageInfoPosition` [#pageinfoposition]
+
+Determines where to place the page information in the layout. It works the same as the [Pagination component property](./Pagination#pageinfoposition).
+
 ### `pageSize` [#pagesize]
 
 This property defines the number of rows to display per page when pagination is enabled.
@@ -876,6 +886,10 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   </Table>
 </App>
 ```
+
+### `pageSizeSelectorPosition` [#pagesizeselectorposition]
+
+Determines where to place the page size selector in the layout. It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).
 
 ### `paginationControlsLocation` (default: "bottom") [#paginationcontrolslocation-default-bottom]
 
@@ -1038,6 +1052,18 @@ The default value is `false`.
   </Table>
 </App>
 ```
+
+### `showCurrentPage` (default: true) [#showcurrentpage-default-true]
+
+Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).
+
+### `showPageInfo` (default: true) [#showpageinfo-default-true]
+
+Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).
+
+### `showPageSizeSelector` (default: true) [#showpagesizeselector-default-true]
+
+Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).
 
 ### `sortBy` [#sortby]
 
