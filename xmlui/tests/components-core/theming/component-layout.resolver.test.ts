@@ -653,8 +653,6 @@ describe("Component property layout", () => {
         },
       });
     });
-
-
   });
 
   describe("component properties with parts and state", () => {
@@ -798,7 +796,12 @@ describe("Component property layout", () => {
           baseStyles: { states: { "hover&active": { color: "red" }, hover: { fontSize: "12px" } } },
         },
         handle: {
-          baseStyles: { states: { focus: { backgroundColor: "green" }, "focus&active": { border: "1px solid black" } } },
+          baseStyles: {
+            states: {
+              focus: { backgroundColor: "green" },
+              "focus&active": { border: "1px solid black" },
+            },
+          },
         },
       });
     });
@@ -807,9 +810,9 @@ describe("Component property layout", () => {
   describe("mixed component properties, parts, and states", () => {
     it("mix of base properties, parts without states, and parts with states", () => {
       const result = resolveComponentLayoutProps({
-        color: "blue",                           // base property
-        "backgroundColor-header": "yellow",     // part property without state
-        "fontSize-indicator--hover": "14px",    // part property with state
+        color: "blue", // base property
+        "backgroundColor-header": "yellow", // part property without state
+        "fontSize-indicator--hover": "14px", // part property with state
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -826,9 +829,9 @@ describe("Component property layout", () => {
 
     it("mix of base properties with states and parts with states", () => {
       const result = resolveComponentLayoutProps({
-        "color--hover": "red",                  // base property with state
+        "color--hover": "red", // base property with state
         "backgroundColor-header--focus": "green", // part property with state
-        "border-footer": "1px solid black",     // part property without state
+        "border-footer": "1px solid black", // part property without state
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -845,30 +848,30 @@ describe("Component property layout", () => {
 
     it("complex mix: base properties, parts, multiple states", () => {
       const result = resolveComponentLayoutProps({
-        width: "100px",                           // base property
-        height: "50px",                          // base property
-        "color--hover": "red",                   // base property with state
-        "backgroundColor--active": "blue",       // base property with different state
-        "fontSize-header": "16px",               // part property
-        "padding-header--hover": "10px",         // part property with state
-        "margin-footer--focus--active": "5px",   // part property with multiple states
-        "border-sidebar": "2px solid gray",      // different part property
+        width: "100px", // base property
+        height: "50px", // base property
+        "color--hover": "red", // base property with state
+        "backgroundColor--active": "blue", // base property with different state
+        "fontSize-header": "16px", // part property
+        "padding-header--hover": "10px", // part property with state
+        "margin-footer--focus--active": "5px", // part property with multiple states
+        "border-sidebar": "2px solid gray", // different part property
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
-          baseStyles: { 
-            width: "100px", 
+          baseStyles: {
+            width: "100px",
             height: "50px",
-            states: { 
-              hover: { color: "red" }, 
-              active: { backgroundColor: "blue" } 
-            } 
+            states: {
+              hover: { color: "red" },
+              active: { backgroundColor: "blue" },
+            },
           },
         },
         header: {
-          baseStyles: { 
+          baseStyles: {
             fontSize: "16px",
-            states: { hover: { padding: "10px" } }
+            states: { hover: { padding: "10px" } },
           },
         },
         footer: {
@@ -882,16 +885,16 @@ describe("Component property layout", () => {
 
     it("same property applied to different contexts", () => {
       const result = resolveComponentLayoutProps({
-        color: "black",                          // base color
-        "color-header": "blue",                  // header color
-        "color-footer--hover": "red",            // footer color on hover
-        "color--active": "green",                // base color on active
+        color: "black", // base color
+        "color-header": "blue", // header color
+        "color-footer--hover": "red", // footer color on hover
+        "color--active": "green", // base color on active
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
-          baseStyles: { 
+          baseStyles: {
             color: "black",
-            states: { active: { color: "green" } }
+            states: { active: { color: "green" } },
           },
         },
         header: {
@@ -905,26 +908,26 @@ describe("Component property layout", () => {
 
     it("overlapping states across base and parts", () => {
       const result = resolveComponentLayoutProps({
-        "backgroundColor--hover": "lightblue",   // base background on hover
-        "color--hover": "darkblue",              // base color on hover
-        "fontSize-title--hover": "18px",         // title font size on hover
-        "padding-title--focus": "8px",           // title padding on focus
-        "margin-content--hover--focus": "12px",  // content margin on hover and focus
+        "backgroundColor--hover": "lightblue", // base background on hover
+        "color--hover": "darkblue", // base color on hover
+        "fontSize-title--hover": "18px", // title font size on hover
+        "padding-title--focus": "8px", // title padding on focus
+        "margin-content--hover--focus": "12px", // content margin on hover and focus
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
-          baseStyles: { 
-            states: { 
-              hover: { backgroundColor: "lightblue", color: "darkblue" }
-            }
+          baseStyles: {
+            states: {
+              hover: { backgroundColor: "lightblue", color: "darkblue" },
+            },
           },
         },
         title: {
-          baseStyles: { 
-            states: { 
+          baseStyles: {
+            states: {
               hover: { fontSize: "18px" },
-              focus: { padding: "8px" }
-            }
+              focus: { padding: "8px" },
+            },
           },
         },
         content: {
@@ -935,24 +938,24 @@ describe("Component property layout", () => {
 
     it("multiple properties per part with mixed states", () => {
       const result = resolveComponentLayoutProps({
-        "width-card": "200px",                   // card width (no state)
-        "height-card": "150px",                  // card height (no state)
-        "backgroundColor-card--hover": "gray",   // card background on hover
+        "width-card": "200px", // card width (no state)
+        "height-card": "150px", // card height (no state)
+        "backgroundColor-card--hover": "gray", // card background on hover
         "border-card--focus": "2px solid blue", // card border on focus
-        "color-card--hover--active": "white",   // card color on hover and active
-        "padding-card": "16px",                  // card padding (no state)
+        "color-card--hover--active": "white", // card color on hover and active
+        "padding-card": "16px", // card padding (no state)
       });
       expect(result).toStrictEqual({
         card: {
-          baseStyles: { 
+          baseStyles: {
             width: "200px",
             height: "150px",
             padding: "16px",
-            states: { 
+            states: {
               hover: { backgroundColor: "gray" },
               focus: { border: "2px solid blue" },
-              "hover&active": { color: "white" }
-            }
+              "hover&active": { color: "white" },
+            },
           },
         },
       });
@@ -960,33 +963,58 @@ describe("Component property layout", () => {
 
     it("state conflicts and merging across different parts", () => {
       const result = resolveComponentLayoutProps({
-        "color--focus": "red",                   // base color on focus
-        "backgroundColor--focus": "yellow",     // base background on focus
-        "fontSize-header--focus": "20px",       // header font size on focus
-        "color-footer--focus": "blue",          // footer color on focus (different from base)
-        "margin-header": "10px",                // header margin (no state)
-        "padding-footer--active": "5px",        // footer padding on active
+        "color--focus": "red", // base color on focus
+        "backgroundColor--focus": "yellow", // base background on focus
+        "fontSize-header--focus": "20px", // header font size on focus
+        "color-footer--focus": "blue", // footer color on focus (different from base)
+        "margin-header": "10px", // header margin (no state)
+        "padding-footer--active": "5px", // footer padding on active
       });
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
-          baseStyles: { 
-            states: { 
-              focus: { color: "red", backgroundColor: "yellow" }
-            }
+          baseStyles: {
+            states: {
+              focus: { color: "red", backgroundColor: "yellow" },
+            },
           },
         },
         header: {
-          baseStyles: { 
+          baseStyles: {
             margin: "10px",
-            states: { focus: { fontSize: "20px" } }
+            states: { focus: { fontSize: "20px" } },
           },
         },
         footer: {
-          baseStyles: { 
-            states: { 
+          baseStyles: {
+            states: {
               focus: { color: "blue" },
-              active: { padding: "5px" }
-            }
+              active: { padding: "5px" },
+            },
+          },
+        },
+      });
+    });
+  });
+
+  describe("regression", () => {
+    it("has responsive with state", () => {
+      const result = resolveComponentLayoutProps({
+        backgroundColor: "red",
+        "backgroundColor-xxl": "green",
+        "backgroundColor-xxl--hover": "blue",
+      });
+      expect(result).toStrictEqual({
+        [BASE_COMPONENT_PART]: {
+          baseStyles: {
+            backgroundColor: "red",
+          },
+          responsiveStyles: {
+            xxl: {
+              backgroundColor: "green",
+              states: {
+                hover: { backgroundColor: "blue" },
+              },
+            },
           },
         },
       });
