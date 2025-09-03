@@ -54,37 +54,40 @@ export const TableMd = createMetadata({
         "pagination. If this property is not defined, the component allows only a page size of 10 items.",
     },
     showPageInfo: d(
-      "Whether to show page information",
+      "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
       undefined,
       "boolean",
       defaultProps.showPageInfo,
     ),
     showPageSizeSelector: d(
-      "Whether to show the page size selector",
+      "Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).",
       undefined,
       "boolean",
       defaultProps.showPageSizeSelector,
     ),
     showCurrentPage: d(
-      "Whether to show the current page indicator",
+      "Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).",
       undefined,
       "boolean",
       defaultProps.showCurrentPage,
     ),
     pageSizeSelectorPosition: {
-      description: "Determines where to place the page size selector in the layout.",
+      description: "Determines where to place the page size selector in the layout. " +
+        "It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).",
       options: PositionValues,
       type: "string",
       default: defaultProps.pageSizeSelectorPosition,
     },
     pageInfoPosition: {
-      description: "Determines where to place the page information in the layout.",
+      description: "Determines where to place the page information in the layout. " +
+        "It works the same as the [Pagination component property](./Pagination#pageinfoposition).",
       options: PositionValues,
       type: "string",
       default: defaultProps.pageInfoPosition,
     },
     buttonRowPosition: d(
-      "Determines where to place the pagination button row in the layout.",
+      "Determines where to place the pagination button row in the layout. " +
+        "It works the same as the [Pagination component property](./Pagination#buttonrowposition).",
       PositionValues,
       "string",
       defaultProps.buttonRowPosition,

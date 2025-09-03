@@ -23,73 +23,33 @@ In this case the `DataSource` component does the heavy lifting by querying the p
 
 ```xmlui-pg
 ---app display
-<App
-    var.pageSize="{5}"
-    var.currentPage="{0}"
-    var.before="{0}"
-    var.after="{pageSize-1}"
-  >
-  <DataSource
-    id="pagination_ds"
-    url="/api/pagination_items/{before}/{after}"
-    />
-    <Text>
-      Page {currentPage + 1}, showing items {before + 1}-{after + 1}
-    </Text>
-    <Pagination
-      id="pagination"
-      itemCount="20"
-      pageSize="{pageSize}"
-      pageIndex="{currentPage}"
-      onPageDidChange="(page, size, total) => {
-        currentPage = page;
-        before = page * size;
-        after = before + size - 1;
-        pagination_ds.refetch();
-      }"
-      onPageSizeDidChange="(size) => {
-        pageSize = size;
-        before = currentPage * size;
-        after = before + size - 1;
-        pagination_ds.refetch();
-      }"
-    />
-    <List data="{pagination_ds}" />
+<App var.pageSize="{5}" var.currentPage="{0}" var.before="{0}" var.after="{pageSize-1}">
+  <DataSource id="pagination_ds" url="/api/pagination_items" queryParams="{{ from: before, to: after }}" />
+  <Pagination
+    itemCount="20"
+    pageSize="{pageSize}"
+    pageIndex="{currentPage}"
+    onPageDidChange="(page, size, total) => {
+      currentPage = page;
+      before = page * size;
+      after = before + size - 1;
+    }"
+  />
+  <List data="{pagination_ds}" />
 </App>
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.pagination_items = [
-    { id: 1, name: 'Laptop Pro', price: 1299 },
-    { id: 2, name: 'Wireless Mouse', price: 29 },
-    { id: 3, name: 'Mechanical Keyboard', price: 149 },
-    { id: 4, name: '4K Monitor', price: 399 },
-    { id: 5, name: 'USB-C Hub', price: 79 },
-    { id: 6, name: 'Bluetooth Headphones', price: 199 },
-    { id: 7, name: 'Webcam HD', price: 89 },
-    { id: 8, name: 'Standing Desk', price: 299 },
-    { id: 9, name: 'Ergonomic Chair', price: 249 },
-    { id: 10, name: 'Desk Lamp', price: 45 },
-    { id: 11, name: 'Cable Organizer', price: 15 },
-    { id: 12, name: 'Mouse Pad', price: 12 },
-    { id: 13, name: 'Laptop Stand', price: 35 },
-    { id: 14, name: 'External SSD', price: 129 },
-    { id: 15, name: 'Wireless Charger', price: 59 },
-    { id: 16, name: 'Smart Speaker', price: 99 },
-    { id: 17, name: 'Fitness Tracker', price: 199 },
-    { id: 18, name: 'Tablet Pro', price: 799 },
-    { id: 19, name: 'Gaming Mouse', price: 89 },
-    { id: 20, name: 'Noise Cancelling Headphones', price: 349 }
-  ]",
+  "initialize": "$state.pagination_items = [{ id: 1, name: 'Laptop Pro', price: 1299 },{ id: 2, name: 'Wireless Mouse', price: 29 },{ id: 3, name: 'Mechanical Keyboard', price: 149 },{ id: 4, name: '4K Monitor', price: 399 },{ id: 5, name: 'USB-C Hub', price: 79 },{ id: 6, name: 'Bluetooth Headphones', price: 199 },{ id: 7, name: 'Webcam HD', price: 89 },{ id: 8, name: 'Standing Desk', price: 299 },{ id: 9, name: 'Ergonomic Chair', price: 249 },{ id: 10, name: 'Desk Lamp', price: 45 },{ id: 11, name: 'Cable Organizer', price: 15 },{ id: 12, name: 'Mouse Pad', price: 12 },{ id: 13, name: 'Laptop Stand', price: 35 },{ id: 14, name: 'External SSD', price: 129 },{ id: 15, name: 'Wireless Charger', price: 59 },{ id: 16, name: 'Smart Speaker', price: 99 },{ id: 17, name: 'Fitness Tracker', price: 199 },{ id: 18, name: 'Tablet Pro', price: 799 },{ id: 19, name: 'Gaming Mouse', price: 89 },{ id: 20, name: 'Noise Cancelling Headphones', price: 349 }]",
   "operations": {
     "get-pagination-items": {
-      "url": "/pagination_items/:from/:to",
+      "url": "/pagination_items",
       "method": "get",
-      "pathParamTypes": {
+      "queryParams": {
         "from": "integer",
         "to": "integer"
       },
-      "handler": "$state.pagination_items.slice($pathParams.from, $pathParams.to + 1)"
+      "handler": "$state.pagination_items.slice(Number($queryParams.from), Number($queryParams.to) + 1);"
     }
   }
 }

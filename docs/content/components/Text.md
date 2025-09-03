@@ -9,7 +9,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties [#properties]
 
-### `breakMode` (default: "not specified") [#breakmode-default-not-specified]
+### `breakMode` (default: "normal") [#breakmode-default-normal]
 
 This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.
 
@@ -17,7 +17,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `normal` | Uses standard word boundaries for breaking |
+| `normal` | Uses standard word boundaries for breaking **(default)** |
 | `word` | Breaks long words when necessary to prevent overflow |
 | `anywhere` | Breaks at any character if needed to fit content |
 | `keep` | Prevents breaking within words entirely |

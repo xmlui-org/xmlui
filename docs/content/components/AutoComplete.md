@@ -56,6 +56,10 @@ This property defines the template to display when the list of options is empty.
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
+### `initiallyOpen` (default: false) [#initiallyopen-default-false]
+
+This property determines whether the dropdown list is open when the component is first rendered.
+
 ### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.

@@ -141,7 +141,7 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
 | [paddingTop](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AppHeader | $space-0 | $space-0 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-4 | $space-4 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-0 | $space-0 |
 | [width](../styles-and-themes/common-units/#size)-logo-AppHeader | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]
