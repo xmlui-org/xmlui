@@ -368,9 +368,9 @@ test.describe("y-axis", () => {
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     // When hideTickY is true, ticks should not be rendered in DOM
-    await expect(page.locator(yTicksSelector)).toHaveCount(0);
     // But the axis line itself should still be present (though not visible due to tickLine=false)
     await expect(page.locator(yAxisSelector)).toBeAttached();
+    await expect(page.locator(yTicksSelector)).toHaveCount(0);
   });
 });
 
