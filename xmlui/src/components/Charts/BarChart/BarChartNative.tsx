@@ -266,21 +266,21 @@ export function BarChart({
             type: "number",
             axisLine: false,
             hide: miniMode || hideX,
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+            height: miniMode || hideX ? 0 : xAxisHeight,
             tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
           }
         : {
             type: "category",
             dataKey: nameKey,
+            hide: miniMode || hideX,
+            height: miniMode || hideX ? 0 : xAxisHeight,
+            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
             interval: interval,
             tickLine: false,
             angle: tickAngle,
             textAnchor: tickAnchor,
-            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-            height: miniMode || hideX ? 0 : xAxisHeight,
-            hide: miniMode || hideX,
-            
           };
 
     const yAxisProps: Record<string, any> =
@@ -293,7 +293,7 @@ export function BarChart({
             tickLine: false,
             tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
             tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
-            width: miniMode || hideY || hideTickY ? 0 : yAxisWidth,
+            width: miniMode || hideY ? 0 : yAxisWidth,
           }
         : {
             type: "number",
@@ -302,7 +302,7 @@ export function BarChart({
             hide: miniMode || hideY,
             tickCount: yTickCount,
             tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
-            width: miniMode || hideY || hideTickY ? 0 : yAxisWidth,
+            width: miniMode || hideY ? 0 : yAxisWidth,
           };
 
     const chart = (
