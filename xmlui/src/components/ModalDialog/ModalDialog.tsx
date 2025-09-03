@@ -116,7 +116,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
     return (
       <ModalDialog
         className={className}
-        fullScreen={extractValue(node.props?.fullScreen)}
+        fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
         title={extractValue(node.props?.title)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
       >

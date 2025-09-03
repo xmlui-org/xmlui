@@ -37,6 +37,11 @@ export const LinkMd = createMetadata({
       `This property allows you to add an optional icon (specify the icon's name) to the link.`,
     ),
   },
+  events: {
+    click: {
+      description: "This event is triggered when the link is clicked."
+    }
+  },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
     [`gap-icon-${COMP}`]:
@@ -76,7 +81,7 @@ export const LinkMd = createMetadata({
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     return (
       <LinkNative
         to={extractValue(node.props.to)}
@@ -85,6 +90,7 @@ export const localLinkComponentRenderer = createComponentRenderer(
         target={extractValue(node.props?.target)}
         className={className}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
+        onClick={lookupEventHandler("click")}
       >
         {node.props.label
           ? extractValue.asDisplayText(node.props.label)

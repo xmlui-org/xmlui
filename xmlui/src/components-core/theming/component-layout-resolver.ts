@@ -52,11 +52,24 @@ export function resolveComponentLayoutProps(
     const partName = parsed.part ? parsed.part : BASE_COMPONENT_PART;
     let propertyTarget: any = (result[partName] ??= {});
     if (parsed.screenSizes && parsed.screenSizes.length > 0) {
+      const screenSizeKey = parsed.screenSizes.join("&");
       propertyTarget.responsiveStyles ??= {};
-      propertyTarget.responsiveStyles = {
-        ...propertyTarget.responsiveStyles,
-        [parsed.screenSizes.join("&")]: cssProps,
-      };
+      propertyTarget.responsiveStyles[screenSizeKey] ??= {};
+      if (stateName) {
+        propertyTarget.responsiveStyles[screenSizeKey].states ??= {};
+        propertyTarget.responsiveStyles[screenSizeKey].states = {
+          ...propertyTarget.responsiveStyles[screenSizeKey].states,
+          [stateName]: {
+            ...propertyTarget.responsiveStyles[screenSizeKey].states[stateName],
+            ...cssProps,
+          },
+        };
+      } else {
+        propertyTarget.responsiveStyles[screenSizeKey] = {
+          ...propertyTarget.responsiveStyles[screenSizeKey],
+          ...cssProps,
+        };
+      }
     } else {
       // --- No screen sizes specified, the property belongs to the base styles
       propertyTarget.baseStyles ??= {};
