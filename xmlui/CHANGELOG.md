@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.10.7
+
+### Patch Changes
+
+- 664ea4f: Fixed BarChart hideTickY property to not remove the Y axis when set to true.
+- a739a26: Fixed Checkbox and Switch visual issue. Fixed Line- and BarChart visual glitch in Table.
+- bdb54dd: Small fixes for tiny bugs found during MyWorkDrive update
+- 81724c6: Fixed BarChart tick labels not appearing.
+
 ## 0.10.6
 
 ### Patch Changes
