@@ -1,7 +1,8 @@
 import { CSSProperties } from "react";
-import { LayoutContext } from "../../abstractions/RendererDefs";
+import { LayoutContext, StylePropResolvers, ValueExtractor } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
 import { parseLayoutProperty } from "./parse-layout-props";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 
 export type ResolvedComponentLayout = Record<string, ResolvedPartLayout>;
 
@@ -21,7 +22,17 @@ const starSizeRegex = /^\d*\*$/;
 
 export function resolveComponentLayoutProps(
   layoutProps: Record<string, any> = EMPTY_OBJECT,
-  layoutContext?: LayoutContext,
+  {
+    layoutContext,
+    stylePropResolvers = EMPTY_OBJECT,
+    node,
+    valueExtractor
+  }: {
+    layoutContext?: LayoutContext;
+    stylePropResolvers?: StylePropResolvers;
+    node: ComponentDef;
+    valueExtractor: ValueExtractor;
+  },
 ): ResolvedComponentLayout {
   const result: ResolvedComponentLayout = {};
 
@@ -39,11 +50,17 @@ export function resolveComponentLayoutProps(
       ?.toString()
       ?.replace(themeVarCapturesRegex, (match: string) => toCssVar(match.trim()));
 
+
+    function resolveStyleProp(cssPropName){
+      console.log("resolveStyleProp", parsed, key);
+    }
     // --- Some properties may need transformation
     const cssProps: CSSProperties =
-      cssPropName in specialResolvers
-        ? specialResolvers[cssPropName](appliedValue, layoutContext)
-        : { [cssPropName]: appliedValue };
+      cssPropName in stylePropResolvers
+        ? stylePropResolvers[cssPropName]({ value: appliedValue, node, extractValue: valueExtractor, layoutContext, resolveStyleProp })
+        : cssPropName in specialResolvers
+          ? specialResolvers[cssPropName](appliedValue, layoutContext)
+          : { [cssPropName]: appliedValue };
 
     // --- Check if the property belongs to one or more states
     const stateName = parsed.states && parsed.states.length > 0 ? parsed.states.join("&") : null;
@@ -163,6 +180,9 @@ const specialResolvers: Record<string, SpecialResolver> = {
   canShrink: (propValue) => ({
     flexShrink: propValue === "true" ? 1 : 0,
   }),
+  visible: (propValue) => {
+    return propValue === "false" ? { display: "none" } : {};
+  },
   width: (propValue, layoutContext) => {
     const horizontalStarSize = getHorizontalStarSize(propValue, layoutContext);
     const result: CSSProperties = {};

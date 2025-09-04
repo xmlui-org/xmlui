@@ -1,5 +1,5 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -21,7 +21,7 @@ import { createValueExtractor } from "../rendering/valueExtractor";
 import { EMPTY_OBJECT } from "../constants";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { ApiBoundComponent } from "../ApiBoundComponent";
-import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
+import { useDeepCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
 import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
 import { useInspector } from "../InspectorContext";
@@ -30,9 +30,9 @@ import { layoutOptionKeys } from "../descriptorHelper";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
-import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
+import { resolveComponentLayoutProps } from "../theming/component-layout-resolver";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -165,7 +165,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Obtain the component renderer and descriptor from the component registry
   const componentRegistry = useComponentRegistry();
-  const { renderer, descriptor, isCompoundComponent } =
+  const { renderer, descriptor, isCompoundComponent, rendererOptions } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 
   // --- Obtain a function that can lookup an event handler, which is bound to a
@@ -197,34 +197,39 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Collect and compile the layout property values
-  const { cssProps } = useMemo(() => {
-    const resolvedLayoutProps: Record<string, any> = {};
-    layoutOptionKeys.forEach((key) => {
-      if (safeNode.props && key in safeNode.props) {
-        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key], true);
-      }
-    });
-
+  const resolvedPartLayouts = useMemo(() => {
+    console.log(safeNode.props);
+    const resolvedLayoutProps: Record<string, any> = Object.keys(safeNode.props)
+      .filter((key) => layoutOptionKeys.some((prefix) => key.startsWith(prefix)))
+      .reduce((acc, key) => {
+        acc[key] = valueExtractor(safeNode.props[key], true);
+        return acc;
+      }, {});
     // --- New layout property resolution
-    return resolveLayoutProps(resolvedLayoutProps, {
-      ...layoutContextRef?.current,
-      mediaSize: appContext.mediaSize,
+    return resolveComponentLayoutProps(resolvedLayoutProps, {
+      layoutContext: layoutContextRef?.current,
+      stylePropResolvers: rendererOptions?.stylePropResolvers,
+      node: safeNode,
+      valueExtractor,
     });
-
     // --- Old layout property resolution
     // return compileLayout(resolvedLayoutProps, themeVars, {
     //   ...layoutContextRef?.current,
     //   mediaSize: appContext.mediaSize,
     // });
-  }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
+  }, [layoutContextRef, rendererOptions?.stylePropResolvers, safeNode, valueExtractor]);
 
   // const className = useComponentStyle(cssProps);
 
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
-  const stableLayoutCss = useShallowCompareMemoize(cssProps);
+  const stableResolvedPartLayouts = useDeepCompareMemoize(resolvedPartLayouts);
 
-  const className = useComponentStyle(stableLayoutCss);
+  useEffect(() => {
+    console.log("StableResolvedComponentProps", stableResolvedPartLayouts);
+  }, [stableResolvedPartLayouts]);
+
+  const className = useComponentStyle(stableResolvedPartLayouts);
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
@@ -250,7 +255,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       uid,
     };
 
-
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
       // --- the compound component
@@ -266,7 +270,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- Render the component using the renderer function obtained from the component registry
       renderedNode = renderer(rendererContext);
     }
-
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.

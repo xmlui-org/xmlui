@@ -194,6 +194,48 @@ export const stackComponentRenderer = createComponentRenderer(
       renderChild,
     });
   },
+  {
+    stylePropResolvers: {
+      orientation: ({value, node, extractValue, resolveStyleProp}) => {
+        return {
+          flexDirection: value === "horizontal" ? "row" : "column",
+        };
+      },
+      horizontalAlignment: ({value, resolveStyleProp})=>{
+        // const flexDirection = resolveStyleProp("flexDirection");
+        // if(flexDirection === "column"){
+        //
+        // }
+        // TODO illesg, idea: resolveStyleProp depends on responsive index (md, xl, etc), and gives the value for that or below
+        //  prerequisit: order of resolution must be base, xs, sm, md, lg, xl, xxl
+        //  example: horizontalAlignment-md -> checks for flexDirection in md, if not found, flexDirection in sm, etc until base
+
+        resolveStyleProp("flexDirection");
+        return {
+          //column
+          alignItems: value,
+
+          //row
+          justifyContent: value,
+        }
+      },
+      // reverse: {
+      //
+      // },
+      // verticalAlignment: {
+      //
+      // }
+      // verticalAlignment: ({value, resolveStyleProp}) => {
+      //   // "verticalAlignment-md";
+      //   if(resolvedStyles.flexDirection === "row") {
+      //     return { alignItems: value };
+      //   } else {
+      //     return { justifyContent: value };
+      //   }
+      // }
+
+    },
+  },
 );
 
 export const vStackComponentRenderer = createComponentRenderer(
@@ -251,6 +293,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
   },
 );
 
+
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
@@ -265,5 +308,5 @@ export const chStackComponentRenderer = createComponentRenderer(
       horizontalAlignment: "center",
       verticalAlignment: "center",
     });
-  },
+  }
 );

@@ -52,11 +52,11 @@ export const Stack = forwardRef(function Stack(
   ref: Ref<any>,
 ) {
   useOnMount(onMount);
-  const { horizontal, vertical } = useContentAlignment(
-    orientation,
-    horizontalAlignment,
-    verticalAlignment,
-  );
+  // const { horizontal, vertical } = useContentAlignment(
+  //   orientation,
+  //   horizontalAlignment,
+  //   verticalAlignment,
+  // );
   return (
     <div
       {...rest}
@@ -67,15 +67,15 @@ export const Stack = forwardRef(function Stack(
         className,
         styles.base,
         {
-          [styles.vertical]: orientation === "vertical",
-          [styles.horizontal]: orientation === "horizontal",
-          [styles.reverse]: reverse,
+          // [styles.vertical]: orientation === "vertical",
+          // [styles.horizontal]: orientation === "horizontal",
+          // [styles.reverse]: reverse,
           [styles.hoverContainer]: hoverContainer,
           "display-on-hover": visibleOnHover,
           [styles.handlesClick]: !!onClick,
         },
-        horizontal ?? "",
-        vertical ?? "",
+        // horizontal ?? "",
+        // vertical ?? "",
       )}
     >
       {children}

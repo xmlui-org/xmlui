@@ -11,6 +11,7 @@ import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
 import type { AsyncFunction } from "./FunctionDefs";
 import type {ComponentApi} from "../components-core/rendering/ContainerWrapper";
+import { layoutOptionKeys } from "../components-core/descriptorHelper";
 
 // This interface defines the renderer context for the exposed components of the 
 // XMLUI framework.
@@ -127,6 +128,23 @@ export type ComponentRendererFn<T extends ComponentDef> = (
   context: RendererContext<T>,
 ) => ReactNode;
 
+
+export type StylePropResolverContext = {
+  value: any,
+  node: ComponentDef,
+  extractValue: ValueExtractor,
+  layoutContext?: LayoutContext,
+  resolveStyleProp: (propName: string) => any
+}
+
+export type StylePropResolvers = Partial<
+  Record<(typeof layoutOptionKeys)[number], (context: StylePropResolverContext) => CSSProperties>
+>;
+
+export type ComponentRendererOptions = {
+  stylePropResolvers?: StylePropResolvers;
+};
+
 // This function renders a component definition into a React component
 export type CompoundComponentRendererInfo = {
   compoundComponentDef: CompoundComponentDef;
@@ -145,6 +163,8 @@ export type ComponentRendererDef<T extends ComponentDef = any> = {
 
   // The metadata to use when rendering the component
   metadata?: ComponentMetadata;
+
+  options?: ComponentRendererOptions
 };
 
 // Rendering components (turning component definitions into their React node 

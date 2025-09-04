@@ -1020,4 +1020,27 @@ describe("Component property layout", () => {
       });
     });
   });
+
+  it("has responsive with state", () => {
+    const result = resolveComponentLayoutProps({
+      "backgroundColor": "red",
+      "backgroundColor-xxl": "green",
+      "backgroundColor-xxl--hover": "blue",
+    });
+    expect(result).toStrictEqual({
+      [BASE_COMPONENT_PART]: {
+        baseStyles: {
+          backgroundColor: "red"
+        },
+        responsiveStyles: {
+          xxl: {
+            backgroundColor: "green",
+            states: {
+              hover: { backgroundColor: "blue" }
+            }
+          }
+        }
+      },
+    });
+  })
 });

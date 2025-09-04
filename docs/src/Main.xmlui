@@ -30,6 +30,7 @@
                 <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
             <NavGroup label="Tutorial">
+                <NavLink label="XMLUI Invoice HERE WE GO" to="/tutorial-here" />
                 <NavLink label="XMLUI Invoice" to="/tutorial-01" />
                 <NavLink label="Main.xmlui" to="/tutorial-02" />
                 <NavLink label="Navigation" to="/tutorial-03" />
@@ -239,6 +240,12 @@
             <Page url="/tutorial-01">
                 <DocumentPageNoTOC url="/pages/tutorial-01.md" />
             </Page>
+
+          <Page url="/tutorial-here">
+            <Stack>
+              HEY HERE WE GO
+            </Stack>
+          </Page>
             <Page url="/tutorial-02">
                 <DocumentPageNoTOC url="/pages/tutorial-02.md" />
             </Page>

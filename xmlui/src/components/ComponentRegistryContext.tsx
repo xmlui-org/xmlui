@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import type { ComponentRendererFn } from "../abstractions/RendererDefs";
+import type { ComponentRendererFn, ComponentRendererOptions } from "../abstractions/RendererDefs";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 
 import type { ComponentRegistry } from "./ComponentProvider";
@@ -13,6 +13,8 @@ export type ComponentRegistryEntry = {
   // Component descriptor (hints and other metadata)
   descriptor?: ComponentMetadata;
   isCompoundComponent?: boolean;
+
+  rendererOptions?: ComponentRendererOptions
 };
 
 // Context object that makes the component registry available

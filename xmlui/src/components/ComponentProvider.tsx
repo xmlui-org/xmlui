@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type {
   ComponentRendererDef,
   ComponentRendererFn,
+  ComponentRendererOptions,
   CompoundComponentRendererInfo,
 } from "../abstractions/RendererDefs";
 import {
@@ -940,11 +941,13 @@ export class ComponentRegistry {
       renderer,
       metadata,
       isCompoundComponent,
+      options,
     }: {
       type: string;
       renderer: ComponentRendererFn<any>;
       isCompoundComponent?: boolean;
       metadata?: ComponentMetadata;
+      options?: ComponentRendererOptions;
     },
     namespace: string,
   ) => {
@@ -952,6 +955,7 @@ export class ComponentRegistry {
       renderer,
       descriptor: metadata,
       isCompoundComponent,
+      rendererOptions: options
     };
     const fullName = `${namespace}.${type}`;
     if (!this.pool.has(namespace)) {

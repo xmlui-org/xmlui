@@ -1,23 +1,23 @@
 import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
-import type { ComponentRendererFn, ComponentRendererDef } from "../abstractions/RendererDefs";
+import type {
+  ComponentRendererFn,
+  ComponentRendererDef,
+  ComponentRendererOptions,
+} from "../abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
 
-/**
- * This helper function creates a component renderer definition from its arguments.
- * @param type The unique identifier of the component definition
- * @param renderer The function that renders the component definition into a React node
- * @param metadata Optional hints to help fix the rendering errors coming from invalid component property definitions
- * @returns The view renderer definition composed of the arguments
- */
+
 export function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
   renderer: ComponentRendererFn<ComponentDef<TMd>>,
+  options?: ComponentRendererOptions
 ): ComponentRendererDef {
   return {
     type,
     renderer,
     metadata,
+    options
   };
 }
 

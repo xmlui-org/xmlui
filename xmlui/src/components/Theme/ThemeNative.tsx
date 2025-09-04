@@ -106,30 +106,36 @@ export function Theme({
       const maxWidthDesktop = getThemeVar("maxWidth-desktop");
       const maxWidthLargeDesktop = getThemeVar("maxWidth-large-desktop");
 
+      //sm
       ret[`@media (min-width: calc(${maxWidthPhone} + 1px))`] = {
         "&": {
           "--screenSize": 1,
         },
       };
 
+
+      //md
       ret[`@media (min-width: calc(${maxWidthLandscapePhone} + 1px))`] = {
         "&": {
           "--screenSize": 2,
         },
       };
 
+      // lg
       ret[`@media (min-width: calc(${maxWidthTablet} + 1px))`] = {
         "&": {
           "--screenSize": 3,
         },
       };
 
+      // xl
       ret[`@media (min-width: calc(${maxWidthDesktop} + 1px))`] = {
         "&": {
           "--screenSize": 4,
         },
       };
 
+      // xxl
       ret[`@media (min-width: calc(${maxWidthLargeDesktop} + 1px))`] = {
         "&": {
           "--screenSize": 5,

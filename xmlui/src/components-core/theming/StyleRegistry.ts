@@ -130,7 +130,7 @@ export class StyleRegistry {
 
     // 2. Generate the CSS for the direct properties at the current selector level.
     if (directProps.length > 0) {
-      finalCss += `${selector} {${directProps.join('')}}`;
+      finalCss += `\n${selector} {${directProps.join('')}}`;
     }
 
     // 3. Append the CSS from all the processed nested rules.
@@ -143,7 +143,7 @@ export class StyleRegistry {
     // If the key is an at-rule (@media, @container, @keyframes), wrap the recursive call.
     if (nestedKey.startsWith('@')) {
       // The inner content is generated relative to the original parent selector.
-      return `${nestedKey}{${this._generateCss(parentSelector, nestedStyles)}}`;
+      return `\n${nestedKey}{${this._generateCss(parentSelector, nestedStyles)}}`;
     }
 
     // If the key is a nested selector, resolve the '&' placeholder.

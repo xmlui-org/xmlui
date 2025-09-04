@@ -5,6 +5,8 @@ import type { StyleObjectType } from "./StyleRegistry";
 import { StyleRegistry } from "./StyleRegistry";
 import { EMPTY_OBJECT } from "../constants";
 import { useIndexerContext } from "../../components/App/IndexerContext";
+import { CssPropsWithStates, ResolvedComponentLayout } from "./component-layout-resolver";
+import { useTheme } from "./ThemeContext";
 
 // The context is typed to hold either a StyleRegistry instance or null.
 const StyleContext = createContext<StyleRegistry | null>(null);
@@ -68,37 +70,93 @@ export function useStyleRegistry(): StyleRegistry {
   return registry;
 }
 
-export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CSSProperties]>) {
+export function useComponentStyle(stableResolvedPartLayouts: ResolvedComponentLayout) {
+  const { getThemeVar } = useTheme();
+
+  const maxWidthPhone = getThemeVar("maxWidth-phone");
+  const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
+  const maxWidthTablet = getThemeVar("maxWidth-tablet");
+  const maxWidthDesktop = getThemeVar("maxWidth-desktop");
+  const maxWidthLargeDesktop = getThemeVar("maxWidth-large-desktop");
+
+  const responsiveSizes = useMemo(() => {
+    return {
+      xs: `@media (width > 0)`,
+      sm: `@media (width > ${maxWidthPhone})`,
+      md: `@media (width > ${maxWidthLandscapePhone})`,
+      lg: `@media (width > ${maxWidthTablet})`,
+      xl: `@media (width > ${maxWidthDesktop})`,
+      xxl: `@media (width > ${maxWidthLargeDesktop})`,
+    };
+  }, [
+    maxWidthDesktop,
+    maxWidthLandscapePhone,
+    maxWidthLargeDesktop,
+    maxWidthPhone,
+    maxWidthTablet,
+  ]);
+
+  const base = stableResolvedPartLayouts["_base_"];
   const rootStyle = useMemo(() => {
-    return (!styles || Object.keys(styles).length === 0)
+    console.log("STYLES STUFF", base);
+    return !base || Object.keys(base).length === 0
       ? EMPTY_OBJECT
       : {
-          "&": styles,
-          // "@container style(--screenSize: 1) or @container style(--screenSize: 2) ... etc": responsiveSizes,
+          ...extractStyleSelectors(base.baseStyles || {}),
+          ...Object.entries(base.responsiveStyles || {}).reduce((acc, [sizeKey, styles]) => {
+            acc[responsiveSizes[sizeKey]] = extractStyleSelectors(styles);
+            return acc;
+          }, {}),
         };
-  }, [styles]);
+  }, [base, responsiveSizes]);
+
+  console.log("rootStyle", rootStyle);
 
   return useStyles(rootStyle);
 }
 
+function extractStyleSelectors(cssPropsWithStates: CssPropsWithStates) {
+  const { states, ...styles } = cssPropsWithStates;
+  const statesBySelector = {};
+  Object.entries(states || {}).forEach(([key, value]) => {
+    let keys = [key];
+    if (key.includes("&")) {
+      keys = key.split("&").map((k) => k.trim());
+    }
+    statesBySelector[keys.map((key) => `&:${key}`).join("")] = value;
+  });
+  return {
+    "&": styles,
+    ...statesBySelector,
+  };
+}
+
 export const StyleInjectionTargetContext = createContext<Document | ShadowRoot | null>(null);
 
-export function useDomRoot(){
+export function useDomRoot() {
   const domRoot = useContext(StyleInjectionTargetContext);
   return domRoot;
 }
 
 type InjectOptions = {
   prepend?: boolean;
-}
-export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EMPTY_OBJECT ): string {
+};
+export function useStyles(
+  styles: StyleObjectType,
+  { prepend }: InjectOptions = EMPTY_OBJECT,
+): string {
   // we skip this whole thing if we're indexing
-  const {indexing} = useIndexerContext();
+  const { indexing } = useIndexerContext();
   const domRoot = useDomRoot();
-  const injectionTarget = typeof document === "undefined" ? null : domRoot instanceof ShadowRoot ? domRoot : document.head
+  const injectionTarget =
+    typeof document === "undefined"
+      ? null
+      : domRoot instanceof ShadowRoot
+        ? domRoot
+        : document.head;
   const registry = useStyleRegistry();
   const { className, styleHash } = useMemo(() => {
-    if(indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
+    if (indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
       return { className: undefined, styleHash: undefined };
     }
     return registry.register(styles);
@@ -113,8 +171,8 @@ export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EM
     if (css) {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("data-style-hash", styleHash);
-      styleElement.innerHTML = `@layer dynamic {\n${css}\n}`;
-      if(prepend){
+      styleElement.innerHTML = `@layer dynamic {${css}\n}`;
+      if (prepend) {
         injectionTarget.insertBefore(styleElement, injectionTarget.firstChild.nextSibling);
       } else {
         injectionTarget.appendChild(styleElement);
@@ -126,7 +184,7 @@ export function useStyles(styles: StyleObjectType, {prepend}: InjectOptions = EM
 
   // HOOK 2: For lifecycle management (reference counting and CLEANUP).
   useEffect(() => {
-    if(!styleHash){
+    if (!styleHash) {
       return;
     }
     // On MOUNT, tell the registry that this component is using this style.
