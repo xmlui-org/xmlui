@@ -204,6 +204,7 @@ import { TooltipMd } from "./Tooltip/Tooltip";
 import { TimeInputMd } from "./TimeInput/TimeInput";
 import { DateInput } from "./DateInput/DateInputNative";
 import { DateInputMd } from "./DateInput/DateInput";
+import { PaginationMd } from "./Pagination/Pagination";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -371,6 +372,7 @@ export const collectedComponentMetadata = {
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
   Pages: PagesMd,
+  Pagination: PaginationMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,

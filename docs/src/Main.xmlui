@@ -158,6 +158,7 @@
                     <NavLink label="Page" to="/components/Page" />
                     <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
                     <NavLink label="Pages" to="/components/Pages" />
+                    <NavLink label="Pagination" to="/components/Pagination" />
                     <NavLink label="PasswordInput" to="/components/PasswordInput" />
                     <NavLink label="PieChart" to="/components/PieChart" />
                     <NavLink label="ProgressBar" to="/components/ProgressBar" />
