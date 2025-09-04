@@ -44,6 +44,7 @@ export const Timer = forwardRef(function Timer(
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [hasExecutedOnce, setHasExecutedOnce] = useState(false);
+  const [hasEverStarted, setHasEverStarted] = useState(false);
   const [isInInitialDelay, setIsInInitialDelay] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const initialDelayRef = useRef<NodeJS.Timeout | null>(null);
@@ -107,33 +108,24 @@ export const Timer = forwardRef(function Timer(
       try {
         await onTick();
         
-        // If this is a "once" timer, mark it as executed and stop the timer
-        if (once) {
+        // Mark that the timer has actually started executing (for initial delay logic)
+        if (!hasEverStarted) {
+          setHasEverStarted(true);
+        }
+        
+        // If this is a "once" timer and it's the very first execution, mark it as executed
+        // After the first execution, the timer becomes a regular timer that can be paused/resumed
+        if (once && !hasExecutedOnce) {
           setHasExecutedOnce(true);
         }
       } finally {
         handlerRunningRef.current = false;
       }
     }
-  }, [onTick, once]);
+  }, [onTick, once, hasExecutedOnce, hasEverStarted]);
 
   useEffect(() => {
-    // If this is a "once" timer and it has already executed, don't start again
-    if (once && hasExecutedOnce) {
-      setIsRunning(false);
-      setIsInInitialDelay(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      if (initialDelayRef.current) {
-        clearTimeout(initialDelayRef.current);
-        initialDelayRef.current = null;
-      }
-      return;
-    }
-
-    // Clear any existing timers
+    // Clear any existing timers first
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -143,13 +135,22 @@ export const Timer = forwardRef(function Timer(
       initialDelayRef.current = null;
     }
 
+    // If "once" is true and the timer has already executed, don't start the timer
+    if (once && hasExecutedOnce) {
+      setIsRunning(false);
+      setIsInInitialDelay(false);
+      return;
+    }
+
     if (enabled && !isPaused && interval > 0) {
       setIsRunning(true);
       
       const startTimer = () => {
         setIsInInitialDelay(false);
-        if (once) {
-          // For "once" timers, use setTimeout instead of setInterval
+        
+        // For "once" timers that haven't executed yet, use setTimeout
+        // For regular timers or "once" timers that have already executed, use setInterval
+        if (once && !hasExecutedOnce) {
           intervalRef.current = setTimeout(handleTick, interval) as any;
         } else {
           intervalRef.current = setInterval(handleTick, interval);
@@ -158,16 +159,15 @@ export const Timer = forwardRef(function Timer(
 
       // Only apply initial delay if:
       // 1. There is an initial delay configured
-      // 2. The timer hasn't executed once yet (fresh start)
-      // 3. This is not a resume from pause (we don't want delay on resume)
-      const shouldUseInitialDelay = initialDelay > 0 && !hasExecutedOnce;
+      // 2. The timer has never been started before (truly fresh start)
+      const shouldUseInitialDelay = initialDelay > 0 && !hasEverStarted;
       
       if (shouldUseInitialDelay) {
         // Start with initial delay
         setIsInInitialDelay(true);
         initialDelayRef.current = setTimeout(startTimer, initialDelay);
       } else {
-        // Start immediately (including resume from pause)
+        // Start immediately (including resume from pause or restart after disable/enable)
         startTimer();
       }
     } else {
@@ -186,7 +186,7 @@ export const Timer = forwardRef(function Timer(
       }
       handlerRunningRef.current = false;
     };
-  }, [enabled, interval, handleTick, once, hasExecutedOnce, isPaused, initialDelay]);
+  }, [enabled, interval, handleTick, once, hasExecutedOnce, isPaused, initialDelay, hasEverStarted]);
 
   // Reset hasExecutedOnce when enabled changes from false to true
   useEffect(() => {
