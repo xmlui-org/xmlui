@@ -83,9 +83,9 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
     if (node) {
       Object.entries(shallowAttrs).forEach(([key, value]) => {
         if (value !== undefined) {
-          node.setAttribute(key, value);
+          node.setAttribute?.(key, value);
         } else {
-          node.removeAttribute(key);
+          node.removeAttribute?.(key);
         }
       });
     }
