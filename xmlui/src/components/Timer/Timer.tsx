@@ -6,7 +6,6 @@ const COMP = "Timer";
 
 export const TimerMd = createMetadata({
   status: "stable",
-  nonVisual: true,
   description:
     "`Timer` is a non-visual component that fires events at regular intervals. " +
     "It can be enabled or disabled and ensures that the timer event handler " +

@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { forwardRef, useEffect, useRef, useState, useCallback, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useRef, useState, useCallback, useImperativeHandle, useMemo } from "react";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export interface TimerApi {
@@ -41,14 +41,34 @@ export const Timer = forwardRef(function Timer(
   }: TimerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [hasExecutedOnce, setHasExecutedOnce] = useState(false);
   const [hasEverStarted, setHasEverStarted] = useState(false);
-  const [isInInitialDelay, setIsInInitialDelay] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const initialDelayRef = useRef<NodeJS.Timeout | null>(null);
   const handlerRunningRef = useRef(false);
+
+  // Refs for current values to ensure handleTick has stable dependencies
+  const enabledRef = useRef(enabled);
+  const isPausedRef = useRef(isPaused);
+  const intervalRef2 = useRef(interval);
+  const onTickRef = useRef(onTick);
+  const onceRef = useRef(once);
+  const hasExecutedOnceRef = useRef(hasExecutedOnce);
+  const hasEverStartedRef = useRef(hasEverStarted);
+
+  // Update refs when values change
+  enabledRef.current = enabled;
+  isPausedRef.current = isPaused;
+  intervalRef2.current = interval;
+  onTickRef.current = onTick;
+  onceRef.current = once;
+  hasExecutedOnceRef.current = hasExecutedOnce;
+  hasEverStartedRef.current = hasEverStarted;
+
+  // Derived state
+  const isRunning = enabled && !isPaused && (intervalRef.current !== null || initialDelayRef.current !== null);
+  const isInInitialDelay = initialDelayRef.current !== null;
 
   // Timer API methods
   const pause = useCallback(() => {
@@ -74,55 +94,54 @@ export const Timer = forwardRef(function Timer(
     }
   }, [enabled, isPaused]);
 
-  const isTimerPaused = useCallback(() => isPaused, [isPaused]);
-  const isTimerRunning = useCallback(() => isRunning && !isPaused, [isRunning, isPaused]);
-
-  // Register the API
-  useImperativeHandle(forwardedRef, () => ({
+  // Create API object once
+  const timerApi = useMemo(() => ({
     pause,
     resume,
-    isPaused: isTimerPaused,
-    isRunning: isTimerRunning,
-  } as TimerApi & HTMLDivElement), [pause, resume, isTimerPaused, isTimerRunning]);
+    isPaused: () => isPaused,
+    isRunning: () => isRunning && !isPaused,
+  }), [pause, resume, isPaused, isRunning]);
 
-  // Register component API if provided
+  // Register both APIs together
+  useImperativeHandle(forwardedRef, () => timerApi as TimerApi & HTMLDivElement, [timerApi]);
+  
   useEffect(() => {
     if (registerComponentApi) {
-      registerComponentApi({
-        pause,
-        resume,
-        isPaused: isTimerPaused,
-        isRunning: isTimerRunning,
-      });
+      registerComponentApi(timerApi);
     }
-  }, [registerComponentApi, pause, resume, isTimerPaused, isTimerRunning]);
+  }, [registerComponentApi, timerApi]);
 
   const handleTick = useCallback(async () => {
+    // Check if timer should still be running (enabled, not paused, valid interval)
+    if (!enabledRef.current || isPausedRef.current || intervalRef2.current <= 0) {
+      return;
+    }
+
     // Prevent re-firing if the previous event hasn't completed yet
     if (handlerRunningRef.current) {
       return;
     }
 
-    if (onTick) {
+    if (onTickRef.current) {
       handlerRunningRef.current = true;
       try {
-        await onTick();
+        await onTickRef.current();
         
         // Mark that the timer has actually started executing (for initial delay logic)
-        if (!hasEverStarted) {
+        if (!hasEverStartedRef.current) {
           setHasEverStarted(true);
         }
         
         // If this is a "once" timer and it's the very first execution, mark it as executed
         // After the first execution, the timer becomes a regular timer that can be paused/resumed
-        if (once && !hasExecutedOnce) {
+        if (onceRef.current && !hasExecutedOnceRef.current) {
           setHasExecutedOnce(true);
         }
       } finally {
         handlerRunningRef.current = false;
       }
     }
-  }, [onTick, once, hasExecutedOnce, hasEverStarted]);
+  }, []);
 
   useEffect(() => {
     // Clear any existing timers first
@@ -137,42 +156,26 @@ export const Timer = forwardRef(function Timer(
 
     // If "once" is true and the timer has already executed, don't start the timer
     if (once && hasExecutedOnce) {
-      setIsRunning(false);
-      setIsInInitialDelay(false);
       return;
     }
 
     if (enabled && !isPaused && interval > 0) {
-      setIsRunning(true);
-      
-      const startTimer = () => {
-        setIsInInitialDelay(false);
-        
-        // For "once" timers that haven't executed yet, use setTimeout
-        // For regular timers or "once" timers that have already executed, use setInterval
-        if (once && !hasExecutedOnce) {
-          intervalRef.current = setTimeout(handleTick, interval) as any;
-        } else {
-          intervalRef.current = setInterval(handleTick, interval);
-        }
+      // Helper to start the actual timer
+      const startTicking = () => {
+        intervalRef.current = (once && !hasExecutedOnce) 
+          ? setTimeout(handleTick, interval) as any
+          : setInterval(handleTick, interval);
       };
 
-      // Only apply initial delay if:
-      // 1. There is an initial delay configured
-      // 2. The timer has never been started before (truly fresh start)
-      const shouldUseInitialDelay = initialDelay > 0 && !hasEverStarted;
-      
-      if (shouldUseInitialDelay) {
-        // Start with initial delay
-        setIsInInitialDelay(true);
-        initialDelayRef.current = setTimeout(startTimer, initialDelay);
+      // Only apply initial delay if timer has never been started before
+      if (initialDelay > 0 && !hasEverStarted) {
+        initialDelayRef.current = setTimeout(() => {
+          initialDelayRef.current = null;
+          startTicking();
+        }, initialDelay);
       } else {
-        // Start immediately (including resume from pause or restart after disable/enable)
-        startTimer();
+        startTicking();
       }
-    } else {
-      setIsRunning(false);
-      setIsInInitialDelay(false);
     }
 
     return () => {
@@ -184,26 +187,22 @@ export const Timer = forwardRef(function Timer(
         clearTimeout(initialDelayRef.current);
         initialDelayRef.current = null;
       }
-      handlerRunningRef.current = false;
     };
-  }, [enabled, interval, handleTick, once, hasExecutedOnce, isPaused, initialDelay, hasEverStarted]);
+  }, [enabled, interval, once, hasExecutedOnce, isPaused, initialDelay, hasEverStarted]);
 
-  // Reset hasExecutedOnce when enabled changes from false to true
+  // Reset state when enabled changes
   useEffect(() => {
     if (enabled && once) {
+      // Reset hasExecutedOnce when enabled changes from false to true for "once" timers
       setHasExecutedOnce(false);
+    }
+    if (!enabled) {
+      // Reset pause state when timer is disabled
+      setIsPaused(false);
     }
   }, [enabled, once]);
 
-  // Reset pause state when timer is disabled
-  useEffect(() => {
-    if (!enabled) {
-      setIsPaused(false);
-    }
-  }, [enabled]);
-
-  // Timer is a non-visual component, but we return a div for potential debugging
-  // and to maintain consistency with other XMLUI components
+  // Timer is a non-visual component
   return (
     <div
       ref={forwardedRef}
