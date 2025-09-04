@@ -202,6 +202,7 @@ import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
 import { TimeInputMd } from "./TimeInput/TimeInput";
+import { TimerMd } from "./Timer/Timer";
 import { DateInput } from "./DateInput/DateInputNative";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
@@ -406,6 +407,7 @@ export const collectedComponentMetadata = {
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
   TimeInput: TimeInputMd,
+  Timer: TimerMd,
   ToneChangerButton: ToneChangerButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,

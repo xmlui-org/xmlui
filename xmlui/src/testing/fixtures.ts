@@ -62,6 +62,7 @@ import {
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
+import { TimerDriver } from "./drivers/TimerDriver";
 import { DateInputDriver } from "./drivers/DateInputDriver";
 
 export { expect } from "./assertions";
@@ -533,6 +534,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(TimeInputDriver, testIdOrLocator);
     });
   },
+  createTimerDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TimerDriver, testIdOrLocator);
+    });
+  },
   createDateInputDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(DateInputDriver, testIdOrLocator);
@@ -611,5 +617,6 @@ type TestDriverExtenderProps = {
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
   createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
+  createTimerDriver: ComponentDriverMethod<TimerDriver>;
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
 };

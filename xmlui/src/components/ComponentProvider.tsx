@@ -117,6 +117,7 @@ import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
 import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
+import { timerComponentRenderer } from "./Timer/Timer";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -532,6 +533,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(datePickerComponentRenderer);
       this.registerCoreComponent(dateInputComponentRenderer);
       this.registerCoreComponent(timeInputComponentRenderer);
+      this.registerCoreComponent(timerComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
