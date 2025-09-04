@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.10.8
+
+### Patch Changes
+
+- a4d62c4: Add experimental Timer component
+- 7ed2918: Add the appendBlob function to the ApiInterceptor backend
+
 ## 0.10.7
 
 ### Patch Changes
