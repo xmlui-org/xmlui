@@ -811,6 +811,55 @@ test.describe("Event Handling", () => {
 
     await expect.poll(testStateDriver.testState).toEqual("beeped");
   });
+
+  test("preserves field values when date combination becomes invalid", async ({ initTestBed, createDateInputDriver, page }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+    
+    // Verify initial state
+    await expect(driver.monthInput).toHaveValue("01");
+    await expect(driver.dayInput).toHaveValue("30");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // Change month from 01 to 02, making Feb 30th which is invalid
+    await driver.monthInput.focus();
+    await driver.monthInput.fill("02");
+    
+    // Tab to day field to trigger validation
+    await page.keyboard.press("Tab");
+    
+    // Month should be updated to 02
+    await expect(driver.monthInput).toHaveValue("02");
+    
+    // Day should preserve the invalid value "30" instead of being normalized or cleared
+    // This is the key fix - invalid date combinations preserve the field values
+    await expect(driver.dayInput).toHaveValue("30");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // The day field should also be marked as invalid visually
+    await expect(driver.dayInput).toHaveClass(/invalid/);
+  });
+
+  test("does not clear all fields when invalid date is entered", async ({ initTestBed, createDateInputDriver, page }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" />`);
+    const driver = await createDateInputDriver("dateInput");
+    
+    // Create a scenario where the complete date would be invalid
+    await driver.monthInput.fill("13"); // Invalid month
+    await driver.dayInput.fill("25");
+    await driver.yearInput.fill("2024");
+    
+    // Tab to trigger validation
+    await page.keyboard.press("Tab");
+    
+    // Month should be normalized (13 % 10 = 3)
+    await expect(driver.monthInput).toHaveValue("03");
+    // Day and year should be preserved
+    await expect(driver.dayInput).toHaveValue("25");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // The important thing is that we don't get all empty fields
+  });
 });
 
 test.describe("API Methods", () => {

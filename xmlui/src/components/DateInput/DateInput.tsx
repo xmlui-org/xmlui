@@ -198,6 +198,10 @@ export const DateInputMd = createMetadata({
         value: "The new value to set for the date input.",
       },
     },
+    isoValue: {
+      description: `Get the current date value formatted in ISO standard (YYYY-MM-DD) format, suitable for JSON serialization.`,
+      signature: "isoValue(): string | null",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

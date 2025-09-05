@@ -340,6 +340,12 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         // Update invalid state immediately for visual feedback
         const isInvalid = validateFn(newValue);
         setInvalid(isInvalid);
+        
+        // Clear day invalid state when any field changes, as the date combination might become valid
+        if (!isInvalid) {
+          setIsDayCurrentlyInvalid(false);
+        }
+        
         // Fire invalid event if the value is invalid
         if (isInvalid) {
           onInvalidChange?.();
@@ -373,11 +379,25 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           setValue(normalizedValue);
           setInvalid(false); // Clear invalid state after normalization
 
-          // Always call handleChange to update the date value
+          // Check if the complete date would be valid
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          handleChange(dateString);
+          
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
         } else if (normalizedValue === null && currentValue !== "") {
           // Reset to previous valid value or clear
           setValue("");
@@ -392,10 +412,24 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          handleChange(dateString);
+          
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
         }
       },
-    [day, month, year, handleChange, handleBeep],
+    [day, month, year, handleChange, handleBeep, onInvalidChange],
   );
 
   // Handle changes from individual inputs
