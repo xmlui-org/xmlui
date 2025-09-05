@@ -7,5 +7,26 @@
 
 %-DESC-END
 
+%-PROP-START initialValue
 
+```xmlui-pg
+<Slider initialValue="5" />
+```
 
+%-PROP-END
+
+%-PROP-START minValue
+
+```xmlui-pg
+<Slider minValue="10" />
+```
+
+%-PROP-END
+
+%-PROP-START maxValue
+
+```xmlui-pg
+<Slider maxValue="30" />
+```
+
+%-PROP-END
