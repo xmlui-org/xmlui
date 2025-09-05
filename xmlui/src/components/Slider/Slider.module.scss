@@ -73,6 +73,10 @@ $componentName: "Slider";
     &.disabled, &[data-disabled] {
       background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
     }
+
+    &:not(.disabled):not([data-disabled]):hover {
+      cursor: pointer;
+    }
   }
 
   // Range element

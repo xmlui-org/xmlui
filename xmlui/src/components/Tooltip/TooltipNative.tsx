@@ -55,6 +55,11 @@ type TooltipOptions = {
 
 type TooltipProps = TooltipOptions & {
   /**
+   * The open state of the tooltip externally controlled
+   */
+  open?: boolean;
+
+  /**
    * The text content to display in the tooltip
    */
   text: string;
@@ -89,7 +94,7 @@ export const defaultProps: TooltipOptions = {
   avoidCollisions: true,
 };
 
-export const Tooltip = function Tooltip({
+export const Tooltip = forwardRef(function Tooltip({
   text,
   markdown,
   tooltipTemplate,
@@ -103,23 +108,26 @@ export const Tooltip = function Tooltip({
   alignOffset = defaultProps.alignOffset,
   avoidCollisions = defaultProps.avoidCollisions,
   children,
-}: TooltipProps) {
+  open,
+}: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
 
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
-      <RadixTooltip.Root defaultOpen={defaultOpen}>
+      <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
         <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (
             <RadixTooltip.Content
+              ref={ref}
               className={styles.content}
               side={side}
               align={align}
               sideOffset={sideOffset}
               alignOffset={alignOffset}
               avoidCollisions={avoidCollisions}
+              data-tooltip-content
             >
               {tooltipTemplate ? (
                 tooltipTemplate
@@ -135,7 +143,7 @@ export const Tooltip = function Tooltip({
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   );
-};
+});
 
 /**
  * Parses tooltip options from any input and returns an object containing only the option properties
