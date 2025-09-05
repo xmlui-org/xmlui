@@ -15,7 +15,6 @@ import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -60,7 +59,6 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
-  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
@@ -82,7 +80,6 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
-  mute?: boolean;
   emptyCharacter?: string;
 };
 
@@ -98,7 +95,6 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
-  mute: false,
   emptyCharacter: "-",
 };
 
@@ -115,7 +111,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onFocus,
     onBlur,
     onInvalidChange,
-    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     hour24 = defaultProps.hour24,
@@ -137,7 +132,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
-    mute = defaultProps.mute,
     emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
@@ -238,16 +232,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onDidChange?.(newValue);
   });
 
-  // Method to handle beeping - both sound and event
-  const handleBeep = useCallback(() => {
-    // Play the beep sound only if not muted
-    if (!mute) {
-      beep(440, 50);
-    }
-    // Always fire the beep event for alternative implementations
-    onBeep?.();
-  }, [onBeep, mute]);
-
   // Helper function to format the complete time value
   const formatTimeValue = useCallback(
     (
@@ -328,11 +312,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
 
         // Check if the current value was invalid (needed normalization or couldn't be normalized)
         const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
-        
-        if (wasInvalid) {
-          // Play beep sound and fire beep event when manually tabbing out of invalid input
-          handleBeep();
-        }
 
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
@@ -378,7 +357,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange, handleBeep],
+    [hour, minute, second, amPm, is12HourFormat, handleChange],
   );
 
   // Handle changes from individual inputs
@@ -726,7 +705,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
             emptyCharacter={processedEmptyCharacter}
-            onBeep={handleBeep}
           />
 
           <InputDivider separator=":" />
@@ -749,7 +727,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
             emptyCharacter={processedEmptyCharacter}
-            onBeep={handleBeep}
           />
 
           {/* Second input (if needed) */}
@@ -773,7 +750,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
                 emptyCharacter={processedEmptyCharacter}
-                onBeep={handleBeep}
               />
             </>
           )}
@@ -946,7 +922,6 @@ type HourInputProps = {
   isInvalid?: boolean;
   is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
@@ -957,7 +932,6 @@ function HourInput({
   isInvalid = false,
   is24Hour = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: HourInputProps): React.ReactElement {
   // Calculate min/max based on format
@@ -1021,7 +995,6 @@ function HourInput({
       min={minHour}
       maxLength={2}
       validateFn={(val) => isHourInvalid(val, is24Hour)}
-      onBeep={onBeep}
       onChange={otherProps.onChange}
       onBlur={(direction, event) => {
         // PartialInput provides direction, but the current onBlur expects just the event
@@ -1055,7 +1028,6 @@ type MinuteInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function MinuteInput({
@@ -1066,7 +1038,6 @@ function MinuteInput({
   value,
   isInvalid = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: MinuteInputProps): React.ReactElement {
   function isSameHour(date: string | Date) {
@@ -1083,7 +1054,6 @@ function MinuteInput({
       name="minute"
       value={value}
       validateFn={isMinuteOrSecondInvalid}
-      onBeep={onBeep}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
       maxLength={2}
@@ -1120,7 +1090,6 @@ type SecondInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function SecondInput({
@@ -1132,7 +1101,6 @@ function SecondInput({
   value,
   isInvalid = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: SecondInputProps): React.ReactElement {
   function isSameMinute(date: string | Date) {
@@ -1149,7 +1117,6 @@ function SecondInput({
       name="second"
       value={value}
       validateFn={isMinuteOrSecondInvalid}
-      onBeep={onBeep}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
       maxLength={2}
