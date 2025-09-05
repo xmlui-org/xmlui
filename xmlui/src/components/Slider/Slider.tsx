@@ -8,7 +8,6 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,
@@ -18,9 +17,7 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValue,
 } from "../metadata-helpers";
 import { Slider, defaultProps } from "./SliderNative";
 
@@ -32,7 +29,9 @@ export const SliderMd = createMetadata({
     "`Slider` provides an interactive control for selecting numeric values within " +
     "a defined range, supporting both single value selection and range selection with " +
     "multiple thumbs. It offers precise control through customizable steps and visual " +
-    "feedback with formatted value display.",
+    "feedback with formatted value display." +
+    "\n\n" +
+    "Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),

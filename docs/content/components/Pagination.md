@@ -56,7 +56,7 @@ The `List` is a perfect example of a component that does not implement its own p
 <List data="{ds}" />
 ```
 
-For a comprehensive example, see [How to paginate a List](./paginate-a-list).
+For a comprehensive example, see [How to paginate a List](../howto/paginate-a-list).
 
 ## Properties [#properties]
 

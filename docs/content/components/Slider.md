@@ -2,6 +2,8 @@
 
 `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
 
+Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.
+
 **Key features:**
 - **Range selection**: Single value or dual-thumb range selection with configurable minimum separation
 - **Step control**: Precise incremental selection with customizable step values
@@ -20,6 +22,10 @@ This boolean property value indicates whether the component responds to user eve
 ### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
+
+```xmlui-pg
+<Slider initialValue="5" />
+```
 
 ### `label` [#label]
 
@@ -50,6 +56,10 @@ This property sets the width of the `Slider` component's label. If not defined, 
 
 This property specifies the maximum value of the allowed input range.
 
+```xmlui-pg
+<Slider maxValue="30" />
+```
+
 ### `minStepsBetweenThumbs` (default: 1) [#minstepsbetweenthumbs-default-1]
 
 This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.
@@ -57,6 +67,10 @@ This property sets the minimum number of steps required between multiple thumbs 
 ### `minValue` (default: 0) [#minvalue-default-0]
 
 This property specifies the minimum value of the allowed input range.
+
+```xmlui-pg
+<Slider minValue="10" />
+```
 
 ### `rangeStyle` [#rangestyle]
 

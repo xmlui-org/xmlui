@@ -34,8 +34,9 @@ export const PaginationMd = createMetadata({
     pageSize: d("Number of items per page", undefined, "number", defaultProps.pageSize),
     pageIndex: d("Current page index (0-based)", undefined, "number", defaultProps.pageIndex),
     maxVisiblePages: d(
-      "Maximum number of page buttons to display",
-      undefined,
+      "Maximum number of page buttons to display. " +
+        "If the value is not among the allowed values, it will fall back to the default.",
+      PageNumberValues,
       "number",
       defaultProps.maxVisiblePages,
     ),
