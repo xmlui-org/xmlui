@@ -89,7 +89,9 @@ test("component handles withSwitch prop", async ({ initTestBed, createExpandable
   await initTestBed(`<ExpandableItem summary="Test" withSwitch="true">Content</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  await expect(driver.getSwitch()).toBeVisible();
+  // Check that the switch container (aria-hidden div) is present
+  const switchContainer = driver.getSummary().locator('[aria-hidden="true"]');
+  await expect(switchContainer).toBeVisible();
   await expect(driver.getIcon()).not.toBeVisible();
 });
 
@@ -101,44 +103,165 @@ test("component has correct accessibility attributes", async ({ initTestBed, cre
   await initTestBed(`<ExpandableItem summary="Test Summary">Content here</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  // Summary should be clickable
-  await expect(driver.getSummary()).toBeVisible();
+  const summary = driver.getSummary();
   
-  // Component should be properly structured
-  await expect(driver.component).toBeVisible();
+  // Summary should have proper button role and ARIA attributes
+  await expect(summary).toHaveRole("button");
+  await expect(summary).toHaveAttribute("aria-expanded", "false");
+  await expect(summary).toHaveAttribute("aria-disabled", "false");
+  await expect(summary).toHaveAttribute("tabindex", "0");
+  await expect(summary).toHaveAttribute("aria-controls");
+  await expect(summary).toHaveAttribute("id");
 });
 
-test("component is keyboard accessible", async ({ initTestBed, createExpandableItemDriver }) => {
-  const { testStateDriver } = await initTestBed(`<ExpandableItem summary="Test" onExpandedChange="testState = 'toggled'">Content</ExpandableItem>`, {});
+test("component ARIA attributes update with expansion state", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`<ExpandableItem summary="Test Summary">Content here</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  // Since the summary is a div, we'll test mouse interaction which is more reliable
-  // for this component type. Real keyboard accessibility would require proper ARIA attributes
-  await driver.getSummary().click();
-  await expect.poll(testStateDriver.testState).toEqual('toggled');
+  const summary = driver.getSummary();
+  
+  // Initially collapsed
+  await expect(summary).toHaveAttribute("aria-expanded", "false");
+  
+  // Expand
+  await summary.click();
+  await expect(summary).toHaveAttribute("aria-expanded", "true");
+  
+  // Collapse
+  await summary.click();
+  await expect(summary).toHaveAttribute("aria-expanded", "false");
+});
+
+test("component content region has correct ARIA attributes", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`<ExpandableItem summary="Test Summary" initiallyExpanded="true">Content here</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  const content = driver.getContent();
+  
+  // Content should have region role and proper labeling
+  await expect(content).toHaveRole("region");
+  await expect(content).toHaveAttribute("aria-labelledby");
+  await expect(content).toHaveAttribute("id");
+  
+  // Verify ARIA relationship between summary and content
+  const summaryId = await summary.getAttribute("id");
+  const contentAriaLabelledBy = await content.getAttribute("aria-labelledby");
+  const summaryAriaControls = await summary.getAttribute("aria-controls");
+  const contentId = await content.getAttribute("id");
+  
+  expect(contentAriaLabelledBy).toBe(summaryId);
+  expect(summaryAriaControls).toBe(contentId);
+});
+
+test("component is keyboard accessible with Enter key", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  const { testStateDriver } = await initTestBed(`<ExpandableItem summary="Test" onExpandedChange="arg => testState = arg">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  
+  // Focus the summary button
+  await summary.focus();
+  await expect(summary).toBeFocused();
+  
+  // Press Enter to toggle
+  await summary.press("Enter");
+  await expect.poll(testStateDriver.testState).toEqual(true);
+  await expect(driver.getContent()).toBeVisible();
+  
+  // Press Enter again to collapse
+  await summary.press("Enter");
+  await expect.poll(testStateDriver.testState).toEqual(false);
+  await expect(driver.getContent()).not.toBeVisible();
+});
+
+test("component is keyboard accessible with Space key", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  const { testStateDriver } = await initTestBed(`<ExpandableItem summary="Test" onExpandedChange="arg => testState = arg">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  
+  // Focus the summary button
+  await summary.focus();
+  await expect(summary).toBeFocused();
+  
+  // Press Space to toggle
+  await summary.press(" ");
+  await expect.poll(testStateDriver.testState).toEqual(true);
+  await expect(driver.getContent()).toBeVisible();
+  
+  // Press Space again to collapse
+  await summary.press(" ");
+  await expect.poll(testStateDriver.testState).toEqual(false);
+  await expect(driver.getContent()).not.toBeVisible();
+});
+
+test("component maintains focus after keyboard toggle", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  
+  // Focus and expand with keyboard
+  await summary.focus();
+  await expect(summary).toBeFocused();
+  await summary.press("Enter");
+  await expect(driver.getContent()).toBeVisible();
+  await expect(summary).toBeFocused(); // Focus should remain
+  
+  // Collapse with keyboard
+  await summary.press("Space");
+  await expect(driver.getContent()).not.toBeVisible();
+  await expect(summary).toBeFocused(); // Focus should still remain
+});
+
+test("component is focusable only when enabled", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`<ExpandableItem summary="Test" enabled="false">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  
+  // Disabled component should not be focusable (no tabindex attribute)
+  await expect(summary).not.toHaveAttribute("tabindex");
+  await expect(summary).toHaveAttribute("aria-disabled", "true");
+});
+
+test("component keyboard interaction works with switch variant", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  const { testStateDriver } = await initTestBed(`<ExpandableItem summary="Test" withSwitch="true" onExpandedChange="arg => testState = arg">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  const summary = driver.getSummary();
+  
+  // Focus and activate with Enter
+  await summary.focus();
+  await summary.press("Enter");
+  await expect.poll(testStateDriver.testState).toEqual(true);
+  await expect(driver.getContent()).toBeVisible();
+  
+  // Deactivate with Space
+  await summary.press(" ");
+  await expect.poll(testStateDriver.testState).toEqual(false);
+  await expect(driver.getContent()).not.toBeVisible();
+});
+
+test("component icon/switch container is hidden from screen readers", async ({ initTestBed, createExpandableItemDriver, page }) => {
+  await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
+  const driver = await createExpandableItemDriver();
+  
+  // Icon container should be aria-hidden
+  const iconContainer = driver.getSummary().locator('[class*="icon"]');
+  await expect(iconContainer).toHaveAttribute("aria-hidden", "true");
 });
 
 test("component supports screen reader navigation", async ({ initTestBed, createExpandableItemDriver }) => {
   await initTestBed(`<ExpandableItem summary="Accessible Summary">Screen reader content</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  // Summary should be clickable for interaction
-  await expect(driver.getSummary()).toBeVisible();
-  await driver.getSummary().click();
+  // Summary should be properly announced as a button
+  const summary = driver.getSummary();
+  await expect(summary).toHaveRole("button");
+  await summary.click();
   await expect(driver.getContent()).toBeVisible();
-});
-
-test("component maintains focus after expansion", async ({ initTestBed, createExpandableItemDriver }) => {
-  await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
-  const driver = await createExpandableItemDriver();
-  
-  // Test interaction rather than focus since div elements aren't focusable by default
-  await driver.getSummary().click();
-  await expect(driver.getContent()).toBeVisible();
-  
-  // Collapse again
-  await driver.getSummary().click();
-  await expect(driver.getContent()).not.toBeVisible();
 });
 
 // =============================================================================
@@ -238,8 +361,8 @@ test("component handles disabled state interaction", async ({ initTestBed, creat
   await initTestBed(`<ExpandableItem summary="Test" enabled="false">Content</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  // Should not expand when disabled
-  await driver.getSummary().click();
+  // Should not expand when disabled - use force click since the element is aria-disabled
+  await driver.getSummary().click({ force: true });
   await expect(driver.getContent()).not.toBeVisible();
 });
 
@@ -385,11 +508,12 @@ test("component works with switch variant", async ({ initTestBed, createExpandab
   await initTestBed(`<ExpandableItem summary="Test" withSwitch="true">Content</ExpandableItem>`, {});
   const driver = await createExpandableItemDriver();
   
-  // Click the switch
-  await driver.getSwitch().click();
+  // With switch variant, users should click the summary (button) to toggle
+  // The switch itself is decorative and aria-hidden
+  await driver.getSummary().click();
   await expect(driver.getContent()).toBeVisible();
   
-  // Click the summary (should also toggle when using switch)
+  // Click the summary again to toggle back
   await driver.getSummary().click();
   await expect(driver.getContent()).not.toBeVisible();
 });
