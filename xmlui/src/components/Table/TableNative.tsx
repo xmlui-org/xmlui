@@ -858,7 +858,7 @@ type ClickableHeaderProps = {
 
 function ClickableHeader({ hasSorting, updateSorting, children }: ClickableHeaderProps) {
   return hasSorting ? (
-    <button className={styles.clickableHeader} onClick={updateSorting}>
+    <button type="button" className={styles.clickableHeader} onClick={updateSorting}>
       {children}
     </button>
   ) : (
