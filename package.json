@@ -6,6 +6,7 @@
   "workspaces": [
     "./xmlui",
     "./docs",
+    "./blog",
     "./tools/create-app",
     "./tools/vscode",
     "./packages/*"

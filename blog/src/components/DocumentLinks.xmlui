@@ -1,0 +1,28 @@
+<Component name="DocumentLinks">
+  <Theme
+    textDecorationLine-Link="none"
+    textColor-Link="$textColor-DocumentLinks"
+    textColor-Link--hover="textColor-DocumentLinks--hover"
+    backgroundColor-ContentSeparator="$backgroundColor-separator-DocumentLinks">
+    <VStack width="{$props.width ? $props.width : '100%'}">
+      <ContentSeparator
+        marginVertical="$space-6"
+        when="{$linkInfo.prevLink || $linkInfo.nextLink}" />
+      <HStack verticalAlignment="center" gap="$space-2">
+        <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
+          <Icon name="chevronleft" />
+          <Text variant="subtitle">
+            {$linkInfo.prevLink.label}
+          </Text>
+        </Link>
+        <SpaceFiller />
+        <Link when="{$linkInfo.nextLink}" to="{$linkInfo.nextLink.to}">
+          <Text variant="subtitle">
+            {$linkInfo.nextLink.label}
+          </Text>
+          <Icon name="chevronright" />
+        </Link>
+      </HStack>
+    </VStack>
+  </Theme>
+</Component>

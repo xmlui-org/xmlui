@@ -1,0 +1,6 @@
+<Component name="Boxes">
+  <Card width="30%">
+    <Stack width="100px" height="36px" backgroundColor="purple" />
+    <Stack width="50px" height="36px" backgroundColor="orange" />
+  </Card>
+</Component>

@@ -1,0 +1,173 @@
+<App gap="$gap-tight">
+  <Text value="The base value is: 0.25rem" variant="strong" />
+  
+  <HStack>
+    <Text value="space-0" width="$space-20" />
+    <Stack width="$space-0" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-0_5" width="$space-20" />
+    <Stack width="$space-0_5" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-1" width="$space-20" />
+    <Stack width="$space-1" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-1_5" width="$space-20" />
+    <Stack width="$space-1_5" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-2" width="$space-20" />
+    <Stack width="$space-2" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-2_5" width="$space-20" />
+    <Stack width="$space-2_5" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-3" width="$space-20" />
+    <Stack width="$space-3" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-3_5" width="$space-20" />
+    <Stack width="$space-3_5" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-4" width="$space-20" />
+    <Stack width="$space-4" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-5" width="$space-20" />
+    <Stack width="$space-5" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-6" width="$space-20" />
+    <Stack width="$space-6" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-7" width="$space-20" />
+    <Stack width="$space-7" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-8" width="$space-20" />
+    <Stack width="$space-8" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-9" width="$space-20" />
+    <Stack width="$space-9" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-10" width="$space-20" />
+    <Stack width="$space-10" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-11" width="$space-20" />
+    <Stack width="$space-11" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-12" width="$space-20" />
+    <Stack width="$space-12" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-14" width="$space-20" />
+    <Stack width="$space-14" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-16" width="$space-20" />
+    <Stack width="$space-16" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-20" width="$space-20" />
+    <Stack width="$space-20" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-24" width="$space-20" />
+    <Stack width="$space-24" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-28" width="$space-20" />
+    <Stack width="$space-28" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-32" width="$space-20" />
+    <Stack width="$space-32" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-36" width="$space-20" />
+    <Stack width="$space-36" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-40" width="$space-20" />
+    <Stack width="$space-40" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-44" width="$space-20" />
+    <Stack width="$space-44" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-48" width="$space-20" />
+    <Stack width="$space-48" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-52" width="$space-20" />
+    <Stack width="$space-52" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-56" width="$space-20" />
+    <Stack width="$space-56" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-60" width="$space-20" />
+    <Stack width="$space-60" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-64" width="$space-20" />
+    <Stack width="$space-64" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-72" width="$space-20" />
+    <Stack width="$space-72" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-80" width="$space-20" />
+    <Stack width="$space-80" backgroundColor="$color-info" />
+  </HStack>
+
+  <HStack>
+    <Text value="space-96" width="$space-20" />
+    <Stack width="$space-96" backgroundColor="$color-info" />
+  </HStack>
+</App>

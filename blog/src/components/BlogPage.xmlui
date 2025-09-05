@@ -1,0 +1,13 @@
+<Component name="BlogPage">
+  <VStack width="{$props.width ? $props.width : '85%'}">
+    <VStack>
+      <H1>{$props.post.title}</H1>
+      <HStack gap="$space-2">
+        <Text>{$props.post.date}</Text>
+        <Text>-</Text>
+        <Text>{$props.post.author}</Text>
+      </HStack>
+    </VStack>
+    <Markdown data="/blog/{$props.post.slug}.md" />
+  </VStack>
+</Component>

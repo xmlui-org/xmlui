@@ -1,0 +1,4 @@
+<Component name="Breadcrumb">
+    <!-- Todo: Add breadcrumb navigation -->
+    <Text />
+</Component>

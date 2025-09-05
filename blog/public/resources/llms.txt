@@ -1,0 +1,803 @@
+# XMLUI Framework
+
+XMLUI is a declarative framework for building user interfaces with XML markup and flexible theming. XMLUI enables developers to create sophisticated web applications with little or no knowledge of JavaScript, CSS, or React.
+
+## Core Philosophy
+
+XMLUI apps are:
+- **Easy to create** - Build on the web platform with minimal programming knowledge
+- **Beautiful by default** - Enjoy themes that look great out of the box and are easy to modify
+- **Connected** - Read and write APIs with little or no scripting
+- **Modular** - Use a comprehensive suite of 90+ components that you can extend
+- **Easy to deploy** - Just drop a handful of files onto a static webserver
+
+### Key Features
+- **Reactive data binding** with automatic UI updates (like spreadsheets)
+- **90+ built-in components** covering all application needs
+- **Virtualized performance** for large datasets (List, Table components)
+- **Template properties** for extensive component customization (25+ templates)
+- **Helper tags** (`<variable>`, `<property>`, `<event>`) for clean markup organization
+- **Comprehensive theming** system with 7 built-in theme variants
+- **Real-time data sources** and seamless API integration
+- **Built-in routing** and navigation management
+- **No CSS required** for most styling needs
+
+### Basic Syntax
+```xml
+<App>
+  <variable name="count" value="{0}" />
+  <Button onClick="count++" label="Count: {count}" />
+  <Text>{count}</Text>
+</App>
+```
+
+## Application Structure
+
+### File Structure
+```
+app/
+├── index.html           # Entry point with XMLUI script reference
+├── Main.xmlui          # Root App component
+├── config.json         # App configuration (optional)
+├── components/         # User-defined components
+│   ├── Dashboard.xmlui
+│   └── UserCard.xmlui
+├── resources/          # Static assets (images, icons)
+├── themes/            # Custom theme definitions
+└── xmlui/             # XMLUI framework files
+    └── 0.9.23.js
+```
+
+### Main.xmlui Structure
+```xml
+<App name="My Application" layout="vertical-sticky">
+  <AppHeader>
+    <property name="logoTemplate">
+      <Heading level="h3" value="My App" />
+    </property>
+  </AppHeader>
+
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home" />
+    <NavGroup label="Management">
+      <NavLink label="Users" to="/users" />
+      <NavLink label="Settings" to="/settings" />
+    </NavGroup>
+  </NavPanel>
+
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <Dashboard />
+    </Page>
+    <Page url="/users">
+      <UserList />
+    </Page>
+  </Pages>
+
+  <Footer>© 2024 My Company</Footer>
+</App>
+```
+
+## Component Categories
+
+### Application Structure (7 components)
+- **App** - Root container with 7 layout templates:
+  - `horizontal` / `horizontal-sticky` - Stacked header, nav, content, footer
+  - `vertical` / `vertical-sticky` / `vertical-full-header` - Left sidebar navigation
+  - `condensed` / `condensed-sticky` - Combined header/nav bar (default)
+- **AppHeader** - Top navigation with logo, title, profile areas
+- **NavPanel** - Navigation container supporting hierarchical menus
+- **Pages/Page** - Declarative routing with URL patterns and `$routeParams`
+- **Footer** - Application footer area
+- **Theme** - Styling contexts without CSS
+- **PageMetaTitle** - Dynamic browser tab titles
+
+### Layout Components (15+ components)
+**Primary Containers:**
+- **Stack/VStack/HStack** - Fundamental layout with orientation, alignment, gaps
+- **CHStack/CVStack** - Centered horizontal/vertical stacks
+- **FlowLayout** - Horizontal layout with automatic wrapping and responsive sizing
+- **Grid** - Grid-based layouts
+- **Splitter/HSplitter/VSplitter** - Resizable divided containers
+
+**Content Organization:**
+- **Card** - Content boundaries with padding, borders, shadows
+- **Backdrop** - Semi-transparent overlays with optional content
+- **ContentSeparator** - Visual dividers (horizontal/vertical lines)
+- **StickyBox** - Fixed positioning (top/bottom)
+- **Breakout** - Full-width sections ignoring parent constraints
+- **SpaceFiller** - Flexible space allocation and line breaks
+
+### Form Components (15+ components)
+**Form Structure:**
+- **Form** - Data binding, validation, submission with `$data` context
+- **FormItem** - Field wrapper with validation, labeling, `$value` context
+- **FormSection** - Field grouping with FlowLayout
+
+**Input Controls:**
+- **TextBox/TextArea/PasswordInput** - Text input with validation support
+- **NumberBox** - Numeric input with spinners and formatting
+- **DatePicker** - Calendar-based date selection
+- **FileInput/FileUploadDropZone** - File selection and drag-drop upload
+
+**Selection Controls:**
+- **Select/AutoComplete** - Dropdown selection with search and custom templates
+- **RadioGroup** - Mutually exclusive selection
+- **Checkbox/Switch** - Boolean controls
+- **Slider** - Numeric range selection with single/dual thumbs
+
+**Specialized:**
+- **ColorPicker** - RGB/HSL/HEX color selection
+- **EmojiSelector** - System emoji browser
+- **Option** - Data structure for selection components
+
+### Data Display (12+ components)
+**High-Performance Lists:**
+- **List** - Virtualized, groupable, sortable lists for thousands of items
+  - Context: `$item`, `$itemIndex`, `$isFirst`, `$isLast`, `$group`
+  - Features: grouping, sorting, pagination, empty state handling
+- **Items** - Lightweight iteration without virtualization
+- **Table** - Structured data with Column components and sorting
+
+**Typography:**
+- **Text** - Styled text with variants (abbr, cite, code, deleted, inserted, keyboard)
+- **Heading/H1-H6** - Semantic headings with anchor generation
+- **Link** - Navigation with internal/external URL support
+- **Markdown** - Rich text formatting with markdown syntax
+
+**Media & Status:**
+- **Image** - Responsive images with aspect ratio control
+- **Icon** - Scalable vector icons from built-in registry
+- **Avatar** - Circular profile images with fallback initials
+- **Logo** - Application branding with light/dark variants
+- **Badge** - Status indicators and tags with color mapping
+- **ProgressBar** - Task completion visualization
+- **Spinner** - Indeterminate loading states
+- **NoResult** - Empty state displays
+
+**Content Organization:**
+- **Tabs/TabItem** - Switchable content panels
+- **ExpandableItem** - Collapsible sections (like HTML details)
+- **TableOfContents** - Auto-generated navigation from headings
+
+### Interactive Components (8+ components)
+**Menus:**
+- **DropdownMenu** - Space-efficient action menus with trigger templates
+- **MenuItem/SubMenuItem** - Menu items with icons, actions, nested submenus
+- **MenuSeparator** - Visual menu grouping
+
+**Dialogs:**
+- **ModalDialog** - Overlay dialogs with parameters and programmatic control
+
+**Navigation:**
+- **NavLink** - Smart navigation with active state detection
+- **NavGroup** - Collapsible hierarchical menu containers
+
+**Utilities:**
+- **Bookmark** - Scroll targets for navigation
+- **ToneChangerButton** - Light/dark mode toggle
+
+### Data Management (6+ components)
+**API Integration:**
+- **DataSource** - Automatic data fetching with reactive URL binding
+- **APICall** - Manual CRUD operations with success/error handling
+- **RealTimeAdapter** - WebSocket/SSE integration
+
+**State Management:**
+- **AppState** - Global state persistence across navigation
+- **ChangeListener** - Reactive value monitoring and side effects
+
+**Background Processing:**
+- **Queue** - FIFO task processing with UI progress feedback
+
+### Chart Components (5 components)
+- **BarChart** - Horizontal/vertical bars, grouped/stacked layouts
+- **LineChart** - Connected points for trends and time series data
+- **PieChart/DonutChart** - Proportional circular visualizations
+- **Legend** - Standalone chart legends with custom positioning
+
+### Utility Components (5+ components)
+- **Fragment** - Conditional rendering and component grouping
+- **Redirect** - Internal navigation redirects with conditions
+- **Column** - Table column definitions with sorting and custom content
+- **LabelList** - Custom chart labeling
+
+### Extension Packages
+**XMLUI Animations (Experimental):**
+- **FadeAnimation/FadeInAnimation/FadeOutAnimation** - Opacity transitions
+- **ScaleAnimation** - Size transformations
+- **SlideInAnimation** - Directional entry animations
+
+## XML Markup Fundamentals
+
+### Properties
+Properties can be literal strings or JavaScript expressions in curly braces:
+```xml
+<!-- Literal -->
+<Text value="Hello World" />
+
+<!-- Expression -->
+<Text value="Result: {6 * 7}" />
+
+<!-- JSON Array -->
+<Items data="{['Apple', 'Banana', 'Cherry']}">
+  <Text>{$item}</Text>
+</Items>
+
+<!-- JSON Object -->
+<Form data='{{ name: "John", age: 30 }}'>
+  <FormItem bindTo="name" />
+  <FormItem bindTo="age" />
+</Form>
+```
+
+### Variables
+Components can declare reactive variables using two syntaxes:
+```xml
+<!-- Attribute syntax -->
+<App var.count="{0}" var.message="Hello">
+  <Text>{message}: {count}</Text>
+</App>
+
+<!-- Helper tag syntax -->
+<App>
+  <variable name="count" value="{0}" />
+  <variable name="message" value="Hello" />
+  <Text>{message}: {count}</Text>
+</App>
+```
+
+### Reactive Variables
+Variables automatically update dependent expressions:
+```xml
+<App var.count="{0}" var.doubleCount="{count * 2}">
+  <Button onClick="count++" label="Increment" />
+  <Text>Count: {count}</Text>
+  <Text>Double: {doubleCount}</Text> <!-- Updates automatically -->
+</App>
+```
+
+### Event Handlers
+Events can be declared as attributes or using helper tags:
+```xml
+<!-- Attribute syntax -->
+<Button onClick="count++" label="Click me" />
+
+<!-- Helper tag syntax (required for component handlers) -->
+<Button label="Save">
+  <event name="click">
+    <APICall url="/api/save" method="POST" body="{formData}" />
+  </event>
+</Button>
+```
+
+## Helper Tags
+
+### `<variable>` - State Management
+Alternative to `var.` attribute syntax:
+```xml
+<variable name="user" value='{{ name: "John", role: "admin" }}' />
+<variable name="isLoading" value="{false}" />
+<variable name="items" value="{[]}" />
+```
+
+### `<property>` - Template Content
+For template properties containing markup:
+```xml
+<List data="{users}">
+  <property name="itemTemplate">
+    <Card>
+      <HStack gap="$space-2">
+        <Avatar src="{$item.avatar}" />
+        <VStack>
+          <Text variant="strong">{$item.name}</Text>
+          <Text color="muted">{$item.email}</Text>
+        </VStack>
+      </HStack>
+    </Card>
+  </property>
+
+  <property name="emptyListTemplate">
+    <VStack horizontalAlignment="center" padding="$space-8">
+      <Icon name="user-x" size="xl" color="muted" />
+      <Text color="muted">No users found</Text>
+    </VStack>
+  </property>
+</List>
+```
+
+### `<event>` - Action Handlers
+For complex event handling with components:
+```xml
+<Button label="Process Data">
+  <event name="click">
+    <APICall
+      url="/api/process"
+      method="POST"
+      body="{selectedItems}"
+      onSuccess="toast('Processing complete!'); data.refresh()"
+      onError="toast('Failed to process', 'error')" />
+  </event>
+</Button>
+```
+
+## Template Properties System
+
+25+ template properties for extensive customization:
+
+### Application Templates (5)
+```xml
+<App>
+  <property name="logoTemplate">
+    <HStack gap="$space-1">
+      <Icon name="star" color="primary" />
+      <Heading level="h3" value="My App" />
+    </HStack>
+  </property>
+</App>
+
+<AppHeader>
+  <property name="profileMenuTemplate">
+    <DropdownMenu>
+      <MenuItem label="Profile" icon="user" />
+      <MenuItem label="Settings" icon="settings" />
+      <MenuSeparator />
+      <MenuItem label="Logout" icon="logout" />
+    </DropdownMenu>
+  </property>
+</AppHeader>
+```
+
+### Form Templates (3)
+```xml
+<Form>
+  <property name="buttonRowTemplate">
+    <HStack gap="$space-2" horizontalAlignment="end">
+      <Button type="button" label="Cancel" variant="outlined" />
+      <Button type="submit" label="Save" variant="solid" />
+    </HStack>
+  </property>
+</Form>
+
+<FormItem field="category">
+  <property name="inputTemplate">
+    <Select>
+      <Option value="work" label="Work" />
+      <Option value="personal" label="Personal" />
+    </Select>
+  </property>
+</FormItem>
+```
+
+### Data Display Templates (8)
+```xml
+<List data="{products}" groupBy="category">
+  <property name="groupHeaderTemplate">
+    <HStack justifyContent="space-between" padding="$space-2">
+      <Text variant="subtitle">{$group.key}</Text>
+      <Badge value="{$group.items.length}" />
+    </HStack>
+  </property>
+
+  <property name="itemTemplate">
+    <Card>
+      <Text variant="strong">{$item.name}</Text>
+      <Text>${$item.price}</Text>
+    </Card>
+  </property>
+
+  <property name="emptyListTemplate">
+    <Text color="muted">No products available</Text>
+  </property>
+</List>
+```
+
+## Context Variables
+
+Special variables automatically provided by XMLUI within specific scopes:
+
+### Form Context
+- **`$data`** - Complete form data object (inside `<Form>`)
+- **`$value`** - Current field value (inside `<FormItem>`)
+- **`$validationResult`** - Field validation status
+- **`$setValue`** - Function to programmatically set field values
+
+```xml
+<Form data='{{ name: "", email: "" }}'>
+  <FormItem bindTo="name">
+    <Text>Current value: {$value}</Text>
+    <TextBox placeholder="Enter name" />
+  </FormItem>
+
+  <Text>Form data: {JSON.stringify($data)}</Text>
+</Form>
+```
+
+### Data Iteration Context
+- **`$item`** - Current item in data iterations
+- **`$itemIndex`** - Zero-based index of current item
+- **`$isFirst/$isLast`** - Boolean position indicators
+
+```xml
+<Items data="{products}">
+  <HStack gap="$space-2">
+    <Badge value="{$itemIndex + 1}" />
+    <Text>{$item.name}</Text>
+    {$isFirst && <Badge value="First" />}
+    {$isLast && <Badge value="Last" />}
+  </HStack>
+</Items>
+```
+
+### Grouping Context (List with groupBy)
+- **`$group`** - Group information object
+  - `$group.key` - Group identifier
+  - `$group.items` - Items in this group
+  - `$group.id` - Unique group ID
+
+```xml
+<List data="{orders}" groupBy="status">
+  <property name="groupHeaderTemplate">
+    <HStack justifyContent="space-between">
+      <Text variant="strong">{$group.key} Orders</Text>
+      <Badge value="{$group.items.length}" />
+    </HStack>
+  </property>
+</List>
+```
+
+### Navigation Context
+- **`$routeParams`** - URL parameters from route patterns
+
+```xml
+<Pages>
+  <Page url="/user/:userId">
+    <Text>Viewing user: {$routeParams.userId}</Text>
+  </Page>
+</Pages>
+```
+
+### Component Context
+- **`$props`** - Properties passed to user-defined components
+- **`var.myVar`** - Scoped variables declared in markup
+- **`componentId`** - Reference to components with `id` attributes
+
+## Reactive Data Binding
+
+XMLUI's reactive system automatically updates UI when data changes:
+
+### Basic Reactivity
+```xml
+<App>
+  <!-- User selection drives other components -->
+  <Select id="category" initialValue="electronics">
+    <Option value="electronics" label="Electronics" />
+    <Option value="clothing" label="Clothing" />
+  </Select>
+
+  <!-- DataSource reacts to selection changes -->
+  <DataSource
+    id="products"
+    url="/api/products?category={category.value}"
+    resultSelector="data" />
+
+  <!-- Multiple components use the same data -->
+  <Text>Found {products.value?.length || 0} products</Text>
+  <List data="{products.value}">
+    <property name="itemTemplate">
+      <Card title="{$item.name}" subtitle="${$item.price}" />
+    </property>
+  </List>
+</App>
+```
+
+### Advanced Data Flow with Forms
+```xml
+<App>
+  <!-- Form drives API calls -->
+  <Form id="searchForm" data='{{ query: "", minPrice: 0 }}'>
+    <FormItem bindTo="query" label="Search">
+      <TextBox placeholder="Product name..." />
+    </FormItem>
+    <FormItem bindTo="minPrice" label="Min Price">
+      <NumberBox />
+    </FormItem>
+  </Form>
+
+  <!-- DataSource reacts to form changes -->
+  <DataSource
+    id="results"
+    url="/api/search?q={searchForm.data.query}&minPrice={searchForm.data.minPrice}"
+    resultSelector="products" />
+
+  <!-- UI updates automatically -->
+  <List data="{results.value}" loading="{results.loading}">
+    <property name="itemTemplate">
+      <Card title="{$item.name}" subtitle="${$item.price}" />
+    </property>
+    <property name="emptyListTemplate">
+      <Text>No products match your criteria</Text>
+    </property>
+  </List>
+</App>
+```
+
+## Layout System
+
+### Fundamental Containers
+
+**Stack Variants:**
+- **VStack** - Vertical layout (each child on new row)
+- **HStack** - Horizontal layout (children in same row)
+- **CHStack/CVStack** - Centered horizontal/vertical stacks
+- **Stack** - Configurable orientation with `orientation` property
+
+**Flow Layout:**
+- **FlowLayout** - Horizontal with wrapping, percentage-aware sizing
+
+### Layout Properties
+- **Alignment**: `horizontalAlignment`, `verticalAlignment` (start, center, end)
+- **Spacing**: `gap`, `padding` (use theme variables like `$space-2`, `$gap-loose`)
+- **Sizing**: `width`, `height`, `minWidth`, `maxWidth` etc.
+
+### Dimension Units
+- **No value** - Container determines size based on content
+- **Fixed units** - px, rem, em (container respects exact size)
+- **Percentage** - % of parent container (50%, 100%)
+- **Star sizing** - * weights for distributing remaining space (*, 2*, 3*)
+
+### Layout Examples
+```xml
+<!-- Responsive card grid -->
+<FlowLayout>
+  <Card width="300px">Content 1</Card>
+  <Card width="300px">Content 2</Card>
+  <Card width="300px">Content 3</Card>
+</FlowLayout>
+
+<!-- Dashboard layout with star sizing -->
+<HStack height="100vh">
+  <!-- Sidebar takes fixed width -->
+  <VStack width="250px" backgroundColor="$color-surface">
+    <Navigation />
+  </VStack>
+
+  <!-- Main content takes remaining space -->
+  <VStack width="*" padding="$space-4">
+    <!-- Header takes content height -->
+    <Header />
+
+    <!-- Content area takes remaining height -->
+    <VStack height="*">
+      <MainContent />
+    </VStack>
+  </VStack>
+</HStack>
+
+<!-- Centered dialog -->
+<CVStack height="100vh" width="100vw">
+  <Card width="400px" padding="$space-6">
+    <ModalContent />
+  </Card>
+</CVStack>
+```
+
+## Theming System
+
+### Built-in Themes
+7 theme variants available:
+- **xmlui** (default blue)
+- **xmlui-green**
+- **xmlui-gray**
+- **xmlui-orange**
+- **xmlui-purple**
+- **xmlui-cyan**
+- **xmlui-red**
+
+Each theme supports light and dark tones.
+
+### Theme Usage
+```xml
+<!-- Global theme -->
+<Theme themeId="xmlui-green" tone="dark">
+  <App>...</App>
+</Theme>
+
+<!-- Scoped theme overrides -->
+<Theme
+  backgroundColor-Button="red"
+  borderRadius-Button="8px"
+  color-text-Button="white">
+  <Button label="Danger Action" />
+</Theme>
+```
+
+### Theme Variables
+**Colors:**
+```css
+--color-primary, --color-secondary, --color-accent
+--color-background, --color-surface, --color-overlay
+--color-text, --color-muted, --color-inverse
+--color-success, --color-warn, --color-danger, --color-info
+```
+
+**Spacing:**
+```css
+--space-xs, --space-sm, --space-normal, --space-lg, --space-xl
+--space-2, --space-4, --space-8, --space-16, --space-32, --space-64
+--gap-tight, --gap-normal, --gap-loose
+```
+
+**Typography:**
+```css
+--font-size-xs, --font-size-sm, --font-size-normal, --font-size-lg
+--font-weight-normal, --font-weight-medium, --font-weight-bold
+--line-height-normal, --line-height-relaxed
+```
+
+## User-Defined Components
+
+### Component Definition
+```xml
+<!-- components/UserCard.xmlui -->
+<Component name="UserCard">
+  <Card>
+    <HStack gap="$space-2">
+      <Avatar src="{$props.user.avatar}" name="{$props.user.name}" />
+      <VStack>
+        <Text variant="strong">{$props.user.name}</Text>
+        <Text color="muted">{$props.user.email}</Text>
+        <Text>{$props.user.role ?? 'User'}</Text>
+      </VStack>
+    </HStack>
+  </Card>
+</Component>
+```
+
+### Component Usage
+```xml
+<App>
+  <UserCard user='{{ name: "John Doe", email: "john@example.com", role: "Admin" }}' />
+</App>
+```
+
+### Component with Methods and Events
+```xml
+<Component
+  name="Counter"
+  var.count="{$props.initialValue ?? 0}"
+  method.reset="() => count = 0"
+  method.setValue="(value) => count = value">
+
+  <HStack gap="$space-2">
+    <Button onClick="count--" label="-" />
+    <Text>{count}</Text>
+    <Button onClick="count++" label="+" />
+    <Button onClick="emitEvent('valueChanged', count)" label="Notify" />
+  </HStack>
+</Component>
+
+<!-- Usage -->
+<Counter
+  id="myCounter"
+  initialValue="{10}"
+  onValueChanged="(value) => toast('Count changed to: ' + value)" />
+<Button onClick="myCounter.reset()" label="Reset Counter" />
+```
+
+### Slots for Content Injection
+```xml
+<Component name="Dialog">
+  <Card padding="$space-6">
+    <VStack gap="$space-4">
+      <!-- Named slot with context -->
+      <Slot name="headerTemplate" title="{$props.title}">
+        <Heading level="h2">{$props.title}</Heading>
+      </Slot>
+
+      <!-- Default slot for main content -->
+      <Slot>
+        <Text>Default content when no children provided</Text>
+      </Slot>
+
+      <!-- Named slot for actions -->
+      <Slot name="actionsTemplate">
+        <Button label="OK" />
+      </Slot>
+    </VStack>
+  </Card>
+</Component>
+
+<!-- Usage -->
+<Dialog title="Confirm Action">
+  <property name="headerTemplate">
+    <HStack gap="$space-2">
+      <Icon name="alert-triangle" color="warn" />
+      <Text variant="strong">{$title}</Text>
+    </HStack>
+  </property>
+
+  <Text>Are you sure you want to delete this item?</Text>
+
+  <property name="actionsTemplate">
+    <HStack gap="$space-2">
+      <Button label="Cancel" variant="outlined" />
+      <Button label="Delete" variant="solid" themeColor="danger" />
+    </HStack>
+  </property>
+</Dialog>
+```
+
+## Performance Features
+
+### Virtualization
+- **List** - Automatically virtualizes large datasets (thousands of items)
+- **Table** - Virtual scrolling for massive data tables
+- Zero configuration required
+
+### Efficient Updates
+- Smart reactivity only updates dependent components
+- Batched DOM updates
+- Minimal re-rendering
+
+### Loading States
+```xml
+<DataSource id="users" url="/api/users" />
+<List data="{users.value}" loading="{users.loading}">
+  <property name="itemTemplate">
+    <UserCard user="{$item}" />
+  </property>
+  <property name="emptyListTemplate">
+    <VStack horizontalAlignment="center" padding="$space-8">
+      <Spinner />
+      <Text>Loading users...</Text>
+    </VStack>
+  </property>
+</List>
+```
+
+## Deployment
+
+### Static Hosting
+XMLUI apps are static files that can be deployed anywhere:
+- **Development**: `python -m http.server` or `npx http-server`
+- **Production**: Any static host (Netlify, AWS S3, GitHub Pages)
+
+### Minimal Deployment
+```
+app/
+├── index.html
+├── Main.xmlui
+└── xmlui/
+    └── 0.9.23.js
+```
+
+The framework automatically loads components from the `components/` folder and handles routing without server configuration.
+
+## Best Practices
+
+### Application Architecture
+1. **Start with App component** defining layout and navigation structure
+2. **Use Pages for routing** with meaningful URL patterns
+3. **Organize components** in logical folders by feature
+4. **Leverage template properties** instead of custom CSS for customization
+
+### Data Management
+1. **Use DataSource for reads**, APICall for writes
+2. **Implement loading states** and error handling
+3. **Utilize reactive binding** for automatic UI updates
+4. **Structure forms** with proper validation and field binding
+
+### Performance
+1. **Choose List over Items** for large datasets (1000+ items)
+2. **Use virtualization** features for tables and lists
+3. **Implement pagination** for very large datasets
+4. **Optimize data fetching** with proper caching
+
+### Code Organization
+1. **Break down complex UIs** into reusable components
+2. **Use meaningful component and variable names**
+3. **Organize navigation** hierarchically with NavGroup
+4. **Handle empty states** and error conditions gracefully
+
+XMLUI enables rapid development of professional web applications through declarative markup, comprehensive theming, and automatic reactive updates. The framework handles modern web complexity while maintaining simplicity for developers of all skill levels.
