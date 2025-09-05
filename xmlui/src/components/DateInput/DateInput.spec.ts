@@ -22,7 +22,7 @@ test.describe("Basic Functionality", () => {
     await expect(driver.yearInput).toHaveValue("2024");
   });
 
-  test.skip("renders in disabled state when enabled is false", async ({
+  test("renders in disabled state when enabled is false", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -31,17 +31,6 @@ test.describe("Basic Functionality", () => {
     await expect(driver.dayInput).toBeDisabled();
     await expect(driver.monthInput).toBeDisabled();
     await expect(driver.yearInput).toBeDisabled();
-  });
-
-  test.skip("renders in readonly state when readOnly is true", async ({
-    initTestBed,
-    createDateInputDriver,
-  }) => {
-    await initTestBed(`<DateInput testId="dateInput" readOnly="true" />`);
-    const driver = await createDateInputDriver("dateInput");
-    await expect(driver.dayInput).toHaveAttribute("readonly", "");
-    await expect(driver.monthInput).toHaveAttribute("readonly", "");
-    await expect(driver.yearInput).toHaveAttribute("readonly", "");
   });
 
   test("shows clear button when clearable is true", async ({
@@ -66,7 +55,7 @@ test.describe("Basic Functionality", () => {
     await expect(driver.clearButton).not.toBeVisible();
   });
 
-  test.skip("renders with required attribute", async ({ initTestBed, createDateInputDriver }) => {
+  test("renders with required attribute", async ({ initTestBed, createDateInputDriver }) => {
     await initTestBed(`<DateInput testId="dateInput" required="true" />`);
     const driver = await createDateInputDriver("dateInput");
     await expect(driver.dayInput).toHaveAttribute("required", "");
@@ -413,7 +402,7 @@ test.describe("validationStatus property", () => {
 });
 
 test.describe("autoFocus property", () => {
-  test.skip("focuses component when autoFocus is true", async ({
+  test("focuses component when autoFocus is true", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -730,7 +719,7 @@ test.describe("User Interactions", () => {
     await expect(driver.yearInput).toBeFocused();
   });
 
-  test.skip("navigates between inputs with arrow keys", async ({
+  test("navigates between inputs with arrow keys", async ({
     initTestBed,
     createDateInputDriver,
     page,
@@ -801,34 +790,6 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual("blurred");
   });
 
-  test("fires beep event on invalid input", async ({ initTestBed, createDateInputDriver }) => {
-    const { testStateDriver } = await initTestBed(
-      `<DateInput testId="dateInput" onBeep="testState = 'beeped'" />`,
-    );
-    const driver = await createDateInputDriver("dateInput");
-
-    await driver.monthInput.fill("13"); // Invalid month
-
-    await expect.poll(testStateDriver.testState).toEqual("beeped");
-  });
-
-  test("fires beep event when creating invalid date combination", async ({ initTestBed, createDateInputDriver, page }) => {
-    const { testStateDriver } = await initTestBed(
-      `<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" onBeep="testState = 'beeped'" />`,
-    );
-    const driver = await createDateInputDriver("dateInput");
-
-    // Change month from 01 to 02, making Feb 30th which is invalid
-    await driver.monthInput.focus();
-    await driver.monthInput.fill("02");
-
-    // Tab to day field to trigger validation and beep
-    await page.keyboard.press("Tab");
-
-    // Should beep due to invalid date combination (Feb 30th)
-    await expect.poll(testStateDriver.testState).toEqual("beeped");
-  });
-
   test("preserves field values when date combination becomes invalid", async ({ initTestBed, createDateInputDriver, page }) => {
     await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" />`);
     const driver = await createDateInputDriver("dateInput");
@@ -841,9 +802,6 @@ test.describe("Event Handling", () => {
     // Change month from 01 to 02, making Feb 30th which is invalid
     await driver.monthInput.focus();
     await driver.monthInput.fill("02");
-    
-    // Tab to day field to trigger validation
-    await page.keyboard.press("Tab");
     
     // Month should be updated to 02
     await expect(driver.monthInput).toHaveValue("02");
@@ -1138,7 +1096,7 @@ test.describe("Accessibility", () => {
     await expect(driver.yearInput).toHaveAttribute("type", "text");
   });
 
-  test.skip("supports required attribute for accessibility", async ({
+  test("supports required attribute for accessibility", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -1289,7 +1247,7 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test.skip("handles rapid consecutive value changes", async ({
+  test("handles rapid consecutive value changes", async ({
     initTestBed,
     createDateInputDriver,
   }) => {

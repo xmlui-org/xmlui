@@ -16,7 +16,6 @@ import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -76,7 +75,6 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
-  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   mode?: DateInputMode;
@@ -102,7 +100,6 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
-  mute?: boolean;
   emptyCharacter?: string;
 };
 
@@ -121,7 +118,6 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
-  mute: false,
   emptyCharacter: "-",
 };
 
@@ -138,7 +134,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     onFocus,
     onBlur,
     onInvalidChange,
-    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     mode = defaultProps.mode,
@@ -164,7 +159,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
-    mute = defaultProps.mute,
     emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
@@ -278,16 +272,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     onDidChange?.(newValue);
   });
 
-  // Method to handle beeping - both sound and event
-  const handleBeep = useCallback(() => {
-    // Play the beep sound only if not muted
-    if (!mute) {
-      beep(440, 50);
-    }
-    // Always fire the beep event for alternative implementations
-    onBeep?.();
-  }, [onBeep, mute]);
-
   // Helper function to format the complete date value
   const formatDateValue = useCallback(
     (d: string | null, m: string | null, y: string | null): string | null => {
@@ -370,11 +354,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         const wasInvalid =
           currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
 
-        if (wasInvalid) {
-          // Play beep sound and fire beep event when manually tabbing out of invalid input
-          handleBeep();
-        }
-
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
           setInvalid(false); // Clear invalid state after normalization
@@ -392,8 +371,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
               onInvalidChange?.();
-              // Play beep sound for invalid date combination
-              handleBeep();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
               // Incomplete date - call handleChange as normal (will be null)
@@ -423,8 +400,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
               onInvalidChange?.();
-              // Play beep sound for invalid date combination
-              handleBeep();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
               // Incomplete date - call handleChange as normal (will be null)
@@ -433,7 +408,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           }
         }
       },
-    [day, month, year, handleChange, handleBeep, onInvalidChange],
+    [day, month, year, handleChange, onInvalidChange],
   );
 
   // Handle changes from individual inputs
@@ -720,7 +695,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 isInvalid={isDayCurrentlyInvalid}
                 month={month}
                 year={year}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -743,7 +717,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 required={required}
                 value={month}
                 isInvalid={isMonthCurrentlyInvalid}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -767,7 +740,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 value={year}
                 isInvalid={isYearCurrentlyInvalid}
                 dateFormat={dateFormat}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -1071,6 +1043,8 @@ function MonthInput({
       placeholderLength={2}
       className={classnames(partClassName(PART_MONTH), styles.input, styles.month)}
       maxLength={2}
+      disabled={otherProps.disabled}
+      required={otherProps.required}
       onBlur={(direction, event) => {
         // PartialInput provides direction, but current onBlur expects just event
         if (otherProps.onBlur) {
@@ -1078,6 +1052,12 @@ function MonthInput({
           otherProps.onBlur(direction, event);
         }
       }}
+      onKeyDown={otherProps.onKeyDown}
+      readOnly={otherProps.readOnly}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      ariaLabel={otherProps.ariaLabel}
     />
   );
 }

@@ -168,19 +168,11 @@ export const DateInputMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
-    mute: {
-      description: "Whether to mute the beep sound while still firing the beep event",
-      valueType: "boolean",
-      defaultValue: defaultProps.mute,
-    },
   },
   events: {
     didChange: dDidChange(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
-    beep: {
-      description: "Event triggered when a beep should occur due to invalid input auto-tab prevention",
-    },
   },
   apis: {
     focus: {
@@ -254,7 +246,6 @@ export const dateInputComponentRenderer = createComponentRenderer(
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        onBeep={lookupEventHandler("beep")}
         registerComponentApi={registerComponentApi}
         dateFormat={extractValue(node.props.dateFormat)}
         showWeekNumber={extractValue.asOptionalBoolean(node.props.showWeekNumber)}
@@ -278,7 +269,6 @@ export const dateInputComponentRenderer = createComponentRenderer(
         clearIcon={extractValue.asOptionalString(node.props.clearIcon)}
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         gap={extractValue.asOptionalString(node.props.gap)}
-        mute={extractValue.asOptionalBoolean(node.props.mute, defaultProps.mute)}
         emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
       />
     );

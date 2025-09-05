@@ -125,12 +125,6 @@ Maximum time that the user can select
 
 Minimum time that the user can select
 
-### `mute` (default: false) [#mute-default-false]
-
-Whether to mute the beep sound while still firing the beep event
-
-When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
-
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
@@ -186,10 +180,6 @@ Available values:
 ```
 
 ## Events [#events]
-
-### `beep` [#beep]
-
-Fired when a beep sound is played due to invalid input, allowing custom feedback implementations
 
 ### `didChange` [#didchange]
 

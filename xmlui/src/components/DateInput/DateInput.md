@@ -164,12 +164,6 @@ Makes the date input read-only. Users can see the value but cannot modify it.
 
 %-PROP-END
 
-%-PROP-START mute
-
-When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
-
-%-PROP-END
-
 %-PROP-START emptyCharacter
 
 Character to use as placeholder for empty date values. If longer than 1 character, uses the first character. Defaults to '-'.
@@ -217,21 +211,6 @@ Fired when the date input receives focus.
     onLostFocus="isFocused = false"
     initialValue="05/25/2024"
   />
-</App>
-```
-
-%-EVENT-END
-
-%-EVENT-START beep
-
-Fired when the user attempts an action that would cause a beep (like entering invalid values).
-
-```xmlui-pg copy {2} display name="Example: beep"
-<App var.beepMessage="">
-  <Text value="{beepMessage}" />
-  <DateInput 
-    onBeep="beepMessage = 'Beep! Invalid input attempted'"
-    onDidChange="beepMessage = ''" />
 </App>
 ```
 

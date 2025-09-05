@@ -181,12 +181,6 @@ Available values:
 | `single` | Single date selection **(default)** |
 | `range` | Date range selection |
 
-### `mute` (default: false) [#mute-default-false]
-
-Whether to mute the beep sound while still firing the beep event
-
-When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
-
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
@@ -266,21 +260,6 @@ Available values:
 | `6` | Saturday |
 
 ## Events [#events]
-
-### `beep` [#beep]
-
-Event triggered when a beep should occur due to invalid input auto-tab prevention
-
-Fired when the user attempts an action that would cause a beep (like entering invalid values).
-
-```xmlui-pg copy {2} display name="Example: beep"
-<App var.beepMessage="">
-  <Text value="{beepMessage}" />
-  <DateInput 
-    onBeep="beepMessage = 'Beep! Invalid input attempted'"
-    onDidChange="beepMessage = ''" />
-</App>
-```
 
 ### `didChange` [#didchange]
 
