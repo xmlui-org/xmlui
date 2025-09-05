@@ -547,6 +547,45 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     handleChange(newValue);
   });
 
+  // Function to get ISO formatted date value (YYYY-MM-DD)
+  const getIsoValue = useCallback((): string | null => {
+    if (!day || !month || !year) {
+      return null;
+    }
+
+    // Convert to numbers
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
+      return null;
+    }
+
+    try {
+      // Create date object (month is 0-indexed in Date constructor)
+      const date = new Date(yearNum, monthNum - 1, dayNum);
+
+      // Validate the date
+      if (
+        date.getFullYear() !== yearNum ||
+        date.getMonth() !== monthNum - 1 ||
+        date.getDate() !== dayNum
+      ) {
+        return null;
+      }
+
+      // Format as ISO date string (YYYY-MM-DD)
+      const year4 = yearNum.toString().padStart(4, "0");
+      const month2 = monthNum.toString().padStart(2, "0");
+      const day2 = dayNum.toString().padStart(2, "0");
+      
+      return `${year4}-${month2}-${day2}`;
+    } catch (error) {
+      return null;
+    }
+  }, [day, month, year]);
+
   // Component API registration
   useImperativeHandle(ref, () => dateInputRef.current as HTMLDivElement);
 
@@ -555,9 +594,10 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       registerComponentApi({
         focus,
         setValue,
+        isoValue: getIsoValue,
       });
     }
-  }, [registerComponentApi, focus, setValue]);
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
 
   // Custom clear icon
   const clearIconElement = useMemo(() => {
@@ -1073,19 +1113,34 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
 
 // Utility function to parse date string into components
 function parseDateString(dateString: string, dateFormat: DateFormat) {
+  // Handle non-string values gracefully by returning null (empty fields)
+  if (typeof dateString !== 'string' || dateString === null || dateString === undefined) {
+    return null;
+  }
+
   try {
     // Try to parse the date using the specified format
     const parsedDate = parse(dateString, dateFormat, new Date());
 
-    if (!isValid(parsedDate)) {
-      return null;
+    if (isValid(parsedDate)) {
+      return {
+        day: parsedDate.getDate().toString().padStart(2, "0"),
+        month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
+        year: parsedDate.getFullYear().toString(),
+      };
     }
 
-    return {
-      day: parsedDate.getDate().toString().padStart(2, "0"),
-      month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
-      year: parsedDate.getFullYear().toString(),
-    };
+    // Fallback: Try to parse as ISO date string
+    const isoDate = new Date(dateString);
+    if (!isNaN(isoDate.getTime())) {
+      return {
+        day: isoDate.getDate().toString().padStart(2, "0"),
+        month: (isoDate.getMonth() + 1).toString().padStart(2, "0"),
+        year: isoDate.getFullYear().toString(),
+      };
+    }
+
+    return null;
   } catch (error) {
     return null;
   }

@@ -212,7 +212,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         hour: hourStr,
         minute: minuteStr,
         second: secondStr,
-      } = parseTimeString(String(localValue), is12HourFormat);
+      } = parseTimeString(localValue, is12HourFormat);
 
       setAmPm(parsedAmPm);
       setHour(hourStr);
@@ -608,6 +608,33 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     handleChange(newValue);
   });
 
+  // Function to get ISO formatted time value (HH:MM:SS in 24-hour format)
+  const getIsoValue = useCallback((): string | null => {
+    if (!hour || !minute) {
+      return null;
+    }
+
+    // Convert to 24-hour format if currently in 12-hour format
+    let hour24: number;
+    if (is12HourFormat && amPm) {
+      const hourInt = parseInt(hour, 10);
+      if (amPm === 'am') {
+        hour24 = hourInt === 12 ? 0 : hourInt;
+      } else { // pm
+        hour24 = hourInt === 12 ? 12 : hourInt + 12;
+      }
+    } else {
+      hour24 = parseInt(hour, 10);
+    }
+
+    // Format as ISO time string (HH:MM:SS)
+    const h24 = hour24.toString().padStart(2, "0");
+    const m24 = minute.padStart(2, "0");
+    const s24 = (second || "00").padStart(2, "0");
+    
+    return `${h24}:${m24}:${s24}`;
+  }, [hour, minute, second, amPm, is12HourFormat]);
+
   // Component API registration
   useImperativeHandle(ref, () => timeInputRef.current as HTMLDivElement);
 
@@ -616,9 +643,10 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       registerComponentApi({
         focus,
         setValue,
+        isoValue: getIsoValue,
       });
     }
-  }, [registerComponentApi, focus, setValue]);
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
 
   // Custom clear icon
   const clearIconElement = useMemo(() => {
@@ -656,9 +684,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     }
     return null;
   }, [endIcon, endText]);
-
-  // Create placeholder using processed empty character
-  const placeholder = processedEmptyCharacter.repeat(2);
 
   const timeInputComponent = (
     <div
@@ -704,7 +729,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             onBeep={handleBeep}
           />
 
-          <InputDivider separator=":" className={styles.divider} />
+          <InputDivider separator=":" />
 
           {/* Minute input */}
           <MinuteInput
@@ -1152,7 +1177,28 @@ function SecondInput({
 }
 
 // Utility function to parse time string into components
-function parseTimeString(timeString: string, targetIs12Hour: boolean = false) {
+function parseTimeString(timeValue: any, targetIs12Hour: boolean = false) {
+  // Handle non-string values gracefully
+  if (timeValue == null || timeValue === undefined) {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  // If not a string, return empty values for type safety
+  if (typeof timeValue !== 'string') {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  const timeString = timeValue;
   const normalizedTimeString = timeString.toLowerCase();
 
   // Check if the time string contains AM/PM
@@ -1162,9 +1208,24 @@ function parseTimeString(timeString: string, targetIs12Hour: boolean = false) {
   // Extract just the time part (remove AM/PM suffix)
   const timePart = normalizedTimeString.replace(/\s*(am|pm)\s*$/i, "").trim();
 
-  const parsedHour = getHours(timePart);
-  const parsedMinute = getMinutes(timePart);
-  const parsedSecond = getSeconds(timePart);
+  let parsedHour = getHours(timePart);
+  let parsedMinute = getMinutes(timePart);
+  let parsedSecond = getSeconds(timePart);
+
+  // If parsing with the current format fails (all zeros), try ISO time format
+  if (parsedHour === 0 && parsedMinute === 0 && parsedSecond === 0 && timePart !== "00:00:00" && timePart !== "00:00") {
+    try {
+      // Try parsing as ISO time format using Date constructor
+      const isoDate = new Date(`1970-01-01T${timePart}`);
+      if (!isNaN(isoDate.getTime())) {
+        parsedHour = isoDate.getHours();
+        parsedMinute = isoDate.getMinutes();
+        parsedSecond = isoDate.getSeconds();
+      }
+    } catch {
+      // If ISO parsing fails, keep the original parsed values (zeros)
+    }
+  }
 
   // Set AM/PM based on the actual string content or convert from 24-hour
   let amPmValue: AmPmType | null = null;
