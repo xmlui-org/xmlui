@@ -812,6 +812,23 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual("beeped");
   });
 
+  test("fires beep event when creating invalid date combination", async ({ initTestBed, createDateInputDriver, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" onBeep="testState = 'beeped'" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+
+    // Change month from 01 to 02, making Feb 30th which is invalid
+    await driver.monthInput.focus();
+    await driver.monthInput.fill("02");
+
+    // Tab to day field to trigger validation and beep
+    await page.keyboard.press("Tab");
+
+    // Should beep due to invalid date combination (Feb 30th)
+    await expect.poll(testStateDriver.testState).toEqual("beeped");
+  });
+
   test("preserves field values when date combination becomes invalid", async ({ initTestBed, createDateInputDriver, page }) => {
     await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" />`);
     const driver = await createDateInputDriver("dateInput");

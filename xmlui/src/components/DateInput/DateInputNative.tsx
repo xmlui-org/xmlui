@@ -392,6 +392,8 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
               onInvalidChange?.();
+              // Play beep sound for invalid date combination
+              handleBeep();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
               // Incomplete date - call handleChange as normal (will be null)
@@ -421,6 +423,8 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
               onInvalidChange?.();
+              // Play beep sound for invalid date combination
+              handleBeep();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
               // Incomplete date - call handleChange as normal (will be null)

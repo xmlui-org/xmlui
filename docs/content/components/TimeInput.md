@@ -256,6 +256,12 @@ Focus the TimeInput component.
 
 **Signature**: `focus(): void`
 
+### `isoValue` [#isovalue]
+
+Get the current time value formatted in ISO standard (HH:MM:SS) using 24-hour format, suitable for JSON serialization.
+
+**Signature**: `isoValue(): string | null`
+
 ### `setValue` [#setvalue]
 
 This method sets the current value of the TimeInput.
@@ -373,7 +379,7 @@ The component has some parts that can be styled through layout properties and th
 | [margin](../styles-and-themes/common-units/#size)-icon-TimeInput | *none* | *none* |
 | [margin](../styles-and-themes/common-units/#size)-input-TimeInput | *none* | *none* |
 | [maxHeight](../styles-and-themes/common-units/#size)-menu-TimeInput | *none* | *none* |
-| [minWidth](../styles-and-themes/common-units/#size)-ampm-TimeInput | 2em | 2em |
+| [minWidth](../styles-and-themes/common-units/#size)-ampm-TimeInput | 2.2em | 2.2em |
 | [minWidth](../styles-and-themes/common-units/#size)-input-TimeInput | 0.54em | 0.54em |
 | [opacity](../styles-and-themes/common-units/#opacity)-item-TimeInput--disabled | *none* | *none* |
 | [opacity](../styles-and-themes/common-units/#opacity)-TimeInput--disabled | *none* | *none* |
@@ -384,7 +390,7 @@ The component has some parts that can be styled through layout properties and th
 | [outlineColor](../styles-and-themes/common-units/#color)-TimeInput-success--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-TimeInput-warning--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-ampm-TimeInput--focused | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-button-TimeInput--focused | 2px | 2px |
+| [outlineOffset](../styles-and-themes/common-units/#size)-button-TimeInput--focused | 0 | 0 |
 | [outlineOffset](../styles-and-themes/common-units/#size)-TimeInput-default--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-TimeInput-error--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-TimeInput-success--focus | *none* | *none* |
@@ -399,13 +405,16 @@ The component has some parts that can be styled through layout properties and th
 | [outlineWidth](../styles-and-themes/common-units/#size)-TimeInput-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-TimeInput-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-TimeInput-warning--focus | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-button-TimeInput | 4px 6px | 4px 6px |
+| [padding](../styles-and-themes/common-units/#size)-button-TimeInput | 4px 4px | 4px 4px |
 | [padding](../styles-and-themes/common-units/#size)-input-TimeInput | 0 2px | 0 2px |
 | [padding](../styles-and-themes/common-units/#size)-item-TimeInput | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TimeInput-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TimeInput-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TimeInput-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TimeInput-warning | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-TimeInput | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-TimeInput | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-TimeInput | $space-2 | $space-2 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TimeInput | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-TimeInput | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-TimeInput | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-TimeInput | $space-2 | $space-2 |
 | spacing-divider-TimeInput | 1px 0 | 1px 0 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-input-TimeInput | center | center |
 | [textColor](../styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |

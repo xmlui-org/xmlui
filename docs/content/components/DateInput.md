@@ -332,6 +332,12 @@ Focus the DateInput component.
 
 **Signature**: `focus(): void`
 
+### `isoValue` [#isovalue]
+
+Get the current date value formatted in ISO standard (YYYY-MM-DD) format, suitable for JSON serialization.
+
+**Signature**: `isoValue(): string | null`
+
 ### `setValue` [#setvalue]
 
 This method sets the current value of the DateInput.
@@ -496,17 +502,13 @@ The component has some parts that can be styled through layout properties and th
 | [outlineWidth](../styles-and-themes/common-units/#size)-DateInput-warning--focus | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-button-DateInput | 4px 6px | 4px 6px |
 | [padding](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-warning | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-input-DateInput | 0 2px | 0 2px |
 | [paddingBottom](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-DateInput | $space-2 | $space-2 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [paddingVertical](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-DateInput | $space-2 | $space-2 |
 | spacing-divider-DateInput | 1px 0 | 1px 0 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-input-DateInput | center | center |
 | [textColor](../styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
