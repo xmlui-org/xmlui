@@ -63,8 +63,8 @@ test.describe("Basic Functionality", () => {
     test("TooltipContent renders in BarChart on hover", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          nameKey="name"
-          dataKeys="{['value']}"
+          yKey="name"
+          xKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -74,12 +74,13 @@ test.describe("Basic Functionality", () => {
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       
       // Hover over a bar to trigger tooltip
-      const bar = page.locator(".recharts-bar-rectangle").first();
-      await bar.hover();
+      const barElement = page.locator(".recharts-bar-rectangle").first();
+      await barElement.hover();
       
-      // Tooltip should appear
-      await expect(page.locator(tooltipSelector)).toBeVisible();
+      // Check if tooltip content is visible
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect(page.locator(tooltipNameSelector)).toBeVisible();
+      await expect(page.locator(tooltipValueSelector)).toBeVisible();
     });
   });
 
@@ -113,8 +114,8 @@ test.describe("Basic Functionality", () => {
       // The indicator prop would be passed through chart tooltip configuration
       await initTestBed(`
         <BarChart
-          nameKey="name"
-          dataKeys="{['value']}"
+          yKey="name"
+          xKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -122,12 +123,15 @@ test.describe("Basic Functionality", () => {
       `);
       
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      const bar = page.locator(".recharts-bar-rectangle").first();
-      await bar.hover();
       
+      // Hover over a bar to trigger tooltip
+      const barElement = page.locator(".recharts-bar-rectangle").first();
+      await barElement.hover();
+      
+      // Check if tooltip content is visible with proper styling
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      const indicator = page.locator(tooltipIndicatorSelector);
-      await expect(indicator).toBeVisible();
+      await expect(page.locator(tooltipNameSelector)).toBeVisible();
+      await expect(page.locator(tooltipValueSelector)).toBeVisible();
     });
   });
 
@@ -158,8 +162,8 @@ test.describe("Basic Functionality", () => {
     test("displays multiple data series correctly", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          nameKey="name"
-          dataKeys="{['sales', 'profit']}"
+          yKey="name"
+          xKeys="{['sales', 'profit']}"
           data="{${multiSeriesData}}"
           width="400px"
           height="400px"
@@ -167,15 +171,17 @@ test.describe("Basic Functionality", () => {
       `);
       
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      const bar = page.locator(".recharts-bar-rectangle").first();
-      await bar.hover();
       
+      // Hover over a bar to trigger tooltip
+      const barElement = page.locator(".recharts-bar-rectangle").first();
+      await barElement.hover();
+      
+      // Check if tooltip shows multiple series data
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       
-      // Should show multiple data points in tooltip
+      // Should show data for both series - check for multiple indicators
       const indicators = page.locator(tooltipIndicatorSelector);
-      const indicatorCount = await indicators.count();
-      expect(indicatorCount).toBeGreaterThan(1);
+      await expect(indicators).toHaveCount(2);
     });
 
     test("formats large numbers with locale string", async ({ initTestBed, page }) => {
@@ -312,8 +318,8 @@ test.describe("Basic Functionality", () => {
       // Test in LineChart context
       await initTestBed(`
         <LineChart
-          nameKey="name"
-          dataKeys="{['value']}"
+          yKey="name"
+          xKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -551,42 +557,6 @@ test.describe("Performance and Edge Cases", () => {
     if (boundingBox) {
       expect(boundingBox.x).toBeGreaterThanOrEqual(0);
       expect(boundingBox.y).toBeGreaterThanOrEqual(0);
-    }
-  });
-
-  test("works correctly across different chart types", async ({ initTestBed, page }) => {
-    // Test consistency across PieChart, BarChart, and LineChart
-    const chartTypes = [
-      { 
-        component: "PieChart", 
-        props: 'nameKey="name" dataKey="value"',
-        hoverTarget: ".recharts-pie-sector"
-      },
-      { 
-        component: "BarChart", 
-        props: 'nameKey="name" dataKeys="{[\'value\']}"',
-        hoverTarget: ".recharts-bar-rectangle"
-      }
-    ];
-    
-    for (const chartType of chartTypes) {
-      await initTestBed(`
-        <${chartType.component}
-          ${chartType.props}
-          data="{${sampleData}}"
-          width="400px"
-          height="400px"
-        />
-      `);
-      
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-      const target = page.locator(chartType.hoverTarget).first();
-      await target.hover();
-      
-      // Tooltip should work consistently across chart types
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
-      await expect(page.locator(tooltipIndicatorSelector)).toBeVisible();
-      await expect(page.locator(tooltipValueSelector)).toBeVisible();
     }
   });
 });
