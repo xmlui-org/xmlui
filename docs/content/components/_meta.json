@@ -15,6 +15,7 @@
   "CHStack": "CHStack",
   "CVStack": "CVStack",
   "Card": "Card",
+  "Carousel": "Carousel",
   "ChangeListener": "ChangeListener",
   "Checkbox": "Checkbox",
   "ColorPicker": "ColorPicker",
