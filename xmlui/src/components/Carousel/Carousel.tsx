@@ -9,7 +9,7 @@ import { orientationOptionMd } from "../abstractions";
 const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
     `This component displays a slideshow by cycling through elements (images, text, or ` +
     `custom slides) like a carousel.`,
