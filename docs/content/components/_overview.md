@@ -78,7 +78,9 @@
 | [RealTimeAdapter](./RealTimeAdapter) | `RealTimeAdapter` is a non-visual component that listens to real-time events. |
 | [Redirect](./Redirect) | `Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally. |
 | [Select](./Select) | `Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration. |
-| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display. |
+| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
+
+Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip. |
 | [Slot](./Slot) | Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered. |
 | [SpaceFiller](./SpaceFiller) | `SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used. |
 | [Spinner](./Spinner) | `Spinner` is an animated indicator that represents an action in progress with no deterministic progress value. |

@@ -11,8 +11,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -27,8 +27,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -54,8 +54,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -76,8 +76,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>

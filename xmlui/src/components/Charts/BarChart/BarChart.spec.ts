@@ -31,9 +31,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders with basic props", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -46,9 +46,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("renders correct number of bar series", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -66,9 +66,9 @@ test.describe("data handling", () => {
   test("renders with empty data array", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${emptyData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -81,9 +81,9 @@ test.describe("data handling", () => {
   test("renders with single data point", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${singlePointData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -96,9 +96,9 @@ test.describe("data handling", () => {
   test("handles non-array data gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{null}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -115,9 +115,9 @@ test.describe("layout", () => {
   test("renders vertical layout by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -132,10 +132,10 @@ test.describe("layout", () => {
   test("renders horizontal layout when specified", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
-        layout="horizontal"
+        xKeys="{['sales', 'profit']}"
+        orientation="horizontal"
         width="600px"
         height="400px"
       />
@@ -154,9 +154,9 @@ test.describe("stacked", () => {
   test("renders grouped bars by default (stacked=false)", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -169,9 +169,9 @@ test.describe("stacked", () => {
   test("renders stacked bars when stacked=true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         stacked
         width="600px"
         height="400px"
@@ -189,9 +189,9 @@ test.describe("legend", () => {
   test("legend is hidden by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -204,9 +204,9 @@ test.describe("legend", () => {
   test("legend is shown when showLegend is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         showLegend
         width="600px"
         height="400px"
@@ -224,9 +224,9 @@ test.describe("tooltip", () => {
   test("tooltip appears on hover by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -244,9 +244,9 @@ test.describe("tooltip", () => {
   test("tooltip is hidden when hideTooltip is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideTooltip
         width="600px"
         height="400px"
@@ -268,9 +268,9 @@ test.describe("x-axis", () => {
   test("x-axis is shown by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -286,9 +286,9 @@ test.describe("x-axis", () => {
   test("x-axis is hidden when hideX is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideX
         width="600px"
         height="400px"
@@ -302,9 +302,9 @@ test.describe("x-axis", () => {
   test("x-axis ticks are hidden when hideTickX is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideTickX
         width="600px"
         height="400px"
@@ -323,9 +323,9 @@ test.describe("y-axis", () => {
   test("y-axis is shown by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -341,9 +341,9 @@ test.describe("y-axis", () => {
   test("y-axis is hidden when hideY is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideY
         width="600px"
         height="400px"
@@ -357,9 +357,9 @@ test.describe("y-axis", () => {
   test("y-axis ticks are hidden when hideTickY is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideTickY
         width="600px"
         height="400px"
@@ -380,9 +380,9 @@ test.describe("formatters", () => {
   test("applies tickFormatterX when provided", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-          nameKey="name"
+          yKey="name"
           data="{${sampleData}}"
-          dataKeys="{['sales', 'profit']}"
+          xKeys="{['sales', 'profit']}"
           tickFormatterX="{(value) => value + ' (X)'}"
           width="600px"
           height="400px"
@@ -397,9 +397,9 @@ test.describe("formatters", () => {
   test("applies tickFormatterY when provided", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-          nameKey="name"
+          yKey="name"
           data="{${sampleData}}"
-          dataKeys="{['sales', 'profit']}"
+          xKeys="{['sales', 'profit']}"
           tickFormatterY="{(value) => '$' + value}"
           width="600px"
           height="400px"
@@ -418,9 +418,9 @@ test.describe("margins", () => {
   test("applies custom margins", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         marginTop="{20}"
         marginRight="{30}"
         marginBottom="{40}"
@@ -442,9 +442,9 @@ test.describe("responsive behavior", () => {
   test("enters mini mode with very small container height", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="50px"
       />
@@ -462,9 +462,9 @@ test.describe("responsive behavior", () => {
   test("renders normally with adequate height", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="200px"
       />
@@ -479,9 +479,9 @@ test.describe("responsive behavior", () => {
   test("handles narrow containers gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="100px"
         height="400px"
       />
@@ -500,10 +500,10 @@ test.describe("layout-specific behavior", () => {
   test("vertical layout has correct axis orientation", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
-        layout="vertical"
+        xKeys="{['sales', 'profit']}"
+        orientation="vertical"
         width="600px"
         height="400px"
       />
@@ -518,10 +518,10 @@ test.describe("layout-specific behavior", () => {
   test("horizontal layout has correct axis orientation", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
-        layout="horizontal"
+        xKeys="{['sales', 'profit']}"
+        orientation="horizontal"
         width="600px"
         height="400px"
       />
@@ -537,12 +537,12 @@ test.describe("layout-specific behavior", () => {
 // --- Edge Cases
 
 test.describe("edge cases", () => {
-  test("handles missing dataKeys gracefully", async ({ initTestBed, page }) => {
+  test("handles missing xKeys gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{[]}"
+        xKeys="{[]}"
         width="600px"
         height="400px"
       />
@@ -552,11 +552,11 @@ test.describe("edge cases", () => {
     await expect(page.locator(barsSelector)).toHaveCount(0);
   });
 
-  test("handles missing nameKey gracefully", async ({ initTestBed, page }) => {
+  test("handles missing yKey gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -577,9 +577,9 @@ test.describe("edge cases", () => {
 
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${dataWithMissingValues}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -597,9 +597,9 @@ test.describe("tooltipTemplate", () => {
   test("renders custom tooltip template", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       >
@@ -630,9 +630,9 @@ test.describe("tooltipTemplate", () => {
   test("tooltip template is not rendered when hideTooltip is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         hideTooltip
         width="600px"
         height="400px"
@@ -655,9 +655,9 @@ test.describe("tooltipTemplate", () => {
   test("falls back to default tooltip when tooltipTemplate is not provided", async ({ initTestBed, page }) => {
     await initTestBed(`
       <BarChart
-        nameKey="name"
+        yKey="name"
         data="{${sampleData}}"
-        dataKeys="{['sales', 'profit']}"
+        xKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -675,4 +675,3 @@ test.describe("tooltipTemplate", () => {
     await expect(tooltip).toBeVisible();
   });
 });
-
