@@ -21,12 +21,12 @@ export const LineChartMd = createMetadata({
         "The data to be displayed in the line chart." +
         "It needs to be an array of objects, where each object represents a data point.",
     },
-    dataKeys: {
+    xKeys: {
       description:
         "This property specifies the keys in the data objects that should be used for rendering the lines.",
       valueType: "string",
     },
-    nameKey: {
+    yKey: {
       description: "The key in the data objects used for labeling different data series.",
       valueType: "string",
     },
@@ -100,8 +100,8 @@ export const lineChartComponentRenderer = createComponentRenderer(
         hideTickY={extractValue(node.props?.hideTickY)}
         data={extractValue(node.props?.data)}
         className={className}
-        dataKeys={extractValue(node.props?.dataKeys)}
-        nameKey={extractValue(node.props?.nameKey)}
+        dataKeys={extractValue(node.props?.xKeys)}
+        nameKey={extractValue(node.props?.yKey)}
         hideX={extractValue(node.props?.hideX)}
         hideY={extractValue(node.props?.hideY)}
         hideTooltip={extractValue(node.props?.hideTooltip)}

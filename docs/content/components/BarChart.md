@@ -7,15 +7,15 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="300px" name="Example: dimension determined by the parent" /Card height="240px" width="75%"/
 <Card height="240px" width="75%">
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
         { 'sprint': 'Sprint 2', 'A': 32 },
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -23,7 +23,7 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ```xmlui-pg copy display height="300px" name="Example: dimension overwritten by BarChart" /height="240px"/ /height="200px"/
 <Card height="240px">
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="200px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -31,8 +31,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -48,10 +48,6 @@ The BarChart component accommodates the size of its parent unless you set it exp
 ### `data` [#data]
 
 This property is used to provide the component with data to display.The data needs to be an array of objects.
-
-### `dataKeys` [#datakeys]
-
-This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.
 
 ### `hideTickX` (default: false) [#hidetickx-default-false]
 
@@ -73,15 +69,11 @@ Determines whether the X-axis should be hidden. If set to `true`, the axis will 
 
 Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.
 
-### `layout` (default: "vertical") [#layout-default-vertical]
+### `orientation` (default: "vertical") [#orientation-default-vertical]
 
 This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
 
 Available values: `horizontal`, `vertical` **(default)**
-
-### `nameKey` [#namekey]
-
-Specifies the key in the data objects that will be used to label the different data series.
 
 ### `showLegend` (default: false) [#showlegend-default-false]
 
@@ -98,7 +90,7 @@ A function that formats the tick labels on the X-axis.
 ```xmlui-pg copy display height="320px" name="Example: tickFormatterX" /tickFormatterX/
 <App>
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="240px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -106,8 +98,8 @@ A function that formats the tick labels on the X-axis.
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
@@ -120,7 +112,7 @@ A function that formats the tick labels on the Y-axis.
 ```xmlui-pg copy display height="320px" name="Example: tickFormatterY" /tickFormatterY/
 <App>
   <BarChart
-    layout="horizontal"
+    orientation="horizontal"
     height="240px"
     data="{[
         { 'sprint': 'Sprint 1', 'A': 44 },
@@ -128,8 +120,8 @@ A function that formats the tick labels on the Y-axis.
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -138,6 +130,14 @@ A function that formats the tick labels on the Y-axis.
 ### `tooltipTemplate` [#tooltiptemplate]
 
 This property allows replacing the default template to display a tooltip.
+
+### `xKeys` [#xkeys]
+
+This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.
+
+### `yKey` [#ykey]
+
+Specifies the key in the data objects that will be used to label the different data series.
 
 ## Events [#events]
 

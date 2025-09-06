@@ -11,19 +11,7 @@ import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 import { Tooltip } from "../Tooltip/TooltipNative";
 
-export const defaultProps = {
-  step: 1,
-  min: 0,
-  max: 10,
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  tabIndex: -1,
-  showValues: true,
-  valueFormat: (value: number) => value.toString(),
-  minStepsBetweenThumbs: 1,
-};
-
-type Props = {
+export type Props = {
   id?: string;
   value?: number | number[];
   initialValue?: number | number[];
@@ -53,6 +41,18 @@ type Props = {
   thumbStyle?: CSSProperties;
   showValues?: boolean;
   valueFormat?: (value: number) => string;
+};
+
+export const defaultProps: Pick<Props, "step" | "min" | "max" | "enabled" | "validationStatus" | "tabIndex" | "showValues" | "valueFormat" | "minStepsBetweenThumbs"> = {
+  step: 1,
+  min: 0,
+  max: 10,
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  tabIndex: -1,
+  showValues: true,
+  valueFormat: (value: number) => value.toString(),
+  minStepsBetweenThumbs: 1,
 };
 
 // Helper function to ensure value is properly formatted
@@ -305,4 +305,4 @@ export const Slider = forwardRef(
   },
 );
 
-Slider.displayName = Root.displayName;
+Slider.displayName = "Slider";

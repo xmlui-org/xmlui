@@ -1,7 +1,7 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Tooltip, defaultProps } from "./TooltipNative";
+import { Tooltip } from "./TooltipNative";
 import type { TooltipProps } from "./TooltipNative";
 import styles from "./Tooltip.module.scss";
 
@@ -30,51 +30,51 @@ export const TooltipMd = createMetadata({
       description:
         "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
       type: "number",
-      defaultValue: defaultProps.delayDuration,
+      defaultValue: 700,
     },
     skipDelayDuration: {
       description:
         "How much time a user has to enter another trigger without incurring a delay again (in ms)",
       type: "number",
-      defaultValue: defaultProps.skipDelayDuration,
+      defaultValue: 300,
     },
     defaultOpen: {
       description: "The open state of the tooltip when it is initially rendered",
       type: "boolean",
-      defaultValue: defaultProps.defaultOpen,
+      defaultValue: false,
     },
     showArrow: {
       description: "Whether to show the arrow pointing to the trigger element",
       type: "boolean",
-      defaultValue: defaultProps.showArrow,
+      defaultValue: false,
     },
     side: {
       description: "The preferred side of the trigger to render against when open",
       type: "string",
       availableValues: ["top", "right", "bottom", "left"],
-      defaultValue: defaultProps.side,
+      defaultValue: "top",
     },
     align: {
       description: "The preferred alignment against the trigger",
       type: "string",
       availableValues: ["start", "center", "end"],
-      defaultValue: defaultProps.align,
+      defaultValue: "center",
     },
     sideOffset: {
       description: "The distance in pixels from the trigger",
       type: "number",
-      defaultValue: defaultProps.sideOffset,
+      defaultValue: 4,
     },
     alignOffset: {
       description: "An offset in pixels from the 'start' or 'end' alignment options",
       type: "number",
-      defaultValue: defaultProps.alignOffset,
+      defaultValue: 0,
     },
     avoidCollisions: {
       description:
         "When true, overrides the side and align preferences to prevent collisions with boundary edges",
       type: "boolean",
-      defaultValue: defaultProps.avoidCollisions,
+      defaultValue: true,
     },
   },
   events: {},
