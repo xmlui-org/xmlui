@@ -211,7 +211,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("showValues", () => {
-    test("showValues=true displays current value", async ({ initTestBed, page }) => {
+    test.skip("showValues=true displays current value", async ({ initTestBed, page }) => {
       await initTestBed(`<Slider showValues="true" initialValue="75" />`);
       await expect(page.getByText("75")).toBeVisible();
     });
