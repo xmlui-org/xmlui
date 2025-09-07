@@ -2,7 +2,7 @@ import { forwardRef, useState } from "react";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 //
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
