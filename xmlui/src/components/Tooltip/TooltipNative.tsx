@@ -127,7 +127,7 @@ export const Tooltip = forwardRef(function Tooltip({
               sideOffset={sideOffset}
               alignOffset={alignOffset}
               avoidCollisions={avoidCollisions}
-              data-tooltip-content
+              data-tooltip-container
             >
               {tooltipTemplate ? (
                 tooltipTemplate
