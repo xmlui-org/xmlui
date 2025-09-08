@@ -102,7 +102,7 @@ export function BarChart({
       if (!tooltipRenderer) return <TooltipContent {...props} />;
 
       const payloadObject: Record<string, any> = {};
-      
+
       if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
         Object.assign(payloadObject, props.payload[0].payload);
       }
@@ -262,56 +262,75 @@ export function BarChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
-  const content = useMemo(() => {
-    // NOTE: Had to place props separately since, for some reason, Recharts cannot handle
-    // if the axes are placed in a React.Fragment. Unsure why, because this worked before.
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
-    const xAxisProps: Record<string, any> =
-      layout === "vertical"
-        ? {
-            type: "number",
-            axisLine: false,
-            hide: miniMode || hideX,
-            height: miniMode || hideX ? 0 : xAxisHeight,
-            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-          }
-        : {
-            type: "category",
-            dataKey: nameKey,
-            hide: miniMode || hideX,
-            height: miniMode || hideX ? 0 : xAxisHeight,
-            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-            interval: interval,
-            tickLine: false,
-            angle: tickAngle,
-            textAnchor: tickAnchor,
-          };
+  const onMouseEnter = useCallback(
+    (e) => {
+      setTooltipPosition({ x: e.x, y: e.y });
+    },
+    [setTooltipPosition],
+  );
 
-    const yAxisProps: Record<string, any> =
-      layout === "vertical"
-        ? {
-            type: "category",
-            dataKey: nameKey,
-            hide: miniMode || hideY,
-            interval: "equidistantPreserveStart",
-            tickLine: false,
-            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
-            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
-            width: miniMode || hideY ? 0 : yAxisWidth,
-          }
-        : {
-            type: "number",
-            axisLine: false,
-            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
-            hide: miniMode || hideY,
-            tickCount: yTickCount,
-            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
-            width: miniMode || hideY ? 0 : yAxisWidth,
-          };
+  const xAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "number",
+          axisLine: false,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+        }
+      : {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+          interval: interval,
+          tickLine: false,
+          angle: tickAngle,
+          textAnchor: tickAnchor,
+        };
 
-    const chart = (
+  const yAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideY,
+          interval: "equidistantPreserveStart",
+          tickLine: false,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        }
+      : {
+          type: "number",
+          axisLine: false,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          hide: miniMode || hideY,
+          tickCount: yTickCount,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        };
+
+  return (
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <div
+        ref={labelsRef}
+        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
+      >
+        {validData
+          .map((d) => d[nameKey])
+          .map((label, idx) => (
+            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {label}
+            </span>
+          ))}
+      </div>
       <div
         className={classnames(className, styles.wrapper)}
         style={{ flexGrow: 1, ...style }}
@@ -324,6 +343,9 @@ export function BarChart({
           debounce={100}
           width="100%"
           height="100%"
+          style={{
+            overflow: "hidden",
+          }}
         >
           <RBarChart
             accessibilityLayer
@@ -334,7 +356,15 @@ export function BarChart({
             <CartesianGrid vertical={true} strokeDasharray="3 3" />
             <XAxis {...xAxisProps} />
             <YAxis {...yAxisProps} />
-            {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
+            {!miniMode && !hideTooltip && (
+              <Tooltip
+                content={safeTooltipRenderer}
+                wrapperStyle={{
+                  pointerEvents: "auto",
+                }}
+                position={tooltipPosition}
+              />
+            )}
             {validData.length > 0 &&
               Object.keys(config).map((key, index) => (
                 <Bar
@@ -344,6 +374,7 @@ export function BarChart({
                   radius={stacked ? 0 : 8}
                   stackId={stacked ? "stacked" : undefined}
                   strokeWidth={1}
+                  onMouseEnter={onMouseEnter}
                 />
               ))}
             {showLegend && (
@@ -361,52 +392,6 @@ export function BarChart({
           </RBarChart>
         </ResponsiveContainer>
       </div>
-    );
-
-    return chart;
-  }, [
-    chartMargin,
-    config,
-    hideTickX,
-    hideTickY,
-    hideX,
-    hideY,
-    interval,
-    layout,
-    miniMode,
-    nameKey,
-    showLegend,
-    stacked,
-    style,
-    className,
-    tickAnchor,
-    tickAngle,
-    tickFormatterX,
-    tickFormatterY,
-    xAxisHeight,
-    yAxisWidth,
-    yTickCount,
-    safeTooltipRenderer,
-    hideTooltip,
-    validData,
-  ]);
-
-  return (
-    <ChartProvider value={chartContextValue}>
-      {children}
-      <div
-        ref={labelsRef}
-        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
-      >
-        {validData
-          .map((d) => d[nameKey])
-          .map((label, idx) => (
-            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-              {label}
-            </span>
-          ))}
-      </div>
-      {content}
     </ChartProvider>
   );
 }
