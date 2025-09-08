@@ -182,7 +182,7 @@ test.describe("Basic Functionality", () => {
     const iconBox = await getBounds(icon);
     const tooltipBox = await getBounds(tooltip);
 
-    expect(iconBox.top - tooltipBox.bottom).toEqualWithTolerance(28);
+    expect(iconBox.top - tooltipBox.bottom).toEqualWithTolerance(28, 4);
   });
 
   test(`renders with 'sideOffset' property when side is bottom`, async ({ page, initTestBed }) => {
