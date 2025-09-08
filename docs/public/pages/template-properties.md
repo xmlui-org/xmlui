@@ -31,6 +31,8 @@ Template properties enable you to define custom markup for specific parts of com
 | [List](/components/List) | [`emptyListTemplate`](/components/List#emptylisttemplate) | Template displayed when list is empty |
 | [Items](/components/Items) | [`itemTemplate`](/components/Items#itemtemplate) | Template for displaying each data item |
 | [Table](/components/Table) | [`noDataTemplate`](/components/Table#nodatatemplate) | Template displayed when table has no data |
+| [BarChart](/components/Charts/BarChart) | [`tooltipTemplate`](/components/Charts/BarChart#tooltiptemplate) | Template for custom tooltip content |
+| [LineChart](/components/Charts/LineChart) | [`tooltipTemplate`](/components/Charts/LineChart#tooltiptemplate) | Template for custom tooltip content |
 
 ## Selection Components
 
