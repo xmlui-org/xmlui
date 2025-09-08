@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from "react";
 import {
   forwardRef,
   useCallback,
-  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -35,13 +34,13 @@ import "./react-table-config.d.ts";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { EMPTY_ARRAY } from "../../components-core/constants";
-import { ScrollContext } from "../../components-core/ScrollContext";
 import { useEvent } from "../../components-core/utils/misc";
 import {
   useHasExplicitHeight,
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
+  useScrollParent,
   useStartMargin,
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -51,7 +50,7 @@ import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { type Position, PaginationNative } from "../Pagination/PaginationNative";
+import { PaginationNative, type Position } from "../Pagination/PaginationNative";
 
 // =====================================================================================================================
 // Helper types
@@ -515,11 +514,13 @@ export const Table = forwardRef(
       setVisibleItems(rows.map((row) => row.original));
     }, [rows]);
 
-    const scrollRef = useContext(ScrollContext);
+    const scrollParent = useScrollParent(wrapperRef.current?.parentElement);
+    const scrollRef = useRef(scrollParent);
+    scrollRef.current = scrollParent;
 
     const hasHeight = useHasExplicitHeight(wrapperRef);
 
-    const hasOutsideScroll = scrollRef && !hasHeight;
+    const hasOutsideScroll = scrollRef.current && !hasHeight;
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
@@ -655,9 +656,12 @@ export const Table = forwardRef(
                   {headerGroup.headers.map((header, headerIndex) => {
                     const { width, ...style } = header.column.columnDef.meta?.style || {};
                     const size = header.getSize();
-                    const alignmentClass = cellVerticalAlign === "top" ? styles.alignTop : 
-                                         cellVerticalAlign === "bottom" ? styles.alignBottom : 
-                                         styles.alignCenter;
+                    const alignmentClass =
+                      cellVerticalAlign === "top"
+                        ? styles.alignTop
+                        : cellVerticalAlign === "bottom"
+                          ? styles.alignBottom
+                          : styles.alignCenter;
                     return (
                       <th
                         key={`${header.id}-${headerIndex}`}
@@ -773,9 +777,12 @@ export const Table = forwardRef(
                     {row.getVisibleCells().map((cell, i) => {
                       const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
                       const size = cell.column.getSize();
-                      const alignmentClass = cellVerticalAlign === "top" ? styles.alignTop : 
-                                           cellVerticalAlign === "bottom" ? styles.alignBottom : 
-                                           styles.alignCenter;
+                      const alignmentClass =
+                        cellVerticalAlign === "top"
+                          ? styles.alignTop
+                          : cellVerticalAlign === "bottom"
+                            ? styles.alignBottom
+                            : styles.alignCenter;
                       return (
                         <td
                           className={classnames(styles.cell, alignmentClass)}

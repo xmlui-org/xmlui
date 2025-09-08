@@ -17,9 +17,9 @@ import {
   noop,
   omit,
   orderBy as lodashOrderBy,
+  rest,
   sortBy,
   uniq,
-  rest,
 } from "lodash-es";
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
@@ -27,8 +27,12 @@ import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
 import type { CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
-import { useHasExplicitHeight, useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
-import { ScrollContext } from "../../components-core/ScrollContext";
+import {
+  useHasExplicitHeight,
+  useIsomorphicLayoutEffect,
+  useScrollParent,
+  useStartMargin,
+} from "../../components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
 import classnames from "classnames";
@@ -274,7 +278,6 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
-
 export const ListNative = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,
@@ -303,12 +306,15 @@ export const ListNative = forwardRef(function DynamicHeightList(
   ref,
 ) {
   const virtualizerRef = useRef<VListHandle>(null);
-  const scrollRef = useContext(ScrollContext);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
+  const scrollParent = useScrollParent(parentRef.current?.parentElement);
+  const scrollRef = useRef(scrollParent);
+  scrollRef.current = scrollParent;
+
   const hasHeight = useHasExplicitHeight(parentRef);
-  const hasOutsideScroll = scrollRef && !hasHeight;
+  const hasOutsideScroll = scrollRef.current && !hasHeight;
 
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 

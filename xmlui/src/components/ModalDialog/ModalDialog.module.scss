@@ -99,7 +99,6 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
     min-height: 0;
     gap: var(--stack-gap-default);
     flex: 1;
-    overflow: auto;
   }
 
   @keyframes overlayShow {
