@@ -181,11 +181,10 @@ export type IsValidFunction<T> = (
 // This type represents the description of a property value, which can be a string, a
 // number, or an object with a value and a description. This type is used in the
 // metadata of a component.
-export type PropertyValueDescription =
-  | string
-  | number
+export type PropertyValueDescription<T = string | number> =
+  | T
   | {
-      value: string | number;
+      value: T;
       description: string;
     };
 
@@ -242,7 +241,7 @@ export type ComponentApiMetadata = {
 // individual parts that make up the component.
 export type ComponentPartMetadata = {
   description: string;
-}
+};
 
 // Components have metadata that the rendering engine uses to render the component.
 // This type defines the structure of such metadata.

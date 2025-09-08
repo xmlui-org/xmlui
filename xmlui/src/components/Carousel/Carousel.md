@@ -167,12 +167,6 @@ This property indicates the duration of the transition between slides in millise
 
 %-PROP-END
 
-%-PROP-START keyboard
-
-This property indicates whether the carousel responds to keyboard events (arrow keys for navigation).
-
-%-PROP-END
-
 %-EVENT-START displayDidChange
 
 This event is triggered when the active slide changes.
