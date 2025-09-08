@@ -181,12 +181,6 @@ Available values:
 | `single` | Single date selection **(default)** |
 | `range` | Date range selection |
 
-### `mute` (default: false) [#mute-default-false]
-
-Whether to mute the beep sound while still firing the beep event
-
-When `true`, prevents audible beeps but still fires the `beep` event for programmatic handling.
-
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
@@ -267,21 +261,6 @@ Available values:
 
 ## Events [#events]
 
-### `beep` [#beep]
-
-Event triggered when a beep should occur due to invalid input auto-tab prevention
-
-Fired when the user attempts an action that would cause a beep (like entering invalid values).
-
-```xmlui-pg copy {2} display name="Example: beep"
-<App var.beepMessage="">
-  <Text value="{beepMessage}" />
-  <DateInput 
-    onBeep="beepMessage = 'Beep! Invalid input attempted'"
-    onDidChange="beepMessage = ''" />
-</App>
-```
-
 ### `didChange` [#didchange]
 
 This event is triggered when value of DateInput has changed.
@@ -331,6 +310,12 @@ This event is triggered when the DateInput has lost the focus.
 Focus the DateInput component.
 
 **Signature**: `focus(): void`
+
+### `isoValue` [#isovalue]
+
+Get the current date value formatted in ISO standard (YYYY-MM-DD) format, suitable for JSON serialization.
+
+**Signature**: `isoValue(): string | null`
 
 ### `setValue` [#setvalue]
 
@@ -496,17 +481,13 @@ The component has some parts that can be styled through layout properties and th
 | [outlineWidth](../styles-and-themes/common-units/#size)-DateInput-warning--focus | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-button-DateInput | 4px 6px | 4px 6px |
 | [padding](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-DateInput-warning | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-input-DateInput | 0 2px | 0 2px |
 | [paddingBottom](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-DateInput | $space-2 | $space-2 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
-| [paddingVertical](../styles-and-themes/common-units/#size)-DateInput | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-DateInput | $space-2 | $space-2 |
 | spacing-divider-DateInput | 1px 0 | 1px 0 |
 | [textAlign](../styles-and-themes/common-units/#text-align)-input-DateInput | center | center |
 | [textColor](../styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |

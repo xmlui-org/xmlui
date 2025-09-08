@@ -15,7 +15,6 @@ import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -60,7 +59,6 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
-  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
@@ -82,7 +80,6 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
-  mute?: boolean;
   emptyCharacter?: string;
 };
 
@@ -98,7 +95,6 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
-  mute: false,
   emptyCharacter: "-",
 };
 
@@ -115,7 +111,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     onFocus,
     onBlur,
     onInvalidChange,
-    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     hour24 = defaultProps.hour24,
@@ -137,7 +132,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
-    mute = defaultProps.mute,
     emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
@@ -212,7 +206,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         hour: hourStr,
         minute: minuteStr,
         second: secondStr,
-      } = parseTimeString(String(localValue), is12HourFormat);
+      } = parseTimeString(localValue, is12HourFormat);
 
       setAmPm(parsedAmPm);
       setHour(hourStr);
@@ -237,16 +231,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     }
     onDidChange?.(newValue);
   });
-
-  // Method to handle beeping - both sound and event
-  const handleBeep = useCallback(() => {
-    // Play the beep sound only if not muted
-    if (!mute) {
-      beep(440, 50);
-    }
-    // Always fire the beep event for alternative implementations
-    onBeep?.();
-  }, [onBeep, mute]);
 
   // Helper function to format the complete time value
   const formatTimeValue = useCallback(
@@ -328,11 +312,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
 
         // Check if the current value was invalid (needed normalization or couldn't be normalized)
         const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
-        
-        if (wasInvalid) {
-          // Play beep sound and fire beep event when manually tabbing out of invalid input
-          handleBeep();
-        }
 
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
@@ -378,7 +357,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange, handleBeep],
+    [hour, minute, second, amPm, is12HourFormat, handleChange],
   );
 
   // Handle changes from individual inputs
@@ -608,6 +587,33 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     handleChange(newValue);
   });
 
+  // Function to get ISO formatted time value (HH:MM:SS in 24-hour format)
+  const getIsoValue = useCallback((): string | null => {
+    if (!hour || !minute) {
+      return null;
+    }
+
+    // Convert to 24-hour format if currently in 12-hour format
+    let hour24: number;
+    if (is12HourFormat && amPm) {
+      const hourInt = parseInt(hour, 10);
+      if (amPm === 'am') {
+        hour24 = hourInt === 12 ? 0 : hourInt;
+      } else { // pm
+        hour24 = hourInt === 12 ? 12 : hourInt + 12;
+      }
+    } else {
+      hour24 = parseInt(hour, 10);
+    }
+
+    // Format as ISO time string (HH:MM:SS)
+    const h24 = hour24.toString().padStart(2, "0");
+    const m24 = minute.padStart(2, "0");
+    const s24 = (second || "00").padStart(2, "0");
+    
+    return `${h24}:${m24}:${s24}`;
+  }, [hour, minute, second, amPm, is12HourFormat]);
+
   // Component API registration
   useImperativeHandle(ref, () => timeInputRef.current as HTMLDivElement);
 
@@ -616,9 +622,10 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       registerComponentApi({
         focus,
         setValue,
+        isoValue: getIsoValue,
       });
     }
-  }, [registerComponentApi, focus, setValue]);
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
 
   // Custom clear icon
   const clearIconElement = useMemo(() => {
@@ -656,9 +663,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     }
     return null;
   }, [endIcon, endText]);
-
-  // Create placeholder using processed empty character
-  const placeholder = processedEmptyCharacter.repeat(2);
 
   const timeInputComponent = (
     <div
@@ -701,10 +705,9 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
             emptyCharacter={processedEmptyCharacter}
-            onBeep={handleBeep}
           />
 
-          <InputDivider separator=":" className={styles.divider} />
+          <InputDivider separator=":" />
 
           {/* Minute input */}
           <MinuteInput
@@ -724,7 +727,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
             emptyCharacter={processedEmptyCharacter}
-            onBeep={handleBeep}
           />
 
           {/* Second input (if needed) */}
@@ -748,7 +750,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
                 emptyCharacter={processedEmptyCharacter}
-                onBeep={handleBeep}
               />
             </>
           )}
@@ -921,7 +922,6 @@ type HourInputProps = {
   isInvalid?: boolean;
   is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
@@ -932,7 +932,6 @@ function HourInput({
   isInvalid = false,
   is24Hour = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: HourInputProps): React.ReactElement {
   // Calculate min/max based on format
@@ -996,7 +995,6 @@ function HourInput({
       min={minHour}
       maxLength={2}
       validateFn={(val) => isHourInvalid(val, is24Hour)}
-      onBeep={onBeep}
       onChange={otherProps.onChange}
       onBlur={(direction, event) => {
         // PartialInput provides direction, but the current onBlur expects just the event
@@ -1030,7 +1028,6 @@ type MinuteInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function MinuteInput({
@@ -1041,7 +1038,6 @@ function MinuteInput({
   value,
   isInvalid = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: MinuteInputProps): React.ReactElement {
   function isSameHour(date: string | Date) {
@@ -1058,7 +1054,6 @@ function MinuteInput({
       name="minute"
       value={value}
       validateFn={isMinuteOrSecondInvalid}
-      onBeep={onBeep}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
       maxLength={2}
@@ -1095,7 +1090,6 @@ type SecondInputProps = {
   value?: string | null;
   isInvalid?: boolean;
   emptyCharacter?: string;
-  onBeep?: () => void;
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
 
 function SecondInput({
@@ -1107,7 +1101,6 @@ function SecondInput({
   value,
   isInvalid = false,
   emptyCharacter = "-",
-  onBeep,
   ...otherProps
 }: SecondInputProps): React.ReactElement {
   function isSameMinute(date: string | Date) {
@@ -1124,7 +1117,6 @@ function SecondInput({
       name="second"
       value={value}
       validateFn={isMinuteOrSecondInvalid}
-      onBeep={onBeep}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
       maxLength={2}
@@ -1152,7 +1144,28 @@ function SecondInput({
 }
 
 // Utility function to parse time string into components
-function parseTimeString(timeString: string, targetIs12Hour: boolean = false) {
+function parseTimeString(timeValue: any, targetIs12Hour: boolean = false) {
+  // Handle non-string values gracefully
+  if (timeValue == null || timeValue === undefined) {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  // If not a string, return empty values for type safety
+  if (typeof timeValue !== 'string') {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  const timeString = timeValue;
   const normalizedTimeString = timeString.toLowerCase();
 
   // Check if the time string contains AM/PM
@@ -1162,9 +1175,24 @@ function parseTimeString(timeString: string, targetIs12Hour: boolean = false) {
   // Extract just the time part (remove AM/PM suffix)
   const timePart = normalizedTimeString.replace(/\s*(am|pm)\s*$/i, "").trim();
 
-  const parsedHour = getHours(timePart);
-  const parsedMinute = getMinutes(timePart);
-  const parsedSecond = getSeconds(timePart);
+  let parsedHour = getHours(timePart);
+  let parsedMinute = getMinutes(timePart);
+  let parsedSecond = getSeconds(timePart);
+
+  // If parsing with the current format fails (all zeros), try ISO time format
+  if (parsedHour === 0 && parsedMinute === 0 && parsedSecond === 0 && timePart !== "00:00:00" && timePart !== "00:00") {
+    try {
+      // Try parsing as ISO time format using Date constructor
+      const isoDate = new Date(`1970-01-01T${timePart}`);
+      if (!isNaN(isoDate.getTime())) {
+        parsedHour = isoDate.getHours();
+        parsedMinute = isoDate.getMinutes();
+        parsedSecond = isoDate.getSeconds();
+      }
+    } catch {
+      // If ISO parsing fails, keep the original parsed values (zeros)
+    }
+  }
 
   // Set AM/PM based on the actual string content or convert from 24-hour
   let amPmValue: AmPmType | null = null;

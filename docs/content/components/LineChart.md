@@ -13,8 +13,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -29,8 +29,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
   />
 </Card>
 ```
@@ -46,10 +46,6 @@ The LineChart component accommodates the size of its parent unless you set it ex
 ### `data` [#data]
 
 The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point.
-
-### `dataKeys` [#datakeys]
-
-This property specifies the keys in the data objects that should be used for rendering the lines.
 
 ### `hideTickX` (default: false) [#hidetickx-default-false]
 
@@ -87,10 +83,6 @@ The right margin of the chart
 
 The top margin of the chart
 
-### `nameKey` [#namekey]
-
-The key in the data objects used for labeling different data series.
-
 ### `showLegend` (default: false) [#showlegend-default-false]
 
 Determines whether the legend should be displayed.
@@ -109,8 +101,8 @@ A function that formats the X-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
@@ -130,8 +122,8 @@ A function that formats the Y-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    dataKeys="{['A']}"
-    nameKey="sprint"
+    xKeys="{['A']}"
+    yKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -140,6 +132,14 @@ A function that formats the Y-axis tick labels. It receives a tick value and ret
 ### `tooltipTemplate` [#tooltiptemplate]
 
 This property allows replacing the default template to display a tooltip.
+
+### `xKeys` [#xkeys]
+
+This property specifies the keys in the data objects that should be used for rendering the lines.
+
+### `yKey` [#ykey]
+
+The key in the data objects used for labeling different data series.
 
 ## Events [#events]
 

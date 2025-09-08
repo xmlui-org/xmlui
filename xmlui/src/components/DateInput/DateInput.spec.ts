@@ -22,7 +22,7 @@ test.describe("Basic Functionality", () => {
     await expect(driver.yearInput).toHaveValue("2024");
   });
 
-  test.skip("renders in disabled state when enabled is false", async ({
+  test("renders in disabled state when enabled is false", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -31,17 +31,6 @@ test.describe("Basic Functionality", () => {
     await expect(driver.dayInput).toBeDisabled();
     await expect(driver.monthInput).toBeDisabled();
     await expect(driver.yearInput).toBeDisabled();
-  });
-
-  test.skip("renders in readonly state when readOnly is true", async ({
-    initTestBed,
-    createDateInputDriver,
-  }) => {
-    await initTestBed(`<DateInput testId="dateInput" readOnly="true" />`);
-    const driver = await createDateInputDriver("dateInput");
-    await expect(driver.dayInput).toHaveAttribute("readonly", "");
-    await expect(driver.monthInput).toHaveAttribute("readonly", "");
-    await expect(driver.yearInput).toHaveAttribute("readonly", "");
   });
 
   test("shows clear button when clearable is true", async ({
@@ -66,7 +55,7 @@ test.describe("Basic Functionality", () => {
     await expect(driver.clearButton).not.toBeVisible();
   });
 
-  test.skip("renders with required attribute", async ({ initTestBed, createDateInputDriver }) => {
+  test("renders with required attribute", async ({ initTestBed, createDateInputDriver }) => {
     await initTestBed(`<DateInput testId="dateInput" required="true" />`);
     const driver = await createDateInputDriver("dateInput");
     await expect(driver.dayInput).toHaveAttribute("required", "");
@@ -163,6 +152,228 @@ test.describe("dateFormat property", () => {
   });
 });
 
+// =============================================================================
+// INITIAL VALUE PROPERTY TESTS
+// =============================================================================
+
+test.describe("initialValue property", () => {
+  test("parses valid date in default format", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("05");
+    await expect(driver.dayInput).toHaveValue("25");
+    await expect(driver.yearInput).toHaveValue("2024");
+  });
+
+  test("falls back to ISO date parsing when format parsing fails", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="2023-08-30" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("08");
+    await expect(driver.dayInput).toHaveValue("30");
+    await expect(driver.yearInput).toHaveValue("2023");
+  });
+
+  test("falls back to ISO date parsing with different dateFormat", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="dd-MM-yyyy" initialValue="2023-12-25" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.dayInput).toHaveValue("25");
+    await expect(driver.monthInput).toHaveValue("12");
+    await expect(driver.yearInput).toHaveValue("2023");
+  });
+
+  test("handles various ISO date formats as fallback", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="2024-02-29T10:30:00Z" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("02");
+    await expect(driver.dayInput).toHaveValue("29");
+    await expect(driver.yearInput).toHaveValue("2024");
+  });
+
+  test("handles leap year dates correctly via ISO fallback", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="yyyyMMdd" initialValue="2024-02-29" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.yearInput).toHaveValue("2024");
+    await expect(driver.monthInput).toHaveValue("02");
+    await expect(driver.dayInput).toHaveValue("29");
+  });
+
+  test("handles null initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{null}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles undefined initialValue gracefully", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{undefined}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles empty string initialValue gracefully", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles invalid date string gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="invalid-date-string" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles numeric initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{123456789}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles object initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{{}}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles boolean initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{true}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles false boolean initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{false}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles array initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{[1, 2, 3]}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles function initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{() => '2024-01-01'}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles zero numeric initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{0}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles negative numeric initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{-123}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles float numeric initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{123.456}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles NaN initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{NaN}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles Infinity initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{Infinity}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles Date object initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{Date.now()}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("handles complex object initialValue gracefully", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="{{year: 2024, month: 5, day: 25}}" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("prioritizes format-specific parsing over ISO fallback", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    // This date could potentially be parsed as ISO, but should use format-specific parsing first
+    await initTestBed(
+      `<DateInput testId="dateInput" dateFormat="yyyy-MM-dd" initialValue="2023-08-30" />`,
+    );
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.yearInput).toHaveValue("2023");
+    await expect(driver.monthInput).toHaveValue("08");
+    await expect(driver.dayInput).toHaveValue("30");
+  });
+});
+
 test.describe("validationStatus property", () => {
   test("applies valid status styling", async ({ initTestBed, createDateInputDriver }) => {
     await initTestBed(
@@ -191,7 +402,7 @@ test.describe("validationStatus property", () => {
 });
 
 test.describe("autoFocus property", () => {
-  test.skip("focuses component when autoFocus is true", async ({
+  test("focuses component when autoFocus is true", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -508,7 +719,7 @@ test.describe("User Interactions", () => {
     await expect(driver.yearInput).toBeFocused();
   });
 
-  test.skip("navigates between inputs with arrow keys", async ({
+  test("navigates between inputs with arrow keys", async ({
     initTestBed,
     createDateInputDriver,
     page,
@@ -579,15 +790,50 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual("blurred");
   });
 
-  test("fires beep event on invalid input", async ({ initTestBed, createDateInputDriver }) => {
-    const { testStateDriver } = await initTestBed(
-      `<DateInput testId="dateInput" onBeep="testState = 'beeped'" />`,
-    );
+  test("preserves field values when date combination becomes invalid", async ({ initTestBed, createDateInputDriver, page }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="01/30/2024" />`);
     const driver = await createDateInputDriver("dateInput");
+    
+    // Verify initial state
+    await expect(driver.monthInput).toHaveValue("01");
+    await expect(driver.dayInput).toHaveValue("30");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // Change month from 01 to 02, making Feb 30th which is invalid
+    await driver.monthInput.focus();
+    await driver.monthInput.fill("02");
+    
+    // Month should be updated to 02
+    await expect(driver.monthInput).toHaveValue("02");
+    
+    // Day should preserve the invalid value "30" instead of being normalized or cleared
+    // This is the key fix - invalid date combinations preserve the field values
+    await expect(driver.dayInput).toHaveValue("30");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // The day field should also be marked as invalid visually
+    await expect(driver.dayInput).toHaveClass(/invalid/);
+  });
 
+  test("does not clear all fields when invalid date is entered", async ({ initTestBed, createDateInputDriver, page }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" />`);
+    const driver = await createDateInputDriver("dateInput");
+    
+    // Create a scenario where the complete date would be invalid
     await driver.monthInput.fill("13"); // Invalid month
-
-    await expect.poll(testStateDriver.testState).toEqual("beeped");
+    await driver.dayInput.fill("25");
+    await driver.yearInput.fill("2024");
+    
+    // Tab to trigger validation
+    await page.keyboard.press("Tab");
+    
+    // Month should be normalized (13 % 10 = 3)
+    await expect(driver.monthInput).toHaveValue("03");
+    // Day and year should be preserved
+    await expect(driver.dayInput).toHaveValue("25");
+    await expect(driver.yearInput).toHaveValue("2024");
+    
+    // The important thing is that we don't get all empty fields
   });
 });
 
@@ -659,6 +905,120 @@ test.describe("API Methods", () => {
     await expect(driver.monthInput).toHaveValue("");
     await expect(driver.dayInput).toHaveValue("");
     await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("isoValue() method returns null when no date is set", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(null);
+  });
+
+  test("isoValue() method returns ISO format for complete date", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" initialValue="05/25/2024" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe("2024-05-25");
+  });
+
+  test("isoValue() method handles different date formats correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" dateFormat="dd/MM/yyyy" initialValue="25/05/2024" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe("2024-05-25");
+  });
+
+  test("isoValue() method returns null for incomplete date", async ({ initTestBed, page, createDateInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" testId="dateInput" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    const driver = await createDateInputDriver("dateInput");
+    
+    // Set only month and day, leave year empty
+    await driver.monthInput.fill("05");
+    await driver.dayInput.fill("25");
+    
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(null);
+  });
+
+  test("isoValue() method returns null for invalid date", async ({ initTestBed, page, createDateInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" testId="dateInput" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    const driver = await createDateInputDriver("dateInput");
+    
+    // Set invalid date (February 30th)
+    await driver.monthInput.fill("02");
+    await driver.dayInput.fill("30");
+    await driver.yearInput.fill("2024");
+    
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(null);
+  });
+
+  test("isoValue() method updates when date is changed programmatically", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" initialValue="05/25/2024" />
+        <Button testId="setDateBtn" onClick="dateInput.setValue('12/31/2023')" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    // Change the date programmatically
+    await page.getByTestId("setDateBtn").click();
+    
+    // Get the ISO value
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe("2023-12-31");
+  });
+
+  test("isoValue() method handles leap year correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" initialValue="02/29/2024" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe("2024-02-29");
+  });
+
+  test("isoValue() method handles edge dates correctly", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DateInput id="dateInput" initialValue="01/01/1900" />
+        <Button testId="getIsoBtn" onClick="testState = dateInput.isoValue()" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("getIsoBtn").click();
+    await expect.poll(testStateDriver.testState).toBe("1900-01-01");
   });
 });
 
@@ -736,7 +1096,7 @@ test.describe("Accessibility", () => {
     await expect(driver.yearInput).toHaveAttribute("type", "text");
   });
 
-  test.skip("supports required attribute for accessibility", async ({
+  test("supports required attribute for accessibility", async ({
     initTestBed,
     createDateInputDriver,
   }) => {
@@ -887,7 +1247,7 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test.skip("handles rapid consecutive value changes", async ({
+  test("handles rapid consecutive value changes", async ({
     initTestBed,
     createDateInputDriver,
   }) => {

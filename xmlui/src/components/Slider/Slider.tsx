@@ -1,5 +1,5 @@
+import { Slider } from "./SliderNative";
 import styles from "./Slider.module.scss";
-
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
@@ -8,7 +8,6 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,
@@ -18,11 +17,8 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValue,
 } from "../metadata-helpers";
-import { Slider, defaultProps } from "./SliderNative";
 
 const COMP = "Slider";
 
@@ -32,7 +28,9 @@ export const SliderMd = createMetadata({
     "`Slider` provides an interactive control for selecting numeric values within " +
     "a defined range, supporting both single value selection and range selection with " +
     "multiple thumbs. It offers precise control through customizable steps and visual " +
-    "feedback with formatted value display.",
+    "feedback with formatted value display." +
+    "\n\n" +
+    "Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),
@@ -42,22 +40,22 @@ export const SliderMd = createMetadata({
     minValue: {
       description: `This property specifies the minimum value of the allowed input range.`,
       valueType: "number",
-      defaultValue: defaultProps.min,
+      defaultValue: 0,
     },
     maxValue: {
       description: `This property specifies the maximum value of the allowed input range.`,
       valueType: "number",
-      defaultValue: defaultProps.max,
+      defaultValue: 10,
     },
     step: {
       description: `This property defines the increment value for the slider, determining the allowed intervals between selectable values.`,
-      defaultValue: defaultProps.step,
+      defaultValue: 1,
     },
     minStepsBetweenThumbs: d(
       `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,
       undefined,
       "number",
-      defaultProps.minStepsBetweenThumbs,
+      1,
     ),
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
@@ -65,7 +63,7 @@ export const SliderMd = createMetadata({
     readOnly: dReadonly(),
     validationStatus: {
       ...dValidationStatus(),
-      defaultValue: defaultProps.validationStatus,
+      defaultValue: "none",
     },
     rangeStyle: d(
       `This optional property allows you to apply custom styles to the range element of the slider.`,
@@ -76,7 +74,7 @@ export const SliderMd = createMetadata({
     showValues: {
       description: `This property controls whether the slider shows the current values of the thumbs.`,
       valueType: "boolean",
-      defaultValue: defaultProps.showValues,
+      defaultValue: true,
     },
     valueFormat: {
       description: `This property allows you to customize how the values are displayed.`,

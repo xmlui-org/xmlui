@@ -16,7 +16,6 @@ import { InputDivider } from "../Input/InputDivider";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { beep } from "../../components-core/utils/audio-utils";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -76,7 +75,6 @@ type Props = {
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
-  onBeep?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   mode?: DateInputMode;
@@ -102,7 +100,6 @@ type Props = {
   labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
-  mute?: boolean;
   emptyCharacter?: string;
 };
 
@@ -121,7 +118,6 @@ export const defaultProps = {
   readOnly: false,
   autoFocus: false,
   labelBreak: false,
-  mute: false,
   emptyCharacter: "-",
 };
 
@@ -138,7 +134,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     onFocus,
     onBlur,
     onInvalidChange,
-    onBeep,
     validationStatus = defaultProps.validationStatus,
     registerComponentApi,
     mode = defaultProps.mode,
@@ -164,7 +159,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
-    mute = defaultProps.mute,
     emptyCharacter = defaultProps.emptyCharacter,
     ...rest
   },
@@ -278,16 +272,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     onDidChange?.(newValue);
   });
 
-  // Method to handle beeping - both sound and event
-  const handleBeep = useCallback(() => {
-    // Play the beep sound only if not muted
-    if (!mute) {
-      beep(440, 50);
-    }
-    // Always fire the beep event for alternative implementations
-    onBeep?.();
-  }, [onBeep, mute]);
-
   // Helper function to format the complete date value
   const formatDateValue = useCallback(
     (d: string | null, m: string | null, y: string | null): string | null => {
@@ -340,6 +324,12 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         // Update invalid state immediately for visual feedback
         const isInvalid = validateFn(newValue);
         setInvalid(isInvalid);
+        
+        // Clear day invalid state when any field changes, as the date combination might become valid
+        if (!isInvalid) {
+          setIsDayCurrentlyInvalid(false);
+        }
+        
         // Fire invalid event if the value is invalid
         if (isInvalid) {
           onInvalidChange?.();
@@ -364,20 +354,29 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         const wasInvalid =
           currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
 
-        if (wasInvalid) {
-          // Play beep sound and fire beep event when manually tabbing out of invalid input
-          handleBeep();
-        }
-
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
           setInvalid(false); // Clear invalid state after normalization
 
-          // Always call handleChange to update the date value
+          // Check if the complete date would be valid
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          handleChange(dateString);
+          
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
         } else if (normalizedValue === null && currentValue !== "") {
           // Reset to previous valid value or clear
           setValue("");
@@ -392,10 +391,24 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          handleChange(dateString);
+          
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
         }
       },
-    [day, month, year, handleChange, handleBeep],
+    [day, month, year, handleChange, onInvalidChange],
   );
 
   // Handle changes from individual inputs
@@ -547,6 +560,45 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     handleChange(newValue);
   });
 
+  // Function to get ISO formatted date value (YYYY-MM-DD)
+  const getIsoValue = useCallback((): string | null => {
+    if (!day || !month || !year) {
+      return null;
+    }
+
+    // Convert to numbers
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
+      return null;
+    }
+
+    try {
+      // Create date object (month is 0-indexed in Date constructor)
+      const date = new Date(yearNum, monthNum - 1, dayNum);
+
+      // Validate the date
+      if (
+        date.getFullYear() !== yearNum ||
+        date.getMonth() !== monthNum - 1 ||
+        date.getDate() !== dayNum
+      ) {
+        return null;
+      }
+
+      // Format as ISO date string (YYYY-MM-DD)
+      const year4 = yearNum.toString().padStart(4, "0");
+      const month2 = monthNum.toString().padStart(2, "0");
+      const day2 = dayNum.toString().padStart(2, "0");
+      
+      return `${year4}-${month2}-${day2}`;
+    } catch (error) {
+      return null;
+    }
+  }, [day, month, year]);
+
   // Component API registration
   useImperativeHandle(ref, () => dateInputRef.current as HTMLDivElement);
 
@@ -555,9 +607,10 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       registerComponentApi({
         focus,
         setValue,
+        isoValue: getIsoValue,
       });
     }
-  }, [registerComponentApi, focus, setValue]);
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
 
   // Custom clear icon
   const clearIconElement = useMemo(() => {
@@ -642,7 +695,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 isInvalid={isDayCurrentlyInvalid}
                 month={month}
                 year={year}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -665,7 +717,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 required={required}
                 value={month}
                 isInvalid={isMonthCurrentlyInvalid}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -689,7 +740,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
                 value={year}
                 isInvalid={isYearCurrentlyInvalid}
                 dateFormat={dateFormat}
-                onBeep={handleBeep}
                 emptyCharacter={processedEmptyCharacter}
               />
               {getSeparator() && <InputDivider separator={getSeparator()} />}
@@ -993,6 +1043,8 @@ function MonthInput({
       placeholderLength={2}
       className={classnames(partClassName(PART_MONTH), styles.input, styles.month)}
       maxLength={2}
+      disabled={otherProps.disabled}
+      required={otherProps.required}
       onBlur={(direction, event) => {
         // PartialInput provides direction, but current onBlur expects just event
         if (otherProps.onBlur) {
@@ -1000,6 +1052,12 @@ function MonthInput({
           otherProps.onBlur(direction, event);
         }
       }}
+      onKeyDown={otherProps.onKeyDown}
+      readOnly={otherProps.readOnly}
+      autoFocus={otherProps.autoFocus}
+      inputRef={otherProps.inputRef}
+      nextInputRef={otherProps.nextInputRef}
+      ariaLabel={otherProps.ariaLabel}
     />
   );
 }
@@ -1073,19 +1131,34 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
 
 // Utility function to parse date string into components
 function parseDateString(dateString: string, dateFormat: DateFormat) {
+  // Handle non-string values gracefully by returning null (empty fields)
+  if (typeof dateString !== 'string' || dateString === null || dateString === undefined) {
+    return null;
+  }
+
   try {
     // Try to parse the date using the specified format
     const parsedDate = parse(dateString, dateFormat, new Date());
 
-    if (!isValid(parsedDate)) {
-      return null;
+    if (isValid(parsedDate)) {
+      return {
+        day: parsedDate.getDate().toString().padStart(2, "0"),
+        month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
+        year: parsedDate.getFullYear().toString(),
+      };
     }
 
-    return {
-      day: parsedDate.getDate().toString().padStart(2, "0"),
-      month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
-      year: parsedDate.getFullYear().toString(),
-    };
+    // Fallback: Try to parse as ISO date string
+    const isoDate = new Date(dateString);
+    if (!isNaN(isoDate.getTime())) {
+      return {
+        day: isoDate.getDate().toString().padStart(2, "0"),
+        month: (isoDate.getMonth() + 1).toString().padStart(2, "0"),
+        year: isoDate.getFullYear().toString(),
+      };
+    }
+
+    return null;
   } catch (error) {
     return null;
   }

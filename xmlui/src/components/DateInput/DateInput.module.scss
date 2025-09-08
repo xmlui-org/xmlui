@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $componentName: "DateInput";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // Compose standard Input theme variables automatically
 $themeVars: t.composePaddingVars($themeVars, $componentName);
@@ -46,7 +47,6 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
@@ -88,6 +88,7 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
     transition: $transition-background-DateInput;
     overflow: hidden;
     gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    @include t.paddingVars($themeVars, $componentName);
 
     &.disabled {
       opacity: $opacity-DateInput--disabled;
@@ -157,7 +158,6 @@ $transition-background-DateInput: createThemeVar("transition-background-#{$compo
     flex-shrink: 0; // Don't shrink to maintain consistency
     min-width: 0; // Allow shrinking if needed
     gap: 0; // Remove gap since dividers handle spacing
-    padding: 0 0.5rem; // Increase horizontal padding for better spacing
     box-sizing: border-box;
   }
 

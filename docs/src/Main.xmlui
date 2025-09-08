@@ -107,6 +107,7 @@
                     <NavLink label="CHStack" to="/components/CHStack" />
                     <NavLink label="CVStack" to="/components/CVStack" />
                     <NavLink label="Card" to="/components/Card" />
+                    <NavLink label="Carousel" to="/components/Carousel" />
                     <NavLink label="ChangeListener" to="/components/ChangeListener" />
                     <NavLink label="Checkbox" to="/components/Checkbox" />
                     <NavLink label="ColorPicker" to="/components/ColorPicker" />

@@ -8,13 +8,13 @@ $themeVars: ();
 }
 
 $componentName: "TimeInput";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // --- TimeInput specific theme variables
 $color-divider-TimeInput: createThemeVar("color-divider-#{$componentName}");
 $spacing-divider-TimeInput: createThemeVar("spacing-divider-#{$componentName}");
 $width-input-TimeInput: createThemeVar("width-input-#{$componentName}");
 $minWidth-input-TimeInput: createThemeVar("minWidth-input-#{$componentName}");
-$padding-input-TimeInput: createThemeVar("padding-input-#{$componentName}");
 $textAlign-input-TimeInput: createThemeVar("textAlign-input-#{$componentName}");
 $fontSize-input-TimeInput: createThemeVar("fontSize-input-#{$componentName}");
 $borderRadius-input-TimeInput: createThemeVar("borderRadius-input-#{$componentName}");
@@ -75,7 +75,6 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
@@ -117,6 +116,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
     transition: $transition-background-TimeInput;
     overflow: hidden;
     gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    @include t.paddingVars($themeVars, $componentName);
 
     &.disabled {
       opacity: $opacity-TimeInput--disabled;
@@ -177,36 +177,22 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
     display: flex;
     flex-grow: 1;
     flex-shrink: 0;
+    align-items: center; // Ensure all child elements are vertically centered
   }
 
   .inputGroup {
     display: flex;
+    height: 80%;
     align-items: center;
     flex-grow: 1;
     min-width: 0; // Allow shrinking
     gap: 0; // Remove gap since dividers handle spacing
-    padding: 0 0.125rem; // Use rem for consistent padding
     box-sizing: border-box;
-  }
-
-  .divider {
-    padding: $spacing-divider-TimeInput;
-    white-space: pre;
-    display: inline-block;
-    font: inherit;
-    color: $color-divider-TimeInput;
-  }
-
-  .leadingZero {
-    display: inline-block;
-    font: inherit;
   }
 
   .input {
     min-width: $minWidth-input-TimeInput;
-    height: 100%;
     position: relative;
-    padding: $padding-input-TimeInput;
     border: 0;
     background: none;
     color: currentColor;
@@ -229,7 +215,6 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
       min-width: 2.5ch;
       max-width: 2.5ch;
       text-align: center;
-      padding: $padding-input-TimeInput !important;
       box-sizing: border-box !important;
     }
 
@@ -276,11 +261,11 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
     border: 0 !important;
     border-radius: $borderRadius-input-TimeInput;
     background: none !important;
-    padding: $padding-input-TimeInput !important;
     cursor: pointer;
     box-sizing: border-box;
     color: currentColor;
     position: relative;
+    outline-offset: -2px;
 
     &:hover {
       background-color: $backgroundColor-TimeInput--hover !important;
@@ -302,7 +287,6 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
   // New button-based AM/PM selector
   .amPmButton {
     min-width: $minWidth-ampm-TimeInput !important;
-    height: 100% !important;
     font: inherit;
     font-size: $fontSize-ampm-TimeInput;
     display: inline-flex !important;
@@ -311,7 +295,6 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
     border: 0 !important;
     border-radius: $borderRadius-input-TimeInput;
     background: none !important;
-    padding: $padding-input-TimeInput !important;
     cursor: pointer;
     box-sizing: border-box;
     color: currentColor;
@@ -386,6 +369,7 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
 
   .button {
     border: 0;
+    height: 1.5em;
     background: transparent;
     padding: $padding-button-TimeInput;
     border-radius: $borderRadius-button-TimeInput;
@@ -415,6 +399,9 @@ $outlineOffset-ampm-TimeInput--focused: createThemeVar(
 
   .clearButton {
     @extend .button;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .buttonIcon {

@@ -212,6 +212,24 @@ export function PartialInput({
     [onBlur, nextInputRef, nextButtonRef],
   );
 
+  /**
+   * Enhanced key down handler that prevents space character input.
+   * Filters out space key presses while allowing other keys to pass through.
+   */
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      // Prevent space character input
+      if (event.key === " " || event.code === "Space") {
+        event.preventDefault();
+        return;
+      }
+
+      // Call the original onKeyDown handler for other keys
+      onKeyDown?.(event as React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement });
+    },
+    [onKeyDown],
+  );
+
   return (
     <input
       aria-label={ariaLabel}
@@ -231,7 +249,7 @@ export function PartialInput({
       onChange={handleInputChange}
       onBlur={handleBlur}
       onFocus={handleInternalFocus}
-      onKeyDown={onKeyDown}
+      onKeyDown={handleKeyDown}
       placeholder={finalPlaceholder}
       readOnly={readOnly}
       ref={inputRef as React.RefObject<HTMLInputElement>}

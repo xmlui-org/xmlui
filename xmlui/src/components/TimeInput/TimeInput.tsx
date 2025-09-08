@@ -105,11 +105,6 @@ export const TimeInputMd = createMetadata({
         "set, the gap declared by the current theme is used.",
       valueType: "string",
     },
-    mute: {
-      description: "Whether to mute the beep sound while still firing the beep event",
-      valueType: "boolean",
-      defaultValue: defaultProps.mute,
-    },
     emptyCharacter: {
       description: "Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'",
       valueType: "string",
@@ -121,7 +116,6 @@ export const TimeInputMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     invalidTime: d("Fired when the user enters an invalid time"),
-    beep: d("Fired when a beep sound is played due to invalid input, allowing custom feedback implementations"),
   },
   apis: {
     focus: {
@@ -139,10 +133,16 @@ export const TimeInputMd = createMetadata({
         value: "The new time value to set for the time picker.",
       },
     },
+    isoValue: {
+      description: `Get the current time value formatted in ISO standard (HH:MM:SS) using 24-hour format, suitable for JSON serialization.`,
+      signature: "isoValue(): string | null",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // TimeInput specific theme variables
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
     [`color-divider-${COMP}`]: "$textColor-secondary",
     [`spacing-divider-${COMP}`]: "1px 0",
     [`width-input-${COMP}`]: "1.8em",
@@ -152,14 +152,14 @@ export const TimeInputMd = createMetadata({
     [`fontSize-input-${COMP}`]: "inherit",
     [`borderRadius-input-${COMP}`]: "$borderRadius",
     [`backgroundColor-input-${COMP}-invalid`]: "rgba(220, 53, 69, 0.15)",
-    [`padding-button-${COMP}`]: "4px 6px",
+    [`padding-button-${COMP}`]: "4px 4px",
     [`borderRadius-button-${COMP}`]: "$borderRadius",
     [`hoverColor-button-${COMP}`]: "$color-surface-800",
     [`disabledColor-button-${COMP}`]: "$textColor-disabled",
     [`outlineColor-button-${COMP}--focused`]: "$color-accent-500",
     [`outlineWidth-button-${COMP}--focused`]: "2px",
-    [`outlineOffset-button-${COMP}--focused`]: "2px",
-    [`minWidth-ampm-${COMP}`]: "2em",
+    [`outlineOffset-button-${COMP}--focused`]: "0",
+    [`minWidth-ampm-${COMP}`]: "2.2em",
     [`fontSize-ampm-${COMP}`]: "inherit",
   },
 });
@@ -207,13 +207,11 @@ export const timeInputComponentRenderer = createComponentRenderer(
         endText={extractValue(node.props.endText)}
         endIcon={extractValue(node.props.endIcon)}
         gap={extractValue.asOptionalString(node.props.gap)}
-        mute={extractValue.asOptionalBoolean(node.props.mute, defaultProps.mute)}
         emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         onInvalidChange={lookupEventHandler("invalidTime")}
-        onBeep={lookupEventHandler("beep")}
       />
     );
   },

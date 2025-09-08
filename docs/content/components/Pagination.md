@@ -56,7 +56,7 @@ The `List` is a perfect example of a component that does not implement its own p
 <List data="{ds}" />
 ```
 
-For a comprehensive example, see [How to paginate a List](./paginate-a-list).
+For a comprehensive example, see [How to paginate a List](../howto/paginate-a-list).
 
 ## Properties [#properties]
 
@@ -84,7 +84,9 @@ Total number of items to paginate. If not provided, the component renders simpli
 
 ### `maxVisiblePages` (default: 1) [#maxvisiblepages-default-1]
 
-Maximum number of page buttons to display
+Maximum number of page buttons to display. If the value is not among the allowed values, it will fall back to the default.
+
+Available values: `1` **(default)**, `3`, `5`
 
 ### `orientation` [#orientation]
 
