@@ -105,9 +105,6 @@ export const CarouselMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
-  themeVarDescriptions: {
-    [`width-indicator-${COMP}`]: "Sets the width of the indicator.",
-  },
   defaultThemeVars: {
     [`backgroundColor-control-${COMP}`]: "$color-primary",
     [`textColor-control-${COMP}`]: "$textColor",

@@ -131,6 +131,39 @@ A function that formats the tick labels on the Y-axis.
 
 This property allows replacing the default template to display a tooltip.
 
+```xmlui-pg copy display height="320px" name="Example: tooltipTemplate" /tooltipTemplate/
+<App>
+  <BarChart
+    orientation="horizontal"
+    height="240px"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44, 'B': 28 },
+        { 'sprint': 'Sprint 2', 'A': 32, 'B': 41 },
+        { 'sprint': 'Sprint 3', 'A': 48, 'B': 35 },
+        { 'sprint': 'Sprint 4', 'A': 72, 'B': 58 }
+       ]}"
+    xKeys="{['A', 'B']}"
+    yKey="sprint"
+  >
+    <property name="tooltipTemplate">
+        <VStack backgroundColor='white' padding="$space-2">
+          <Text fontWeight='bold'>{$tooltip.label}</Text>
+          <HStack>
+            <Text color='blue'>Series A: {$tooltip.payload.A}</Text>
+            <Text color='green'>Series B: {$tooltip.payload.B}</Text>
+          </HStack>
+        </VStack>
+    </property>
+  </BarChart>
+</App>
+```
+
+The `tooltipTemplate` prop allows you to customize the appearance and content of chart tooltips. The template receives a `$tooltip` context variable containing:
+
+- `$tooltip.label`: The label for the data point (typically the yKey value)
+- `$tooltip.payload`: An object containing all data values for the hovered point
+- `$tooltip.active`: Boolean indicating if the tooltip is currently active
+
 ### `xKeys` [#xkeys]
 
 This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.
