@@ -1,8 +1,15 @@
-import { CSSProperties } from "react";
-import { LayoutContext, StylePropResolvers, ValueExtractor } from "../../abstractions/RendererDefs";
+import type { CSSProperties } from "react";
+import type {
+  LayoutContext,
+  StylePropResolvers,
+  ValueExtractor,
+} from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
+import type { ParsedLayout } from "./parse-layout-props";
 import { parseLayoutProperty } from "./parse-layout-props";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "../../abstractions/ComponentDefs";
+import type { MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 export type ResolvedComponentLayout = Record<string, ResolvedPartLayout>;
 
@@ -20,22 +27,118 @@ export const BASE_COMPONENT_PART = "_base_";
 const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-_]*)/g;
 const starSizeRegex = /^\d*\*$/;
 
-export function resolveComponentLayoutProps(
-  layoutProps: Record<string, any> = EMPTY_OBJECT,
-  {
-    layoutContext,
-    stylePropResolvers = EMPTY_OBJECT,
+type ResolveComponentLayoutPropsContext = {
+  layoutContext?: LayoutContext;
+  stylePropResolvers?: StylePropResolvers;
+  node?: ComponentDef;
+  valueExtractor?: ValueExtractor;
+};
+
+function resolveSingleProp(
+  parsed: ParsedLayout,
+  value,
+  result: ResolvedComponentLayout,
+  node: ComponentDef<ComponentMetadata>,
+  valueExtractor: ValueExtractor,
+  layoutContext: LayoutContext<ComponentDef<ComponentMetadata>>,
+  stylePropResolvers: StylePropResolvers,
+  resolveStyleProp,
+  cssResolved?,
+) {
+  // --- Process the properties, resolve theme variables to CSS variables
+  const cssPropName = parsed.property;
+  const appliedValue = value
+    ?.toString()
+    ?.replace(themeVarCapturesRegex, (match: string) => toCssVar(match.trim()));
+
+
+  const defaults = stylePropResolvers?.defaults?.();
+
+  // --- Some properties may need transformation
+  let stylePropResolverContext = {
+    value: appliedValue,
     node,
-    valueExtractor
-  }: {
-    layoutContext?: LayoutContext;
-    stylePropResolvers?: StylePropResolvers;
-    node: ComponentDef;
-    valueExtractor: ValueExtractor;
-  },
-): ResolvedComponentLayout {
+    extractValue: valueExtractor,
+    layoutContext,
+    resolveStyleProp: (propName)=>{
+      return resolveStyleProp(propName, defaults);
+    },
+  };
+  const cssProps: CSSProperties =
+    cssPropName in stylePropResolvers
+      ? stylePropResolvers[cssPropName](stylePropResolverContext)
+      : cssPropName in specialResolvers
+        ? specialResolvers[cssPropName](appliedValue, layoutContext)
+        : { [cssPropName]: appliedValue };
+
+  cssResolved?.(cssProps);
+  // --- Check if the property belongs to one or more states
+  const stateName = parsed.states && parsed.states.length > 0 ? parsed.states.join("&") : null;
+
+  // --- Prepare the place to store the styles. It belongs to the specified part.
+  const partName = parsed.part ? parsed.part : BASE_COMPONENT_PART;
+  let propertyTarget: any = (result[partName] ??= {});
+  if (parsed.screenSizes && parsed.screenSizes.length > 0) {
+    const screenSizeKey = parsed.screenSizes.join("&");
+    propertyTarget.responsiveStyles ??= {};
+    propertyTarget.responsiveStyles[screenSizeKey] ??=
+      stylePropResolvers?.defaults?.(stylePropResolverContext) || {};
+    if (stateName) {
+      propertyTarget.responsiveStyles[screenSizeKey].states ??= {};
+      propertyTarget.responsiveStyles[screenSizeKey].states = {
+        ...propertyTarget.responsiveStyles[screenSizeKey].states,
+        [stateName]: {
+          ...propertyTarget.responsiveStyles[screenSizeKey].states[stateName],
+          ...cssProps,
+        },
+      };
+    } else {
+      propertyTarget.responsiveStyles[screenSizeKey] = {
+        ...propertyTarget.responsiveStyles[screenSizeKey],
+        ...cssProps,
+      };
+    }
+  } else {
+    // --- No screen sizes specified, the property belongs to the base styles
+    propertyTarget.baseStyles ??= stylePropResolvers?.defaults?.(stylePropResolverContext) || {};
+    if (stateName) {
+      propertyTarget.baseStyles.states ??= {};
+      propertyTarget.baseStyles.states = {
+        ...propertyTarget.baseStyles.states,
+        [stateName]: { ...propertyTarget.baseStyles.states[stateName], ...cssProps },
+      };
+    } else {
+      propertyTarget.baseStyles = { ...propertyTarget.baseStyles, ...cssProps };
+    }
+  }
+}
+
+function findStyleProp(newParsed: ParsedLayout, result: ResolvedComponentLayout, propNAme) {
+  if (newParsed.screenSizes?.length) {
+    const screenSize = newParsed.screenSizes[0];
+    let responsiveStyles = result[newParsed.part ?? BASE_COMPONENT_PART]?.responsiveStyles;
+    for (let i = MediaBreakpointKeys.indexOf(screenSize); i >= 0; i--) {
+      if (responsiveStyles?.[MediaBreakpointKeys[i]]?.[propNAme]) {
+        return responsiveStyles?.[MediaBreakpointKeys[i]][propNAme];
+      }
+    }
+  }
+  return result[newParsed.part ?? BASE_COMPONENT_PART]?.baseStyles?.[propNAme]// || defaults?.[propNAme];
+}
+
+function doResolve(
+  layoutProps: Record<string, any>,
+  node: ComponentDef<ComponentMetadata>,
+  valueExtractor: ValueExtractor,
+  layoutContext: LayoutContext<ComponentDef>,
+  stylePropResolvers: StylePropResolvers = {},
+) {
   const result: ResolvedComponentLayout = {};
 
+  const depMap: Record<string, Set<string>> = {};
+  const definedStylesByProperties: Record<string, Set<string>> = {};
+  const sizesForProps: Record<string, Set<MediaBreakpointType>> = {};
+  const parsedPropertiesForProp: Record<string, Array<{ parsedLayout: ParsedLayout, value: any, key: string }>> = {};
   for (const [key, value] of Object.entries(layoutProps)) {
     const parsed = parseLayoutProperty(key, false);
 
@@ -44,66 +147,127 @@ export function resolveComponentLayoutProps(
       continue;
     }
 
-    // --- Process the properties, resolve theme variables to CSS variables
-    const cssPropName = parsed.property;
-    const appliedValue = value
-      ?.toString()
-      ?.replace(themeVarCapturesRegex, (match: string) => toCssVar(match.trim()));
+    parsed.value = value;
 
-
-    function resolveStyleProp(cssPropName){
-      console.log("resolveStyleProp", parsed, key);
-    }
-    // --- Some properties may need transformation
-    const cssProps: CSSProperties =
-      cssPropName in stylePropResolvers
-        ? stylePropResolvers[cssPropName]({ value: appliedValue, node, extractValue: valueExtractor, layoutContext, resolveStyleProp })
-        : cssPropName in specialResolvers
-          ? specialResolvers[cssPropName](appliedValue, layoutContext)
-          : { [cssPropName]: appliedValue };
-
-    // --- Check if the property belongs to one or more states
-    const stateName = parsed.states && parsed.states.length > 0 ? parsed.states.join("&") : null;
-
-    // --- Prepare the place to store the styles. It belongs to the specified part.
-    const partName = parsed.part ? parsed.part : BASE_COMPONENT_PART;
-    let propertyTarget: any = (result[partName] ??= {});
-    if (parsed.screenSizes && parsed.screenSizes.length > 0) {
-      const screenSizeKey = parsed.screenSizes.join("&");
-      propertyTarget.responsiveStyles ??= {};
-      propertyTarget.responsiveStyles[screenSizeKey] ??= {};
-      if (stateName) {
-        propertyTarget.responsiveStyles[screenSizeKey].states ??= {};
-        propertyTarget.responsiveStyles[screenSizeKey].states = {
-          ...propertyTarget.responsiveStyles[screenSizeKey].states,
-          [stateName]: {
-            ...propertyTarget.responsiveStyles[screenSizeKey].states[stateName],
-            ...cssProps,
-          },
-        };
-      } else {
-        propertyTarget.responsiveStyles[screenSizeKey] = {
-          ...propertyTarget.responsiveStyles[screenSizeKey],
-          ...cssProps,
-        };
-      }
-    } else {
-      // --- No screen sizes specified, the property belongs to the base styles
-      propertyTarget.baseStyles ??= {};
-      if (stateName) {
-        propertyTarget.baseStyles.states ??= {};
-        propertyTarget.baseStyles.states = {
-          ...propertyTarget.baseStyles.states,
-          [stateName]: { ...propertyTarget.baseStyles.states[stateName], ...cssProps },
-        };
-      } else {
-        propertyTarget.baseStyles = { ...propertyTarget.baseStyles, ...cssProps };
-      }
-    }
+    sizesForProps[parsed.property] = sizesForProps[parsed.property] || new Set();
+    sizesForProps[parsed.property] = sizesForProps[parsed.property].union(
+      new Set(parsed.screenSizes || []),
+    );
+    parsedPropertiesForProp[parsed.property] = parsedPropertiesForProp[parsed.property] || [];
+    parsedPropertiesForProp[parsed.property].push({ parsedLayout: parsed, value: value, key });
+    resolveSingleProp(
+      parsed,
+      value,
+      result,
+      node,
+      valueExtractor,
+      layoutContext,
+      stylePropResolvers,
+      function resolveStyleProp(propName) {
+        depMap[parsed.property] = depMap[parsed.property] || new Set();
+        depMap[parsed.property].add(propName);
+        console.log("HEY, resolveStyleProp", propName, result);
+        console.log("HEY, parsed", parsed, key);
+        return findStyleProp(parsed, result, propName);
+      },
+      function cssResolved(props) {
+        Object.keys(props).forEach((key) => {
+          definedStylesByProperties[key] = definedStylesByProperties[key] || new Set();
+          definedStylesByProperties[key].add(parsed.property);
+        });
+      },
+    );
   }
 
-  // --- Done
+  console.log("depMap", depMap);
+  console.log("definedStylesByProperties", definedStylesByProperties);
+
+  const mergedDepMap = Object.entries(depMap).reduce(
+    (acc, [key, values]) => {
+      acc[key] = acc[key] || new Set();
+      values.forEach((v) => {
+        if (definedStylesByProperties[v]) {
+          acc[key] = acc[key].union(definedStylesByProperties[v]);
+          acc[key].delete(key);//make sure it doesn't contain itself
+        }
+      });
+      return acc;
+    },
+    {} as Record<string, Set<string>>,
+  );
+
+  console.log("mergedDepMap", mergedDepMap);
+
+  //megvan, hogy melyik property kitol fugg
+  // azokat, akik fuggnek valakitol, azokat ujra kell szamolni azokkal a variaciokkal, akiktol fuggenek
+
+  Object.entries(mergedDepMap).forEach(([what, dependsToProps]) => {
+    parsedPropertiesForProp[what]?.forEach(({ parsedLayout, value, key }) => {
+
+
+
+    });
+
+
+    //TODO resolve for the existing AND the extras, too (for the extras, the value should be the last in the cascade)
+    const extraScreenSizes = new Set<MediaBreakpointType>();
+    dependsToProps.forEach((p) => {
+      (sizesForProps[p] || new Set()).forEach((s) => extraScreenSizes.add(s));
+    });
+    const toRevisit = parsedPropertiesForProp[what]?.map(p => p.parsedLayout).toSorted((a, b)=>{
+      if(!a.screenSizes && !b.screenSizes){
+        return 0;
+      }
+      if(!a.screenSizes){
+        return -1;
+      }
+      const screenSizeA = a.screenSizes[0];
+      const screenSizeB = a.screenSizes[0];
+      return MediaBreakpointKeys.indexOf(screenSizeA) - MediaBreakpointKeys.indexOf(screenSizeB);
+    });
+
+    console.log("resolving what for extrasizes", what, extraScreenSizes, toRevisit);
+    extraScreenSizes.forEach((size)=>{
+      let newParsed = {...toRevisit[toRevisit.length - 1]};
+      newParsed.screenSizes = [size];
+      toRevisit.push(newParsed);
+    })
+    toRevisit.forEach((parsedL) => {
+      resolveSingleProp(
+        parsedL,
+        parsedL.value,
+        result,
+        node,
+        valueExtractor,
+        layoutContext,
+        stylePropResolvers,
+        (propNAme) => {
+          return findStyleProp(parsedL, result, propNAme);
+        },
+      );
+    });
+
+  });
+
   return result;
+}
+
+export function resolveComponentLayoutProps(
+  layoutProps: Record<string, any> = EMPTY_OBJECT,
+  {
+    layoutContext,
+    stylePropResolvers,
+    node,
+    valueExtractor,
+  }: ResolveComponentLayoutPropsContext = EMPTY_OBJECT,
+): ResolvedComponentLayout {
+  return doResolve(
+    layoutProps,
+    node,
+    valueExtractor,
+    layoutContext,
+    stylePropResolvers,
+  );
 }
 
 // --- Checks if the specified size is a star size and the orientation is horizontal
@@ -181,7 +345,7 @@ const specialResolvers: Record<string, SpecialResolver> = {
     flexShrink: propValue === "true" ? 1 : 0,
   }),
   visible: (propValue) => {
-    return propValue === "false" ? { display: "none" } : {};
+    return propValue === "false" ? { display: "none" } : { display: 'revert-layer'};
   },
   width: (propValue, layoutContext) => {
     const horizontalStarSize = getHorizontalStarSize(propValue, layoutContext);

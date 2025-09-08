@@ -3,7 +3,7 @@ import type React from "react";
 import styles from "./Stack.module.scss";
 
 import type { ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { RenderChildFn, StylePropResolvers } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
@@ -176,6 +176,41 @@ function renderStack({
   );
 }
 
+export const StackStylePropResolvers: StylePropResolvers = {
+  defaults: () => {
+    return {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "flex-start",
+    };
+  },
+  orientation: ({ value, node, extractValue, resolveStyleProp }) => {
+    return {
+      flexDirection: value === "horizontal" ? "row" : "column",
+    };
+  },
+  reverse: ({ value, resolveStyleProp }) => {
+    if (resolveStyleProp("flexDirection").startsWith("row")) {
+      return { flexDirection: value === "true" ? "row-reverse" : "row" };
+    } else {
+      return { flexDirection: value === "true" ? "column-reverse" : "column" };
+    }
+  },
+  horizontalAlignment: ({ value, resolveStyleProp }) => {
+    if (resolveStyleProp("flexDirection").startsWith("row")) {
+      return { justifyContent: value };
+    } else {
+      return { alignItems: value };
+    }
+  },
+  verticalAlignment: ({ value, resolveStyleProp }) => {
+    if (resolveStyleProp("flexDirection").startsWith("column")) {
+      return { justifyContent: value };
+    } else {
+      return { alignItems: value };
+    }
+  },
+};
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
@@ -195,46 +230,7 @@ export const stackComponentRenderer = createComponentRenderer(
     });
   },
   {
-    stylePropResolvers: {
-      orientation: ({value, node, extractValue, resolveStyleProp}) => {
-        return {
-          flexDirection: value === "horizontal" ? "row" : "column",
-        };
-      },
-      horizontalAlignment: ({value, resolveStyleProp})=>{
-        // const flexDirection = resolveStyleProp("flexDirection");
-        // if(flexDirection === "column"){
-        //
-        // }
-        // TODO illesg, idea: resolveStyleProp depends on responsive index (md, xl, etc), and gives the value for that or below
-        //  prerequisit: order of resolution must be base, xs, sm, md, lg, xl, xxl
-        //  example: horizontalAlignment-md -> checks for flexDirection in md, if not found, flexDirection in sm, etc until base
-
-        resolveStyleProp("flexDirection");
-        return {
-          //column
-          alignItems: value,
-
-          //row
-          justifyContent: value,
-        }
-      },
-      // reverse: {
-      //
-      // },
-      // verticalAlignment: {
-      //
-      // }
-      // verticalAlignment: ({value, resolveStyleProp}) => {
-      //   // "verticalAlignment-md";
-      //   if(resolvedStyles.flexDirection === "row") {
-      //     return { alignItems: value };
-      //   } else {
-      //     return { justifyContent: value };
-      //   }
-      // }
-
-    },
+    stylePropResolvers: StackStylePropResolvers,
   },
 );
 
@@ -293,7 +289,6 @@ export const cvStackComponentRenderer = createComponentRenderer(
   },
 );
 
-
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
@@ -308,5 +303,5 @@ export const chStackComponentRenderer = createComponentRenderer(
       horizontalAlignment: "center",
       verticalAlignment: "center",
     });
-  }
+  },
 );

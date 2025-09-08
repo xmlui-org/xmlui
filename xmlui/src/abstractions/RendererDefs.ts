@@ -138,7 +138,7 @@ export type StylePropResolverContext = {
 }
 
 export type StylePropResolvers = Partial<
-  Record<(typeof layoutOptionKeys)[number], (context: StylePropResolverContext) => CSSProperties>
+  Record<(typeof layoutOptionKeys)[number] | "defaults", (context: StylePropResolverContext) => CSSProperties>
 >;
 
 export type ComponentRendererOptions = {

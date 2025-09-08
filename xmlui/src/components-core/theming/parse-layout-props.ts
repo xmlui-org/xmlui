@@ -1,6 +1,7 @@
 import { MediaBreakpointType, MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 export type ParsedLayout = {
+  value: any;
   property: string;
   part?: string;
   component?: string;

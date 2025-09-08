@@ -200,7 +200,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const resolvedPartLayouts = useMemo(() => {
     console.log(safeNode.props);
     const resolvedLayoutProps: Record<string, any> = Object.keys(safeNode.props)
-      .filter((key) => layoutOptionKeys.some((prefix) => key.startsWith(prefix)))
+      .filter((key) => [...Object.keys(rendererOptions?.stylePropResolvers || {}), ...layoutOptionKeys].some((prefix) => key.startsWith(prefix)))
       .reduce((acc, key) => {
         acc[key] = valueExtractor(safeNode.props[key], true);
         return acc;

@@ -3,6 +3,7 @@ import {
   BASE_COMPONENT_PART,
   resolveComponentLayoutProps,
 } from "../../../src/components-core/theming/component-layout-resolver";
+import { StackStylePropResolvers } from "../../../src/components/Stack/Stack";
 
 describe("Component property layout", () => {
   it("should parse empty", () => {
@@ -149,9 +150,11 @@ describe("Component property layout", () => {
           width: "23*",
         },
         {
-          type: "Stack",
-          orientation: "horizontal",
-        },
+          layoutContext: {
+            type: "Stack",
+            orientation: "horizontal",
+          },
+        }
       );
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -177,9 +180,11 @@ describe("Component property layout", () => {
           height: "23*",
         },
         {
-          type: "Stack",
-          orientation: "vertical",
-        },
+          layoutContext: {
+            type: "Stack",
+            orientation: "vertical",
+          },
+        }
       );
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -341,9 +346,11 @@ describe("Component property layout", () => {
           backgroundColor: "green",
         },
         {
-          type: "Stack",
-          orientation: "horizontal",
-        },
+          layoutContext: {
+            type: "Stack",
+            orientation: "horizontal",
+          },
+        }
       );
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -371,9 +378,11 @@ describe("Component property layout", () => {
           backgroundColor: "green",
         },
         {
-          type: "Stack",
-          orientation: "vertical",
-        },
+          layoutContext: {
+            type: "Stack",
+            orientation: "vertical",
+          },
+        }
       );
       expect(result).toStrictEqual({
         [BASE_COMPONENT_PART]: {
@@ -1021,26 +1030,115 @@ describe("Component property layout", () => {
     });
   });
 
-  it("has responsive with state", () => {
+  it("responsive depends on (Stack orientation + horizontalAlignment)", () => {
+    // <Stack
+    //     orientation="vertical"
+    //     orientation-md="horizontal"
+    //     horizontalAlignment="center"
+    //   >
+
     const result = resolveComponentLayoutProps({
-      "backgroundColor": "red",
-      "backgroundColor-xxl": "green",
-      "backgroundColor-xxl--hover": "blue",
+      "orientation": "vertical",
+      "horizontalAlignment": "center",
+      "orientation-md": "horizontal"
+    }, {
+      stylePropResolvers: StackStylePropResolvers
     });
     expect(result).toStrictEqual({
       [BASE_COMPONENT_PART]: {
         baseStyles: {
-          backgroundColor: "red"
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center"
         },
         responsiveStyles: {
-          xxl: {
-            backgroundColor: "green",
-            states: {
-              hover: { backgroundColor: "blue" }
-            }
+          md: {
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "flex-start",
           }
         }
       },
     });
-  })
+  });
+
+  it("responsive depends on (Stack orientation + horizontalAlignment + reverse)", () => {
+    // <Stack
+    //     orientation="vertical"
+    //     orientation-md="horizontal"
+    //     horizontalAlignment="center"
+    //   >
+
+    const result = resolveComponentLayoutProps({
+      "orientation": "vertical",
+      "horizontalAlignment": "center",
+      "reverse": "true",
+      "orientation-md": "horizontal",
+      "reverse-md": "false",
+    }, {
+      stylePropResolvers: StackStylePropResolvers
+    });
+    expect(result).toStrictEqual({
+      [BASE_COMPONENT_PART]: {
+        baseStyles: {
+          flexDirection: "column-reverse",
+          justifyContent: "flex-start",
+          alignItems: "center"
+        },
+        responsiveStyles: {
+          md: {
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "flex-start",
+          }
+        }
+      },
+    });
+  });
+
+
+  it("responsive depends on (Stack orientation + horizontalAlignment + reverse 2)", () => {
+    // <Stack
+    //     orientation="vertical"
+    //     orientation-md="horizontal"
+    //     horizontalAlignment="center"
+    //   >
+
+    const result = resolveComponentLayoutProps({
+      "orientation": "vertical",
+      "horizontalAlignment": "center",
+      "reverse": "true",
+      "orientation-md": "horizontal",
+      "reverse-xl": "false",
+      "backgroundColor-xxl": "red"
+    }, {
+      stylePropResolvers: StackStylePropResolvers
+    });
+    expect(result).toStrictEqual({
+      [BASE_COMPONENT_PART]: {
+        baseStyles: {
+          flexDirection: "column-reverse",
+          justifyContent: "flex-start",
+          alignItems: "center"
+        },
+        responsiveStyles: {
+          md: {
+            flexDirection: "row-reverse",
+            justifyContent: "center",
+            alignItems: "flex-start",
+          },
+          xl: {
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "flex-start",
+          },
+          xxl: {
+            backgroundColor: "red"
+          }
+        }
+      },
+    });
+  });
+
+
 });
