@@ -1,11 +1,9 @@
-import React, { forwardRef, type ReactNode, useEffect, useRef } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import React, { forwardRef, type ReactNode, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./NavPanel.module.scss";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { ScrollContext } from "../../components-core/ScrollContext";
 import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
@@ -223,23 +221,15 @@ function DrawerNavPanel({
   style?: React.CSSProperties;
   logoContent?: ReactNode;
 }) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   return (
     <NavPanelContext.Provider value={contextValue}>
-      <div
-        {...rest}
-        ref={scrollContainerRef}
-        className={classnames(styles.wrapper, className)}
-        style={style}
-      >
-        <ScrollContext.Provider value={scrollContainerRef}>
-          <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
-            {logoContent || <Logo />}
-          </div>
-          <div className={styles.wrapperInner} style={style}>
-            {children}
-          </div>
-        </ScrollContext.Provider>
+      <div {...rest} className={classnames(styles.wrapper, className)} style={style}>
+        <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
+          {logoContent || <Logo />}
+        </div>
+        <div className={styles.wrapperInner} style={style}>
+          {children}
+        </div>
       </div>
     </NavPanelContext.Provider>
   );
@@ -266,10 +256,8 @@ export const NavPanel = forwardRef(function NavPanel(
     navLinks,
     ...rest
   }: Props,
-  forwardedRef,
+  forwardedRef: React.ForwardedRef<any>,
 ) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const ref = forwardedRef ? composeRefs(scrollContainerRef, forwardedRef) : scrollContainerRef;
   const appLayoutContext = useAppLayoutContext();
   const linkInfoContext = useLinkInfoContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
@@ -299,7 +287,7 @@ export const NavPanel = forwardRef(function NavPanel(
   return (
     <div
       {...rest}
-      ref={ref}
+      ref={forwardedRef}
       className={classnames(styles.wrapper, className, {
         [styles.horizontal]: horizontal,
         [styles.vertical]: vertical,
@@ -307,14 +295,12 @@ export const NavPanel = forwardRef(function NavPanel(
       })}
       style={style}
     >
-      <ScrollContext.Provider value={scrollContainerRef}>
-        {showLogo && (
-          <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
-        )}
-        <div className={styles.wrapperInner} style={style}>
-          {children}
-        </div>
-      </ScrollContext.Provider>
+      {showLogo && (
+        <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
+      )}
+      <div className={styles.wrapperInner} style={style}>
+        {children}
+      </div>
     </div>
   );
 });

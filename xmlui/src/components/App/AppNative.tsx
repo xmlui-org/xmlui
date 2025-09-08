@@ -18,7 +18,6 @@ import styles from "./App.module.scss";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
-import { ScrollContext } from "../../components-core/ScrollContext";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
@@ -340,9 +339,7 @@ export function App({
               {header}
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={pagesWrapperClasses}>{children}</div>
-              </ScrollContext.Provider>
+              <div className={pagesWrapperClasses}>{children}</div>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
               {footer}
@@ -367,9 +364,7 @@ export function App({
               {header}
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={pagesWrapperClasses}>{children}</div>
-              </ScrollContext.Provider>
+              <div className={pagesWrapperClasses}>{children}</div>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
               {footer}
@@ -396,9 +391,7 @@ export function App({
             {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={pagesWrapperClasses}>{children}</div>
-                </ScrollContext.Provider>
+                <div className={pagesWrapperClasses}>{children}</div>
               </div>
             </main>
           </div>
@@ -431,9 +424,7 @@ export function App({
             {header}
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </ScrollContext.Provider>
+            <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
@@ -454,9 +445,7 @@ export function App({
             {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </ScrollContext.Provider>
+            <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
@@ -481,9 +470,7 @@ export function App({
             {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-            <ScrollContext.Provider value={scrollContainerRef}>
-              <div className={pagesWrapperClasses}>{children}</div>
-            </ScrollContext.Provider>
+            <div className={pagesWrapperClasses}>{children}</div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
