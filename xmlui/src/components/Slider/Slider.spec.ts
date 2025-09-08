@@ -210,16 +210,16 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Required slider")).toContainText("*");
   });
 
-  test.describe("showValues", () => {
-    test.skip("showValues=true displays current value", async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider showValues="true" initialValue="75" />`);
-      await expect(page.getByText("75")).toBeVisible();
-    });
+  test("showValues=true displays current value", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider showValues="true" initialValue="75" />`);
+    await page.getByRole("slider").hover();
+    await expect(page.getByText("75")).toBeVisible();
+  });
 
-    test("showValues=false hides current value", async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider showValues="false" initialValue="75" />`);
-      await expect(page.getByText("75")).not.toBeVisible();
-    });
+  test("showValues=false hides current value", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider showValues="false" initialValue="75" />`);
+    await page.getByRole("slider").hover();
+    await expect(page.getByText("75")).not.toBeVisible();
   });
 
   test.skip(
