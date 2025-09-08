@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -8,189 +9,243 @@ test.describe("Basic Functionality", () => {
   // Use low delay duration for faster tests as suggested
   const LOW_DELAY = 10;
 
-  test.skip("renders with tooltip property", async ({ page, initTestBed }) => {
+  test("renders with tooltip property", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <CHStack height="100px" verticalAlignment="center">
-        <Button
-          label="Hover me!"
-          tooltip="I'm a tooltip!"
-          tooltipOptions="delayDuration: ${LOW_DELAY}"
-          testId="tooltip-button"
-        />
-      </CHStack>
+      <Tooltip delayDuration="${LOW_DELAY}" text="I'm a tooltip!">
+        <Button label="Hover me!" testId="tooltip-button" />
+      </Tooltip>
     `);
 
     const button = page.getByTestId("tooltip-button");
     await expect(button).toBeVisible();
-    
+
     // Hover over the button to trigger tooltip
     await button.hover();
-    
+
     // Wait for tooltip to appear with low delay
-    await expect(page.getByText("I'm a tooltip!")).toBeVisible();
-    
+    await expect(page.getByRole("tooltip")).toHaveText("I'm a tooltip!");
+
     // Note: We skip testing tooltip hiding as it's dependent on implementation details
     // and the main functionality test is that it appears correctly on hover
   });
 
-  test.skip("renders with markdown content", async ({ page, initTestBed }) => {
+  test("renders with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <VStack height="80px" width="fit-content">
-        <Card
-          title="Tooltip with markdown"
-          tooltipMarkdown="This *example* uses \`tooltipMarkdown\`"
-          tooltipOptions="delayDuration: ${LOW_DELAY}"
-          testId="markdown-card"
-        />
-      </VStack>
+      <Tooltip delayDuration="${LOW_DELAY}" markdown="This *example* uses \`tooltipMarkdown\`">
+        <Card title="Tooltip with markdown" testId="markdown-card" />
+      </Tooltip>
     `);
 
     const card = page.getByTestId("markdown-card");
     await expect(card).toBeVisible();
-    
+
     // Hover to show tooltip
     await card.hover();
-    
+
     // Check that markdown is rendered (looking for emphasis and code elements)
-    const tooltip = page.locator('[role="tooltip"]').first();
+    const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator('em')).toContainText('example');
-    await expect(tooltip.locator('code')).toContainText('tooltipMarkdown');
+    await expect(tooltip.locator("em")).toContainText("example");
+    await expect(tooltip.locator("code")).toContainText("tooltipMarkdown");
   });
 
-  test.skip("renders with 'side' property set to right", async ({ page, initTestBed }) => {
+  test("renders with 'side' property set to right", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <CHStack height="100px" verticalAlignment="center">
-        <Button
-          label="Hover me!"
-          tooltip="I'm positioned right"
-          tooltipOptions="right; sideOffset: 32; delayDuration: ${LOW_DELAY}"
-          testId="right-tooltip-button"
-        />
-      </CHStack>
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned right" side="right" sideOffset="{0}">
+          <Button label="Hover me!" testId="right-tooltip-button" />
+        </Tooltip>
+      </CVStack>
     `);
 
     const button = page.getByTestId("right-tooltip-button");
     await button.hover();
-    
+
     const tooltip = page.getByText("I'm positioned right");
     await expect(tooltip).toBeVisible();
-    
+
     // Verify tooltip is positioned to the right of the button
-    const buttonBox = await button.boundingBox();
-    const tooltipBox = await tooltip.boundingBox();
-    
-    expect(tooltipBox!.x).toBeGreaterThan(buttonBox!.x + buttonBox!.width);
+    const buttonBox = await getBounds(button);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.left).toBeGreaterThan(buttonBox.right);
   });
 
-  test.skip("renders with object-style 'tooltipOptions'", async ({ page, initTestBed }) => {
+  test("renders with 'side' property set to left", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <CHStack height="100px" verticalAlignment="center">
-        <Button
-          label="Hover me!"
-          tooltip="My options use an object"
-          tooltipOptions="{{ showArrow: false, side: 'bottom', align: 'start', delayDuration: ${LOW_DELAY} }}"
-          testId="object-options-button"
-        />
-      </CHStack>
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned left" side="left" sideOffset="{0}">
+          <Button label="Hover me!" testId="left-tooltip-button" />
+        </Tooltip>
+      </CVStack>
     `);
 
-    const button = page.getByTestId("object-options-button");
+    const button = page.getByTestId("left-tooltip-button");
     await button.hover();
-    
-    const tooltip = page.getByText("My options use an object");
+
+    const tooltip = page.getByText("I'm positioned left");
     await expect(tooltip).toBeVisible();
-    
-    // Verify tooltip is positioned below the button (bottom side)
-    const buttonBox = await button.boundingBox();
-    const tooltipBox = await tooltip.boundingBox();
-    
-    expect(tooltipBox!.y).toBeGreaterThan(buttonBox!.y + buttonBox!.height);
+
+    // Verify tooltip is positioned to the right of the button
+    const buttonBox = await getBounds(button);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.right).toBeLessThan(buttonBox.left);
   });
 
-  test.skip("renders with string-style 'tooltipOptions'", async ({ page, initTestBed }) => {
+  test("renders with 'side' property set to top", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <VStack height="100px" horizontalAlignment="center" gap="3rem">
-        <Card
-          title="Tooltip to the left with no arrow"
-          tooltip="I'm a Tooltip"
-          tooltipOptions="left; delayDuration: ${LOW_DELAY}; !showArrow"
-          testId="left-tooltip-card"
-        />
-      </VStack>
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned top" side="top" sideOffset="{0}">
+          <Button label="Hover me!" testId="top-tooltip-button" />
+        </Tooltip>
+      </CVStack>
     `);
 
-    const card = page.getByTestId("left-tooltip-card");
-    await card.hover();
-    
-    const tooltip = page.getByText("I'm a Tooltip");
+    const button = page.getByTestId("top-tooltip-button");
+    await button.hover();
+
+    const tooltip = page.getByText("I'm positioned top");
     await expect(tooltip).toBeVisible();
-    
-    // Verify tooltip is positioned to the left of the card
-    const cardBox = await card.boundingBox();
-    const tooltipBox = await tooltip.boundingBox();
-    
-    expect(tooltipBox!.x + tooltipBox!.width).toBeLessThan(cardBox!.x);
+
+    // Verify tooltip is positioned above the button
+    const buttonBox = await getBounds(button);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.bottom).toBeLessThan(buttonBox.top);
   });
 
-  test.skip("renders with 'sideOffset' property", async ({ page, initTestBed }) => {
+  test("renders with 'side' property set to bottom", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <HStack>
-        <Icon
-          name="email"
-          width="48px"
-          height="48px"
-          tooltipMarkdown="**Tooltip** to the bottom with arrows, 28 pixels away"
-          tooltipOptions="bottom; showArrow; sideOffset: 28; delayDuration: ${LOW_DELAY}"
-          testId="bottom-tooltip-icon"
-        />
-      </HStack>
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned bottom" side="bottom" sideOffset="{0}">
+          <Button label="Hover me!" testId="bottom-tooltip-button" />
+        </Tooltip>
+      </CVStack>
     `);
 
-    const icon = page.getByTestId("bottom-tooltip-icon");
+    const button = page.getByTestId("bottom-tooltip-button");
+    await button.hover();
+
+    const tooltip = page.getByText("I'm positioned bottom");
+    await expect(tooltip).toBeVisible();
+
+    // Verify tooltip is positioned below the button
+    const buttonBox = await getBounds(button);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.top).toBeGreaterThan(buttonBox.bottom);
+  });
+
+  test(`renders with 'sideOffset' property when side is top`, async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip side="top" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
+          <Icon name="email" testId="tooltip-icon" />
+        </Tooltip>
+      </CVStack>
+    `);
+    const icon = page.getByTestId("tooltip-icon");
     await icon.hover();
-    
-    const tooltip = page.locator('[role="tooltip"]').first();
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator('strong')).toContainText('Tooltip');
-    
-    // Verify tooltip is positioned below the icon
-    const iconBox = await icon.boundingBox();
-    const tooltipBox = await tooltip.boundingBox();
-    
-    expect(tooltipBox!.y).toBeGreaterThan(iconBox!.y + iconBox!.height);
+
+    const tooltip = page.locator("[data-tooltip-container]");
+
+    // Verify tooltip is positioned above the icon with the correct offset
+    const iconBox = await getBounds(icon);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(iconBox.top - tooltipBox.bottom).toEqualWithTolerance(28);
   });
 
-  test.skip("renders as direct Tooltip component", async ({ page, initTestBed }) => {
+  test(`renders with 'sideOffset' property when side is bottom`, async ({ page, initTestBed }) => {
     await initTestBed(`
-      <VStack height="100px" horizontalAlignment="center">
-        <Tooltip side="bottom" markdown="This *example* uses a \`Tooltip\` component" delayDuration="${LOW_DELAY}">
+      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip side="bottom" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
+          <Icon name="email" testId="tooltip-icon" />
+        </Tooltip>
+      </Stack>
+    `);
+    const icon = page.getByTestId("tooltip-icon");
+    await icon.hover();
+
+    const tooltip = page.locator("[data-tooltip-container]");
+
+    // Verify tooltip is positioned below the icon with the correct offset
+    const iconBox = await getBounds(icon);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.top - iconBox.bottom).toBeGreaterThanOrEqual(28);
+  });
+
+  test(`renders with 'sideOffset' property when side is left`, async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip side="left" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
+          <Icon name="email" testId="tooltip-icon-left" />
+        </Tooltip>
+      </Stack>
+    `);
+    const icon = page.getByTestId("tooltip-icon-left");
+    await icon.hover();
+
+    const tooltip = page.getByRole("tooltip");
+
+    // Verify tooltip is positioned to the left of the icon with the correct offset
+    const iconBox = await getBounds(icon);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(iconBox.left - tooltipBox.right).toBeGreaterThanOrEqual(28);
+  });
+
+  test(`renders with 'sideOffset' property when side is right`, async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+        <Tooltip side="right" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
+          <Icon name="email" testId="tooltip-icon-right" />
+        </Tooltip>
+      </Stack>
+    `);
+    const icon = page.getByTestId("tooltip-icon-right");
+    await icon.hover();
+
+    const tooltip = page.getByRole("tooltip");
+
+    // Verify tooltip is positioned to the right of the icon with the correct offset
+    const iconBox = await getBounds(icon);
+    const tooltipBox = await getBounds(tooltip);
+
+    expect(tooltipBox.left - iconBox.right).toBeGreaterThanOrEqual(28);
+  });
+
+  test("Tooltip is shown for all wrapped children", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Tooltip side="bottom" markdown="This *example* uses a \`Tooltip\` component" delayDuration="${LOW_DELAY}">
+        <VStack horizontalAlignment="center">
           <Card title="Card 1: within a Tooltip" testId="tooltip-card-1" />
           <Card title="Card 2: within the same Tooltip" testId="tooltip-card-2" />
-        </Tooltip>
-      </VStack>
+        </VStack>
+      </Tooltip>
     `);
 
     const card1 = page.getByTestId("tooltip-card-1");
     const card2 = page.getByTestId("tooltip-card-2");
-    
+
     await expect(card1).toBeVisible();
     await expect(card2).toBeVisible();
-    
+
     // Hover over first card
     await card1.hover();
-    
-    const tooltip = page.locator('[role="tooltip"]').first();
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator('em')).toContainText('example');
-    await expect(tooltip.locator('code')).toContainText('Tooltip');
-    
+
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip.locator("em")).toContainText("example");
+    await expect(tooltip.locator("code")).toContainText("Tooltip");
+
     // Move to second card - tooltip should still be visible
     await card2.hover();
     await expect(tooltip).toBeVisible();
   });
 
-  test.skip("renders with 'tooltipTemplate' property", async ({ page, initTestBed }) => {
+  test("renders with 'tooltipTemplate' property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <VStack height="100px" horizontalAlignment="center">
         <Tooltip side="bottom" delayDuration="${LOW_DELAY}">
@@ -207,103 +262,80 @@ test.describe("Basic Functionality", () => {
 
     const card = page.getByTestId("template-card");
     await card.hover();
-    
+
     // Check that custom template elements are present
-    const tooltip = page.locator('[role="tooltip"]').first();
+    const tooltip = page.locator('[role="tooltip"]');
     await expect(tooltip).toBeVisible();
     await expect(tooltip.getByTestId("purple-square")).toBeVisible();
     await expect(tooltip.getByRole("heading", { level: 2 })).toContainText("This is a tooltip");
   });
 
-  test.skip("handles multiple tooltips", async ({ page, initTestBed }) => {
+  test("renders with start 'align' property value", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <VStack gap="2rem">
-        <Button
-          label="First button"
-          tooltip="First tooltip"
-          tooltipOptions="delayDuration: ${LOW_DELAY}"
-          testId="first-button"
-        />
-        <Button
-          label="Second button"
-          tooltip="Second tooltip"
-          tooltipOptions="delayDuration: ${LOW_DELAY}"
-          testId="second-button"
-        />
-      </VStack>
-    `);
-
-    const firstButton = page.getByTestId("first-button");
-    const secondButton = page.getByTestId("second-button");
-    
-    // Hover first button
-    await firstButton.hover();
-    await expect(page.getByText("First tooltip")).toBeVisible();
-    
-    // Move to second button
-    await secondButton.hover();
-    
-    // First tooltip should disappear, second should appear
-    await expect(page.getByText("First tooltip")).not.toBeVisible();
-    await expect(page.getByText("Second tooltip")).toBeVisible();
-  });
-
-  test.skip("renders with different 'align' property values", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <HStack gap="4rem" horizontalAlignment="center">
-        <Button
-          label="Start aligned"
-          tooltip="Start aligned tooltip"
-          tooltipOptions="bottom; start; delayDuration: ${LOW_DELAY}"
-          testId="start-button"
-        />
-        <Button
-          label="Center aligned"
-          tooltip="Center aligned tooltip"
-          tooltipOptions="bottom; center; delayDuration: ${LOW_DELAY}"
-          testId="center-button"
-        />
-        <Button
-          label="End aligned"
-          tooltip="End aligned tooltip"
-          tooltipOptions="bottom; end; delayDuration: ${LOW_DELAY}"
-          testId="end-button"
-        />
+      <HStack horizontalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="Start aligned" side="bottom" align="start">
+          <Button label="Start aligned Start aligned" testId="start-button" />
+        </Tooltip>
       </HStack>
     `);
-
-    // Test start alignment
     const startButton = page.getByTestId("start-button");
     await startButton.hover();
-    await expect(page.getByText("Start aligned tooltip")).toBeVisible();
-    
-    await page.locator('body').hover(); // Clear hover
-    
-    // Test center alignment
-    const centerButton = page.getByTestId("center-button");
-    await centerButton.hover();
-    await expect(page.getByText("Center aligned tooltip")).toBeVisible();
-    
-    await page.locator('body').hover(); // Clear hover
-    
-    // Test end alignment
-    const endButton = page.getByTestId("end-button");
-    await endButton.hover();
-    await expect(page.getByText("End aligned tooltip")).toBeVisible();
+
+    const tooltipBox = await getBounds(page.locator("div[data-tooltip-container]"));
+    const buttonBox = await getBounds(startButton);
+
+    expect(tooltipBox.left + tooltipBox.width / 2).toBeLessThan(
+      buttonBox.left + buttonBox.width / 2,
+    );
   });
 
-  test.skip("renders with 'defaultOpen' property", async ({ page, initTestBed }) => {
+  test("renders with center 'align' property value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack horizontalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="Center aligned" side="bottom" align="center">
+          <Button label="Center aligned Center aligned" testId="center-button" />
+        </Tooltip>
+      </HStack>
+    `);
+    const centerButton = page.getByTestId("center-button");
+    await centerButton.hover();
+
+    const tooltipBox = await getBounds(page.locator("div[data-tooltip-container]"));
+    const buttonBox = await getBounds(centerButton);
+
+    expect(tooltipBox.left + tooltipBox.width / 2).toEqualWithTolerance(
+      buttonBox.left + buttonBox.width / 2,
+      10,
+    );
+  });
+
+  test("renders with end 'align' property value", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack horizontalAlignment="center">
+        <Tooltip delayDuration="${LOW_DELAY}" text="End aligned" side="bottom" align="end">
+          <Button label="End aligned End aligned" testId="end-button" />
+        </Tooltip>
+      </HStack>
+    `);
+    const endButton = page.getByTestId("end-button");
+    await endButton.hover();
+
+    const tooltipBox = await getBounds(page.locator("div[data-tooltip-container]"));
+    const buttonBox = await getBounds(endButton);
+
+    expect(tooltipBox.left + tooltipBox.width / 2).toBeGreaterThan(
+      buttonBox.left + buttonBox.width / 2,
+    );
+  });
+
+  test("renders with 'defaultOpen' property", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Tooltip text="Always visible tooltip" defaultOpen="true" delayDuration="${LOW_DELAY}">
         <Button label="Button with default open tooltip" testId="default-open-button" />
       </Tooltip>
     `);
-
-    // Tooltip should be visible immediately without hovering
-    await expect(page.getByText("Always visible tooltip")).toBeVisible();
-    
-    const button = page.getByTestId("default-open-button");
-    await expect(button).toBeVisible();
+    await expect(page.locator("div[data-tooltip-container]")).toBeVisible();
+    await expect(page.getByTestId("default-open-button")).toBeVisible();
   });
 });
 
@@ -326,7 +358,7 @@ test.describe("Accessibility", () => {
 
     const button = page.getByTestId("tooltip-trigger");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("Test tooltip");
@@ -344,11 +376,11 @@ test.describe("Accessibility", () => {
 
     const button = page.getByTestId("accessible-button");
     await button.hover();
-    
+
     // Check that tooltip has proper accessibility attributes
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
-    
+
     // Verify tooltip content is properly exposed
     await expect(tooltip).toHaveText("This tooltip is accessible");
   });
@@ -362,103 +394,121 @@ test.describe("Theme Variables", () => {
   const LOW_DELAY = 10;
 
   test.skip("applies 'backgroundColor-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Button
         label="Test button"
         tooltip="Test tooltip"
         tooltipOptions="delayDuration: ${LOW_DELAY}"
         testId="theme-button"
       />
-    `, {
-      testThemeVars: { "backgroundColor-Tooltip": "rgb(255, 0, 0)" },
-    });
+    `,
+      {
+        testThemeVars: { "backgroundColor-Tooltip": "rgb(255, 0, 0)" },
+      },
+    );
 
     const button = page.getByTestId("theme-button");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
   test.skip("applies 'textColor-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Button
         label="Test button"
         tooltip="Test tooltip"
         tooltipOptions="delayDuration: ${LOW_DELAY}"
         testId="text-color-button"
       />
-    `, {
-      testThemeVars: { "textColor-Tooltip": "rgb(0, 255, 0)" },
-    });
+    `,
+      {
+        testThemeVars: { "textColor-Tooltip": "rgb(0, 255, 0)" },
+      },
+    );
 
     const button = page.getByTestId("text-color-button");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("color", "rgb(0, 255, 0)");
   });
 
   test.skip("applies 'borderRadius-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Button
         label="Test button"
         tooltip="Test tooltip"
         tooltipOptions="delayDuration: ${LOW_DELAY}"
         testId="border-radius-button"
       />
-    `, {
-      testThemeVars: { "borderRadius-Tooltip": "12px" },
-    });
+    `,
+      {
+        testThemeVars: { "borderRadius-Tooltip": "12px" },
+      },
+    );
 
     const button = page.getByTestId("border-radius-button");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("border-radius", "12px");
   });
 
   test.skip("applies 'fontSize-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Button
         label="Test button"
         tooltip="Test tooltip"
         tooltipOptions="delayDuration: ${LOW_DELAY}"
         testId="font-size-button"
       />
-    `, {
-      testThemeVars: { "fontSize-Tooltip": "20px" },
-    });
+    `,
+      {
+        testThemeVars: { "fontSize-Tooltip": "20px" },
+      },
+    );
 
     const button = page.getByTestId("font-size-button");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("font-size", "20px");
   });
 
-  test.skip("applies 'paddingLeft-Tooltip' and 'paddingRight-Tooltip' theme variables", async ({ page, initTestBed }) => {
-    await initTestBed(`
+  test.skip("applies 'paddingLeft-Tooltip' and 'paddingRight-Tooltip' theme variables", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
       <Button
         label="Test button"
         tooltip="Test tooltip"
         tooltipOptions="delayDuration: ${LOW_DELAY}"
         testId="padding-button"
       />
-    `, {
-      testThemeVars: { 
-        "paddingLeft-Tooltip": "20px",
-        "paddingRight-Tooltip": "25px"
+    `,
+      {
+        testThemeVars: {
+          "paddingLeft-Tooltip": "20px",
+          "paddingRight-Tooltip": "25px",
+        },
       },
-    });
+    );
 
     const button = page.getByTestId("padding-button");
     await button.hover();
-    
+
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("padding-left", "20px");
@@ -467,7 +517,7 @@ test.describe("Theme Variables", () => {
 });
 
 // =============================================================================
-// OTHER EDGE CASE TESTS  
+// OTHER EDGE CASE TESTS
 // =============================================================================
 
 test.describe("Other Edge Cases", () => {
@@ -485,13 +535,13 @@ test.describe("Other Edge Cases", () => {
 
     const button = page.getByTestId("empty-tooltip-button");
     await expect(button).toBeVisible();
-    
+
     // Hover should not show any tooltip content
     await button.hover();
-    
+
     // Wait a bit to ensure tooltip would appear if it was going to
     await page.waitForTimeout(50);
-    
+
     // There should be no visible tooltip with meaningful content
     const tooltips = page.locator('[role="tooltip"]');
     const count = await tooltips.count();
@@ -512,11 +562,11 @@ test.describe("Other Edge Cases", () => {
 
     const button = page.getByTestId("no-content-button");
     await expect(button).toBeVisible();
-    
+
     // Hover should not show tooltip since there's no content
     await button.hover();
     await page.waitForTimeout(50);
-    
+
     // Should not find any tooltip with content
     const tooltips = page.locator('[role="tooltip"]');
     const count = await tooltips.count();
