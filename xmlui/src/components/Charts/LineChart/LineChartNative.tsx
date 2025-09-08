@@ -131,10 +131,16 @@ export const LineChart = forwardRef(function LineChart({
     (props: any) => {
       if (!tooltipRenderer) return <TooltipContent {...props}/>;
 
+      const payloadObject: Record<string, any> = {};
+      
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        Object.assign(payloadObject, props.payload[0].payload);
+      }
+
       // Extract tooltip data from Recharts props
       const tooltipData = {
         label: props.label,
-        payload: props.payload,
+        payload: payloadObject,
         active: props.active,
       };
 
