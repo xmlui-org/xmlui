@@ -17,7 +17,7 @@ test.describe("Basic Functionality", () => {
   });
 
   // NOTE: all carousel items are visible by default in embla-carousel
-  // From this point on, instead of visibility checks, we check for dimensions
+  // From this point on, instead of visibility checks, we check that the correct slide is in the viewport
   test("component renders with correct role on items", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Carousel>
@@ -41,10 +41,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
     `);
-    const secondSlide = page.getByRole("region").getByRole("group").nth(1);
-    const { width, height } = await getBounds(secondSlide);
-    expect(width).toBeGreaterThan(0);
-    expect(height).toBeGreaterThan(0);
+    await expect(page.getByRole("region").getByRole("group").nth(1)).toBeInViewport();
   });
 
   test("controls prop displays controls", async ({ page, initTestBed }) => {
@@ -71,8 +68,7 @@ test.describe("Basic Functionality", () => {
     await page.getByRole("button", { name: "Next Slide" }).click();
 
     // Verify second slide is now visible
-    const secondSlide = page.getByRole("region").getByRole("group").nth(1);
-    await expect(secondSlide).toBeVisible();
+    await expect(page.getByRole("region").getByRole("group").nth(1)).toBeInViewport();
   });
 
   test("component scrolls to previous slide on control click", async ({ page, initTestBed }) => {
@@ -84,15 +80,14 @@ test.describe("Basic Functionality", () => {
       </Carousel>
     `);
     // Verify we start on slide 2
-    const secondSlide = page.getByRole("region").getByRole("group").nth(1);
-    await expect(secondSlide).toBeVisible();
+    await expect(page.getByRole("region").getByRole("group").nth(1)).toBeInViewport();
 
     // Click previous button
     await page.getByRole("button", { name: "Previous Slide" }).click();
 
     // Verify first slide is now visible
     const firstSlide = page.getByRole("region").getByRole("group").first();
-    await expect(firstSlide).toBeVisible();
+    await expect(firstSlide).toBeInViewport();
   });
 
   test("component navigates to slide on indicator click", async ({ page, initTestBed }) => {
@@ -110,7 +105,7 @@ test.describe("Basic Functionality", () => {
 
     // Verify third slide is visible
     const thirdSlide = page.getByRole("region").getByRole("group").nth(2);
-    await expect(thirdSlide).toBeVisible();
+    await expect(thirdSlide).toBeInViewport();
   });
 
   test("component loops correctly when loop is enabled", async ({ page, initTestBed }) => {
@@ -122,13 +117,13 @@ test.describe("Basic Functionality", () => {
       </Carousel>
     `);
     // Verify we're on the last slide
-    await expect(page.getByRole("region").getByRole("group").nth(2)).toContainText("Slide 3");
+    await expect(page.getByRole("region").getByRole("group").nth(2)).toBeInViewport();
 
     // Click next again to loop back to first slide
     await page.getByRole("button", { name: "Next Slide" }).click();
 
     // Verify we're back on the first slide
-    await expect(page.getByRole("region").getByRole("group").first()).toBeVisible();
+    await expect(page.getByRole("region").getByRole("group").first()).toBeInViewport();
   });
 
   test("component autoplay works correctly", async ({ page, initTestBed }) => {
@@ -142,10 +137,10 @@ test.describe("Basic Functionality", () => {
     const slides = page.getByRole("region").getByRole("group");
 
     // Verify first slide is initially visible
-    await expect(slides.first()).toBeVisible();
+    await expect(slides.first()).toBeInViewport();
 
     await page.waitForTimeout(200);
-    await expect(slides.nth(1)).toBeVisible();
+    await expect(slides.nth(1)).toBeInViewport();
   });
 
   // TODO: handle vertical test
@@ -228,16 +223,14 @@ test.describe("Accessibility", () => {
 
     // Verify second slide is visible
     const secondSlide = page.getByRole("region").getByRole("group").nth(1);
-    await expect(secondSlide).toBeVisible();
-    await expect(secondSlide).toContainText("Slide 2");
+    await expect(secondSlide).toBeInViewport();
 
     // Press left arrow key
     await page.keyboard.press("ArrowLeft");
 
     // Verify first slide is visible again
     const firstSlide = page.getByRole("region").getByRole("group").first();
-    await expect(firstSlide).toBeVisible();
-    await expect(firstSlide).toContainText("Slide 1");
+    await expect(firstSlide).toBeInViewport();
   });
 });
 
@@ -277,19 +270,6 @@ test.skip("component applies theme variables correctly", async ({ page, initTest
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test("carousel handles no slides gracefully", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Carousel>
-        <CarouselItem>Slide 1</CarouselItem>
-        <CarouselItem>Slide 2</CarouselItem>
-      </Carousel>
-    `);
-
-    // Verify no slides are visible
-    await expect(page.getByRole("region").getByRole("group").first()).toBeVisible();
-    await expect(page.getByRole("region").getByRole("group").nth(1)).toBeVisible();
-  });
-
   test("component handles many slides efficiently", async ({ page, initTestBed }) => {
     const itemNum = 20;
 
@@ -316,7 +296,7 @@ test.describe("Edge Cases", () => {
     await page.getByRole("button", { name: "Next Slide" }).click({ clickCount: itemNum, delay: 100 });
 
     // Verify we've navigated to the correct slide
-    await expect(slides.last()).toBeVisible();
+    await expect(slides.last()).toBeInViewport();
   });
 
   test("component displays tab indicators for many slides", async ({ page, initTestBed }) => {
