@@ -1,6 +1,6 @@
 import styles from "./HeroSection.module.scss";
 
-import { createComponentRenderer, createMetadata, dComponent, parseScssVar } from "xmlui";
+import { createComponentRenderer, createMetadata, dComponent, d, parseScssVar } from "xmlui";
 import { HeroSection } from "./HeroSectionNative";
 
 const COMP = "HeroSection";
@@ -9,6 +9,12 @@ export const HeroSectionMd = createMetadata({
   status: "experimental",
   description: "HeroSection",
   parts: {
+    header: {
+      description: "The header section containing all text content and CTA button",
+    },
+    content: {
+      description: "The content section containing image and children",
+    },
     headingSection: {
       description: "The heading section containing preamble, headline, and subheadline",
     },
@@ -27,19 +33,38 @@ export const HeroSectionMd = createMetadata({
     ctaButton: {
       description: "The call-to-action button for the hero section",
     },
-    main: {
-      description: "The main content area of the hero section",
-    },
     image: {
       description: "The image for the hero section",
     },
+    background: {
+      description: "The background template area of the hero section",
+    },
   },
   props: {
-    alignHeading: {
-      description: "Alignment of the heading section",
+    headerAlignment: {
+      description: "Alignment of the header content. If not specified, defaults based on contentPlacement: bottom→center, left→start, right→end",
+      type: "string",
+      options: ["start", "center", "end"],
+    },
+    contentPlacement: {
+      description: "Position of the content area relative to the header",
+      type: "string", 
+      defaultValue: "bottom",
+      options: ["left", "right", "bottom"],
+    },
+    contentAlignment: {
+      description: "Horizontal alignment of the content within its area",
       type: "string",
       defaultValue: "center",
       options: ["start", "center", "end"],
+    },
+    headerWidth: {
+      description: "Width of the header section in horizontal layouts",
+      type: "string",
+    },
+    gap: {
+      description: "Gap between header and content sections",
+      type: "string",
     },
     preamble: {
       description: "The preamble text for the hero section",
@@ -87,14 +112,13 @@ export const HeroSectionMd = createMetadata({
     backgroundTemplate: dComponent("The template for the background of the hero section"),
   },
   events: {
-    ctaClick: {
-      description: "Triggered when the call-to-action button is clicked",
-    },
+    ctaClick: d("Triggered when the call-to-action button is clicked"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingTop-${COMP}`]: "$space-12",
     [`paddingBottom-${COMP}`]: "$space-12",
+    [`paddingHorizontal-${COMP}`]: "$space-12",
     [`fontSize-headline-${COMP}`]: "3em",
     [`fontWeight-headline-${COMP}`]: "$fontWeight-bold",
     [`lineHeight-headline-${COMP}`]: "1.4em",
@@ -116,7 +140,11 @@ export const heroSectionComponentRenderer = createComponentRenderer(
     const props = (node.props as typeof HeroSectionMd.props)!;
     return (
       <HeroSection
-        alignHeading={extractValue(props.alignHeading)}
+        headerAlignment={extractValue(props.headerAlignment)}
+        contentPlacement={extractValue(props.contentPlacement)}
+        contentAlignment={extractValue(props.contentAlignment)}
+        headerWidth={extractValue(props.headerWidth)}
+        gap={extractValue(props.gap)}
         preamble={extractValue(props.preamble)}
         headline={extractValue(props.headline)}
         subheadline={extractValue(props.subheadline)}

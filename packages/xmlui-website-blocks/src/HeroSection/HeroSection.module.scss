@@ -20,7 +20,6 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
   .heroWrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
     position: relative;
     z-index: 0; // Create a stacking context to contain z-index values
     overflow: hidden; // Prevent background from extending beyond bounds
@@ -40,8 +39,39 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
       z-index: 0; // Above background but within normal document flow
       display: flex;
       flex-direction: column;
-      align-items: center;
       width: 100%;
+
+      &.horizontal {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      &.vertical {
+        flex-direction: column;
+      }
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      &.contentStart {
+        align-items: flex-start;
+      }
+
+      &.contentCenter {
+        align-items: center;
+      }
+
+      &.contentEnd {
+        align-items: flex-end;
+      }
     }
 
     .headingSection {
@@ -92,7 +122,19 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
   }
 
   .ctaButtonWrapper {
-    margin-top: t.$space-16;
+    display: flex;
+
+    &.ctaStart {
+      justify-content: flex-start;
+    }
+
+    &.ctaCenter {
+      justify-content: center;
+    }
+
+    &.ctaEnd {
+      justify-content: flex-end;
+    }
   }
 
   .ctaButton {
