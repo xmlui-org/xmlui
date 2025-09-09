@@ -7,28 +7,88 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "HeroSection";
+$headline: "headline-#{$component}";
+$subheadline: "subheadline-#{$component}";
+$mainText: "mainText-#{$component}";
+
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, $headline);
+$themeVars: t.composeTextVars($themeVars, $subheadline);
+
 @layer components {
   .heroWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 0; // Create a stacking context to contain z-index values
+    overflow: hidden; // Prevent background from extending beyond bounds
+    @include t.paddingVars($themeVars, $component);
+
+    .backgroundTemplate {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1; // Place behind content but within the hero wrapper's context
+    }
+
+    .heroContent {
+      position: relative;
+      z-index: 0; // Above background but within normal document flow
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .headingSection {
+      display: flex;
+      flex-direction: column;
+
+      &.start {
+        text-align: start;
+      }
+
+      &.center {
+        text-align: center;
+      }
+
+      &.end {
+        text-align: end;
+      }
+    }
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+    display: inline-block;
   }
 
   .headline {
-    font-size: 4em;
+    @include t.textVars($themeVars, $headline);
+    margin: 0;
+    padding-bottom: createThemeVar("gap-#{$headline}");
   }
 
   .subheadline {
-    font-size: 2em;
+    @include t.textVars($themeVars, $subheadline);
+    margin: 0;
+    padding-bottom: createThemeVar("gap-#{$subheadline}");
   }
 
   .textWrapper {
     display: flex;
     flex-direction: column;
+    padding-bottom: createThemeVar("gap-#{$mainText}");
   }
 
-  .text {
-    font-size: 1.5em;
+  .mainText {
+    @include t.textVars($themeVars, $mainText);
+    margin: 0;
+    padding-bottom: createThemeVar("gap-#{$mainText}");
   }
 
   .ctaButtonWrapper {
@@ -40,6 +100,6 @@ $themeVars: ();
   }
 }
 
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
