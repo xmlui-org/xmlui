@@ -1,5 +1,5 @@
 import {
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   type ReactNode,
   useEffect,
@@ -95,6 +95,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
 
   return (
     <RAccordion.Item
+      id={itemId}
       key={itemId}
       value={itemId}
       className={classnames(styles.item, className)}
@@ -104,7 +105,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
           {...rest}
-          id={`trigger_${itemId}`}
+          id={triggerId}
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",
           })}
@@ -120,6 +121,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
               <Icon
                 name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
                 className={styles.chevron}
+                aria-hidden="true"
               />
             </span>
           )}

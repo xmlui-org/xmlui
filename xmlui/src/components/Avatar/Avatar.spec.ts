@@ -1,6 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-import { sizeNames } from "../abstractions";
+import { sizeValues } from "../abstractions";
 import { defaultProps } from "./AvatarNative";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
@@ -101,14 +101,10 @@ test("click handler triggers correctly", async ({ initTestBed, createAvatarDrive
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-// =============================================================================
-// ADDITIONAL TEST OPPORTUNITIES - EMPTY TEST CASES FOR FUTURE IMPLEMENTATION
-// =============================================================================
-
 // --- Size Property Tests ---
 
 test("size", async ({ initTestBed, page }) => {
-  const components = sizeNames
+  const components = sizeValues
     .map((size) => {
       return `<Avatar testId="${size}" size="${size}" name="Lynn Gilbert" />`;
     })
