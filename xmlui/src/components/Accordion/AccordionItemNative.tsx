@@ -1,5 +1,5 @@
 import {
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   type ReactNode,
   useEffect,
@@ -36,6 +36,7 @@ type Props = {
   initiallyExpanded?: boolean;
 
   style?: React.CSSProperties;
+  className?: string;
 };
 
 export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> = {
@@ -44,13 +45,15 @@ export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> =
 };
 
 export const AccordionItemComponent = forwardRef(function AccordionItemComponent(
-  { 
-    id, 
-    header, 
-    headerRenderer = defaultProps.headerRenderer, 
-    content, 
-    initiallyExpanded = defaultProps.initiallyExpanded, 
-    style 
+  {
+    id,
+    header,
+    headerRenderer = defaultProps.headerRenderer,
+    content,
+    initiallyExpanded = defaultProps.initiallyExpanded,
+    style,
+    className,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -91,10 +94,18 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
   }, [triggerId, unRegister]);
 
   return (
-    <RAccordion.Item key={itemId} value={itemId} className={styles.item} ref={forwardedRef} style={style}>
+    <RAccordion.Item
+      id={itemId}
+      key={itemId}
+      value={itemId}
+      className={classnames(styles.item, className)}
+      ref={forwardedRef}
+      style={style}
+    >
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
-          id={`trigger_${itemId}`}
+          {...rest}
+          id={triggerId}
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",
           })}
@@ -110,6 +121,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
               <Icon
                 name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
                 className={styles.chevron}
+                aria-hidden="true"
               />
             </span>
           )}

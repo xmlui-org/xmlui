@@ -10,7 +10,6 @@ import {
   dEnabled,
   dEndIcon,
   dEndText,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,
@@ -162,6 +161,8 @@ export const DatePickerMd = createMetadata({
     [`backgroundColor-menu-${COMP}`]: "$color-surface-50",
     [`backgroundColor-item-${COMP}--hover`]: "$color-surface-100",
     [`backgroundColor-item-${COMP}--active`]: "$color-surface-200",
+    [`paddingVertical-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
   },
 });
 
@@ -173,14 +174,14 @@ export const datePickerComponentRenderer = createComponentRenderer(
     state,
     updateState,
     extractValue,
-    layoutCss,
+    className,
     lookupEventHandler,
     registerComponentApi,
   }) => {
     return (
       <DatePicker
         id={node.uid}
-        style={layoutCss}
+        className={className}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}

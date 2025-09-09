@@ -53,7 +53,7 @@ export const ImageMd = createMetadata({
 export const imageComponentRenderer = createComponentRenderer(
   COMP,
   ImageMd,
-  ({ node, extractValue, layoutCss, extractResourceUrl }) => {
+  ({ node, extractValue, className, extractResourceUrl }) => {
     return (
       <Image
         src={extractResourceUrl(node.props.src)}
@@ -62,7 +62,7 @@ export const imageComponentRenderer = createComponentRenderer(
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         aspectRatio={extractValue(node.props.aspectRatio)}
-        style={layoutCss}
+        className={className}
         animation={extractValue(node.props.animation)}
       />
     );

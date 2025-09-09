@@ -71,6 +71,7 @@ interface SelectProps {
 
   // Styling
   style?: CSSProperties;
+  className?: string;
   dropdownHeight?: CSSProperties["height"];
 
   // Validation
@@ -112,6 +113,7 @@ interface SimpleSelectProps {
   onValueChange: (selectedValue: SingleValueType) => void;
   id: string;
   style: React.CSSProperties;
+  className?: string;
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
@@ -146,6 +148,8 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       children,
       readOnly,
       emptyListNode,
+      className,
+      ...rest
     } = props;
 
     // Compose refs for proper forwarding
@@ -166,13 +170,6 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       [onValueChange, readOnly],
     );
 
-    // Generate trigger class names based on validation status
-    const triggerClassName = classnames(styles.selectTrigger, {
-      [styles.error]: validationStatus === "error",
-      [styles.warning]: validationStatus === "warning",
-      [styles.valid]: validationStatus === "valid",
-    });
-
     const optionsArray = useMemo(() => Array.from(options), [options]);
 
     const selectedOption = useMemo(() => {
@@ -182,13 +179,14 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     return (
       <SelectRoot value={stringValue} onValueChange={handleValueChange}>
         <SelectTrigger
+          {...rest}
           id={id}
           aria-haspopup="listbox"
           style={style}
           onFocus={onFocus}
           onBlur={onBlur}
           disabled={!enabled}
-          className={classnames(styles.selectTrigger, {
+          className={classnames(className, styles.selectTrigger, {
             [styles.error]: validationStatus === "error",
             [styles.warning]: validationStatus === "warning",
             [styles.valid]: validationStatus === "valid",
@@ -251,6 +249,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
     // Styling
     style,
+    className,
     dropdownHeight,
 
     // Validation
@@ -283,6 +282,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     updateState = noop,
     registerComponentApi,
     children,
+
+    ...rest
   },
   ref,
 ) {
@@ -419,23 +420,26 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <ItemWithLabel
-          ref={ref}
-          id={inputId}
-          labelPosition={labelPosition as any}
-          label={label}
-          labelWidth={labelWidth}
-          labelBreak={labelBreak}
-          required={required}
-          enabled={enabled}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          style={style}
-        >
-          {searchable || multiSelect ? (
-            <OptionTypeProvider Component={HiddenOption}>
-              <Popover open={open} onOpenChange={setOpen} modal={false}>
+        {searchable || multiSelect ? (
+          <OptionTypeProvider Component={HiddenOption}>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <ItemWithLabel
+                {...rest}
+                ref={ref}
+                id={inputId}
+                labelPosition={labelPosition as any}
+                label={label}
+                labelWidth={labelWidth}
+                labelBreak={labelBreak}
+                required={required}
+                enabled={enabled}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={className}
+                style={style}
+              >
                 <PopoverTrigger
+                  {...rest}
                   id={inputId}
                   aria-haspopup="listbox"
                   style={style}
@@ -450,122 +454,146 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     event.stopPropagation();
                     setOpen((prev) => !prev);
                   }}
-                  className={classnames(styles.selectTrigger, styles[validationStatus], {
-                    [styles.disabled]: !enabled,
-                    [styles.multi]: multiSelect,
-                  })}
+                  className={classnames(
+                    styles.selectTrigger,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multiSelect,
+                    },
+                    className,
+                  )}
                   autoFocus={autoFocus}
                 >
-                  {multiSelect ? (
-                    Array.isArray(value) && value.length > 0 ? (
-                      <div className={styles.badgeListContainer}>
-                        <div className={styles.badgeList}>
-                          {value.map((v) =>
-                            valueRenderer ? (
-                              valueRenderer(
-                                Array.from(options).find((o) => o.value === `${v}`),
-                                () => {
-                                  toggleOption(v);
-                                },
-                              )
-                            ) : (
-                              <span key={v} className={styles.badge}>
-                                {Array.from(options).find((o) => o.value === `${v}`)?.label}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
+                  <>
+                    {multiSelect ? (
+                      Array.isArray(value) && value.length > 0 ? (
+                        <div className={styles.badgeListContainer}>
+                          <div className={styles.badgeList}>
+                            {value.map((v) =>
+                              valueRenderer ? (
+                                valueRenderer(
+                                  Array.from(options).find((o) => o.value === `${v}`),
+                                  () => {
                                     toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <span placeholder={placeholder} className={styles.placeholder}>
-                        {placeholder}
-                      </span>
-                    )
-                  ) : value !== undefined && value !== null ? (
-                    <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
-                  ) : (
-                    <span aria-placeholder={placeholder} className={styles.placeholder}>
-                      {placeholder || ""}
-                    </span>
-                  )}
-                  <div className={styles.actions}>
-                    {multiSelect && Array.isArray(value) && value.length > 0 && (
-                      <Icon
-                        name="close"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
-                        }}
-                      />
-                    )}
-                    <Icon name="chevrondown" />
-                  </div>
-                </PopoverTrigger>
-                {open && (
-                  <Portal container={root}>
-                    <FocusScope asChild loop trapped>
-                      <PopoverContent
-                        style={{ minWidth: width, height: dropdownHeight }}
-                        className={styles.selectContent}
-                      >
-                        <Cmd
-                          className={styles.command}
-                          shouldFilter={searchable}
-                          filter={(_, search, keywords) => {
-                            const lowSearch = search.toLowerCase();
-                            for (const kw of keywords) {
-                              if (kw.toLowerCase().includes(lowSearch)) return 1;
-                            }
-                            return 0;
-                          }}
-                        >
-                          {searchable ? (
-                            <div className={styles.commandInputContainer}>
-                              <Icon name="search" />
-                              <CmdInput
-                                className={classnames(styles.commandInput)}
-                                placeholder="Search..."
-                              />
-                            </div>
-                          ) : (
-                            // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
-                            <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                          )}
-                          <CmdList className={styles.commandList}>
-                            {inProgress && (
-                              <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                                  },
+                                )
+                              ) : (
+                                <span key={v} className={styles.badge}>
+                                  {Array.from(options).find((o) => o.value === `${v}`)?.label}
+                                  <Icon
+                                    name="close"
+                                    size="sm"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      toggleOption(v);
+                                    }}
+                                  />
+                                </span>
+                              ),
                             )}
-                            {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                              <ComboboxOption
-                                key={value}
-                                readOnly={readOnly}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                              />
-                            ))}
-                            {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
-                          </CmdList>
-                        </Cmd>
-                      </PopoverContent>
-                    </FocusScope>
-                  </Portal>
-                )}
-              </Popover>
-              {children}
-            </OptionTypeProvider>
-          ) : (
-            <OptionTypeProvider Component={SelectOption}>
+                          </div>
+                        </div>
+                      ) : (
+                        <span placeholder={placeholder} className={styles.placeholder}>
+                          {placeholder}
+                        </span>
+                      )
+                    ) : value !== undefined && value !== null ? (
+                      <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
+                    ) : (
+                      <span aria-placeholder={placeholder} className={styles.placeholder}>
+                        {placeholder || ""}
+                      </span>
+                    )}
+                    <div className={styles.actions}>
+                      {multiSelect && Array.isArray(value) && value.length > 0 && (
+                        <Icon
+                          name="close"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
+                        />
+                      )}
+                      <Icon name="chevrondown" />
+                    </div>
+                  </>
+                </PopoverTrigger>
+              </ItemWithLabel>
+              {open && (
+                <Portal container={root}>
+                  <FocusScope asChild loop trapped>
+                    <PopoverContent
+                      style={{ minWidth: width, height: dropdownHeight }}
+                      className={styles.selectContent}
+                    >
+                      <Cmd
+                        className={styles.command}
+                        shouldFilter={searchable}
+                        filter={(_, search, keywords) => {
+                          const lowSearch = search.toLowerCase();
+                          for (const kw of keywords) {
+                            if (kw.toLowerCase().includes(lowSearch)) return 1;
+                          }
+                          return 0;
+                        }}
+                      >
+                        {searchable ? (
+                          <div className={styles.commandInputContainer}>
+                            <Icon name="search" />
+                            <CmdInput
+                              className={classnames(styles.commandInput)}
+                              placeholder="Search..."
+                            />
+                          </div>
+                        ) : (
+                          // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                          <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                        )}
+                        <CmdList className={styles.commandList}>
+                          {inProgress && (
+                            <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                          )}
+                          {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                            <ComboboxOption
+                              key={value}
+                              readOnly={readOnly}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                            />
+                          ))}
+                          {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
+                        </CmdList>
+                      </Cmd>
+                    </PopoverContent>
+                  </FocusScope>
+                </Portal>
+              )}
+            </Popover>
+            {children}
+          </OptionTypeProvider>
+        ) : (
+          <OptionTypeProvider Component={SelectOption}>
+            <ItemWithLabel
+              {...rest}
+              ref={ref}
+              id={inputId}
+              labelPosition={labelPosition as any}
+              label={label}
+              labelWidth={labelWidth}
+              labelBreak={labelBreak}
+              required={required}
+              enabled={enabled}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              className={className}
+              style={style}
+            >
               <SimpleSelect
+                {...rest}
                 readOnly={!!readOnly}
                 ref={ref}
                 key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
@@ -573,6 +601,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 onValueChange={toggleOption}
                 id={inputId}
                 style={style}
+                className={className}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 enabled={enabled}
@@ -586,9 +615,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               >
                 {children}
               </SimpleSelect>
-            </OptionTypeProvider>
-          )}
-        </ItemWithLabel>
+            </ItemWithLabel>
+          </OptionTypeProvider>
+        )}
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
@@ -645,7 +674,7 @@ export const ComboboxOption = forwardRef(function Combobox(
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
     const visibleContentRef = useRef<HTMLDivElement>(null);
-    const { value, label, enabled = true, children } = option;
+    const { value, label, enabled = true, children, className } = option;
     const { value: selectedValue, optionRenderer } = useSelect();
     const { onOptionRemove, onOptionAdd } = useOption();
 
@@ -666,7 +695,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     return (
       <SelectItem
         ref={ref}
-        className={styles.selectItem}
+        className={classnames(styles.selectItem, className)}
         value={value + ""}
         textValue={label || visibleContentRef.current?.textContent}
         disabled={!enabled}

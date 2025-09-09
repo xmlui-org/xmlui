@@ -34,6 +34,10 @@ export class ComponentDriver {
     return this.locator;
   }
 
+  getByPartName(part: string): Locator {
+    return this.component.locator(`[data-part-id="${part}"]`).first();
+  }
+
   /**
    * Gets the html tag name of the final rendered component
    */
@@ -67,11 +71,11 @@ export class ComponentDriver {
 
 export class InputComponentDriver extends ComponentDriver {
   get field() {
-    return this.component.locator("input");
+    return this.getByPartName("input");
   }
 
   get label() {
-    return this.component.locator("label");
+    return this.getByPartName("label");
   }
 
   get placeholder() {
@@ -770,9 +774,6 @@ export class TextBoxDriver extends InputComponentDriver {}
 // --- TextArea
 
 export class TextAreaDriver extends InputComponentDriver {
-  get field() {
-    return this.component.locator("textarea").or(this.component).last();
-  }
 }
 
 // --- ProgressBar
@@ -914,7 +915,11 @@ export class HeadingDriver extends ComponentDriver {}
 
 // --- Icon
 
-export class IconDriver extends ComponentDriver {}
+export class IconDriver extends ComponentDriver {
+  get svgIcon() {
+    return this.component.locator("svg");
+  }
+}
 
 // --- Stack
 

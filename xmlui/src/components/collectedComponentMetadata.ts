@@ -198,9 +198,14 @@ import { LabelListMd } from "./Charts/LabelList/LabelList";
 import { LegendMd } from "./Charts/Legend/Legend";
 import { LineChartMd } from "./Charts/LineChart/LineChart";
 import { PieChartMd } from "./Charts/PieChart/PieChart";
-import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
+import { TooltipMd } from "./Tooltip/Tooltip";
+import { TimeInputMd } from "./TimeInput/TimeInput";
+import { TimerMd } from "./Timer/Timer";
+import { DateInput } from "./DateInput/DateInputNative";
+import { DateInputMd } from "./DateInput/DateInput";
+import { PaginationMd } from "./Pagination/Pagination";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -326,6 +331,7 @@ export const collectedComponentMetadata = {
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
+  DateInput: DateInputMd,
   DropdownMenu: DropdownMenuMd,
   EM: HtmlEMMd,
   Fragment: FragmentMd,
@@ -367,6 +373,7 @@ export const collectedComponentMetadata = {
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
   Pages: PagesMd,
+  Pagination: PaginationMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
@@ -380,6 +387,7 @@ export const collectedComponentMetadata = {
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
+  Tooltip: TooltipMd,
   HSplitter: HSplitterMd,
   VSplitter: VSplitterMd,
   Stack: StackMd,
@@ -398,6 +406,8 @@ export const collectedComponentMetadata = {
   TextBox: TextBoxMd,
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
+  TimeInput: TimeInputMd,
+  Timer: TimerMd,
   ToneChangerButton: ToneChangerButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,

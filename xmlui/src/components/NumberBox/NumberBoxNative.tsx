@@ -31,6 +31,11 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import {
+  PART_END_ADORNMENT,
+  PART_INPUT,
+  PART_START_ADORNMENT,
+} from "../../components-core/parts";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -56,6 +61,7 @@ type Props = {
   value?: number | string | null;
   initialValue?: number | string | null;
   style?: CSSProperties;
+  className?: string;
   step?: number | string;
   enabled?: boolean;
   placeholder?: string;
@@ -93,6 +99,7 @@ export const NumberBox = forwardRef(function NumberBox(
     value,
     initialValue,
     style,
+    className,
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
@@ -122,6 +129,7 @@ export const NumberBox = forwardRef(function NumberBox(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -398,6 +406,7 @@ export const NumberBox = forwardRef(function NumberBox(
 
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       ref={forwardedRef}
       labelPosition={labelPosition as any}
@@ -409,6 +418,7 @@ export const NumberBox = forwardRef(function NumberBox(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
     >
@@ -425,14 +435,22 @@ export const NumberBox = forwardRef(function NumberBox(
         onFocus={() => {
           inputRef.current?.focus();
         }}
-        style={{gap}}
+        style={{ gap }}
       >
-        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <Adornment
+          data-part-id={PART_START_ADORNMENT}
+          text={startText}
+          iconName={startIcon}
+          className={classnames(styles.adornment)}
+        />
         <input
           id={id}
+          data-part-id={PART_INPUT}
           type="text"
           inputMode="numeric"
-          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          className={classnames(styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
           disabled={!enabled}
           value={valueStrRep}
           step={step}
@@ -448,7 +466,12 @@ export const NumberBox = forwardRef(function NumberBox(
           maxLength={maxLength}
           required={required}
         />
-        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        <Adornment
+          data-part-id={PART_END_ADORNMENT}
+          text={endText}
+          iconName={endIcon}
+          className={classnames(styles.adornment)}
+        />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
@@ -475,7 +498,11 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={downButton}
             >
-              <Icon name={spinnerDownIcon || "spinnerDown:NumberBox"} fallback="chevrondown" size="sm" />
+              <Icon
+                name={spinnerDownIcon || "spinnerDown:NumberBox"}
+                fallback="chevrondown"
+                size="sm"
+              />
             </Button>
           </div>
         )}

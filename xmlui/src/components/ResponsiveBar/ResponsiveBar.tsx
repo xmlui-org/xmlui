@@ -58,14 +58,14 @@ export const ResponsiveBarMd = createMetadata({
 export const responsiveBarComponentRenderer = createComponentRenderer(
   COMP,
   ResponsiveBarMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return (
       <ResponsiveBar
         orientation={extractValue(node.props?.orientation)}
         overflowIcon={extractValue(node.props?.overflowIcon)}
         gap={extractValue(node.props?.gap)}
         onClick={lookupEventHandler("click")}
-        style={layoutCss}
+        className={className}
       >
         {renderChild(node.children)}
       </ResponsiveBar>

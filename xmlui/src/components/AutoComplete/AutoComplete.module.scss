@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -9,6 +11,7 @@ $themeVars: ();
 
 $component: "AutoComplete";
 $themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -17,7 +20,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
   border-width: createThemeVar("Input:borderWidth-#{$component}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$component}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$component}-#{$variantName}");
-  background-color: createThemeVar( "Input:backgroundColor-#{$component}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$component}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}");
   color: createThemeVar("Input:textColor-#{$component}-#{$variantName}");
 
@@ -34,157 +37,164 @@ $themeVars: t.composeBorderVars($themeVars, $component);
   }
 }
 
-.command {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-  background-color: transparent;
-}
-
-.badgeListWrapper {
-  outline: none;
-  width: 100%;
-  gap: t.$space-1;
-  display: flex;
-  padding: t.$space-1 t.$space-2;
-  min-height: 2.5rem; /* h-12 */
-
-  @include variant("default");
-
-  &.error {
-    @include variant("error");
+@layer components {
+  .command {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    background-color: transparent;
   }
 
-  &.warning {
-    @include variant("warning");
-  }
-
-  &.valid {
-    @include variant("success");
-  }
-
-  &.disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    background-color: createThemeVar("Input:backgroundColor-#{$component}--disabled");
-    color: createThemeVar("Input:textColor-#{$component}--disabled");
-    border-color: createThemeVar("Input:borderColor-#{$component}--disabled");
-  }
-
-  &.focused {
-    outline-width: createThemeVar('Input:outlineWidth-#{$component}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$component}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$component}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$component}--focus');
-  }
-}
-
-.badgeList {
-  position: relative;
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.badge {
-  width: fit-content;
-  height: fit-content;
-  min-width: 0;
-  padding: createThemeVar("paddingVertical-#{$component}-badge") createThemeVar("paddingHorizontal-#{$component}-badge");
-  border-radius: t.$borderRadius;
-  transition: color 0.2s, background-color 0.2s;
-  user-select: none;
-  cursor: pointer;
-  display: flex;
-  gap: t.$space-1;
-  justify-content: center;
-  align-items: center;
-  font-size: createThemeVar("Input:fontSize-#{$component}-badge");
-  background-color: createThemeVar("Input:backgroundColor-#{$component}-badge");
-  color: createThemeVar("Input:textColor-#{$component}-badge");
-
-  &:hover {
-    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
-    color: createThemeVar("Input:textColor-#{$component}-badge--hover");
-  }
-
-  &:active {
-    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
-    color: createThemeVar("Input:textColor-#{$component}-badge--active");
-  }
-}
-
-.commandInput {
-  flex: 1;
-  background-color: transparent;
-  outline: none;
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-
-  &::placeholder {
-    color: createThemeVar("Input:textColor-placeholder-#{$component}");
-  }
-  &:focus-within {
+  .badgeListWrapper {
     outline: none;
-  }
-}
+    width: 100%;
+    gap: t.$space-1;
+    display: flex;
+    @include t.paddingVars($themeVars, $component);
+    min-height: 2.5rem;
+    /* h-12 */
 
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    @include variant("default");
 
-.action {
-  cursor: pointer;
-}
+    &.error {
+      @include variant("error");
+    }
 
-.autoCompleteEmpty {
-  display: flex;
-  gap: .2rem;
-  padding: 10px 0;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  width: 100%;
-}
+    &.warning {
+      @include variant("warning");
+    }
 
-.commandList {
-  position: absolute;
-  overflow: hidden;
-  top: 0.25rem;
-  z-index: 10;
-  width: 100%;
-  outline: none;
-  background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
-  border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
-  box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
-  animation: fade-in 0.3s ease-in-out; /* animate-in */
-}
+    &.valid {
+      @include variant("success");
+    }
 
-.autoCompleteOption {
-  padding: 0.5rem 1rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: createThemeVar("backgroundColor-item-#{$component}");
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      background-color: createThemeVar("Input:backgroundColor-#{$component}--disabled");
+      color: createThemeVar("Input:textColor-#{$component}--disabled");
+      border-color: createThemeVar("Input:borderColor-#{$component}--disabled");
+    }
 
-  &[data-selected=true] {
-    background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
+    &.focused {
+      outline-width: createThemeVar("Input:outlineWidth-#{$component}--focus");
+      outline-color: createThemeVar("Input:outlineColor-#{$component}--focus");
+      outline-style: createThemeVar("Input:outlineStyle-#{$component}--focus");
+      outline-offset: createThemeVar("Input:outlineOffset-#{$component}--focus");
+    }
   }
 
-  &[data-disabled=true] {
-    pointer-events: none;
-    cursor: not-allowed;
-    color: createThemeVar("textColor-item-#{$component}--disabled");
-    font-style: italic;
+  .badgeList {
+    position: relative;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .badge {
+    width: fit-content;
+    height: fit-content;
+    min-width: 0;
+    padding: createThemeVar("paddingVertical-#{$component}-badge") createThemeVar("paddingHorizontal-#{$component}-badge");
+    border-radius: createThemeVar("borderRadius-#{$component}-badge");
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: t.$space-1;
+    justify-content: center;
+    align-items: center;
+    font-size: createThemeVar("Input:fontSize-#{$component}-badge");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge");
+    color: createThemeVar("Input:textColor-#{$component}-badge");
+
+    &:hover {
+      background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
+      color: createThemeVar("Input:textColor-#{$component}-badge--hover");
+    }
+
+    &:active {
+      background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
+      color: createThemeVar("Input:textColor-#{$component}-badge--active");
+    }
+  }
+
+  .commandInput {
+    flex: 1;
+    background-color: transparent;
+    outline: none;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &::placeholder {
+      color: createThemeVar("Input:textColor-placeholder-#{$component}");
+    }
+
+    &:focus-within {
+      outline: none;
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+
+  .autoCompleteEmpty {
+    display: flex;
+    gap: 0.2rem;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .commandList {
+    position: absolute;
+    overflow: hidden;
+    top: 0.25rem;
+    z-index: 10;
+    width: 100%;
+    outline: none;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
+    animation: fade-in 0.3s ease-in-out;
+    /* animate-in */
+  }
+
+  .autoCompleteOption {
+    padding: 0.5rem 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$component}");
+
+    &[data-selected="true"] {
+      background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
+    }
+
+    &[data-disabled="true"] {
+      pointer-events: none;
+      cursor: not-allowed;
+      color: createThemeVar("textColor-item-#{$component}--disabled");
+      font-style: italic;
+    }
   }
 }
 
@@ -192,7 +202,3 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-
-
-
-

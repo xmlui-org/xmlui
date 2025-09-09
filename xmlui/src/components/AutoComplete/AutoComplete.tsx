@@ -27,7 +27,6 @@ import {
   d,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
-import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "AutoComplete";
 
@@ -58,6 +57,12 @@ export const AutoCompleteMd = createMetadata({
       ...dEnabled(),
       defaultValue: defaultProps.enabled,
     },
+    initiallyOpen: d(
+      `This property determines whether the dropdown list is open when the component is first rendered.`,
+      null,
+      "boolean",
+      defaultProps.initiallyOpen,
+    ),
     creatable: d(
       `This property allows the user to create new items that are not present in the list of options.`,
       null,
@@ -134,8 +139,11 @@ export const AutoCompleteMd = createMetadata({
     [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
+    [`borderRadius-${COMP}-badge`]: "$borderRadius",
     [`paddingHorizontal-${COMP}-badge`]: "$space-2",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-${COMP}`]: "$space-1",
+    [`paddingVertical-${COMP}`]: "$space-2",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
     [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
@@ -153,13 +161,13 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
     extractValue,
     renderChild,
     lookupEventHandler,
-    layoutCss,
     registerComponentApi,
+    className,
   }) => {
     return (
       <AutoComplete
         multi={extractValue.asOptionalBoolean(node.props.multi)}
-        style={layoutCss}
+        className={className}
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
@@ -179,6 +187,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {

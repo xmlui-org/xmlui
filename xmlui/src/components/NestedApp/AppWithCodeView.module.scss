@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -14,37 +16,39 @@ $padding-sideBySide-AppWithCode: createThemeVar("padding-sideBySide-#{$component
 $margin-sideBySide-AppWithCode: createThemeVar("margin-sideBySide-#{$component}");
 $gap-sideBySide-AppWithCode: createThemeVar("gap-sideBySide-#{$component}");
 
-.container {
-  display: flex;
-  /* default flexbox alignment */
-  justify-content: flex-start;
-  align-items: stretch;
-  min-height: 0;
-  min-width: 0;
-  gap: $gap-sideBySide-AppWithCode;
-  background: $background-sideBySide-AppWithCode;
-  border: $border-sideBySide-AppWithCode;
-  padding: $padding-sideBySide-AppWithCode;
-  margin: $margin-sideBySide-AppWithCode;
-}
+@layer components {
+  .container {
+    display: flex;
+    /* default flexbox alignment */
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 0;
+    min-width: 0;
+    gap: $gap-sideBySide-AppWithCode;
+    background: $background-sideBySide-AppWithCode;
+    border: $border-sideBySide-AppWithCode;
+    padding: $padding-sideBySide-AppWithCode;
+    margin: $margin-sideBySide-AppWithCode;
+  }
 
-.vertical {
-  flex-direction: column;
-  gap: var(--stack-gap-default);
-  min-height: 0;
-}
+  .vertical {
+    flex-direction: column;
+    gap: var(--stack-gap-default);
+    min-height: 0;
+  }
 
-.horizontal {
-  flex-direction: row;
-}
+  .horizontal {
+    flex-direction: row;
+  }
 
 
-.column {
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  .column {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 

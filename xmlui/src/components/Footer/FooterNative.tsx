@@ -17,9 +17,10 @@ export const Footer = forwardRef(function Footer(
     children,
     style,
     className,
+    ...rest
   }: {
     children: ReactNode;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
     className?: string;
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -27,7 +28,7 @@ export const Footer = forwardRef(function Footer(
   const { layout } = useAppLayoutContext() || {};
   const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
-    <div className={styles.outerWrapper} ref={forwardedRef} style={style}>
+    <div {...rest} className={styles.outerWrapper} ref={forwardedRef} style={style}>
       <div
         className={classnames(styles.wrapper, className, {
           [styles.full]: !canRestrictContentWidth,

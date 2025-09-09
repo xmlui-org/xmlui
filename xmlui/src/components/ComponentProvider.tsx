@@ -21,7 +21,6 @@ import { localLinkComponentRenderer } from "./Link/Link";
 import { treeComponentRenderer } from "./Tree/TreeComponent";
 import { treeDisplayComponentRenderer } from "./TreeDisplay/TreeDisplay";
 import { buttonComponentRenderer } from "./Button/Button";
-import { helloWorldComponentRenderer } from "./HelloWorld/HelloWorld";
 import {
   h1ComponentRenderer,
   h2ComponentRenderer,
@@ -116,6 +115,9 @@ import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDa
 import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
 import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { dateInputComponentRenderer } from "./DateInput/DateInput";
+import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
+import { timerComponentRenderer } from "./Timer/Timer";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -255,8 +257,8 @@ import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
-import { editorComponentRenderer } from "./TableEditor/TableEditor";
 import { paginationComponentRenderer } from "./Pagination/Pagination";
+import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -402,12 +404,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
       this.registerCoreComponent(buttonComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
-      this.registerCoreComponent(helloWorldComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
-      this.registerCoreComponent(editorComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
       this.registerCoreComponent(checkboxComponentRenderer);
     }
@@ -455,6 +451,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Badge !== "false") {
       this.registerCoreComponent(badgeComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_SimpleTooltip !== "false") {
+      this.registerCoreComponent(tooltipComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Avatar !== "false") {
       this.registerCoreComponent(avatarComponentRenderer);
@@ -536,6 +535,9 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
+      this.registerCoreComponent(dateInputComponentRenderer);
+      this.registerCoreComponent(timeInputComponentRenderer);
+      this.registerCoreComponent(timerComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {

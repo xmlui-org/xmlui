@@ -21,12 +21,14 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
     return EMPTY_OBJECT;
   }
 
-  return {
-    onClick,
-    onMouseLeave,
-    onMouseEnter,
-    onDoubleClick,
-  };
+  return Object.fromEntries(
+    Object.entries({
+      onClick,
+      onMouseLeave,
+      onMouseEnter,
+      onDoubleClick,
+    }).filter(([, value]) => value !== undefined)
+  );
 
   // --- Creates a particular event handler
   function useEventHandler<TMd extends ComponentMetadata>(

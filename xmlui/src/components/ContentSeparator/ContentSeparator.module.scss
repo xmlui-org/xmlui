@@ -10,17 +10,19 @@ $themeVars: ();
 $backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
 $size-ContentSeparator: createThemeVar("size-ContentSeparator");
 
-.separator {
-  background-color: $backgroundColor-ContentSeparator;
+@layer components {
+  .separator {
+    background-color: $backgroundColor-ContentSeparator;
 
-  &.horizontal {
-    height: $size-ContentSeparator;
-    width: 100%;
-  }
+    &.horizontal {
+      height: $size-ContentSeparator;
+      width: 100%;
+    }
 
-  &.vertical {
-    width: $size-ContentSeparator;
-    min-height: 100%;
+    &.vertical {
+      width: $size-ContentSeparator;
+      min-height: 100%;
+    }
   }
 }
 

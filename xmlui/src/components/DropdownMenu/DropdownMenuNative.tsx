@@ -1,5 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
 
@@ -23,6 +23,7 @@ type DropdownMenuProps = {
   label?: string;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
+  className?: string;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
@@ -54,6 +55,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     label,
     registerComponentApi,
     style,
+    className,
     onWillOpen,
     alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
@@ -61,11 +63,13 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     triggerButtonThemeColor = defaultDropdownMenuProps.triggerButtonThemeColor,
     triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
     triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
+    ...rest
   }: DropdownMenuProps,
   ref,
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     registerComponentApi?.({
@@ -74,22 +78,44 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     });
   }, [registerComponentApi]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <ReactDropdownMenu.Root
       open={open}
       onOpenChange={async (isOpen) => {
         if (isOpen) {
+          // Clear any pending close timeout when opening
+          if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+          }
+          
           const willOpenResult = await onWillOpen?.();
           if (willOpenResult === false) {
             return;
           }
+          setOpen(isOpen);
+        } else {
+          // When closing, add a small delay to allow child components (like Select)
+          // to handle their click-outside events first before the DropdownMenu closes
+          closeTimeoutRef.current = setTimeout(() => {
+            setOpen(false);
+            closeTimeoutRef.current = undefined;
+          }, 0);
         }
-        setOpen(isOpen);
       }}
     >
-      <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any}>
+      <ReactDropdownMenu.Trigger {...rest} asChild disabled={disabled} ref={ref as any}>
         {triggerTemplate ? (
-          triggerTemplate
+          <div>{triggerTemplate}</div>
         ) : (
           <Button
             icon={<Icon name={triggerButtonIcon} fallback="chevrondown" />}
@@ -107,7 +133,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         <ReactDropdownMenu.Content
           align={alignment}
           style={style}
-          className={styles.DropdownMenuContent}
+          className={classnames(styles.DropdownMenuContent, className)}
         >
           {children}
         </ReactDropdownMenu.Content>
@@ -123,6 +149,7 @@ type MenuItemProps = {
   children?: ReactNode;
   label?: string;
   style?: CSSProperties;
+  className?: string;
   to?: string;
   active?: boolean;
   enabled?: boolean;
@@ -139,6 +166,7 @@ export const MenuItem = forwardRef(function MenuItem(
     onClick = noop,
     label,
     style,
+    className,
     icon,
     iconPosition = defaultMenuItemProps.iconPosition,
     active = defaultMenuItemProps.active,
@@ -151,7 +179,7 @@ export const MenuItem = forwardRef(function MenuItem(
   return (
     <ReactDropdownMenu.Item
       style={style}
-      className={classnames(styles.DropdownMenuItem, {
+      className={classnames(className, styles.DropdownMenuItem, {
         [styles.active]: active,
         [styles.disabled]: !enabled,
       })}

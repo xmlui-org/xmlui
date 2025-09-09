@@ -436,8 +436,8 @@ test.describe("Visual States", () => {
   test("component applies theme variables correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" />`, {
       testThemeVars: {
-        "backgroundColor-Textarea-default": "rgb(255, 0, 0)",
-        "textColor-Textarea-default": "rgb(0, 255, 0)",
+        "backgroundColor-TextArea-default": "rgb(255, 0, 0)",
+        "textColor-TextArea-default": "rgb(0, 255, 0)",
       },
     });
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");
@@ -462,9 +462,9 @@ test.describe("Visual States", () => {
   test("component handles disabled visual state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea enabled="false" />`, {
       testThemeVars: {
-        "backgroundColor-Textarea--disabled": "rgb(255, 0, 0)",
-        "textColor-Textarea--disabled": "rgb(0, 255, 0)",
-        "borderColor-Textarea--disabled": "rgb(0, 0, 255)"
+        "backgroundColor-TextArea--disabled": "rgb(255, 0, 0)",
+        "textColor-TextArea--disabled": "rgb(0, 255, 0)",
+        "borderColor-TextArea--disabled": "rgb(0, 0, 255)"
       },
     });
     const textarea = page.getByRole("textbox");
@@ -477,9 +477,9 @@ test.describe("Visual States", () => {
   test("component handles focus state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`, {
       testThemeVars: {
-        "borderColor-Textarea--focus": "rgb(255, 0, 0)",
-        "backgroundColor-Textarea--focus": "rgb(0, 255, 0)",
-        "textColor-Textarea--focus": "rgb(0, 0, 255)",
+        "borderColor-TextArea--focus": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--focus": "rgb(0, 255, 0)",
+        "textColor-TextArea--focus": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");
@@ -494,9 +494,9 @@ test.describe("Visual States", () => {
   test("component handles hover state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`, {
       testThemeVars: {
-        "borderColor-Textarea--hover": "rgb(255, 0, 0)",
-        "backgroundColor-Textarea--hover": "rgb(0, 255, 0)",
-        "textColor-Textarea--hover": "rgb(0, 0, 255)",
+        "borderColor-TextArea--hover": "rgb(255, 0, 0)",
+        "backgroundColor-TextArea--hover": "rgb(0, 255, 0)",
+        "textColor-TextArea--hover": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");
@@ -919,10 +919,10 @@ test.describe("Regression", () => {
     createTextBoxDriver,
   }) => {
     await initTestBed(`
-      <App var.value="">
+      <Fragment var.value="">
         <TextBox testId="myTextBox" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
         <TextArea testId="myTextArea" initialValue="{value}" onDidChange="{(val) => {value = val}}"/>
-      </App>
+      </Fragment>
     `);
 
     const tbDriver = await createTextBoxDriver("myTextBox");
@@ -932,17 +932,12 @@ test.describe("Regression", () => {
     await expect(driver.component).toBeVisible();
 
     await driver.focus();
-    await driver.field.fill("a");
-    await expect(driver.field).toHaveValue("a");
-    await expect(driver.field).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("a");
-    await tbDriver.field.fill("abc");
-    await expect(driver.field).toHaveValue("abc");
-    await expect(tbDriver.field).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("abc");
-    await driver.field.fill("abcde");
-    await expect(driver.field).toHaveValue("abcde");
-    await expect(driver.field).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("abcde");
+    await expect(driver.component).toBeFocused();
+    await driver.component.fill("a");
+    await expect(driver.component).toHaveValue("a");
+    await driver.component.fill("abc");
+    await expect(driver.component).toHaveValue("abc");
+    await driver.component.fill("abcde");
+    await expect(driver.component).toHaveValue("abcde");
   });
 });

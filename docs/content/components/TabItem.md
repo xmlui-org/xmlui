@@ -48,7 +48,26 @@ This property sets the label of the component.  If not set, the component will n
 
 ## Events [#events]
 
-This component does not have any events.
+### `activated` [#activated]
+
+This event is triggered when the tab is activated.
+
+```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px" 
+<App var.activationCount="{0}">
+  <Tabs>
+    <TabItem label="Account" onActivated="activationCount++">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  <Text>The Account tab has been activated {activationCount} times.</Text>
+</App>
+```
 
 ## Exposed Methods [#exposed-methods]
 

@@ -9,11 +9,20 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
+import classnames from "classnames";
+import styles from "./BarChart.module.scss";
 
 export type BarChartProps = {
   data: any[];
@@ -31,6 +40,8 @@ export type BarChartProps = {
   tickFormatterY?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
+  className?: string;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<
@@ -58,6 +69,11 @@ export const defaultProps: Pick<
   showLegend: false,
 };
 
+const defaultChartParams = {
+  chartWidth: 800,
+  chartHeight: 300,
+};
+
 export function BarChart({
   data = [],
   layout = defaultProps.layout,
@@ -72,12 +88,36 @@ export function BarChart({
   tickFormatterX = defaultProps.tickFormatterX,
   tickFormatterY = defaultProps.tickFormatterY,
   style,
+  className,
   children,
   showLegend = defaultProps.showLegend,
+  tooltipRenderer,
 }: BarChartProps) {
   // Validate and normalize data
-  const validData = Array.isArray(data) ? data : [];
+  const validData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
   const { getThemeVar } = useTheme();
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
+
+      const payloadObject: Record<string, any> = {};
+
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        Object.assign(payloadObject, props.payload[0].payload);
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadObject,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer],
+  );
 
   const colorValues = useMemo(() => {
     return [
@@ -151,14 +191,25 @@ export function BarChart({
 
   useEffect(() => {
     const calc = () => {
-      const width = containerRef?.current?.offsetWidth || 800;
+      const chartWidth = containerRef?.current?.offsetWidth || defaultChartParams.chartWidth;
+      const chartHeight = containerRef?.current?.offsetHeight || defaultChartParams.chartHeight;
+
       const spans = labelsRef.current?.querySelectorAll("span") || [];
       const yTicks = Array.from(
         document.querySelectorAll(".recharts-y-axis .recharts-layer tspan"),
       ) as SVGGraphicsElement[];
       const maxYTickWidth =
         yTicks.length > 0 ? Math.max(...yTicks.map((t) => t.getBBox().width)) : 40;
-      setYAxisWidth(maxYTickWidth);
+
+      // Only update if the value actually changed
+      // NOTE: This might cause recursive calls along with setting the state in here directly. Fix if necessary.
+      setYAxisWidth((prev) => {
+        // Add a small tolerance to prevent micro-adjustments
+        if (Math.abs(maxYTickWidth - prev) > 1) {
+          return maxYTickWidth;
+        }
+        return prev;
+      });
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
       let anchor: "end" | "middle" = "middle";
@@ -167,14 +218,14 @@ export function BarChart({
       let leftMargin = Math.ceil(maxWidth / 3);
       let rightMargin = Math.ceil(maxWidth / 3);
       let xAxisH = Math.ceil(fontSize * 1.2);
-      let maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+      let maxTicks = Math.max(1, Math.floor(chartWidth / minTickSpacing));
       let skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
       if (skip > 0) {
         angle = -60;
         anchor = "end";
         rad = (Math.abs(angle) * Math.PI) / 180;
         minTickSpacing = Math.ceil(maxWidth * Math.cos(rad)) + 2;
-        maxTicks = Math.max(1, Math.floor(width / minTickSpacing));
+        maxTicks = Math.max(1, Math.floor(chartWidth / minTickSpacing));
         skip = Math.max(0, Math.ceil(validData.length / maxTicks) - 1);
         leftMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
@@ -196,169 +247,117 @@ export function BarChart({
       }
       setChartMargin({ left: leftMargin, right: rightMargin, top: 10, bottom: bottomMargin });
 
-      const chartHeight = containerRef?.current?.offsetHeight || 300;
       const maxYTicks = Math.max(2, Math.floor(chartHeight / (fontSize * 3)));
       setYTickCount(maxYTicks);
       setXAxisHeight(Math.ceil(fontSize));
-      const containerHeight = containerRef?.current?.offsetHeight || 0;
-      const containerWidth = containerRef?.current?.offsetWidth || 0;
       const neededHeight = 10 + xAxisHeight + 10 + 32;
       const neededWidth = chartMargin.left + chartMargin.right + yAxisWidth + 32;
-      setMiniMode(neededHeight > containerHeight || neededWidth > containerWidth);
+      setMiniMode(neededHeight > chartHeight || neededWidth > chartWidth);
     };
 
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data]);
+    // See note above: leaving out yAxisWidth may stop recursive calls but is hacky
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
-  const containerSize = useMemo(() => {
-    const parseSize = (value?: string) => {
-      if (!value) return "100%";
-      if (value.endsWith("px")) {
-        return parseInt(value, 10);
-      }
-      return value;
+  const [tooltipElement, setTooltipElement] = useState<HTMLElement | null>(null);
+  const observer = useRef<ResizeObserver>();
+
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [tooltipWidth, setTooltipWidth] = useState(0);
+
+  const onMouseEnter = useCallback(
+    (e) => {
+
+      setTooltipPosition({ x: e.x - tooltipWidth / 2, y: e.y });
+    },
+    [setTooltipPosition, tooltipWidth],
+  );
+
+  // Observe the size of the reference element
+  useEffect(() => {
+    observer.current?.disconnect();
+
+    if (tooltipElement) {
+      observer.current = new ResizeObserver((entries) => {
+        if (entries[0]) {
+          setTooltipWidth(entries[0].contentRect.width);
+        }
+      });
+      observer.current.observe(tooltipElement);
+    }
+
+    return () => {
+      observer.current?.disconnect();
     };
+  }, [tooltipElement]);
 
-    const width = parseSize(style?.width as string);
-    const height = parseSize(style?.height as string);
-
-    return {
-      width,
-      height,
-    };
-  }, [style?.width, style?.height]);
-
-  const content = useMemo(() => {
-    const auto = style?.width === "*" || style?.height === "*";
-    const chart = (
-      <ResponsiveContainer
-        ref={containerRef}
-        minWidth={60}
-        minHeight={60}
-        debounce={100}
-        width={auto ? "100%" : containerSize.width}
-        height={auto ? "100%" : containerSize.height}
-      >
-        <RBarChart
-          style={style}
-          accessibilityLayer
-          data={validData}
-          layout={layout}
-          margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
+  // Custom tooltip renderer that captures the DOM element
+  const customTooltipRenderer = useCallback(
+    (props: any) => {
+      const tooltipContent = safeTooltipRenderer(props);
+      
+      return (
+        <div
+          ref={(el) => {
+            if (el && el !== tooltipElement) {
+              setTooltipElement(el);
+            }
+          }}
         >
-          <CartesianGrid vertical={true} strokeDasharray="3 3" />
-          {layout === "vertical" ? (
-            <>
-              <XAxis
-                type="number"
-                axisLine={false}
-                hide={miniMode || hideX}
-                tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
-                tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
-              />
-              <YAxis
-                hide={miniMode || hideY}
-                dataKey={nameKey}
-                type="category"
-                interval={"equidistantPreserveStart"}
-                tickLine={false}
-                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
-                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
-              />
-            </>
-          ) : (
-            <>
-              <XAxis
-                dataKey={nameKey}
-                type="category"
-                interval={interval}
-                tickLine={false}
-                angle={tickAngle}
-                textAnchor={tickAnchor}
-                tick={miniMode || hideTickX ? false : { fill: "currentColor", fontSize }}
-                tickFormatter={miniMode || hideTickX ? undefined : tickFormatterX}
-                height={miniMode || hideX ? 0 : xAxisHeight}
-                hide={miniMode || hideX}
-              />
-              <YAxis
-                type="number"
-                axisLine={false}
-                tick={miniMode || hideTickY ? false : { fill: "currentColor", fontSize }}
-                hide={miniMode || hideY}
-                tickCount={yTickCount}
-                tickFormatter={miniMode || hideTickY ? undefined : tickFormatterY}
-                width={miniMode || hideY || hideTickY ? 0 : 40}
-              />
-            </>
-          )}
-          {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
-          {validData.length > 0 && Object.keys(config).map((key, index) => (
-            <Bar
-              key={index}
-              dataKey={key}
-              fill={config[key].color}
-              radius={stacked ? 0 : 8}
-              stackId={stacked ? "stacked" : undefined}
-              strokeWidth={1}
-            />
-          ))}
-          {showLegend && (
-            <RLegend
-              wrapperStyle={{
-                bottom: 0,
-                left: 0,
-                right: 0,
-                margin: "0 auto",
-                width: "100%",
-                textAlign: "center",
-              }}
-            />
-          )}
-        </RBarChart>
-      </ResponsiveContainer>
-    );
+          {tooltipContent}
+        </div>
+      );
+    },
+    [safeTooltipRenderer],
+  );
 
-    return auto ? (
-      <div
-        ref={wrapperRef}
-        style={{
-          flexGrow: 1,
-          width: containerSize.width,
-          height: containerSize.height,
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        {chart}
-      </div>
-    ) : (
-      chart
-    );
-  }, [
-    data,
-    layout,
-    nameKey,
-    stacked,
-    dataKeys,
-    style,
-    miniMode,
-    chartMargin,
-    interval,
-    tickAngle,
-    tickAnchor,
-    xAxisHeight,
-    hideX,
-    hideY,
-    hideTickX,
-    hideTickY,
-    tickFormatterX,
-    tickFormatterY,
-    yTickCount,
-    showLegend,
-    config,
-  ]);
+  const xAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "number",
+          axisLine: false,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+        }
+      : {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+          interval: interval,
+          tickLine: false,
+          angle: tickAngle,
+          textAnchor: tickAnchor,
+        };
+
+  const yAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideY,
+          interval: "equidistantPreserveStart",
+          tickLine: false,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        }
+      : {
+          type: "number",
+          axisLine: false,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          hide: miniMode || hideY,
+          tickCount: yTickCount,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        };
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -375,7 +374,64 @@ export function BarChart({
             </span>
           ))}
       </div>
-      {content}
+      <div
+        className={classnames(className, styles.wrapper)}
+        style={{ flexGrow: 1, ...style }}
+        ref={wrapperRef}
+      >
+        <ResponsiveContainer
+          ref={containerRef}
+          minWidth={60}
+          minHeight={60}
+          debounce={100}
+          width="100%"
+          height="100%"
+        >
+          <RBarChart
+            accessibilityLayer
+            data={validData}
+            layout={layout}
+            margin={miniMode ? { left: 0, right: 0, top: 0, bottom: 0 } : chartMargin}
+          >
+            <CartesianGrid vertical={true} strokeDasharray="3 3" />
+            <XAxis {...xAxisProps} />
+            <YAxis {...yAxisProps} />
+            {!miniMode && !hideTooltip && (
+              <Tooltip
+                content={customTooltipRenderer}
+                wrapperStyle={{
+                  pointerEvents: "auto",
+                }}
+                position={tooltipPosition}
+              />
+            )}
+            {validData.length > 0 &&
+              Object.keys(config).map((key, index) => (
+                <Bar
+                  key={index}
+                  dataKey={key}
+                  fill={config[key].color}
+                  radius={stacked ? 0 : 8}
+                  stackId={stacked ? "stacked" : undefined}
+                  strokeWidth={1}
+                  onMouseEnter={onMouseEnter}
+                />
+              ))}
+            {showLegend && (
+              <RLegend
+                wrapperStyle={{
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  margin: "0 auto",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              />
+            )}
+          </RBarChart>
+        </ResponsiveContainer>
+      </div>
     </ChartProvider>
   );
 }

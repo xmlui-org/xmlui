@@ -17,7 +17,7 @@ This property defines the template to use for the logo. With this property, you 
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="150px"
+```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="170px"
 <App>
   <AppHeader>
   <property name="logoTemplate">
@@ -141,7 +141,7 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
 | [paddingTop](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AppHeader | $space-0 | $space-0 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-4 | $space-4 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-0 | $space-0 |
 | [width](../styles-and-themes/common-units/#size)-logo-AppHeader | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]

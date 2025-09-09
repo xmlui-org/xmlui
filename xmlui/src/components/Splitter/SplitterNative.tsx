@@ -19,6 +19,7 @@ export const defaultProps = {
 type SplitterProps = {
   children: React.ReactNode[] | React.ReactNode;
   style?: React.CSSProperties;
+  className?: string;
   splitterTemplate?: React.ReactNode;
   orientation?: OrientationOptions;
   floating?: boolean;
@@ -36,10 +37,12 @@ export const Splitter = ({
   orientation = defaultProps.orientation,
   children,
   style,
+  className,
   swapped = defaultProps.swapped,
   floating = defaultProps.floating,
   splitterTemplate,
   resize = noop,
+  ...rest
 }: SplitterProps) => {
   const [size, setSize] = useState(0);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
@@ -165,11 +168,16 @@ export const Splitter = ({
 
   return (
     <div
+      {...rest}
       ref={(s) => setSplitter(s)}
-      className={classnames(styles.splitter, {
-        [styles.horizontal]: orientation === "horizontal",
-        [styles.vertical]: orientation === "vertical",
-      })}
+      className={classnames(
+        styles.splitter,
+        {
+          [styles.horizontal]: orientation === "horizontal",
+          [styles.vertical]: orientation === "vertical",
+        },
+        className,
+      )}
       style={style}
     >
       {React.Children.count(children) > 1 ? (

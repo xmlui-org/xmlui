@@ -11,7 +11,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
-import type { ButtonThemeColor, ButtonVariant, ComponentSize, IconPosition } from "../abstractions";
+import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -27,11 +27,12 @@ type Props = {
   id?: string;
   enabled?: boolean;
   style?: CSSProperties;
+  className?: string;
   // Button styles
   buttonLabel?: string;
   variant?: ButtonVariant;
   buttonThemeColor?: ButtonThemeColor;
-  buttonSize?: ComponentSize;
+  buttonSize?: SizeType;
   buttonIcon?: React.ReactNode;
   buttonIconPosition?: IconPosition;
   // Input props
@@ -86,6 +87,7 @@ export const FileInput = ({
   id,
   enabled = defaultProps.enabled,
   style,
+  className,
   placeholder,
   buttonPosition = defaultProps.buttonPosition,
   buttonLabel = defaultProps.buttonLabel,
@@ -112,6 +114,7 @@ export const FileInput = ({
   labelWidth,
   labelBreak,
   required,
+  ...rest
 }: Props) => {
   const _id = useId();
   id = id || _id;
@@ -183,6 +186,7 @@ export const FileInput = ({
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}
@@ -193,6 +197,7 @@ export const FileInput = ({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       isInputTemplateUsed={true}
     >
       <div

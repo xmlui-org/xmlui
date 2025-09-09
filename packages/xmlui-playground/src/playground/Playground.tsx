@@ -30,7 +30,7 @@ export const PlaygroundMd = createMetadata({
 export const playgroundComponentRenderer = createComponentRenderer(
   COMP,
   PlaygroundMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, renderChild }: any) => {
     return (
       <Playground
         height={extractValue(node.props.height)}

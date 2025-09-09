@@ -23,297 +23,319 @@ $component: "Text";
   vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
 }
 
-.text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
-  padding: 0;
-  min-height: fit-content;
+@layer components {
+  .text {
+    display: inline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
+    min-height: fit-content;
 
-  &.default {
-    @include textVariant("");
+    &.default {
+      @include textVariant("");
+    }
+
+    &.inherit {
+      @include t.ignoreTextVars();
+    }
+
+    &.abbr {
+      font-weight: createThemeVar("fontWeight-#{$component}-abbr");
+      text-transform: createThemeVar("textTransform-#{$component}-abbr");
+    }
+
+    &.cite {
+      font-style: createThemeVar("fontStyle-#{$component}-cite");
+    }
+
+    &.em {
+      font-style: createThemeVar("fontStyle-#{$component}-em");
+    }
+
+    &.deleted {
+      text-decoration-line: createThemeVar("textDecorationLine-#{$component}-deleted");
+      text-decoration-color: createThemeVar("textDecorationColor-#{$component}-deleted");
+      text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-deleted");
+      text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-deleted");
+
+      // Based on accessibility concerns
+      // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del
+      &::before,
+      &::after {
+        clip-path: inset(100%);
+        clip: rect(1px, 1px, 1px, 1px);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+      }
+      &::before {
+        content: " [deletion start] ";
+      }
+      &::after {
+        content: " [deletion end] ";
+      }
+    }
+
+    &.inserted {
+      text-decoration-line: createThemeVar("textDecorationLine-#{$component}-inserted") !important;
+      text-decoration-color: createThemeVar("textDecorationColor-#{$component}-inserted") !important;
+      text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-inserted") !important;
+      text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-inserted") !important;
+
+      // Based on accessibility concerns
+      // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins
+      &::before,
+      &::after {
+        clip-path: inset(100%);
+        clip: rect(1px, 1px, 1px, 1px);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+      }
+      &::before {
+        content: " [insertion start] ";
+      }
+      &::after {
+        content: " [insertion end] ";
+      }
+    }
+
+    // This is just a style placeholder
+    &.keyboard {
+      background-color: createThemeVar("backgroundColor-#{$component}-keyboard");
+      font-family: createThemeVar("fontFamily-#{$component}-keyboard");
+      font-weight: createThemeVar("fontWeight-#{$component}-keyboard");
+      font-size: createThemeVar("fontSize-#{$component}-keyboard");
+      border-width: createThemeVar("borderWidth-#{$component}-keyboard");
+      border-color: createThemeVar("borderColor-#{$component}-keyboard");
+      border-style: createThemeVar("borderStyle-#{$component}-keyboard");
+      border-radius: createThemeVar("borderRadius-#{$component}-keyboard");
+      padding-left: createThemeVar("paddingHorizontal-#{$component}-keyboard");
+      padding-right: createThemeVar("paddingHorizontal-#{$component}-keyboard");
+    }
+
+    &.marked {
+      background-color: createThemeVar("backgroundColor-#{$component}-marked");
+      color: createThemeVar("color-#{$component}-marked");
+      font-weight: createThemeVar("fontWeight-#{$component}-marked");
+      font-style: createThemeVar("fontStyle-#{$component}-marked");
+      line-height: createThemeVar("lineHeight-#{$component}-marked");
+
+      // Based on accessibility concerns
+      // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
+      &::before,
+      &::after {
+        clip-path: inset(100%);
+        clip: rect(1px, 1px, 1px, 1px);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+      }
+      &::before {
+        content: " [highlight start] ";
+      }
+      &::after {
+        content: " [highlight end] ";
+      }
+    }
+
+    &.mono {
+      font-family: createThemeVar("fontFamily-#{$component}-mono");
+    }
+
+    &.sample {
+      font-family: createThemeVar("fontFamily-#{$component}-sample");
+      font-size: createThemeVar("fontSize-#{$component}-sample");
+    }
+
+    &.sup {
+      font-size: createThemeVar("fontSize-#{$component}-sup");
+      vertical-align: createThemeVar("verticalAlignment-#{$component}-sup");
+    }
+
+    &.sub {
+      font-size: createThemeVar("fontSize-#{$component}-sub");
+      vertical-align: createThemeVar("verticalAlignment-#{$component}-sub");
+    }
+
+    &.var {
+      font-style: createThemeVar("fontStyle-#{$component}-var");
+    }
+
+    &.title {
+      font-size: createThemeVar("fontSize-#{$component}-title");
+    }
+
+    &.subtitle {
+      font-size: createThemeVar("fontSize-#{$component}-subtitle");
+    }
+
+    &.small {
+      @include textVariant("small");
+    }
+
+    &.caption {
+      letter-spacing: createThemeVar("letterSpacing-#{$component}-caption");
+    }
+
+    &.placeholder {
+      color: createThemeVar("color-#{$component}-placeholder");
+      font-style: createThemeVar("fontStyle-#{$component}-placeholder");
+      font-weight: createThemeVar("fontWeight-#{$component}-placeholder");
+      font-size: createThemeVar("fontSize-#{$component}-placeholder");
+    }
+
+    &.paragraph {
+      font-size: createThemeVar("fontSize-#{$component}-paragraph");
+      padding-top: createThemeVar("paddingVertical-#{$component}-paragraph");
+      padding-bottom: createThemeVar("paddingVertical-#{$component}-paragraph");
+    }
+
+    &.subheading {
+      font-size: createThemeVar("fontSize-#{$component}-subheading");
+      font-weight: createThemeVar("fontWeight-#{$component}-subheading");
+      font-style: createThemeVar("fontStyle-#{$component}-subheading");
+      letter-spacing: createThemeVar("letterSpacing-#{$component}-subheading");
+      text-transform: createThemeVar("textTransform-#{$component}-subheading");
+      color: createThemeVar("color-#{$component}-subheading");
+    }
+
+    &.tableheading {
+      margin-top: createThemeVar("marginTop-#{$component}-tableheading");
+      margin-bottom: createThemeVar("marginBottom-#{$component}-tableheading");
+      padding-left: createThemeVar("paddingHorizontal-#{$component}-tableheading");
+      padding-right: createThemeVar("paddingHorizontal-#{$component}-tableheading");
+      font-size: createThemeVar("fontSize-#{$component}-tableheading");
+      font-weight: createThemeVar("fontWeight-#{$component}-tableheading");
+    }
+
+    &.secondary {
+      font-size: createThemeVar("fontSize-#{$component}-secondary");
+      color: createThemeVar("color-#{$component}-secondary");
+    }
+
+    &.strong{
+      font-weight: t.$fontWeight-bold;
+    }
   }
 
-  &.inherit {
-    @include t.ignoreTextVars();
+  /*
+  This is a Chromium based solution that is supported by most modern browsers.
+  See this source for details: https://css-tricks.com/line-clampin/
+  */
+  .truncateOverflow {
+    overflow: hidden;
+    overflow-wrap: break-word;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
-  &.markdown {
-    @include textVariant("markdown");
-    overflow: visible;
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+    display: inline-block;
   }
 
-  &.abbr {
-    font-weight: createThemeVar("fontWeight-#{$component}-abbr");
-    text-transform: createThemeVar("textTransform-#{$component}-abbr");
+  .noEllipsis {
+    text-overflow: clip;
   }
 
-  &.cite {
-    font-style: createThemeVar("fontStyle-#{$component}-cite");
+  // --- Overflow behavior classes
+  .overflowNone {
+    // Force single line as per metadata: "No wrapping, text stays on a single line"
+    white-space: nowrap;
+    // Hide overflow content
+    overflow: hidden;
+    // Use clip instead of ellipsis
+    text-overflow: clip;
+    // Constrain width
+    max-width: 100%;
   }
 
-  &.em {
-    font-style: createThemeVar("fontStyle-#{$component}-em");
-  }
-
-  // --- Styling <pre><code> elements
-
-  // codefence/<pre> elements are block level by default, even in another text element
-  // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
-  .text.codefence {
-    display: block;
-    margin-top: createThemeVar("marginTop-#{$component}-codefence");
-    margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
-    height: 100%;
-  }
-
-  // For inline code
-  :not(.text.codefence) > &.code,
-  :not(.text.codefence) > &code {
-    @include textVariant("code");
-  }
-
-  // For code blocks using <![CDATA[ + <code> tags
-  &.codefence:has(> .text.code),
-  &.codefence:has(> code) {
-    @include textVariant("codefence");
-    // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
+  .overflowScroll {
+    white-space: nowrap;
     overflow-x: auto;
-    text-overflow: initial;
-  }
-
-  // TEMP: experimental - may be removed
-  &.codefence:has(> code > span) {
-    padding-inline: 0;
-  }
-  &.codefence > code > span:not([class*="numbered"]) {
-    padding-inline: t.$space-3;
-  }
-
-  &.codefence > code {
-    font-family: createThemeVar("fontFamily-#{$component}-codefence");
-    //white-space: pre-wrap;
-    font-family: createThemeVar("fontFamily-#{$component}-codefence");
-    //display: inline-block;
-    width: 100%;
-  }
-
-  &.codefence > code::before {
-    counter-reset: listing;
-  }
-
-  &.codefence > code > span {
-    display: inline-block;
-    width: 100%;
-  }
-  &.codefence > code > span[class*="numbered"] {
-    counter-increment: listing;
-  }
-
-  &.codefence > code > span[class*="numbered"]::before {
-    content: counter(listing);
-    display: inline-block;
-    width: t.$space-12;
-    padding-left: auto;
-    padding-right: t.$space-5;
-    margin-left: auto;
-    text-align: right;
-    color: t.$textColor-secondary;
-  }
-  // END TEMP
-
-  // ---
-
-  &.deleted {
-    text-decoration-line: createThemeVar("textDecorationLine-#{$component}-deleted");
-    text-decoration-color: createThemeVar("textDecorationColor-#{$component}-deleted");
-    text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-deleted");
-    text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-deleted");
-
-    // Based on accessibility concerns
-    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del
-    &::before,
-    &::after {
-      clip-path: inset(100%);
-      clip: rect(1px, 1px, 1px, 1px);
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      white-space: nowrap;
-      width: 1px;
+    overflow-y: hidden;
+    text-overflow: unset;
+    max-width: 100%;
+    
+    // Ensure scrollbar is visible when needed
+    &::-webkit-scrollbar {
+      height: 6px;
     }
-    &::before {
-      content: " [deletion start] ";
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
     }
-    &::after {
-      content: " [deletion end] ";
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
     }
   }
 
-  &.inserted {
-    text-decoration-line: createThemeVar("textDecorationLine-#{$component}-inserted") !important;
-    text-decoration-color: createThemeVar("textDecorationColor-#{$component}-inserted") !important;
-    text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-inserted") !important;
-    text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-inserted") !important;
-
-    // Based on accessibility concerns
-    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins
-    &::before,
-    &::after {
-      clip-path: inset(100%);
-      clip: rect(1px, 1px, 1px, 1px);
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      white-space: nowrap;
-      width: 1px;
+  .overflowFlow {
+    // Allow text to wrap to multiple lines
+    white-space: normal;
+    // Hide horizontal overflow, show vertical scrollbar when needed
+    overflow-x: hidden;
+    overflow-y: auto;
+    // Disable text-overflow ellipsis since we want wrapping
+    text-overflow: unset;
+    // Constrain width but allow height to grow
+    max-width: 100%;
+    // Change display to block to respect width/height constraints
+    display: block;
+    // Ensure height constraint is respected in flex contexts
+    flex-shrink: 0;
+    flex-grow: 0;
+    // Use min-height instead of height to avoid conflicts
+    min-height: 0;
+    
+    // Style vertical scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
     }
-    &::before {
-      content: " [insertion start] ";
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
     }
-    &::after {
-      content: " [insertion end] ";
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
     }
-  }
-
-  // This is just a style placeholder
-  &.keyboard {
-    background-color: createThemeVar("backgroundColor-#{$component}-keyboard");
-    font-family: createThemeVar("fontFamily-#{$component}-keyboard");
-    font-weight: createThemeVar("fontWeight-#{$component}-keyboard");
-    font-size: createThemeVar("fontSize-#{$component}-keyboard");
-    border-width: createThemeVar("borderWidth-#{$component}-keyboard");
-    border-color: createThemeVar("borderColor-#{$component}-keyboard");
-    border-style: createThemeVar("borderStyle-#{$component}-keyboard");
-    border-radius: createThemeVar("borderRadius-#{$component}-keyboard");
-    padding-left: createThemeVar("paddingHorizontal-#{$component}-keyboard");
-    padding-right: createThemeVar("paddingHorizontal-#{$component}-keyboard");
-  }
-
-  &.marked {
-    background-color: createThemeVar("backgroundColor-#{$component}-marked");
-    color: createThemeVar("color-#{$component}-marked");
-    font-weight: createThemeVar("fontWeight-#{$component}-marked");
-    font-style: createThemeVar("fontStyle-#{$component}-marked");
-    line-height: createThemeVar("lineHeight-#{$component}-marked");
-
-    // Based on accessibility concerns
-    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
-    &::before,
-    &::after {
-      clip-path: inset(100%);
-      clip: rect(1px, 1px, 1px, 1px);
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      white-space: nowrap;
-      width: 1px;
-    }
-    &::before {
-      content: " [highlight start] ";
-    }
-    &::after {
-      content: " [highlight end] ";
-    }
-  }
-
-  &.mono {
-    font-family: createThemeVar("fontFamily-#{$component}-mono");
-  }
-
-  &.sample {
-    font-family: createThemeVar("fontFamily-#{$component}-sample");
-    font-size: createThemeVar("fontSize-#{$component}-sample");
-  }
-
-  &.sup {
-    font-size: createThemeVar("fontSize-#{$component}-sup");
-    vertical-align: createThemeVar("verticalAlignment-#{$component}-sup");
-  }
-
-  &.sub {
-    font-size: createThemeVar("fontSize-#{$component}-sub");
-    vertical-align: createThemeVar("verticalAlignment-#{$component}-sub");
-  }
-
-  &.var {
-    font-style: createThemeVar("fontStyle-#{$component}-var");
-  }
-
-  &.title {
-    font-size: createThemeVar("fontSize-#{$component}-title");
-  }
-
-  &.subtitle {
-    font-size: createThemeVar("fontSize-#{$component}-subtitle");
-  }
-
-  &.small {
-    @include textVariant("small");
-  }
-
-  &.caption {
-    letter-spacing: createThemeVar("letterSpacing-#{$component}-caption");
-  }
-
-  &.placeholder {
-    color: createThemeVar("color-#{$component}-placeholder");
-    font-style: createThemeVar("fontStyle-#{$component}-placeholder");
-    font-weight: createThemeVar("fontWeight-#{$component}-placeholder");
-    font-size: createThemeVar("fontSize-#{$component}-placeholder");
-  }
-
-  &.paragraph {
-    font-size: createThemeVar("fontSize-#{$component}-paragraph");
-    padding-top: createThemeVar("paddingVertical-#{$component}-paragraph");
-    padding-bottom: createThemeVar("paddingVertical-#{$component}-paragraph");
-  }
-
-  &.subheading {
-    font-size: createThemeVar("fontSize-#{$component}-subheading");
-    font-weight: createThemeVar("fontWeight-#{$component}-subheading");
-    font-style: createThemeVar("fontStyle-#{$component}-subheading");
-    letter-spacing: createThemeVar("letterSpacing-#{$component}-subheading");
-    text-transform: createThemeVar("textTransform-#{$component}-subheading");
-    color: createThemeVar("color-#{$component}-subheading");
-  }
-
-  &.tableheading {
-    margin-top: createThemeVar("marginTop-#{$component}-tableheading");
-    margin-bottom: createThemeVar("marginBottom-#{$component}-tableheading");
-    padding-left: createThemeVar("paddingHorizontal-#{$component}-tableheading");
-    padding-right: createThemeVar("paddingHorizontal-#{$component}-tableheading");
-    font-size: createThemeVar("fontSize-#{$component}-tableheading");
-    font-weight: createThemeVar("fontWeight-#{$component}-tableheading");
-  }
-
-  &.secondary {
-    font-size: createThemeVar("fontSize-#{$component}-secondary");
-    color: createThemeVar("color-#{$component}-secondary");
-  }
-
-  &.strong{
-    font-weight: t.$fontWeight-bold;
   }
 }
 
-/*
-This is a Chromium based solution that is supported by most modern browsers.
-See this source for details: https://css-tricks.com/line-clampin/
-*/
-.truncateOverflow {
-  overflow: hidden;
+// --- Break mode classes
+.breakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.breakWord {
   overflow-wrap: break-word;
-  white-space: nowrap;
-  max-width: 100%;
 }
 
-.preserveLinebreaks {
-  white-space: pre-wrap;
+.breakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
-.noEllipsis {
-  text-overflow: clip;
+.breakKeep {
+  word-break: keep-all;
+}
+
+.breakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 :export {

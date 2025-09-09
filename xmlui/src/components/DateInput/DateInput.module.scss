@@ -1,0 +1,235 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "DateInput";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
+
+// Compose standard Input theme variables automatically
+$themeVars: t.composePaddingVars($themeVars, $componentName);
+$themeVars: t.composeBorderVars($themeVars, $componentName);
+
+// --- DateInput specific theme variables
+$color-divider-DateInput: createThemeVar("color-divider-#{$componentName}");
+$spacing-divider-DateInput: createThemeVar("spacing-divider-#{$componentName}");
+$width-input-DateInput: createThemeVar("width-input-#{$componentName}");
+$minWidth-input-DateInput: createThemeVar("minWidth-input-#{$componentName}");
+$padding-input-DateInput: createThemeVar("padding-input-#{$componentName}");
+$textAlign-input-DateInput: createThemeVar("textAlign-input-#{$componentName}");
+$fontSize-input-DateInput: createThemeVar("fontSize-input-#{$componentName}");
+$borderRadius-input-DateInput: createThemeVar("borderRadius-input-#{$componentName}");
+$backgroundColor-input-DateInput-invalid: createThemeVar("backgroundColor-input-#{$componentName}-invalid");
+$padding-button-DateInput: createThemeVar("padding-button-#{$componentName}");
+$borderRadius-button-DateInput: createThemeVar("borderRadius-button-#{$componentName}");
+$hoverColor-button-DateInput: createThemeVar("hoverColor-button-#{$componentName}");
+$disabledColor-button-DateInput: createThemeVar("disabledColor-button-#{$componentName}");
+$outlineColor-button-DateInput--focused: createThemeVar("outlineColor-button-#{$componentName}--focused");
+$outlineWidth-button-DateInput--focused: createThemeVar("outlineWidth-button-#{$componentName}--focused");
+$outlineOffset-button-DateInput--focused: createThemeVar("outlineOffset-button-#{$componentName}--focused");
+
+// New theme variables for better theming
+$opacity-DateInput--disabled: createThemeVar("opacity-#{$componentName}--disabled");
+$backgroundColor-DateInput--hover: createThemeVar("backgroundColor-#{$componentName}--hover");
+$margin-input-DateInput: createThemeVar("margin-input-#{$componentName}");
+$transition-background-DateInput: createThemeVar("transition-background-#{$componentName}");
+
+// --- CSS properties of a particular DateInput variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
+  }
+
+  &:has(.dateInputWrapper input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
+  }
+
+  .adornment {
+    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+  }
+}
+
+@layer components {
+  .dateInputWrapper {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    border-style: solid;
+    border-width: 1px;
+    transition: $transition-background-DateInput;
+    overflow: hidden;
+    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    @include t.paddingVars($themeVars, $componentName);
+
+    &.disabled {
+      opacity: $opacity-DateInput--disabled;
+      pointer-events: none;
+    }
+    
+    &.readOnly {
+      .dateInputWrapper input {
+        cursor: default;
+      }
+    }
+
+    @include variant("default");
+
+    &.error {
+      @include variant("error");
+    }
+    &.warning {
+      @include variant("warning");
+    }
+    &.valid {
+      @include variant("success");
+    }
+
+    &:has(input:is(:disabled)) {
+      cursor: not-allowed;
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
+    
+    button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      padding: $padding-button-DateInput;
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}-default");
+      
+      &:hover {
+        background-color: $backgroundColor-DateInput--hover;
+      }
+      
+      &:focus {
+        outline: 2px solid createThemeVar("Input:outlineColor-#{$componentName}-default--focus");
+        outline-offset: 2px;
+      }
+      
+      &:disabled {
+        cursor: not-allowed;
+        opacity: $opacity-DateInput--disabled;
+      }
+    }
+  }
+
+  // DateInput internal components styling
+  .wrapper {
+    display: flex;
+    flex-grow: 0; // Don't grow to eliminate unused space
+    flex-shrink: 0; // Don't shrink to maintain consistency
+  }
+
+  .inputGroup {
+    display: flex;
+    align-items: center;
+    flex-grow: 0; // Don't grow to eliminate unused space
+    flex-shrink: 0; // Don't shrink to maintain consistency
+    min-width: 0; // Allow shrinking if needed
+    gap: 0; // Remove gap since dividers handle spacing
+    box-sizing: border-box;
+  }
+
+  .divider {
+    padding: 0 0.25rem; // Increase horizontal spacing around dividers
+    white-space: pre;
+    display: inline-block;
+    font: inherit;
+    color: $color-divider-DateInput;
+  }
+
+  .input {
+    min-width: $minWidth-input-DateInput;
+    height: 100%;
+    position: relative;
+    padding: $padding-input-DateInput;
+    border: 0;
+    background: none;
+    color: currentColor;
+    font: inherit;
+    font-size: $fontSize-input-DateInput;
+    box-sizing: content-box;
+    border-radius: $borderRadius-input-DateInput;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    // Consistent width for all date inputs (following TimeInput strategy)
+    &.day,
+    &.month,
+    &.year {
+      width: 2.5ch; // Uniform width following TimeInput pattern
+      min-width: 2.5ch;
+      max-width: 2.5ch;
+      text-align: center;
+      padding: $padding-input-DateInput !important;
+      box-sizing: border-box !important;
+    }
+
+    &.year {
+      width: 4.5ch;
+      min-width: 4.5ch;
+      max-width: 4.5ch;
+    }
+
+    // Hide spin buttons for number inputs
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      margin: 0 !important;
+      display: none !important;
+    }
+
+    // Hide spin buttons for Firefox
+    &[type="number"] {
+      -moz-appearance: textfield !important;
+      appearance: textfield !important;
+    }
+
+    &:invalid {
+      background-color: $backgroundColor-input-DateInput-invalid;
+    }
+
+    &.invalid {
+      background-color: $backgroundColor-input-DateInput-invalid;
+    }
+  }
+}
+
+// Export theme variables for consumption by the component definition
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

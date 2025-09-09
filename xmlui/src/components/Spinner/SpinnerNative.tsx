@@ -2,6 +2,7 @@ import type { CSSProperties, ForwardedRef } from "react";
 import { forwardRef, useEffect, useState } from "react";
 
 import styles from "./Spinner.module.scss";
+import classnames from "classnames";
 
 export const defaultProps = {
   delay: 400,
@@ -12,11 +13,18 @@ type SpinnerProps = {
   delay?: number;
   fullScreen?: boolean;
   style?: CSSProperties;
+  className?: string;
 };
 
 // source https://loading.io/css/
 export const Spinner = forwardRef(function Spinner(
-  { delay = defaultProps.delay, fullScreen = defaultProps.fullScreen, style }: SpinnerProps,
+  {
+    delay = defaultProps.delay,
+    fullScreen = defaultProps.fullScreen,
+    style,
+    className,
+    ...rest
+  }: SpinnerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [pastDelay, setPastDelay] = useState(delay === 0);
@@ -35,8 +43,17 @@ export const Spinner = forwardRef(function Spinner(
   } else {
     if (fullScreen) {
       return (
-        <div role="status" aria-label="Loading" className={styles.fullScreenSpinnerWrapper}>
-          <div className={styles["lds-ring"]} style={style} ref={forwardedRef}>
+        <div
+          {...rest}
+          role="status"
+          aria-label="Loading"
+          className={styles.fullScreenSpinnerWrapper}
+        >
+          <div
+            className={classnames(styles["lds-ring"], className)}
+            style={style}
+            ref={forwardedRef}
+          >
             <div></div>
             <div></div>
             <div></div>
@@ -47,7 +64,8 @@ export const Spinner = forwardRef(function Spinner(
     }
     return (
       <div
-        className={styles["lds-ring"]}
+        {...rest}
+        className={classnames(styles["lds-ring"], className)}
         role="status"
         aria-label="Loading"
         style={style}

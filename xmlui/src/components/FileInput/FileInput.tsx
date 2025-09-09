@@ -128,7 +128,7 @@ export const FileInputMd = createMetadata({
 export const fileInputRenderer = createComponentRenderer(
   COMP,
   FileInputMd,
-  ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi }) => {
+  ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, className }) => {
     const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
     return (
       <FileInput
@@ -158,6 +158,7 @@ export const fileInputRenderer = createComponentRenderer(
         labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        className={className}
       />
     );
   },

@@ -27,6 +27,7 @@ type Props = {
   disabled?: boolean;
   onClick?: () => void;
   style?: CSSProperties;
+  className?: string;
 } & Partial<
   Pick<
     HTMLAnchorElement,
@@ -52,6 +53,7 @@ export const LinkNative = forwardRef(function LinkNative(
     target,
     disabled = defaultProps.disabled,
     style,
+    className,
     ...anchorProps
   } = specifyTypes(props);
 
@@ -63,17 +65,17 @@ export const LinkNative = forwardRef(function LinkNative(
   const Node = to ? Link : "div";
   return (
     <Node
+      {...anchorProps}
       ref={forwardedRef as any}
       to={smartTo}
       style={style}
       target={target}
       onClick={onClick}
-      className={classnames(styles.container, {
+      className={classnames(className, styles.container, {
         [styles.iconLink]: iconLink,
         [styles.active]: active,
         [styles.disabled]: disabled,
       })}
-      {...anchorProps}
     >
       {icon && (
         <div className={styles.iconWrapper}>

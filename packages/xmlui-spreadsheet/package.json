@@ -13,7 +13,7 @@
     "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
-    "jspdf": "^3.0.1",
+    "jspdf": "^3.0.2",
     "jspreadsheet-ce": "^5.0.1",
     "jszip": "^3.10.1"
   },

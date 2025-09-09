@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.101",
+  "version": "0.10.10",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -49,12 +49,6 @@
     "@tanstack/react-query-devtools": "^4.36.1",
     "@tanstack/react-table": "8.17.3",
     "@tanstack/react-virtual": "3.10.8",
-    "@tiptap/extension-table": "^2.23.0",
-    "@tiptap/extension-table-cell": "^2.23.0",
-    "@tiptap/extension-table-header": "^2.23.0",
-    "@tiptap/extension-table-row": "^2.23.0",
-    "@tiptap/react": "^2.23.0",
-    "@tiptap/starter-kit": "^2.23.0",
     "@types/chroma-js": "^3.1.1",
     "@types/color": "3.0.6",
     "@vitejs/plugin-react": "4.3.0",
@@ -71,6 +65,7 @@
     "embla-carousel-react": "^8.3.0",
     "emoji-picker-react": "4.4.10",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.18.1",
     "glob": "7.2.0",
     "immer": "9.0.16",
     "js-yaml": "^4.1.0",
@@ -84,7 +79,7 @@
     "react-datepicker": "4.25.0",
     "react-day-picker": "9.7.0",
     "react-dom": "18.2.0",
-    "react-dropzone": "14.2.3",
+    "react-dropzone": "14.3.8",
     "react-helmet-async": "1.3.0",
     "react-hot-toast": "2.4.1",
     "react-icons": "4.12.0",
@@ -98,6 +93,7 @@
     "react-select": "5.7.4",
     "react-sticky-el": "^2.1.1",
     "react-textarea-autosize": "8.5.3",
+    "react-time-picker": "^8.0.2",
     "react-virtualized-auto-sizer": "1.0.24",
     "react-window": "1.8.10",
     "recharts": "^2.15.1",
@@ -114,7 +110,6 @@
     "vite-plugin-svgr": "4.2.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11",
-    "framer-motion": "^12.18.1",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -122,6 +117,9 @@
     "@babel/preset-env": "7.19.4",
     "@babel/preset-typescript": "7.18.6",
     "@playwright/test": "1.53.0",
+    "@remix-run/dev": "2.12.1",
+    "@remix-run/node": "2.12.1",
+    "@remix-run/serve": "2.12.1",
     "@rollup/pluginutils": "5.1.0",
     "@types/adm-zip": "0.5.4",
     "@types/glob": "7.2.0",
@@ -137,9 +135,6 @@
     "@types/yargs": "17.0.31",
     "@typescript-eslint/eslint-plugin": "8.15.0",
     "@typescript-eslint/parser": "8.15.0",
-    "@remix-run/dev": "2.12.1",
-    "@remix-run/serve": "2.12.1",
-    "@remix-run/node": "2.12.1",
     "babel-loader": "8.2.5",
     "clean-package": "2.2.0",
     "eslint": "^8.57.0",
@@ -150,6 +145,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "prettier": "^3.3.3",
     "rimraf": "6.0.1",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-visualizer": "5.8.3",
     "serve": "14.2.0",
     "typescript": "5.7.3",
@@ -203,8 +199,12 @@
           "require": "./dist/lib/*.css"
         },
         "./index.scss": {
-          "import": "./src/index.scss",
-          "require": "./src/index.scss"
+          "import": "./dist/lib/scss/index.scss",
+          "require": "./dist/lib/scss/index.scss"
+        },
+        "./themes.scss": {
+          "import": "./dist/lib/scss/components-core/theming/_themes.scss",
+          "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",

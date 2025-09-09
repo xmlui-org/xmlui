@@ -137,6 +137,17 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 **Signature**: `get value(): string | undefined`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`endAdornment`**: The adornment displayed at the end of the text box.
+- **`input`**: The text box input area.
+- **`label`**: The label displayed for the text box.
+- **`startAdornment`**: The adornment displayed at the start of the text box.
+
+**Default part**: `input`
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
@@ -241,13 +252,15 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [outlineWidth](../styles-and-themes/common-units/#size)-TextBox-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-TextBox-success--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-TextBox-warning--focus | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-Input | $space-2 | $space-2 |
-| [padding](../styles-and-themes/common-units/#size)-TextBox-default | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TextBox-error | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TextBox-success | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-TextBox-warning | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-TextBox | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-TextBox | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-TextBox | $space-2 | $space-2 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TextBox | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-passwordToggle-TextBox | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-TextBox | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-TextBox | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-TextBox | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-Input | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-Input--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Input | $textColor-subtitle | $textColor-subtitle |

@@ -1,6 +1,9 @@
 import { defaultProps, LineChart } from "./LineChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata, d } from "../../metadata-helpers";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
+import styles from "./LineChart.module.scss";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "LineChart";
 
@@ -18,12 +21,12 @@ export const LineChartMd = createMetadata({
         "The data to be displayed in the line chart." +
         "It needs to be an array of objects, where each object represents a data point.",
     },
-    dataKeys: {
+    xKeys: {
       description:
         "This property specifies the keys in the data objects that should be used for rendering the lines.",
       valueType: "string",
     },
-    nameKey: {
+    yKey: {
       description: "The key in the data objects used for labeling different data series.",
       valueType: "string",
     },
@@ -71,17 +74,24 @@ export const LineChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
     marginTop: d("The top margin of the chart"),
     marginRight: d("The right margin of the chart"),
     marginBottom: d("The bottom margin of the chart"),
     marginLeft: d("The left margin of the chart"),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`width-line-LineChart`]: "1px",
   },
 });
 
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
@@ -89,9 +99,9 @@ export const lineChartComponentRenderer = createComponentRenderer(
         hideTickX={extractValue(node.props?.hideTickX)}
         hideTickY={extractValue(node.props?.hideTickY)}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
-        dataKeys={extractValue(node.props?.dataKeys)}
-        nameKey={extractValue(node.props?.nameKey)}
+        className={className}
+        dataKeys={extractValue(node.props?.xKeys)}
+        nameKey={extractValue(node.props?.yKey)}
         hideX={extractValue(node.props?.hideX)}
         hideY={extractValue(node.props?.hideY)}
         hideTooltip={extractValue(node.props?.hideTooltip)}
@@ -100,6 +110,22 @@ export const lineChartComponentRenderer = createComponentRenderer(
         marginRight={extractValue.asOptionalNumber(node.props?.marginRight)}
         marginBottom={extractValue.asOptionalNumber(node.props?.marginBottom)}
         marginLeft={extractValue.asOptionalNumber(node.props?.marginLeft)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </LineChart>

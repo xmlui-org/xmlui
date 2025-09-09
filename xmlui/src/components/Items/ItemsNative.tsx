@@ -33,17 +33,19 @@ export function Items({ items, renderItem, reverse = defaultProps.reverse }: Pro
   return (
     <>
       {itemsToRender.map((item, index) => {
-        return <Fragment key={index}>
-          {renderItem?.(
-            {
-              $item: item,
-              $itemIndex: index,
-              $isFirst: index === 0,
-              $isLast: index === itemsToRender.length - 1,
-            },
-            index,
-          )}
-        </Fragment>;
+        return (
+          <Fragment key={index}>
+            {renderItem?.(
+              {
+                $item: item,
+                $itemIndex: index,
+                $isFirst: index === 0,
+                $isLast: index === itemsToRender.length - 1,
+              },
+              index,
+            )}
+          </Fragment>
+        );
       })}
     </>
   );

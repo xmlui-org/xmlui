@@ -46,6 +46,18 @@ This property indicates when the row selection header is displayed. When the val
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `buttonRowPosition` (default: "center") [#buttonrowposition-default-center]
+
+Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).
+
+Available values: `start`, `center` **(default)**, `end`
+
+### `cellVerticalAlign` (default: "center") [#cellverticalalign-default-center]
+
+This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.
+
+Available values: `top`, `center` **(default)**, `bottom`
+
 ### `data` [#data]
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
@@ -609,7 +621,7 @@ This property adds pagination controls to the `Table`.
 
 ```xmlui copy /isPaginated="true"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -669,7 +681,7 @@ This property adds pagination controls to the `Table`.
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -713,17 +725,23 @@ A property to customize what to display if the table does not contain any data.
 </App>
 ```
 
-### `pageSizes` [#pagesizes]
+### `pageInfoPosition` [#pageinfoposition]
 
-This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
+Determines where to place the page information in the layout. It works the same as the [Pagination component property](./Pagination#pageinfoposition).
+
+### `pageSize` [#pagesize]
+
+This property defines the number of rows to display per page when pagination is enabled.
+
+Options
 
 Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
-```xmlui copy /pageSizes="{[3, 6, 12]}"/
+```xmlui copy /pageSizeOptions="{[3, 6, 12]}"/
 <App>
-  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -731,7 +749,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 </App>
 ```
 
-```xmlui-pg name="Example: pageSizes"
+```xmlui-pg name="Example: pageSizeOptions"
 <App>
   <Table data='{[
   {
@@ -783,13 +801,101 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     key: 0,
   },
 ]}' 
-    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
   </Table>
 </App>
 ```
+
+### `pageSizeOptions` [#pagesizeoptions]
+
+This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
+
+Page sizes are only accepted in an array, even if the array contains one item.
+
+Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
+
+```xmlui copy /pageSizeOptions="{[3, 6, 12]}"/
+<App>
+  <Table data='{[...]}' isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: pageSizeOptions"
+<App>
+  <Table data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' 
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+### `pageSizeSelectorPosition` [#pagesizeselectorposition]
+
+Determines where to place the page size selector in the layout. It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).
+
+### `paginationControlsLocation` (default: "bottom") [#paginationcontrolslocation-default-bottom]
+
+This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.
+
+Available values: `top`, `bottom` **(default)**, `both`
 
 ### `rowDisabledPredicate` [#rowdisabledpredicate]
 
@@ -946,6 +1052,18 @@ The default value is `false`.
   </Table>
 </App>
 ```
+
+### `showCurrentPage` (default: true) [#showcurrentpage-default-true]
+
+Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).
+
+### `showPageInfo` (default: true) [#showpageinfo-default-true]
+
+Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).
+
+### `showPageSizeSelector` (default: true) [#showpagesizeselector-default-true]
+
+Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).
 
 ### `sortBy` [#sortby]
 

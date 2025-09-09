@@ -9,7 +9,7 @@ import { orientationOptionMd } from "../abstractions";
 const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
     `This component displays a slideshow by cycling through elements (images, text, or ` +
     `custom slides) like a carousel.`,
@@ -24,56 +24,52 @@ export const CarouselMd = createMetadata({
       defaultValue: defaultProps.orientation,
     },
     indicators: {
-      description: "This property indicates whether the carousel displays the indicators.",
+      description: "Display the individual slides as buttons (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultProps.indicators,
     },
     controls: {
-      description: "This property indicates whether the carousel displays the controls.",
+      description: "Display the previous/next controls (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultProps.controls,
     },
     autoplay: {
-      description: "This property indicates whether the carousel automatically scrolls.",
+      description: "Start scrolling the carousel automatically (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultProps.autoplay,
     },
     loop: {
-      description: "This property indicates whether the carousel loops.",
+      description: "Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.",
       valueType: "boolean",
       defaultValue: defaultProps.loop,
     },
     startIndex: {
-      description: "This property indicates the index of the first slide to display.",
+      description: "The index of the first slide to display.",
       valueType: "number",
       defaultValue: defaultProps.startIndex,
     },
     transitionDuration: {
-      description: "This property indicates the duration of the transition between slides.",
+      description: "The duration of the transition between slides.",
       valueType: "number",
       defaultValue: defaultProps.transitionDuration,
     },
     autoplayInterval: {
-      description: "This property specifies the interval between autoplay transitions.",
+      description: "Specifies the interval between autoplay transitions.",
       valueType: "number",
       defaultValue: defaultProps.autoplayInterval,
     },
     stopAutoplayOnInteraction: {
-      description: "This property indicates whether autoplay stops on interaction.",
+      description: "This property indicates whether autoplay stops on user interaction.",
       valueType: "boolean",
       defaultValue: defaultProps.stopAutoplayOnInteraction,
     },
     prevIcon: {
-      description: "This property specifies the icon to display for the previous control.",
+      description: "The icon to display for the previous control.",
       valueType: "string",
     },
     nextIcon: {
-      description: "This property specifies the icon to display for the next control.",
+      description: "The icon to display for the next control.",
       valueType: "string",
-    },
-    keyboard: {
-      description: "This property indicates whether the carousel responds to keyboard events.",
-      valueType: "boolean",
     },
   },
   events: {
@@ -105,9 +101,6 @@ export const CarouselMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
-  themeVarDescriptions: {
-    [`width-indicator-${COMP}`]: "Sets the width of the indicator.",
-  },
   defaultThemeVars: {
     [`backgroundColor-control-${COMP}`]: "$color-primary",
     [`textColor-control-${COMP}`]: "$textColor",
@@ -136,10 +129,10 @@ export const CarouselMd = createMetadata({
 export const carouselComponentRenderer = createComponentRenderer(
   COMP,
   CarouselMd,
-  ({ node, renderChild, layoutCss, extractValue, lookupEventHandler, registerComponentApi }) => {
+  ({ node, renderChild, className, extractValue, lookupEventHandler, registerComponentApi }) => {
     return (
       <CarouselComponent
-        style={layoutCss}
+        className={className}
         stopAutoplayOnInteraction={extractValue.asOptionalBoolean(
           node.props?.stopAutoplayOnInteraction,
         )}
@@ -155,7 +148,6 @@ export const carouselComponentRenderer = createComponentRenderer(
         startIndex={extractValue.asOptionalNumber(node.props?.startIndex)}
         prevIcon={extractValue(node.props?.prevIcon)}
         nextIcon={extractValue(node.props?.nextIcon)}
-        keyboard={extractValue.asOptionalBoolean(node.props?.keyboard)}
       >
         {renderChild(node.children)}
       </CarouselComponent>

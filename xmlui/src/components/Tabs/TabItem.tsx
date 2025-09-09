@@ -17,8 +17,15 @@ export const TabItemMd = createMetadata({
     label: dLabel(),
     headerTemplate: dComponent("This property allows the customization of the TabItem header."),
   },
+  events: {
+    activated: {
+      description: "This event is triggered when the tab is activated.",
+    },
+  },
   contextVars: {
-    $header: d("This context value represents the header context with props: id (optional), index, label, isActive."),
+    $header: d(
+      "This context value represents the header context with props: id (optional), index, label, isActive.",
+    ),
   },
 });
 
@@ -26,29 +33,36 @@ export const tabItemComponentRenderer = createComponentRenderer(
   COMP,
   TabItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue } = rendererContext;
+    const { node, renderChild, extractValue, lookupEventHandler } = rendererContext;
     return (
-      <TabItemComponent id={extractValue(node.uid)} label={extractValue(node.props.label)} headerRenderer={node.props.headerTemplate
-        ? (item) => {
-            return (
-              <MemoizedItem
-                node={node.props.headerTemplate}
-                itemKey="$header"
-                contextVars={{
-                  $header: {
-                    id: item.id,
-                    index: item.index,
-                    label: item.label,
-                    isActive: item.isActive,
-                  },
-                }}
-                renderChild={renderChild}
-              />
-            );
-          }
-        : undefined}>
+      <TabItemComponent
+        id={extractValue(node.uid)}
+        label={extractValue(node.props.label)}
+        activated={lookupEventHandler("activated")}
+        headerRenderer={
+          node.props.headerTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.headerTemplate}
+                    itemKey="$header"
+                    contextVars={{
+                      $header: {
+                        id: item.id,
+                        index: item.index,
+                        label: item.label,
+                        isActive: item.isActive,
+                      },
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
+      >
         {renderChild(node.children)}
       </TabItemComponent>
     );
   },
-)
+);

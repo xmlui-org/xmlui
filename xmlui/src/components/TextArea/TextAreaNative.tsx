@@ -21,6 +21,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import TextAreaResizable from "./TextAreaResizable";
+import { PART_INPUT } from "../../components-core/parts";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -50,6 +51,7 @@ type Props = {
   onBlur?: () => void;
   controlled?: boolean;
   style?: CSSProperties;
+  className?: string;
   registerComponentApi?: RegisterComponentApiFn;
   autoSize?: boolean;
   maxRows?: number;
@@ -78,7 +80,7 @@ export const defaultProps = {
   controlled: true,
   enterSubmits: true,
   rows: 2,
-  enabled: true
+  enabled: true,
 };
 
 export const TextArea = forwardRef(function TextArea(
@@ -101,6 +103,7 @@ export const TextArea = forwardRef(function TextArea(
     enterSubmits = defaultProps.enterSubmits,
     escResets,
     style,
+    className,
     registerComponentApi,
     autoSize,
     maxRows,
@@ -112,6 +115,7 @@ export const TextArea = forwardRef(function TextArea(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
 ) {
@@ -221,15 +225,19 @@ export const TextArea = forwardRef(function TextArea(
     [enterSubmits, escResets],
   );
 
+  let classes = classnames(className, styles.textarea, {
+    [styles.resizeHorizontal]: resize === "horizontal",
+    [styles.resizeVertical]: resize === "vertical",
+    [styles.resizeBoth]: resize === "both",
+    [styles.focused]: focused,
+    [styles.disabled]: !enabled,
+    [styles.error]: validationStatus === "error",
+    [styles.warning]: validationStatus === "warning",
+    [styles.valid]: validationStatus === "valid",
+  });
   const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
     React.RefAttributes<HTMLTextAreaElement> = {
-    className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
-      [styles.focused]: focused,
-      [styles.disabled]: !enabled,
-      [styles.error]: validationStatus === "error",
-      [styles.warning]: validationStatus === "warning",
-      [styles.valid]: validationStatus === "valid",
-    }),
+    className: classes,
     ref: inputRef,
     style: style as any,
     value: controlled ? value || "" : undefined,
@@ -253,6 +261,7 @@ export const TextArea = forwardRef(function TextArea(
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
       <ItemWithLabel
+        {...rest}
         ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
@@ -266,7 +275,10 @@ export const TextArea = forwardRef(function TextArea(
       >
         <TextAreaResizable
           {...textareaProps}
+          data-part-id={PART_INPUT}
+          ref={inputRef}
           style={style as any}
+          className={classnames(classes)}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -277,6 +289,7 @@ export const TextArea = forwardRef(function TextArea(
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
       <ItemWithLabel
+        {...rest}
         ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
@@ -290,7 +303,10 @@ export const TextArea = forwardRef(function TextArea(
       >
         <TextareaAutosize
           {...textareaProps}
+          data-part-id={PART_INPUT}
+          ref={inputRef}
           style={style as any}
+          className={classnames(classes)}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -301,6 +317,7 @@ export const TextArea = forwardRef(function TextArea(
 
   return (
     <ItemWithLabel
+      {...rest}
       ref={forwardedRef as any}
       labelPosition={labelPosition as any}
       label={label}
@@ -312,7 +329,13 @@ export const TextArea = forwardRef(function TextArea(
       onBlur={onBlur}
       style={style}
     >
-      <textarea {...textareaProps} rows={rows} />
+      <textarea
+        {...textareaProps}
+        data-part-id={PART_INPUT}
+        ref={inputRef}
+        rows={rows}
+        className={classnames(classes)}
+      />
     </ItemWithLabel>
   );
 });

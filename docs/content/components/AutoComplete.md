@@ -56,6 +56,10 @@ This property defines the template to display when the list of options is empty.
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
+### `initiallyOpen` (default: false) [#initiallyopen-default-false]
+
+This property determines whether the dropdown list is open when the component is first rendered.
+
 ### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
@@ -234,6 +238,7 @@ This API allows you to get or set the value of the component. If no value is set
 | [color](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-badge | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-default | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-error | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-success | *none* | *none* |
@@ -290,7 +295,14 @@ This API allows you to get or set the value of the component. If no value is set
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-2 | $space-2 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |

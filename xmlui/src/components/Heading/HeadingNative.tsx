@@ -122,16 +122,16 @@ export const Heading = forwardRef(function Heading(
 
   return (
     <Element
+      {...furtherProps}
       ref={ref}
       id={uid}
       title={title}
       style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
-      className={classnames(styles.heading, styles[Element], className || "", {
+      className={classnames(styles.heading, styles[Element], className, {
         [styles.truncateOverflow]: maxLines > 0,
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,
       })}
-      {...furtherProps}
     >
       {anchorId && (
         <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />

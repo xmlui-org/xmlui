@@ -235,10 +235,12 @@ The component itself cannot be styled, but the components that render the final 
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-H1-markdown | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | fontSize-${COMP} | fontSize-${COMP} |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text | *none* | *none* |
 | [fontVariant](../styles-and-themes/common-units/#font-variant)-Text | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-markdown | fontWeight-Text | fontWeight-Text |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [lineBreak](../styles-and-themes/common-units/#line-break)-Text | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
@@ -253,9 +255,12 @@ The component itself cannot be styled, but the components that render the final 
 | [marginBottom](../styles-and-themes/common-units/#size)-HtmlLi | $space-2_5 | $space-2_5 |
 | [marginBottom](../styles-and-themes/common-units/#size)-HtmlVideo | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Image-markdown | $space-4 | $space-4 |
+| [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Admonition-content | $space-1_5 | $space-1_5 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Image-markdown | $space-0 | $space-0 |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Image-markdown | $space-0 | $space-0 |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Admonition | $space-7 | $space-7 |
 | [marginTop](../styles-and-themes/common-units/#size)-Blockquote | $space-7 | $space-7 |
 | [marginTop](../styles-and-themes/common-units/#size)-H1-markdown | *none* | *none* |
@@ -267,6 +272,7 @@ The component itself cannot be styled, but the components that render the final 
 | [marginTop](../styles-and-themes/common-units/#size)-HtmlLi | $space-2_5 | $space-2_5 |
 | [marginTop](../styles-and-themes/common-units/#size)-HtmlVideo | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Image-markdown | $space-4 | $space-4 |
+| [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
 | [padding](../styles-and-themes/common-units/#size)-Admonition | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Blockquote | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Admonition | $space-2 | $space-2 |

@@ -38,7 +38,7 @@ const TextAreaResizable: React.ForwardRefRenderFunction<HTMLTextAreaElement, Tex
     // --- ... and calculate the min and max heights based on the line height
     setMinCompHeight(lineHeight * (minRows ?? 1) + extraSize);
     setMaxCompHeight(lineHeight * (maxRows ?? 10_000) + extraSize);
-  }, [libRef.current, maxRows, minRows]);
+  }, [maxRows, minRows]);
 
   return (
     <textarea

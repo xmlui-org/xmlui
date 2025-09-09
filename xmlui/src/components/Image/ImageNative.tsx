@@ -11,6 +11,7 @@ type Props = {
   alt?: string;
   fit?: "cover" | "contain";
   style?: CSSProperties;
+  className?: string;
   lazyLoad?: boolean;
   aspectRatio?: string;
   animation?: object;
@@ -24,25 +25,41 @@ export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline"> = {
 };
 
 export const Image = forwardRef(function Img(
-  { src, alt, fit = defaultProps.fit, style, onClick, aspectRatio, lazyLoad = defaultProps.lazyLoad, inline = defaultProps.inline }: Props,
+  {
+    src,
+    alt,
+    fit = defaultProps.fit,
+    style,
+    className,
+    onClick,
+    aspectRatio,
+    lazyLoad = defaultProps.lazyLoad,
+    inline = defaultProps.inline,
+    ...rest
+  }: Props,
   ref,
 ) {
   return (
     <img
+      {...rest}
       src={src}
       ref={ref as any}
       alt={alt}
       loading={lazyLoad ? "lazy" : "eager"}
-      className={classnames(styles.img, {
-        [styles.clickable]: !!onClick,
-      })}
-      style={{ 
-        objectFit: fit, 
-        boxShadow: "none", 
-        ...style, 
-        flexShrink: 1, 
+      className={classnames(
+        styles.img,
+        {
+          [styles.clickable]: !!onClick,
+        },
+        className,
+      )}
+      style={{
+        objectFit: fit,
+        boxShadow: "none",
+        ...style,
+        flexShrink: 1,
         aspectRatio: aspectRatio,
-        ...(inline ? { display: 'inline' } : {})
+        ...(inline ? { display: "inline" } : {}),
       }}
       onClick={onClick}
     />

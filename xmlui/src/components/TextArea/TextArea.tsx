@@ -38,6 +38,20 @@ export const resizeOptionsMd: PropertyValueDescription[] = [
 export const TextAreaMd = createMetadata({
   status: "stable",
   description: "`TextArea` provides a multiline text input area.",
+  parts: {
+    label: {
+      description: "The label displayed for the text area.",
+    },
+    startAdornment: {
+      description: "The adornment displayed at the start of the text area.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the text area.",
+    },
+    input: {
+      description: "The text area input.",
+    },
+  },
   props: {
     enterSubmits: {
       description:
@@ -109,6 +123,10 @@ export const TextAreaMd = createMetadata({
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`paddingVertical-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+  },
 });
 
 export const textAreaComponentRenderer = createComponentRenderer(
@@ -119,7 +137,7 @@ export const textAreaComponentRenderer = createComponentRenderer(
     extractValue,
     state,
     updateState,
-    layoutCss,
+    className,
     registerComponentApi,
     lookupEventHandler,
   }) => {
@@ -138,7 +156,7 @@ export const textAreaComponentRenderer = createComponentRenderer(
         resize={node.props.resize as ResizeOptions}
         enterSubmits={extractValue.asOptionalBoolean(node.props.enterSubmits)}
         escResets={extractValue.asOptionalBoolean(node.props.escResets)}
-        style={layoutCss}
+        className={className}
         registerComponentApi={registerComponentApi}
         maxRows={extractValue.asOptionalNumber(node.props.maxRows)}
         minRows={extractValue.asOptionalNumber(node.props.minRows)}

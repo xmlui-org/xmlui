@@ -13,6 +13,7 @@ type Props = {
   value?: string;
   initialValue?: string;
   style?: CSSProperties;
+  className?: string;
   onDidChange?: (newValue: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -44,6 +45,7 @@ export const ColorPicker = forwardRef(
   (
     {
       style,
+      className,
       updateState,
       onDidChange = noop,
       onFocus = noop,
@@ -60,6 +62,7 @@ export const ColorPicker = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
@@ -110,6 +113,7 @@ export const ColorPicker = forwardRef(
 
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -119,6 +123,7 @@ export const ColorPicker = forwardRef(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={className}
         ref={forwardedRef}
       >
         {/* Produces a 7 character RGB color output in hex as a string type */}

@@ -6,10 +6,11 @@ import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
+import copy from 'rollup-plugin-copy';
 // @ts-ignore
 import * as packageJson from "./package.json";
 
-export default ({ mode }) => {
+export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
   let define;
@@ -71,6 +72,35 @@ export default ({ mode }) => {
       };
     }
   }
+  let plugins = mode === "metadata"
+    ? []
+    : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })];
+
+  if(mode === "lib"){
+    plugins.push(copy({
+      hook: 'writeBundle',
+      targets: [
+        {
+          src: [
+            'src/**/*.scss',
+            '!src/**/*.module.scss'
+          ],
+          dest: 'dist/lib/scss',
+          rename: (name, extension, fullPath) => {
+            //we do this to preserve the folder structure of the scss files
+            // e.g. src/components/button/Button.scss should be copied to dist/lib/scss/components/button/Button.scss
+            // and not to dist/lib/scss/Button.scss
+            // fullPath will be something like 'src/components/button/Button.scss'
+            // We want to remove the 'src/' prefix to get the relative path
+            const relativePath = fullPath.replace('src/', '');
+
+            // This returns 'components/button/Button.scss'
+            return relativePath;
+          }
+        }
+      ]
+    }));
+  }
   return defineConfig({
     resolve: {
       alias: {
@@ -87,7 +117,7 @@ export default ({ mode }) => {
       },
     },
     build: {
-      // minify:false,
+      //minify:false,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib: lib,
@@ -106,9 +136,6 @@ export default ({ mode }) => {
         },
       },
     },
-    plugins:
-      mode === "metadata"
-        ? []
-        : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
+    plugins: plugins
   });
 };

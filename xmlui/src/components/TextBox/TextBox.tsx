@@ -8,13 +8,11 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
   dEndIcon,
   dEndText,
-  dFocus,
   dGotFocus,
   dInitialValue,
   dLabel,
@@ -26,7 +24,6 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -40,6 +37,21 @@ export const TextBoxMd = createMetadata({
   description:
     "`TextBox` captures user text input for forms, search fields, and data entry " +
     "with support for validation, icons, and formatting hints.",
+  parts: {
+    label: {
+      description: "The label displayed for the text box.",
+    },
+    startAdornment: {
+      description: "The adornment displayed at the start of the text box.",
+    },
+    endAdornment: {
+      description: "The adornment displayed at the end of the text box.",
+    },
+    input: {
+      description: "The text box input area.",
+    }
+  },
+  defaultPart: "input",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {
@@ -119,7 +131,8 @@ export const TextBoxMd = createMetadata({
     "backgroundColor-Input--disabled": "$backgroundColor--disabled",
     "borderWidth-Input": "1px",
     "minHeight-Input": "39px",
-    "padding-Input": "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
     "gap-adornment-Input": "$space-2",
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
@@ -148,7 +161,7 @@ export const TextBoxMd = createMetadata({
 type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
 
 function renderTextBox(
-  layoutCss: React.CSSProperties,
+  className: string | undefined,
   state: any,
   updateState: (componentState: any) => void,
   extractValue: ValueExtractor,
@@ -160,11 +173,12 @@ function renderTextBox(
   registerComponentApi: RegisterComponentApiFn,
   type: "text" | "password" = "text",
 ) {
-  delete layoutCss.gap;
+  // TODO: How can we use the gap from the className?
+  //delete layoutCss.gap;
   return (
     <TextBox
       type={type}
-      style={layoutCss}
+      className={className}
       value={state.value}
       updateState={updateState}
       initialValue={extractValue(node.props.initialValue)}
@@ -204,11 +218,11 @@ export const textBoxComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      layoutCss,
+      className,
       state,
       updateState,
       extractValue,
@@ -235,11 +249,11 @@ export const passwordInputComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      layoutCss,
+      className,
       state,
       updateState,
       extractValue,

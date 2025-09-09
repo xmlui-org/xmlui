@@ -1,8 +1,10 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
 $animDuration: 0.1s;
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -10,6 +12,7 @@ $animDuration: 0.1s;
 
 $componentName: "Select";
 $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 
 // --- CSS properties of a particular Select variant
@@ -46,422 +49,432 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 }
 
 @mixin valueVariant($variantName) {
-  & > span {
+  &>span {
     font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
     color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
 
-    & > div {
+    &>div {
       color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
       font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
     }
   }
 }
 
-.selectValue {
-  @include valueVariant("default");
+@layer components {
+  .selectValue {
+    @include valueVariant("default");
 
-  &.error {
-    @include valueVariant("error");
+    &.error {
+      @include valueVariant("error");
+    }
+
+    &.warning {
+      @include valueVariant("warning");
+    }
+
+    &.valid {
+      @include valueVariant("success");
+    }
   }
 
-  &.warning {
-    @include valueVariant("warning");
-  }
-
-  &.valid {
-    @include valueVariant("success");
-  }
-}
-
-.selectTrigger {
-  min-height: 2.6rem;
-  display: flex;
-  padding: t.$space-1 t.$space-2;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  outline: none;
-  overflow: hidden;
-
-  @include variant("default");
-
-  &.error {
-    @include variant("error");
-  }
-
-  &.warning {
-    @include variant("warning");
-  }
-
-  &.valid {
-    @include variant("success");
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: createThemeVar("opacity-#{$componentName}--disabled");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-    color: createThemeVar("Input:textColor-#{$componentName}--disabled");
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
-  }
-}
-
-.selectTrigger > span {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-}
-
-.badgeListContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.badgeList {
-  gap: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.badge {
-  width: fit-content;
-  height: fit-content;
-  min-width: 0;
-  padding: createThemeVar("paddingVertical-#{$componentName}-badge") createThemeVar("paddingHorizontal-#{$componentName}-badge");
-  transition: color 0.2s, background-color 0.2s;
-  user-select: none;
-  cursor: pointer;
-  display: flex;
-  gap: t.$space-1;
-  justify-content: center;
-  align-items: center;
-  border-radius: t.$borderRadius;
-  font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
-  color: createThemeVar("Input:textColor-#{$componentName}-badge");
-
-  &:hover {
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}-badge--hover");
-  }
-
-  &:active {
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
-    color: createThemeVar("Input:textColor-#{$componentName}-badge--active");
-  }
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.placeholder {
-  display: block;
-  color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-}
-
-.emptyList {
-  display: flex;
-  gap: .2rem;
-  padding: 10px 0;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  width: 100%;
-}
-
-.selectScrollUpButton {
-  display: flex;
-  cursor: default;
-  align-items: center;
-  justify-content: center;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.selectScrollDownButton {
-  display: flex;
-  cursor: default;
-  align-items: center;
-  justify-content: center;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.command {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  border-radius: 6px;
-  background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
-}
-
-.commandInputContainer {
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  border-bottom: 1px solid t.$borderColor;
-}
-
-.commandInput {
-  flex: 1;
-  background-color: transparent;
-  padding: 0.5rem;
-  font-size: 14px;
-  outline: none;
-  border: none;
-
-  &:focus {
-    outline: none;
-    box-shadow: none;
-    border: 0;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: createThemeVar("opacity-#{$componentName}--disabled");
-  }
-}
-
-.commandList {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.selectContent {
-  position: relative;
-  width: 100%;
-  max-height: 280px;
-  z-index: 1000;
-  overflow: auto;
-  background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
-  border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
-  box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
-  border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
-
-  &[data-state='open'] {
-    animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
-  }
-
-  &[data-state='closed'] {
-    animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
-  }
-
-  &[data-side='bottom'] {
-    animation: slideInFromTop 0.08s ease-in-out;
-  }
-
-  &[data-side='left'] {
-    animation: slideInFromRight $animDuration ease-in-out;
-  }
-
-  &[data-side='right'] {
-    animation: slideInFromLeft $animDuration ease-in-out;
-  }
-
-  &[data-side='top'] {
-    animation: slideInFromBottom $animDuration ease-in-out;
-  }
-
-  &[data-side='bottom'] {
-    transform: translateY(0.15rem);
-  }
-
-  &[data-side='left'] {
-    transform: translateX(-0.15rem);
-  }
-
-  &[data-side='right'] {
-    transform: translateX(0.15rem);
-  }
-
-  &[data-side='top'] {
-    transform: translateY(-0.15rem);
-  }
-}
-
-.multiComboboxOption {
-  .multiComboboxOptionContent {
+  .selectTrigger {
+    min-height: 2.6rem;
+    display: flex;
+    @include t.paddingVars($themeVars, $componentName);
     width: 100%;
-    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    outline: none;
+    overflow: hidden;
+
+    @include variant("default");
+
+    &.error {
+      @include variant("error");
+    }
+
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: createThemeVar("opacity-#{$componentName}--disabled");
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
+  }
+
+  .selectTrigger>span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+  }
+
+  .badgeListContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .badgeList {
+    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .badge {
+    width: fit-content;
+    height: fit-content;
+    min-width: 0;
+    padding: createThemeVar("paddingVertical-#{$componentName}-badge") createThemeVar("paddingHorizontal-#{$componentName}-badge");
+    transition: color 0.2s, background-color 0.2s;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: t.$space-1;
+    justify-content: center;
+    align-items: center;
+    border-radius: createThemeVar("borderRadius-#{$componentName}-badge");
+    font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
+    color: createThemeVar("Input:textColor-#{$componentName}-badge");
+
+    &:hover {
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
+      color: createThemeVar("Input:textColor-#{$componentName}-badge--hover");
+    }
+
+    &:active {
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
+      color: createThemeVar("Input:textColor-#{$componentName}-badge--active");
+    }
+  }
+
+  .actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .placeholder {
+    display: block;
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+  }
+
+  .emptyList {
+    display: flex;
+    gap: .2rem;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .selectScrollUpButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .selectScrollDownButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .command {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    border-radius: 6px;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+  }
+
+  .commandInputContainer {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid t.$borderColor;
+  }
+
+  .commandInput {
+    flex: 1;
+    background-color: transparent;
+    padding: 0.5rem;
+    font-size: 14px;
+    outline: none;
+    border: none;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+      border: 0;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: createThemeVar("opacity-#{$componentName}--disabled");
+    }
+  }
+
+  .commandList {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .selectContent {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    z-index: 1000;
+    overflow: auto;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
+
+    &[data-state='open'] {
+      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
+    }
+
+    &[data-state='closed'] {
+      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
+    }
+
+    &[data-side='bottom'] {
+      animation: slideInFromTop 0.08s ease-in-out;
+    }
+
+    &[data-side='left'] {
+      animation: slideInFromRight $animDuration ease-in-out;
+    }
+
+    &[data-side='right'] {
+      animation: slideInFromLeft $animDuration ease-in-out;
+    }
+
+    &[data-side='top'] {
+      animation: slideInFromBottom $animDuration ease-in-out;
+    }
+
+    &[data-side='bottom'] {
+      transform: translateY(0.15rem);
+    }
+
+    &[data-side='left'] {
+      transform: translateX(-0.15rem);
+    }
+
+    &[data-side='right'] {
+      transform: translateX(0.15rem);
+    }
+
+    &[data-side='top'] {
+      transform: translateY(-0.15rem);
+    }
+  }
+
+  .multiComboboxOption {
+    .multiComboboxOptionContent {
+      width: 100%;
+      gap: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+      @include t.paddingVars($themeVars, "item-#{$componentName}");
+    }
+
+    &[data-selected=true] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    &[data-disabled=true] {
+      pointer-events: none;
+      opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
+      cursor: not-allowed;
+      font-style: italic;
+    }
+  }
+
+  .selectItem {
+    position: relative;
+    display: flex;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
-    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    user-select: none;
+    align-items: center;
+    outline: none;
+    font-size: createThemeVar("fontSize-#{$componentName}");
+
+    &[data-highlighted] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    &[data-state=checked] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    .selectItemContent {
+      display: flex;
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+      align-items: center;
+      outline: none;
+      @include t.paddingVars($themeVars, "item-#{$componentName}");
+    }
   }
 
-  &[data-selected=true] {
-    background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-  }
-
-  &[data-disabled=true] {
+  .selectItem[data-disabled] {
     pointer-events: none;
     opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
     cursor: not-allowed;
     font-style: italic;
   }
-}
 
-.selectItem {
-  position: relative;
-  display: flex;
-  cursor: pointer;
-  user-select: none;
-  align-items: center;
-  outline: none;
-  font-size: createThemeVar("fontSize-#{$componentName}");
-
-  &[data-highlighted] {
-    background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-  }
-
-  &[data-state=checked] {
-    background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
-  }
-
-  .selectItemContent {
+  .selectItemIndicator {
     display: flex;
-    flex: 1;
-    cursor: pointer;
-    user-select: none;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    height: 0.875rem;
+    width: 0.875rem;
     align-items: center;
-    outline: none;
-    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    justify-content: center;
+    color: createThemeVar("textColor-indicator-#{$componentName}");
   }
-}
 
-.selectItem[data-disabled] {
-  pointer-events: none;
-  opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
-  cursor: not-allowed;
-  font-style: italic;
-}
+  .selectViewport {
+    height: fit-content;
+    width: 100%;
+    min-width: var(--radix-select-trigger-width);
+  }
 
-.selectItemIndicator {
-  display: flex;
-  margin-right: 0.5rem;
-  flex-shrink: 0;
-  height: 0.875rem;
-  width: 0.875rem;
-  align-items: center;
-  justify-content: center;
-  color: createThemeVar("textColor-indicator-#{$componentName}");
-}
+  .selectEmpty {
+    display: flex;
+    gap: .2rem;
+    height: 100%;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    width: 100%;
+  }
 
-.selectViewport {
-  height: fit-content;
-  width: 100%;
-  min-width: var(--radix-select-trigger-width);
-}
+  .loading {
+    padding: 0.5rem 1rem;
+  }
 
-.selectEmpty {
-  display: flex;
-  gap: .2rem;
-  height: 100%;
-  padding: 10px 0;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  width: 100%;
-}
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
-.loading {
-  padding: 0.5rem 1rem;
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
 
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+    to {
+      opacity: 1;
+    }
+  }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
 
-@keyframes fadeOut {
-  from {
-    opacity: 1;
+    to {
+      opacity: 0;
+    }
   }
-  to {
-    opacity: 0;
-  }
-}
 
-@keyframes zoomIn {
-  from {
-    transform: scale(0.95);
-  }
-  to {
-    transform: scale(1);
-  }
-}
+  @keyframes zoomIn {
+    from {
+      transform: scale(0.95);
+    }
 
-@keyframes zoomOut {
-  from {
-    transform: scale(1);
+    to {
+      transform: scale(1);
+    }
   }
-  to {
-    transform: scale(0.95);
-  }
-}
 
-@keyframes slideInFromTop {
-  from {
-    transform: translateY(-0.75rem);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
+  @keyframes zoomOut {
+    from {
+      transform: scale(1);
+    }
 
-@keyframes slideInFromBottom {
-  from {
-    transform: translateY(0.75rem);
+    to {
+      transform: scale(0.95);
+    }
   }
-  to {
-    transform: translateY(0);
-  }
-}
 
-@keyframes slideInFromLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
+  @keyframes slideInFromTop {
+    from {
+      transform: translateY(-0.75rem);
+    }
 
-@keyframes slideInFromRight {
-  from {
-    transform: translateX(100%);
+    to {
+      transform: translateY(0);
+    }
   }
-  to {
-    transform: translateX(0);
+
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(0.75rem);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
   }
 }
 
@@ -469,4 +482,3 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-

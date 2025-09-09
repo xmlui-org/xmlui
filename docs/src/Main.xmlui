@@ -46,7 +46,7 @@
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
                 <NavLink label="Markup" to="/markup" />
-                <!-- <NavLink label="Component Scoping" to="/scoping" /> -->
+                <NavLink label="Scoping" to="/scoping" />
                 <NavLink label="Scripting" to="/scripting" />
                 <NavLink label="Layout" to="/layout" />
                 <NavLink label="Working with Text" to="/working-with-text" />
@@ -65,10 +65,27 @@
                 <NavLink
                     label="Build a HelloWorld Component"
                     to="/build-hello-world-component" />
-                <NavLink
-                    label="Build a TableEditor Component"
-                    to="/build-editor-component" />
-                <NavLink label="How To" to="/howto" />
+                <NavLink label="Hosted Deployment" to="/hosted-deployment" />
+            </NavGroup>
+            <NavGroup label="How To">
+                <NavLink label="Expose a method from a component" to="/howto/expose-a-method-from-a-component" />
+                <NavLink label="React to button click not keystrokes" to="/howto/react-to-button-click-not-keystrokes" />
+                <NavLink label="Modify a value reported in a Column" to="/howto/modify-a-value-reported-in-a-column" />
+                <NavLink label="Filter and transform data from an API" to="/howto/filter-and-transform-data-from-an-api" />
+                <NavLink label="Group items in List by a property" to="/howto/group-items-in-list-by-a-property" />
+                <NavLink label="Delay a DataSource until another DataSource is ready" to="/howto/delay-a-datasource-until-another-datasource-is-ready" />
+                <NavLink label="Hide an element until its DataSource is ready" to="/howto/hide-an-element-until-its-datasource-is-ready" />
+                <NavLink label="Use built-in form validation" to="/howto/use-built-in-form-validation" />
+                <NavLink label="Do custom form validation" to="/howto/do-custom-form-validation" />
+                <NavLink label="Assign a complex JSON literal to a component variable" to="/howto/assign-a-complex-json-literal-to-a-component-variable" />
+                <NavLink label="Make a set of equal-width cards" to="/howto/make-a-set-of-equal-width-cards" />
+                <NavLink label="Set the initial value of a Select from fetched data" to="/howto/set-the-initial-value-of-a-select-from-fetched-data" />
+                <NavLink label="Pass data to a Modal Dialog" to="/howto/pass-data-to-a-modal-dialog" />
+                <NavLink label="Debug a component" to="/howto/debug-a-component" />
+                <NavLink label="Share a ModalDialog across components" to="/howto/share-a-modaldialog-across-components" />
+                <NavLink label="Use the same ModalDialog to add or edit" to="/howto/use-the-same-modaldialog-to-add-or-edit" />
+                <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
+                <!-- Add more links as additional files are created -->
             </NavGroup>
             <NavGroup label="Reference">
                 <NavGroup label="Components">
@@ -89,12 +106,14 @@
                     <NavLink label="CHStack" to="/components/CHStack" />
                     <NavLink label="CVStack" to="/components/CVStack" />
                     <NavLink label="Card" to="/components/Card" />
+                    <NavLink label="Carousel" to="/components/Carousel" />
                     <NavLink label="ChangeListener" to="/components/ChangeListener" />
                     <NavLink label="Checkbox" to="/components/Checkbox" />
                     <NavLink label="ColorPicker" to="/components/ColorPicker" />
                     <NavLink label="Column" to="/components/Column" />
                     <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
                     <NavLink label="DataSource" to="/components/DataSource" />
+                    <NavLink label="DateInput" to="/components/DateInput" />
                     <NavLink label="DatePicker" to="/components/DatePicker" />
                     <NavLink label="DonutChart" to="/components/DonutChart" />
                     <NavLink label="DropdownMenu" to="/components/DropdownMenu" />
@@ -140,6 +159,7 @@
                     <NavLink label="Page" to="/components/Page" />
                     <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
                     <NavLink label="Pages" to="/components/Pages" />
+                    <NavLink label="Pagination" to="/components/Pagination" />
                     <NavLink label="PasswordInput" to="/components/PasswordInput" />
                     <NavLink label="PieChart" to="/components/PieChart" />
                     <NavLink label="ProgressBar" to="/components/ProgressBar" />
@@ -165,8 +185,11 @@
                     <NavLink label="TextArea" to="/components/TextArea" />
                     <NavLink label="TextBox" to="/components/TextBox" />
                     <NavLink label="Theme" to="/components/Theme" />
+                    <NavLink label="TimeInput" to="/components/TimeInput" />
+                    <NavLink label="Timer" to="/components/Timer" />
                     <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
                     <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
+                    <NavLink label="Tooltip" to="/components/Tooltip" />
                     <NavLink label="VSplitter" to="/components/VSplitter" />
                     <NavLink label="VStack" to="/components/VStack" />
                     <!-- END GENERATED CONTENT/Component references links -->
@@ -331,8 +354,60 @@
             <Page url="/build-editor-component">
                 <DocumentPage url="/pages/build-editor-component.md" />
             </Page>
-            <Page url="/howto">
-                <DocumentPage url="/pages/howto.md" />
+            <Page url="/howto/expose-a-method-from-a-component">
+                <DocumentPageNoTOC url="/pages/howto/expose-a-method-from-a-component.md" />
+            </Page>
+            <Page url="/howto/react-to-button-click-not-keystrokes">
+                <DocumentPageNoTOC url="/pages/howto/react-to-button-click-not-keystrokes.md" />
+            </Page>
+            <Page url="/howto/modify-a-value-reported-in-a-column">
+                <DocumentPageNoTOC url="/pages/howto/modify-a-value-reported-in-a-column.md" />
+            </Page>
+            <Page url="/howto/filter-and-transform-data-from-an-api">
+                <DocumentPageNoTOC url="/pages/howto/filter-and-transform-data-from-an-api.md" />
+            </Page>
+            <Page url="/howto/group-items-in-list-by-a-property">
+                <DocumentPageNoTOC url="/pages/howto/group-items-in-list-by-a-property.md" />
+            </Page>
+            <Page url="/howto/delay-a-datasource-until-another-datasource-is-ready">
+                <DocumentPageNoTOC url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md" />
+            </Page>
+            <Page url="/howto/hide-an-element-until-its-datasource-is-ready">
+                <DocumentPageNoTOC url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md" />
+            </Page>
+            <Page url="/howto/use-built-in-form-validation">
+                <DocumentPageNoTOC url="/pages/howto/use-built-in-form-validation.md" />
+            </Page>
+            <Page url="/howto/do-custom-form-validation">
+                <DocumentPageNoTOC url="/pages/howto/do-custom-form-validation.md" />
+            </Page>
+            <Page url="/howto/assign-a-complex-json-literal-to-a-component-variable">
+                <DocumentPageNoTOC url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md" />
+            </Page>
+            <Page url="/howto/make-a-set-of-equal-width-cards">
+                <DocumentPageNoTOC url="/pages/howto/make-a-set-of-equal-width-cards.md" />
+            </Page>
+            <Page url="/howto/set-the-initial-value-of-a-select-from-fetched-data">
+                <DocumentPageNoTOC url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md" />
+            </Page>
+            <Page url="/howto/pass-data-to-a-modal-dialog">
+                <DocumentPageNoTOC url="/pages/howto/pass-data-to-a-modal-dialog.md" />
+            </Page>
+            <Page url="/howto/debug-a-component">
+                <DocumentPageNoTOC url="/pages/howto/debug-a-component.md" />
+            </Page>
+            <Page url="/howto/share-a-modaldialog-across-components">
+                <DocumentPageNoTOC url="/pages/howto/share-a-modaldialog-across-components.md" />
+            </Page>
+            <Page url="/howto/use-the-same-modaldialog-to-add-or-edit">
+                <DocumentPageNoTOC url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md" />
+            </Page>
+            <Page url="/howto/paginate-a-list">
+                <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
+            </Page>
+            <!-- Add more pages as additional files are created -->
+            <Page url="/hosted-deployment">
+                <DocumentPage url="/pages/hosted-deployment.md" />
             </Page>
             <Page url="/change-log">
                 <ChangeLog />

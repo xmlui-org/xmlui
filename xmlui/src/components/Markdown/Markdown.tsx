@@ -4,7 +4,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
 import type React from "react";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
@@ -87,6 +87,11 @@ export const MarkdownMd = createMetadata({
     "marginLeft-Image-markdown": "$space-0",
     "marginRight-Image-markdown": "$space-0",
 
+    "marginTop-Text-markdown": "$space-3",
+    "marginBottom-Text-markdown": "$space-6",
+    "fontSize-Text-markdown": "fontSize-${COMP}",
+    "fontWeight-Text-markdown": "fontWeight-Text",
+
     light: {
       // --- No light-specific theme vars
     },
@@ -100,7 +105,7 @@ export const MarkdownMd = createMetadata({
 export const markdownComponentRenderer = createComponentRenderer(
   COMP,
   MarkdownMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     let renderedChildren = "";
 
     // 1. Static content prop fallback
@@ -125,7 +130,7 @@ export const markdownComponentRenderer = createComponentRenderer(
 
     return (
       <TransformedMarkdown
-        style={layoutCss}
+        className={className}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
@@ -140,62 +145,68 @@ export const markdownComponentRenderer = createComponentRenderer(
 type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
-  style: React.CSSProperties;
+  className?: string;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
 };
 
-const TransformedMarkdown = ({
-  children,
-  removeIndents,
-  style,
-  extractValue,
-  codeHighlighter,
-  showHeadingAnchors,
-}: TransformedMarkdownProps) => {
-  const markdownContent = useMemo(() => {
-    if (typeof children !== "string") {
-      return null;
-    }
+const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
+  (
+    {
+      children,
+      removeIndents,
+      className,
+      extractValue,
+      codeHighlighter,
+      showHeadingAnchors,
+    }: TransformedMarkdownProps,
+    ref,
+  ) => {
+    const markdownContent = useMemo(() => {
+      if (typeof children !== "string") {
+        return null;
+      }
 
-    // --- Resolve binding expression values
-    // --- Resolve xmlui playground definitions
+      // --- Resolve binding expression values
+      // --- Resolve xmlui playground definitions
 
-    let resolvedMd = children;
-    while (true) {
-      const nextPlayground = observePlaygroundPattern(resolvedMd);
-      if (!nextPlayground) break;
+      let resolvedMd = children;
+      while (true) {
+        const nextPlayground = observePlaygroundPattern(resolvedMd);
+        if (!nextPlayground) break;
 
-      resolvedMd =
-        resolvedMd.slice(0, nextPlayground[0]) +
-        convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
-        resolvedMd.slice(nextPlayground[1]);
-    }
+        resolvedMd =
+          resolvedMd.slice(0, nextPlayground[0]) +
+          convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
+          resolvedMd.slice(nextPlayground[1]);
+      }
 
-    while (true) {
-      const nextTreeDisplay = observeTreeDisplay(resolvedMd);
-      if (!nextTreeDisplay) break;
-      resolvedMd =
-        resolvedMd.slice(0, nextTreeDisplay[0]) +
-        convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
-        resolvedMd.slice(nextTreeDisplay[1]);
-    }
+      while (true) {
+        const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+        if (!nextTreeDisplay) break;
+        resolvedMd =
+          resolvedMd.slice(0, nextTreeDisplay[0]) +
+          convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+          resolvedMd.slice(nextTreeDisplay[1]);
+      }
 
-    resolvedMd = parseBindingExpression(resolvedMd, extractValue);
-    return resolvedMd;
-  }, [children, extractValue]);
+      resolvedMd = parseBindingExpression(resolvedMd, extractValue);
+      return resolvedMd;
+    }, [children, extractValue]);
 
-  return (
-    <Markdown
-      removeIndents={removeIndents}
-      codeHighlighter={codeHighlighter}
-      style={style}
-      showHeadingAnchors={showHeadingAnchors}
-    >
-      {markdownContent}
-    </Markdown>
-  );
-};
+    return (
+      <Markdown
+        ref={ref}
+        removeIndents={removeIndents}
+        codeHighlighter={codeHighlighter}
+        className={className}
+        showHeadingAnchors={showHeadingAnchors}
+      >
+        {markdownContent}
+      </Markdown>
+    );
+  },
+);
 
 export { Markdown } from "./MarkdownNative";

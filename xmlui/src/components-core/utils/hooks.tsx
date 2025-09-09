@@ -393,3 +393,34 @@ export const useStartMargin = (
 
   return startMargin;
 };
+
+export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivElement | null>) {
+  const [hasHeight, setHasHeight] = useState(false);
+  useLayoutEffect(() => {
+    if (parentRef.current) {
+      const computedStyles = window.getComputedStyle(parentRef.current);
+      const hasMaxHeight = computedStyles.maxHeight !== "none";
+      // Get the original computed height
+      const originalHeight = window.getComputedStyle(parentRef.current).height;
+
+      // Store original inline style to restore it later
+      const originalInlineHeight = parentRef.current.style.height || "";
+
+      // Temporarily set height to auto and get the new computed height
+      parentRef.current.style.height = "auto";
+      const autoHeight = window.getComputedStyle(parentRef.current).height;
+
+      // Restore the original inline style immediately
+      parentRef.current.style.height = originalInlineHeight;
+
+      // If the original height is different from what the browser
+      // calculates for 'auto', it means a height was explicitly set.
+      // We also check if the inline style itself had a value.
+      let hasHeight = originalHeight !== autoHeight || !!originalInlineHeight;
+
+      const isFlex = computedStyles.display === "flex";
+      setHasHeight(hasMaxHeight || hasHeight || isFlex);
+    }
+  }, [parentRef]);
+  return hasHeight;
+}

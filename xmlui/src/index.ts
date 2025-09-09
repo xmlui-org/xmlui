@@ -45,12 +45,19 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
+import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { StyleProvider } from "./components-core/theming/StyleContext";
+import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
-import { createMetadata, d } from "./components/metadata-helpers";
+import {
+  createMetadata,
+  d,
+  dComponent,
+} from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -76,6 +83,7 @@ export {
   createComponentRenderer,
   createMetadata,
   d,
+  dComponent,
   parseScssVar,
   startApp,
   useTheme,
@@ -106,8 +114,11 @@ export {
   LinkNative,
   ToneChangerButton,
   Logo,
+  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
+  StyleProvider,
+  StyleRegistry,
   useEvent,
-  StandaloneComponent
+  StandaloneComponent,
 };

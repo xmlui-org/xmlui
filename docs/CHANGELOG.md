@@ -1,5 +1,41 @@
 # xmlui-docs
 
+## 0.0.8
+
+### Patch Changes
+
+- 4ad31fc: refactor: rename dataKeys/nameKey to xKeys/yKey and layout to orientation in chart components - BarChart, LineChart
+- Updated dependencies [879c09d]
+- Updated dependencies [3ad8514]
+- Updated dependencies [0c69245]
+- Updated dependencies [4ad31fc]
+- Updated dependencies [c99f184]
+- Updated dependencies [5032e4a]
+- Updated dependencies [2394f36]
+  - xmlui@0.10.9
+
+## 0.0.7
+
+### Patch Changes
+
+- 6bc9ed1: feat: support aligning cells in a Table row vertically
+- Updated dependencies [2e512bb]
+- Updated dependencies [46d1d18]
+- Updated dependencies [6bc9ed1]
+- Updated dependencies [0b1f983]
+- Updated dependencies [a2637f3]
+- Updated dependencies [eb4d592]
+  - xmlui@0.10.3
+
+## 0.0.6
+
+### Patch Changes
+
+- 1451a94: feat: make input padding configurable via theme variables
+- Updated dependencies [ff14e15]
+- Updated dependencies [1451a94]
+  - xmlui@0.10.2
+
 ## 0.0.5
 
 ### Patch Changes

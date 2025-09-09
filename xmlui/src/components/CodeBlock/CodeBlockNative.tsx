@@ -1,7 +1,11 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
 import { Text } from "../Text/TextNative";
-import { type CodeHighlighterMeta, CodeHighlighterMetaKeys, encodeToBase64 } from "./highlight-code";
+import {
+  type CodeHighlighterMeta,
+  CodeHighlighterMetaKeys,
+  encodeToBase64,
+} from "./highlight-code";
 import { Button } from "../Button/ButtonNative";
 import Icon from "../Icon/IconNative";
 import toast from "react-hot-toast";
@@ -15,25 +19,35 @@ type CodeBlockProps = {
   textToCopy?: string;
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;
+  className?: string;
 };
 
 export const defaultProps = {
   // No default props needed for this component currently
 };
 
-export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
+export function CodeBlock({
+  children,
+  meta,
+  textToCopy,
+  style,
+  className,
+  ...rest
+}: CodeBlockProps) {
   // 'global-codeBlock' class is there so we could apply styles if this codeblock is used inside a splitView nested app
   if (!meta) {
     return (
-      <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
-        <div className={styles.codeBlockContent}>
-          {children}
-        </div>
+      <div
+        {...rest}
+        className={classnames(className, styles.codeBlock, "global-codeBlock")}
+        style={style}
+      >
+        <div className={styles.codeBlockContent}>{children}</div>
       </div>
     );
   }
   return (
-    <div className={classnames(styles.codeBlock, 'global-codeBlock')} style={style}>
+    <div className={classnames(styles.codeBlock, "global-codeBlock")} style={style}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
           <Text variant="em">{meta.filename}</Text>
@@ -41,19 +55,21 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
       )}
       <div className={styles.codeBlockContent}>
         {children}
-        {meta.copy !== false && <div className={styles.codeBlockCopyButton}>
-          <Button
-            variant="ghost"
-            size="xs"
-            className={styles.copyButton}
-            icon={<Icon name={"copy"} aria-hidden />}
-            onClick={() => {
-              if (!textToCopy) return;
-              navigator.clipboard.writeText(textToCopy);
-              toast.success("Code copied!");
-            }}
-          ></Button>
-        </div>}
+        {meta.copy !== false && (
+          <div className={styles.codeBlockCopyButton}>
+            <Button
+              variant="ghost"
+              size="xs"
+              className={styles.copyButton}
+              icon={<Icon name={"copy"} aria-hidden />}
+              onClick={() => {
+                if (!textToCopy) return;
+                navigator.clipboard.writeText(textToCopy);
+                toast.success("Code copied!");
+              }}
+            ></Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -113,7 +129,8 @@ export function markdownCodeBlockParser() {
           }
         }
         if (item.startsWith("!/") && item.endsWith("/")) {
-          const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
+          const unparsedSubstrings =
+            acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
           const newItemBase64 = encodeToBase64(item.substring(2, item.length - 1));
 
           if (!unparsedSubstrings) {

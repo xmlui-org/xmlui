@@ -1,6 +1,7 @@
 import { BarChart, defaultProps } from "./BarChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata } from "../../metadata-helpers";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "BarChart";
 
@@ -17,7 +18,7 @@ export const BarChartMd = createMetadata({
         `This property is used to provide the component with data to display.` +
         `The data needs to be an array of objects.`,
     },
-    dataKeys: {
+    xKeys: {
       description:
         "This property specifies the keys in the data objects that should be used for rendering the bars." +
         `E.g. 'id' or 'key'.`,
@@ -30,7 +31,7 @@ export const BarChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.stacked,
     },
-    layout: {
+    orientation: {
       description:
         `This property determines the orientation of the bar chart. The \`vertical\` variant ` +
         `specifies the horizontal axis as the primary and lays out the bars from left to right. ` +
@@ -40,7 +41,7 @@ export const BarChartMd = createMetadata({
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.layout,
     },
-    nameKey: {
+    yKey: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
       valueType: "string",
@@ -87,22 +88,25 @@ export const BarChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
   },
 });
 
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <BarChart
-        style={layoutCss}
+        className={className}
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
         tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
-        layout={extractValue(node.props?.layout)}
-        nameKey={extractValue(node.props?.nameKey)}
-        dataKeys={extractValue(node.props?.dataKeys)}
+        layout={extractValue(node.props?.orientation)}
+        nameKey={extractValue(node.props?.yKey)}
+        dataKeys={extractValue(node.props?.xKeys)}
         stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
         hideX={extractValue.asOptionalBoolean(node.props?.hideX)}
         hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
@@ -110,6 +114,22 @@ export const barChartComponentRenderer = createComponentRenderer(
         hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
         hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </BarChart>

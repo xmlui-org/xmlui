@@ -52,13 +52,13 @@ export const AvatarMd = createMetadata({
 export const avatarComponentRenderer = createComponentRenderer(
   COMP,
   AvatarMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss, extractResourceUrl }) => {
+  ({ node, extractValue, lookupEventHandler, className, extractResourceUrl }) => {
     return (
       <Avatar
+        className={className}
         size={node.props?.size}
         url={extractResourceUrl(node.props.url)}
         name={extractValue(node.props.name)}
-        style={layoutCss}
         onClick={lookupEventHandler("click")}
       />
     );

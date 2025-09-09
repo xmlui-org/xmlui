@@ -142,14 +142,14 @@ export const FormMd = createMetadata({
 export const formComponentRenderer = createComponentRenderer(
   COMP,
   FormMd,
-  ({ node, renderChild, extractValue, layoutCss, lookupEventHandler, registerComponentApi }) => {
+  ({ node, renderChild, extractValue, className, lookupEventHandler, registerComponentApi }) => {
     return (
       <FormWithContextVar
         node={node as any}
         renderChild={renderChild}
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
-        style={layoutCss}
+        className={className}
         registerComponentApi={registerComponentApi}
       />
     );

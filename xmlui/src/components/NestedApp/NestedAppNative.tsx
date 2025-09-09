@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
@@ -17,6 +17,10 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import styles from "./NestedApp.module.scss";
 import classnames from "classnames";
+import {
+  StyleInjectionTargetContext,
+  StyleProvider, useStyles
+} from "../../components-core/theming/StyleContext";
 
 type NestedAppProps = {
   api?: any;
@@ -142,6 +146,13 @@ export function NestedApp({
     if (!shadowRef.current && rootRef.current) {
       // Clone existing style and link tags
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
+      let style = document.createElement("style");
+
+      // since we are using shadow DOM, we need to define the layers here
+      // to ensure that the styles are applied correctly (the adopted styleheets setting is asynchronous, so the layer order might not be respected if we don't do this)
+      // MUST BE IN SYNC WITH THE STYLESHEET ORDER IN index.scss
+      style.innerHTML = "@layer reset, base, components, dynamic;";
+      shadowRef.current.appendChild(style);
 
       // This should run once to prepare the stylesheets
       const sheetPromises = Array.from(document.styleSheets).map(async (sheet) => {
@@ -149,7 +160,7 @@ export function NestedApp({
         if (
           sheet.ownerNode &&
           sheet.ownerNode instanceof Element &&
-          sheet.ownerNode.hasAttribute("data-theme-root")
+          sheet.ownerNode.hasAttribute("data-style-hash")
         ) {
           return null; // Skip this stylesheet
         }
@@ -161,7 +172,7 @@ export function NestedApp({
             // Get the CSS rules as text
             const cssText = Array.from(sheet.cssRules)
               .map((rule) => rule.cssText)
-              .join(" ");
+              .join(" \n");
             // Apply the text to the new sheet object
             await newSheet.replace(cssText);
             return newSheet;
@@ -217,40 +228,38 @@ export function NestedApp({
       apiUrl,
     };
 
-    // css variables are leaking into to shadow dom, so we reset them here
-    const themeVarReset = {};
-    Object.keys(theme.themeStyles).forEach((key) => {
-      themeVarReset[key] = "initial";
-    });
-
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
-        <ApiInterceptorProvider
-          parentInterceptorContext={parentInterceptorContext}
-          key={`app-${refreshVersion}`}
-          interceptor={mock}
-          waitForApiInterceptor={true}
-        >
-          <div style={{ height, ...style, ...themeVarReset }}>
-            <AppRoot
-              onInit={onInit}
-              isNested={true}
-              previewMode={true}
-              standalone={true}
-              trackContainerHeight={height ? "fixed" : "auto"}
-              node={component}
-              globalProps={globalProps}
-              defaultTheme={activeTheme || config?.defaultTheme}
-              defaultTone={toneToApply as ThemeTone}
-              contributes={{
-                compoundComponents,
-                themes: config?.themes,
-              }}
-              resources={config?.resources}
-              extensionManager={componentRegistry.getExtensionManager()}
-            />
-          </div>
-        </ApiInterceptorProvider>
+        <StyleInjectionTargetContext.Provider value={shadowRef.current}>
+          <StyleProvider forceNew={true}>
+            <ApiInterceptorProvider
+              parentInterceptorContext={parentInterceptorContext}
+              key={`app-${refreshVersion}`}
+              interceptor={mock}
+              waitForApiInterceptor={true}
+            >
+              <NestedAppRoot themeStylesToReset={theme.themeStyles}>
+                <AppRoot
+                  onInit={onInit}
+                  isNested={true}
+                  previewMode={true}
+                  standalone={true}
+                  trackContainerHeight={height ? "fixed" : "auto"}
+                  node={component}
+                  globalProps={globalProps}
+                  defaultTheme={activeTheme || config?.defaultTheme}
+                  defaultTone={toneToApply as ThemeTone}
+                  contributes={{
+                    compoundComponents,
+                    themes: config?.themes,
+                  }}
+                  resources={config?.resources}
+                  extensionManager={componentRegistry.getExtensionManager()}
+                />
+              </NestedAppRoot>
+            </ApiInterceptorProvider>
+          </StyleProvider>
+        </StyleInjectionTargetContext.Provider>
       </ErrorBoundary>,
     );
   }, [
@@ -307,3 +316,23 @@ export function NestedApp({
     </div>
   );
 }
+
+function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; themeStylesToReset?: Record<string, string>}) {
+  // css variables are leaking into to shadow dom, so we reset them here
+  const themeVarReset = useMemo(() => {
+    const vars = {};
+    Object.keys(themeStylesToReset).forEach((key) => {
+      vars[key] = "initial";
+    });
+    return vars;
+  }, [themeStylesToReset]);
+
+  const resetClassName = useStyles(themeVarReset, { prepend: true });
+
+  return <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>
+    <div className={styles.content}>
+      {children}
+    </div>
+  </div>
+}
+

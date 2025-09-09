@@ -1,5 +1,115 @@
 # xmlui-vscode
 
+## 0.10.10
+
+### Patch Changes
+
+- Updated dependencies [fff80c5]
+  - xmlui@0.10.10
+
+## 0.10.9
+
+### Patch Changes
+
+- Updated dependencies [879c09d]
+- Updated dependencies [3ad8514]
+- Updated dependencies [0c69245]
+- Updated dependencies [4ad31fc]
+- Updated dependencies [c99f184]
+- Updated dependencies [5032e4a]
+- Updated dependencies [2394f36]
+  - xmlui@0.10.9
+
+## 0.10.8
+
+### Patch Changes
+
+- Updated dependencies [a4d62c4]
+- Updated dependencies [7ed2918]
+  - xmlui@0.10.8
+
+## 0.10.7
+
+### Patch Changes
+
+- Updated dependencies [664ea4f]
+- Updated dependencies [a739a26]
+- Updated dependencies [bdb54dd]
+- Updated dependencies [81724c6]
+  - xmlui@0.10.7
+
+## 0.10.6
+
+### Patch Changes
+
+- Updated dependencies [6464ec8]
+  - xmlui@0.10.6
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies [d38351d]
+  - xmlui@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- Updated dependencies [43fd8c5]
+- Updated dependencies [1df8e5d]
+- Updated dependencies [0d5d9d1]
+- Updated dependencies [3def673]
+- Updated dependencies [428ebea]
+- Updated dependencies [a12ce66]
+  - xmlui@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- Updated dependencies [2e512bb]
+- Updated dependencies [46d1d18]
+- Updated dependencies [6bc9ed1]
+- Updated dependencies [0b1f983]
+- Updated dependencies [a2637f3]
+- Updated dependencies [eb4d592]
+  - xmlui@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [ff14e15]
+- Updated dependencies [1451a94]
+  - xmlui@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [442416b]
+- Updated dependencies [a018431]
+- Updated dependencies [33cb547]
+- Updated dependencies [b5d7537]
+  - xmlui@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [6d0ce52]
+- Updated dependencies [8c98f33]
+- Updated dependencies [ef86593]
+- Updated dependencies [da5f4e7]
+- Updated dependencies [47c7a2d]
+- Updated dependencies [740f904]
+- Updated dependencies [5009c52]
+- Updated dependencies [000a311]
+- Updated dependencies [eb8b958]
+- Updated dependencies [2f5ec32]
+  - xmlui@0.10.0
+
 ## 0.9.101
 
 ### Patch Changes

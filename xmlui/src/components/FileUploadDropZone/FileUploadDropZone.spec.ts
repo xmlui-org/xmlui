@@ -71,11 +71,11 @@ test("component has correct accessibility structure", async ({ initTestBed, crea
 test("component supports keyboard interaction through children", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
   await initTestBed(`
     <FileUploadDropZone>
-      <Button>Browse Files</Button>
+      <Button testId="customButton">Browse Files</Button>
     </FileUploadDropZone>
   `);
   const driver = await createFileUploadDropZoneDriver();
-  const button = driver.component.getByRole('button');
+  const button = driver.component.getByTestId('customButton');
   await expect(button).toBeVisible();
   await button.focus();
   await expect(button).toBeFocused();
@@ -301,17 +301,17 @@ test("component works with nested interactive elements", async ({ initTestBed, c
   await initTestBed(`
     <FileUploadDropZone>
       <VStack>
-        <Button>Upload from Computer</Button>
+        <Button testId="button">Upload from Computer</Button>
         <Text>Upload Help</Text>
-        <TextBox placeholder="File description"/>
+        <TextBox testId="textbox" placeholder="File description"/>
       </VStack>
     </FileUploadDropZone>
   `);
   const driver = await createFileUploadDropZoneDriver();
   
-  await expect(driver.component.getByRole('button')).toBeVisible();
+  await expect(driver.component.getByTestId('button')).toBeVisible();
   await expect(driver.component).toContainText("Upload Help");
-  await expect(driver.component.getByRole('textbox')).toBeVisible();
+  await expect(driver.component.getByTestId('textbox')).toBeVisible();
 });
 
 test("component handles paste operations when enabled", async ({ initTestBed, createFileUploadDropZoneDriver }) => {

@@ -39,9 +39,9 @@ export const CodeBlockMd = createMetadata({
 export const codeBlockComponentRenderer = createComponentRenderer(
   "CodeBlock",
   CodeBlockMd,
-  ({ node, renderChild, layoutCss }) => {
+  ({ node, renderChild, className }) => {
     return (
-      <CodeBlock style={layoutCss}>
+      <CodeBlock className={className}>
         {renderChild(node.children)}
       </CodeBlock>
     );

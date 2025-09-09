@@ -93,7 +93,9 @@ This property defines the URL of the link. If the value is not defined, the link
 
 ## Events [#events]
 
-This component does not have any events.
+### `click` [#click]
+
+This event is triggered when the link is clicked.
 
 ## Exposed Methods [#exposed-methods]
 

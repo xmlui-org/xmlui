@@ -1,7 +1,7 @@
 {
   "name": "xmlui-docs",
   "private": true,
-  "version": "0.0.5",
+  "version": "0.0.8",
   "scripts": {
     "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
@@ -12,11 +12,12 @@
     "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
   },
   "dependencies": {
-    "shiki": "^3.3.0",
     "@shikijs/langs": "3.4.2",
+    "shiki": "^3.3.0",
     "xmlui": "*",
     "xmlui-playground": "*",
-    "xmlui-search": "*"
+    "xmlui-search": "*",
+    "xmlui-hello-world": "*"
   },
   "msw": {
     "workerDirectory": [
@@ -24,6 +25,7 @@
     ]
   },
   "devDependencies": {
+    "@emotion/is-prop-valid": "^1.3.1",
     "@octokit/rest": "^22.0.0",
     "remark-parse": "11.0.0",
     "remark-stringify": "11.0.0",

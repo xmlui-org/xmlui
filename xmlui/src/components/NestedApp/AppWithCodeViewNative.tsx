@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
@@ -176,7 +176,7 @@ export function AppWithCodeViewNative({
             </Markdown>
             <IndexAwareNestedApp
               className={classnames({ [styles.hidden]: showCode })}
-              height={"100%"}
+              height="100%"
               app={app}
               api={api}
               components={components}

@@ -9,6 +9,7 @@ type Props = {
   url?: string;
   name?: string;
   style?: CSSProperties;
+  className?: string;
 } & Pick<React.HTMLAttributes<HTMLDivElement>, "onClick">;
 
 export const defaultProps: Pick<Props, "size"> = {
@@ -16,7 +17,7 @@ export const defaultProps: Pick<Props, "size"> = {
 };
 
 export const Avatar = memo(forwardRef(function Avatar(
-  { size = defaultProps.size, url, name, style, onClick, ...rest }: Props,
+  { size = defaultProps.size, url, name, style, className, onClick, ...rest }: Props,
   ref: Ref<any>,
 ) {
   // Memoize the abbreviated name calculation to avoid recalculation on every render
@@ -32,6 +33,7 @@ export const Avatar = memo(forwardRef(function Avatar(
 
   // Simplified className generation by directly mapping size to styles
   const commonClassNames = classnames(
+    className,
     styles.container,
     styles[size as keyof typeof styles] || styles.sm, // Fallback to sm if size not found
     { [styles.clickable]: !!onClick }

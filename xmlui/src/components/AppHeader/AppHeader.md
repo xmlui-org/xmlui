@@ -13,7 +13,7 @@
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="150px"
+```xmlui-pg copy display {3-8} name="Example: logoTemplate" height="170px"
 <App>
   <AppHeader>
   <property name="logoTemplate">

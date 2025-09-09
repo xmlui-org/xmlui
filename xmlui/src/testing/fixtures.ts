@@ -61,6 +61,9 @@ import {
   SpinnerDriver,
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
+import { TimeInputDriver } from "./drivers/TimeInputDriver";
+import { TimerDriver } from "./drivers/TimerDriver";
+import { DateInputDriver } from "./drivers/DateInputDriver";
 
 export { expect } from "./assertions";
 
@@ -94,14 +97,12 @@ class Clipboard {
   init() {
     return () => {
       window.navigator.clipboard.readText = async () => this.content;
-      window.navigator.clipboard.read = async () => [new ClipboardItem({ "text/plain": this.content })];
+      window.navigator.clipboard.read = async () => {
+        throw new Error("Clipboard read not implemented in mocked environment");
+      };
       window.navigator.clipboard.writeText = async (text) => { this.content = text };
       window.navigator.clipboard.write = async (items) => {
-        for (const item of items) {
-          if (item.types.includes("text/plain")) {
-            this.content = await item.getType("text/plain").then((blob) => blob.text());
-          }
-        }
+        throw new Error("Clipboard write not implemented in mocked environment");
       };
     }
   }
@@ -528,6 +529,21 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
+  createTimeInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TimeInputDriver, testIdOrLocator);
+    });
+  },
+  createTimerDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TimerDriver, testIdOrLocator);
+    });
+  },
+  createDateInputDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(DateInputDriver, testIdOrLocator);
+    });
+  }
 });
 
 // --- Types
@@ -600,4 +616,7 @@ type TestDriverExtenderProps = {
   createLabelDriver: ComponentDriverMethod<LabelDriver>;
   createSpinnerDriver: ComponentDriverMethod<SpinnerDriver>;
   createDropdownMenuDriver: ComponentDriverMethod<DropdownMenuDriver>;
+  createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
+  createTimerDriver: ComponentDriverMethod<TimerDriver>;
+  createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
 };

@@ -34,7 +34,7 @@ export const OptionMd = createMetadata({
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
-  ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
+  ({ node, extractValue, className, renderChild, layoutContext }) => {
     const label = extractValue.asOptionalString(node.props.label);
     const value = extractValue.asOptionalString(node.props.value);
 
@@ -50,7 +50,7 @@ export const optionComponentRenderer = createComponentRenderer(
         label={label || textNodeChild}
         value={value || label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        style={layoutCss}
+        className={className}
         optionRenderer={
           node.children?.length > 0
             ? !hasTextNodeChild ? (contextVars) => (

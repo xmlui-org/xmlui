@@ -9,6 +9,7 @@ export type Option = {
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
+  className?: string;
   readOnly?: boolean;
   keywords?: string[];
   children?: ReactNode;
@@ -26,6 +27,7 @@ export type Tab = {
   headerRenderer?: (contextVars: any) => ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
+  activated?: () => void;
 };
 
 export const LinkTargetNames = ["_self", "_blank", "_parent", "_top", "_unfencedTop"] as const;
@@ -108,15 +110,17 @@ export const viewportSizeMd: PropertyValueDescription[] = [
 export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
-export const sizeNames = ["xs", "sm", "md", "lg"] as const;
-export const sizeMd: PropertyValueDescription[] = [
+export const sizeValues = ["xs", "sm", "md", "lg"] as const;
+export type SizeType = (typeof sizeValues)[number];
+export const sizeMd: PropertyValueDescription<SizeType>[] = [
   { value: "xs", description: "Extra small" },
   { value: "sm", description: "Small" },
   { value: "md", description: "Medium" },
   { value: "lg", description: "Large" },
 ];
-const sizeValues = Object.keys(sizeMd);
-export type ComponentSize = (typeof sizeValues)[number];
+export function isSizeType(value: any): value is SizeType {
+  return sizeValues.includes(value);
+}
 
 // --- Available button themes
 export const buttonThemeValues = ["attention", "primary", "secondary"] as const;
@@ -311,7 +315,6 @@ const TextVariantKeys = [
   "abbr", // use <abbr>
   "cite", // use <cite>
   "code", // use <code>
-  "codefence", // use uniquely styled <![CDATA[
   "deleted", // use <del>
   "inherit",
   "inserted", // use <ins>
@@ -335,6 +338,26 @@ const TextVariantKeys = [
   "secondary", // use a secondary text style
 ] as const;
 export type TextVariant = (typeof TextVariantKeys)[number];
+
+// --- overflow mode for text components
+const OverflowModeKeys = [
+  "none", // Clips text cleanly without ellipsis when maxLines is reached
+  "ellipsis", // Truncates with an ellipsis (text-overflow: ellipsis)
+  "scroll", // Enables horizontal scrolling (overflow: auto), ignores maxLines
+  "flow", // Breaks text into multiple lines with vertical scrolling when needed
+] as const;
+export type OverflowMode = (typeof OverflowModeKeys)[number];
+
+// --- break mode for text components
+const BreakModeKeys = [
+  "normal", // Uses standard word boundaries for breaking
+  "word", // Breaks long words when necessary to prevent overflow
+  "anywhere", // Breaks at any character if needed to fit content
+  "keep", // Prevents breaking within words entirely
+  "hyphenate", // Uses automatic hyphenation when breaking words
+] as const;
+export type BreakMode = (typeof BreakModeKeys)[number];
+
 type TextPropertyValueDescription = PropertyValueDescription & {
   value: TextVariant;
   description: string;
@@ -365,7 +388,6 @@ export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   abbr: "abbr",
   cite: "cite",
   code: "code",
-  codefence: "pre",
   deleted: "del",
   inherit: "span",
   inserted: "ins",
@@ -394,10 +416,6 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "caption", description: "Represents the caption (or title) of a table" },
   { value: "cite", description: "Is used to mark up the title of a cited work" },
   { value: "code", description: "Represents a line of code" },
-  {
-    value: "codefence",
-    description: "Handles the display of code blocks if combined with a `code` variant",
-  },
   { value: "deleted", description: "Represents text that has been deleted" },
   { value: "em", description: "Marks text to stress emphasis" },
   {

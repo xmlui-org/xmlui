@@ -1,4 +1,4 @@
-import React, { type CSSProperties, memo, type ReactNode, useRef } from "react";
+import React, { type CSSProperties, forwardRef, memo, type ReactNode, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -25,6 +25,7 @@ import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
+import { CodeText } from "./CodeText";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -35,9 +36,9 @@ type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
+  className?: string;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
-  className?: string;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -56,9 +57,9 @@ function PreTagComponent({ id, children, codeHighlighter }) {
 
   const defaultCodefence = (
     <CodeBlock>
-      <Text uid={id} variant="codefence">
+      <CodeText uid={id}>
         {children}
-      </Text>
+      </CodeText>
     </CodeBlock>
   );
 
@@ -70,322 +71,334 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   if (!highlighterResult) {
     return defaultCodefence;
   }
+  
   return (
     <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-      <Text
+      <CodeText
         uid={id}
-        variant="codefence"
-        syntaxHighlightClasses={highlighterResult.classNames}
         dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
       />
     </CodeBlock>
   );
 }
 
-export const Markdown = memo(function Markdown({
-  removeIndents = defaultProps.removeIndents,
-  children,
-  style,
-  codeHighlighter,
-  showHeadingAnchors,
-  className,
-}: MarkdownProps) {
-  const imageInfo = useRef(new Map<string, boolean>());
-  if (typeof children !== "string") {
-    return null;
-  }
-  children = removeIndents ? removeTextIndents(children) : children;
+export const Markdown = memo(
+  forwardRef<HTMLDivElement, MarkdownProps>(function Markdown(
+    {
+      removeIndents = defaultProps.removeIndents,
+      children,
+      style,
+      className,
+      codeHighlighter,
+      showHeadingAnchors,
+      ...rest
+    }: MarkdownProps,
+    ref,
+  ) {
+    const imageInfo = useRef(new Map<string, boolean>());
+    if (typeof children !== "string") {
+      return null;
+    }
+    children = removeIndents ? removeTextIndents(children) : children;
 
-  const getImageKey = (node: any) =>
-    `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
+    const getImageKey = (node: any) =>
+      `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
 
-  const markdownImgParser = () => {
-    imageInfo.current.clear();
-    return function transformer(tree: Node) {
-      visit(tree, "image", visitor);
+    const markdownImgParser = () => {
+      imageInfo.current.clear();
+      return function transformer(tree: Node) {
+        visit(tree, "image", visitor);
+      };
+
+      function visitor(node: any, _: number, parent: Parent | undefined) {
+        imageInfo.current.set(
+          getImageKey(node),
+          parent.type === "paragraph" && parent.children.length > 1,
+        );
+      }
     };
 
-    function visitor(node: any, _: number, parent: Parent | undefined) {
-      imageInfo.current.set(
-        getImageKey(node),
-        parent.type === "paragraph" && parent.children.length > 1,
-      );
-    }
-  };
-
-  return (
-    <div className={classnames(styles.markdownContent, className)} style={style}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          details({ children, node, ...props }) {
-            return (
-              <details className={htmlTagStyles.htmlDetails} {...props}>
-                {children}
-              </details>
-            );
-          },
-          video({ children, node, ...props }) {
-            return (
-              <video className={htmlTagStyles.htmlVideo} {...props}>
-                {children}
-              </video>
-            );
-          },
-          img({ children, node, ...props }) {
-            const src = props?.src;
-            const popOut = props?.["data-popout"];
-            const alt = props?.alt || "";
-
-            // --- Determine if the image should be inline or block
-            let isInline = imageInfo.current.get(getImageKey(node));
-
-            // Apply styling based on whether image should be inline or block
-            const imgStyle = {
-              ...(props.style || {}),
-              display: isInline ? "inline" : "block",
-            };
-
-            if (popOut) {
+    return (
+      <div
+        {...rest}
+        ref={ref}
+        className={classnames(styles.markdownContent, className)}
+        style={style}
+      >
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
+          rehypePlugins={[rehypeRaw]}
+          components={{
+            details({ children, node, ...props }) {
               return (
-                <a href={src} target="_blank" rel="noreferrer">
-                  <img src={src} alt={alt} style={imgStyle}>
+                <details className={htmlTagStyles.htmlDetails} {...props}>
+                  {children}
+                </details>
+              );
+            },
+            video({ children, node, ...props }) {
+              return (
+                <video className={htmlTagStyles.htmlVideo} {...props}>
+                  {children}
+                </video>
+              );
+            },
+            img({ children, node, ...props }) {
+              const src = props?.src;
+              const popOut = props?.["data-popout"];
+              const alt = props?.alt || "";
+
+              // --- Determine if the image should be inline or block
+              let isInline = imageInfo.current.get(getImageKey(node));
+
+              // Apply styling based on whether image should be inline or block
+              const imgStyle = {
+                ...(props.style || {}),
+                display: isInline ? "inline" : "block",
+              };
+
+              if (popOut) {
+                return (
+                  <a href={src} target="_blank" rel="noreferrer">
+                    <img src={src} alt={alt} style={imgStyle}>
+                      {children}
+                    </img>
+                  </a>
+                );
+              } else {
+                return (
+                  <img
+                    src={src}
+                    alt={alt}
+                    style={imgStyle}
+                    {...props}
+                    className={classnames({ [styles.block]: !isInline })}
+                  >
                     {children}
                   </img>
-                </a>
-              );
-            } else {
-              return (
-                <img
-                  src={src}
-                  alt={alt}
-                  style={imgStyle}
-                  {...props}
-                  className={classnames({ [styles.block]: !isInline })}
-                >
-                  {children}
-                </img>
-              );
-            }
-          },
-          h1({ children }) {
-            return (
-              <LinkAwareHeading level="h1" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          h2({ children }) {
-            return (
-              <LinkAwareHeading level="h2" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          h3({ children }) {
-            return (
-              <LinkAwareHeading level="h3" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          h4({ children }) {
-            return (
-              <LinkAwareHeading level="h4" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          h5({ children }) {
-            return (
-              <LinkAwareHeading level="h5" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          h6({ children }) {
-            return (
-              <LinkAwareHeading level="h6" showHeadingAnchors={showHeadingAnchors}>
-                {children}
-              </LinkAwareHeading>
-            );
-          },
-          p({ id, children }) {
-            return (
-              <Text uid={id} variant="markdown">
-                {children}
-              </Text>
-            );
-          },
-          code({ id, children }) {
-            return (
-              <Text uid={id} variant="code">
-                {children}
-              </Text>
-            );
-          },
-          pre({ id, children }) {
-            return (
-              <PreTagComponent id={id} codeHighlighter={codeHighlighter}>
-                {children}
-              </PreTagComponent>
-            );
-          },
-          strong({ id, children }) {
-            return (
-              <Text uid={id} variant="strong">
-                {children}
-              </Text>
-            );
-          },
-          em({ id, children }) {
-            return (
-              <Text uid={id} variant="em">
-                {children}
-              </Text>
-            );
-          },
-          del({ id, children }) {
-            return (
-              <Text uid={id} variant="deleted">
-                {children}
-              </Text>
-            );
-          },
-          blockquote({ children }) {
-            return <Blockquote>{children}</Blockquote>;
-          },
-          ol({ children, node, ...props }) {
-            return (
-              <ol className={htmlTagStyles.htmlOl} {...props}>
-                {children}
-              </ol>
-            );
-          },
-          ul({ children, node, ...props }) {
-            return (
-              <ul className={htmlTagStyles.htmlUl} {...props}>
-                {children}
-              </ul>
-            );
-          },
-          li({ children, node, ...props }) {
-            return (
-              <li className={htmlTagStyles.htmlLi} {...props}>
-                <Text>{children}</Text>
-              </li>
-            );
-          },
-          hr() {
-            return <HorizontalRule />;
-          },
-
-          a({ children, href, ...props }) {
-            let target: string | undefined = undefined;
-            let label: React.ReactNode = children;
-
-            // --- Extract the optional target
-            if (typeof children === "string") {
-              // Match a non-escaped pipe followed by target specification
-              const match = children.match(/^((?:[^|]|\\\|)*[^\\])\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
-              if (match) {
-                // Unescape any escaped pipes in the label
-                label = match[1].trim().replace(/\\\|/g, '|');
-                target = match[2];
-              } else {
-                // If no target specification, unescape any escaped pipes in the whole text
-                label = children.replace(/\\\|/g, '|');
+                );
               }
-            }
+            },
+            h1({ children }) {
+              return (
+                <LinkAwareHeading level="h1" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            h2({ children }) {
+              return (
+                <LinkAwareHeading level="h2" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            h3({ children }) {
+              return (
+                <LinkAwareHeading level="h3" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            h4({ children }) {
+              return (
+                <LinkAwareHeading level="h4" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            h5({ children }) {
+              return (
+                <LinkAwareHeading level="h5" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            h6({ children }) {
+              return (
+                <LinkAwareHeading level="h6" showHeadingAnchors={showHeadingAnchors}>
+                  {children}
+                </LinkAwareHeading>
+              );
+            },
+            p({ id, children }) {
+              return (
+                <Text className={styles.markdown} uid={id} >
+                  {children}
+                </Text>
+              );
+            },
+            code({ id, children }) {
+              return (
+                <Text uid={id} variant="code">
+                  {children}
+                </Text>
+              );
+            },
+            pre({ id, children }) {
+              return (
+                <PreTagComponent id={id} codeHighlighter={codeHighlighter}>
+                  {children}
+                </PreTagComponent>
+              );
+            },
+            strong({ id, children }) {
+              return (
+                <Text uid={id} variant="strong">
+                  {children}
+                </Text>
+              );
+            },
+            em({ id, children }) {
+              return (
+                <Text uid={id} variant="em">
+                  {children}
+                </Text>
+              );
+            },
+            del({ id, children }) {
+              return (
+                <Text uid={id} variant="deleted">
+                  {children}
+                </Text>
+              );
+            },
+            blockquote({ children }) {
+              return <Blockquote>{children}</Blockquote>;
+            },
+            ol({ children, node, ...props }) {
+              return (
+                <ol className={htmlTagStyles.htmlOl} {...props}>
+                  {children}
+                </ol>
+              );
+            },
+            ul({ children, node, ...props }) {
+              return (
+                <ul className={htmlTagStyles.htmlUl} {...props}>
+                  {children}
+                </ul>
+              );
+            },
+            li({ children, node, ...props }) {
+              return (
+                <li className={htmlTagStyles.htmlLi} {...props}>
+                  <Text>{children}</Text>
+                </li>
+              );
+            },
+            hr() {
+              return <HorizontalRule />;
+            },
 
-            return (
-              <LinkNative to={href} target={target} {...(props as any)}>
-                {label}
-              </LinkNative>
-            );
-          },
+            a({ children, href, ...props }) {
+              let target: string | undefined = undefined;
+              let label: React.ReactNode = children;
 
-          // TODO: somehow get the label from the containing li element
-          input({ disabled, checked }) {
-            return (
-              <Toggle
-                variant="checkbox"
-                readOnly={disabled}
-                value={checked}
-                /* label={value}
+              // --- Extract the optional target
+              if (typeof children === "string") {
+                // Match a non-escaped pipe followed by target specification
+                const match = children.match(
+                  /^((?:[^|]|\\\|)*[^\\])\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/,
+                );
+                if (match) {
+                  // Unescape any escaped pipes in the label
+                  label = match[1].trim().replace(/\\\|/g, "|");
+                  target = match[2];
+                } else {
+                  // If no target specification, unescape any escaped pipes in the whole text
+                  label = children.replace(/\\\|/g, "|");
+                }
+              }
+
+              return (
+                <LinkNative to={href} target={target} {...(props as any)}>
+                  {label}
+                </LinkNative>
+              );
+            },
+
+            // TODO: somehow get the label from the containing li element
+            input({ disabled, checked }) {
+              return (
+                <Toggle
+                  variant="checkbox"
+                  readOnly={disabled}
+                  value={checked}
+                  /* label={value}
                 labelPosition={"right"} */
-              />
-            );
-          },
-          table({ children }) {
-            return (
-              <div className={styles.tableScrollContainer}>
-                <table className={htmlTagStyles.htmlTable}>{children}</table>
-              </div>
-            );
-          },
-          tr({ children }) {
-            return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
-          },
-          td({ children }) {
-            return <td className={htmlTagStyles.htmlTd}>{children}</td>;
-          },
-          th({ children }) {
-            return <th className={htmlTagStyles.htmlTh}>{children}</th>;
-          },
-          thead({ children }) {
-            return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
-          },
-          tbody({ children }) {
-            return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
-          },
-          tfoot({ children }) {
-            return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
-          },
-          samp({ ...props }) {
-            const markdownContentBase64 = props?.["data-pg-markdown"];
-            const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
-            const dataContentBase64 = props?.["data-pg-content"];
-            const jsonContent = atob(dataContentBase64);
-            const appProps = JSON.parse(jsonContent);
-            return (
-              <NestedAppAndCodeViewNative
-                markdown={markdownContent}
-                app={appProps.app}
-                config={appProps.config}
-                components={appProps.components}
-                api={appProps.api}
-                activeTheme={appProps.activeTheme}
-                activeTone={appProps.activeTone}
-                title={appProps.name}
-                height={appProps.height}
-                allowPlaygroundPopup={!appProps.noPopup}
-                withFrame={appProps.noFrame ? false : true}
-                noHeader={appProps.noHeader ?? false}
-                splitView={appProps.splitView ?? false}
-                initiallyShowCode={appProps.initiallyShowCode ?? false}
-                popOutUrl={appProps.popOutUrl}
-                immediate={appProps.immediate}
-                withSplashScreen={appProps.withSplashScreen}
-              />
-            );
-          },
-          section({ children, ...props }) {
-            const treeContentBase64 = props?.["data-tree-content"];
-            if (treeContentBase64 !== undefined) {
-              const content = atob(treeContentBase64);
-              return <TreeDisplay content={content} />;
-            }
-            return null;
-          },
-        }}
-      >
-        {children as any}
-      </ReactMarkdown>
-    </div>
-  );
-});
+                />
+              );
+            },
+            table({ children }) {
+              return (
+                <div className={styles.tableScrollContainer}>
+                  <table className={htmlTagStyles.htmlTable}>{children}</table>
+                </div>
+              );
+            },
+            tr({ children }) {
+              return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
+            },
+            td({ children }) {
+              return <td className={htmlTagStyles.htmlTd}>{children}</td>;
+            },
+            th({ children }) {
+              return <th className={htmlTagStyles.htmlTh}>{children}</th>;
+            },
+            thead({ children }) {
+              return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
+            },
+            tbody({ children }) {
+              return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
+            },
+            tfoot({ children }) {
+              return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
+            },
+            samp({ ...props }) {
+              const markdownContentBase64 = props?.["data-pg-markdown"];
+              const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
+              const dataContentBase64 = props?.["data-pg-content"];
+              const jsonContent = atob(dataContentBase64);
+              const appProps = JSON.parse(jsonContent);
+              return (
+                <NestedAppAndCodeViewNative
+                  markdown={markdownContent}
+                  app={appProps.app}
+                  config={appProps.config}
+                  components={appProps.components}
+                  api={appProps.api}
+                  activeTheme={appProps.activeTheme}
+                  activeTone={appProps.activeTone}
+                  title={appProps.name}
+                  height={appProps.height}
+                  allowPlaygroundPopup={!appProps.noPopup}
+                  withFrame={appProps.noFrame ? false : true}
+                  noHeader={appProps.noHeader ?? false}
+                  splitView={appProps.splitView ?? false}
+                  initiallyShowCode={appProps.initiallyShowCode ?? false}
+                  popOutUrl={appProps.popOutUrl}
+                  immediate={appProps.immediate}
+                  withSplashScreen={appProps.withSplashScreen}
+                />
+              );
+            },
+            section({ children, ...props }) {
+              const treeContentBase64 = props?.["data-tree-content"];
+              if (treeContentBase64 !== undefined) {
+                const content = atob(treeContentBase64);
+                return <TreeDisplay content={content} />;
+              }
+              return null;
+            },
+          }}
+        >
+          {children as any}
+        </ReactMarkdown>
+      </div>
+    );
+  }),
+);
 
 const HorizontalRule = () => {
   return <hr className={styles.horizontalRule} />;
@@ -600,11 +613,7 @@ const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHead
   const headingId = anchor ?? getHeadingId(children);
 
   return (
-    <Heading
-      level={level}
-      id={headingId}
-      className={styles.linkAwareHeading}
-    >
+    <Heading level={level} id={headingId} className={styles.linkAwareHeading}>
       {label}
       {showHeadingAnchors && (
         <a
@@ -689,51 +698,4 @@ function removeTextIndents(input: string): string {
   );
 
   return trimmedLines.join("\n");
-}
-
-function getCustomAnchor(value: string): [string, string] {
-  if (!value) {
-    return ["", ""];
-  }
-
-  // --- Match the pattern: "Heading text [#anchor]"
-  const match = value.match(/^(.*?)\s*\[#([^\]]+)\]$/);
-
-  if (match) {
-    const headingLabel = match[1].trim(); // Extract the heading text
-    const anchorId = match[2].trim(); // Extract the anchor ID
-    return [headingLabel, anchorId];
-  }
-
-  // If no match, return the full value as the heading label and an empty anchor ID
-  return [value.trim(), ""];
-}
-
-function headingToAnchorLink(rawStr: string) {
-  return (
-    rawStr
-      .trim()
-      .toLocaleLowerCase()
-      // replace all non-alphanumeric characters with hyphens
-      .replaceAll(/[^A-Za-z0-9-]/g, "-")
-      // remove multiple hyphens
-      .replaceAll(/--+/g, "-")
-      // remove leading and trailing hyphens
-      .replace(/^-|-$/, "")
-      // remove backticks
-      .replace(/`/g, "")
-      // remove parentheses
-      .replace(/"|'/g, "")
-  );
-}
-
-function extractTextNodes(node: React.ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return node.toString();
-  if (React.isValidElement(node) && node.props && node.props.children) {
-    if (Array.isArray(node.props.children)) {
-      return node.props.children.map(extractTextNodes).join("");
-    }
-    return extractTextNodes(node.props.children);
-  }
-  return "";
 }

@@ -20,17 +20,24 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
+import { noop } from "../../components-core/constants";
 
 type Props = {
   id?: string;
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
-  headerRenderer?: (item: { id?: string; index: number; label: string; isActive: boolean }) => ReactNode;
+  headerRenderer?: (item: {
+    id?: string;
+    index: number;
+    label: string;
+    isActive: boolean;
+  }) => ReactNode;
   style?: CSSProperties;
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   className?: string;
   distributeEvenly?: boolean;
+  onDidChange?: (index: number, id: string, label: string) => void;
 };
 
 export const defaultProps = {
@@ -50,11 +57,14 @@ export const Tabs = forwardRef(function Tabs(
     registerComponentApi,
     className,
     distributeEvenly = defaultProps.distributeEvenly,
+    onDidChange = noop,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const tabsId = id || useId();
+  const _id = useId();
+  const tabsId = id || _id;
 
   // Ensure activeTab is within valid bounds
   const validActiveTab = useMemo(() => {
@@ -126,15 +136,18 @@ export const Tabs = forwardRef(function Tabs(
   return (
     <TabContext.Provider value={tabContextValue}>
       <RTabsRoot
+        {...rest}
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(styles.tabs, className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
+          const tabItem = tabItems.find((item) => item.innerId === tab);
           const newIndex = tabItems.findIndex((item) => item.innerId === tab);
           if (newIndex !== activeIndex) {
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
+            onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
           }
         }}
         orientation={orientation}
@@ -142,11 +155,7 @@ export const Tabs = forwardRef(function Tabs(
       >
         <RTabsList className={styles.tabsList} role="tablist">
           {tabItems.map((tab, index) => (
-            <RTabsTrigger
-              key={tab.innerId}
-              value={tab.innerId}
-              asChild
-            >
+            <RTabsTrigger key={tab.innerId} value={tab.innerId} asChild>
               <div
                 role="tab"
                 aria-label={tab.label}
@@ -154,23 +163,21 @@ export const Tabs = forwardRef(function Tabs(
                   [styles.distributeEvenly]: distributeEvenly,
                 })}
               >
-                {
-                  tab.headerRenderer ?
-                    tab.headerRenderer({
+                {tab.headerRenderer
+                  ? tab.headerRenderer({
                       ...(tab.id !== undefined && { id: tab.id }),
                       index,
                       label: tab.label,
-                      isActive: tab.innerId === currentTab
+                      isActive: tab.innerId === currentTab,
                     })
-                    : headerRenderer ?
-                      headerRenderer({
+                  : headerRenderer
+                    ? headerRenderer({
                         ...(tab.id !== undefined && { id: tab.id }),
                         index,
                         label: tab.label,
-                        isActive: tab.innerId === currentTab
+                        isActive: tab.innerId === currentTab,
                       })
-                      : tab.label
-                }
+                    : tab.label}
               </div>
             </RTabsTrigger>
           ))}

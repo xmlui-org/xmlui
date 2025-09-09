@@ -8,7 +8,7 @@ import { version } from "../../../package.json";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
-import { useThemes } from "../theming/ThemeContext";
+import { useTheme, useThemes } from "../theming/ThemeContext";
 import {
   useDocumentKeydown,
   useIsInIFrame,
@@ -86,9 +86,10 @@ export function AppContent({
     setActiveThemeId,
     setActiveThemeTone,
     availableThemeIds,
-    root,
     toggleThemeTone,
   } = useThemes();
+
+  const {root} = useTheme();
 
   // --- Handle special key combinations to change the theme and tone
   useDocumentKeydown((event: KeyboardEvent) => {

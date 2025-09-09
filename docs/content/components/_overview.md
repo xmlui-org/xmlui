@@ -15,6 +15,7 @@
 | [Breakout](./Breakout) | The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width. |
 | [Button](./Button) | `Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels. |
 | [Card](./Card) | `Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface. |
+| [Carousel](./Carousel) | This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel. |
 | [ChangeListener](./ChangeListener) | `ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers. |
 | [Checkbox](./Checkbox) | `Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions. |
 | [CHStack](./CHStack) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. |
@@ -23,6 +24,7 @@
 | [ContentSeparator](./ContentSeparator) | `ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections. |
 | [CVStack](./CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [DataSource](./DataSource) | `DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data. |
+| [DateInput](./DateInput) | `DateInput` provides a text-based date input interface for selecting single dates or date ranges, with direct keyboard input similar to TimeInput. It offers customizable formatting and validation options without dropdown calendars. |
 | [DatePicker](./DatePicker) | `DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction. |
 | [DonutChart](./DonutChart) | A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly. |
 | [DropdownMenu](./DropdownMenu) | `DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space. |
@@ -68,6 +70,7 @@
 | [Page](./Page) | `Page` defines route endpoints within an application, mapping specific URL patterns to content that displays when users navigate to those routes. Each Page represents a distinct view or screen in your single-page application's routing system. |
 | [PageMetaTitle](./PageMetaTitle) | `PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles. |
 | [Pages](./Pages) | `Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL. |
+| [Pagination](./Pagination) | `Pagination` enables navigation through large datasets by dividing content into pages. It provides controls for page navigation and can display current page information. |
 | [PasswordInput](./PasswordInput) | `Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords. |
 | [PieChart](./PieChart) | `PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly. |
 | [ProgressBar](./ProgressBar) | `ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete). |
@@ -76,7 +79,9 @@
 | [RealTimeAdapter](./RealTimeAdapter) | `RealTimeAdapter` is a non-visual component that listens to real-time events. |
 | [Redirect](./Redirect) | `Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally. |
 | [Select](./Select) | `Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration. |
-| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display. |
+| [Slider](./Slider) | `Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
+
+Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip. |
 | [Slot](./Slot) | Placeholder in a reusable component. Signs the slot where the component's injected children should be rendered. |
 | [SpaceFiller](./SpaceFiller) | `SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used. |
 | [Spinner](./Spinner) | `Spinner` is an animated indicator that represents an action in progress with no deterministic progress value. |
@@ -93,8 +98,11 @@
 | [TextArea](./TextArea) | `TextArea` provides a multiline text input area. |
 | [TextBox](./TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
 | [Theme](./Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
+| [TimeInput](./TimeInput) | `TimeInput` provides time input with support for 12-hour and 24-hour formats and configurable precision for hours, minutes, and seconds. |
+| [Timer](./Timer) | `Timer` is a non-visual component that fires events at regular intervals. It can be enabled or disabled and ensures that the timer event handler completes before firing the next event. |
 | [ToneChangerButton](./ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
 | [ToneSwitch](./ToneSwitch) | `ToneSwitch` enables the user to switch between light and dark modes using a switch control. |
+| [Tooltip](./Tooltip) | A tooltip component that displays text when hovering over trigger content. |
 | [VSplitter](./VSplitter) | `Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them. |
 | [VStack](./VStack) | This component represents a stack rendering its contents vertically. |
 

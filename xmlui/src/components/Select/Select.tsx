@@ -44,6 +44,10 @@ export const SelectMd = createMetadata({
       defaultValue: defaultProps.placeholder,
     },
     initialValue: dInitialValue(),
+    value: {
+      description: "This property sets the current value of the component.",
+      isInternal: true  //TODO illesg temp
+    },
     autoFocus: {
       ...dAutoFocus(),
       defaultValue: defaultProps.autoFocus,
@@ -145,10 +149,13 @@ export const SelectMd = createMetadata({
     [`borderColor-menu-${COMP}`]: "$borderColor",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
-    [`paddingHorizontal-${COMP}-badge`]: "$space-1",
-    [`paddingVertical-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-${COMP}-badge`]: "$space-2_5",
+    [`paddingVertical-${COMP}-badge`]: "$space-0_5",
+    [`borderRadius-${COMP}-badge`]: "$borderRadius",
     [`paddingHorizontal-item-${COMP}`]: "$space-2",
     [`paddingVertical-item-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",
     [`opacity-${COMP}--disabled`]: "0.5",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
@@ -173,25 +180,26 @@ export const selectComponentRenderer = createComponentRenderer(
     extractValue,
     renderChild,
     lookupEventHandler,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
 
+    const isControlled = node.props.value !== undefined;
     return (
       <Select
         multiSelect={multiSelect}
-        style={layoutCss}
+        className={className}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,
         )}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        updateState={updateState}
+        updateState={isControlled ? undefined : updateState}
         searchable={searchable}
         initialValue={extractValue(node.props.initialValue)}
-        value={state?.value}
+        value={isControlled ? extractValue(node.props.value) : state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}

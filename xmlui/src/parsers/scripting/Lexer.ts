@@ -1129,7 +1129,6 @@ resolverHash.set("default", TokenType.Default);
 resolverHash.set("delete", TokenType.Delete);
 resolverHash.set("function", TokenType.Function);
 resolverHash.set("as", TokenType.As);
-resolverHash.set("from", TokenType.From);
 
 /**
  * Tests if a token id EOF

@@ -21,18 +21,20 @@ $width-HtmlTable: createThemeVarTable("width-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
 $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
-.htmlTable {
-  background-color: $backgroundColor-HtmlTable;
-  color: $textColor-HtmlTable;
-  font-family: $fontFamily-HtmlTable;
-  font-size: $fontSize-HtmlTable;
-  font-weight: $fontWeight-HtmlTable;
-  text-transform: $textTransform-HtmlTable;
-  margin-top: $marginTop-HtmlTable;
-  margin-bottom: $marginBottom-HtmlTable;
-  width: $width-HtmlTable;
-  @include t.borderVars($themeVarsTable, "HtmlTable");
-  @include t.paddingVars($themeVarsTable, "HtmlTable");
+@layer components {
+  .htmlTable {
+    background-color: $backgroundColor-HtmlTable;
+    color: $textColor-HtmlTable;
+    font-family: $fontFamily-HtmlTable;
+    font-size: $fontSize-HtmlTable;
+    font-weight: $fontWeight-HtmlTable;
+    text-transform: $textTransform-HtmlTable;
+    margin-top: $marginTop-HtmlTable;
+    margin-bottom: $marginBottom-HtmlTable;
+    width: $width-HtmlTable;
+    @include t.borderVars($themeVarsTable, "HtmlTable");
+    @include t.paddingVars($themeVarsTable, "HtmlTable");
+  }
 }
 
 // --- thead
@@ -52,14 +54,16 @@ $textTransform-HtmlThead: createThemeVarThead("textTransform-HtmlThead");
 $themeVarsThead: t.composeBorderVars($themeVarsThead, "HtmlThead");
 $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
-.htmlThead {
-  background-color: $backgroundColor-HtmlThead;
-  color: $textColor-HtmlThead;
-  font-weight: $fontWeight-HtmlThead;
-  font-size: $fontSize-HtmlThead;
-  text-transform: $textTransform-HtmlThead;
-  @include t.borderVars($themeVarsThead, "HtmlThead");
-  @include t.paddingVars($themeVarsThead, "HtmlThead");
+@layer components {
+  .htmlThead {
+    background-color: $backgroundColor-HtmlThead;
+    color: $textColor-HtmlThead;
+    font-weight: $fontWeight-HtmlThead;
+    font-size: $fontSize-HtmlThead;
+    text-transform: $textTransform-HtmlThead;
+    @include t.borderVars($themeVarsThead, "HtmlThead");
+    @include t.paddingVars($themeVarsThead, "HtmlThead");
+  }
 }
 
 // --- tbody
@@ -77,12 +81,14 @@ $textAlign-HtmlTbody: createThemeVarTbody("textAlign-HtmlTbody");
 $verticalAlignment-HtmlTbody: createThemeVarTbody("verticalAlignment-HtmlTbody");
 $textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
-.htmlTbody {
-  background-color: $backgroundColor-HtmlTbody;
-  color: $textColor-HtmlTbody;
-  text-align: $textAlign-HtmlTbody;
-  vertical-align: $verticalAlignment-HtmlTbody;
-  text-transform: $textTransform-HtmlTbody;
+@layer components {
+  .htmlTbody {
+    background-color: $backgroundColor-HtmlTbody;
+    color: $textColor-HtmlTbody;
+    text-align: $textAlign-HtmlTbody;
+    vertical-align: $verticalAlignment-HtmlTbody;
+    text-transform: $textTransform-HtmlTbody;
+  }
 }
 
 // --- tfoot
@@ -97,9 +103,11 @@ $themeVarsTfoot: ();
 $backgroundColor-HtmlTfoot: createThemeVarTfoot("backgroundColor-HtmlTfoot");
 $textColor-HtmlTfoot: createThemeVarTfoot("textColor-HtmlTfoot");
 
-.htmlTfoot {
-  background-color: $backgroundColor-HtmlTfoot;
-  color: $textColor-HtmlTfoot;
+@layer components {
+  .htmlTfoot {
+    background-color: $backgroundColor-HtmlTfoot;
+    color: $textColor-HtmlTfoot;
+  }
 }
 
 // --- th
@@ -119,16 +127,18 @@ $backgroundColor-HtmlTh--hover: createThemeVarTh("backgroundColor-HtmlTh--hover"
 $themeVarsTh: t.composeBorderVars($themeVarsTh, "HtmlTh");
 $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
-.htmlTh {
-  background-color: $backgroundColor-HtmlTh;
-  color: $textColor-HtmlTh;
-  font-weight: $fontWeight-HtmlTh;
-  font-size: $fontSize-HtmlTh;
-  @include t.borderVars($themeVarsTh, "HtmlTh");
-  @include t.paddingVars($themeVarsTh, "HtmlTh");
+@layer components {
+  .htmlTh {
+    background-color: $backgroundColor-HtmlTh;
+    color: $textColor-HtmlTh;
+    font-weight: $fontWeight-HtmlTh;
+    font-size: $fontSize-HtmlTh;
+    @include t.borderVars($themeVarsTh, "HtmlTh");
+    @include t.paddingVars($themeVarsTh, "HtmlTh");
 
-  &:hover {
-    background-color: $backgroundColor-HtmlTh--hover;
+    &:hover {
+      background-color: $backgroundColor-HtmlTh--hover;
+    }
   }
 }
 
@@ -150,26 +160,28 @@ $fontSize-HtmlTr: createThemeVarTr("fontSize-HtmlTr");
 $fontWeight-HtmlTr: createThemeVarTr("fontWeight-HtmlTr");
 $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
-.htmlTr {
-  background-color: $backgroundColor-HtmlTr;
-  color: $textColor-HtmlTr;
-  font-weight: $fontWeight-HtmlTr;
-  font-size: $fontSize-HtmlTr;
-  @include t.borderVars($themeVarsTr, "HtmlTr");
+@layer components {
+  .htmlTr {
+    background-color: $backgroundColor-HtmlTr;
+    color: $textColor-HtmlTr;
+    font-weight: $fontWeight-HtmlTr;
+    font-size: $fontSize-HtmlTr;
+    @include t.borderVars($themeVarsTr, "HtmlTr");
 
-  &:nth-child(even) {
-    background-color: $backgroundColor-even-HtmlTr;
-  }
+    &:nth-child(even) {
+      background-color: $backgroundColor-even-HtmlTr;
+    }
 
-  // Apply hover effect for rows with mixed th, td elements
-  &:hover {
-    background-color: $backgroundColor-HtmlTr--hover;
-    color: $textColor-HtmlTr--hover;
-  }
+    // Apply hover effect for rows with mixed th, td elements
+    &:hover {
+      background-color: $backgroundColor-HtmlTr--hover;
+      color: $textColor-HtmlTr--hover;
+    }
 
-  // Remove hover effect for rows with only th elements
-  &:hover:not(:has(:not(th))) {
-    background-color: initial;
+    // Remove hover effect for rows with only th elements
+    &:hover:not(:has(:not(th))) {
+      background-color: initial;
+    }
   }
 }
 
@@ -190,14 +202,16 @@ $fontWeight-HtmlTd: createThemeVarTd("fontWeight-HtmlTd");
 $themeVarsTd: t.composeBorderVars($themeVarsTd, "HtmlTd");
 $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 
-.htmlTd {
-  background-color: $backgroundColor-HtmlTd;
-  text-align: $text-align-HtmlTd;
-  vertical-align: $verticalAlignment-HtmlTd;
-  font-size: $fontSize-HtmlTd;
-  font-weight: $fontWeight-HtmlTd;
-  @include t.borderVars($themeVarsTd, "HtmlTd");
-  @include t.paddingVars($themeVarsTd, "HtmlTd");
+@layer components {
+  .htmlTd {
+    background-color: $backgroundColor-HtmlTd;
+    text-align: $text-align-HtmlTd;
+    vertical-align: $verticalAlignment-HtmlTd;
+    font-size: $fontSize-HtmlTd;
+    font-weight: $fontWeight-HtmlTd;
+    @include t.borderVars($themeVarsTd, "HtmlTd");
+    @include t.paddingVars($themeVarsTd, "HtmlTd");
+  }
 }
 
 // --- List styling (for both ul and ol)
@@ -226,30 +240,32 @@ $marginTop-HtmlLi: createThemeVarList("marginTop-HtmlLi");
 $marginBottom-HtmlLi: createThemeVarList("marginBottom-HtmlLi");
 $listStyleType-HtmlLi: createThemeVarList("listStyleType-HtmlLi");
 
-// Apply to both ul and ol elements
-.htmlUl {
-  margin-top: $marginTop-HtmlUl;
-  margin-bottom: $marginBottom-HtmlUl;
-  @include t.borderVars($themeVarsList, "HtmlUl");
-  @include t.paddingVars($themeVarsList, "HtmlUl");
-}
+@layer components {
+  // Apply to both ul and ol elements
+  .htmlUl {
+    margin-top: $marginTop-HtmlUl;
+    margin-bottom: $marginBottom-HtmlUl;
+    @include t.borderVars($themeVarsList, "HtmlUl");
+    @include t.paddingVars($themeVarsList, "HtmlUl");
+  }
 
-.htmlOl {
-  margin-top: $marginTop-HtmlOl;
-  margin-bottom: $marginBottom-HtmlOl;
-  @include t.borderVars($themeVarsList, "HtmlOl");
-  @include t.paddingVars($themeVarsList, "HtmlOl");
-}
+  .htmlOl {
+    margin-top: $marginTop-HtmlOl;
+    margin-bottom: $marginBottom-HtmlOl;
+    @include t.borderVars($themeVarsList, "HtmlOl");
+    @include t.paddingVars($themeVarsList, "HtmlOl");
+  }
 
-.htmlLi {
-  margin-top: $marginTop-HtmlLi;
-  margin-bottom: $marginBottom-HtmlLi;
-  list-style-type: $listStyleType-HtmlLi;
-  margin-left: $marginLeft-HtmlLi;
-  @include t.borderVars($themeVarsList, "HtmlLi");
-  @include t.paddingVars($themeVarsList, "HtmlLi");
-}
+  .htmlLi {
+    margin-top: $marginTop-HtmlLi;
+    margin-bottom: $marginBottom-HtmlLi;
+    list-style-type: $listStyleType-HtmlLi;
+    margin-left: $marginLeft-HtmlLi;
+    @include t.borderVars($themeVarsList, "HtmlLi");
+    @include t.paddingVars($themeVarsList, "HtmlLi");
+  }
 
+}
 /*
 // Compress when nested
 li .htmlUl,
@@ -270,14 +286,16 @@ $themeVarsHeading: ();
 $marginTop-HtmlHeading: createThemeVarHeading("marginTop-HtmlHeading");
 $marginBottom-HtmlHeading: createThemeVarHeading("marginBottom-HtmlHeading");
 
-.htmlH1,
-.htmlH2,
-.htmlH3,
-.htmlH4,
-.htmlH5,
-.htmlH6 {
-  margin-top: $marginTop-HtmlHeading;
-  margin-bottom: $marginBottom-HtmlHeading;
+@layer components {
+  .htmlH1,
+  .htmlH2,
+  .htmlH3,
+  .htmlH4,
+  .htmlH5,
+  .htmlH6 {
+    margin-top: $marginTop-HtmlHeading;
+    margin-bottom: $marginBottom-HtmlHeading;
+  }
 }
 
 // --- Video
@@ -292,9 +310,11 @@ $themeVarsVideo: ();
 $marginTop-HtmlVideo: createThemeVarVideo("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVarVideo("marginBottom-HtmlVideo");
 
-.htmlVideo {
-  margin-top: $marginTop-HtmlVideo;
-  margin-bottom: $marginBottom-HtmlVideo;
+@layer components {
+  .htmlVideo {
+    margin-top: $marginTop-HtmlVideo;
+    margin-bottom: $marginBottom-HtmlVideo;
+  }
 }
 
 // --- Details
@@ -311,11 +331,13 @@ $themeVarsDetails: t.composePaddingVars($themeVarsDetails, "HtmlDetails");
 $marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
 $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
 
-.htmlDetails {
-  margin-top: $marginTop-HtmlDetails;
-  margin-bottom: $marginBottom-HtmlDetails;
-  @include t.borderVars($themeVarsDetails, "HtmlDetails");
-  @include t.paddingVars($themeVarsDetails, "HtmlDetails");
+@layer components {
+  .htmlDetails {
+    margin-top: $marginTop-HtmlDetails;
+    margin-bottom: $marginBottom-HtmlDetails;
+    @include t.borderVars($themeVarsDetails, "HtmlDetails");
+    @include t.paddingVars($themeVarsDetails, "HtmlDetails");
+  }
 }
 
 // --- Details
@@ -330,9 +352,11 @@ $themeVarsDetails: ();
 $marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
 $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
 
-.htmlDetails {
-  margin-top: $marginTop-HtmlDetails;
-  margin-bottom: $marginBottom-HtmlDetails;
+@layer components {
+  .htmlDetails {
+    margin-top: $marginTop-HtmlDetails;
+    margin-bottom: $marginBottom-HtmlDetails;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

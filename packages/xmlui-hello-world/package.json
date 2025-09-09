@@ -1,0 +1,38 @@
+{
+  "name": "xmlui-hello-world",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-hello-world.js",
+  "module": "./dist/xmlui-hello-world.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-hello-world.mjs",
+      "require": "./dist/xmlui-hello-world.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

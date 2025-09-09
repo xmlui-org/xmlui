@@ -8,7 +8,7 @@ import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, headerRenderer, style, id }: Tab,
+  { children, label, headerRenderer, style, id, activated, ...rest }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerId = useId();
@@ -29,10 +29,17 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
     };
   }, [innerId, unRegister]);
 
+  useEffect(() => {
+    if (activeTabId === innerId && activated) {
+      activated();
+    }
+  }, [activeTabId, innerId, activated]);
+
   if (activeTabId !== innerId) return null;
 
   return (
     <Content
+      {...rest}
       key={innerId}
       value={innerId}
       className={styles.tabsContent}

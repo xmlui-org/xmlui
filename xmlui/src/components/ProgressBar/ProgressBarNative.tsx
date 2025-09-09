@@ -1,10 +1,12 @@
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import classnames from "classnames";
 
 import styles from "./ProgressBar.module.scss";
 
 interface Props {
   value: number;
-  style: CSSProperties;
+  style?: CSSProperties;
+  className?: string;
 }
 
 export const defaultProps = {
@@ -12,11 +14,16 @@ export const defaultProps = {
 };
 
 export const ProgressBar = forwardRef(function ProgressBar(
-  { value = defaultProps.value, style }: Props,
+  { value = defaultProps.value, style, className, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
-    <div className={styles.wrapper} style={style} ref={forwardedRef}>
+    <div
+      {...rest}
+      className={classnames(styles.wrapper, className)}
+      style={style}
+      ref={forwardedRef}
+    >
       <div
         role="progressbar"
         aria-valuenow={value * 100}

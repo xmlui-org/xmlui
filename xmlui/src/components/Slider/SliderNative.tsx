@@ -9,24 +9,14 @@ import { useEvent } from "../../components-core/utils/misc";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
+import { Tooltip } from "../Tooltip/TooltipNative";
 
-export const defaultProps = {
-  step: 1,
-  min: 0,
-  max: 10,
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  tabIndex: -1,
-  showValues: true,
-  valueFormat: (value: number) => value.toString(),
-  minStepsBetweenThumbs: 1,
-};
-
-type Props = {
+export type Props = {
   id?: string;
   value?: number | number[];
   initialValue?: number | number[];
   style?: CSSProperties;
+  className?: string;
   step?: number;
   max?: number;
   min?: number;
@@ -34,8 +24,8 @@ type Props = {
   validationStatus?: ValidationStatus;
   minStepsBetweenThumbs?: number;
   onDidChange?: (newValue: number | number[]) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
   autoFocus?: boolean;
@@ -51,6 +41,18 @@ type Props = {
   thumbStyle?: CSSProperties;
   showValues?: boolean;
   valueFormat?: (value: number) => string;
+};
+
+export const defaultProps: Pick<Props, "step" | "min" | "max" | "enabled" | "validationStatus" | "tabIndex" | "showValues" | "valueFormat" | "minStepsBetweenThumbs"> = {
+  step: 1,
+  min: 0,
+  max: 10,
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  tabIndex: -1,
+  showValues: true,
+  valueFormat: (value: number) => value.toString(),
+  minStepsBetweenThumbs: 1,
 };
 
 // Helper function to ensure value is properly formatted
@@ -72,6 +74,7 @@ export const Slider = forwardRef(
     {
       id,
       style,
+      className,
       step = defaultProps.step,
       min = defaultProps.min,
       max = defaultProps.max,
@@ -98,15 +101,21 @@ export const Slider = forwardRef(
       thumbStyle,
       showValues = defaultProps.showValues,
       valueFormat = defaultProps.valueFormat,
+      ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
     const _id = useId();
     id = id || _id;
     const inputRef = useRef(null);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const thumbRef = useRef(null);
 
     // Initialize localValue properly
     const [localValue, setLocalValue] = React.useState<number[]>([]);
+    const [showTooltip, setShowTooltip] = React.useState(false);
+    const onShowTooltip = useCallback(() => setShowTooltip(true), []);
+    const onHideTooltip = useCallback(() => setShowTooltip(false), []);
 
     // Process initialValue on mount
     useEffect(() => {
@@ -123,8 +132,12 @@ export const Slider = forwardRef(
             initialVal = num;
           }
         }
+      } else if (typeof initialValue === "number") {
+        if (initialValue >= min && initialValue <= max) {
+          initialVal = initialValue;
+        }
       } else {
-        initialVal = initialValue;
+        initialVal = formatValue(initialValue, min);
       }
 
       // Format the value properly
@@ -133,11 +146,14 @@ export const Slider = forwardRef(
 
       // Notify parent component
       if (updateState) {
-        updateState({
-          value: formattedValue.length === 1 ? formattedValue[0] : formattedValue
-        }, { initial: true });
+        updateState(
+          {
+            value: formattedValue.length === 1 ? formattedValue[0] : formattedValue,
+          },
+          { initial: true },
+        );
       }
-    }, [initialValue, min, updateState]);
+    }, [initialValue, min, max, updateState]);
 
     // Sync with external value changes
     useEffect(() => {
@@ -177,13 +193,15 @@ export const Slider = forwardRef(
     );
 
     // Component APIs
-    const handleOnFocus = useCallback(() => {
-      onFocus?.();
-    }, [onFocus]);
+    const handleOnFocus = useCallback(
+      (ev) => onFocus?.(ev),
+      [onFocus],
+    );
 
-    const handleOnBlur = useCallback(() => {
-      onBlur?.();
-    }, [onBlur]);
+    const handleOnBlur = useCallback(
+      (ev) => onBlur?.(ev),
+      [onBlur],
+    );
 
     const focus = useCallback(() => {
       inputRef.current?.focus();
@@ -202,17 +220,11 @@ export const Slider = forwardRef(
 
     // Ensure we always have at least one thumb
     const displayValue = localValue.length > 0 ? localValue : [min];
-
-    // Format the current values as a string
-    const valuesText = displayValue.map(v => valueFormat(v)).join(', ');
-
-    // Create a custom label that includes the current values
-    const displayLabel = label ? (showValues ? `${label} ${valuesText}` : label) : (showValues ? valuesText : '');
-
     return (
       <ItemWithLabel
+        {...rest}
         labelPosition={labelPosition as any}
-        label={displayLabel}
+        label={label}
         labelWidth={labelWidth}
         labelBreak={labelBreak}
         required={required}
@@ -220,19 +232,20 @@ export const Slider = forwardRef(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={className}
         ref={forwardedRef}
         id={id}
         isInputTemplateUsed={true}
       >
-        <div className={styles.sliderContainer}>
+        <div className={styles.sliderContainer} data-slider-container>
           <Root
             minStepsBetweenThumbs={minStepsBetweenThumbs}
             ref={inputRef}
             tabIndex={tabIndex}
             aria-readonly={readOnly}
-            className={classnames(styles.sliderRoot, {
+            className={classnames(className, styles.sliderRoot, {
               [styles.disabled]: !enabled,
-              [styles.readOnly]: readOnly
+              [styles.readOnly]: readOnly,
             })}
             style={style}
             max={max}
@@ -243,6 +256,9 @@ export const Slider = forwardRef(
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
             onValueChange={onInputChange}
+            onMouseOver={onShowTooltip}
+            onMouseLeave={onHideTooltip}
+            onPointerDown={onShowTooltip}
             aria-required={required}
             value={displayValue}
             autoFocus={autoFocus}
@@ -259,19 +275,28 @@ export const Slider = forwardRef(
             >
               <Range
                 className={classnames(styles.sliderRange, {
-                  [styles.disabled]: !enabled
+                  [styles.disabled]: !enabled,
                 })}
               />
             </Track>
             {displayValue.map((_, index) => (
-              <Thumb
+              <Tooltip
                 key={index}
-                className={classnames(styles.sliderThumb, {
-                  [styles.disabled]: !enabled
-                })}
-                style={thumbStyle ? { ...thumbStyle } : undefined}
-                id={id}
-              />
+                ref={tooltipRef}
+                text={valueFormat(displayValue[index])}
+                delayDuration={100}
+                open={showValues && showTooltip}
+              >
+                <Thumb
+                  ref={index === 0 ? thumbRef : null}
+                  className={classnames(styles.sliderThumb, {
+                    [styles.disabled]: !enabled,
+                  })}
+                  style={thumbStyle ? { ...thumbStyle } : undefined}
+                  id={id}
+                  data-thumb-index={index}
+                />
+              </Tooltip>
             ))}
           </Root>
         </div>
@@ -280,4 +305,4 @@ export const Slider = forwardRef(
   },
 );
 
-Slider.displayName = Root.displayName;
+Slider.displayName = "Slider";

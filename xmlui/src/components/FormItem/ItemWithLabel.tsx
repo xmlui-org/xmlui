@@ -7,11 +7,15 @@ import styles from "./FormItem.module.scss";
 
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
+import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
+
+// Component part names
 
 type ItemWithLabelProps = {
   id?: string;
   labelPosition?: LabelPosition;
   style?: CSSProperties;
+  className?: string;
   labelStyle?: CSSProperties;
   label?: string;
   labelWidth?: string;
@@ -21,8 +25,8 @@ type ItemWithLabelProps = {
   children: ReactNode;
   validationInProgress?: boolean;
   shrinkToLabel?: boolean;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
   isInputTemplateUsed?: boolean;
   validationResult?: ReactNode;
 };
@@ -36,7 +40,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
     labelPosition = "top",
-    style,
+    style = {},
+    className,
     label,
     labelBreak = defaultProps.labelBreak,
     labelWidth,
@@ -50,14 +55,29 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     labelStyle,
     validationResult,
     isInputTemplateUsed = false,
+    ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
+  // --- HACK: the "rest" may contain a "layoutContext" property with undefined value, and it
+  // --- would issue a warning in React.
+  if ((rest as any).layoutContext === undefined) {
+    delete (rest as any).layoutContext;
+  }
+  // --- END HACK
+
   const generatedId = useId();
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
     return (
-      <Slot style={style} id={inputId} ref={ref}>
+      <Slot
+        {...rest}
+        data-part-id={PART_LABELED_ITEM}
+        style={style}
+        className={className}
+        id={inputId}
+        ref={ref}
+      >
         {children}
       </Slot>
     );
@@ -71,7 +91,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={style} ref={ref} className={styles.itemWithLabel}>
+    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
@@ -83,6 +103,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       >
         {label && (
           <label
+            data-part-id={PART_LABEL}
             htmlFor={inputId}
             onClick={() => document.getElementById(inputId)?.focus()}
             style={{
@@ -104,7 +125,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot id={!isInputTemplateUsed ? inputId : undefined}>{children}</Slot>
+        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined}>
+          {children}
+        </Slot>
       </div>
       {validationResult}
     </div>

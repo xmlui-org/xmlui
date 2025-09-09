@@ -37,8 +37,15 @@ The [Markdown](/components/Markdown) component that renders this page is invoked
                 data="{$props.url}" />
             <DocumentLinks />
         </VStack>
-        <TableOfContents width="$space-64" when="{mediaSize.sizeIndex > 3 && !$props.hideToc}" maxHeadingLevel="3" />
-        <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
+        <TableOfContents 
+          width="$space-64" 
+          when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
+          maxHeadingLevel="3" 
+        />
+        <VStack 
+          width="$space-64" 
+          when="{mediaSize.sizeIndex > 3 && $props.hideToc}" 
+        />
     </HStack>
 </Component>
 ```

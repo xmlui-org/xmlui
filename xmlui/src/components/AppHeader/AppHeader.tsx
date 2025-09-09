@@ -6,6 +6,7 @@ import { paddingSubject } from "../../components-core/theming/themes/base-utils"
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
 import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
+import classnames from "classnames";
 
 const COMP = "AppHeader";
 
@@ -50,7 +51,7 @@ export const AppHeaderMd = createMetadata({
     [`maxWidth-content-${COMP}`]: "$maxWidth-content-App",
     [`maxWidth-${COMP}`]: "$maxWidth-App",
     [`borderBottom-${COMP}`]: "1px solid $borderColor",
-    ...paddingSubject(`logo-${COMP}`, { horizontal: "$space-0", vertical: "$space-4" }),
+    ...paddingSubject(`logo-${COMP}`, { horizontal: "$space-0", vertical: "$space-0" }),
     ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-0" }),
     [`borderRadius-${COMP}`]: "0px",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
@@ -60,7 +61,7 @@ export const AppHeaderMd = createMetadata({
 export const appHeaderComponentRenderer = createComponentRenderer(
   COMP,
   AppHeaderMd,
-  ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
+  ({ node, renderChild, className, layoutContext, extractValue }) => {
     // --- Convert the plain (text) logo template into component definition
     const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
     const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
@@ -82,8 +83,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
           type: "Stack",
           orientation: "horizontal",
         })}
-        style={layoutCss}
-        className={layoutContext?.themeClassName}
+        className={classnames(layoutContext?.themeClassName, className)}
         renderChild={renderChild}
       >
         {renderChild(node.children, {

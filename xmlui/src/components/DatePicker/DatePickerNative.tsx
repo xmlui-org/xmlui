@@ -1,6 +1,6 @@
 import { type CSSProperties, useId } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import type { DateRange } from "react-day-picker";
+import type { DateRange, Matcher } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
 import classnames from "classnames";
@@ -15,9 +15,46 @@ import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import Icon from "../Icon/IconNative";
+import { Item } from "@radix-ui/react-dropdown-menu";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
+
+// Extended matcher types that support string dates in addition to Date objects
+type StringDateRange = { 
+  from: string | Date; 
+  to?: string | Date; 
+};
+
+type StringDateBefore = { 
+  before: string | Date; 
+};
+
+type StringDateAfter = { 
+  after: string | Date; 
+};
+
+type StringDateInterval = { 
+  before: string | Date; 
+  after: string | Date; 
+};
+
+type DayOfWeekMatcher = { 
+  dayOfWeek: number | number[]; 
+};
+
+type ExtendedMatcher = 
+  | boolean
+  | string
+  | Date
+  | (string | Date)[]
+  | StringDateRange
+  | StringDateBefore  
+  | StringDateAfter
+  | StringDateInterval
+  | DayOfWeekMatcher
+  | ((date: Date) => boolean)
+  | ExtendedMatcher[];
 
 type Props = {
   id?: string;
@@ -28,9 +65,10 @@ type Props = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   style?: CSSProperties;
+  className?: string;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   dateFormat?: DateFormat;
@@ -38,7 +76,7 @@ type Props = {
   weekStartsOn?: WeekDays;
   minValue?: string;
   maxValue?: string;
-  disabledDates?: string[];
+  disabledDates?: ExtendedMatcher;
   inline?: boolean;
   startText?: string;
   startIcon?: string;
@@ -95,7 +133,7 @@ export const defaultProps: Pick<
   dateFormat: "MM/dd/yyyy",
   showWeekNumber: false,
   weekStartsOn: WeekDays.Sunday,
-  disabledDates: [],
+  disabledDates: undefined as ExtendedMatcher | undefined,
 };
 
 const Chevron = ({ ...props }) => {
@@ -131,6 +169,7 @@ export const DatePicker = forwardRef(function DatePicker(
     maxValue,
     disabledDates = defaultProps.disabledDates,
     style,
+    className,
     registerComponentApi,
     inline = defaultProps.inline,
     startText,
@@ -144,13 +183,14 @@ export const DatePicker = forwardRef(function DatePicker(
     readOnly = false,
     required,
     autoFocus = false,
+    ...rest
   }: Props,
   ref: React.Ref<HTMLDivElement>,
 ) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
-  const [isButtonFocused, setIsButtonFocused] = useState(false);
   const [isMenuFocused, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
   const generatedId = useId();
   const inputId = id || generatedId;
 
@@ -165,6 +205,8 @@ export const DatePicker = forwardRef(function DatePicker(
     }
     return undefined;
   }, [value, mode]);
+
+  console.log("sel", selected)
 
   useEffect(() => {
     if (!dateFormats.includes(dateFormat)) {
@@ -182,20 +224,130 @@ export const DatePicker = forwardRef(function DatePicker(
     return maxValue ? parse(maxValue, dateFormat, new Date()) : undefined;
   }, [maxValue, dateFormat]);
 
+  const defaultMonth = useMemo(() => {
+    if (mode === "single" && selected) {
+      return selected;
+    } else if (mode === "range" && selected && typeof selected === "object" && selected.from) {
+      return selected.from;
+    }
+    return undefined;
+  }, [selected, mode]);
+
   const disabled = useMemo(() => {
-    return disabledDates?.map((date) => parse(date, dateFormat, new Date()));
+    if (!disabledDates) {
+      return undefined;
+    }
+
+    const convertStringToDate = (dateValue: string | Date): Date | undefined => {
+      if (dateValue instanceof Date) {
+        return dateValue;
+      }
+      if (typeof dateValue === 'string') {
+        // Try to parse as ISO date first
+        const isoDate = parseISODate(dateValue);
+        if (isoDate) {
+          return isoDate;
+        }
+        // Parse using the specified dateFormat
+        const parsedDate = parse(dateValue, dateFormat, new Date());
+        if (isValid(parsedDate)) {
+          return parsedDate;
+        }
+      }
+      return undefined;
+    };
+
+    const convertMatcher = (matcher: ExtendedMatcher): Matcher | undefined => {
+      // Handle boolean - disable all dates
+      if (typeof matcher === 'boolean') {
+        return matcher;
+      }
+
+      // Handle function matcher - pass through as is
+      if (typeof matcher === 'function') {
+        return matcher;
+      }
+
+      // Handle single Date or string
+      if (matcher instanceof Date || typeof matcher === 'string') {
+        const convertedDate = convertStringToDate(matcher);
+        return convertedDate || undefined;
+      }
+
+      // Handle array of mixed matchers (combines multiple disable patterns)
+      if (Array.isArray(matcher)) {
+        const convertedMatchers: any[] = [];
+        
+        for (const item of matcher) {
+          if (typeof item === 'object' && item !== null && !Array.isArray(item) && !(item instanceof Date)) {
+            // Handle nested matcher objects in array (e.g., {dayOfWeek: [0,6]}, {from: date, to: date})
+            const nestedResult = convertMatcher(item);
+            if (nestedResult) {
+              convertedMatchers.push(nestedResult);
+            }
+          } else if (item instanceof Date || typeof item === 'string') {
+            // Handle individual dates in the array
+            const convertedDate = convertStringToDate(item);
+            if (convertedDate) {
+              convertedMatchers.push(convertedDate);
+            }
+          }
+        }
+        
+        // Return array of all matchers to combine their effects
+        return convertedMatchers.length > 0 ? convertedMatchers as Matcher : undefined;
+      }
+
+      // Handle object matchers (DateRange, DateBefore, DateAfter, DateInterval, DayOfWeek)
+      if (typeof matcher === 'object' && matcher !== null) {
+        // Handle DateRange: { from: Date, to?: Date }
+        if ('from' in matcher) {
+          const fromDate = convertStringToDate(matcher.from);
+          const toDate = matcher.to ? convertStringToDate(matcher.to) : undefined;
+          if (fromDate) {
+            return { from: fromDate, to: toDate };
+          }
+        }
+
+        // Handle DateBefore: { before: Date }
+        if ('before' in matcher && !('after' in matcher)) {
+          const beforeDate = convertStringToDate(matcher.before);
+          if (beforeDate) {
+            return { before: beforeDate };
+          }
+        }
+
+        // Handle DateAfter: { after: Date }
+        if ('after' in matcher && !('before' in matcher)) {
+          const afterDate = convertStringToDate(matcher.after);
+          if (afterDate) {
+            return { after: afterDate };
+          }
+        }
+
+        // Handle DateInterval: { before: Date, after: Date }
+        if ('before' in matcher && 'after' in matcher) {
+          const beforeDate = convertStringToDate(matcher.before);
+          const afterDate = convertStringToDate(matcher.after);
+          if (beforeDate && afterDate) {
+            return { before: beforeDate, after: afterDate };
+          }
+        }
+
+        // Handle DayOfWeek: { dayOfWeek: number | number[] }
+        if ('dayOfWeek' in matcher) {
+          return { dayOfWeek: matcher.dayOfWeek };
+        }
+      }
+
+      return undefined;
+    };
+
+    return convertMatcher(disabledDates);
   }, [disabledDates, dateFormat]);
 
   const [open, setOpen] = useState(false);
   const { root } = useTheme();
-
-  const handleOnButtonFocus = () => {
-    setIsButtonFocused(true);
-  };
-
-  const handleOnButtonBlur = () => {
-    setIsButtonFocused(false);
-  };
 
   const handleOnMenuFocus = () => {
     setIsMenuFocused(true);
@@ -211,8 +363,7 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [referenceElement]);
 
   const setValue = useEvent((newValue: string) => {
-    const parsedDate = parseDate(newValue);
-    handleSelect(parsedDate);
+    updateState({ value: newValue });
   });
 
   useEffect(() => {
@@ -222,18 +373,32 @@ export const DatePicker = forwardRef(function DatePicker(
     });
   }, [focus, registerComponentApi, setValue]);
 
-  useEffect(() => {
-    if (!isButtonFocused && !isMenuFocused) {
-      onBlur?.();
-    }
-    if (isButtonFocused || isMenuFocused) {
-      onFocus?.();
-    }
-  }, [isButtonFocused, isMenuFocused, onFocus, onBlur]);
+  // useEffect(() => {
+  //   if (!isButtonFocused && !isMenuFocused) {
+  //     onBlur?.();
+  //   }
+  //   if (isButtonFocused || isMenuFocused) {
+  //     onFocus?.();
+  //   }
+  // }, [isButtonFocused, isMenuFocused, onFocus, onBlur]);
 
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
+
+  // Update inline month when selected value changes
+  useEffect(() => {
+    if (inline) {
+      if (mode === "single" && selected) {
+        setInlineMonth(selected);
+      } else if (mode === "range" && selected && typeof selected === "object" && selected.from) {
+        setInlineMonth(selected.from);
+      } else if (!selected) {
+        // Reset to defaultMonth logic when no selection
+        setInlineMonth(defaultMonth);
+      }
+    }
+  }, [selected, mode, inline, defaultMonth]);
 
   const handleSelect = useCallback(
     (dateOrRange?: Date | DateRange) => {
@@ -264,7 +429,7 @@ export const DatePicker = forwardRef(function DatePicker(
     [onDidChange, updateState, mode, dateFormat],
   );
 
-  return (
+  return inline ? (
     <ItemWithLabel
       id={inputId}
       labelPosition={labelPosition as any}
@@ -276,109 +441,131 @@ export const DatePicker = forwardRef(function DatePicker(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       ref={ref}
     >
-      {inline ? (
-        <div className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>
+      <div {...rest} className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>
+        <DayPicker
+          id={inputId}
+          required={undefined}
+          captionLayout="dropdown"
+          fixedWeeks
+          startMonth={startDate}
+          endMonth={endDate}
+          month={inlineMonth}
+          onMonthChange={setInlineMonth}
+          disabled={disabled}
+          weekStartsOn={_weekStartsOn}
+          showWeekNumber={showWeekNumber}
+          showOutsideDays
+          classNames={styles}
+          mode={mode === "single" ? "single" : "range"}
+          selected={selected}
+          onSelect={handleSelect}
+          autoFocus={autoFocus}
+          numberOfMonths={mode === "range" ? 2 : 1}
+          components={{
+            Chevron,
+          }}
+        />
+      </div>
+    </ItemWithLabel>
+  ) : (
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <ItemWithLabel
+        {...rest}
+        id={inputId}
+        labelPosition={labelPosition as any}
+        label={label}
+        labelWidth={labelWidth}
+        labelBreak={labelBreak}
+        required={required}
+        enabled={enabled}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+        className={className}
+        ref={ref}
+      >
+        <PopoverTrigger
+          ref={setReferenceElement}
+          id={inputId}
+          aria-haspopup={true}
+          disabled={!enabled}
+          style={style}
+          aria-expanded={open}
+          className={classnames(
+            styles.datePicker,
+            {
+              [styles.disabled]: !enabled,
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+            },
+            className,
+          )}
+          autoFocus={autoFocus}
+          onFocus={onFocus as any}
+          onBlur={onBlur as any}
+        >
+          <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+          <div className={styles.datePickerValue}>
+            {mode === "single" && selected ? (
+              <>{format(selected, dateFormat)}</>
+            ) : mode === "range" && typeof selected === "object" && selected.from ? (
+              selected.to ? (
+                <>
+                  {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
+                </>
+              ) : (
+                <>{format(selected.from, dateFormat)}</>
+              )
+            ) : placeholder ? (
+              <span className={styles.placeholder} placeholder={placeholder}>
+                {placeholder}
+              </span>
+            ) : (
+              <span>&nbsp;</span>
+            )}
+          </div>
+          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        </PopoverTrigger>
+      </ItemWithLabel>
+      <PopoverPortal container={root}>
+        <PopoverContent
+          role="menu"
+          align={"start"}
+          sideOffset={5}
+          className={styles.datePickerMenu}
+          onFocus={handleOnMenuFocus}
+          onBlur={handleOnMenuBlur}
+          onInteractOutside={handleOnMenuBlur}
+        >
           <DayPicker
-            id={inputId}
             required={undefined}
-            captionLayout="dropdown"
+            animate
             fixedWeeks
+            autoFocus={autoFocus}
+            classNames={styles}
+            captionLayout="dropdown"
             startMonth={startDate}
             endMonth={endDate}
+            defaultMonth={defaultMonth}
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
             showOutsideDays
-            classNames={styles}
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
-            autoFocus={autoFocus}
             numberOfMonths={mode === "range" ? 2 : 1}
             components={{
               Chevron,
             }}
           />
-        </div>
-      ) : (
-        <Popover open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger
-            ref={setReferenceElement}
-            id={inputId}
-            aria-haspopup={true}
-            disabled={!enabled}
-            style={style}
-            aria-expanded={open}
-            className={classnames(styles.datePicker, {
-              [styles.disabled]: !enabled,
-              [styles.error]: validationStatus === "error",
-              [styles.warning]: validationStatus === "warning",
-              [styles.valid]: validationStatus === "valid",
-            })}
-            autoFocus={autoFocus}
-            onFocus={onFocus}
-            onBlur={onBlur}
-          >
-            <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-            <div className={styles.datePickerValue}>
-              {mode === "single" && selected ? (
-                <>{format(selected, dateFormat)}</>
-              ) : mode === "range" && typeof selected === "object" && selected.from ? (
-                selected.to ? (
-                  <>
-                    {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
-                  </>
-                ) : (
-                  <>{format(selected.from, dateFormat)}</>
-                )
-              ) : placeholder ? (
-                <span className={styles.placeholder} placeholder={placeholder}>
-                  {placeholder}
-                </span>
-              ) : (
-                <span>&nbsp;</span>
-              )}
-            </div>
-            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-          </PopoverTrigger>
-          <PopoverPortal container={root}>
-            <PopoverContent
-              role="menu"
-              align={"start"}
-              sideOffset={5}
-              className={styles.datePickerMenu}
-              onFocus={handleOnMenuFocus}
-              onBlur={handleOnMenuBlur}
-              onInteractOutside={handleOnMenuBlur}
-            >
-              <DayPicker
-                required={undefined}
-                animate
-                fixedWeeks
-                autoFocus={autoFocus}
-                classNames={styles}
-                captionLayout="dropdown"
-                startMonth={startDate}
-                endMonth={endDate}
-                disabled={disabled}
-                weekStartsOn={_weekStartsOn}
-                showWeekNumber={showWeekNumber}
-                showOutsideDays
-                mode={mode === "single" ? "single" : "range"}
-                selected={selected}
-                onSelect={handleSelect}
-                numberOfMonths={mode === "range" ? 2 : 1}
-                components={{
-                  Chevron,
-                }}
-              />
-            </PopoverContent>
-          </PopoverPortal>
-        </Popover>
-      )}
-    </ItemWithLabel>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>
   );
 });
 

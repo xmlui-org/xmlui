@@ -181,11 +181,10 @@ export type IsValidFunction<T> = (
 // This type represents the description of a property value, which can be a string, a
 // number, or an object with a value and a description. This type is used in the
 // metadata of a component.
-export type PropertyValueDescription =
-  | string
-  | number
+export type PropertyValueDescription<T = string | number> =
+  | T
   | {
-      value: string | number;
+      value: T;
       description: string;
     };
 
@@ -236,6 +235,12 @@ export type ComponentApiMetadata = {
   // This field defines the parameters of the API method. It is an object where each key
   // is the parameter name, and the value is its description.
   readonly parameters?: Record<string, string>;
+};
+
+// This type defines the metadata of a component part. It is used to describe the
+// individual parts that make up the component.
+export type ComponentPartMetadata = {
+  description: string;
 };
 
 // Components have metadata that the rendering engine uses to render the component.
@@ -306,6 +311,12 @@ export type ComponentMetadata<
 
   // Indicates that the component represent an HTML tag
   isHtmlTag?: boolean;
+
+  // Describes the individual parts that make up the component
+  parts?: Record<string, ComponentPartMetadata>;
+
+  // The name of the default part. Layout properties will be applied to this part by default.
+  defaultPart?: string;
 };
 
 export interface ParentRenderContext {

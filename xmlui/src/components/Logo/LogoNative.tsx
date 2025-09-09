@@ -1,4 +1,5 @@
-import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import type { CSSProperties, ForwardedRef} from "react";
+import { forwardRef } from "react";
 
 import { Image } from "../Image/ImageNative";
 import { useLogoUrl } from "../AppHeader/AppHeaderNative";
@@ -12,11 +13,12 @@ export const defaultProps = {
 type LogoProps = {
   alt?: string;
   style?: CSSProperties;
+  className?: string;
   inline?: boolean;
 };
 
 export const Logo = forwardRef(function Logo(
-  { style, alt = defaultProps.alt, inline = defaultProps.inline }: LogoProps,
+  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -26,10 +28,12 @@ export const Logo = forwardRef(function Logo(
   //width auto for safari
   return (
     <Image
+      {...rest}
       ref={forwardedRef}
       src={logoUrl}
       alt={alt}
       inline={inline}
+      className={className}
       style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );

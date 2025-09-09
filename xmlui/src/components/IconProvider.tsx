@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -23,9 +23,10 @@ import {
   FiUserPlus,
   FiUsers,
   FiX,
-  FiMoon,
   FiChevronsRight,
   FiChevronsLeft,
+  FiChevronsDown,
+  FiChevronsUp,
 } from "react-icons/fi";
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
@@ -129,7 +130,7 @@ import TableDeleteRowIcon from "./Icon/TableDeleteRowIcon";
 import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 
-type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
+type IconRenderer<T extends IconBaseProps> = (props: T, ref: ForwardedRef<HTMLElement>) => React.ReactElement<T>;
 
 type IconRegistryEntry = {
   renderer: IconRenderer<any>;
@@ -173,6 +174,8 @@ registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {..
 registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
 registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
 registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
+registerIconRenderer("doublechevrondown", (props: IconBaseProps) => <FiChevronsDown {...props} />);
+registerIconRenderer("doublechevronup", (props: IconBaseProps) => <FiChevronsUp {...props} />);
 registerIconRenderer("doublechevronright", (props: IconBaseProps) => <FiChevronsRight {...props} />);
 registerIconRenderer("doublechevronleft", (props: IconBaseProps) => <FiChevronsLeft {...props} />);
 registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);

@@ -7,85 +7,87 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.base {
-  display: flex;
-  /* default flexbox alignment */
-  justify-content: flex-start;
-  align-items: stretch;
-  min-height: 0;
-  min-width: 0;
-  gap: var(--stack-gap-default);
+@layer components {
+  .base {
+    display: flex;
+    /* default flexbox alignment */
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 0;
+    min-width: 0;
+    gap: var(--stack-gap-default);
 
-  &.hoverContainer{
-    :global(.display-on-hover){
-      transition: opacity .1s;
-      opacity: 0;
-      visibility: hidden;
-    }
-    
-    &:has(:global(.dropdown-visible)) :global(.display-on-hover){
-      opacity: 1;
-      visibility: visible;
-    }
+    &.hoverContainer{
+      :global(.display-on-hover){
+        transition: opacity .1s;
+        opacity: 0;
+        visibility: hidden;
+      }
 
-    &:hover, &:focus-within{
-      :global(.display-on-hover) {
+      &:has(:global(.dropdown-visible)) :global(.display-on-hover){
         opacity: 1;
         visibility: visible;
       }
+
+      &:hover, &:focus-within{
+        :global(.display-on-hover) {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+    }
+
+    &.handlesClick{
+      cursor: pointer;
     }
   }
-  
-  &.handlesClick{
-    cursor: pointer;
+
+  .vertical {
+    flex-direction: column;
+    min-height: 0;
+
+    &.reverse{
+      flex-direction: column-reverse;
+    }
   }
-}
 
-.vertical {
-  flex-direction: column;
-  min-height: 0;
-
-  &.reverse{
-    flex-direction: column-reverse;
+  .horizontal {
+    flex-direction: row;
+    &.reverse{
+      flex-direction: row-reverse;
+    }
   }
-}
 
-.horizontal {
-  flex-direction: row;
-  &.reverse{
-    flex-direction: row-reverse;
+  /* Main axis */
+  .justifyItemsStart {
+    justify-content: flex-start;
   }
-}
+  .justifyItemsCenter {
+    justify-content: center;
+  }
+  .justifyItemsStretch {
+    justify-content: stretch;
+  }
+  .justifyItemsEnd {
+    justify-content: flex-end;
+  }
 
-/* Main axis */
-.justifyItemsStart {
-  justify-content: flex-start;
-}
-.justifyItemsCenter {
-  justify-content: center;
-}
-.justifyItemsStretch {
-  justify-content: stretch;
-}
-.justifyItemsEnd {
-  justify-content: flex-end;
-}
-
-/* Cross axis */
-.alignItemsStart {
-  align-items: flex-start;
-}
-.alignItemsCenter {
-  align-items: center;
-}
-.alignItemsStretch {
-  align-items: stretch;
-}
-.alignItemsEnd {
-  align-items: flex-end;
-}
-.alignItemsBaseline {
-  align-items: baseline;
+  /* Cross axis */
+  .alignItemsStart {
+    align-items: flex-start;
+  }
+  .alignItemsCenter {
+    align-items: center;
+  }
+  .alignItemsStretch {
+    align-items: stretch;
+  }
+  .alignItemsEnd {
+    align-items: flex-end;
+  }
+  .alignItemsBaseline {
+    align-items: baseline;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

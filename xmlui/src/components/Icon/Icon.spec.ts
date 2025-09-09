@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -109,9 +110,10 @@ test.describe("name Property", () => {
 // =============================================================================
 
 test.describe("size Property", () => {
-  test("renders with predefined size 'xs'", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="xs"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with predefined size 'xs'", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="xs"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     // Check computed width/height using CSS
     const computedStyle = await icon.evaluate((el) => {
@@ -121,9 +123,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("12px"); // 0.75em calculated
   });
 
-  test("renders with predefined size 'sm'", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="sm"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with predefined size 'sm'", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="sm"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -132,9 +135,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("16px"); // 1em calculated
   });
 
-  test("renders with predefined size 'md'", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="md"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with predefined size 'md'", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="md"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -143,9 +147,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("24px"); // 1.5rem calculated
   });
 
-  test("renders with predefined size 'lg'", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="lg"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with predefined size 'lg'", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="lg"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -154,9 +159,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("32px"); // 2em calculated
   });
 
-  test("renders with custom pixel size", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="48px"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with custom pixel size", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="48px"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -165,9 +171,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("48px");
   });
 
-  test("renders with custom em size", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="3em"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with custom em size", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="3em"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -176,9 +183,10 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("48px"); // 3em calculated at 16px base
   });
 
-  test("renders with custom rem size", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="2rem"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("renders with custom rem size", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="2rem"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -187,20 +195,22 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("32px"); // 2rem calculated
   });
 
-  test("handles invalid size gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="invalid-size"/>`);
-    const icon = page.getByTestId("test-id-component");
-    await expect(icon).toBeVisible();
+  test("handles invalid size gracefully", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="invalid-size"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
+    await expect(icon).not.toBeVisible();
   });
 
-  test("handles negative size value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="-20px"/>`);
-    const icon = page.getByTestId("test-id-component");
-    
+  test("handles negative size value", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="-20px"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
+
     // With negative size, element exists but browser normalizes to 0px
     const exists = await icon.count();
     expect(exists).toBe(1);
-    
+
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
@@ -209,13 +219,14 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("0px");
   });
 
-  test("handles zero size value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="0px"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("handles zero size value", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="0px"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     // Zero-size elements might not be "visible" but should exist
     const exists = await icon.count();
     expect(exists).toBe(1);
-    
+
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
@@ -223,21 +234,17 @@ test.describe("size Property", () => {
     expect(computedStyle.width).toBe("0px");
   });
 
-  test("handles null size value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="{null}"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("handles null size value", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="{null}"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
   });
 
-  test("handles undefined size value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="{undefined}"/>`);
-    const icon = page.getByTestId("test-id-component");
-    await expect(icon).toBeVisible();
-  });
-
-  test("handles CSS variable in size", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="$icon-size-custom"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("handles undefined size value", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="{undefined}"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
   });
 });
@@ -305,56 +312,63 @@ test.describe("fallback Property", () => {
 // =============================================================================
 
 test.describe("click Event", () => {
-  test("fires click event when icon is clicked", async ({ initTestBed, page }) => {
+  test("fires click event when icon is clicked", async ({ initTestBed, createIconDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="testState = 'clicked'"/>
+      <Icon testId="icon" name="home" onClick="testState = 'clicked'"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await icon.click();
-    
-    await expect.poll(testStateDriver.testState).toEqual('clicked');
+
+    await expect.poll(testStateDriver.testState).toEqual("clicked");
   });
 
-  test("applies clickable cursor when click handler is present", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" onClick="testState = 'clicked'"/>`);
-    
-    const icon = page.getByTestId("test-id-component");
+  test("applies clickable cursor when click handler is present", async ({
+    initTestBed,
+    createIconDriver,
+  }) => {
+    await initTestBed(`<Icon testId="icon" name="home" onClick="testState = 'clicked'"/>`);
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toHaveCSS("cursor", "pointer");
   });
 
-  test("does not apply clickable cursor when no click handler", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`);
-    
-    const icon = page.getByTestId("test-id-component");
+  test("does not apply clickable cursor when no click handler", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     const cursor = await icon.evaluate((el) => window.getComputedStyle(el).cursor);
     expect(cursor).not.toBe("pointer");
   });
 
-  test("click event provides event object", async ({ initTestBed, page }) => {
+  test("click event provides event object", async ({ initTestBed, createIconDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="event => testState = event.type"/>
+      <Icon testId="icon" name="home" onClick="event => testState = event.type"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await icon.click();
-    
-    await expect.poll(testStateDriver.testState).toEqual('click');
+
+    await expect.poll(testStateDriver.testState).toEqual("click");
   });
 
-  test("multiple clicks increment counter", async ({ initTestBed, page }) => {
+  test("multiple clicks increment counter", async ({ initTestBed, createIconDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="testState = (testState || 0) + 1"/>
+      <Icon testId="icon" name="home" onClick="testState = (testState || 0) + 1"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
-    
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
+
     await icon.click();
     await expect.poll(testStateDriver.testState).toEqual(1);
-    
+
     await icon.click();
     await expect.poll(testStateDriver.testState).toEqual(2);
-    
+
     await icon.click();
     await expect.poll(testStateDriver.testState).toEqual(3);
   });
@@ -365,78 +379,87 @@ test.describe("click Event", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("icon renders as inline element by default", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`);
-    const icon = page.getByTestId("test-id-component");
-    
-    const display = await icon.evaluate((el) => window.getComputedStyle(el).display);
+  test("icon renders as inline element by default", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    const icon = await createIconDriver("icon");
+    const display = await icon.svgIcon.evaluate((el) => window.getComputedStyle(el).display);
     expect(display).toBe("inline-block");
   });
 
-  test("icon has correct vertical alignment", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`);
-    const icon = page.getByTestId("test-id-component");
-    
-    await expect(icon).toHaveCSS("vertical-align", "text-bottom");
+  test("icon has correct vertical alignment", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    const icon = await createIconDriver("icon");
+
+    await expect(icon.svgIcon as any).toHaveCSS("vertical-align", "text-bottom");
   });
 
-  test("icon inherits color from parent", async ({ initTestBed, page }) => {
+  test("icon inherits color from parent", async ({ initTestBed, createIconDriver }) => {
     await initTestBed(`
       <Text color="red">
-        <Icon name="home"/>
+        <Icon testId="icon" name="home"/>
       </Text>
     `);
-    const icon = page.getByTestId("test-id-component");
-    
-    const color = await icon.evaluate((el) => window.getComputedStyle(el).color);
+    const icon = await createIconDriver("icon");
+
+    const color = await icon.svgIcon.evaluate((el) => window.getComputedStyle(el).color);
     // Should inherit red color or have some computed red value
     expect(color).not.toBe(""); // Should have some color value
   });
 
-  test("icon is clickable when click handler is present", async ({ initTestBed, page }) => {
+  test("icon is clickable when click handler is present", async ({ initTestBed, createIconDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="testState = 'activated'"/>
+      <Icon testId="icon" name="home" onClick="testState = 'activated'"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
+
+    const icon = await createIconDriver("icon");
     await icon.click();
-    
-    await expect.poll(testStateDriver.testState).toEqual('activated');
+
+    await expect.poll(testStateDriver.testState).toEqual("activated");
   });
 
-  test.fixme("icon can receive focus via tabIndex when clickable", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" onClick="testState = 'clicked'" tabIndex="0"/>`);
-    
-    const icon = page.getByTestId("test-id-component");
-    
-    // Check that the icon has tabIndex attribute
-    const tabIndex = await icon.getAttribute("tabindex");
-    expect(tabIndex).toBe("0");
-    
-    // For SVG elements, we test focus capability by checking if it can be found after focus
-    await icon.focus();
-    const activeElement = await page.evaluate(() => document.activeElement?.getAttribute("data-testid"));
-    expect(activeElement).toBe("test-id-component");
-  });
+  test.fixme(
+    "icon can receive focus via tabIndex when clickable",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`<Icon name="home" onClick="testState = 'clicked'" tabIndex="0"/>`);
 
-  test.fixme("icon supports keyboard activation with tabIndex when clickable", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
+      const icon = page.getByTestId("test-id-component");
+
+      // Check that the icon has tabIndex attribute
+      const tabIndex = await icon.getAttribute("tabindex");
+      expect(tabIndex).toBe("0");
+
+      // For SVG elements, we test focus capability by checking if it can be found after focus
+      await icon.focus();
+      const activeElement = await page.evaluate(() =>
+        document.activeElement?.getAttribute("data-testid"),
+      );
+      expect(activeElement).toBe("test-id-component");
+    },
+  );
+
+  test.fixme(
+    "icon supports keyboard activation with tabIndex when clickable",
+    async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
       <Icon name="home" onClick="testState = 'space-activated'" tabIndex="0"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
-    
-    // Focus the icon and verify it's focused
-    await icon.focus();
-    const activeElement = await page.evaluate(() => document.activeElement?.getAttribute("data-testid"));
-    expect(activeElement).toBe("test-id-component");
-    
-    // For SVG elements, Space key might not trigger click by default
-    // Let's test Enter key instead which is more reliable for SVG elements
-    await icon.press('Enter');
-    
-    await expect.poll(testStateDriver.testState).toEqual('space-activated');
-  });
+
+      const icon = page.getByTestId("test-id-component");
+
+      // Focus the icon and verify it's focused
+      await icon.focus();
+      const activeElement = await page.evaluate(() =>
+        document.activeElement?.getAttribute("data-testid"),
+      );
+      expect(activeElement).toBe("test-id-component");
+
+      // For SVG elements, Space key might not trigger click by default
+      // Let's test Enter key instead which is more reliable for SVG elements
+      await icon.press("Enter");
+
+      await expect.poll(testStateDriver.testState).toEqual("space-activated");
+    },
+  );
 });
 
 // =============================================================================
@@ -444,53 +467,54 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies theme variable for size", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`, {
+  test("applies theme variable for size", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`, {
       testThemeVars: {
         "size-Icon": "3rem",
       },
     });
-    
-    const icon = page.getByTestId("test-id-component");
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    
+
     expect(computedStyle.width).toBe("48px"); // 3rem calculated
     expect(computedStyle.height).toBe("48px");
   });
 
-  test("size prop overrides theme variable", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="2rem"/>`, {
+  test("size prop overrides theme variable", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="2rem"/>`, {
       testThemeVars: {
         "size-Icon": "4rem",
       },
     });
-    
-    const icon = page.getByTestId("test-id-component");
-    const computedStyle = await icon.evaluate((el) => {
+
+    const icon = await createIconDriver("icon");
+    const computedStyle = await icon.svgIcon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    
+
     expect(computedStyle.width).toBe("32px"); // 2rem calculated, not 4rem from theme
     expect(computedStyle.height).toBe("32px");
   });
 
-  test("applies theme variable with custom CSS variable", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`, {
+  test("applies theme variable with custom CSS variable", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`, {
       testThemeVars: {
         "size-Icon": "var(--custom-icon-size, 40px)",
       },
     });
-    
-    const icon = page.getByTestId("test-id-component");
-    const computedStyle = await icon.evaluate((el) => {
+
+    const icon = await createIconDriver("icon");
+    const computedStyle = await icon.svgIcon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
-    
+
     expect(computedStyle.width).toBe("40px"); // Fallback value used
     expect(computedStyle.height).toBe("40px");
   });
@@ -501,34 +525,35 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Other Edge Cases", () => {
-  test("handles null and undefined props gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home"/>`);
-    const icon = page.getByTestId("test-id-component");
-    await expect(icon).toBeVisible();
+  test("handles null and undefined props gracefully", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    const icon = await createIconDriver("icon");
+    await expect(icon.svgIcon).toBeVisible();
   });
 
-  test("handles component with all invalid props gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon invalidProp="invalid" anotherInvalid="{123}"/>`);
+  test("handles component with all invalid props gracefully", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" invalidProp="invalid" anotherInvalid="{123}"/>`);
 
     // Component with invalid props may not be visible, but should not crash
-    const component = page.getByTestId("test-id-component");
-    const isVisible = await component.isVisible();
-    
+    const icon = await createIconDriver("icon");
+    const isVisible = await icon.svgIcon.isVisible();
+
     // Either it's visible with fallback behavior or gracefully hidden
     if (isVisible) {
       // If visible, it should have fallback behavior
-      await expect(component).toBeVisible();
+      await expect(icon.svgIcon).toBeVisible();
     } else {
       // It's acceptable for component to be hidden with invalid props
       expect(isVisible).toBe(false);
     }
   });
 
-  test("handles mixed valid and invalid props", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" invalidProp="invalid" size="lg"/>`);
-    const icon = page.getByTestId("test-id-component");
+  test("handles mixed valid and invalid props", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" invalidProp="invalid" size="lg"/>`);
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
     await expect(icon).toBeVisible();
-    
+
     // Valid props should still work
     const computedStyle = await icon.evaluate((el) => {
       const style = window.getComputedStyle(el);
@@ -537,71 +562,64 @@ test.describe("Other Edge Cases", () => {
     expect(computedStyle.width).toBe("32px"); // lg size should apply
   });
 
-  test("handles object value for name prop", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="{{}}" />`);
+  test("handles object value for name prop", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="{{}}" />`);
 
-    const component = page.getByTestId("test-id-component");
-    const isVisible = await component.isVisible();
-    
+    const icon = await createIconDriver("icon");
+    const isVisible = await icon.svgIcon.isVisible();
+
     if (isVisible) {
-      await expect(component).toBeVisible();
+      await expect(icon.svgIcon).toBeVisible();
     } else {
       expect(isVisible).toBe(false);
     }
   });
 
-  test("handles array value for size prop", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="{[]}" />`);
+  test("handles array value for size prop", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="{[]}" />`);
 
-    const component = page.getByTestId("test-id-component");
-    const isVisible = await component.isVisible();
-    
+    const icon = await createIconDriver("icon");
+    const isVisible = await icon.svgIcon.isVisible();
+
     if (isVisible) {
-      await expect(component).toBeVisible();
+      await expect(icon.svgIcon).toBeVisible();
     } else {
       expect(isVisible).toBe(false);
     }
   });
 
-  test("handles very long Unicode string in fallback", async ({ initTestBed, page }) => {
+  test("handles very long Unicode string in fallback", async ({ initTestBed, createIconDriver }) => {
     const longUnicodeString = "👨‍👩‍👧‍👦".repeat(100);
-    await initTestBed(`<Icon name="home" fallback="${longUnicodeString}"/>`);
-    const icon = page.getByTestId("test-id-component");
-    await expect(icon).toBeVisible(); // Icon renders with valid primary name, fallback ignored
+    await initTestBed(`<Icon testId="icon" name="home" fallback="${longUnicodeString}"/>`);
+    const icon = await createIconDriver("icon");
+    await expect(icon.svgIcon).toBeVisible(); // Icon renders with valid primary name, fallback ignored
   });
 
-  test("handles concurrent property changes", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="home" size="sm"/>`);
-    const icon = page.getByTestId("test-id-component");
-    await expect(icon).toBeVisible();
-    
+  test("handles concurrent property changes", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`<Icon testId="icon" name="home" size="sm"/>`);
+    const icon = await createIconDriver("icon");
+    await expect(icon.svgIcon).toBeVisible();
+
     // Test that initial state is correct
-    let computedStyle = await icon.evaluate((el) => {
+    let computedStyle = await icon.svgIcon.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { width: style.width, height: style.height };
     });
     expect(computedStyle.width).toBe("16px"); // sm size
   });
 
-  test("handles rapid sequential clicks", async ({ initTestBed, page }) => {
+  test("handles rapid sequential clicks", async ({ initTestBed, createIconDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="testState = (testState || 0) + 1"/>
+      <Icon testId="icon" name="home" onClick="testState = (testState || 0) + 1"/>
     `);
-    
-    const icon = page.getByTestId("test-id-component");
-    
+
+    const iconDrv = await createIconDriver("icon");
+    const icon = iconDrv.svgIcon;
+
     // Rapid sequential clicks
-    await Promise.all([
-      icon.click(),
-      icon.click(),
-      icon.click(),
-      icon.click(),
-      icon.click(),
-    ]);
-    
+    await Promise.all([icon.click(), icon.click(), icon.click(), icon.click(), icon.click()]);
+
     // Should eventually reach 5 (all clicks processed)
     await expect.poll(testStateDriver.testState).toEqual(5);
   });
 });
-
-

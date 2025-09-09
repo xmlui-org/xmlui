@@ -24,7 +24,7 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
 
 @layer components {
   .expandableItem {
-    width: 100%;
+    width: fit-content;
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
     background-color: $backgroundColor-ExpandableItem;

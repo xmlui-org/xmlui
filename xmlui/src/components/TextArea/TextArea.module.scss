@@ -1,13 +1,16 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "Textarea";
+$componentName: "TextArea";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // --- CSS properties of a particular Textarea variant
 @mixin variant($variantName) {
@@ -16,7 +19,6 @@ $componentName: "Textarea";
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
@@ -24,23 +26,25 @@ $componentName: "Textarea";
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus-within {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
   }
 
-  &:focus-visible{
-    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+  &:focus-visible {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
   }
 
   &::placeholder {
@@ -49,44 +53,53 @@ $componentName: "Textarea";
   }
 }
 
-.textarea {
-  display: block;
-  width: 100%;
-  line-height: 1.5em;
-  outline: none;
-  resize: none;
-  border-style: solid;
-  border-width: 1px;
-  transition: border .1s ease-in-out, box-shadow .1s ease-in-out, background .1s ease-in-out;
+@layer components {
+  .textarea {
+    display: block;
+    width: 100%;
+    line-height: 1.5em;
+    outline: none;
+    resize: none;
+    border-style: solid;
+    border-width: 1px;
+    transition:
+      border 0.1s ease-in-out,
+      box-shadow 0.1s ease-in-out,
+      background 0.1s ease-in-out;
+    @include t.paddingVars($themeVars, $componentName);
+    @include variant("default");
 
-  @include variant("default");
+    &.error {
+      @include variant("error");
+    }
 
-  &.error {
-    @include variant("error");
-  }
-  &.warning {
-    @include variant("warning");
-  }
-  &.valid {
-    @include variant("success");
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
+
+    &:is(:disabled) {
+      cursor: not-allowed;
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
   }
 
-  &:is(:disabled) {
-    cursor: not-allowed;
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-    color: createThemeVar("Input:textColor-#{$componentName}--disabled");
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+  .resizeHorizontal {
+    resize: horizontal;
   }
-}
 
-.resizeHorizontal {
-  resize: horizontal;
-}
-.resizeVertical {
-  resize: vertical;
-}
-.resizeBoth {
-  resize: both;
+  .resizeVertical {
+    resize: vertical;
+  }
+
+  .resizeBoth {
+    resize: both;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

@@ -1,4 +1,4 @@
-import { type CSSProperties, forwardRef, type ReactNode, useCallback, useEffect, useRef } from "react";
+import { type CSSProperties, forwardRef, type ReactNode, useCallback, useEffect, useId, useRef } from "react";
 import { useState } from "react";
 import classNames from "classnames";
 
@@ -49,10 +49,14 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     withSwitch = defaultExpandableItemProps.withSwitch,
     onExpandedChange,
     registerComponentApi,
+    ...rest
   }: ExpandableItemProps,
   ref,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyExpanded);
+  const generatedId = useId();
+  const summaryId = `${generatedId}-summary`;
+  const contentId = `${generatedId}-content`;
 
   const toggleOpen = useCallback(() => {
     if (!enabled) return;
@@ -103,10 +107,6 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     });
   }, [registerComponentApi, expand, collapse, toggle, getIsExpanded]);
 
-  // Create refs for the Toggle components
-  const toggleStartRef = useRef<{ setValue?: (value: boolean) => void }>();
-  const toggleEndRef = useRef<{ setValue?: (value: boolean) => void }>();
-  
   // Handler for clicking on the summary when using a switch
   const handleSummaryClick = useCallback(() => {
     if (!enabled || !withSwitch) return;
@@ -114,17 +114,25 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     const newValue = !isOpen;
     setIsOpen(newValue);
     onExpandedChange?.(newValue);
+  }, [enabled, withSwitch, isOpen, onExpandedChange]);
+
+  // Handle keyboard events for accessibility
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (!enabled) return;
     
-    // Update the toggle switch UI state too
-    if (iconPosition === "start" && toggleStartRef.current?.setValue) {
-      toggleStartRef.current.setValue(newValue);
-    } else if (iconPosition === "end" && toggleEndRef.current?.setValue) {
-      toggleEndRef.current.setValue(newValue);
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (withSwitch) {
+        handleSwitchChange(!isOpen);
+      } else {
+        toggleOpen();
+      }
     }
-  }, [enabled, withSwitch, isOpen, onExpandedChange, iconPosition]);
+  }, [enabled, withSwitch, isOpen, handleSwitchChange, toggleOpen]);
 
   return (
     <div
+      {...rest}
       className={classNames(styles.expandableItem, className, {
         [styles.open]: isOpen,
         [styles.disabled]: !enabled,
@@ -139,8 +147,15 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
           [styles.iconEnd]: iconPosition === "end",
         })}
         onClick={enabled ? (withSwitch ? handleSummaryClick : toggleOpen) : undefined}
+        onKeyDown={handleKeyDown}
+        tabIndex={enabled ? 0 : undefined}
+        role="button"
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        aria-disabled={!enabled}
+        id={summaryId}
       >
-        <div className={withSwitch ? styles.switch : styles.icon}>
+        <div className={withSwitch ? styles.switch : styles.icon} aria-hidden="true">
           {withSwitch ? (
             <Toggle
               variant="switch"
@@ -155,9 +170,20 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
             />
           )}
         </div>
-        <div className={styles.summaryContent}>{summary}</div>
+        <div className={styles.summaryContent}>
+          {summary}
+        </div>
       </div>
-      {isOpen && <div className={styles.content}>{children}</div>}
+      {isOpen && (
+        <div 
+          className={styles.content}
+          role="region"
+          aria-labelledby={summaryId}
+          id={contentId}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 });

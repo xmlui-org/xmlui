@@ -125,7 +125,21 @@ export class Backend {
         ...miscellaneousUtils,
         delay,
         Errors,
-        createFile: (...args: any[]) => new File(args[0], args[1], args[2]),
+        createFile: (...args: any[]) => { 
+          return new File(args[0], args[1], args[2]); 
+        },
+        appendBlob: (blob1: Blob | undefined | null, blob2: Blob) => {
+          if (blob1 && blob2) {
+            return new Blob([blob1, blob2], { type: blob1.type || blob2.type });
+          }
+          if (blob1) {
+            return blob1;
+          }
+          if (blob2) {
+            return blob2;
+          }
+          return null;
+        },
         getDate,
       },
     });

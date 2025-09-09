@@ -8,6 +8,7 @@ import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { layoutOptionKeys } from "../descriptorHelper";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -185,14 +186,13 @@ export function shouldKeep(
 export function resolveAndCleanProps<T extends Record<string, any>>(
   props: Record<string, any>,
   extractValue: ValueExtractor,
-  layoutCss: CSSProperties = {},
   resourceExtraction?: {
     extractResourceUrl: (url?: string) => string | undefined;
     resourceProps?: string[];
   },
 ): T {
   const { extractResourceUrl, resourceProps } = resourceExtraction ?? {};
-  const cleanedProps = removeStylesFromProps(props, layoutCss);
+  const cleanedProps = removeStylesFromProps(props);
 
   const resultProps: Record<string, any> = {} as any;
   const result = Object.keys(cleanedProps).reduce((acc, propName) => {
@@ -225,12 +225,10 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
 /**
  * Removes unnecessary style related properties so only layoutCss contains them.
  * @param nodeProps properties to clean
- * @param layoutCss which style properties to remove
  * @returns only component-specific properties
  */
 export function removeStylesFromProps(
   nodeProps: Record<string, any>,
-  layoutCss: CSSProperties = {},
 ) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
@@ -238,14 +236,11 @@ export function removeStylesFromProps(
   if (nodeProps.hasOwnProperty("class")) {
     delete nodeProps["class"];
   }
-  return removeEntries(nodeProps, layoutCss);
 
-  function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
-    const filterKeys = Object.keys(filterObj);
-    return Object.fromEntries(
-      Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)),
-    );
-  }
+  const filterKeys = layoutOptionKeys;
+  return Object.fromEntries(
+    Object.entries(nodeProps).filter(([key]) => !filterKeys.includes(key)),
+  );
 }
 
 type NodeProps = Record<string, any>;
@@ -270,12 +265,11 @@ export class PropsTrasform<T extends NodeProps> {
   constructor(
     extractValue: ValueExtractor,
     extractResourceUrl: ResourceUrlExtractor,
-    layoutCss: CSSProperties,
     props: T,
   ) {
     this.extractValue = extractValue;
     this.extractResourceUrl = extractResourceUrl;
-    this.nodeProps = removeStylesFromProps(props, layoutCss) as T;
+    this.nodeProps = removeStylesFromProps(props) as T;
   }
 
   private mapValues(keys: (keyof T)[], fn: (value: any) => any) {

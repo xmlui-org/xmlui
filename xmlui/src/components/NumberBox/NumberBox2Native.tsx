@@ -56,6 +56,7 @@ export const defaultProps = {
 type Props = {
   id?: string;
   style?: CSSProperties;
+  className?: string;
   value?: number | string | null;
   initialValue?: number | string | null;
   placeholder?: string;
@@ -100,6 +101,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
   {
     id,
     style,
+    className,
     value,
     initialValue,
     zeroOrPositive = defaultProps.zeroOrPositive,
@@ -130,6 +132,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     labelPosition,
     labelWidth,
     labelBreak,
+    ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -363,6 +366,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
 
   return (
     <ItemWithLabel
+      {...rest}
       ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
@@ -373,6 +377,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
     >
       <div
         className={classnames(styles.inputRoot, {

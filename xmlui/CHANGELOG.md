@@ -1,5 +1,107 @@
 # xmlui
 
+## 0.10.10
+
+### Patch Changes
+
+- fff80c5: Bump package version
+
+## 0.10.9
+
+### Patch Changes
+
+- 879c09d: Component part handling and testing refactored
+- 3ad8514: Added tooltip value display to Slider thumbs. Removed value display from Slider label.
+- 0c69245: fix: virtualized list/table in ModalDialog
+- 4ad31fc: refactor: rename dataKeys/nameKey to xKeys/yKey and layout to orientation in chart components - BarChart, LineChart
+- c99f184: Fix ExpandableItem focus issue
+- 5032e4a: Experimenting with HeroSection
+- 2394f36: Enhance DateInput and TimeInput
+
+## 0.10.8
+
+### Patch Changes
+
+- a4d62c4: Add experimental Timer component
+- 7ed2918: Add the appendBlob function to the ApiInterceptor backend
+
+## 0.10.7
+
+### Patch Changes
+
+- 664ea4f: Fixed BarChart hideTickY property to not remove the Y axis when set to true.
+- a739a26: Fixed Checkbox and Switch visual issue. Fixed Line- and BarChart visual glitch in Table.
+- bdb54dd: Small fixes for tiny bugs found during MyWorkDrive update
+- 81724c6: Fixed BarChart tick labels not appearing.
+
+## 0.10.6
+
+### Patch Changes
+
+- 6464ec8: fix ssr
+
+## 0.10.5
+
+### Patch Changes
+
+- d38351d: fix missing dependency
+
+## 0.10.4
+
+### Patch Changes
+
+- 43fd8c5: small fixes: Avatar, FileUploadDropzone, auto xsrf token handling
+- 1df8e5d: Autocomplete: initiallyOpen prop
+- 0d5d9d1: Reworked Pagination layout strategy. Provided props to better control layout: pageSizeSelectorPosition, pageInfoPosition, buttonRowPosition. These props are available in Table pagination as well.
+- 3def673: DropdownMenu doesn't cooperate with Fragment triggerTemplate
+- 428ebea: include themes.scss file in lib dist
+- a12ce66: FileUploadDropZone fixes (dropPlaceholder disappeared)
+
+## 0.10.3
+
+### Patch Changes
+
+- 2e512bb: Add solid overflow handling modes to Text
+- 46d1d18: Remove the "codefence" Text variant
+- 6bc9ed1: feat: support aligning cells in a Table row vertically
+- 0b1f983: Add new, compound layout property name parsing
+- a2637f3: Text is displayed as inline (you can nest Text into Text)
+- eb4d592: Adding the "part" concept to native components
+
+## 0.10.2
+
+### Patch Changes
+
+- ff14e15: fix: LineChart - sizing issue
+- 1451a94: feat: make input padding configurable via theme variables
+
+## 0.10.1
+
+### Patch Changes
+
+- 442416b: Refactor visual components to allow tooltip
+- a018431: feat: add custom tooltip template support for Bar and Line charts
+- 33cb547: Pagination component now handles itemCount being undefined/null. Introduced hasPrevPage and hasNextPage props to toggle button disabled state.
+- b5d7537: Enhance the disabledDates property of DatePicker
+
+## 0.10.0
+
+### Minor Changes
+
+- 000a311: Add tooltip behavior to visible components
+- eb8b958: Rework inline styling system, prepare for responsive styling
+
+### Patch Changes
+
+- 6d0ce52: Added features to the Pagination component: page size selector dropdown control. Also added the following props: layout orientation and layout order reversal.
+- 8c98f33: feat: add theme variable support for LineChart stroke width
+- ef86593: feat: add didChange event handler to Tabs component
+- da5f4e7: test: create e2e tests for chart components
+- 47c7a2d: Integrated the new Pagination component with Table.
+- 740f904: Add "activated" event to TabItem
+- 5009c52: Add "parts" to component metadata
+- 2f5ec32: Remove "from" from the list or reserved script keywords, as no longer used
+
 ## 0.9.101
 
 ### Patch Changes

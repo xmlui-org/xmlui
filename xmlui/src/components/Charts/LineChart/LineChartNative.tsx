@@ -7,12 +7,14 @@ import {
   Legend as RLegend,
   YAxis,
 } from "recharts";
-import type { ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "../../../components-core/theming/ThemeContext";
+import classnames from "classnames";
+import styles from './LineChart.module.scss';
 
 export type LineChartProps = {
   data: any[];
@@ -21,6 +23,7 @@ export type LineChartProps = {
   style?: React.CSSProperties;
   hideTickX?: boolean;
   hideTickY?: boolean;
+  className?: string;
   hideX?: boolean;
   hideY?: boolean;
   hideTooltip?: boolean;
@@ -32,6 +35,7 @@ export type LineChartProps = {
   marginRight?: number;
   marginBottom?: number;
   marginLeft?: number;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip" | "showLegend" | "tickFormatterX" | "tickFormatterY" | "hideTickX" | "hideTickY"> = {
@@ -45,11 +49,16 @@ export const defaultProps: Pick<LineChartProps, "hideX" | "hideY" | "hideTooltip
   tickFormatterY: (value) => value,
 };
 
-export function LineChart({
+const defaultChartParams = {
+  chartWidth: 800,
+};
+
+export const LineChart = forwardRef(function LineChart({
   data,
   dataKeys = [],
   nameKey,
   style,
+  className,
   hideX = defaultProps.hideX,
   hideY = defaultProps.hideY,
   hideTickX = defaultProps.hideTickX,
@@ -59,7 +68,8 @@ export function LineChart({
   tickFormatterY = defaultProps.tickFormatterY,
   children,
   showLegend = defaultProps.showLegend,
-}: LineChartProps) {
+  tooltipRenderer,
+}: LineChartProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -117,9 +127,31 @@ export function LineChart({
 
   const safeData = Array.isArray(data) ? data : [];
 
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props}/>;
+
+      const payloadObject: Record<string, any> = {};
+      
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        Object.assign(payloadObject, props.payload[0].payload);
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadObject,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer]
+  );
+
   useEffect(() => {
     const calc = () => {
-      const width = containerRef.current?.offsetWidth || 800;
+      const width = containerRef.current?.offsetWidth || defaultChartParams.chartWidth;
       const spans = labelsRef.current?.querySelectorAll("span") || [];
       const maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
       let angle = 0;
@@ -154,7 +186,10 @@ export function LineChart({
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data, nameKey, xAxisHeight]);
+  }, [data, nameKey, xAxisHeight, safeData.length, fontSize]);
+  
+  // The stroke width of the lines
+  const strokeWidth = getThemeVar("width-line-LineChart");
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -174,19 +209,16 @@ export function LineChart({
           : null}
       </div>
       <div
-        style={{
-          flexGrow: 1,
-          width: style?.width || "100%",
-          height: style?.height || "100%",
-          padding: 0,
-          margin: 0,
-        }}
+        ref={forwardedRef}
+        className={classnames(className, styles.wrapper)}
+        style={{ flexGrow: 1, ...style}} 
       >
         <ResponsiveContainer
           ref={containerRef}
-          style={style}
           width="100%"
           height="100%"
+          minWidth={60}
+          minHeight={30}
           debounce={100}
         >
           <RLineChart
@@ -211,7 +243,7 @@ export function LineChart({
               tickFormatter={miniMode ? undefined : tickFormatterY}
               tick={miniMode ? false : !hideTickY && { fill: "currentColor", fontSize }}
             />
-            {!miniMode && !hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {dataKeys.map((dataKey, i) => (
               <Line
                 key={dataKey}
@@ -219,7 +251,7 @@ export function LineChart({
                 dataKey={dataKey}
                 name={dataKey}
                 stroke={colorValues[i]}
-                strokeWidth={1}
+                strokeWidth={strokeWidth}
                 dot={false}
               />
             ))}
@@ -240,4 +272,4 @@ export function LineChart({
       </div>
     </ChartProvider>
   );
-}
+});

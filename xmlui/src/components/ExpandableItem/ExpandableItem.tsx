@@ -99,7 +99,7 @@ export const ExpandableItemMd = createMetadata({
 export const expandableItemComponentRenderer = createComponentRenderer(
   COMP,
   ExpandableItemMd,
-  ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, layoutCss }) => {
+  ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, className }) => {
     return (
       <ExpandableItem
         summary={extractValue(node.props?.summary)}
@@ -126,7 +126,7 @@ export const expandableItemComponentRenderer = createComponentRenderer(
           defaultExpandableItemProps.withSwitch,
         )}
         onExpandedChange={lookupEventHandler("expandedChange")}
-        style={layoutCss}
+        className={className}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}

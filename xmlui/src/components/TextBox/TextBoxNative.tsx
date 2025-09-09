@@ -10,6 +10,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -27,6 +28,7 @@ type Props = {
   updateState?: UpdateStateFn;
   initialValue?: string;
   style?: CSSProperties;
+  className?: string;
   maxLength?: number;
   enabled?: boolean;
   placeholder?: string;
@@ -103,6 +105,7 @@ export const TextBox = forwardRef(function TextBox(
     updateState = defaultProps.updateState,
     initialValue = defaultProps.initialValue,
     style,
+    className,
     maxLength,
     enabled = defaultProps.enabled,
     placeholder,
@@ -128,23 +131,25 @@ export const TextBox = forwardRef(function TextBox(
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
     passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+    ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  id = id || useId();
+  const _id = useId();
+  id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   // State to control password visibility
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Determine the actual input type based on the password visibility toggle
-  const actualType = (type === "password" && showPassword) ? "text" : type;
-  
+  const actualType = type === "password" && showPassword ? "text" : type;
+
   // Toggle password visibility
   const togglePasswordVisibility = useCallback(() => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   }, []);
-  
+
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -209,6 +214,7 @@ export const TextBox = forwardRef(function TextBox(
 
   return (
     <ItemWithLabel
+      {...rest}
       id={id}
       labelPosition={labelPosition as any}
       label={label}
@@ -217,6 +223,7 @@ export const TextBox = forwardRef(function TextBox(
       required={required}
       enabled={enabled}
       style={style}
+      className={className}
       ref={ref}
       // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
       isInputTemplateUsed={true}
@@ -233,11 +240,19 @@ export const TextBox = forwardRef(function TextBox(
         onFocus={focus}
         style={{ gap }}
       >
-        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <Adornment
+          data-part-id={PART_START_ADORNMENT}
+          text={startText}
+          iconName={startIcon}
+          className={classnames(styles.adornment)}
+        />
         <input
           id={id}
+          data-part-id={PART_INPUT}
           type={actualType}
-          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          className={classnames(styles.input, {
+            [styles.readOnly]: readOnly,
+          })}
           disabled={!enabled}
           value={localValue}
           maxLength={maxLength}
@@ -254,12 +269,18 @@ export const TextBox = forwardRef(function TextBox(
         />
         {type === "password" && showPasswordToggle ? (
           <Adornment
-            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon} 
+            data-part-id={PART_END_ADORNMENT}
+            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
             className={classnames(styles.adornment, styles.passwordToggle)}
             onClick={togglePasswordVisibility}
           />
         ) : (
-          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+          <Adornment
+            data-part-id={PART_END_ADORNMENT}
+            text={endText}
+            iconName={endIcon}
+            className={styles.adornment}
+          />
         )}
       </div>
     </ItemWithLabel>
