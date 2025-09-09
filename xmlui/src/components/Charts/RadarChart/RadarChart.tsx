@@ -93,10 +93,10 @@ export const RadarChartMd = createMetadata({
 export const radarChartComponentRenderer = createComponentRenderer(
   COMP,
   RadarChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, renderChild }: any) => {
     return (
       <RadarChart
-        style={layoutCss}
+        className={className}
         data={extractValue(node.props?.data)}
         nameKey={extractValue(node.props?.nameKey)}
         dataKeys={extractValue(node.props?.dataKeys)}

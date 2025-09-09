@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -19,7 +19,7 @@ export type RadarChartProps = {
   data: any[];
   nameKey: string;
   dataKeys?: string[];
-  style?: CSSProperties;
+  className?: string;
   hideGrid?: boolean;
   hideAngleAxis?: boolean;
   hideRadiusAxis?: boolean;
@@ -60,7 +60,7 @@ export function RadarChart({
   hideAngleAxis = defaultProps.hideAngleAxis,
   hideRadiusAxis = defaultProps.hideRadiusAxis,
   hideTooltip = defaultProps.hideTooltip,
-  style,
+  className,
   children,
   showLegend = defaultProps.showLegend,
   filled = defaultProps.filled,
@@ -145,7 +145,7 @@ export function RadarChart({
 
   return (
     <ChartProvider value={chartContextValue}>
-      <div ref={containerRef} style={style}>
+      <div ref={containerRef} className={className}>
         <ResponsiveContainer width="100%" height="100%">
           <RRadarChart data={validData}>
             {!hideGrid && <PolarGrid />}

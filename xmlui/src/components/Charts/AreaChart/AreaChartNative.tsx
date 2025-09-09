@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -19,7 +19,7 @@ export type AreaChartProps = {
   data: any[];
   nameKey: string;
   dataKeys?: string[];
-  style?: CSSProperties;
+  className?: string;
   hideTickX?: boolean;
   hideTickY?: boolean;
   hideX?: boolean;
@@ -69,7 +69,7 @@ export function AreaChart({
   hideTooltip = defaultProps.hideTooltip,
   tickFormatterX = defaultProps.tickFormatterX,
   tickFormatterY = defaultProps.tickFormatterY,
-  style,
+  className,
   children,
   showLegend = defaultProps.showLegend,
   stacked = defaultProps.stacked,
@@ -154,7 +154,7 @@ export function AreaChart({
 
   return (
     <ChartProvider value={chartContextValue}>
-      <div ref={containerRef} style={style}>
+      <div ref={containerRef} className={className}>
         <ResponsiveContainer width="100%" height="100%">
           <RAreaChart data={validData}>
             {!hideX && (

@@ -93,10 +93,10 @@ export const AreaChartMd = createMetadata({
 export const areaChartComponentRenderer = createComponentRenderer(
   COMP,
   AreaChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <AreaChart
-        style={layoutCss}
+        className={className}
         tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
         tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
