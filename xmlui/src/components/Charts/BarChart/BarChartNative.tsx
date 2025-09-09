@@ -262,13 +262,56 @@ export function BarChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
+  const [tooltipElement, setTooltipElement] = useState<HTMLElement | null>(null);
+  const observer = useRef<ResizeObserver>();
+
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [tooltipWidth, setTooltipWidth] = useState(0);
 
   const onMouseEnter = useCallback(
     (e) => {
-      setTooltipPosition({ x: e.x, y: e.y });
+
+      setTooltipPosition({ x: e.x - tooltipWidth / 2, y: e.y });
     },
-    [setTooltipPosition],
+    [setTooltipPosition, tooltipWidth],
+  );
+
+  // Observe the size of the reference element
+  useEffect(() => {
+    observer.current?.disconnect();
+
+    if (tooltipElement) {
+      observer.current = new ResizeObserver((entries) => {
+        if (entries[0]) {
+          setTooltipWidth(entries[0].contentRect.width);
+        }
+      });
+      observer.current.observe(tooltipElement);
+    }
+
+    return () => {
+      observer.current?.disconnect();
+    };
+  }, [tooltipElement]);
+
+  // Custom tooltip renderer that captures the DOM element
+  const customTooltipRenderer = useCallback(
+    (props: any) => {
+      const tooltipContent = safeTooltipRenderer(props);
+      
+      return (
+        <div
+          ref={(el) => {
+            if (el && el !== tooltipElement) {
+              setTooltipElement(el);
+            }
+          }}
+        >
+          {tooltipContent}
+        </div>
+      );
+    },
+    [safeTooltipRenderer],
   );
 
   const xAxisProps: Record<string, any> =
@@ -343,9 +386,6 @@ export function BarChart({
           debounce={100}
           width="100%"
           height="100%"
-          style={{
-            overflow: "hidden",
-          }}
         >
           <RBarChart
             accessibilityLayer
@@ -358,7 +398,7 @@ export function BarChart({
             <YAxis {...yAxisProps} />
             {!miniMode && !hideTooltip && (
               <Tooltip
-                content={safeTooltipRenderer}
+                content={customTooltipRenderer}
                 wrapperStyle={{
                   pointerEvents: "auto",
                 }}
