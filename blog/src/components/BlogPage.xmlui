@@ -7,6 +7,7 @@
         <Text>-</Text>
         <Text>{$props.post.author}</Text>
       </HStack>
+      <Image src="/blog/images/{$props.post.image}" />
     </VStack>
     <Markdown data="/blog/{$props.post.slug}.md" />
   </VStack>

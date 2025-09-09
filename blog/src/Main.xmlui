@@ -8,8 +8,8 @@
             title: "Welcome to the XMLUI blog!",
             slug: "welcome-to-the-xmlui-blog",
             author: "Jon Udell",
-            date: "2025-09-01",
-            image: "blog-page-component.png"
+            date: "2025-09-10",
+            image: "blog-scrabble.png"
           },
           {
             title: "Lorem Ipsum!",
@@ -40,11 +40,14 @@
                 when="{mediaSize.sizeIndex <= 2}">
                 <Search data="{appGlobals.plainTextContent}" />
             </Stack>
-            <NavLink label="Blog" to="/blog" />
+            <NavGroup label="Recent posts" to="/blog" >
+              <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
+              <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
+            </NavGroup>
         </NavPanel>
         <Pages fallbackPath="/404">
             <Page url="/">
-                <DocumentPageNoTOC url="/pages/intro.md" />
+                <BlogOverview posts="{posts}" />
             </Page>
             <Page url="/blog">
                 <BlogOverview posts="{posts}" />

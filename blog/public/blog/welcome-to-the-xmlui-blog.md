@@ -223,22 +223,27 @@ Although it's feasible to use a `NavGroup` to list the posts, a blog should real
     <H1>XMLUI Blog</H1>
     <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
   </Stack>
-    <List
-      data="{$props.posts.sort((a, b) => new Date(b.date) - new Date(a.date))}">
-      <VStack gap="$space-1" width="90%">
-        <Link to="/blog/{$item.slug}">
-          <Text>
-            {$item.title}
-          </Text>
-        </Link>
-        <Text>
-          {$item.date} - {$item.author}
+  <List
+    data="{
+      $props.posts.sort(function(a, b) {
+        return new Date(b.date) - new Date(a.date);
+      })
+    }">
+    <VStack gap="$space-2" width="90%">
+      <Link to="/blog/{$item.slug}">
+        <Text fontSize="larger">
+          {$item.title}
         </Text>
-        <Link to="/blog/{$item.slug}">
-          <Image src="/blog/images/{$item.image}" />
-        </Link>
-      </VStack>
-    </List>
+      </Link>
+      <Text>
+        {$item.date} • {$item.author}
+      </Text>
+      <Link to="/blog/{$item.slug}">
+        <Image src="/blog/images/{$item.image}" />
+      </Link>
+    <Stack height="3rem" />
+    </VStack>
+  </List>
 </Component>
 ```
 
@@ -267,22 +272,16 @@ We can't call it a blog unless it provides an RSS feed. For that we've added a s
 <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
 ```
 
-## Add search
-
-The XMLUI repo has a build process that makes documentation available to the search function on this site. We've updated the build to include blog posts.
-
-![blog search](/blog/images/integrated-blog-search.png)
-
 ## Deploy standalone
 
-The details of the search mechanism are specific to the XMLUI monorepo. Suppose you wanted to decouple the blog engine from the monorepo and use it standalone? Let's start with this footprint.
+Suppose you wanted to decouple the blog engine from the monorepo and use it standalone? Let's start with this footprint.
 
 
 ```
 ├── Main.xmlui
 ├── blog
 │   ├── images
-│   │   ├── blog-page-component.png
+│   │   ├── blog-scrabble.png
 │   │   └── lorem-ipsum.png
 │   ├── lorem-ipsum.md
 │   └── welcome-to-the-xmlui-blog.md
@@ -319,6 +318,8 @@ And here's `Main.xmlui`.
 ```xmlui copy
 <Fragment>
     <App
+        layout="vertical-full-header"
+        noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}"
         var.posts = `{[
           {
@@ -326,7 +327,7 @@ And here's `Main.xmlui`.
             slug: "welcome-to-the-xmlui-blog",
             author: "Jon Udell",
             date: "2025-09-01",
-            image: "blog-page-component.png"
+            image: "blog-scrabble.png"
           },
           {
             title: "Lorem Ipsum!",
@@ -343,27 +344,49 @@ And here's `Main.xmlui`.
                     <Logo height="$space-8" />
                 </Link>
             </property>
+            <SpaceFiller />
+            <Search
+                data="{appGlobals.plainTextContent}"
+                when="{mediaSize.sizeIndex > 2}" />
+            <ToneSwitch />
         </AppHeader>
-        <NavPanel>
-          <NavLink label="Home" to="/" />
-          <NavLink label="Blog" to="/blog" />
+        <NavPanel
+            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+            <Stack
+                paddingHorizontal="$space-4"
+                paddingBottom="$space-4"
+                when="{mediaSize.sizeIndex <= 2}">
+                <Search data="{appGlobals.plainTextContent}" />
+            </Stack>
+            <NavGroup label="Recent posts" to="/blog" >
+              <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
+              <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
+            </NavGroup>
         </NavPanel>
         <Pages fallbackPath="/404">
-           <Page url="/">
-             <Text>Test of XMLUI blog</Text>
-           </Page>
-           <Page url="/blog">
-             <BlogOverview posts="{posts}" />
-           </Page>
-           <Page url="/blog/{posts[0].slug}">
-             <BlogPage post="{posts[0]}" />
+            <Page url="/blog">
+                <BlogOverview posts="{posts}" />
             </Page>
-           <Page url="/blog/{posts[1].slug}">
-             <BlogPage post="{posts[1]}" />
+            <Page url="/blog/{posts[0].slug}">
+                <BlogPage post="{posts[0]}" />
+            </Page>
+            <Page url="/blog/{posts[1].slug}">
+                <BlogPage post="{posts[1]}" />
+            </Page>
+            <Page url="/404">
+                <PageNotFound />
             </Page>
         </Pages>
         <Footer>
-            <ToneSwitch />
+            <CHStack width="*">
+                This site is an XMLUI™ app.
+                <SpaceFiller />
+                <Link
+                    to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
+                    target="_blank">
+                    <Button variant="ghost" icon="github" />
+                </Link>
+            </CHStack>
         </Footer>
     </App>
     <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
@@ -443,11 +466,9 @@ With these ingredients in place, I dragged the folder containing the standalone 
 
 [https://test-xmlui-blog.netlify.app/](https://test-xmlui-blog.netlify.app/)
 
-## Next steps
+## XMLUI for publishing
 
-There's always more to do. For example, we should probably explore what's possible with XMLUI [Themes](/themes-intro). But this is plenty for now. The engine described here evolved during the course of writing this post, it's not yet merged into the site, once that's done and we've sanded off the rough edges we can think about enhancements.
-
-And yeah, we know, blog engines are a dime a dozen. We made this one because XMLUI was already a strong publishing system  — we use it this site, the [demo site](https://demo.xmlui.org), and the [landing page](https://xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do. We think it's pretty easy to create a competent engine that makes life easy for authors and readers.
+We get it, blog engines are a dime a dozen. We made this one because XMLUI was already a strong publishing system that we use for the [docs](https://docs.xmlui.org), [demo](https://demo.xmlui.org), and [landing page](https://xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do. We think it's pretty easy to create a competent engine that makes life easy for authors and readers.
 
 
 
