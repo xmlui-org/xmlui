@@ -13,9 +13,11 @@ const PART_TEXT = "text";
 const PART_CTA_BUTTON = "ctaButton";
 const PART_MAIN = "main";
 const PART_IMAGE = "image";
+const PART_BACKGROUND = "background";
 
 type Props = {
   children?: ReactNode;
+  backgroundTemplate?: ReactNode;
   alignHeading?: string;
   preamble?: string;
   headline?: string;
@@ -26,6 +28,8 @@ type Props = {
   ctaButtonText?: string;
   ctaButtonTemplate?: ReactNode;
   image?: string;
+  imageWidth?: number | string;
+  imageHeight?: number | string;
   preImageTemplate?: ReactNode;
   postImageTemplate?: ReactNode;
   fullWidthBackground?: boolean;
@@ -41,6 +45,7 @@ export const HeroSection = forwardRef(
   (
     {
       children,
+      backgroundTemplate,
       alignHeading = defaultProps.alignHeading,
       preamble,
       headline,
@@ -51,6 +56,8 @@ export const HeroSection = forwardRef(
       ctaButtonText,
       ctaButtonTemplate,
       image,
+      imageWidth,
+      imageHeight,
       fullWidthBackground = defaultProps.fullWidthBackground,
       className,
       onCtaClick,
@@ -69,71 +76,86 @@ export const HeroSection = forwardRef(
 
     const heroContent = (
       <div ref={ref} className={classnames(styles.heroWrapper, className)}>
-        <div
-          className={classnames(partClassName(PART_HEADING_SECTION), styles.headingSection, {
-            [styles.start]: alignHeading === "start",
-            [styles.center]: alignHeading === "center",
-            [styles.end]: alignHeading === "end",
-          })}
-        >
-          {preamble && (
-            <div
-              className={classnames(
-                partClassName(PART_PREAMBLE),
-                styles.preamble,
-                styles.preserveLinebreaks,
-              )}
-            >
-              {preamble}
-            </div>
+        {backgroundTemplate && (
+          <div className={classnames(partClassName(PART_BACKGROUND), styles.backgroundTemplate)}>
+            {backgroundTemplate}
+          </div>
+        )}
+        <div className={styles.heroContent}>
+          <div
+            className={classnames(partClassName(PART_HEADING_SECTION), styles.headingSection, {
+              [styles.start]: alignHeading === "start",
+              [styles.center]: alignHeading === "center",
+              [styles.end]: alignHeading === "end",
+            })}
+          >
+            {preamble && (
+              <div
+                className={classnames(
+                  partClassName(PART_PREAMBLE),
+                  styles.preamble,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {preamble}
+              </div>
+            )}
+            {headline && (
+              <div
+                className={classnames(
+                  partClassName(PART_HEADLINE),
+                  styles.headline,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {headline}
+              </div>
+            )}
+            {subheadline && (
+              <div
+                className={classnames(
+                  partClassName(PART_SUBHEADLINE),
+                  styles.subheadline,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {subheadline}
+              </div>
+            )}
+            {mainTextTemplate && (
+              <div
+                className={classnames(
+                  partClassName(PART_TEXT),
+                  styles.textWrapper,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {mainTextTemplate}
+              </div>
+            )}
+            {!mainTextTemplate && mainText && (
+              <div
+                className={classnames(
+                  partClassName(PART_TEXT),
+                  styles.mainText,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {mainText}
+              </div>
+            )}
+          </div>
+          <div>{ctaButton}</div>
+          {image && (
+            <img
+              className={styles.image}
+              src={image}
+              style={{ width: imageWidth, height: imageHeight }}
+              aria-hidden
+            />
           )}
-          {headline && (
-            <div
-              className={classnames(
-                partClassName(PART_HEADLINE),
-                styles.headline,
-                styles.preserveLinebreaks,
-              )}
-            >
-              {headline}
-            </div>
-          )}
-          {subheadline && (
-            <div
-              className={classnames(
-                partClassName(PART_SUBHEADLINE),
-                styles.subheadline,
-                styles.preserveLinebreaks,
-              )}
-            >
-              {subheadline}
-            </div>
-          )}
-          {mainTextTemplate && (
-            <div
-              className={classnames(
-                partClassName(PART_TEXT),
-                styles.textWrapper,
-                styles.preserveLinebreaks,
-              )}
-            >
-              {mainTextTemplate}
-            </div>
-          )}
-          {!mainTextTemplate && mainText && (
-            <div
-              className={classnames(
-                partClassName(PART_TEXT),
-                styles.mainText,
-                styles.preserveLinebreaks,
-              )}
-            >
-              {mainText}
-            </div>
-          )}
+          {children}
         </div>
-        <div>{ctaButton}</div>
-        {children}
       </div>
     );
 

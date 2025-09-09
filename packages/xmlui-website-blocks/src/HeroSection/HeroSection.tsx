@@ -67,15 +67,24 @@ export const HeroSectionMd = createMetadata({
       type: "string",
     },
     ctaButtonTemplate: dComponent("The template for the call-to-action button"),
-    image: {
-      description: "The image for the hero section",
-      type: "string",
-    },
     fullWidthBackground: {
       description: "Whether the background should span the full width of the viewport",
       type: "boolean",
       defaultValue: false,
     },
+    image: {
+      description: "The image for the hero section",
+      type: "string",
+    },
+    imageWidth: {
+      description: "The width of the image",
+      type: "string",
+    },
+    imageHeight: {
+      description: "The height of the image",
+      type: "string",
+    },
+    backgroundTemplate: dComponent("The template for the background of the hero section"),
   },
   events: {
     ctaClick: {
@@ -117,9 +126,12 @@ export const heroSectionComponentRenderer = createComponentRenderer(
         ctaButtonText={extractValue(props.ctaButtonText)}
         ctaButtonTemplate={renderChild(props.ctaButtonTemplate as any)}
         image={extractValue(props.image)}
+        imageWidth={extractValue(props.imageWidth)}
+        imageHeight={extractValue(props.imageHeight)}
         fullWidthBackground={extractValue.asOptionalBoolean(props.fullWidthBackground)}
         className={extractValue(className)}
         onCtaClick={lookupEventHandler("ctaClick")}
+        backgroundTemplate={renderChild(props.backgroundTemplate as any)}
       >
         {renderChild(node.children)}
       </HeroSection>
