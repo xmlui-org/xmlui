@@ -30,7 +30,11 @@ export const RadioGroupMd = createMetadata({
     "`RadioGroup` creates a mutually exclusive selection interface where users can " +
     "choose only one option from a group of radio buttons. It manages the selection " +
     "state and ensures that selecting one option automatically deselects all others in " +
-    "the group.",
+    "the group." +
+    "\n\n" +
+    "Radio options store their values as strings. Numbers and booleans are converted to strings " +
+    "when assigned, while objects, functions and arrays default to an empty string unless resolved " +
+    "via binding expressions.",
   props: {
     initialValue: {
       ...dInitialValue(),
@@ -117,6 +121,7 @@ export const radioGroupRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       >
         {renderChild(node.children)}
       </RadioGroup>

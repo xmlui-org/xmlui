@@ -22,24 +22,6 @@ import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
 
-export const defaultProps = {
-  value: "",
-  initialValue: "",
-  enabled: true,
-  validationStatus: "none" as ValidationStatus,
-  required: false,
-};
-
-const RadioGroupStatusContext = createContext<{
-  value?: string;
-  setValue?: (value: string) => void;
-  status: ValidationStatus;
-  enabled?: boolean;
-}>({
-  status: "none",
-  enabled: defaultProps.enabled,
-});
-
 type RadioGroupProps = {
   id?: string;
   initialValue?: string;
@@ -53,6 +35,7 @@ type RadioGroupProps = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  readOnly?: boolean;
   updateState?: UpdateStateFn;
   onDidChange?: (newValue: string) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -60,6 +43,28 @@ type RadioGroupProps = {
   children?: React.ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
 };
+
+export const defaultProps: Pick<
+  RadioGroupProps,
+  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly"
+> = {
+  value: "",
+  initialValue: "",
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  required: false,
+  readOnly: false,
+};
+
+const RadioGroupStatusContext = createContext<{
+  value?: string;
+  setValue?: (value: string) => void;
+  status: ValidationStatus;
+  enabled?: boolean;
+}>({
+  status: "none",
+  enabled: defaultProps.enabled,
+});
 
 export const RadioGroup = forwardRef(function RadioGroup(
   {
@@ -73,6 +78,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
     labelWidth,
     labelBreak,
     required = defaultProps.required,
+    readOnly = defaultProps.readOnly,
     updateState = noop,
     onDidChange = noop,
     onFocus = noop,
@@ -89,7 +95,21 @@ export const RadioGroup = forwardRef(function RadioGroup(
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
+    let _initialValue = initialValue;
+    if (typeof initialValue !== "string") {
+      // Check if the value can be safely converted to string
+      if (
+        initialValue != null &&
+        typeof initialValue !== "object" &&
+        typeof initialValue !== "function" &&
+        !Number.isNaN(initialValue)
+      ) {
+        _initialValue = String(initialValue);
+      } else {
+        _initialValue = defaultProps.initialValue;
+      }
+    }
+    updateState({ value: _initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   // --- Handle the value change events for this input
@@ -104,9 +124,10 @@ export const RadioGroup = forwardRef(function RadioGroup(
 
   const onInputChange = useCallback(
     (value: string) => {
+      if (readOnly) return;
       updateValue(value);
     },
-    [updateValue],
+    [updateValue, readOnly],
   );
 
   // --- Manage obtaining and losing the focus
@@ -165,6 +186,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
             onValueChange={onInputChange}
             value={value}
             disabled={!enabled}
+            required={required}
+            aria-readonly={readOnly}
             className={classnames(styles.radioGroupContainer, {
               [styles.focused]: focused,
               [styles.disabled]: !enabled,
@@ -218,7 +241,12 @@ export const RadioGroupOption = ({
   );
 
   return (
-    <div key={id} className={classnames(styles.radioOptionContainer, className)} style={style}>
+    <div
+      key={id}
+      className={classnames(styles.radioOptionContainer, className)}
+      style={style}
+      data-radio-item
+    >
       {!!optionRenderer ? (
         <label className={styles.optionLabel}>
           <div className={styles.itemContainer}>{item}</div>
