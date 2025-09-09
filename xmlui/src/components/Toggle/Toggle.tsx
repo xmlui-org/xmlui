@@ -17,7 +17,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { LabelPosition } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { PART_INPUT, partClassName } from "../../components-core/parts";
+import { PART_INPUT } from "../../components-core/parts";
 
 type ToggleProps = {
   id?: string;
@@ -174,6 +174,7 @@ export const Toggle = forwardRef(function Toggle(
     return (
       <input
         id={inputId}
+        data-part-id={PART_INPUT}
         ref={innerRef}
         type="checkbox"
         role={variant}
@@ -189,7 +190,7 @@ export const Toggle = forwardRef(function Toggle(
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         autoFocus={autoFocus}
-        className={classnames(partClassName(PART_INPUT), styles.resetAppearance, {
+        className={classnames(styles.resetAppearance, {
           [styles.checkbox]: variant === "checkbox",
           [styles.switch]: variant === "switch",
           [styles.error]: validationStatus === "error",

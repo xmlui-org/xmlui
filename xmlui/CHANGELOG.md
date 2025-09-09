@@ -1,5 +1,23 @@
 # xmlui
 
+## 0.10.10
+
+### Patch Changes
+
+- fff80c5: Bump package version
+
+## 0.10.9
+
+### Patch Changes
+
+- 879c09d: Component part handling and testing refactored
+- 3ad8514: Added tooltip value display to Slider thumbs. Removed value display from Slider label.
+- 0c69245: fix: virtualized list/table in ModalDialog
+- 4ad31fc: refactor: rename dataKeys/nameKey to xKeys/yKey and layout to orientation in chart components - BarChart, LineChart
+- c99f184: Fix ExpandableItem focus issue
+- 5032e4a: Experimenting with HeroSection
+- 2394f36: Enhance DateInput and TimeInput
+
 ## 0.10.8
 
 ### Patch Changes

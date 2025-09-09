@@ -1,51 +1,63 @@
 import { forwardRef, ReactNode } from "react";
-import { Button, Icon, partClassName } from "xmlui";
+import { Button, Icon, Breakout } from "xmlui";
 
 import styles from "./HeroSection.module.scss";
 
 import classnames from "classnames";
 
+const PART_HEADING_SECTION = "headingSection";
+const PART_PREAMBLE = "preamble";
 const PART_HEADLINE = "headline";
 const PART_SUBHEADLINE = "subheadline";
-const PART_TEXT = "text";
+const PART_MAIN_TEXT = "mainText";
 const PART_CTA_BUTTON = "ctaButton";
-const PART_MAIN = "main";
 const PART_IMAGE = "image";
-const PART_PRE_IMAGE = "preImage";
-const PART_POST_IMAGE = "postImage";
+const PART_BACKGROUND = "background";
 
 type Props = {
+  children?: ReactNode;
+  backgroundTemplate?: ReactNode;
+  alignHeading?: string;
+  preamble?: string;
   headline?: string;
   subheadline?: string;
-  text?: string;
-  textTemplate?: ReactNode;
+  mainText?: string;
+  mainTextTemplate?: ReactNode;
   ctaButtonIcon?: string;
   ctaButtonText?: string;
   ctaButtonTemplate?: ReactNode;
   image?: string;
+  imageWidth?: number | string;
+  imageHeight?: number | string;
   preImageTemplate?: ReactNode;
   postImageTemplate?: ReactNode;
-  heroTemplate?: ReactNode;
-  breakout?: boolean;
+  fullWidthBackground?: boolean;
   className?: string;
   onCtaClick?: () => void;
+};
+export const defaultProps: Pick<Props, "fullWidthBackground" | "alignHeading"> = {
+  alignHeading: "center",
+  fullWidthBackground: true,
 };
 
 export const HeroSection = forwardRef(
   (
     {
+      children,
+      backgroundTemplate,
+      alignHeading = defaultProps.alignHeading,
+      preamble,
       headline,
       subheadline,
-      text,
-      textTemplate,
+      mainText,
+      mainTextTemplate,
       ctaButtonIcon,
       ctaButtonText,
       ctaButtonTemplate,
       image,
-      preImageTemplate,
-      postImageTemplate,
-      heroTemplate,
-      breakout,
+      imageWidth,
+      imageHeight,
+      fullWidthBackground = defaultProps.fullWidthBackground,
       className,
       onCtaClick,
     }: Props,
@@ -53,35 +65,104 @@ export const HeroSection = forwardRef(
   ) => {
     const ctaButton = ctaButtonTemplate || (
       <Button
-        className={classnames(partClassName(PART_CTA_BUTTON), styles.ctaButton)}
+        data-part-id={PART_CTA_BUTTON}
+        className={classnames(styles.ctaButton)}
         icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
         onClick={onCtaClick}
       >
         {ctaButtonText}
       </Button>
     );
-    return (
-      <div ref={ref} className={classnames(styles.heroWrapper, className)}>
-        {headline && (
-          <div className={classnames(partClassName(PART_HEADLINE), styles.headline)}>
-            {headline}
+
+    const heroContent = (
+      <div
+        ref={ref}
+        data-part-id={PART_BACKGROUND}
+        className={classnames(styles.heroWrapper, className)}
+      >
+        {backgroundTemplate && (
+          <div className={styles.backgroundTemplate}>{backgroundTemplate}</div>
+        )}
+        <div className={styles.heroContent}>
+          <div
+            data-part-id={PART_HEADING_SECTION}
+            className={classnames(styles.headingSection, {
+              [styles.start]: alignHeading === "start",
+              [styles.center]: alignHeading === "center",
+              [styles.end]: alignHeading === "end",
+            })}
+          >
+            {preamble && (
+              <div
+                data-part-id={PART_PREAMBLE}
+                className={classnames(
+                  styles.preamble,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {preamble}
+              </div>
+            )}
+            {headline && (
+              <div
+                data-part-id={PART_HEADLINE}
+                className={classnames(
+                  styles.headline,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {headline}
+              </div>
+            )}
+            {subheadline && (
+              <div
+                data-part-id={PART_SUBHEADLINE}
+                className={classnames(
+                  styles.subheadline,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {subheadline}
+              </div>
+            )}
+            {mainTextTemplate && (
+              <div
+                data-part-id={PART_MAIN_TEXT}
+                className={classnames(
+                  styles.textWrapper,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {mainTextTemplate}
+              </div>
+            )}
+            {!mainTextTemplate && mainText && (
+              <div
+                data-part-id={PART_MAIN_TEXT}
+                className={classnames(
+                  styles.mainText,
+                  styles.preserveLinebreaks,
+                )}
+              >
+                {mainText}
+              </div>
+            )}
           </div>
-        )}
-        {subheadline && (
-          <div className={classnames(partClassName(PART_SUBHEADLINE), styles.subheadline)}>
-            {subheadline}
-          </div>
-        )}
-        {textTemplate && (
-          <div className={classnames(partClassName(PART_TEXT), styles.textWrapper)}>
-            {textTemplate}
-          </div>
-        )}
-        {!textTemplate && text && (
-          <div className={classnames(partClassName(PART_TEXT), styles.text)}>{text}</div>
-        )}
-        <div>{ctaButton}</div>
+          <div>{ctaButton}</div>
+          {image && (
+            <img
+              data-part-id={PART_IMAGE}
+              className={styles.image}
+              src={image}
+              style={{ width: imageWidth, height: imageHeight }}
+              aria-hidden
+            />
+          )}
+          {children}
+        </div>
       </div>
     );
+
+    return fullWidthBackground ? <Breakout>{heroContent}</Breakout> : heroContent;
   },
 );

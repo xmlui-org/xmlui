@@ -1,4 +1,6 @@
-import { createComponentRenderer, createMetadata, dComponent } from "xmlui";
+import styles from "./HeroSection.module.scss";
+
+import { createComponentRenderer, createMetadata, dComponent, parseScssVar } from "xmlui";
 import { HeroSection } from "./HeroSectionNative";
 
 const COMP = "HeroSection";
@@ -7,13 +9,19 @@ export const HeroSectionMd = createMetadata({
   status: "experimental",
   description: "HeroSection",
   parts: {
+    headingSection: {
+      description: "The heading section containing preamble, headline, and subheadline",
+    },
+    preamble: {
+      description: "The preamble text for the hero section",
+    },
     headline: {
       description: "The headline text for the hero section",
     },
     subheadline: {
       description: "The subheadline text for the hero section",
     },
-    text: {
+    mainText: {
       description: "The main text content for the hero section",
     },
     ctaButton: {
@@ -25,14 +33,18 @@ export const HeroSectionMd = createMetadata({
     image: {
       description: "The image for the hero section",
     },
-    preImage: {
-      description: "The template for the image displayed before the main content",
-    },
-    postImage: {
-      description: "The template for the image displayed after the main content",
-    },
   },
   props: {
+    alignHeading: {
+      description: "Alignment of the heading section",
+      type: "string",
+      defaultValue: "center",
+      options: ["start", "center", "end"],
+    },
+    preamble: {
+      description: "The preamble text for the hero section",
+      type: "string",
+    },
     headline: {
       description: "The headline text for the hero section",
       type: "string",
@@ -41,11 +53,11 @@ export const HeroSectionMd = createMetadata({
       description: "The subheadline text for the hero section",
       type: "string",
     },
-    text: {
+    mainText: {
       description: "The main text content for the hero section",
       type: "string",
     },
-    textTemplate: dComponent("The template for the text content in the hero section"),
+    mainTextTemplate: dComponent("The template for the text content in the hero section"),
     ctaButtonIcon: {
       description: "The icon for the call-to-action button",
       type: "string",
@@ -55,22 +67,45 @@ export const HeroSectionMd = createMetadata({
       type: "string",
     },
     ctaButtonTemplate: dComponent("The template for the call-to-action button"),
+    fullWidthBackground: {
+      description: "Whether the background should span the full width of the viewport",
+      type: "boolean",
+      defaultValue: false,
+    },
     image: {
       description: "The image for the hero section",
       type: "string",
     },
-    preImageTemplate: dComponent("The template for the image displayed before the main content"),
-    postImageTemplate: dComponent("The template for the image displayed after the main content"),
-    heroTemplate: dComponent("The template for the hero section"),
-    breakout: {
-      description: "Indicates whether the hero section should be used in a breakout",
-      type: "boolean",
+    imageWidth: {
+      description: "The width of the image",
+      type: "string",
     },
+    imageHeight: {
+      description: "The height of the image",
+      type: "string",
+    },
+    backgroundTemplate: dComponent("The template for the background of the hero section"),
   },
   events: {
     ctaClick: {
       description: "Triggered when the call-to-action button is clicked",
     },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`paddingTop-${COMP}`]: "$space-12",
+    [`paddingBottom-${COMP}`]: "$space-12",
+    [`fontSize-headline-${COMP}`]: "3em",
+    [`fontWeight-headline-${COMP}`]: "$fontWeight-bold",
+    [`lineHeight-headline-${COMP}`]: "1.4em",
+    [`gap-headline-${COMP}`]: "$space-8",
+    [`fontSize-subheadline-${COMP}`]: "2em",
+    [`lineHeight-subheadline-${COMP}`]: "1.1em",
+    [`fontWeight-subheadline-${COMP}`]: "$fontWeight-bold",
+    [`gap-subheadline-${COMP}`]: "$space-4",
+    [`fontSize-mainText-${COMP}`]: "1.4em",
+    [`lineHeight-mainText-${COMP}`]: "1.1em",
+    [`gap-mainText-${COMP}`]: "$space-4",
   },
 });
 
@@ -81,21 +116,25 @@ export const heroSectionComponentRenderer = createComponentRenderer(
     const props = (node.props as typeof HeroSectionMd.props)!;
     return (
       <HeroSection
+        alignHeading={extractValue(props.alignHeading)}
+        preamble={extractValue(props.preamble)}
         headline={extractValue(props.headline)}
         subheadline={extractValue(props.subheadline)}
-        text={extractValue(props.text)}
-        textTemplate={renderChild(props.textTemplate as any)}
+        mainText={extractValue(props.mainText)}
+        mainTextTemplate={renderChild(props.mainTextTemplate as any)}
         ctaButtonIcon={extractValue(props.ctaButtonIcon)}
         ctaButtonText={extractValue(props.ctaButtonText)}
         ctaButtonTemplate={renderChild(props.ctaButtonTemplate as any)}
         image={extractValue(props.image)}
-        preImageTemplate={renderChild(props.preImageTemplate as any)}
-        postImageTemplate={renderChild(props.postImageTemplate as any)}
-        heroTemplate={renderChild(props.heroTemplate as any)}
-        breakout={extractValue.asOptionalBoolean(props.breakout)}
+        imageWidth={extractValue(props.imageWidth)}
+        imageHeight={extractValue(props.imageHeight)}
+        fullWidthBackground={extractValue.asOptionalBoolean(props.fullWidthBackground)}
         className={extractValue(className)}
         onCtaClick={lookupEventHandler("ctaClick")}
-      />
+        backgroundTemplate={renderChild(props.backgroundTemplate as any)}
+      >
+        {renderChild(node.children)}
+      </HeroSection>
     );
   },
 );

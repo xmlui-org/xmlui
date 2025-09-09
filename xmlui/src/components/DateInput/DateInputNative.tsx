@@ -20,7 +20,6 @@ import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
-import { partClassName } from "../../components-core/parts";
 
 // Component part names
 const PART_DAY = "day";
@@ -777,8 +776,8 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
 
         {clearable && (
           <button
+            data-part-id={PART_CLEAR_BUTTON}
             className={classnames(
-              partClassName(PART_CLEAR_BUTTON),
               styles.clearButton,
               styles.button,
             )}
@@ -977,6 +976,7 @@ function DayInput({
 
   return (
     <PartialInput
+      data-part-id={PART_DAY}
       value={value}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
@@ -994,7 +994,7 @@ function DayInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_DAY), styles.input, styles.day)}
+      className={classnames(styles.input, styles.day)}
       invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
@@ -1030,6 +1030,7 @@ function MonthInput({
 }: MonthInputProps): React.ReactElement {
   return (
     <PartialInput
+      data-part-id={PART_MONTH}
       max={12}
       min={1}
       name="month"
@@ -1041,7 +1042,7 @@ function MonthInput({
       onChange={otherProps.onChange}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
-      className={classnames(partClassName(PART_MONTH), styles.input, styles.month)}
+      className={classnames(styles.input, styles.month)}
       maxLength={2}
       disabled={otherProps.disabled}
       required={otherProps.required}
@@ -1094,6 +1095,7 @@ function YearInput({
 
   return (
     <PartialInput
+      data-part-id={PART_YEAR}
       max={max}
       min={min}
       name="year"
@@ -1104,7 +1106,7 @@ function YearInput({
       onBeep={onBeep}
       emptyCharacter={emptyCharacter}
       placeholderLength={4}
-      className={classnames(partClassName(PART_YEAR), styles.input, styles.year, originalClassName)}
+      className={classnames(styles.input, styles.year, originalClassName)}
       maxLength={maxLength}
       onBlur={(direction, event) => {
         // PartialInput provides direction, but current onBlur expects just event

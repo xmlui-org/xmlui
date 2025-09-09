@@ -1,14 +1,14 @@
 <App>
-  <Hello />
   <HeroSection
-    headline="Modern Project Management You Truly Own"
+    backgroundColor="lightblue"
+    fullWidthBackground="false"
+    headline="Modern Project Management
+            You Truly Own"
     subheadline="A fast, intuitive tool you can host, shape, and trust."
-    text="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
     ctaButtonIcon="home"
     ctaButtonText="Go Home"
     onCtaClick="() => toast('CTA Clicked')">
-    <property name="ctaButtonTemplate">
-      <Button themeColor="secondary" icon="home" onClick="() => toast('CTA2 Clicked')">Go Home</Button>
-    </property>
-    </HeroSection>
+    BlaBlaBla
+  </HeroSection>
 </App>

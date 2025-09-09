@@ -4,12 +4,13 @@ import classnames from "classnames";
 import styles from "./Button.module.scss";
 
 import {
+  isSizeType,
+  type SizeType,
   type AlignmentOptions,
   type ButtonAria,
   type ButtonThemeColor,
   type ButtonType,
   type ButtonVariant,
-  type ComponentSize,
   type IconPosition,
   type OrientationOptions,
 } from "../abstractions";
@@ -21,7 +22,7 @@ type Props = {
   type?: ButtonType;
   variant?: ButtonVariant;
   themeColor?: ButtonThemeColor;
-  size?: ComponentSize;
+  size?: SizeType;
   disabled?: boolean;
   children?: React.ReactNode | React.ReactNode[];
   icon?: React.ReactNode;
@@ -31,7 +32,6 @@ type Props = {
   formId?: string;
   style?: CSSProperties;
   gap?: string | number;
-  accessibilityProps?: any;
   autoFocus?: boolean;
   contextualLabel?: string;
 } & Pick<
@@ -106,6 +106,9 @@ export const Button = React.forwardRef(function Button(
 
   const iconToLeft = iconPosition === "start";
 
+  if (!isSizeType(size)) {
+    size = defaultProps.size;
+  }
   return (
     <button
       {...rest}

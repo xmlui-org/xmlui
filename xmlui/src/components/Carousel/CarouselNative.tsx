@@ -29,7 +29,6 @@ export type CarouselProps = {
   prevIcon?: string;
   nextIcon?: string;
   onDisplayDidChange?: (activeSlide: number) => void;
-  keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   transitionDuration?: number;
   autoplayInterval?: number;
@@ -85,7 +84,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [activeSlide, setActiveSlide] = useState(0);
   const [plugins, setPlugins] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { carouselContextValue, carouselItems } = useCarouselContextValue();
+  const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators);
   const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const [carouselRef, api] = useEmblaCarousel(
@@ -243,24 +242,42 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         {controls && (
           <div className={styles.controls}>
             {autoplay && (
-              <button className={styles.controlButton} onClick={toggleAutoplay}>
+              <button
+                className={styles.controlButton}
+                onClick={toggleAutoplay}
+                aria-label={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
+              >
                 {isPlaying ? <Icon name={"pause"} /> : <Icon name={"play"} />}
               </button>
             )}
-            <button className={styles.controlButton} disabled={!canScrollPrev} onClick={scrollPrev}>
+            <button
+              className={styles.controlButton}
+              disabled={!canScrollPrev}
+              onClick={scrollPrev}
+              aria-label="Previous Slide"
+            >
               <Icon name={prevIconName} />
             </button>
-            <button className={styles.controlButton} onClick={scrollNext} disabled={!canScrollNext}>
+            <button
+              className={styles.controlButton}
+              onClick={scrollNext}
+              disabled={!canScrollNext}
+              aria-label="Next Slide"
+            >
               <Icon name={nextIconName} />
             </button>
           </div>
         )}
         {indicators && (
-          <div className={styles.indicators}>
+          <div className={styles.indicators} role="tablist" aria-label="Select slide">
             {carouselItems.map((_, index) => (
               <button
                 key={index}
                 type="button"
+                role="tab"
+                aria-label={`Go to slide ${index + 1}`}
+                aria-controls="carousel"
+                tabIndex={index === activeSlide ? 0 : -1}
                 onClick={() => scrollTo(index)}
                 className={classnames(styles.indicator, {
                   [styles.active]: index === activeSlide,

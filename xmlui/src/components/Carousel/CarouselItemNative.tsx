@@ -16,7 +16,7 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
-  const { register, unRegister } = useCarousel();
+  const { register, unRegister, itemProps } = useCarousel();
 
   useEffect(() => {
     register({
@@ -34,8 +34,7 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
     <div
       {...rest}
       key={id}
-      role="group"
-      aria-roledescription="slide"
+      {...itemProps}
       className={classnames(styles.carouselItem)}
     >
       <div className={styles.innerWrapper} ref={forwardedRef} style={style}>

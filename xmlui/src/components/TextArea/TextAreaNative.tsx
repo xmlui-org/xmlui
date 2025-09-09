@@ -21,7 +21,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import TextAreaResizable from "./TextAreaResizable";
-import { PART_INPUT, partClassName } from "../../components-core/parts";
+import { PART_INPUT } from "../../components-core/parts";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
@@ -275,9 +275,10 @@ export const TextArea = forwardRef(function TextArea(
       >
         <TextAreaResizable
           {...textareaProps}
+          data-part-id={PART_INPUT}
           ref={inputRef}
           style={style as any}
-          className={classnames(partClassName(PART_INPUT), classes)}
+          className={classnames(classes)}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -302,9 +303,10 @@ export const TextArea = forwardRef(function TextArea(
       >
         <TextareaAutosize
           {...textareaProps}
+          data-part-id={PART_INPUT}
           ref={inputRef}
           style={style as any}
-          className={classnames(partClassName(PART_INPUT), classes)}
+          className={classnames(classes)}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -329,9 +331,10 @@ export const TextArea = forwardRef(function TextArea(
     >
       <textarea
         {...textareaProps}
+        data-part-id={PART_INPUT}
         ref={inputRef}
         rows={rows}
-        className={classnames(partClassName(PART_INPUT), classes)}
+        className={classnames(classes)}
       />
     </ItemWithLabel>
   );
