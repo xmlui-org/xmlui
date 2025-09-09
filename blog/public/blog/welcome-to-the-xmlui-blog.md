@@ -48,7 +48,7 @@ We started with the simplest possible approach: post metadata and data as litera
 </Component>
 ```
 
-You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes.
+You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes. 
 
 This is a pretty good start! We can write posts, arrange them in reverse chronological order, and hey, it's the essence of a blog. Since it's a blog about XMLUI the live playground is a nice bonus that any XMLUI app might put to good use. The user interfaces that you build with XMLUI will require some explaining, it's handy to explain with working examples as well as images, text, and video.
 
@@ -112,7 +112,7 @@ So far the post content exists only as the `content` property passed to the `Blo
       slug: "welcome-to-the-xmlui-blog",
       author: "Jon Udell",
       date: "2025-09-01",
-      image: "blog-page-component.png"
+      image: "blog-scrabble.png"
     },
     {
       title: "Lorem Ipsum!",
@@ -141,20 +141,17 @@ So far the post content exists only as the `content` property passed to the `Blo
 ---comp
 <Component name="BlogPage">
   <VStack width="{$props.width ? $props.width : '85%'}">
-    <VStack>
+    <VStack gap="0">
       <H1>{$props.post.title}</H1>
-      <HStack gap="$space-2">
-        <Text>{$props.post.date}</Text>
-        <Text> - </Text>
-        <Text>{$props.post.author}</Text>
-      </HStack>
+      <Text>{$props.post.date} - {$props.post.author}</Text>
     </VStack>
-    <Markdown data="/blog/{$props.post.slug}.md" />
+    <Image src="/blog/images/{$props.post.image}" />
+    <Markdown marginTop="$space-4" data="/blog/{$props.post.slug}.md" />
   </VStack>
 </Component>
 ```
 
-Now we write post metadata as an App-level variable, and create Markdown files corresponding to the slugs. In this case the files are `welcome-to-the-xmlui-blog.md` (this post) and `lorem-ipsum.png` (a dummy older post). We also add a hero image for each post.
+Now we write post metadata as an App-level variable, and create Markdown files corresponding to the slugs. In this case the files are `welcome-to-the-xmlui-blog.md` (this post) and `lorem-ipsum.md` (a dummy older post). We also add a hero image for each post.
 
 ```xmlui copy
 <App
@@ -291,7 +288,7 @@ Suppose you wanted to decouple the blog engine from the monorepo and use it stan
 ├── index.html
 └── xmlui
     ├── xmlui-playground.js
-    └── xmlui-standalone.umd.js
+    └── xmlui-0.10.8.js
 ```
 
 Here's the `index.html`.
@@ -303,7 +300,7 @@ Here's the `index.html`.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XMLUI blog test</title>
-  <script src="xmlui/xmlui-standalone.umd.js"></script>
+  <script src="xmlui/xmlui-0.10.8.js"></script>
   <script src="xmlui/xmlui-playground.js"></script>
 <script>
 </script>
@@ -393,7 +390,7 @@ And here's `Main.xmlui`.
 </Fragment>
 ```
 
-That's all you need to run the blog. Note that we include `xmlui-playground.js`. The live playgrounds you can use here are provided by an extension, and a standalone app can use that extension in the same way our main site does. So when you serve the blog from a static webserver, the playground examples work the same way.
+That's all we need to serve the blog. Note that we include `xmlui-playground.js`. The live playgrounds you can use here are provided by an extension, and a standalone app can use that extension in the same way our main site does. So when you serve the blog from a static webserver, the playground examples work the same way.
 
 You can host the standalone blog on any static webserver. We'll do that, but first let's create a search mechanism that's decoupled from the monorepo's build and works entirely client-side. We'll create two user-defined components: `SearchPrep` and `BlogSearch`.
 
