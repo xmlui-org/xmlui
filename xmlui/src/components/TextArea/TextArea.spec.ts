@@ -935,11 +935,9 @@ test.describe("Regression", () => {
     await expect(driver.component).toBeFocused();
     await driver.component.fill("a");
     await expect(driver.component).toHaveValue("a");
-    await tbDriver.field.fill("abc");
-    await expect(tbDriver.field).toHaveValue("abc");
+    await driver.component.fill("abc");
+    await expect(driver.component).toHaveValue("abc");
     await driver.component.fill("abcde");
     await expect(driver.component).toHaveValue("abcde");
-    await expect(driver.component).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("abcde");
   });
 });

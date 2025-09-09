@@ -1,6 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
 import { getPseudoStyles } from "./component-test-helpers";
-import { partClassName } from "../components-core/parts";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -36,7 +35,7 @@ export class ComponentDriver {
   }
 
   getByPartName(part: string): Locator {
-    return this.component.locator(`.${partClassName(part)}`).first();
+    return this.component.locator(`[data-part-id="${part}"]`).first();
   }
 
   /**

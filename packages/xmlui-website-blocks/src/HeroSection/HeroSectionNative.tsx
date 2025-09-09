@@ -1,5 +1,5 @@
 import { forwardRef, ReactNode } from "react";
-import { Button, Icon, Breakout, partClassName } from "xmlui";
+import { Button, Icon, Breakout } from "xmlui";
 
 import styles from "./HeroSection.module.scss";
 
@@ -9,9 +9,8 @@ const PART_HEADING_SECTION = "headingSection";
 const PART_PREAMBLE = "preamble";
 const PART_HEADLINE = "headline";
 const PART_SUBHEADLINE = "subheadline";
-const PART_TEXT = "text";
+const PART_MAIN_TEXT = "mainText";
 const PART_CTA_BUTTON = "ctaButton";
-const PART_MAIN = "main";
 const PART_IMAGE = "image";
 const PART_BACKGROUND = "background";
 
@@ -66,7 +65,8 @@ export const HeroSection = forwardRef(
   ) => {
     const ctaButton = ctaButtonTemplate || (
       <Button
-        className={classnames(partClassName(PART_CTA_BUTTON), styles.ctaButton)}
+        data-part-id={PART_CTA_BUTTON}
+        className={classnames(styles.ctaButton)}
         icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
         onClick={onCtaClick}
       >
@@ -75,15 +75,18 @@ export const HeroSection = forwardRef(
     );
 
     const heroContent = (
-      <div ref={ref} className={classnames(styles.heroWrapper, className)}>
+      <div
+        ref={ref}
+        data-part-id={PART_BACKGROUND}
+        className={classnames(styles.heroWrapper, className)}
+      >
         {backgroundTemplate && (
-          <div className={classnames(partClassName(PART_BACKGROUND), styles.backgroundTemplate)}>
-            {backgroundTemplate}
-          </div>
+          <div className={styles.backgroundTemplate}>{backgroundTemplate}</div>
         )}
         <div className={styles.heroContent}>
           <div
-            className={classnames(partClassName(PART_HEADING_SECTION), styles.headingSection, {
+            data-part-id={PART_HEADING_SECTION}
+            className={classnames(styles.headingSection, {
               [styles.start]: alignHeading === "start",
               [styles.center]: alignHeading === "center",
               [styles.end]: alignHeading === "end",
@@ -91,8 +94,8 @@ export const HeroSection = forwardRef(
           >
             {preamble && (
               <div
+                data-part-id={PART_PREAMBLE}
                 className={classnames(
-                  partClassName(PART_PREAMBLE),
                   styles.preamble,
                   styles.preserveLinebreaks,
                 )}
@@ -102,8 +105,8 @@ export const HeroSection = forwardRef(
             )}
             {headline && (
               <div
+                data-part-id={PART_HEADLINE}
                 className={classnames(
-                  partClassName(PART_HEADLINE),
                   styles.headline,
                   styles.preserveLinebreaks,
                 )}
@@ -113,8 +116,8 @@ export const HeroSection = forwardRef(
             )}
             {subheadline && (
               <div
+                data-part-id={PART_SUBHEADLINE}
                 className={classnames(
-                  partClassName(PART_SUBHEADLINE),
                   styles.subheadline,
                   styles.preserveLinebreaks,
                 )}
@@ -124,8 +127,8 @@ export const HeroSection = forwardRef(
             )}
             {mainTextTemplate && (
               <div
+                data-part-id={PART_MAIN_TEXT}
                 className={classnames(
-                  partClassName(PART_TEXT),
                   styles.textWrapper,
                   styles.preserveLinebreaks,
                 )}
@@ -135,8 +138,8 @@ export const HeroSection = forwardRef(
             )}
             {!mainTextTemplate && mainText && (
               <div
+                data-part-id={PART_MAIN_TEXT}
                 className={classnames(
-                  partClassName(PART_TEXT),
                   styles.mainText,
                   styles.preserveLinebreaks,
                 )}
@@ -148,6 +151,7 @@ export const HeroSection = forwardRef(
           <div>{ctaButton}</div>
           {image && (
             <img
+              data-part-id={PART_IMAGE}
               className={styles.image}
               src={image}
               style={{ width: imageWidth, height: imageHeight }}
