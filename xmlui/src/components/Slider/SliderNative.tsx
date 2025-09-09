@@ -43,7 +43,18 @@ export type Props = {
   valueFormat?: (value: number) => string;
 };
 
-export const defaultProps: Pick<Props, "step" | "min" | "max" | "enabled" | "validationStatus" | "tabIndex" | "showValues" | "valueFormat" | "minStepsBetweenThumbs"> = {
+export const defaultProps: Pick<
+  Props,
+  | "step"
+  | "min"
+  | "max"
+  | "enabled"
+  | "validationStatus"
+  | "tabIndex"
+  | "showValues"
+  | "valueFormat"
+  | "minStepsBetweenThumbs"
+> = {
   step: 1,
   min: 0,
   max: 10,
@@ -193,15 +204,9 @@ export const Slider = forwardRef(
     );
 
     // Component APIs
-    const handleOnFocus = useCallback(
-      (ev) => onFocus?.(ev),
-      [onFocus],
-    );
+    const handleOnFocus = useCallback((ev) => onFocus?.(ev), [onFocus]);
 
-    const handleOnBlur = useCallback(
-      (ev) => onBlur?.(ev),
-      [onBlur],
-    );
+    const handleOnBlur = useCallback((ev) => onBlur?.(ev), [onBlur]);
 
     const focus = useCallback(() => {
       inputRef.current?.focus();

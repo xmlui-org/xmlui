@@ -2,6 +2,8 @@
 
 `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.
 
+Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions.
+
 **Key features:**
 - **Exclusive selection**: Only one option can be selected at a time within the group
 - **Form integration**: Built-in validation states and seamless form compatibility

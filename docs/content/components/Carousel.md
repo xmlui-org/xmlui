@@ -17,7 +17,7 @@ This component displays a slideshow by cycling through elements (images, text, o
 
 ### `autoplay` (default: false) [#autoplay-default-false]
 
-This property indicates whether the carousel automatically scrolls.
+Start scrolling the carousel automatically (`true`) or not (`false`).
 
 This property indicates whether the carousel automatically scrolls through slides.
 
@@ -39,13 +39,13 @@ This property indicates whether the carousel automatically scrolls through slide
 
 ### `autoplayInterval` (default: 5000) [#autoplayinterval-default-5000]
 
-This property specifies the interval between autoplay transitions.
+Specifies the interval between autoplay transitions.
 
 This property specifies the interval between autoplay transitions in milliseconds.
 
 ### `controls` (default: true) [#controls-default-true]
 
-This property indicates whether the carousel displays the controls.
+Display the previous/next controls (`true`) or not (`false`).
 
 This property indicates whether the carousel displays navigation controls (previous/next buttons).
 
@@ -60,7 +60,7 @@ This property indicates whether the carousel displays navigation controls (previ
 
 ### `indicators` (default: true) [#indicators-default-true]
 
-This property indicates whether the carousel displays the indicators.
+Display the individual slides as buttons (`true`) or not (`false`).
 
 This property indicates whether the carousel displays position indicators.
 
@@ -74,15 +74,9 @@ This property indicates whether the carousel displays position indicators.
 </App>
 ```
 
-### `keyboard` [#keyboard]
-
-This property indicates whether the carousel responds to keyboard events.
-
-This property indicates whether the carousel responds to keyboard events (arrow keys for navigation).
-
 ### `loop` (default: false) [#loop-default-false]
 
-This property indicates whether the carousel loops.
+Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.
 
 This property indicates whether the carousel loops continuously from the last slide back to the first.
 
@@ -104,7 +98,7 @@ This property indicates whether the carousel loops continuously from the last sl
 
 ### `nextIcon` [#nexticon]
 
-This property specifies the icon to display for the next control.
+The icon to display for the next control.
 
 This property specifies the icon to display for the next control button.
 
@@ -149,13 +143,13 @@ Available values:
 
 ### `prevIcon` [#previcon]
 
-This property specifies the icon to display for the previous control.
+The icon to display for the previous control.
 
 This property specifies the icon to display for the previous control button.
 
 ### `startIndex` (default: 0) [#startindex-default-0]
 
-This property indicates the index of the first slide to display.
+The index of the first slide to display.
 
 This property indicates the index of the first slide to display when the carousel initializes.
 
@@ -172,13 +166,13 @@ This property indicates the index of the first slide to display when the carouse
 
 ### `stopAutoplayOnInteraction` (default: true) [#stopautoplayoninteraction-default-true]
 
-This property indicates whether autoplay stops on interaction.
+This property indicates whether autoplay stops on user interaction.
 
 This property indicates whether autoplay stops when the user interacts with the carousel (clicking controls, indicators, or using keyboard navigation).
 
 ### `transitionDuration` (default: 25) [#transitionduration-default-25]
 
-This property indicates the duration of the transition between slides.
+The duration of the transition between slides.
 
 This property indicates the duration of the transition between slides in milliseconds.
 
