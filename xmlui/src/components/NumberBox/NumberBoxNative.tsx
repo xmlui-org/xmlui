@@ -35,7 +35,6 @@ import {
   PART_END_ADORNMENT,
   PART_INPUT,
   PART_START_ADORNMENT,
-  partClassName,
 } from "../../components-core/parts";
 
 // Default props for NumberBox component
@@ -439,15 +438,17 @@ export const NumberBox = forwardRef(function NumberBox(
         style={{ gap }}
       >
         <Adornment
+          data-part-id={PART_START_ADORNMENT}
           text={startText}
           iconName={startIcon}
-          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+          className={classnames(styles.adornment)}
         />
         <input
           id={id}
+          data-part-id={PART_INPUT}
           type="text"
           inputMode="numeric"
-          className={classnames(partClassName(PART_INPUT), styles.input, {
+          className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
           disabled={!enabled}
@@ -466,9 +467,10 @@ export const NumberBox = forwardRef(function NumberBox(
           required={required}
         />
         <Adornment
+          data-part-id={PART_END_ADORNMENT}
           text={endText}
           iconName={endIcon}
-          className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
+          className={classnames(styles.adornment)}
         />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>

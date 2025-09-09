@@ -7,7 +7,7 @@ import styles from "./FormItem.module.scss";
 
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
-import { PART_LABELED_ITEM, PART_LABEL, partClassName } from "../../components-core/parts";
+import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 
 // Component part names
 
@@ -72,8 +72,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     return (
       <Slot
         {...rest}
+        data-part-id={PART_LABELED_ITEM}
         style={style}
-        className={classnames(partClassName(PART_LABELED_ITEM), className)}
+        className={className}
         id={inputId}
         ref={ref}
       >
@@ -102,6 +103,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       >
         {label && (
           <label
+            data-part-id={PART_LABEL}
             htmlFor={inputId}
             onClick={() => document.getElementById(inputId)?.focus()}
             style={{
@@ -109,7 +111,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
               flexShrink: labelWidth !== undefined ? 0 : undefined,
             }}
-            className={classnames(partClassName(PART_LABEL), styles.inputLabel, {
+            className={classnames(styles.inputLabel, {
               [styles.required]: required,
               [styles.disabled]: !enabled,
               [styles.labelBreak]: labelBreak,
@@ -123,10 +125,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot
-          className={partClassName(PART_LABELED_ITEM)}
-          id={!isInputTemplateUsed ? inputId : undefined}
-        >
+        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined}>
           {children}
         </Slot>
       </div>

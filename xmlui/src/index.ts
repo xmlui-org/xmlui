@@ -58,7 +58,6 @@ import {
   d,
   dComponent,
 } from "./components/metadata-helpers";
-import { partClassName } from "./components-core/parts";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -121,6 +120,5 @@ export {
   StyleProvider,
   StyleRegistry,
   useEvent,
-  partClassName,
   StandaloneComponent,
 };

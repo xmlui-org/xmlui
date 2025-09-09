@@ -99,6 +99,7 @@ export function PartialInput({
   inputRef,
   step = 1,
   isInvalid = false,
+  ...restProps
 }: PartialInputProps) {
   
   /**
@@ -232,6 +233,7 @@ export function PartialInput({
 
   return (
     <input
+      {...restProps}
       aria-label={ariaLabel}
       autoComplete="off"
       // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision

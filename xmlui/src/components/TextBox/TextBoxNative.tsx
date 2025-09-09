@@ -10,7 +10,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
-import { partClassName, PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -241,14 +241,16 @@ export const TextBox = forwardRef(function TextBox(
         style={{ gap }}
       >
         <Adornment
+          data-part-id={PART_START_ADORNMENT}
           text={startText}
           iconName={startIcon}
-          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+          className={classnames(styles.adornment)}
         />
         <input
           id={id}
+          data-part-id={PART_INPUT}
           type={actualType}
-          className={classnames(partClassName(PART_INPUT), styles.input, {
+          className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
           disabled={!enabled}
@@ -267,19 +269,17 @@ export const TextBox = forwardRef(function TextBox(
         />
         {type === "password" && showPasswordToggle ? (
           <Adornment
+            data-part-id={PART_END_ADORNMENT}
             iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
-            className={classnames(
-              partClassName(PART_END_ADORNMENT),
-              styles.adornment,
-              styles.passwordToggle,
-            )}
+            className={classnames(styles.adornment, styles.passwordToggle)}
             onClick={togglePasswordVisibility}
           />
         ) : (
           <Adornment
+            data-part-id={PART_END_ADORNMENT}
             text={endText}
             iconName={endIcon}
-            className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
+            className={styles.adornment}
           />
         )}
       </div>
