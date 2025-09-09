@@ -11,7 +11,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
-import type { ButtonThemeColor, ButtonVariant, ComponentSize, IconPosition } from "../abstractions";
+import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -32,7 +32,7 @@ type Props = {
   buttonLabel?: string;
   variant?: ButtonVariant;
   buttonThemeColor?: ButtonThemeColor;
-  buttonSize?: ComponentSize;
+  buttonSize?: SizeType;
   buttonIcon?: React.ReactNode;
   buttonIconPosition?: IconPosition;
   // Input props
