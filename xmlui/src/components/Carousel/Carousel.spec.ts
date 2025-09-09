@@ -238,31 +238,54 @@ test.describe("Accessibility", () => {
 // VISUAL STATE TESTS
 // =============================================================================
 
-test.skip("component applies theme variables correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-
-  await initTestBed(
-    `<Carousel>
-      <CarouselItem>Slide 1</CarouselItem>
-      <CarouselItem>Slide 2</CarouselItem>
-    </Carousel>`,
-    {
-      testThemeVars: {
-        "backgroundColor-control-Carousel": "rgb(255, 0, 0)",
-        "textColor-control-Carousel": "rgb(0, 0, 255)",
-        "width-indicator-Carousel": "20px",
+test.describe("Visual States", () => {
+  test("component control background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-control-Carousel": "rgb(255, 0, 0)",
+        },
       },
-    },
-  );
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
 
-  // Check control button styling
-  const control = page.locator(".control").first();
-  await expect(control).toHaveCSS("background-color", "rgb(255, 0, 0)");
-  await expect(control).toHaveCSS("color", "rgb(0, 0, 255)");
+  test("component control text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-control-Carousel": "rgb(0, 0, 255)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
 
-  // Check indicator styling
-  const indicator = page.locator(".indicator").first();
-  await expect(indicator).toHaveCSS("width", "20px");
+  test("component indicator width", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "width-indicator-Carousel": "20px",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 1" });
+    await expect(indicator).toHaveCSS("width", "20px");
+  });
 });
 
 // =============================================================================
@@ -293,7 +316,9 @@ test.describe("Edge Cases", () => {
     await expect(slides).toHaveCount(itemNum);
 
     // Verify we can navigate through slides
-    await page.getByRole("button", { name: "Next Slide" }).click({ clickCount: itemNum, delay: 100 });
+    await page
+      .getByRole("button", { name: "Next Slide" })
+      .click({ clickCount: itemNum, delay: 100 });
 
     // Verify we've navigated to the correct slide
     await expect(slides.last()).toBeInViewport();
@@ -315,86 +340,88 @@ test.describe("Edge Cases", () => {
     // Verify carousel renders
     await expect(page.getByRole("region").getByRole("button")).toHaveCount(20);
   });
+
+  test("component works without indicators and controls", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Carousel indicators="false" controls="false">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>
+    `);
+
+    // Verify carousel container renders
+    await expect(page.getByRole("region")).toBeVisible();
+
+    // Verify indicators are not visible
+    await expect(page.getByRole("region").getByRole("tablist")).not.toBeVisible();
+
+    // Verify controls are not visible
+    await expect(page.getByRole("region").getByRole("button", { name: "Previous Slide" })).not.toBeVisible();
+    await expect(page.getByRole("region").getByRole("button", { name: "Next Slide" })).not.toBeVisible();
+  });
 });
 
 // =============================================================================
 // INTEGRATION TESTS
 // =============================================================================
 
-test.skip("component works correctly with custom content", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
+test.describe("Integration", () => {
+  test("component works correctly with custom content", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Carousel>
+        <CarouselItem>
+          <Card title="Card 1" />
+        </CarouselItem>
+        <CarouselItem>
+          <Card title="Card 2" />
+        </CarouselItem>
+      </Carousel>
+    `);
+    await expect(page.getByRole("group").first()).toContainText("Card 1");
+    await expect(page.getByRole("group").last()).toContainText("Card 2");
+  });
 
-  await initTestBed(
-    `
-    <Carousel>
-      <CarouselItem>
-        <Card>
-          <CardHeader>Card 1 Header</CardHeader>
-          <CardBody>Card 1 Content</CardBody>
-        </Card>
-      </CarouselItem>
-      <CarouselItem>
-        <Card>
-          <CardHeader>Card 2 Header</CardHeader>
-          <CardBody>Card 2 Content</CardBody>
-        </Card>
-      </CarouselItem>
-    </Carousel>
-  `,
-    {},
+  test.skip(
+    "component handles custom control icon on Prev button",
+    SKIP_REASON.XMLUI_BUG("Icon does not show up"),
+    async ({ page, initTestBed }) => {
+      await initTestBed(
+        `
+          <Carousel controls="true" prevIcon="test">
+            <CarouselItem>Slide 1</CarouselItem>
+            <CarouselItem>Slide 2</CarouselItem>
+          </Carousel>    
+        `,
+        {
+          resources: {
+            "icon.test": "resources/bell.svg",
+          },
+        },
+      );
+      const useElement = page.getByRole("button", { name: "Previous Slide" }).locator("svg use");
+      await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
+    },
   );
 
-  // Verify complex content renders correctly
-  await expect(page.locator("text=Card 1 Header")).toBeVisible();
-  await expect(page.locator("text=Card 1 Content")).toBeVisible();
-
-  // Navigate to second slide
-  await page.locator(".controlNext").click();
-  await page.waitForTimeout(500);
-
-  // Verify second card is visible
-  await expect(page.locator("text=Card 2 Header")).toBeVisible();
-  await expect(page.locator("text=Card 2 Content")).toBeVisible();
-});
-
-test.skip("component handles custom control icons", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-
-  await initTestBed(
-    `
-    <Carousel prevIcon="chevronleft" nextIcon="chevronright">
-      <CarouselItem>Slide 1</CarouselItem>
-      <CarouselItem>Slide 2</CarouselItem>
-    </Carousel>
-  `,
-    {},
+  test.skip(
+    "component handles custom control icon on Next button",
+    SKIP_REASON.XMLUI_BUG("Icon does not show up"),
+    async ({ page, initTestBed }) => {
+      await initTestBed(
+        `
+          <Carousel controls="true" nextIcon="test">
+            <CarouselItem>Slide 1</CarouselItem>
+            <CarouselItem>Slide 2</CarouselItem>
+          </Carousel>    
+        `,
+        {
+          resources: {
+            "icon.test": "resources/bell.svg",
+          },
+        },
+      );
+      const useElement = page.getByRole("button", { name: "Next Slide" }).locator("svg use");
+      await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
+    },
   );
-
-  // Verify custom icons are used
-  await expect(page.locator(".controlPrev [data-icon-name='chevronleft']")).toBeVisible();
-  await expect(page.locator(".controlNext [data-icon-name='chevronright']")).toBeVisible();
-});
-
-test.skip("component works without indicators and controls", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-
-  await initTestBed(
-    `
-    <Carousel indicators={false} controls={false}>
-      <CarouselItem>Slide 1</CarouselItem>
-      <CarouselItem>Slide 2</CarouselItem>
-    </Carousel>
-  `,
-    {},
-  );
-
-  // Verify carousel container renders
-  await expect(page.locator(".embla")).toBeVisible();
-
-  // Verify indicators are not visible
-  await expect(page.locator(".indicators")).toBeHidden();
-
-  // Verify controls are not visible
-  await expect(page.locator(".controlPrev")).toBeHidden();
-  await expect(page.locator(".controlNext")).toBeHidden();
 });
