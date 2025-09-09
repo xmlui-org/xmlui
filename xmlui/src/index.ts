@@ -45,6 +45,7 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
+import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
@@ -114,6 +115,7 @@ export {
   LinkNative,
   ToneChangerButton,
   Logo,
+  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
   StyleProvider,
