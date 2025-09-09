@@ -197,3 +197,39 @@ Interactive area chart for showing data trends over time with filled areas under
 ```
 
 %-PROP-END
+
+%-PROP-START tooltipTemplate
+
+```xmlui-pg copy display height="320px" name="Example: tooltipTemplate" /tooltipTemplate/
+<App>
+  <AreaChart
+    height="240px"
+    data="{[
+        { 'month': 'Jan', 'sales': 1200, 'profit': 400 },
+        { 'month': 'Feb', 'sales': 1900, 'profit': 600 },
+        { 'month': 'Mar', 'sales': 1500, 'profit': 500 },
+        { 'month': 'Apr', 'sales': 1800, 'profit': 700 }
+       ]}"
+    dataKeys="{['sales', 'profit']}"
+    nameKey="month"
+  >
+    <property name="tooltipTemplate">
+        <VStack backgroundColor='white' padding="$space-2">
+          <Text fontWeight='bold'>{$tooltip.label}</Text>
+          <HStack>
+            <Text color='blue'>Sales: {$tooltip.payload.sales}</Text>
+            <Text color='green'>Profit: {$tooltip.payload.profit}</Text>
+          </HStack>
+        </VStack>
+    </property>
+  </AreaChart>
+</App>
+```
+
+The `tooltipTemplate` prop allows you to customize the appearance and content of chart tooltips. The template receives a `$tooltip` context variable containing:
+
+- `$tooltip.label`: The label for the data point (typically the nameKey value)
+- `$tooltip.payload`: An object containing all data values for the hovered point
+- `$tooltip.active`: Boolean indicating if the tooltip is currently active
+
+%-PROP-END

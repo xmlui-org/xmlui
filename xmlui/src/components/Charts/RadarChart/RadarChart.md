@@ -207,3 +207,39 @@ Interactive radar chart for displaying multivariate data in a two-dimensional ch
 ```
 
 %-PROP-END
+
+%-PROP-START tooltipTemplate
+
+```xmlui-pg copy display height="320px" name="Example: tooltipTemplate" /tooltipTemplate/
+<App>
+  <RadarChart
+    height="240px"
+    data="{[
+        { 'skill': 'Communication', 'teamA': 80, 'teamB': 90 },
+        { 'skill': 'Problem Solving', 'teamA': 95, 'teamB': 85 },
+        { 'skill': 'Leadership', 'teamA': 70, 'teamB': 95 },
+        { 'skill': 'Technical', 'teamA': 90, 'teamB': 80 }
+       ]}"
+    dataKeys="{['teamA', 'teamB']}"
+    nameKey="skill"
+  >
+    <property name="tooltipTemplate">
+        <VStack backgroundColor='white' padding="$space-2">
+          <Text fontWeight='bold'>{$tooltip.label}</Text>
+          <HStack>
+            <Text color='blue'>Team A: {$tooltip.payload.teamA}</Text>
+            <Text color='green'>Team B: {$tooltip.payload.teamB}</Text>
+          </HStack>
+        </VStack>
+    </property>
+  </RadarChart>
+</App>
+```
+
+The `tooltipTemplate` prop allows you to customize the appearance and content of chart tooltips. The template receives a `$tooltip` context variable containing:
+
+- `$tooltip.label`: The label for the data point (typically the nameKey value)
+- `$tooltip.payload`: An object containing all data values for the hovered point
+- `$tooltip.active`: Boolean indicating if the tooltip is currently active
+
+%-PROP-END

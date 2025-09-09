@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState, useCallback } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -31,6 +31,7 @@ export type AreaChartProps = {
   showLegend?: boolean;
   stacked?: boolean;
   curved?: boolean;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<
@@ -74,6 +75,7 @@ export function AreaChart({
   showLegend = defaultProps.showLegend,
   stacked = defaultProps.stacked,
   curved = defaultProps.curved,
+  tooltipRenderer,
 }: AreaChartProps) {
   // Validate and normalize data
   const validData = Array.isArray(data) ? data : [];
@@ -111,12 +113,12 @@ export function AreaChart({
   }, [colorValues, dataKeys]);
 
   const chartContextValue = useChartContextValue({ dataKeys, nameKey });
-  
+
   // Process data and create chart elements based on dataKeys
   const chartElements = useMemo(() => {
     return dataKeys.map((key, index) => {
       const color = colorValues[index % colorValues.length];
-      
+
       return (
         <Area
           key={key}
@@ -145,12 +147,34 @@ export function AreaChart({
     };
 
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, []);
 
   // Determine if we're in mini mode (very small container)
   const isMiniMode = containerSize.height < 150;
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
+
+      const payloadObject: Record<string, any> = {};
+
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        Object.assign(payloadObject, props.payload[0].payload);
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadObject,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer],
+  );
 
   return (
     <ChartProvider value={chartContextValue}>
@@ -165,15 +189,9 @@ export function AreaChart({
                 hide={isMiniMode}
               />
             )}
-            {!hideY && (
-              <YAxis
-                tick={!hideTickY}
-                tickFormatter={tickFormatterY}
-                hide={isMiniMode}
-              />
-            )}
+            {!hideY && <YAxis tick={!hideTickY} tickFormatter={tickFormatterY} hide={isMiniMode} />}
             <CartesianGrid strokeDasharray="3 3" />
-            {!hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {!isMiniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {showLegend && !isMiniMode && <RLegend />}
             {chartElements}
             {children}

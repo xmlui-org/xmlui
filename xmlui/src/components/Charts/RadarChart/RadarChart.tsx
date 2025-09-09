@@ -1,6 +1,7 @@
 import { RadarChart, defaultProps } from "./RadarChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata } from "../../metadata-helpers";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "RadarChart";
 
@@ -74,6 +75,9 @@ export const RadarChartMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.fillOpacity,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
   },
   
   events: {
@@ -108,6 +112,22 @@ export const radarChartComponentRenderer = createComponentRenderer(
         filled={extractValue.asOptionalBoolean(node.props?.filled)}
         strokeWidth={extractValue.asOptionalNumber(node.props?.strokeWidth)}
         fillOpacity={extractValue.asOptionalNumber(node.props?.fillOpacity)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </RadarChart>

@@ -1,6 +1,7 @@
 import { AreaChart, defaultProps } from "./AreaChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import { createMetadata } from "../../metadata-helpers";
+import { MemoizedItem } from "../../container-helpers";
 
 const COMP = "AreaChart";
 
@@ -74,6 +75,9 @@ export const AreaChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.curved,
     },
+    tooltipTemplate: {
+      description: "This property allows replacing the default template to display a tooltip.",
+    },
   },
   
   events: {
@@ -110,6 +114,22 @@ export const areaChartComponentRenderer = createComponentRenderer(
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
         curved={extractValue.asOptionalBoolean(node.props?.curved)}
+        tooltipRenderer={
+          node.props.tooltipTemplate
+            ? (tooltipData) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.tooltipTemplate}
+                    item={tooltipData}
+                    contextVars={{
+                      $tooltip: tooltipData,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </AreaChart>

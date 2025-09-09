@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState, useCallback } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
@@ -29,6 +29,7 @@ export type RadarChartProps = {
   filled?: boolean;
   strokeWidth?: number;
   fillOpacity?: number;
+  tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<
@@ -66,6 +67,7 @@ export function RadarChart({
   filled = defaultProps.filled,
   strokeWidth = defaultProps.strokeWidth,
   fillOpacity = defaultProps.fillOpacity,
+  tooltipRenderer,
 }: RadarChartProps) {
   // Validate and normalize data
   const validData = Array.isArray(data) ? data : [];
@@ -143,6 +145,28 @@ export function RadarChart({
   // Determine if we're in mini mode (very small container)
   const isMiniMode = containerSize.height < 150;
 
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
+
+      const payloadObject: Record<string, any> = {};
+
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        Object.assign(payloadObject, props.payload[0].payload);
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadObject,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer],
+  );
+
   return (
     <ChartProvider value={chartContextValue}>
       <div ref={containerRef} className={className}>
@@ -160,7 +184,9 @@ export function RadarChart({
                 hide={isMiniMode}
               />
             )}
-            {!hideTooltip && <Tooltip content={<TooltipContent />} />}
+            {!isMiniMode && !hideTooltip && (
+              <Tooltip content={safeTooltipRenderer} />
+            )}
             {showLegend && !isMiniMode && <RLegend />}
             {radarElements}
             {children}
