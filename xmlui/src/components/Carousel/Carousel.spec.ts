@@ -338,7 +338,7 @@ test.describe("Edge Cases", () => {
     `);
 
     // Verify carousel renders
-    await expect(page.getByRole("region").getByRole("button")).toHaveCount(20);
+    await expect(page.getByRole("region").getByRole("tab")).toHaveCount(20);
   });
 
   test("component works without indicators and controls", async ({ page, initTestBed }) => {
