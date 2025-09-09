@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.10.10
+
+### Patch Changes
+
+- fff80c5: Bump package version
+
 ## 0.10.9
 
 ### Patch Changes
