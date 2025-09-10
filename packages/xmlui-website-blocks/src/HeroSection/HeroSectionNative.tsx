@@ -22,6 +22,7 @@ type Props = {
   contentPlacement?: "left" | "right" | "bottom";
   contentAlignment?: "start" | "center" | "end";
   headerWidth?: string | number;
+  contentWidth?: string | number;
   gap?: string | number;
   headerAlignment?: string;
   preamble?: string;
@@ -35,20 +36,19 @@ type Props = {
   image?: string;
   imageWidth?: number | string;
   imageHeight?: number | string;
-  preImageTemplate?: ReactNode;
-  postImageTemplate?: ReactNode;
   fullWidthBackground?: boolean;
   className?: string;
   onCtaClick?: () => void;
 };
 export const defaultProps: Pick<
   Props,
-  "fullWidthBackground" | "contentPlacement" | "contentAlignment" | "headerWidth"
+  "fullWidthBackground" | "contentPlacement" | "contentAlignment" | "headerWidth" | "contentWidth"
 > = {
   headerWidth: "50%",
   fullWidthBackground: true,
   contentPlacement: "bottom",
   contentAlignment: "center",
+  contentWidth: "$maxWidth-content",
 };
 
 export const HeroSection = forwardRef(
@@ -60,6 +60,7 @@ export const HeroSection = forwardRef(
       contentPlacement = defaultProps.contentPlacement,
       contentAlignment = defaultProps.contentAlignment,
       headerWidth = defaultProps.headerWidth,
+      contentWidth,
       gap,
       preamble,
       headline,
@@ -89,15 +90,18 @@ export const HeroSection = forwardRef(
 
     const isHorizontal = effectiveContentPlacement === "left" || effectiveContentPlacement === "right";
 
-    const ctaButton = ctaButtonTemplate || (
-      <Button
-        data-part-id={PART_CTA_BUTTON}
-        className={classnames(styles.ctaButton)}
-        icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
-        onClick={onCtaClick}
-      >
-        {ctaButtonText}
-      </Button>
+    // Only render CTA button if there's content for it
+    const ctaButton = (ctaButtonTemplate || ctaButtonText) && (
+      ctaButtonTemplate || (
+        <Button
+          data-part-id={PART_CTA_BUTTON}
+          className={classnames(styles.ctaButton)}
+          icon={ctaButtonIcon && <Icon name={ctaButtonIcon} aria-hidden />}
+          onClick={onCtaClick}
+        >
+          {ctaButtonText}
+        </Button>
+      )
     );
 
     // Header section (preamble to CTA button)
@@ -121,7 +125,7 @@ export const HeroSection = forwardRef(
           {preamble && (
             <div
               data-part-id={PART_PREAMBLE}
-              className={classnames(styles.preamble, styles.preserveLinebreaks)}
+              className={styles.preamble}
             >
               {preamble}
             </div>
@@ -129,7 +133,7 @@ export const HeroSection = forwardRef(
           {headline && (
             <div
               data-part-id={PART_HEADLINE}
-              className={classnames(styles.headline, styles.preserveLinebreaks)}
+              className={styles.headline}
             >
               {headline}
             </div>
@@ -137,7 +141,7 @@ export const HeroSection = forwardRef(
           {subheadline && (
             <div
               data-part-id={PART_SUBHEADLINE}
-              className={classnames(styles.subheadline, styles.preserveLinebreaks)}
+              className={styles.subheadline}
             >
               {subheadline}
             </div>
@@ -145,7 +149,7 @@ export const HeroSection = forwardRef(
           {mainTextTemplate && (
             <div
               data-part-id={PART_MAIN_TEXT}
-              className={classnames(styles.textWrapper, styles.preserveLinebreaks)}
+              className={styles.textWrapper}
             >
               {mainTextTemplate}
             </div>
@@ -153,20 +157,16 @@ export const HeroSection = forwardRef(
           {!mainTextTemplate && mainText && (
             <div
               data-part-id={PART_MAIN_TEXT}
-              className={classnames(styles.mainText, styles.preserveLinebreaks)}
+              className={styles.mainText}
             >
               {mainText}
             </div>
           )}
-          <div 
-            className={classnames(styles.ctaButtonWrapper, {
-              [styles.ctaStart]: effectiveHeaderAlignment === "start",
-              [styles.ctaCenter]: effectiveHeaderAlignment === "center", 
-              [styles.ctaEnd]: effectiveHeaderAlignment === "end",
-            })}
-          >
-            {ctaButton}
-          </div>
+          {ctaButton && (
+            <div className={styles.ctaButtonWrapper}>
+              {ctaButton}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -208,12 +208,11 @@ export const HeroSection = forwardRef(
             [styles.horizontal]: isHorizontal,
             [styles.vertical]: !isHorizontal,
           })}
-          style={{ gap }}
+          style={{ gap, width: contentWidth }}
         >
           {effectiveContentPlacement === "left" && contentSection}
           {headerSection}
-          {effectiveContentPlacement === "right" && contentSection}
-          {effectiveContentPlacement === "bottom" && contentSection}
+          {(effectiveContentPlacement === "right" || effectiveContentPlacement === "bottom") && contentSection}
         </div>
       </div>
     );

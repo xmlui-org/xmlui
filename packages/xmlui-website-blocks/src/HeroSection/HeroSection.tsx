@@ -1,7 +1,7 @@
 import styles from "./HeroSection.module.scss";
 
 import { createComponentRenderer, createMetadata, dComponent, d, parseScssVar } from "xmlui";
-import { HeroSection } from "./HeroSectionNative";
+import { HeroSection, defaultProps } from "./HeroSectionNative";
 
 const COMP = "HeroSection";
 
@@ -42,25 +42,32 @@ export const HeroSectionMd = createMetadata({
   },
   props: {
     headerAlignment: {
-      description: "Alignment of the header content. If not specified, defaults based on contentPlacement: bottom→center, left→start, right→end",
+      description: "Alignment of the header content",
       type: "string",
+      defaultValue: "center",
       options: ["start", "center", "end"],
     },
     contentPlacement: {
       description: "Position of the content area relative to the header",
       type: "string", 
-      defaultValue: "bottom",
+      defaultValue: defaultProps.contentPlacement,
       options: ["left", "right", "bottom"],
     },
     contentAlignment: {
       description: "Horizontal alignment of the content within its area",
       type: "string",
-      defaultValue: "center",
+      defaultValue: defaultProps.contentAlignment,
       options: ["start", "center", "end"],
     },
     headerWidth: {
       description: "Width of the header section in horizontal layouts",
       type: "string",
+      defaultValue: defaultProps.headerWidth,
+    },
+    contentWidth: {
+      description: "Width of the hero content (header + content sections)",
+      type: "string",
+      defaultValue: defaultProps.contentWidth,
     },
     gap: {
       description: "Gap between header and content sections",
@@ -95,7 +102,7 @@ export const HeroSectionMd = createMetadata({
     fullWidthBackground: {
       description: "Whether the background should span the full width of the viewport",
       type: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.fullWidthBackground,
     },
     image: {
       description: "The image for the hero section",
@@ -144,6 +151,7 @@ export const heroSectionComponentRenderer = createComponentRenderer(
         contentPlacement={extractValue(props.contentPlacement)}
         contentAlignment={extractValue(props.contentAlignment)}
         headerWidth={extractValue(props.headerWidth)}
+        contentWidth={extractValue(props.contentWidth)}
         gap={extractValue(props.gap)}
         preamble={extractValue(props.preamble)}
         headline={extractValue(props.headline)}
