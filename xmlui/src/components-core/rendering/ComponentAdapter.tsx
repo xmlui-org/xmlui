@@ -33,6 +33,7 @@ import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
+import { Animation, parseAnimation } from "../../components/Animation/AnimationNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -405,6 +406,27 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
         {nodeToRender}
       </Tooltip>
+    );
+  }
+
+  // --- Check if the component has an animation property
+  const animation = useMemo(
+    () => valueExtractor(safeNode.props?.animation, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Check if the component has an animationOptions property
+  const animationOptions = useMemo(
+    () => valueExtractor(safeNode.props?.animationOptions, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  // --- Handle animations
+  if (animation) {
+    return (
+      <Animation animation={parseAnimation(animation)} {...animationOptions}>
+        {nodeToRender}
+      </Animation>
     );
   }
 
