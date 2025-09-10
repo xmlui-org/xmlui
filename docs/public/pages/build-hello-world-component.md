@@ -76,7 +76,6 @@ This creates a basic `package.json` and installs the xmlui package as a developm
 Now let's update the `package.json` with the proper configuration for our extension:
 
 ```xmlui copy
-cat > package.json << 'EOF'
 {
   "name": "xmlui-hello-world",
   "version": "0.1.0",
@@ -99,7 +98,6 @@ cat > package.json << 'EOF'
     "dist"
   ]
 }
-EOF
 ```
 
 The build system will generate both:
@@ -117,10 +115,9 @@ First, let's create the `src` directory for our component files:
 mkdir src
 ```
 
-Now copy/paste this command to create `src/HelloWorldNative.tsx` with the core React implementation.
+Create `src/HelloWorldNative.tsx` with the core React implementation.
 
 ```xmlui copy
-cat > src/HelloWorldNative.tsx << 'EOF'
 import React, { useState } from "react";
 import styles from "./HelloWorld.module.scss";
 
@@ -153,7 +150,6 @@ export function HelloWorld({
     </div>
   );
 }
-EOF
 ```
 
 This creates the core React component with:
@@ -164,7 +160,6 @@ This creates the core React component with:
 ## Step 4: Create basic styles
 
 ```xmlui copy
-cat > src/HelloWorld.module.scss << 'EOF'
 .container {
   background-color: #f5f5f5;
   color: #333;
@@ -199,7 +194,6 @@ cat > src/HelloWorld.module.scss << 'EOF'
   font-size: 1.2rem;
   font-weight: bold;
 }
-EOF
 ```
 
 This SCSS module defines the basic visual styling for our HelloWorld component:
@@ -213,10 +207,9 @@ At this stage, we use hardcoded colors. In Step 9, we'll replace these theme var
 
 ## Step 5: Create component metadata and renderer
 
-Copy/paste these commands to create `HelloWorld.tsx`.
+Create `HelloWorld.tsx`.
 
 ```xmlui copy
-cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
@@ -246,7 +239,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
     );
   }
 );
-EOF
 ```
 
 **What we're creating**
@@ -276,7 +268,7 @@ This pattern enables XMLUI to:
 
 ## Step 6: Create the extension index
 
-Copy/paste this command to create `src/index.tsx` which exports your component as an extension.
+Create `src/index.tsx` which exports your component as an extension.
 
 ```xmlui copy
 cat > src/index.tsx << 'EOF'
@@ -321,75 +313,85 @@ Since we've integrated it into the docs site, you can see it live right here.
 
 ```xmlui-pg
 ---app display
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
+<App>
   <VStack gap="2rem" padding="2rem">
     <H1>HelloWorld Component Live Demo</H1>
 
     <Card>
-      <Extensions:HelloWorld message="Hello from the docs site!" />
+      <HelloWorld message="Hello from the docs site!" />
     </Card>
 
   </VStack>
+
+  <script>
+    // Event handlers for the HelloWorld component
+    window.addEventListener('helloWorldClick', (event) => {
+      console.log('HelloWorld clicked!', event.detail);
+    });
+  </script>
 </App>
 ```
 
 But you will want to see it in a standalone app. Let's create a simple test app to verify our component works.
 
-First, create a test directory:
+First, create a test directory and an `xmlui` subdirectory within it:
 
 ```xmlui copy
 mkdir test-app
 cd test-app
+mkdir xmlui
 ```
 
-Now create a simple HTML file to test your component:
+Now, copy your built component into the `xmlui` subdirectory:
 
 ```xmlui copy
-cat > index.html << 'EOF'
+cp ../dist/xmlui-hello-world.js xmlui/xmlui-hello-world.js
+```
+
+Create the `Main.xmlui` file with your component's markup:
+
+```xmlui copy
+<App>
+  <VStack gap="2rem" padding="2rem">
+    <Heading>HelloWorld Component Test</Heading>
+    <HelloWorld message="Hello from standalone app!" />
+  </VStack>
+
+  <script>
+    // Event handlers for the HelloWorld component
+    window.addEventListener('helloWorldClick', (event) => {
+      console.log('HelloWorld clicked!', event.detail);
+    });
+  </script>
+</App>
+```
+
+Finally, create a simple `index.html` file to load the XMLUI engine from CDN and your component:
+
+```xmlui copy
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HelloWorld Component Test</title>
-    <script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/xmlui@latest/dist/lib/index.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HelloWorld Extension Test</title>
+  <script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
+  <script src="xmlui/xmlui-hello-world.js"></script>
 </head>
 <body>
-    <div id="app"></div>
-
-    <!-- Load your component -->
-    <script src="../dist/xmlui-hello-world.js"></script>
-    <link rel="stylesheet" href="../dist/index.css">
-
-    <script>
-        // Initialize XMLUI with your component
-        xmlui.standalone.startApp({
-            'Main.xmlui': `
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <VStack gap="2rem" padding="2rem">
-    <H1>HelloWorld Component Test</H1>
-    <Card>
-      <Extensions:HelloWorld message="Hello from standalone app!" />
-    </Card>
-  </VStack>
-</App>`
-        }, document.getElementById('app'));
-    </script>
 </body>
 </html>
-EOF
 ```
 
 This creates a simple test app that loads your component.
 
-To run the app with Python.
+To run the app with Python:
 
 ```xmlui copy
 python -m http.server # visit 8000
 ```
 
-With Node.js.
+With Node.js:
 
 ```xmlui copy
 npx server # visit 3000
@@ -412,7 +414,6 @@ XMLUI provides a sophisticated theming system that:
 Let's update our SCSS to use XMLUI's theme system:
 
 ```xmlui copy
-cat > src/HelloWorld.module.scss << 'EOF'
 @use "xmlui/themes.scss" as t;
 
 $themeVars: ();
@@ -465,7 +466,6 @@ $textColor: createThemeVar("textColor-#{$component}");
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-EOF
 ```
 
 **What changed**
@@ -483,7 +483,6 @@ The `:export { themeVars: t.json-stringify($themeVars); }` exports the theme var
 We also need to tell XMLUI about our theme variables. Update the metadata in `HelloWorld.tsx`:
 
 ```xmlui copy
-cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
@@ -522,7 +521,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
     );
   }
 );
-EOF
 ```
 
 **Rebuild and test**
@@ -539,11 +537,11 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
 
 ```xmlui-pg
 ---app display copy
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
+<App>
   <VStack gap="2rem" padding="2rem">
     <H1>HelloWorld with Theme Variables</H1>
 
-    <Extensions:HelloWorld message="Default styling" />
+    <HelloWorld message="Default styling" />
 
     <Card>
       <H2>Custom Colors</H2>
@@ -551,7 +549,7 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
         backgroundColor-HelloWorld="$color-warn-300"
         textColor-HelloWorld="$textColor-primary"
       >
-        <Extensions:HelloWorld message="Custom colors!" />
+        <HelloWorld message="Custom colors!" />
       </Theme>
     </Card>
 
@@ -571,7 +569,6 @@ The HelloWorld component has a click handler that increments a counter, and a re
 Update the component metadata in `src/HelloWorld.tsx`:
 
 ```xmlui copy
-cat > src/HelloWorld.tsx << 'EOF'
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
@@ -626,7 +623,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
     );
   },
 );
-EOF
 ```
 
 **New props**
@@ -643,7 +639,6 @@ EOF
 Update `src/HelloWorldNative.tsx` to accept and call the event handler.
 
 ```xmlui copy
-cat > src/HelloWorldNative.tsx << 'EOF'
 import React, { useState } from "react";
 import styles from "./HelloWorld.module.scss";
 
@@ -708,7 +703,6 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     );
   }
 );
-EOF
 ```
 
 **Metadata changes:**
@@ -758,8 +752,8 @@ Now you can use the component with event handling.
 
 ```xmlui-pg
 ---app display copy
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-    <Extensions:HelloWorld
+<App>
+    <HelloWorld
           onClick="handleHelloClick"
           onReset="handleHelloReset"
         />
@@ -772,7 +766,6 @@ Update `src/HelloWorldNative.tsx`.
 
 
 ```xmlui copy
-cat > src/HelloWorldNative.tsx << 'EOF'
 import React, { useState, useEffect } from "react";
 import styles from "./HelloWorld.module.scss";
 import type { RegisterComponentApiFn } from "xmlui";
@@ -853,7 +846,6 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     );
   }
 );
-EOF
 ```
 
 **New props**
