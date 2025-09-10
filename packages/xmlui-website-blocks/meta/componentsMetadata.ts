@@ -1,5 +1,6 @@
 import { HelloMd } from "../src/Hello/Hello"; 
 import { HeroSectionMd } from "../src/HeroSection/HeroSection"
+import { ScrollToTopMd } from "../src/ScrollToTop/ScrollToTop"
 
 export const componentMetadata = {
   name: "Websites",
@@ -8,5 +9,6 @@ export const componentMetadata = {
   metadata: {
     Hello: HelloMd,
     HeroSection: HeroSectionMd,
+    ScrollToTop: ScrollToTopMd,
   },
 };

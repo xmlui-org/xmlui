@@ -167,7 +167,7 @@
     "src/syntax"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "dist/scripts/bin/bootstrap.js"
   },
   "clean-package": {
     "replace": {
@@ -221,42 +221,47 @@
       }
     }
   },
-  "main": "./src/index.ts",
+  "main": "./dist/standalone/xmlui-standalone.umd.js",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
-    },
-    "./parser": {
-      "import": "./src/parsers/xmlui-parser/index.ts",
-      "require": "./src/parsers/xmlui-parser/index.ts"
-    },
-    "./index.scss": {
-      "import": "./src/index.scss",
-      "require": "./src/index.scss"
-    },
-    "./themes.scss": {
-      "import": "./src/components-core/theming/_themes.scss"
-    },
-    "./vite-xmlui-plugin": {
-      "import": "./bin/vite-xmlui-plugin.ts",
-      "require": "./bin/vite-xmlui-plugin.ts"
+      "import": "./dist/lib/xmlui.mjs",
+      "require": "./dist/standalone/xmlui-standalone.umd.js"
     },
     "./language-server": {
-      "import": "./src/language-server/server.ts",
-      "require": "./src/language-server/server.ts"
+      "import": "./dist/lib/language-server.mjs",
+      "require": "./dist/lib/language-server.mjs"
     },
     "./language-server-web-worker": {
-      "import": "./src/language-server/server-web-worker.ts",
-      "require": "./src/language-server/server-web-worker.ts"
+      "import": "./dist/lib/language-server-web-worker.mjs",
+      "require": "./dist/lib/language-server-web-worker.mjs"
+    },
+    "./parser": {
+      "import": "./dist/lib/xmlui-parser.mjs",
+      "require": "./dist/lib/xmlui-parser.mjs"
+    },
+    "./*.css": {
+      "import": "./dist/lib/*.css",
+      "require": "./dist/lib/*.css"
+    },
+    "./index.scss": {
+      "import": "./dist/lib/scss/index.scss",
+      "require": "./dist/lib/scss/index.scss"
+    },
+    "./themes.scss": {
+      "import": "./dist/lib/scss/components-core/theming/_themes.scss",
+      "require": "./dist/lib/scss/components-core/theming/_themes.scss"
+    },
+    "./vite-xmlui-plugin": {
+      "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
+      "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
     },
     "./syntax/monaco": {
-      "import": "./src/syntax/monaco/index.ts",
-      "require": "./src/syntax/monaco/index.ts"
+      "import": "./dist/lib/syntax-monaco.mjs",
+      "require": "./dist/lib/syntax-monaco.mjs"
     },
     "./syntax/textmate": {
-      "import": "./src/syntax/textMate/index.ts",
-      "require": "./src/syntax/textMate/index.ts"
+      "import": "./dist/lib/syntax-textmate.mjs",
+      "require": "./dist/lib/syntax-textmate.mjs"
     }
   },
   "browserslist": {
@@ -276,5 +281,7 @@
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure/public"
-  }
+  },
+  "module": "./dist/lib/xmlui.mjs",
+  "types": "./dist/lib/xmlui.d.ts"
 }
