@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type React from "react";
-import { forwardRef, useMemo, useRef, useEffect, useLayoutEffect } from "react";
+import { forwardRef, useMemo, useRef } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -8,10 +8,10 @@ import styles from "./Text.module.scss";
 
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import {
+  type BreakMode,
+  type OverflowMode,
   type TextVariant,
   TextVariantElement,
-  type OverflowMode,
-  type BreakMode,
 } from "../abstractions";
 
 type TextProps = {
@@ -54,11 +54,6 @@ export const Text = forwardRef(function Text(
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
-
-  // For dynamic CSS properties that require DOM access
-  useLayoutEffect(() => {
-    // Note: No special handling needed for current overflow modes
-  }, [overflowMode]);
 
   // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props
