@@ -1,0 +1,79 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "ScrollToTop";
+$backgroundColor-ScrollToTop: createThemeVar("backgroundColor-#{$component}");
+$borderColor-ScrollToTop: createThemeVar("borderColor-#{$component}");
+$color-ScrollToTop: createThemeVar("color-#{$component}");
+$size-ScrollToTop: createThemeVar("size-#{$component}");
+$borderRadius-ScrollToTop: createThemeVar("borderRadius-#{$component}");
+$shadow-ScrollToTop: createThemeVar("shadow-#{$component}");
+$bottom-ScrollToTop: createThemeVar("bottom-#{$component}");
+$horizontalSpacing-ScrollToTop: createThemeVar("horizontalSpacing-#{$component}");
+$zIndex-ScrollToTop: createThemeVar("zIndex-#{$component}");
+
+@layer components {
+  .scrollToTop {
+    position: fixed;
+    bottom: $bottom-ScrollToTop;
+    width: $size-ScrollToTop;
+    height: $size-ScrollToTop;
+    background-color: $backgroundColor-ScrollToTop;
+    border: 1px solid $borderColor-ScrollToTop;
+    border-radius: $borderRadius-ScrollToTop;
+    box-shadow: $shadow-ScrollToTop;
+    cursor: pointer;
+    z-index: $zIndex-ScrollToTop;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: $color-ScrollToTop;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus {
+      outline: 2px solid $backgroundColor-ScrollToTop;
+      outline-offset: 2px;
+    }
+
+    &.positionStart {
+      left: $horizontalSpacing-ScrollToTop;
+    }
+
+    &.positionCenter {
+      left: 50%;
+      transform: translateX(-50%);
+
+      &:hover {
+        transform: translateX(-50%) translateY(-2px);
+      }
+
+      &:active {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    &.positionEnd {
+      right: $horizontalSpacing-ScrollToTop;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
