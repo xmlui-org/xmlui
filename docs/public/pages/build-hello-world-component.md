@@ -2,11 +2,11 @@
 
 In this tutorial we'll build a HelloWorld component that demonstrates the core patterns for XMLUI component development.
 
-The XMLUI repository contains two types of components:
+The XMLUI framework supports two types of components:
 
-**Core components** are built into the main XMLUI library and available by default. Components like Button, Text, Card, and Stack live in `xmlui/xmlui/src/components/` and are always available in any XMLUI app.
+**Core components** are built into the main XMLUI library and available by default. Components like Button, Text, Card, and Stack are always available in any XMLUI app.
 
-**Extension packages** are standalone components that can be optionally included. They live in `xmlui/packages` and are built, distributed, and imported separately.
+**Extension packages** are standalone components that can be optionally included. They are built, distributed, and imported separately, making them perfect for custom components that aren't needed by every XMLUI application.
 
 We'll build an extension package so the HelloWorld component can:
 
@@ -14,7 +14,7 @@ We'll build an extension package so the HelloWorld component can:
 - Be optionally included in standalone apps
 - Be distributed and reused across different projects
 
-Extensions are the recommended approach for custom components that aren't needed by every XMLUI application. By the end of this guide, you'll have created a HelloWorld component that:
+Extensions are the recommended approach for custom components. By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
 - Features an interactive click counter
@@ -22,14 +22,13 @@ Extensions are the recommended approach for custom components that aren't needed
 - Defines event handlers
 - Provides callable methods
 
-
 ## XMLUI component architecture
 
 XMLUI components are made of three main parts:
 
 1. Native React component (`HelloWorldNative.tsx`) - The actual React implementation
 2. Component metadata (`HelloWorld.tsx`) - Describes props and integrates with XMLUI
-3. Component registration (`ComponentProvider.tsx`) - Registers the component with XMLUI
+3. For visual components, a .scss file (`HelloWorld.module.scss`)
 
 This separation allows XMLUI to understand your component's interface while maintaining clean React code.
 
@@ -37,37 +36,44 @@ This separation allows XMLUI to understand your component's interface while main
 
 - Familiarity with React and TypeScript
 - Basic understanding of XMLUI markup
-- A local clone of [https://github.com/xmlui-org/xmlui](https://github.com/xmlui-org/xmlui)
+- Node.js 18.0.0 or higher
+- npm (comes with Node.js)
 
-## Step 1: Prepare the workspace
+## Step 1: Create your project directory
 
-Since you'll be working in the same XMLUI repository that creates this site, you'll need to clear out the existing HelloWorld component to start fresh.
-
-Switch to the directory into which you cloned the XMLUI repo.
+Let's start by creating a new directory for your HelloWorld component project.
 
 **Windows**
 
 ```xmlui copy
-cd packages/xmlui-hello-world
-rmdir /s /q src
-mkdir src
+mkdir xmlui-hello-world
+cd xmlui-hello-world
 ```
 
 **Mac / WSL / Linux**
 
 ```xmlui copy
-cd packages/xmlui-hello-world
-rm -rf src/*
+mkdir xmlui-hello-world
+cd xmlui-hello-world
 ```
 
-This clears out the existing HelloWorld component files so you can build it from scratch.
+This creates a fresh project directory where you'll build your component from scratch.
 
 > [!INFO]
 > This page includes playground examples that use the HelloWorld component. They are available here because this site loads the final extension package that you will build. That means the live playground examples here reflect the final state, not the interim states described as we go along. But in the standalone app that you'll create you will see the progression exactly as described here.
 
 ## Step 2: Create the package configuration
 
-Switch to `packages/xmlui-hello-world` and copy/paste this command to recreate `package.json`.
+First, let's initialize a new npm project and install the xmlui package:
+
+```xmlui copy
+npm init -y
+npm install --save-dev xmlui
+```
+
+This creates a basic `package.json` and installs the xmlui package as a development dependency.
+
+Now let's update the `package.json` with the proper configuration for our extension:
 
 ```xmlui copy
 cat > package.json << 'EOF'
@@ -101,11 +107,17 @@ The build system will generate both:
 - xmlui-hello-world.js (CommonJS/UMD for browser script tags)
 - xmlui-hello-world.mjs (ES modules for import statements)
 
- `xmlui-hello-world.js` is the file you'll pull into a standalone XMLUI app using a `<script>` tag.
+`xmlui-hello-world.js` is the file you'll pull into a standalone XMLUI app using a `<script>` tag.
 
 ## Step 3: Create the React component
 
-Copy/paste this command to create `src/HelloWorldNative.tsx` with the core React implementation.
+First, let's create the `src` directory for our component files:
+
+```xmlui copy
+mkdir src
+```
+
+Now copy/paste this command to create `src/HelloWorldNative.tsx` with the core React implementation.
 
 ```xmlui copy
 cat > src/HelloWorldNative.tsx << 'EOF'
@@ -321,31 +333,55 @@ Since we've integrated it into the docs site, you can see it live right here.
 </App>
 ```
 
-But you will want to see it in a standalone app. Switch to the xmlui repo home and run this tool.
+But you will want to see it in a standalone app. Let's create a simple test app to verify our component works.
+
+First, create a test directory:
 
 ```xmlui copy
-node tools/create-xmlui-hello-world/index.js /path/to/test_folder
+mkdir test-app
+cd test-app
 ```
 
-Then switch to that folder.
+Now create a simple HTML file to test your component:
 
 ```xmlui copy
-cd /path/to/test_folder
+cat > index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelloWorld Component Test</title>
+    <script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/xmlui@latest/dist/lib/index.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <!-- Load your component -->
+    <script src="../dist/xmlui-hello-world.js"></script>
+    <link rel="stylesheet" href="../dist/index.css">
+
+    <script>
+        // Initialize XMLUI with your component
+        xmlui.standalone.startApp({
+            'Main.xmlui': `
+<App xmlns:Extensions="component-ns:XMLUIExtensions">
+  <VStack gap="2rem" padding="2rem">
+    <H1>HelloWorld Component Test</H1>
+    <Card>
+      <Extensions:HelloWorld message="Hello from standalone app!" />
+    </Card>
+  </VStack>
+</App>`
+        }, document.getElementById('app'));
+    </script>
+</body>
+</html>
+EOF
 ```
 
-This creates:
-
-```xmlui-pg noHeader
----app
-<TreeDisplay content="
-test-folder
-  Main.xmlui
-  index.html
-  xmlui
-    xmlui-hello-world.js
-    xmlui-latest.js
- " />
-```
+This creates a simple test app that loads your component.
 
 To run the app with Python.
 
