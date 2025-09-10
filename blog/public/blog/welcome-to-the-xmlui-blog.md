@@ -48,7 +48,7 @@ We started with the simplest possible approach: post metadata and data as litera
 </Component>
 ```
 
-You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes. 
+You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes.
 
 This is a pretty good start! We can write posts, arrange them in reverse chronological order, and hey, it's the essence of a blog. Since it's a blog about XMLUI the live playground is a nice bonus that any XMLUI app might put to good use. The user interfaces that you build with XMLUI will require some explaining, it's handy to explain with working examples as well as images, text, and video.
 
@@ -347,18 +347,17 @@ And here's `Main.xmlui`.
                 when="{mediaSize.sizeIndex > 2}" />
             <ToneSwitch />
         </AppHeader>
-        <NavPanel
-            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+        <NavPanel when="{ mediaSize.sizeIndex > 2 && (searchState.value.searchResults.length === 0 || !searchState.value.searchQuery)}">
             <Stack
-                paddingHorizontal="$space-4"
-                paddingBottom="$space-4"
-                when="{mediaSize.sizeIndex <= 2}">
-                <Search data="{appGlobals.plainTextContent}" />
-            </Stack>
-            <NavGroup label="Recent posts" to="/blog" >
-              <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
-              <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
-            </NavGroup>
+              paddingHorizontal="$space-4"
+              paddingBottom="$space-4"
+              when="{mediaSize.sizeIndex <= 2}">
+            <Search data="{appGlobals.plainTextContent}" />
+          </Stack>
+          <NavGroup label="Recent posts" to="/blog" >
+            <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
+            <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
+          </NavGroup>
         </NavPanel>
         <Pages fallbackPath="/404">
             <Page url="/blog">
