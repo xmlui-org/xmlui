@@ -8,16 +8,18 @@ type Props = {
   visible?: boolean;
   threshold?: number;
   icon?: string;
+  behavior?: "smooth" | "instant" | "auto";
   onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
 };
 
-export const defaultProps: Pick<Props, "position" | "visible" | "threshold" | "icon"> = {
+export const defaultProps: Pick<Props, "position" | "visible" | "threshold" | "icon" | "behavior"> = {
   position: "end",
   visible: true,
   threshold: 300,
   icon: "chevronup",
+  behavior: "smooth",
 };
 
 export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
@@ -27,6 +29,7 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
       visible = defaultProps.visible,
       threshold = defaultProps.threshold,
       icon = defaultProps.icon,
+      behavior = defaultProps.behavior,
       onClick,
       className,
       style,
@@ -34,6 +37,12 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
     ref,
   ) {
     const [isVisible, setIsVisible] = useState(false);
+
+    // Validate position and fall back to "end" if invalid
+    const validPosition = ["start", "center", "end"].includes(position || "") ? position : "end";
+    
+    // Validate behavior and fall back to "smooth" if invalid
+    const validBehavior = ["smooth", "instant", "auto"].includes(behavior || "") ? behavior : "smooth";
 
     // Check scroll position to determine visibility
     useEffect(() => {
@@ -102,18 +111,27 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
       // Force scroll to top using multiple methods
       // This will work regardless of which container is scrolled
       
-      // Method 1: Standard window scroll
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Convert behavior prop to ScrollBehavior type
+      const scrollBehavior: ScrollBehavior = validBehavior === "instant" ? "instant" : validBehavior === "auto" ? "auto" : "smooth";
       
-      // Method 2: Direct property setting
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      // Method 1: Standard window scroll
+      window.scrollTo({ top: 0, behavior: scrollBehavior });
+      
+      // Method 2: Direct property setting (for instant behavior)
+      if (validBehavior === "instant") {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
       
       // Method 3: Find and scroll any scrolled containers
       const allElements = document.querySelectorAll('*');
       allElements.forEach((element) => {
         if (element instanceof HTMLElement && element.scrollTop > 0) {
-          element.scrollTo({ top: 0, behavior: "smooth" });
+          if (validBehavior === "instant") {
+            element.scrollTop = 0;
+          } else {
+            element.scrollTo({ top: 0, behavior: scrollBehavior });
+          }
         }
       });
       
@@ -123,12 +141,16 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
       );
       xmluiContainers.forEach((element) => {
         if (element instanceof HTMLElement) {
-          element.scrollTo({ top: 0, behavior: "smooth" });
+          if (validBehavior === "instant") {
+            element.scrollTop = 0;
+          } else {
+            element.scrollTo({ top: 0, behavior: scrollBehavior });
+          }
         }
       });
       
       onClick?.();
-    }, [onClick]);
+    }, [validBehavior, onClick]);
 
     if (!isVisible) {
       return null;
@@ -140,9 +162,9 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
         className={classnames(
           styles.scrollToTop,
           {
-            [styles.positionStart]: position === "start",
-            [styles.positionCenter]: position === "center",
-            [styles.positionEnd]: position === "end",
+            [styles.positionStart]: validPosition === "start",
+            [styles.positionCenter]: validPosition === "center",
+            [styles.positionEnd]: validPosition === "end",
           },
           className,
         )}
@@ -151,7 +173,7 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
         aria-label="Scroll to top"
         type="button"
       >
-        <Icon name={icon} fallback="chevronup" aria-hidden />
+        <Icon className={styles.icon} name={icon} fallback="chevronup" aria-hidden />
       </button>
     );
   },

@@ -9,6 +9,11 @@ const { ScrollToTop, defaultProps } = ScrollToTopNative;
 export const ScrollToTopMd = createMetadata({
   status: "experimental",
   description: "A floating button that scrolls the page to the top when clicked",
+  parts: {
+    icon: {
+      description: "The icon displayed inside the scroll to top button",
+    }
+  },
   props: {
     position: {
       description: "Horizontal position of the button at the bottom of the screen",
@@ -31,6 +36,12 @@ export const ScrollToTopMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.icon,
     },
+    behavior: {
+      description: "Scroll behavior when scrolling to top",
+      type: "string",
+      defaultValue: defaultProps.behavior,
+      options: ["smooth", "instant", "auto"],
+    },
   },
   events: {
     click: d("Triggered when the scroll to top button is clicked"),
@@ -39,10 +50,12 @@ export const ScrollToTopMd = createMetadata({
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-primary",
     [`borderColor-${COMP}`]: "$color-primary-dark",
-    [`iconColor-${COMP}`]: "$color-white",
+    [`color-${COMP}`]: "$color-surface-0",
     [`size-${COMP}`]: "48px",
+    [`borderRadius-${COMP}`]: "$space-24",
     [`shadow-${COMP}`]: "$shadow-lg",
     [`bottom-${COMP}`]: "$space-16",
+    [`horizontalSpacing-${COMP}`]: "$space-16",
     [`zIndex-${COMP}`]: "1000",
   },
 });
@@ -50,15 +63,17 @@ export const ScrollToTopMd = createMetadata({
 export const scrollToTopComponentRenderer = createComponentRenderer(
   COMP,
   ScrollToTopMd,
-  ({ node, extractValue, lookupEventHandler }) => {
+  ({ node, extractValue, className, lookupEventHandler }) => {
     const props = (node.props as typeof ScrollToTopMd.props)!;
     
     return (
       <ScrollToTop
+        className={className}
         position={extractValue.asOptionalString(props.position, defaultProps.position)}
         visible={extractValue.asOptionalBoolean(props.visible, defaultProps.visible)}
         threshold={extractValue.asOptionalNumber(props.threshold, defaultProps.threshold)}
         icon={extractValue.asOptionalString(props.icon, defaultProps.icon)}
+        behavior={extractValue.asOptionalString(props.behavior, defaultProps.behavior) as "smooth" | "instant" | "auto"}
         onClick={lookupEventHandler("click")} // This is not an error.
       />
     );
