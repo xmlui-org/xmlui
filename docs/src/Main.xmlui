@@ -3,22 +3,6 @@
         layout="vertical-full-header"
         noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}"
-        var.posts = `{[
-          {
-            title: "Welcome to the XMLUI blog!",
-            slug: "welcome-to-the-xmlui-blog",
-            author: "Jon Udell",
-            date: "2025-09-01",
-            image: "blog-page-component.png"
-          },
-          {
-            title: "Lorem Ipsum!",
-            slug: "lorem-ipsum",
-            author: "H. Rackham",
-            date: "1914-06-03",
-            image: "lorem-ipsum.png"
-          }
-        ]}`
         >
         <AppHeader>
             <property name="logoTemplate">
