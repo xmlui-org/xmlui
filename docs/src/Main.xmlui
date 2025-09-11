@@ -44,7 +44,6 @@
                 <NavLink label="Import" to="/tutorial-11" />
                 <NavLink label="Settings" to="/tutorial-12" />
             </NavGroup>
-            <NavLink label="Blog" to="/blog" />
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
                 <NavLink label="Markup" to="/markup" />
