@@ -9,8 +9,9 @@
     "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
     "gen:rss": "node scripts/generate-rss.js",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && npm run gen:download-latest-xmlui-release && npm run gen:rss",
-    "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npx xmlui-optimizer",
-    "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip"
+    "build-optimized": "npx xmlui-optimizer",
+    "release-ci-optimized": "npm run build-optimized && xmlui zip-dist --source=xmlui-optimized-output --target=ui-optimized.zip",
+    "preview-optimized": "npx serve@latest ./xmlui-optimized-output"
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",
