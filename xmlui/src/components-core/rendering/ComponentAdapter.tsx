@@ -33,7 +33,7 @@ import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
-import { Animation, parseAnimation } from "../../components/Animation/AnimationNative";
+import { Animation, parseAnimation, parseAnimationOptions } from "../../components/Animation/AnimationNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -408,11 +408,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const applyWrappers = (node: ReactNode) => {
     // --- Handle animations and tooltips together
     if (animation && (tooltipMarkdown || tooltipText)) {
-
       const parsedOptions = parseTooltipOptions(tooltipOptions);
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
       return (
         <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-          <Animation animation={parseAnimation(animation)} {...animationOptions}>
+          <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
             {node}
           </Animation>
         </Tooltip>
@@ -421,8 +421,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
     // --- Handle animation
     if (animation) {
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
       return (
-        <Animation animation={parseAnimation(animation)} {...animationOptions}>
+        <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
           {node}
         </Animation>
       );

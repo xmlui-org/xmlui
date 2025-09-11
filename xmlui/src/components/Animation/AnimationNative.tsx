@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import { RegisterComponentApiFn } from "../..";
+import { isPlainObject } from "lodash-es";
 
 export type AnimationProps = {
   children?: React.ReactNode;
@@ -96,6 +97,72 @@ export const parseAnimation = (animation: string | object): object => {
 
   return presetAnimations[animation] || { from: {}, to: {} };
 };
+
+/**
+ * Helper function to parse a single animation-specific option value.
+ */
+function parseAnimationOptionValue(name: string, value: string): any {
+  switch (name) {
+    case "duration":
+    case "delay":
+      const num = parseInt(value, 10);
+      return isNaN(num) ? undefined : num;
+
+    case "animateWhenInView":
+    case "reverse":
+    case "loop":
+    case "once":
+      const lowerVal = value.toLowerCase();
+      if (lowerVal === "true" || lowerVal === "1" || lowerVal === "yes") return true;
+      if (lowerVal === "false" || lowerVal === "0" || lowerVal === "no") return false;
+      return undefined;
+
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Parses animation options from a string or object.
+ */
+export function parseAnimationOptions(input: any): Partial<AnimationProps> {
+  if (isPlainObject(input)) {
+    return input as Partial<AnimationProps>;
+  }
+
+  if (typeof input === "string") {
+    const options: Partial<AnimationProps> = {};
+    const values = input
+      .split(";")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+
+    for (const value of values) {
+      if (value.includes(":")) {
+        const [name, val] = value.split(":").map((part) => part.trim());
+        if (name && val) {
+          const parsedValue = parseAnimationOptionValue(name, val);
+          if (parsedValue !== undefined) {
+            (options as any)[name] = parsedValue;
+          }
+        }
+      } else {
+        const booleanOptions = ["animateWhenInView", "reverse", "loop", "once"];
+        if (booleanOptions.includes(value)) {
+          (options as any)[value] = true;
+        } else if (value.startsWith("!") && value.length > 1) {
+          const optionName = value.substring(1);
+          if (booleanOptions.includes(optionName)) {
+            (options as any)[optionName] = false;
+          }
+        }
+      }
+    }
+    return options;
+  }
+
+  return {};
+}
 
 export const Animation = forwardRef(function Animation(
   {
