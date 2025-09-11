@@ -156,7 +156,7 @@ export const fancyButtonComponentRenderer = createComponentRenderer(
         variant={extractValue.asOptionalString(props.variant)}
         autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
         size={extractValue.asOptionalString(props.size)}
-        icon={iconName && <Icon name={iconName} aria-hidden />}
+        icon={extractValue.asOptionalString(props.icon)}
         iconPosition={extractValue.asOptionalString(props.iconPosition)}
         orientation={extractValue.asOptionalString(props.orientation)}
         contentPosition={extractValue.asOptionalString(props.contentPosition)}

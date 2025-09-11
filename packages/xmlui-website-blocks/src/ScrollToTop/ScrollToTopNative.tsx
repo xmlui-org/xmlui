@@ -173,7 +173,7 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
         aria-label="Scroll to top"
         type="button"
       >
-        <Icon className={styles.icon} name={icon} fallback="chevronup" aria-hidden />
+        <Icon name={icon} fallback="chevronup" aria-hidden />
       </button>
     );
   },

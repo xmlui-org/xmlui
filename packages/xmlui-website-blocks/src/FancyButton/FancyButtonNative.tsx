@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import classnames from "classnames";
 import styles from "./FancyButton.module.scss";
+import { Icon } from "xmlui";
 
 // Define props interface
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   autoFocus?: boolean;
   disabled?: boolean;
-  icon?: React.ReactNode;
+  icon?: string;
   iconPosition?: "start" | "end";
   orientation?: "horizontal" | "vertical";
   contentPosition?: "start" | "center" | "end";
@@ -119,21 +120,21 @@ export const FancyButton = forwardRef<HTMLButtonElement, Props>(
       }
 
       // Both icon and children
-      const iconElement = <span className={styles.icon}>{icon}</span>;
+      const iconElement = icon && <Icon name={icon} aria-hidden />;
       const contentElement = <span className={styles.content}>{children}</span>;
 
       if (iconPosition === "end") {
         return (
           <>
             {contentElement}
-            {icon}
+            {iconElement}
           </>
         );
       }
 
       return (
         <>
-          {icon}
+          {iconElement}
           {contentElement}
         </>
       );
