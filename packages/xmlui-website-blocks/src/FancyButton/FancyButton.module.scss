@@ -1,10 +1,11 @@
-@use "sass:string";
+// FancyButton.module.scss
+@use "../../../../xmlui/src/components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
 $themeVars: ();
 @function createThemeVar($componentVariable) {
-  $themeVars: append($themeVars, $componentVariable) !global;
-  @return var(--#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 // Define theme variables
@@ -12,15 +13,17 @@ $width-FancyButton: createThemeVar("width-FancyButton");
 $height-FancyButton: createThemeVar("height-FancyButton");
 $fontSize-FancyButton: createThemeVar("fontSize-FancyButton");
 $fontWeight-FancyButton: createThemeVar("fontWeight-FancyButton");
-$backgroundColor-FancyButton--disabled: createThemeVar("backgroundColor-FancyButton--disabled");
-$borderColor-FancyButton--disabled: createThemeVar("borderColor-FancyButton--disabled");
 $borderStyle-FancyButton: createThemeVar("borderStyle-FancyButton");
-$textColor-FancyButton--disabled: createThemeVar("textColor-FancyButton--disabled");
-$outlineColor-FancyButton--focus: createThemeVar("outlineColor-FancyButton--focus");
 $borderWidth-FancyButton: createThemeVar("borderWidth-FancyButton");
+$outlineColor-FancyButton--focus: createThemeVar("outlineColor-FancyButton--focus");
 $outlineWidth-FancyButton--focus: createThemeVar("outlineWidth-FancyButton--focus");
 $outlineStyle-FancyButton--focus: createThemeVar("outlineStyle-FancyButton--focus");
 $outlineOffset-FancyButton--focus: createThemeVar("outlineOffset-FancyButton--focus");
+
+// Disabled state variables
+$backgroundColor-FancyButton--disabled: createThemeVar("backgroundColor-FancyButton--disabled");
+$borderColor-FancyButton--disabled: createThemeVar("borderColor-FancyButton--disabled");
+$textColor-FancyButton--disabled: createThemeVar("textColor-FancyButton--disabled");
 
 // Size-specific padding variables
 $paddingHorizontal-FancyButton-xs: createThemeVar("paddingHorizontal-FancyButton-xs");
@@ -31,12 +34,18 @@ $paddingHorizontal-FancyButton-md: createThemeVar("paddingHorizontal-FancyButton
 $paddingVertical-FancyButton-md: createThemeVar("paddingVertical-FancyButton-md");
 $paddingHorizontal-FancyButton-lg: createThemeVar("paddingHorizontal-FancyButton-lg");
 $paddingVertical-FancyButton-lg: createThemeVar("paddingVertical-FancyButton-lg");
+$paddingHorizontal-FancyButton-xl: createThemeVar("paddingHorizontal-FancyButton-xl");
+$paddingVertical-FancyButton-xl: createThemeVar("paddingVertical-FancyButton-xl");
 
 // Rounded variant theme variables
 $borderRadius-FancyButton-rounded: createThemeVar("borderRadius-FancyButton-rounded");
 $backgroundColor-FancyButton-rounded: createThemeVar("backgroundColor-FancyButton-rounded");
-$backgroundColor-FancyButton-rounded--hover: createThemeVar("backgroundColor-FancyButton-rounded--hover");
-$backgroundColor-FancyButton-rounded--active: createThemeVar("backgroundColor-FancyButton-rounded--active");
+$backgroundColor-FancyButton-rounded--hover: createThemeVar(
+  "backgroundColor-FancyButton-rounded--hover"
+);
+$backgroundColor-FancyButton-rounded--active: createThemeVar(
+  "backgroundColor-FancyButton-rounded--active"
+);
 $textColor-FancyButton-rounded: createThemeVar("textColor-FancyButton-rounded");
 $borderColor-FancyButton-rounded: createThemeVar("borderColor-FancyButton-rounded");
 $borderColor-FancyButton-rounded--hover: createThemeVar("borderColor-FancyButton-rounded--hover");
@@ -44,8 +53,12 @@ $borderColor-FancyButton-rounded--hover: createThemeVar("borderColor-FancyButton
 // Square variant theme variables
 $borderRadius-FancyButton-square: createThemeVar("borderRadius-FancyButton-square");
 $backgroundColor-FancyButton-square: createThemeVar("backgroundColor-FancyButton-square");
-$backgroundColor-FancyButton-square--hover: createThemeVar("backgroundColor-FancyButton-square--hover");
-$backgroundColor-FancyButton-square--active: createThemeVar("backgroundColor-FancyButton-square--active");
+$backgroundColor-FancyButton-square--hover: createThemeVar(
+  "backgroundColor-FancyButton-square--hover"
+);
+$backgroundColor-FancyButton-square--active: createThemeVar(
+  "backgroundColor-FancyButton-square--active"
+);
 $textColor-FancyButton-square: createThemeVar("textColor-FancyButton-square");
 $borderColor-FancyButton-square: createThemeVar("borderColor-FancyButton-square");
 $borderColor-FancyButton-square--hover: createThemeVar("borderColor-FancyButton-square--hover");
@@ -56,57 +69,55 @@ $borderColor-FancyButton-square--hover: createThemeVar("borderColor-FancyButton-
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: $borderWidth-FancyButton $borderStyle-FancyButton transparent;
   cursor: pointer;
-  font-family: inherit;
-  font-size: $fontSize-FancyButton;
-  font-weight: $fontWeight-FancyButton;
-  text-decoration: none;
   transition: all 0.2s ease-in-out;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  text-decoration: none;
+  user-select: none;
+  position: relative;
+
   width: $width-FancyButton;
   height: $height-FancyButton;
-  
-  &:focus {
-    outline: $outlineWidth-FancyButton--focus $outlineStyle-FancyButton--focus $outlineColor-FancyButton--focus;
+  font-size: $fontSize-FancyButton;
+  font-weight: $fontWeight-FancyButton;
+  border-style: $borderStyle-FancyButton;
+  border-width: $borderWidth-FancyButton;
+
+  &:focus-visible {
+    outline: $outlineStyle-FancyButton--focus $outlineWidth-FancyButton--focus
+      $outlineColor-FancyButton--focus;
     outline-offset: $outlineOffset-FancyButton--focus;
   }
 
-  &--disabled {
-    background-color: $backgroundColor-FancyButton--disabled !important;
-    border-color: $borderColor-FancyButton--disabled !important;
-    color: $textColor-FancyButton--disabled !important;
-    cursor: not-allowed;
-    
-    &:hover,
-    &:active {
-      background-color: $backgroundColor-FancyButton--disabled !important;
-      border-color: $borderColor-FancyButton--disabled !important;
-    }
-  }
-
-  // Size variants
-  &--xs {
+  // Size variations
+  &.xs {
     padding: $paddingVertical-FancyButton-xs $paddingHorizontal-FancyButton-xs;
   }
 
-  &--sm {
+  &.sm {
     padding: $paddingVertical-FancyButton-sm $paddingHorizontal-FancyButton-sm;
   }
 
-  &--md {
+  &.md {
     padding: $paddingVertical-FancyButton-md $paddingHorizontal-FancyButton-md;
   }
 
-  &--lg {
+  &.lg {
     padding: $paddingVertical-FancyButton-lg $paddingHorizontal-FancyButton-lg;
   }
 
-  // Rounded variant styles
-  &--rounded {
+  &.xl {
+    padding: $paddingVertical-FancyButton-xl $paddingHorizontal-FancyButton-xl;
+  }
+
+  // Rounded variant
+  &.rounded {
     border-radius: $borderRadius-FancyButton-rounded;
     background-color: $backgroundColor-FancyButton-rounded;
-    border-color: $borderColor-FancyButton-rounded;
     color: $textColor-FancyButton-rounded;
+    border-color: $borderColor-FancyButton-rounded;
 
     &:hover:not(.fancyButton--disabled) {
       background-color: $backgroundColor-FancyButton-rounded--hover;
@@ -118,12 +129,12 @@ $borderColor-FancyButton-square--hover: createThemeVar("borderColor-FancyButton-
     }
   }
 
-  // Square variant styles
-  &--square {
+  // Square variant
+  &.square {
     border-radius: $borderRadius-FancyButton-square;
     background-color: $backgroundColor-FancyButton-square;
-    border-color: $borderColor-FancyButton-square;
     color: $textColor-FancyButton-square;
+    border-color: $borderColor-FancyButton-square;
 
     &:hover:not(.fancyButton--disabled) {
       background-color: $backgroundColor-FancyButton-square--hover;
@@ -135,47 +146,67 @@ $borderColor-FancyButton-square--hover: createThemeVar("borderColor-FancyButton-
     }
   }
 
-  // Orientation and positioning
-  &--horizontal {
-    flex-direction: row;
+  // Disabled state
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $backgroundColor-FancyButton--disabled !important;
+    border-color: $borderColor-FancyButton--disabled !important;
+    color: $textColor-FancyButton--disabled !important;
   }
 
-  &--vertical {
-    flex-direction: column;
-  }
-
-  &--start {
-    justify-content: flex-start;
-  }
-
-  &--center {
-    justify-content: center;
-  }
-
-  &--end {
-    justify-content: flex-end;
-  }
-
-  &--iconOnly {
+  // Icon only styling
+  &.iconOnly {
     aspect-ratio: 1;
     padding: 0.5rem;
   }
-}
 
-.fancyButton__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+  // Orientation
+  &.orientationVertical {
+    flex-direction: column;
+  }
 
-.fancyButton__label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  &.orientationHorizontal {
+    flex-direction: row;
+  }
+
+  // Content position
+  &.contentPositionStart {
+    justify-content: flex-start;
+  }
+
+  &.contentPositionCenter {
+    justify-content: center;
+  }
+
+  &.contentPositionEnd {
+    justify-content: flex-end;
+  }
+
+  // Icon position (when both icon and content exist)
+  &.iconPositionEnd {
+    flex-direction: row-reverse;
+
+    &.orientationVertical {
+      flex-direction: column-reverse;
+    }
+  }
+
+  // Icon and content styling
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: string.quote("#{$themeVars}");
+  themeVars: t.json-stringify($themeVars);
 }

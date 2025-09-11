@@ -1,123 +1,154 @@
-import React, { forwardRef, ReactNode } from "react";
+import React, { forwardRef } from "react";
 import classnames from "classnames";
 import styles from "./FancyButton.module.scss";
 
+// Define props interface
 type Props = {
   id?: string;
-  children?: ReactNode;
   type?: "button" | "submit" | "reset";
   variant?: "rounded" | "square";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   autoFocus?: boolean;
-  size?: "xs" | "sm" | "md" | "lg";
-  icon?: string;
+  disabled?: boolean;
+  icon?: React.ReactNode;
   iconPosition?: "start" | "end";
   orientation?: "horizontal" | "vertical";
   contentPosition?: "start" | "center" | "end";
-  disabled?: boolean;
+  contextualLabel?: string;
+  children?: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
-  className?: string;
-  contextualLabel?: string;
 } & React.HTMLAttributes<HTMLButtonElement>;
 
-export const defaultProps: Required<Pick<Props, "autoFocus" | "variant" | "size" | "type" | "orientation" | "iconPosition" | "contentPosition">> = {
-  autoFocus: false,
+// Define default props
+export const defaultProps: Required<Pick<Props, "type" | "variant" | "size" | "autoFocus" | "iconPosition" | "orientation" | "contentPosition">> = {
+  type: "button",
   variant: "rounded",
   size: "md",
-  type: "button",
-  orientation: "horizontal",
+  autoFocus: false,
   iconPosition: "start",
+  orientation: "horizontal",
   contentPosition: "center",
 };
 
+// Component implementation with forwardRef
 export const FancyButton = forwardRef<HTMLButtonElement, Props>(
   function FancyButton(
     {
-      children,
+      id,
       type = defaultProps.type,
       variant = defaultProps.variant,
-      autoFocus = defaultProps.autoFocus,
       size = defaultProps.size,
+      autoFocus = defaultProps.autoFocus,
+      disabled = false,
       icon,
       iconPosition = defaultProps.iconPosition,
       orientation = defaultProps.orientation,
       contentPosition = defaultProps.contentPosition,
-      disabled = false,
+      contextualLabel,
+      children,
       onClick,
       onFocus,
       onBlur,
       className,
-      contextualLabel,
       ...rest
     },
-    ref,
+    ref
   ) {
-    console.log("render");
-    const hasIcon = Boolean(icon);
-    const hasLabel = Boolean(children);
-    const isIconOnly = hasIcon && !hasLabel;
+
+    const hasIcon = !!icon;
+    const hasChildren = !!children;
+    const isIconOnly = hasIcon && !hasChildren;
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (!disabled && onClick) {
+        onClick(event);
+      }
+    };
+
+    const handleFocus = (event: React.FocusEvent<HTMLButtonElement>) => {
+      if (!disabled && onFocus) {
+        onFocus(event);
+      }
+    };
+
+    const handleBlur = (event: React.FocusEvent<HTMLButtonElement>) => {
+      if (!disabled && onBlur) {
+        onBlur(event);
+      }
+    };
 
     const buttonClassNames = classnames(
       styles.fancyButton,
       styles[`fancyButton--${variant}`],
-      styles[`fancyButton--${size}`],
+      
       {
-        [styles[`fancyButton--${orientation}`]]: orientation,
-        [styles[`fancyButton--${contentPosition}`]]: contentPosition,
-        [styles[`fancyButton--iconOnly`]]: isIconOnly,
-        [styles[`fancyButton--disabled`]]: disabled,
+        [styles.xs]: size === "xs",
+        [styles.sm]: size === "sm",
+        [styles.md]: size === "md",
+        [styles.lg]: size === "lg",
+        [styles.xl]: size === "xl",
+
+        [styles.disabled]: disabled,
+        [styles.iconOnly]: isIconOnly,
+        [styles.orientationVertical]: orientation === "vertical",
+        [styles.orientationHorizontal]: orientation === "horizontal",
+        [styles.contentPositionStart]: contentPosition === "start",
+        [styles.contentPositionCenter]: contentPosition === "center",
+        [styles.contentPositionEnd]: contentPosition === "end",
+        [styles.iconPositionEnd]: hasIcon && hasChildren && iconPosition === "end",
+
+        [styles.rounded]: variant === "rounded",
+        [styles.square]: variant === "square",
       },
-      className,
+      className
     );
 
-    const renderIcon = () => {
-      if (!hasIcon) return null;
-      // For now, we'll render the icon name as text since we don't have access to the Icon component
-      // In a real implementation, you would import and use the Icon component
-      return <span className={styles.fancyButton__icon}>{icon}</span>;
-    };
-
     const renderContent = () => {
-      if (isIconOnly) {
-        return renderIcon();
+      if (!hasIcon && !hasChildren) {
+        return null;
       }
 
-      const iconElement = renderIcon();
-      const labelElement = children && <span className={styles.fancyButton__label}>{children}</span>;
+      if (isIconOnly) {
+        return icon;
+      }
 
-      if (orientation === "horizontal") {
-        return iconPosition === "start" ? (
-          <>
-            {iconElement}
-            {labelElement}
-          </>
-        ) : (
-          <>
-            {labelElement}
-            {iconElement}
-          </>
-        );
-      } else {
-        // Vertical orientation - icon always on top
+      if (!hasIcon) {
+        return children;
+      }
+
+      // Both icon and children
+      const iconElement = <span className={styles.icon}>{icon}</span>;
+      const contentElement = <span className={styles.content}>{children}</span>;
+
+      if (iconPosition === "end") {
         return (
           <>
-            {iconElement}
-            {labelElement}
+            {contentElement}
+            {icon}
           </>
         );
       }
+
+      return (
+        <>
+          {icon}
+          {contentElement}
+        </>
+      );
     };
 
     return (
       <button
+        id={id}
         ref={ref}
         type={type}
         autoFocus={autoFocus}
         disabled={disabled}
-        onClick={onClick}
-        onFocus={onFocus}
-        onBlur={onBlur}
+        onClick={handleClick}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         className={buttonClassNames}
         aria-label={contextualLabel}
         {...rest}
@@ -125,5 +156,5 @@ export const FancyButton = forwardRef<HTMLButtonElement, Props>(
         {renderContent()}
       </button>
     );
-  },
+  }
 );

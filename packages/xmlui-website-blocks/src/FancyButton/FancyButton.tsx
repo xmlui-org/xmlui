@@ -1,33 +1,50 @@
 import styles from "./FancyButton.module.scss";
 
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import {
+  alignmentOptionMd,
+  sizeMd,
+  iconPositionMd,
+  buttonTypesMd,
+} from "../../../../xmlui/src/components/abstractions";
+import { createComponentRenderer } from "../../../../xmlui/src/components-core/renderers";
+import { parseScssVar } from "../../../../xmlui/src/components-core/theming/themeVars";
+import { createMetadata, dClick, dGotFocus, dLostFocus, dOrientation } from "../../../../xmlui/src/components/metadata-helpers";
+import { Icon } from "../../../../xmlui/src/components/Icon/IconNative";
 import { FancyButton, defaultProps } from "./FancyButtonNative";
 
 const COMP = "FancyButton";
+
+const fancyButtonVariantMd = [
+  { value: "rounded", description: "Rounded variant with soft corners" },
+  { value: "square", description: "Square variant with sharp corners" },
+];
 
 export const FancyButtonMd = createMetadata({
   status: "experimental",
   description:
     "`FancyButton` is an enhanced interactive component for triggering actions with " +
-    "fancy styling variations. It supports rounded and square variants with customizable " +
-    "appearance and behavior for modern web interfaces.",
+    "advanced styling options. It provides rounded and square variants for different " +
+    "design aesthetics while maintaining all standard button functionality.",
   props: {
     autoFocus: {
       description: "Indicates if the button should receive focus when the page loads.",
+      isRequired: false,
       type: "boolean",
       defaultValue: defaultProps.autoFocus,
     },
     variant: {
-      description: "The button variant determines the visual style of the button.",
+      description: "The button variant determines the visual style and corner treatment.",
+      isRequired: false,
       type: "string",
+      availableValues: fancyButtonVariantMd,
       defaultValue: defaultProps.variant,
-      options: ["rounded", "square"],
     },
     size: {
       description: "Sets the size of the button.",
+      isRequired: false,
       type: "string",
+      availableValues: sizeMd,
       defaultValue: defaultProps.size,
-      options: ["xs", "sm", "md", "lg"],
     },
     label: {
       description:
@@ -41,9 +58,9 @@ export const FancyButtonMd = createMetadata({
       description:
         `This optional string describes how the ${COMP} appears in an HTML context. You ` +
         `rarely need to set this property explicitly.`,
-      type: "string",
+      availableValues: buttonTypesMd,
+      valueType: "string",
       defaultValue: defaultProps.type,
-      options: ["button", "submit", "reset"],
     },
     enabled: {
       description:
@@ -52,12 +69,7 @@ export const FancyButtonMd = createMetadata({
       type: "boolean",
       defaultValue: true,
     },
-    orientation: {
-      description: "Sets the orientation for arranging the icon and label.",
-      type: "string",
-      defaultValue: defaultProps.orientation,
-      options: ["horizontal", "vertical"],
-    },
+    orientation: dOrientation(defaultProps.orientation),
     icon: {
       description:
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
@@ -67,17 +79,17 @@ export const FancyButtonMd = createMetadata({
     },
     iconPosition: {
       description: `This optional string determines the location of the icon in the ${COMP}.`,
+      availableValues: iconPositionMd,
       type: "string",
       defaultValue: defaultProps.iconPosition,
-      options: ["start", "end"],
     },
     contentPosition: {
       description:
         `This optional value determines how the label and icon (or nested children) should be placed` +
         `inside the ${COMP} component.`,
+      availableValues: alignmentOptionMd,
       type: "string",
       defaultValue: defaultProps.contentPosition,
-      options: ["start", "center", "end"],
     },
     contextualLabel: {
       description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
@@ -85,9 +97,9 @@ export const FancyButtonMd = createMetadata({
     },
   },
   events: {
-    click: d("Triggered when the button is clicked"),
-    gotFocus: d("Triggered when the button receives focus"),
-    lostFocus: d("Triggered when the button loses focus"),
+    click: dClick(COMP),
+    gotFocus: dGotFocus(COMP),
+    lostFocus: dLostFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -112,50 +124,48 @@ export const FancyButtonMd = createMetadata({
     [`paddingVertical-${COMP}-md`]: "$space-3",
     [`paddingHorizontal-${COMP}-lg`]: "$space-5",
     [`paddingVertical-${COMP}-lg`]: "$space-4",
+    [`paddingHorizontal-${COMP}-xl`]: "$space-8",
+    [`paddingVertical-${COMP}-xl`]: "$space-6",
+
+    // Common colors
+    [`backgroundColor-${COMP}`]: "$color-primary-500",
+    [`backgroundColor-${COMP}--hover`]: "$color-primary-400",
+    [`backgroundColor-${COMP}--active`]: "$color-primary-600",
+    [`textColor-${COMP}`]: "$const-color-surface-50",
+    [`borderColor-${COMP}`]: "$color-primary-500",
+    [`borderColor-${COMP}--hover`]: "$color-primary-400",
 
     // Rounded variant theme variables
-    [`borderRadius-${COMP}-rounded`]: "24px",
-    [`backgroundColor-${COMP}-rounded`]: "$color-primary-500",
-    [`backgroundColor-${COMP}-rounded--hover`]: "$color-primary-400",
-    [`backgroundColor-${COMP}-rounded--active`]: "$color-primary-600",
-    [`textColor-${COMP}-rounded`]: "$const-color-surface-50",
-    [`borderColor-${COMP}-rounded`]: "$color-primary-500",
-    [`borderColor-${COMP}-rounded--hover`]: "$color-primary-400",
+    [`borderRadius-${COMP}-rounded`]: "$space-72",
 
     // Square variant theme variables
-    [`borderRadius-${COMP}-square`]: "4px",
-    [`backgroundColor-${COMP}-square`]: "$color-secondary-500",
-    [`backgroundColor-${COMP}-square--hover`]: "$color-secondary-400",
-    [`backgroundColor-${COMP}-square--active`]: "$color-secondary-600",
-    [`textColor-${COMP}-square`]: "$const-color-surface-50",
-    [`borderColor-${COMP}-square`]: "$color-secondary-500",
-    [`borderColor-${COMP}-square--hover`]: "$color-secondary-400",
+    [`borderRadius-${COMP}-square`]: "$space-0",
   },
 });
 
 export const fancyButtonComponentRenderer = createComponentRenderer(
-  COMP,
+  "FancyButton",
   FancyButtonMd,
   ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     const props = (node.props as typeof FancyButtonMd.props)!;
-    const iconName = extractValue(props.icon);
-    const label = extractValue(props.label);
+    const iconName = extractValue.asString(props.icon);
+    const label = extractValue.asDisplayText(props.label);
     return (
       <FancyButton
-        type={extractValue(props.type)}
-        variant={extractValue(props.variant)}
+        type={extractValue.asOptionalString(props.type)}
+        variant={extractValue.asOptionalString(props.variant)}
         autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
-        size={extractValue(props.size)}
-        icon={iconName}
-        iconPosition={extractValue(props.iconPosition)}
-        orientation={extractValue(props.orientation)}
-        contentPosition={extractValue(props.contentPosition)}
+        size={extractValue.asOptionalString(props.size)}
+        icon={iconName && <Icon name={iconName} aria-hidden />}
+        iconPosition={extractValue.asOptionalString(props.iconPosition)}
+        orientation={extractValue.asOptionalString(props.orientation)}
+        contentPosition={extractValue.asOptionalString(props.contentPosition)}
         disabled={!extractValue.asOptionalBoolean(props.enabled, true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        className={extractValue(className)}
-        contextualLabel={extractValue(props.contextualLabel)}
+        className={className}
+        contextualLabel={extractValue.asOptionalString(props.contextualLabel)}
       >
         {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}
       </FancyButton>
