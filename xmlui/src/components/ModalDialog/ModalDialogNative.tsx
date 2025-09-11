@@ -19,7 +19,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
-import { rest } from "lodash-es";
 
 // Default props for ModalDialog component
 export const defaultProps = {

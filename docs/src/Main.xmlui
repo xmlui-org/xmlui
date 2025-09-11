@@ -2,7 +2,8 @@
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}">
+        when="{!window.location.hash.includes('/playground')}"
+        >
         <AppHeader>
             <property name="logoTemplate">
                 <Link to="https://xmlui.org/">
@@ -43,6 +44,7 @@
                 <NavLink label="Import" to="/tutorial-11" />
                 <NavLink label="Settings" to="/tutorial-12" />
             </NavGroup>
+            <NavLink label="Blog" to="/blog" />
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure" />
                 <NavLink label="Markup" to="/markup" />
@@ -272,6 +274,15 @@
             </Page>
             <Page url="/tutorial-12">
                 <DocumentPageNoTOC url="/pages/tutorial-12.md" />
+            </Page>
+            <Page url="/blog">
+                <BlogOverview posts="{posts}" />
+            </Page>
+            <Page url="/blog/{posts[0].slug}">
+                <BlogPage post="{posts[0]}" />
+            </Page>
+            <Page url="/blog/{posts[1].slug}">
+                <BlogPage post="{posts[1]}" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPageNoTOC url="/pages/app-structure.md" />

@@ -1,5 +1,5 @@
 import { createComponentRenderer } from "../../components-core/renderers";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Tooltip } from "./TooltipNative";
 import type { TooltipProps } from "./TooltipNative";

@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $component: "HeroSection";
+$preamble: "preamble-#{$component}";
 $headline: "headline-#{$component}";
 $subheadline: "subheadline-#{$component}";
 $mainText: "mainText-#{$component}";
@@ -20,11 +21,9 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
   .heroWrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
     position: relative;
     z-index: 0; // Create a stacking context to contain z-index values
     overflow: hidden; // Prevent background from extending beyond bounds
-    @include t.paddingVars($themeVars, $component);
 
     .backgroundTemplate {
       position: absolute;
@@ -40,8 +39,42 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
       z-index: 0; // Above background but within normal document flow
       display: flex;
       flex-direction: column;
-      align-items: center;
-      width: 100%;
+      @include t.paddingVars($themeVars, $component);
+      // --- Here, 2 * t.$space-4 accounts for the left and right padding of the page area
+      width: calc(createThemeVar("maxWidth-content") - 2 * t.$space-4);
+      margin: 0 auto; // Center horizontally within parent
+
+      &.horizontal {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      &.vertical {
+        flex-direction: column;
+      }
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      &.contentStart {
+        align-items: flex-start;
+      }
+
+      &.contentCenter {
+        align-items: center;
+      }
+
+      &.contentEnd {
+        align-items: flex-end;
+      }
     }
 
     .headingSection {
@@ -50,31 +83,40 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
 
       &.start {
         text-align: start;
+        align-items: flex-start;
       }
 
       &.center {
         text-align: center;
+        align-items: center;
       }
 
       &.end {
         text-align: end;
+        align-items: flex-end;
       }
     }
   }
 
-  .preserveLinebreaks {
+  .preamble {
     white-space: pre-wrap;
     display: inline-block;
+    margin: 0;
+    padding-bottom: createThemeVar("gap-#{$preamble}");
   }
 
   .headline {
     @include t.textVars($themeVars, $headline);
+    white-space: pre-wrap;
+    display: inline-block;
     margin: 0;
     padding-bottom: createThemeVar("gap-#{$headline}");
   }
 
   .subheadline {
     @include t.textVars($themeVars, $subheadline);
+    white-space: pre-wrap;
+    display: inline-block;
     margin: 0;
     padding-bottom: createThemeVar("gap-#{$subheadline}");
   }
@@ -82,11 +124,14 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
   .textWrapper {
     display: flex;
     flex-direction: column;
+    white-space: pre-wrap;
     padding-bottom: createThemeVar("gap-#{$mainText}");
   }
 
   .mainText {
     @include t.textVars($themeVars, $mainText);
+    white-space: pre-wrap;
+    display: inline-block;
     margin: 0;
     padding-bottom: createThemeVar("gap-#{$mainText}");
   }
