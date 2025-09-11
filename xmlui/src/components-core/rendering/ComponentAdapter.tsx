@@ -379,59 +379,70 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         ? cloneElement(renderedNode, null, children)
         : renderedNode;
   }
-
   // --- Check if the component has a tooltip property
   const tooltipText = useMemo(
     () => valueExtractor(safeNode.props?.tooltip, true),
     [safeNode.props, valueExtractor],
   );
-
   // --- Check if the component has a tooltip property
   const tooltipMarkdown = useMemo(
     () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
     [safeNode.props, valueExtractor],
   );
-  // --- Check if the component has a tooltipOptions property
+
   const tooltipOptions = useMemo(
     () => valueExtractor(safeNode.props?.tooltipOptions, true),
     [safeNode.props, valueExtractor],
   );
 
-  // --- Handle tooltips
-  if (tooltipMarkdown || tooltipText) {
-    // --- Obtain options
-    const parsedOptions = parseTooltipOptions(tooltipOptions);
-
-    return (
-      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-        {nodeToRender}
-      </Tooltip>
-    );
-  }
-
-  // --- Check if the component has an animation property
   const animation = useMemo(
     () => valueExtractor(safeNode.props?.animation, true),
     [safeNode.props, valueExtractor],
   );
 
-  // --- Check if the component has an animationOptions property
   const animationOptions = useMemo(
     () => valueExtractor(safeNode.props?.animationOptions, true),
     [safeNode.props, valueExtractor],
   );
 
-  // --- Handle animations
-  if (animation) {
-    return (
-      <Animation animation={parseAnimation(animation)} {...animationOptions}>
-        {nodeToRender}
-      </Animation>
-    );
-  }
+  const applyWrappers = (node: ReactNode) => {
+    // --- Handle animations and tooltips together
+    if (animation && (tooltipMarkdown || tooltipText)) {
 
-  // --- Done
-  return nodeToRender;
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          <Animation animation={parseAnimation(animation)} {...animationOptions}>
+            {node}
+          </Animation>
+        </Tooltip>
+      );
+    }
+
+    // --- Handle animation
+    if (animation) {
+      return (
+        <Animation animation={parseAnimation(animation)} {...animationOptions}>
+          {node}
+        </Animation>
+      );
+    }
+
+    // --- Handle tooltip
+    if (tooltipMarkdown || tooltipText) {
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          {node}
+        </Tooltip>
+      );
+    }
+
+    // --- No wrappers needed
+    return node;
+  };
+
+  return applyWrappers(nodeToRender);
 });
 
 /**

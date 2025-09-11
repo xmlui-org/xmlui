@@ -1,6 +1,8 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, forwardRef, useEffect, useMemo, useState } from "react";
+import React, { Children, ForwardedRef, forwardRef, useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+
 import { RegisterComponentApiFn } from "../..";
 
 export type AnimationProps = {
@@ -18,8 +20,12 @@ export type AnimationProps = {
 };
 
 const AnimatedComponent = animated(
-  forwardRef(function InlineComponentDef(props: any, ref) {
+  forwardRef(function InlineComponentDef(props: any, ref: ForwardedRef<any>) {
     const { children, ...rest } = props;
+
+    if (!React.isValidElement(children)) {
+      return children;
+    }
     return React.cloneElement(children, { ...rest, ref });
   }),
 );
@@ -91,19 +97,23 @@ export const parseAnimation = (animation: string | object): object => {
   return presetAnimations[animation] || { from: {}, to: {} };
 };
 
-export const Animation = ({
-  children,
-  registerComponentApi,
-  animation,
-  duration,
-  onStop,
-  onStart,
-  delay = defaultProps.delay,
-  animateWhenInView = defaultProps.animateWhenInView,
-  reverse = defaultProps.reverse,
-  loop = defaultProps.loop,
-  once = defaultProps.once,
-}: AnimationProps) => {
+export const Animation = forwardRef(function Animation(
+  {
+    children,
+    registerComponentApi,
+    animation,
+    duration,
+    onStop,
+    onStart,
+    delay = defaultProps.delay,
+    animateWhenInView = defaultProps.animateWhenInView,
+    reverse = defaultProps.reverse,
+    loop = defaultProps.loop,
+    once = defaultProps.once,
+    ...rest
+  }: AnimationProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const [_animation] = useState(animation);
   const [toggle, setToggle] = useState(false);
   const [reset, setReset] = useState(false);
@@ -164,6 +174,7 @@ export const Animation = ({
   const [ref, animationStyles] = useInView(() => animationSettings, {
     once,
   });
+  const composedRef = ref ? composeRefs(ref, forwardedRef) : forwardedRef;
 
   const startAnimation = useCallback(() => {
     api.start(_animation);
@@ -186,16 +197,16 @@ export const Animation = ({
   const content = useMemo(() => {
     return Children.map(children, (child, index) =>
       animateWhenInView ? (
-        <AnimatedComponent style={animationStyles} key={index} ref={ref}>
+        <AnimatedComponent key={index} {...rest} style={animationStyles} ref={composedRef}>
           {child}
         </AnimatedComponent>
       ) : (
-        <AnimatedComponent style={springs} key={index}>
+        <AnimatedComponent key={index} {...rest} style={springs} ref={forwardedRef}>
           {child}
         </AnimatedComponent>
       ),
     );
-  }, [animateWhenInView, animationStyles, children, ref, springs]);
+  }, [animateWhenInView, animationStyles, children, springs, rest]);
 
   return content;
-};
+});
