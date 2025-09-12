@@ -1,5 +1,173 @@
 [
   {
+    "tag_name": "xmlui@0.10.10",
+    "published_at": "2025-09-09T12:43:31Z",
+    "changes": [
+      {
+        "description": "Bump package version",
+        "commit_sha": "fff80c5"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.10.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.10/xmlui-0.10.10.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.8",
+    "published_at": "2025-09-04T13:13:38Z",
+    "changes": [
+      {
+        "description": "Add experimental Timer component",
+        "commit_sha": "a4d62c4"
+      },
+      {
+        "description": "Add the appendBlob function to the ApiInterceptor backend",
+        "commit_sha": "7ed2918"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.8.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.8/xmlui-0.10.8.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.7",
+    "published_at": "2025-09-03T10:53:53Z",
+    "changes": [
+      {
+        "description": "Fixed BarChart hideTickY property to not remove the Y axis when set to true.",
+        "commit_sha": "664ea4f"
+      },
+      {
+        "description": "Fixed Checkbox and Switch visual issue. Fixed Line- and BarChart visual glitch in Table.",
+        "commit_sha": "a739a26"
+      },
+      {
+        "description": "Small fixes for tiny bugs found during MyWorkDrive update",
+        "commit_sha": "bdb54dd"
+      },
+      {
+        "description": "Fixed BarChart tick labels not appearing.",
+        "commit_sha": "81724c6"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.7.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.7/xmlui-0.10.7.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.6",
+    "published_at": "2025-09-02T08:34:14Z",
+    "changes": [
+      {
+        "description": "fix ssr",
+        "commit_sha": "6464ec8"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.6.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.6/xmlui-0.10.6.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.5",
+    "published_at": "2025-09-02T07:46:45Z",
+    "changes": [
+      {
+        "description": "fix missing dependency",
+        "commit_sha": "d38351d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.5.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.5/xmlui-0.10.5.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.4",
+    "published_at": "2025-09-01T15:53:19Z",
+    "changes": [
+      {
+        "description": "small fixes: Avatar, FileUploadDropzone, auto xsrf token handling",
+        "commit_sha": "43fd8c5"
+      },
+      {
+        "description": "Autocomplete: initiallyOpen prop",
+        "commit_sha": "1df8e5d"
+      },
+      {
+        "description": "Reworked Pagination layout strategy. Provided props to better control layout: pageSizeSelectorPosition, pageInfoPosition, buttonRowPosition. These props are available in Table pagination as well.",
+        "commit_sha": "0d5d9d1"
+      },
+      {
+        "description": "DropdownMenu doesn't cooperate with Fragment triggerTemplate",
+        "commit_sha": "3def673"
+      },
+      {
+        "description": "include themes.scss file in lib dist",
+        "commit_sha": "428ebea"
+      },
+      {
+        "description": "FileUploadDropZone fixes (dropPlaceholder disappeared)",
+        "commit_sha": "a12ce66"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.4.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.4/xmlui-0.10.4.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.3",
+    "published_at": "2025-08-29T12:38:27Z",
+    "changes": [
+      {
+        "description": "Add solid overflow handling modes to Text",
+        "commit_sha": "2e512bb"
+      },
+      {
+        "description": "Remove the \"codefence\" Text variant",
+        "commit_sha": "46d1d18"
+      },
+      {
+        "description": "feat: support aligning cells in a Table row vertically",
+        "commit_sha": "6bc9ed1"
+      },
+      {
+        "description": "Add new, compound layout property name parsing",
+        "commit_sha": "0b1f983"
+      },
+      {
+        "description": "Text is displayed as inline (you can nest Text into Text)",
+        "commit_sha": "a2637f3"
+      },
+      {
+        "description": "Adding the \"part\" concept to native components",
+        "commit_sha": "eb4d592"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.3.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.3/xmlui-0.10.3.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.2",
     "published_at": "2025-08-26T14:36:22Z",
     "changes": [
@@ -96,178 +264,6 @@
       {
         "name": "xmlui-0.10.0.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.0/xmlui-0.10.0.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.98",
-    "published_at": "2025-08-12T04:31:18Z",
-    "changes": [
-      {
-        "description": "new internal react component for integrating into existing react applications (StandaloneComponent)",
-        "commit_sha": "ff781f3"
-      },
-      {
-        "description": "Fix image animation issue in Carousel",
-        "commit_sha": "377f0f2"
-      },
-      {
-        "description": "Added hover & active styles for Slider on thumb. FileInput opens file browser on label focus.",
-        "commit_sha": "ce0ff76"
-      },
-      {
-        "description": "Fixed input adornments not changing color on setting their respective theme variable. Spinbox buttons in NumberBox now have role=spinbutton.",
-        "commit_sha": "208768a"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.98.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.98/xmlui-0.9.98.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.97",
-    "published_at": "2025-08-08T13:55:33Z",
-    "changes": [
-      {
-        "description": "Implement simple IFrame APIs",
-        "commit_sha": "f7e8019"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.97.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.97/xmlui-0.9.97.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.96",
-    "published_at": "2025-08-08T09:04:36Z",
-    "changes": [
-      {
-        "description": "Add IFrame component (first prototype)",
-        "commit_sha": "3196156"
-      },
-      {
-        "description": "NumberBox tweaks: fixed missing padding theme var, fixed incorrect label association.",
-        "commit_sha": "cfee78a"
-      },
-      {
-        "description": "fix: Tabs - descendant button warning",
-        "commit_sha": "f51002a"
-      },
-      {
-        "description": "fix: Table sortBy now works as expected",
-        "commit_sha": "3fa52d9"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.96.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.96/xmlui-0.9.96.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.95",
-    "published_at": "2025-08-07T13:59:31Z",
-    "changes": [
-      {
-        "description": "fix: Tabs - fixed the inconsistency in the headerTemplate.",
-        "commit_sha": "af6a7a0"
-      },
-      {
-        "description": "Fix the useEventHaddler hook",
-        "commit_sha": "69a2a8f"
-      },
-      {
-        "description": "fix: H1 ... H6 now ignores the level property",
-        "commit_sha": "29c68fe"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.95.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.95/xmlui-0.9.95.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.94",
-    "published_at": "2025-08-06T15:54:03Z",
-    "changes": [
-      {
-        "description": "feat: Tabs component - use headerTemplate instead of labelTemplate/tabTemplate",
-        "commit_sha": "1d9365c"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.94.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.94/xmlui-0.9.94.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.93",
-    "published_at": "2025-08-06T08:00:33Z",
-    "changes": [
-      {
-        "description": "feat:add labelTemplate prop to TabItem component",
-        "commit_sha": "af17117"
-      },
-      {
-        "description": "The transformation of Checkbox and Switch values (to Booleans) are now documented and tested",
-        "commit_sha": "44da3d9"
-      },
-      {
-        "description": "Fix formatHumanElapsedTime unit tests, make the local-independent",
-        "commit_sha": "b7a6b9a"
-      },
-      {
-        "description": "improve: Select and AutoComplete components",
-        "commit_sha": "bc95844"
-      },
-      {
-        "description": "Fix the ComponentWrapper childrenAsTemplate issue",
-        "commit_sha": "52d94a2"
-      },
-      {
-        "description": "New end-to-end tests reviewed",
-        "commit_sha": "6629ce5"
-      },
-      {
-        "description": "Fixed the initialValue issue with TextArea",
-        "commit_sha": "0254471"
-      },
-      {
-        "description": "feat: provide context in browser error reports",
-        "commit_sha": "3318cfb"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.93.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.93/xmlui-0.9.93.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.92",
-    "published_at": "2025-07-31T14:31:02Z",
-    "changes": [
-      {
-        "description": "Review component e2e tests",
-        "commit_sha": "347cda1"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.9.92.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.92/xmlui-0.9.92.js"
       }
     ]
   }

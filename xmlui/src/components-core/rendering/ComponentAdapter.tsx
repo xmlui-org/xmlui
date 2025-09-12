@@ -33,6 +33,7 @@ import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
+import { Animation, parseAnimation, parseAnimationOptions } from "../../components/Animation/AnimationNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -378,38 +379,71 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         ? cloneElement(renderedNode, null, children)
         : renderedNode;
   }
-
   // --- Check if the component has a tooltip property
   const tooltipText = useMemo(
     () => valueExtractor(safeNode.props?.tooltip, true),
     [safeNode.props, valueExtractor],
   );
-
   // --- Check if the component has a tooltip property
   const tooltipMarkdown = useMemo(
     () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
     [safeNode.props, valueExtractor],
   );
-  // --- Check if the component has a tooltipOptions property
+
   const tooltipOptions = useMemo(
     () => valueExtractor(safeNode.props?.tooltipOptions, true),
     [safeNode.props, valueExtractor],
   );
 
-  // --- Handle tooltips
-  if (tooltipMarkdown || tooltipText) {
-    // --- Obtain options
-    const parsedOptions = parseTooltipOptions(tooltipOptions);
+  const animation = useMemo(
+    () => valueExtractor(safeNode.props?.animation, true),
+    [safeNode.props, valueExtractor],
+  );
 
-    return (
-      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-        {nodeToRender}
-      </Tooltip>
-    );
-  }
+  const animationOptions = useMemo(
+    () => valueExtractor(safeNode.props?.animationOptions, true),
+    [safeNode.props, valueExtractor],
+  );
 
-  // --- Done
-  return nodeToRender;
+  const applyWrappers = (node: ReactNode) => {
+    // --- Handle animations and tooltips together
+    if (animation && (tooltipMarkdown || tooltipText)) {
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
+            {node}
+          </Animation>
+        </Tooltip>
+      );
+    }
+
+    // --- Handle animation
+    if (animation) {
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
+      return (
+        <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
+          {node}
+        </Animation>
+      );
+    }
+
+    // --- Handle tooltip
+    if (tooltipMarkdown || tooltipText) {
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          {node}
+        </Tooltip>
+      );
+    }
+
+    // --- No wrappers needed
+    return node;
+  };
+
+  return applyWrappers(nodeToRender);
 });
 
 /**
