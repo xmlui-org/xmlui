@@ -12,7 +12,7 @@ import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRen
 export function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
-  renderer: ComponentRendererFn<ComponentDef<TMd>>,
+  renderer: ComponentRendererFn<ComponentDef<any>>,
 ): ComponentRendererDef {
   return {
     type,

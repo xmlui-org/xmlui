@@ -44,6 +44,19 @@ const OMIT_FROM_TOC_DESC = {
   type: "boolean",
   defaultValue: defaultProps.omitFromToc,
 };
+const SHOW_ANCHOR_DESC = {
+  description:
+    "This property indicates whether an anchor link should be displayed next to the heading. " +
+    "If set to `true`, an anchor link will be displayed on hover next to the heading.",
+  type: "boolean",
+  defaultValue: defaultProps.showAnchor,
+};
+const APIS_DESC = {
+  scrollIntoView: {
+    signature: "scrollIntoView()",
+    description: "Scrolls the heading into view.",
+  },
+};
 
 export const HeadingMd = createMetadata({
   status: "stable",
@@ -63,19 +76,9 @@ export const HeadingMd = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
-    showAnchor: {
-      description:
-        "This property indicates whether an anchor link should be displayed next to the heading. " +
-        "If set to `true`, an anchor link will be displayed on hover next to the heading.",
-      type: "boolean",
-    },
+    showAnchor: SHOW_ANCHOR_DESC,
   },
-  apis: {
-    scrollIntoView: {
-      signature: "scrollIntoView()",
-      description: "Scrolls the heading into view.",
-    },
-  },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
@@ -104,8 +107,12 @@ export const H1Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H1}`]: "$fontSize-large",
@@ -131,8 +138,12 @@ export const H2Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H2}`]: "$fontSize-medium",
@@ -157,8 +168,12 @@ export const H3Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H3}`]: "$fontSize-normal",
@@ -184,7 +199,11 @@ export const H4Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H4}`]: "$fontSize-small",
@@ -210,7 +229,11 @@ export const H5Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H5}`]: "$fontSize-smaller",
@@ -236,7 +259,11 @@ export const H6Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H6}`]: "$fontSize-tiny",
@@ -296,7 +323,7 @@ export const headingComponentRenderer = createComponentRenderer(
   HeadingMd,
   ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
-      node,
+      node: node as HeadingComponentDef,
       extractValue,
       className,
       level: node.props.level,
