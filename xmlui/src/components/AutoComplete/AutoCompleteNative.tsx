@@ -33,6 +33,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "../Select/HiddenOption";
+import { PART_INPUT } from "../../components-core/parts";
 
 type AutoCompleteProps = {
   id?: string;
@@ -188,7 +189,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       onDidChange(newSelectedValue);
       inputRef.current?.focus();
     },
-    [multi, value, updateState, onDidChange, inputRef.current],
+    [multi, value, updateState, onDidChange],
   );
 
   useEffect(() => {
@@ -233,7 +234,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   // Register component API for external interactions
   const focus = useCallback(() => {
     inputRef?.current?.focus();
-  }, [inputRef?.current]);
+  }, [inputRef]);
 
   const setValue = useEvent((newValue: string | string[]) => {
     updateState({ value: newValue });
@@ -306,7 +307,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
               >
                 <PopoverTrigger asChild>
                   <div
-                    id={inputId}
                     ref={setReferenceElement}
                     style={{ width: "100%", ...style }}
                     className={classnames(
@@ -365,9 +365,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
                           setOpen((prev) => !prev);
                         }
                       }}
-                      id={id}
+                      id={inputId}
+                      data-part-id={PART_INPUT}
                       readOnly={readOnly}
                       autoFocus={autoFocus}
+                      aria-expanded={open}
                       ref={inputRef}
                       value={inputValue}
                       disabled={!enabled}
