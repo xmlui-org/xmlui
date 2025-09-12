@@ -167,6 +167,8 @@ export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
   ({ node, registerComponentApi, uid, extractValue }) => {
-    return <APICallNative registerComponentApi={registerComponentApi} node={node} uid={uid} />;
+    return (
+      <APICallNative registerComponentApi={registerComponentApi} node={node as any} uid={uid} />
+    );
   },
 );

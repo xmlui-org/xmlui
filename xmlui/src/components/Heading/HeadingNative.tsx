@@ -40,13 +40,14 @@ export type HeadingProps = {
 
 export const defaultProps: Pick<
   HeadingProps,
-  "level" | "ellipses" | "omitFromToc" | "maxLines" | "preserveLinebreaks"
+  "level" | "ellipses" | "omitFromToc" | "maxLines" | "preserveLinebreaks" | "showAnchor"
 > = {
   level: "h1",
   ellipses: true,
   omitFromToc: false,
   maxLines: 0,
   preserveLinebreaks: false,
+  showAnchor: false,
 };
 
 export const Heading = forwardRef(function Heading(

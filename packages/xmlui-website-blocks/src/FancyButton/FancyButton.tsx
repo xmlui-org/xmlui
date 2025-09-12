@@ -8,8 +8,12 @@ import {
 } from "../../../../xmlui/src/components/abstractions";
 import { createComponentRenderer } from "../../../../xmlui/src/components-core/renderers";
 import { parseScssVar } from "../../../../xmlui/src/components-core/theming/themeVars";
-import { createMetadata, dClick, dGotFocus, dLostFocus, dOrientation } from "../../../../xmlui/src/components/metadata-helpers";
-import { Icon } from "../../../../xmlui/src/components/Icon/IconNative";
+import {
+  createMetadata,
+  dClick,
+  dGotFocus,
+  dLostFocus,
+} from "../../../../xmlui/src/components/metadata-helpers";
 import { FancyButton, defaultProps } from "./FancyButtonNative";
 
 const COMP = "FancyButton";
@@ -17,6 +21,8 @@ const COMP = "FancyButton";
 const fancyButtonVariantMd = [
   { value: "rounded", description: "Rounded variant with soft corners" },
   { value: "square", description: "Square variant with sharp corners" },
+  { value: "pill", description: "Pill variant with fully rounded edges" },
+  { value: "outlinedPill", description: "Outlined pill variant with fully rounded edges" },
 ];
 
 export const FancyButtonMd = createMetadata({
@@ -69,7 +75,6 @@ export const FancyButtonMd = createMetadata({
       type: "boolean",
       defaultValue: true,
     },
-    orientation: dOrientation(defaultProps.orientation),
     icon: {
       description:
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
@@ -103,10 +108,9 @@ export const FancyButtonMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`width-${COMP}`]: "fit-content",
-    [`height-${COMP}`]: "fit-content",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
+    [`gap-${COMP}`]: "$space-2",
     [`backgroundColor-${COMP}--disabled`]: "$backgroundColor--disabled",
     [`borderColor-${COMP}--disabled`]: "$borderColor--disabled",
     [`borderStyle-${COMP}`]: "solid",
@@ -116,16 +120,32 @@ export const FancyButtonMd = createMetadata({
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
-    [`paddingHorizontal-${COMP}-xs`]: "$space-1",
-    [`paddingVertical-${COMP}-xs`]: "$space-0_5",
+
+    // Size variant theme variables
+    [`paddingHorizontal-${COMP}-xs`]: "$space-3",
+    [`paddingVertical-${COMP}-xs`]: "$space-1_5",
+    [`fontSize-${COMP}-xs`]: "$fontSize-smaller",
+    [`gap-${COMP}-xs`]: "$space-2",
+
     [`paddingHorizontal-${COMP}-sm`]: "$space-4",
     [`paddingVertical-${COMP}-sm`]: "$space-2",
-    [`paddingHorizontal-${COMP}-md`]: "$space-4",
-    [`paddingVertical-${COMP}-md`]: "$space-3",
-    [`paddingHorizontal-${COMP}-lg`]: "$space-5",
-    [`paddingVertical-${COMP}-lg`]: "$space-4",
-    [`paddingHorizontal-${COMP}-xl`]: "$space-8",
-    [`paddingVertical-${COMP}-xl`]: "$space-6",
+    [`fontSize-${COMP}-sm`]: "$fontSize-small",
+    [`gap-${COMP}-sm`]: "$space-2_5",
+
+    [`paddingHorizontal-${COMP}-md`]: "$space-5",
+    [`paddingVertical-${COMP}-md`]: "$space-2_5",
+    [`fontSize-${COMP}-md`]: "$fontSize-medium",
+    [`gap-${COMP}-md`]: "$space-3",
+
+    [`paddingHorizontal-${COMP}-lg`]: "$space-8",
+    [`paddingVertical-${COMP}-lg`]: "$space-3",
+    [`fontSize-${COMP}-lg`]: "$fontSize-large",
+    [`gap-${COMP}-lg`]: "$space-4",
+
+    [`paddingHorizontal-${COMP}-xl`]: "$space-10",
+    [`paddingVertical-${COMP}-xl`]: "$space-4",
+    [`fontSize-${COMP}-xl`]: "$fontSize-larger",
+    [`gap-${COMP}-xl`]: "$space-5",
 
     // Common colors
     [`backgroundColor-${COMP}`]: "$color-primary-500",
@@ -136,10 +156,30 @@ export const FancyButtonMd = createMetadata({
     [`borderColor-${COMP}--hover`]: "$color-primary-400",
 
     // Rounded variant theme variables
-    [`borderRadius-${COMP}-rounded`]: "$space-72",
+    [`borderRadius-${COMP}-rounded-xs`]: "6px",
+    [`borderRadius-${COMP}-rounded-sm`]: "8px",
+    [`borderRadius-${COMP}-rounded-md`]: "12px",
+    [`borderRadius-${COMP}-rounded-lg`]: "16px",
+    [`borderRadius-${COMP}-rounded-xl`]: "24px",
 
     // Square variant theme variables
     [`borderRadius-${COMP}-square`]: "$space-0",
+
+    // Pill variant theme variables
+    [`borderRadius-${COMP}-pill`]: "9999px",
+
+    // Outlined pill variant theme variables
+    [`backgroundColor-${COMP}-outlinedPill`]: "transparent",
+    [`backgroundColor-${COMP}-outlinedPill--hover`]: "transparent",
+    [`borderRadius-${COMP}-outlinedPill`]: "9999px",
+    [`borderColor-${COMP}-outlinedPill--hover`]: "red",
+    [`textColor-${COMP}-outlinedPill`]: "$textColor-primary",
+    [`borderWidth-${COMP}-outlinedPill-xs`]: "1.5px",
+    [`borderWidth-${COMP}-outlinedPill-sm`]: "2px",
+    [`borderWidth-${COMP}-outlinedPill-md`]: "2.5px",
+    [`borderWidth-${COMP}-outlinedPill-lg`]: "4px",
+    [`borderWidth-${COMP}-outlinedPill-xl`]: "5px",
+
   },
 });
 
@@ -148,7 +188,6 @@ export const fancyButtonComponentRenderer = createComponentRenderer(
   FancyButtonMd,
   ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     const props = (node.props as typeof FancyButtonMd.props)!;
-    const iconName = extractValue.asString(props.icon);
     const label = extractValue.asDisplayText(props.label);
     return (
       <FancyButton
@@ -158,9 +197,8 @@ export const fancyButtonComponentRenderer = createComponentRenderer(
         size={extractValue.asOptionalString(props.size)}
         icon={extractValue.asOptionalString(props.icon)}
         iconPosition={extractValue.asOptionalString(props.iconPosition)}
-        orientation={extractValue.asOptionalString(props.orientation)}
         contentPosition={extractValue.asOptionalString(props.contentPosition)}
-        disabled={!extractValue.asOptionalBoolean(props.enabled, true)}
+        enabled={extractValue.asOptionalBoolean(props.enabled)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}

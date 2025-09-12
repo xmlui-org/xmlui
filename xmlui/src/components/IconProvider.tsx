@@ -320,7 +320,6 @@ registerIconRenderer("eye", (props) => <IoEyeOutline {...props} />);
 registerIconRenderer("eye-off", (props) => <IoEyeOffOutline {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
-  console.log("IconProvider rendered", pool);
   const getRegisteredIconNames = useCallback(() => {
     return Array.from(pool.keys());
   }, []);
