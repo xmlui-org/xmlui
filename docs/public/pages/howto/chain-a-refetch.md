@@ -5,14 +5,13 @@
 ```xmlui-pg copy display {54} name="Click the Like button"
 ---comp display
 <Component name="SocialButton">
-  <Theme borderRadius-Button="50%">
-    <Button
-      icon="{$props.icon}"
-      variant="outlined"
-      themeColor="{$props.themeColor || 'secondary'}"
-      size="xs"
-      onClick="{emitEvent('click')}" />
-  </Theme>
+  <Button
+    borderRadius="50%"
+    icon="{$props.icon}"
+    variant="outlined"
+    themeColor="{$props.themeColor || 'secondary'}"
+    size="xs"
+    onClick="{emitEvent('click')}" />
 </Component>
 ---app display
 <App>
