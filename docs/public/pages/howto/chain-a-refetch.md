@@ -3,6 +3,17 @@
 `APICall.execute` returns a Promise, you can call `.then` to do something else.
 
 ```xmlui-pg copy display {54} name="Click the Like button"
+---comp display
+<Component name="SocialButton">
+  <Theme borderRadius-Button="50%">
+    <Button
+      icon="{$props.icon}"
+      variant="outlined"
+      themeColor="{$props.themeColor || 'secondary'}"
+      size="xs"
+      onClick="{emitEvent('click')}" />
+  </Theme>
+</Component>
 ---app display
 <App>
   <APICall
@@ -26,47 +37,26 @@
           <Text>{$item.content}</Text>
           <HStack gap="$space-4" verticalAlignment="center">
             <HStack gap="$space-1" verticalAlignment="center">
-              <CHStack
-                border="1px solid $color-surface-300"
-                borderRadius="50%"
-                width="1.4rem"
-                height="1.4rem"
-                backgroundColor="transparent">
-                <Icon name="reply" size="sm" color="$color-surface-500" />
-              </CHStack>
+              <SocialButton icon="reply" />
               <Text variant="caption">{$item.replies_count}</Text>
             </HStack>
             <HStack gap="$space-1" verticalAlignment="center">
-              <CHStack
-                border="1px solid $color-surface-300"
-                borderRadius="50%"
-                width="1.4rem"
-                height="1.4rem"
-                backgroundColor="transparent">
-                <Icon name="trending-up" size="sm" color="$color-surface-500" />
-              </CHStack>
+              <SocialButton icon="trending-up" />
               <Text variant="caption">{$item.reblogs_count}</Text>
             </HStack>
             <HStack gap="$space-1" verticalAlignment="center">
-              <CHStack
-                border="1px solid $color-surface-300"
-                borderRadius="50%"
-                width="1.4rem"
-                height="1.4rem"
-                backgroundColor="transparent">
-                <Icon
-                  name="like"
-                  size="sm"
-                  color="{$item.favourited ? '$color-attention' : '$color-surface-500'}"
-                  onClick="{
-                    if ($item.favourited) {
-                      // execute returns a Promise
-                      unfavoritePost.execute($item.id).then(() => timelineData.refetch());
-                    } else {
-                      favoritePost.execute($item.id).then(() => timelineData.refetch());
-                    }
-                  }" />
-              </CHStack>
+              <SocialButton
+                icon="like"
+                themeColor="{$item.favourited ? 'attention' : 'secondary'}">
+                <event name="click">
+                  if ($item.favourited) {
+                    // execute returns a Promise
+                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
+                  } else {
+                    favoritePost.execute($item.id).then(() => timelineData.refetch());
+                  }
+                </event>
+              </SocialButton>
               <Text variant="caption">{$item.favourites_count}</Text>
             </HStack>
           </HStack>
@@ -135,4 +125,3 @@
   }
 }
 ```
-
