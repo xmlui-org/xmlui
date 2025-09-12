@@ -86,6 +86,7 @@
                 <NavLink label="Share a ModalDialog across components" to="/howto/share-a-modaldialog-across-components" />
                 <NavLink label="Use the same ModalDialog to add or edit" to="/howto/use-the-same-modaldialog-to-add-or-edit" />
                 <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
+                <NavLink label="Chain APICall.refetch from APICall.execute" to="/howto/chain-a-refetch" />
                 <!-- Add more links as additional files are created -->
             </NavGroup>
             <NavGroup label="Reference">
@@ -414,6 +415,9 @@
             </Page>
             <Page url="/howto/paginate-a-list">
                 <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
+            </Page>
+            <Page url="/howto/chain-a-refetch">
+                <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
             </Page>
             <!-- Add more pages as additional files are created -->
             <Page url="/hosted-deployment">
