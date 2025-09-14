@@ -78,6 +78,7 @@ Available values:
 | `sm` | Small |
 | `md` | Medium |
 | `lg` | Large |
+| `xl` | Extra large |
 
 ```xmlui-pg copy display name="Example: buttonSize"
 <App>

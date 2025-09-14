@@ -28,6 +28,7 @@ type ToggleProps = {
   readOnly?: boolean;
   validationStatus?: ValidationStatus;
   updateState?: UpdateStateFn;
+  onClick?: (event: React.MouseEvent) => void;
   onDidChange?: (newValue: boolean) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -65,6 +66,7 @@ export const Toggle = forwardRef(function Toggle(
     readOnly,
     validationStatus = defaultProps.validationStatus,
     updateState = noop,
+    onClick = noop,
     onDidChange = noop,
     onFocus = noop,
     onBlur = noop,
@@ -186,6 +188,7 @@ export const Toggle = forwardRef(function Toggle(
         aria-checked={indeterminate ? "mixed" : legitValue}
         aria-required={required}
         aria-disabled={!enabled}
+        onClick={onClick}
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}

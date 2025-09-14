@@ -118,6 +118,10 @@ Available values:
 
 ## Events [#events]
 
+### `click` [#click]
+
+This event is triggered when the Switch is clicked.
+
 ### `didChange` [#didchange]
 
 This event is triggered when value of Switch has changed.

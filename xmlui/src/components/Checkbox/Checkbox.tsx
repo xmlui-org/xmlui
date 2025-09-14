@@ -5,6 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dAutoFocus,
+  dClick,
   dComponent,
   dDidChange,
   dEnabled,
@@ -65,6 +66,7 @@ export const CheckboxMd = createMetadata({
   },
   childrenAsTemplate: "inputTemplate",
   events: {
+    click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
@@ -137,6 +139,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
+        onClick={lookupEventHandler("click")}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}

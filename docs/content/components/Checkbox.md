@@ -171,6 +171,10 @@ Available values:
 
 ## Events [#events]
 
+### `click` [#click]
+
+This event is triggered when the Checkbox is clicked.
+
 ### `didChange` [#didchange]
 
 This event is triggered when value of Checkbox has changed.

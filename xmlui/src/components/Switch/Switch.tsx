@@ -5,6 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dAutoFocus,
+  dClick,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -51,6 +52,7 @@ export const SwitchMd = createMetadata({
     ),
   },
   events: {
+    click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
@@ -120,6 +122,7 @@ export const switchComponentRenderer = createComponentRenderer(
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        onClick={lookupEventHandler("click")}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
