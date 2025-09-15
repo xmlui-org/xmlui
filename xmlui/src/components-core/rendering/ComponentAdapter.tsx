@@ -15,6 +15,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 
 import { extractParam } from "../utils/extractParam";
 import { useTheme } from "../theming/ThemeContext";
+import { useComponentStyle } from "../theming/StyleContext";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
@@ -31,13 +32,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
-import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
-import { useComponentStyle } from "../theming/StyleContext";
-import {
-  Animation,
-  parseAnimation,
-  parseAnimationOptions,
-} from "../../components/Animation/AnimationNative";
+import { useBehaviors } from "../behaviors/BehaviorContext";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -232,32 +227,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // const className = useComponentStyle(cssProps);
 
-  // --- Check if the component has a tooltip property
-  const tooltipText = useMemo(
-    () => valueExtractor(safeNode.props?.tooltip, true),
-    [safeNode.props, valueExtractor],
-  );
-  // --- Check if the component has a tooltip property
-  const tooltipMarkdown = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  const tooltipOptions = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipOptions, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  const animation = useMemo(
-    () => valueExtractor(safeNode.props?.animation, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  const animationOptions = useMemo(
-    () => valueExtractor(safeNode.props?.animationOptions, true),
-    [safeNode.props, valueExtractor],
-  );
-
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
@@ -266,28 +235,28 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
+  // --- Assemble the renderer context we pass down the rendering chain
+  const rendererContext: RendererContext<any> = {
+    node: safeNode,
+    state: state[uid] || EMPTY_OBJECT,
+    updateState: memoedUpdateState,
+    appContext,
+    extractValue: valueExtractor,
+    lookupEventHandler: memoedLookupEventHandler,
+    lookupAction: memoedLookupAction,
+    lookupSyncCallback: memoedLookupSyncCallback,
+    extractResourceUrl,
+    renderChild: memoedRenderChild,
+    registerComponentApi: memoedRegisterComponentApi,
+    className,
+    layoutContext: layoutContextRef?.current,
+    uid,
+  };
+
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
   let renderingError = null;
   try {
-    // --- Assemble the renderer context we pass down the rendering chain
-    const rendererContext: RendererContext<any> = {
-      node: safeNode,
-      state: state[uid] || EMPTY_OBJECT,
-      updateState: memoedUpdateState,
-      appContext,
-      extractValue: valueExtractor,
-      lookupEventHandler: memoedLookupEventHandler,
-      lookupAction: memoedLookupAction,
-      lookupSyncCallback: memoedLookupSyncCallback,
-      extractResourceUrl,
-      renderChild: memoedRenderChild,
-      registerComponentApi: memoedRegisterComponentApi,
-      className,
-      layoutContext: layoutContextRef?.current,
-      uid,
-    };
-
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
       // --- the compound component
@@ -415,42 +384,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         : renderedNode;
   }
 
+  const { getBehaviors } = useBehaviors();
   const applyWrappers = (node: ReactNode) => {
-    // --- Handle animations and tooltips together
-    if (animation && (tooltipMarkdown || tooltipText)) {
-      const parsedOptions = parseTooltipOptions(tooltipOptions);
-      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
-      return (
-        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-          <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
-            {node}
-          </Animation>
-        </Tooltip>
-      );
+    const behaviors = getBehaviors();
+    let wrappedNode = node;
+    for (const behavior of behaviors) {
+      if (behavior.isEnabled(rendererContext)) {
+        wrappedNode = behavior.wrap(rendererContext, wrappedNode);
+      }
     }
-
-    // --- Handle animation
-    if (animation) {
-      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
-      return (
-        <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
-          {node}
-        </Animation>
-      );
-    }
-
-    // --- Handle tooltip
-    if (tooltipMarkdown || tooltipText) {
-      const parsedOptions = parseTooltipOptions(tooltipOptions);
-      return (
-        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-          {node}
-        </Tooltip>
-      );
-    }
-
-    // --- No wrappers needed
-    return node;
+    return wrappedNode;
   };
 
   return applyWrappers(nodeToRender);

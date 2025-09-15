@@ -11,6 +11,7 @@ import type { AppWrapperProps } from "./AppWrapper";
 import { AppWrapper } from "./AppWrapper";
 import type { ComponentCompilation } from "../../abstractions/scripting/Compilation";
 import { StyleProvider } from "../theming/StyleContext";
+import { BehaviorsProvider } from "../behaviors/BehaviorContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -101,29 +102,31 @@ export function AppRoot({
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <StyleProvider>
-        <DebugViewProvider debugConfig={globalProps?.debug}>
-          <AppWrapper
-            projectCompilation={projectCompilation}
-            resourceMap={resourceMap}
-            apiInterceptor={apiInterceptor}
-            node={rootNode as ComponentLike}
-            contributes={contributes}
-            resources={resources}
-            routerBaseName={routerBaseName}
-            decorateComponentsWithTestId={decorateComponentsWithTestId}
-            debugEnabled={debugEnabled}
-            defaultTheme={defaultTheme}
-            defaultTone={defaultTone}
-            globalProps={enhancedGlobalProps}
-            standalone={standalone}
-            trackContainerHeight={trackContainerHeight}
-            previewMode={previewMode}
-            sources={sources}
-            onInit={onInit}
-          >
-            {children}
-          </AppWrapper>
-        </DebugViewProvider>
+        <BehaviorsProvider>
+          <DebugViewProvider debugConfig={globalProps?.debug}>
+            <AppWrapper
+              projectCompilation={projectCompilation}
+              resourceMap={resourceMap}
+              apiInterceptor={apiInterceptor}
+              node={rootNode as ComponentLike}
+              contributes={contributes}
+              resources={resources}
+              routerBaseName={routerBaseName}
+              decorateComponentsWithTestId={decorateComponentsWithTestId}
+              debugEnabled={debugEnabled}
+              defaultTheme={defaultTheme}
+              defaultTone={defaultTone}
+              globalProps={enhancedGlobalProps}
+              standalone={standalone}
+              trackContainerHeight={trackContainerHeight}
+              previewMode={previewMode}
+              sources={sources}
+              onInit={onInit}
+            >
+              {children}
+            </AppWrapper>
+          </DebugViewProvider>
+        </BehaviorsProvider>
       </StyleProvider>
     </ComponentProvider>
   );
