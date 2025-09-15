@@ -385,18 +385,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }
 
   const { getBehaviors } = useBehaviors();
-  const applyWrappers = (node: ReactNode) => {
+  const applyBehaviors = (node: ReactNode) => {
     const behaviors = getBehaviors();
     let wrappedNode = node;
     for (const behavior of behaviors) {
-      if (behavior.isEnabled(rendererContext)) {
-        wrappedNode = behavior.wrap(rendererContext, wrappedNode);
+      if (behavior.canAttach(rendererContext.node)) {
+        wrappedNode = behavior.attach(rendererContext, wrappedNode);
       }
     }
     return wrappedNode;
   };
 
-  return applyWrappers(nodeToRender);
+  return applyBehaviors(nodeToRender);
 });
 
 /**

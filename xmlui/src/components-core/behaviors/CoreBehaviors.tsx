@@ -14,13 +14,12 @@ import type { Behavior } from "./BehaviorContext";
  */
 export const tooltipBehavior: Behavior = {
   name: "tooltip",
-  isEnabled: (context) => {
-    const { node, extractValue } = context;
-    const tooltipText = extractValue(node.props?.tooltip, true);
-    const tooltipMarkdown = extractValue(node.props?.tooltipMarkdown, true);
+  canAttach: (node) => {
+    const tooltipText = node.props?.tooltip;
+    const tooltipMarkdown = node.props?.tooltipMarkdown;
     return !!tooltipText || !!tooltipMarkdown;
   },
-  wrap: (context, node) => {
+  attach: (context, node) => {
     const { extractValue } = context;
     const tooltipText = extractValue(context.node.props?.tooltip, true);
     const tooltipMarkdown = extractValue(context.node.props?.tooltipMarkdown, true);
@@ -40,12 +39,10 @@ export const tooltipBehavior: Behavior = {
  */
 export const animationBehavior: Behavior = {
   name: "animation",
-  isEnabled: (context) => {
-    const { node, extractValue } = context;
-    const animation = extractValue(node.props?.animation, true);
-    return !!animation;
+  canAttach: (node) => {
+    return !!node.props?.animation;
   },
-  wrap: (context, node) => {
+  attach: (context, node) => {
     const { extractValue } = context;
     const animation = extractValue(context.node.props?.animation, true);
     const animationOptions = extractValue(

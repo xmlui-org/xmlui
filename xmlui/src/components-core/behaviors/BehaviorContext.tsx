@@ -3,6 +3,7 @@ import { createContext, useContext, useMemo } from "react";
 
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { animationBehavior, tooltipBehavior } from "./CoreBehaviors";
+import { ComponentDef } from "../..";
 
 /**
  * Defines the shape of a component behavior that can wrap a component with
@@ -17,19 +18,18 @@ export interface Behavior {
   /**
    * A function that determines if the behavior should be applied based on the
    * component's context and props.
-   * @param context The renderer context of the component.
-   * @returns True if the behavior is enabled, otherwise false.
+   * @param node The component definition.
+   * @returns True if the behavior can be attached, otherwise false.
    */
-  isEnabled: (context: RendererContext<any>) => boolean;
+  canAttach: (node: ComponentDef) => boolean;
 
   /**
-   * A function that wraps the component's React node with the behavior's
-   * functionality.
+   * A function that attaches the behavior to the component's React node.
    * @param context The renderer context of the component.
-   * @param node The React node to wrap.
-   * @returns The wrapped React node.
+   * @param node The React node to attach.
+   * @returns The attached React node.
    */
-  wrap: (context: RendererContext<any>, node: ReactNode) => ReactNode;
+  attach: (context: RendererContext<any>, node: ReactNode) => ReactNode;
 }
 
 /**
@@ -84,8 +84,12 @@ export const BehaviorsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useMemo(() => {
-    registerBehavior(animationBehavior);
-    registerBehavior(tooltipBehavior);
+    if (process.env.VITE_USED_BEHAVIORS_Animation !== "false") {
+      registerBehavior(animationBehavior);
+    }
+    if (process.env.VITE_USED_BEHAVIORS_Tooltip !== "false") {
+      registerBehavior(tooltipBehavior);
+    }
   }, []);
 
   const contextValue = useMemo<BehaviorContextType>(
