@@ -21,9 +21,11 @@ export type ParserResult = {
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 };
-const COLOR_DANER_100 = "hsl(356, 100%, 91%)";
-const COLOR_DANER_300 = "hsl(356, 100%, 70%)";
-const SPACE_2 = "0.5rem";
+const COLOR_DANGER_100 = "hsl(356, 100%, 91%)";
+const COLOR_DANGER_300 = "hsl(356, 100%, 70%)";
+const COLOR_PRIMARY = "hsl(204, 30.3%, 13%)";
+const COLOR_PRIMARY_LINE_NUMS = "#555b5e";
+const RADIUS = "0.5rem";
 
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
@@ -140,13 +142,20 @@ function createErrorReportComponent(
 
         const lineChildren: ComponentDef[] = [
           {
-            type: "Text",
-            props: {
-              value: linePrefix,
-              fontFamily: "monospace",
-              color: "hsl(204, 30.3%, 45%)",
-            },
+            type: "Theme",
+            props: {},
+            children: [
+              {
+                type: "Text",
+                props: {
+                  value: linePrefix,
+                  fontFamily: "monospace",
+                  color: COLOR_PRIMARY_LINE_NUMS,
+                },
+              },
+            ],
           },
+          ,
         ];
 
         if (errorStartInContext >= lineStart && errorStartInContext < lineEnd) {
@@ -176,7 +185,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -199,7 +208,7 @@ function createErrorReportComponent(
               fontFamily: "monospace",
               textDecorationLine: "underline",
               textDecorationColor: "$color-error",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
             },
           });
         } else if (
@@ -219,7 +228,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -250,7 +259,7 @@ function createErrorReportComponent(
               textDecorationLine: "underline",
               fontFamily: "monospace",
               fontWeight: "bold",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
               color: "$color-error",
             },
           });
@@ -280,7 +289,7 @@ function createErrorReportComponent(
             type: "Text",
             props: {
               value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):`,
-              color: "hsl(204, 30.3%, 27%)",
+              // color: "hsl(204, 30.3%, 27%)",
             },
           },
           {
@@ -316,7 +325,7 @@ function createErrorReportComponent(
           gap: "$gap-none",
           padding: "16px",
           backgroundColor: "white",
-          borderRadius: SPACE_2,
+          borderRadius: RADIUS,
         },
         children: [errMsgComponenet],
       };
@@ -326,50 +335,58 @@ function createErrorReportComponent(
       return errComponent;
     });
   const comp: ComponentDef = {
-    type: "VStack",
+    type: "Theme",
     props: {
-      padding: "5px 10px 10px 38px",
-      gap: 0,
-      backgroundColor: COLOR_DANER_100,
-      margin: "10px",
-      border: "2px solid " + COLOR_DANER_300,
-      borderRadius: SPACE_2,
+      "textColor-primary": COLOR_PRIMARY,
     },
     children: [
       {
-        type: "HStack",
+        type: "VStack",
         props: {
-          verticalAlignment: "center",
-          marginLeft: "-34px",
-          padding: "15px 0px",
-          gap: "4px",
+          padding: "16px 32px 16px 38px",
+          gap: 0,
+          backgroundColor: COLOR_DANGER_100,
+          margin: "10px",
+          border: "2px solid " + COLOR_DANGER_300,
+          borderRadius: RADIUS,
         },
         children: [
           {
-            type: "Icon",
+            type: "HStack",
             props: {
-              name: "error",
-              size: "30px",
-              color: "$color-error",
+              verticalAlignment: "center",
+              marginLeft: "-34px",
+              padding: "0px 0px 15px 0px",
+              gap: "4px",
             },
+            children: [
+              {
+                type: "Icon",
+                props: {
+                  name: "error",
+                  size: "30px",
+                  color: "$color-error",
+                },
+              },
+              {
+                type: "H2",
+                props: {
+                  value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
+                  fontWeight: "bold",
+                  showAnchor: false,
+                },
+              },
+            ],
           },
           {
-            type: "H2",
+            type: "VStack",
             props: {
-              value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
-              fontWeight: "bold",
-              showAnchor: false,
+              padding: "$padding-none",
+              gap: "16px",
             },
+            children: errList,
           },
         ],
-      },
-      {
-        type: "VStack",
-        props: {
-          padding: "$padding-none",
-          gap: "16px",
-        },
-        children: errList,
       },
     ],
   };
