@@ -21,8 +21,8 @@ export type ParserResult = {
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 };
-const COLOR_DANER_100 = "hsl(356, 100%, 91%)";
-const COLOR_DANER_300 = "hsl(356, 100%, 70%)";
+const COLOR_DANGER_100 = "hsl(356, 100%, 91%)";
+const COLOR_DANGER_300 = "hsl(356, 100%, 70%)";
 const COLOR_PRIMARY = "hsl(204, 30.3%, 13%)";
 const COLOR_PRIMARY_LINE_NUMS = "#555b5e";
 const RADIUS = "0.5rem";
@@ -185,7 +185,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -208,7 +208,7 @@ function createErrorReportComponent(
               fontFamily: "monospace",
               textDecorationLine: "underline",
               textDecorationColor: "$color-error",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
             },
           });
         } else if (
@@ -228,7 +228,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -259,7 +259,7 @@ function createErrorReportComponent(
               textDecorationLine: "underline",
               fontFamily: "monospace",
               fontWeight: "bold",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
               color: "$color-error",
             },
           });
@@ -343,11 +343,11 @@ function createErrorReportComponent(
       {
         type: "VStack",
         props: {
-          padding: "5px 10px 10px 38px",
+          padding: "16px 32px 16px 38px",
           gap: 0,
-          backgroundColor: COLOR_DANER_100,
+          backgroundColor: COLOR_DANGER_100,
           margin: "10px",
-          border: "2px solid " + COLOR_DANER_300,
+          border: "2px solid " + COLOR_DANGER_300,
           borderRadius: RADIUS,
         },
         children: [
@@ -356,7 +356,7 @@ function createErrorReportComponent(
             props: {
               verticalAlignment: "center",
               marginLeft: "-34px",
-              padding: "15px 0px",
+              padding: "0px 0px 15px 0px",
               gap: "4px",
             },
             children: [
