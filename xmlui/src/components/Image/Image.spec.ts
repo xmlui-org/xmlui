@@ -7,11 +7,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("img")).toBeVisible();
   });
 
-  test("handles undefined src", async ({ page, initTestBed }) => {
-    await initTestBed(`<Image testId="img" />`);
-    await expect(page.getByTestId("img")).not.toHaveAttribute("src");
-  });
-
   test("displays image with valid src", async ({ page, initTestBed }) => {
     await initTestBed(`<Image testId="img" src="/resources/test-image-100x100.jpg" />`);
     await expect(page.getByTestId("img")).toHaveAttribute(
@@ -167,50 +162,63 @@ test.describe("Theme Variables", () => {
 });
 
 test.describe("Other Edge Cases", () => {
-  test(
-    "handles object as src prop",
-    SKIP_REASON.UNSURE("Need to define how we handle incorrect input formats"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Image testId="img" src="{{}}" />`);
-      await expect(page.getByTestId("img")).not.toBeAttached();
-    },
-  );
+  [
+    { label: "null", value: null },
+    { label: "undefined", value: undefined },
+    { label: "number", value: 123 },
+    { label: "boolean", value: true },
+    { label: "empty object", value: "{}" },
+    { label: "empty array", value: "[]" },
+    { label: "array", value: "['/resources/test-image-100x100.jpg']" },
+    { label: "function", value: "() => '/resources/test-image-100x100.jpg'" },
+    { label: "object", value: "{ a: '/resources/test-image-100x100.jpg' }" },
+  ].forEach(({ label, value }) => {
+    test(`src prop handles ${label} by rendering broken image`, async ({ page, initTestBed }) => {
+      await initTestBed(`<Image testId="img" src="{${value}}" />`);
+      const img = page.getByTestId("img");
 
-  test.skip(
-    "handles null src prop",
-    SKIP_REASON.UNSURE("Need to define how we handle incorrect input formats"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Image testId="img" src="{null}" />`);
-      await expect(page.getByTestId("img")).not.toBeAttached();
-    },
-  );
+      await expect(img).toBeVisible();
 
-  test.skip(
-    "handles undefined src prop",
-    SKIP_REASON.UNSURE("Need to define how we handle incorrect input formats"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Image testId="img" src="{undefined}" />`);
-      await expect(page.getByTestId("img")).not.toBeAttached();
-    },
-  );
+      const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
+      const naturalHeight = await img.evaluate((el: HTMLImageElement) => el.naturalHeight);
 
-  test.skip(
-    "handles number src prop",
-    SKIP_REASON.UNSURE("Need to define how we handle incorrect input formats"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Image testId="img" src="{123}" />`);
-      await expect(page.getByTestId("img")).not.toBeAttached();
-    },
-  );
+      expect(naturalWidth).toBe(0);
+      expect(naturalHeight).toBe(0);
+    });
+  });
 
-  test.skip(
-    "handles boolean src prop",
-    SKIP_REASON.UNSURE("Need to define how we handle incorrect input formats"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Image testId="img" src="{true}" />`);
-      await expect(page.getByTestId("img")).not.toBeAttached();
-    },
-  );
+  [
+    { label: "empty string", prop: "alt=\"\"", expected: undefined },
+    { label: "string", prop: 'alt="some text"', expected: "some text" },
+    { label: "number", prop: 'alt="{123}"', expected: "123" },
+    { label: "boolean", prop: 'alt="{true}"', expected: "true" },
+  ].forEach(({ label, prop, expected }) => {
+    test(`alt attribute appears if value is ${label}`, async ({ page, initTestBed }) => {
+      await initTestBed(`<Image testId="img" ${prop} />`);
+      const img = page.getByTestId("img");
+
+      await expect(img).toBeVisible();
+      await expect(img).toHaveAttribute("alt", expected);
+    });
+  });
+
+  [
+    { label: "null", prop: 'alt="{null}"' },
+    { label: "undefined", prop: 'alt="{undefined}"' },
+    { label: "empty object", prop: 'alt="{{}}"' },
+    { label: "empty array", prop: 'alt="{[]}"' },
+    { label: "array", prop: 'alt="{[\'/resources/test-image-100x100.jpg\']}"' },
+    { label: "function", prop: 'alt="{() => \'/resources/test-image-100x100.jpg\'}"' },
+    { label: "object", prop: 'alt="{{ a: \'/resources/test-image-100x100.jpg\' }}"' },
+  ].forEach(({ label, prop }) => {
+    test(`alt attr not shown if value is ${label}`, async ({ page, initTestBed }) => {
+      await initTestBed(`<Image testId="img" ${prop} />`);
+      const img = page.getByTestId("img");
+
+      await expect(img).toBeVisible();
+      await expect(img).not.toHaveAttribute("alt");
+    });
+  });
 
   test("handles very long src URL", async ({ page, initTestBed }) => {
     const longUrl = "/very/long/path/".repeat(20) + "image.jpg";

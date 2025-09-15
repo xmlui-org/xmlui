@@ -1,4 +1,4 @@
-import { CSSProperties, HTMLAttributes, forwardRef } from "react";
+import { type CSSProperties, type HTMLAttributes, forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Image.module.scss";
@@ -39,6 +39,8 @@ export const Image = forwardRef(function Img(
   }: Props,
   ref,
 ) {
+  src = safeConvertPropToString(src);
+  alt = safeConvertPropToString(alt);
   return (
     <img
       {...rest}
@@ -65,3 +67,16 @@ export const Image = forwardRef(function Img(
     />
   );
 });
+
+function safeConvertPropToString(prop: unknown): string | undefined {
+  if (typeof prop === "string") return prop;
+  if (
+    prop != null &&
+    typeof prop !== "object" &&
+    typeof prop !== "function" &&
+    !Number.isNaN(prop)
+  ) {
+    return String(prop);
+  }
+  return undefined;
+}

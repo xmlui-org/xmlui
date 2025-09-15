@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -40,11 +41,7 @@ test("initialValue sets the selected option", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 });
 
-test("opens dropdown when clicked", async ({
-  initTestBed,
-  page,
-  createAutoCompleteDriver,
-}) => {
+test("opens dropdown when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
   await initTestBed(`
     <AutoComplete>
       <Option value="1" label="Bruce Wayne" />
@@ -415,16 +412,25 @@ test("autoFocus brings focus to the component on load", async ({ initTestBed, pa
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 });
 
-test("label is displayed correctly", async ({ initTestBed, page }) => {
-  const label = "Select a superhero";
-  await initTestBed(`
-    <AutoComplete label="${label}">
+test.skip(
+  "input has linked label",
+  SKIP_REASON.XMLUI_BUG(
+    "Cmdk limitation: it generates an ID internally removing the possibility to add a label externally.",
+  ),
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+    <AutoComplete label="Select hero">
       <Option value="1" label="Bruce Wayne" />
     </AutoComplete>
   `);
 
-  await expect(page.getByText(label)).toBeVisible();
-});
+    const inp = page.getByLabel("Select hero");
+    await inp.fill("Bruce");
+
+    const opt = page.getByRole("option", { name: "Bruce Wayne" });
+    await expect(opt).toBeVisible();
+  },
+);
 
 test("creates new option when typing non-existing value", async ({
   initTestBed,
@@ -462,32 +468,38 @@ test("creates new option when typing non-existing value", async ({
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.skip("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
-  // TODO: review these Copilot-created tests
-  await initTestBed(`
+test.skip(
+  "has appropriate ARIA attributes",
+  SKIP_REASON.XMLUI_BUG(
+    "There's a weird issue where the aria-expanded attribute is not set correctly on the input but it is on the wrapping div.",
+  ),
+  async ({ initTestBed, page }) => {
+    // TODO: review these Copilot-created tests
+    await initTestBed(`
     <AutoComplete label="Select a hero" placeholder="Search heroes">
       <Option value="1" label="Bruce Wayne" />
       <Option value="2" label="Clark Kent" />
       <Option value="3" label="Diana Prince" />
     </AutoComplete>
   `);
-  
-  // Get the combobox element
-  const combobox = page.getByRole("combobox");
-  
-  // Check initial ARIA attributes
-  await expect(combobox).toHaveAttribute("aria-autocomplete", "list");
-  await expect(combobox).toHaveAttribute("aria-expanded", "false");
-  
-  // Open the dropdown
-  await combobox.click();
-  
-  // Check expanded state
-  await expect(combobox).toHaveAttribute("aria-expanded", "true");
-  
-  // Check that options have proper roles
-  await expect(page.getByRole("option")).toHaveCount(3);
-});
+
+    // Get the combobox element
+    const combobox = page.getByRole("combobox");
+
+    // Check initial ARIA attributes
+    await expect(combobox).toHaveAttribute("aria-autocomplete", "list");
+    await expect(combobox).toHaveAttribute("aria-expanded", "false");
+
+    // Open the dropdown
+    await combobox.click();
+
+    // Check expanded state
+    await expect(combobox).toHaveAttribute("aria-expanded", "true");
+
+    // Check that options have proper roles
+    await expect(page.getByRole("option")).toHaveCount(3);
+  },
+);
 
 test("supports keyboard navigation with arrow keys", async ({ initTestBed, page }) => {
   await initTestBed(`
@@ -497,19 +509,19 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
       <Option value="3" label="Diana Prince" />
     </AutoComplete>
   `);
-  
+
   // Focus the autocomplete
   await page.getByRole("combobox").focus();
-  
+
   // Open dropdown with arrow down
   await page.keyboard.press("ArrowDown", { delay: 100 });
   await expect(page.getByRole("listbox")).toBeVisible();
-  
+
   // Navigate through options
   await page.keyboard.press("ArrowDown", { delay: 100 }); // First option
   await page.keyboard.press("ArrowDown", { delay: 100 }); // Second option
   await page.keyboard.press("ArrowDown", { delay: 100 }); // Third option
-  await page.keyboard.press("ArrowUp", { delay: 100 });   // Back to second option
+  await page.keyboard.press("ArrowUp", { delay: 100 }); // Back to second option
 
   // Select with Enter
   await page.keyboard.press("Enter", { delay: 100 });
