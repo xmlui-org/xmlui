@@ -40,7 +40,7 @@ export const Image = forwardRef(function Img(
   ref,
 ) {
   src = safeConvertPropToString(src);
-  alt = safeConvertPropToString(alt) ?? "";
+  alt = safeConvertPropToString(alt);
   return (
     <img
       {...rest}

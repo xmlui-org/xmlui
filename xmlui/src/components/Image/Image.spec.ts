@@ -7,11 +7,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("img")).toBeVisible();
   });
 
-  test("handles undefined src", async ({ page, initTestBed }) => {
-    await initTestBed(`<Image testId="img" />`);
-    await expect(page.getByTestId("img")).not.toHaveAttribute("src");
-  });
-
   test("displays image with valid src", async ({ page, initTestBed }) => {
     await initTestBed(`<Image testId="img" src="/resources/test-image-100x100.jpg" />`);
     await expect(page.getByTestId("img")).toHaveAttribute(
@@ -189,6 +184,39 @@ test.describe("Other Edge Cases", () => {
 
       expect(naturalWidth).toBe(0);
       expect(naturalHeight).toBe(0);
+    });
+  });
+
+  [
+    { label: "empty string", prop: "alt=\"\"", expected: undefined },
+    { label: "string", prop: 'alt="some text"', expected: "some text" },
+    { label: "number", prop: 'alt="{123}"', expected: "123" },
+    { label: "boolean", prop: 'alt="{true}"', expected: "true" },
+  ].forEach(({ label, prop, expected }) => {
+    test(`alt attribute appears if value is ${label}`, async ({ page, initTestBed }) => {
+      await initTestBed(`<Image testId="img" ${prop} />`);
+      const img = page.getByTestId("img");
+
+      await expect(img).toBeVisible();
+      await expect(img).toHaveAttribute("alt", expected);
+    });
+  });
+
+  [
+    { label: "null", prop: 'alt="{null}"' },
+    { label: "undefined", prop: 'alt="{undefined}"' },
+    { label: "empty object", prop: 'alt="{{}}"' },
+    { label: "empty array", prop: 'alt="{[]}"' },
+    { label: "array", prop: 'alt="{[\'/resources/test-image-100x100.jpg\']}"' },
+    { label: "function", prop: 'alt="{() => \'/resources/test-image-100x100.jpg\'}"' },
+    { label: "object", prop: 'alt="{{ a: \'/resources/test-image-100x100.jpg\' }}"' },
+  ].forEach(({ label, prop }) => {
+    test(`alt attr not shown if value is ${label}`, async ({ page, initTestBed }) => {
+      await initTestBed(`<Image testId="img" ${prop} />`);
+      const img = page.getByTestId("img");
+
+      await expect(img).toBeVisible();
+      await expect(img).not.toHaveAttribute("alt");
     });
   });
 
