@@ -18,8 +18,10 @@ export const fragmentComponentRenderer = createComponentRenderer(
   COMP,
   FragmentMd,
   ({ node, extractValue, renderChild, layoutContext }) => {
-    return (
-      <Fragment key={extractValue(node.uid)}>{renderChild(node.children, layoutContext)}</Fragment>
-    );
+    let renderedChild = renderChild(node.children, layoutContext);
+    if(Array.isArray(renderedChild)) {
+      return <Fragment key={extractValue(node.uid)}>{renderedChild}</Fragment>
+    }
+    return renderedChild;
   },
 );
