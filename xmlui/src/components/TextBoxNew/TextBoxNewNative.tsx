@@ -9,6 +9,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
 /**
@@ -143,6 +144,8 @@ export const TextBoxNew = forwardRef(function TextBoxNew(
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const composedRef = ref ? composeRefs(ref, inputRef) : inputRef;
+  
   // Toggle password visibility
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
@@ -206,6 +209,7 @@ export const TextBoxNew = forwardRef(function TextBoxNew(
 
   return (
       <div
+        {...rest}
         style={{gap}}
         className={classnames(styles.inputRoot, className, {
           [styles.disabled]: !enabled,
@@ -225,7 +229,7 @@ export const TextBoxNew = forwardRef(function TextBoxNew(
         />
         <input
           id={id}
-          ref={inputRef}
+          ref={composedRef}
           data-part-id={PART_INPUT}
           type={actualType}
           className={classnames(styles.input, {

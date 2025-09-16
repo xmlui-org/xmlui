@@ -74,7 +74,7 @@ export const labelBehavior: Behavior = {
     }
     
     // Skip components that handle their own labeling
-    const skipComponents = ['TextArea'];
+    const skipComponents = ['TextBox'];
     if (skipComponents.includes(node.type)) {
       return false;
     }

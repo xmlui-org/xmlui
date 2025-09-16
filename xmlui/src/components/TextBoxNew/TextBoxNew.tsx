@@ -167,6 +167,7 @@ function renderTextBoxNew(
 
   return (
     <TextBoxNew
+      id={node.uid}
       type={type}
       className={className}
       value={state.value}
@@ -179,6 +180,7 @@ function renderTextBoxNew(
       onDidChange={lookupEventHandler("didChange")}
       onFocus={lookupEventHandler("gotFocus")}
       onBlur={lookupEventHandler("lostFocus")}
+      required={extractValue.asOptionalBoolean(node.props.required)}
       registerComponentApi={registerComponentApi}
       startText={extractValue.asOptionalString(node.props.startText)}
       startIcon={extractValue.asOptionalString(node.props.startIcon)}
