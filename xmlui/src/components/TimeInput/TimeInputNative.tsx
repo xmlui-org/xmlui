@@ -694,6 +694,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         <div className={styles.inputGroup}>
           {/* Hour input */}
           <HourInput
+            id={id}
             amPm={amPm}
             autoFocus={autoFocus}
             disabled={!enabled}
@@ -791,25 +792,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       {endAdornment}
     </div>
   );
-
-  // Wrap with label if needed
-  if (label) {
-    return (
-      <ItemWithLabel
-        label={label}
-        labelPosition={labelPosition as any}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-      >
-        <>
-          {startAdornment}
-          {timeInputComponent}
-          {endAdornment}
-        </>
-      </ItemWithLabel>
-    );
-  }
 
   return timeInputComponent;
 });
@@ -918,6 +900,7 @@ type TimeInputElementProps = {
 
 // HourInput component
 type HourInputProps = {
+  id?: string;
   amPm?: AmPmType | null;
   maxTime?: string;
   minTime?: string;

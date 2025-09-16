@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 
 import type { RendererContext } from "../../abstractions/RendererDefs";
-import { animationBehavior, tooltipBehavior } from "./CoreBehaviors";
+import { animationBehavior, tooltipBehavior, labelBehavior } from "./CoreBehaviors";
 import { ComponentDef } from "../..";
 
 /**
@@ -89,6 +89,9 @@ export const BehaviorsProvider = ({ children }: { children: ReactNode }) => {
     }
     if (process.env.VITE_USED_BEHAVIORS_Tooltip !== "false") {
       registerBehavior(tooltipBehavior);
+    }
+    if (process.env.VITE_USED_BEHAVIORS_Label !== "false") {
+      registerBehavior(labelBehavior);
     }
   }, []);
 

@@ -61,6 +61,10 @@ import { positionedContainerComponentRenderer } from "./PositionedContainer/Posi
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
+import {
+  passwordInputNewComponentRenderer,
+  textBoxNewComponentRenderer,
+} from "./TextBoxNew/TextBoxNew";
 import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
 import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
@@ -553,6 +557,8 @@ export class ComponentRegistry {
       this.registerCoreComponent(realTimeAdapterComponentRenderer);
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
+      this.registerCoreComponent(textBoxNewComponentRenderer);
+      this.registerCoreComponent(passwordInputNewComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
       this.registerCoreComponent(numberBox2ComponentRenderer);
       this.registerCoreComponent(hoverCardComponentRenderer);
