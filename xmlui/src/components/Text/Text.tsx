@@ -92,6 +92,12 @@ export const TextMd = createMetadata({
       ],
     },
   },
+  apis: {
+    hasOverflow: {
+      description: "Returns true when the displayed text overflows its container boundaries.",
+      signature: "hasOverflow(): boolean",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`borderRadius-${COMP}`]: "$borderRadius",
@@ -171,7 +177,7 @@ export const TextMd = createMetadata({
 export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     const {
       variant,
       maxLines,
@@ -201,6 +207,7 @@ export const textComponentRenderer = createComponentRenderer(
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(breakMode) as BreakMode | undefined}
+        registerComponentApi={registerComponentApi}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type React from "react";
-import { forwardRef, useMemo, useRef } from "react";
+import { forwardRef, useMemo, useRef, useImperativeHandle, useCallback, useEffect } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -14,6 +14,10 @@ import {
   TextVariantElement,
 } from "../abstractions";
 
+interface TextAPI {
+  hasOverflow: () => boolean;
+}
+
 type TextProps = {
   uid?: string;
   children?: React.ReactNode;
@@ -25,6 +29,7 @@ type TextProps = {
   breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
+  registerComponentApi?: (api: TextAPI) => void;
   [variantSpecificProps: string]: any;
 };
 
@@ -36,7 +41,7 @@ export const defaultProps = {
   breakMode: "normal" as BreakMode | undefined,
 };
 
-export const Text = forwardRef(function Text(
+export const Text = forwardRef<TextAPI, TextProps>(function Text(
   {
     uid,
     variant,
@@ -48,12 +53,36 @@ export const Text = forwardRef(function Text(
     ellipses = defaultProps.ellipses,
     overflowMode = defaultProps.overflowMode,
     breakMode = defaultProps.breakMode,
+    registerComponentApi,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef,
 ) {
   const innerRef = useRef<HTMLElement>(null);
-  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
+  
+  // Implement hasOverflow function
+  const hasOverflow = useCallback((): boolean => {
+    const element = innerRef.current;
+    if (!element) return false;
+    
+    // Check both horizontal and vertical overflow
+    const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
+    const hasVerticalOverflow = element.scrollHeight > element.clientHeight;
+    
+    return hasHorizontalOverflow || hasVerticalOverflow;
+  }, []);
+
+  // Expose API using useImperativeHandle
+  useImperativeHandle(forwardedRef, () => ({
+    hasOverflow,
+  }), [hasOverflow]);
+
+  // Register API with XMLUI if provided
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({ hasOverflow });
+    }
+  }, [registerComponentApi, hasOverflow]);
 
   // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props
@@ -144,7 +173,7 @@ export const Text = forwardRef(function Text(
   return (
     <Element
       {...restVariantSpecificProps}
-      ref={ref as any}
+      ref={innerRef as any}
       className={classnames(
         syntaxHighlightClasses,
         styles.text,
