@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type React from "react";
-import { forwardRef, useMemo, useRef, useImperativeHandle, useCallback, useEffect } from "react";
+import { forwardRef, useMemo, useRef, useCallback, useEffect } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -38,7 +38,7 @@ export const defaultProps = {
   breakMode: "normal" as BreakMode | undefined,
 };
 
-export const Text = forwardRef<TextProps>(function Text(
+export const Text = forwardRef(function Text(
   {
     uid,
     variant,
@@ -56,7 +56,8 @@ export const Text = forwardRef<TextProps>(function Text(
   forwardedRef,
 ) {
   const innerRef = useRef<HTMLElement>(null);
-  
+  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
+
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
     const element = innerRef.current;
@@ -68,11 +69,6 @@ export const Text = forwardRef<TextProps>(function Text(
     
     return hasHorizontalOverflow || hasVerticalOverflow;
   }, []);
-
-  // Expose API using useImperativeHandle
-  useImperativeHandle(forwardedRef, () => ({
-    hasOverflow,
-  }), [hasOverflow]);
 
   // Register API with XMLUI if provided
   useEffect(() => {
@@ -170,7 +166,7 @@ export const Text = forwardRef<TextProps>(function Text(
   return (
     <Element
       {...restVariantSpecificProps}
-      ref={innerRef as any}
+      ref={ref as any}
       className={classnames(
         syntaxHighlightClasses,
         styles.text,
