@@ -13,10 +13,7 @@ import {
   type TextVariant,
   TextVariantElement,
 } from "../abstractions";
-
-interface TextAPI {
-  hasOverflow: () => boolean;
-}
+import { RegisterComponentApiFn } from "../..";
 
 type TextProps = {
   uid?: string;
@@ -29,7 +26,7 @@ type TextProps = {
   breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
-  registerComponentApi?: (api: TextAPI) => void;
+  registerComponentApi?: RegisterComponentApiFn;
   [variantSpecificProps: string]: any;
 };
 
@@ -41,7 +38,7 @@ export const defaultProps = {
   breakMode: "normal" as BreakMode | undefined,
 };
 
-export const Text = forwardRef<TextAPI, TextProps>(function Text(
+export const Text = forwardRef<TextProps>(function Text(
   {
     uid,
     variant,
