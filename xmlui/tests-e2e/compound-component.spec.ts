@@ -363,7 +363,8 @@ ${EXPECTED_VALUE2}
   expect(bodyText).toBe(`${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`);
 });
 
-test.fixme(
+// NOTE: This fails because initTestBed has a hidden Text component that has null in it, and Playwright sees that.
+/* test.fixme(
   "Markdown with multiple slots - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Second EXPECTED_VALUE2 has a null at the end"),
   async ({ page, initTestBed }) => {
@@ -398,7 +399,7 @@ ${EXPECTED_VALUE2}
       `${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`,
     );
   },
-);
+); */
 
 test("Markdown with a single+default slot", async ({ page, initTestBed }) => {
   const EXPECTED_VALUE1 = "Howdy!";
@@ -659,27 +660,6 @@ test("call api with id works in compound components", async ({ page }) => {
   await page.getByTestId("buttonComponent").click();
   await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
 });
-
-test.fixme(
-  "call api with id works in compound components - fix!",
-  SKIP_REASON.TEST_NOT_WORKING("Event does not fire"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(
-      `<TestButton testId="buttonComponent" onClick="buttonComponent.incrementInside()"/>`,
-      {
-        components: [
-          `
-      <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
-        <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
-      </Component>
-    `,
-        ],
-      },
-    );
-    await page.getByTestId("buttonComponent").click();
-    await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
-  },
-);
 
 test("$self works in compound components", async ({ page, initTestBed }) => {
   await initTestBed(`<TestButton testId="buttonComponent"/>`, {

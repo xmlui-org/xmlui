@@ -197,52 +197,6 @@ test("Compound components works", async ({ page }) => {
   await expect(page.getByTestId("button3")).toHaveText("Button3 1");
 });
 
-test.fixme(
-  "Compound components work - fix!",
-  SKIP_REASON.TEST_NOT_WORKING("Events not firing, must be translation issue from JSON from XMLUI"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-    <TestButton 
-      var.counter1="{0}" var.counter2="{0}" var.counter3="{0}"
-      label1="Button1 {counter1}" label2="Button2 {counter2}" label3="Button3 {counter3}"
-      onClick1="counter1++" onClick2="counter2++" onClick3="counter3++"
-    />`,
-      {
-        components: [
-          `
-        <Component name="TestButton">
-          <Stack>
-            <Button testId="button1" label="{$props.label1}" onClick="emitEvent('onClick1')" />
-            <Button testId="button2" label="{$props.label2}" onClick="emitEvent('onClick2')" />
-            <AnotherTestButton testId="button3" label="{$props.label3}" onClick="emitEvent('onClick3')" />
-          </Stack>
-        </Component>
-        `,
-          `
-        <Component name="AnotherTestButton">
-          <Button label="{$props.label}" onClick="emitEvent('click')" />
-        </Component>
-        `,
-        ],
-      },
-    );
-    const button1 = page.getByTestId("button1");
-    const button2 = page.getByTestId("button2");
-    const button3 = page.getByTestId("button3");
-
-    await button1.click();
-    await button1.click();
-    await button1.click();
-    await expect(button1).toHaveText("Button1 3");
-    await button2.click();
-    await button2.click();
-    await expect(button2).toHaveText("Button2 2");
-    await button3.click();
-    await expect(button3).toHaveText("Button3 1");
-  },
-);
-
 test("Arrow in arrow works", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Stack
@@ -447,59 +401,6 @@ test("Async hell", async ({ page }) => {
     '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}'
   );
 });
-
-test.fixme(
-  "Async hell - fix!",
-  SKIP_REASON.TEST_NOT_WORKING("Events do not fire correctly"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(`
-    <Stack
-      var.asyncValue="{ { valami: { counter: 0, counter2: 0 } } }"
-      var.stuff="{ { a: { b: { c: 0 } } } }"
-      var.results=""
-      var.getResult="{()=> { delay(100); return asyncValue.valami.counter } }"
-      var.set1="{()=> {
-        if( !results['set1'] ){ results['set1'] = {}; }
-        results['set1'].setting = true;
-        asyncValue.valami.counter += 1;
-        results['set1'].value = asyncValue.valami.counter;
-        results['set1'].setting = false;
-        }}"
-      var.set2="{()=> {
-        if(!results['set2']){ results['set2'] = {}; };
-        results['set2'].setting = true;
-        const res = getResult();
-        asyncValue.valami.counter2 += res;
-        results['set2'].value = asyncValue.valami.counter2;
-        results['set2'].setting = false;
-        }}"
-    >
-      <Text testId="text1" value="{JSON.stringify(asyncValue.valami)}" />
-      <Text testId="text2" value="{JSON.stringify(results)}" />
-      <Stack>
-        <Button testId="button1" onClick="set1()" />
-        <Button testId="button2" onClick="set2()" />
-      </Stack>
-    </Stack>`);
-
-    await expect(page.getByTestId("text1")).toHaveText('{"counter":1,"counter2":1}');
-    await expect(page.getByTestId("text2")).toHaveText(
-      '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}',
-    );
-    await page.getByTestId("button1").click();
-    await delay(200);
-    await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":1}');
-    await expect(page.getByTestId("text2")).toHaveText(
-      '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}',
-    );
-    await page.getByTestId("button2").click();
-    await delay(200);
-    await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":3}');
-    await expect(page.getByTestId("text2")).toHaveText(
-      '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}',
-    );
-  },
-);
 
 test("Async return value works", async ({ page, initTestBed }) => {
   await initTestBed(`
