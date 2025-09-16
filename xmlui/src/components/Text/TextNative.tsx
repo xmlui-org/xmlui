@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type React from "react";
-import { forwardRef, useMemo, useRef } from "react";
+import { forwardRef, useMemo, useRef, useCallback, useEffect } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -13,6 +13,7 @@ import {
   type TextVariant,
   TextVariantElement,
 } from "../abstractions";
+import { RegisterComponentApiFn } from "../..";
 
 type TextProps = {
   uid?: string;
@@ -25,6 +26,7 @@ type TextProps = {
   breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
+  registerComponentApi?: RegisterComponentApiFn;
   [variantSpecificProps: string]: any;
 };
 
@@ -48,12 +50,32 @@ export const Text = forwardRef(function Text(
     ellipses = defaultProps.ellipses,
     overflowMode = defaultProps.overflowMode,
     breakMode = defaultProps.breakMode,
+    registerComponentApi,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef,
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
+
+  // Implement hasOverflow function
+  const hasOverflow = useCallback((): boolean => {
+    const element = innerRef.current;
+    if (!element) return false;
+    
+    // Check both horizontal and vertical overflow
+    const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
+    const hasVerticalOverflow = element.scrollHeight > element.clientHeight;
+    
+    return hasHorizontalOverflow || hasVerticalOverflow;
+  }, []);
+
+  // Register API with XMLUI if provided
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({ hasOverflow });
+    }
+  }, [registerComponentApi, hasOverflow]);
 
   // NOTE: This is to accept syntax highlight classes coming from shiki
   // classes need not to be added to the rendered html element, so we remove them from props

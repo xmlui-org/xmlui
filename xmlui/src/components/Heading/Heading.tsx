@@ -56,6 +56,10 @@ const APIS_DESC = {
     signature: "scrollIntoView()",
     description: "Scrolls the heading into view.",
   },
+  hasOverflow: {
+    signature: "hasOverflow()",
+    description: "Returns true when the displayed text overflows the bounds of this heading component.",
+  },
 };
 
 export const HeadingMd = createMetadata({
@@ -289,6 +293,7 @@ type RenderHeadingProps = {
   level: string;
   showAnchor?: boolean;
   renderChild: RenderChildFn;
+  registerComponentApi?: (api: any) => void;
 };
 
 function renderHeading({
@@ -298,6 +303,7 @@ function renderHeading({
   level,
   showAnchor,
   renderChild,
+  registerComponentApi,
 }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
@@ -311,6 +317,7 @@ function renderHeading({
       showAnchor={extractValue.asOptionalBoolean(showAnchor)}
       className={className}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
+      registerComponentApi={registerComponentApi}
       {...resolveAndCleanProps(restProps, extractValue)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
@@ -321,13 +328,14 @@ function renderHeading({
 export const headingComponentRenderer = createComponentRenderer(
   COMP,
   HeadingMd,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node: node as HeadingComponentDef,
       extractValue,
       className,
       level: node.props.level,
       renderChild,
+      registerComponentApi,
     });
   },
 );
@@ -335,13 +343,14 @@ export const headingComponentRenderer = createComponentRenderer(
 export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h1",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -349,13 +358,14 @@ export const h1ComponentRenderer = createComponentRenderer(
 export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h2",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -363,13 +373,14 @@ export const h2ComponentRenderer = createComponentRenderer(
 export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h3",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -377,13 +388,14 @@ export const h3ComponentRenderer = createComponentRenderer(
 export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h4",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -391,13 +403,14 @@ export const h4ComponentRenderer = createComponentRenderer(
 export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h5",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -405,13 +418,14 @@ export const h5ComponentRenderer = createComponentRenderer(
 export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h6",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
