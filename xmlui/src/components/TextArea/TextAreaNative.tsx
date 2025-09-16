@@ -143,6 +143,14 @@ export const TextArea = forwardRef(function TextArea(
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [autoFocus, inputRef.current]);
+
   // --- Execute this function when the user copies the value
   const handleCopy = (event: React.SyntheticEvent) => {
     if (allowCopy) {
@@ -242,7 +250,6 @@ export const TextArea = forwardRef(function TextArea(
     style: style as any,
     value: controlled ? value || "" : undefined,
     disabled: !enabled,
-    autoFocus,
     name: id,
     placeholder,
     required,
