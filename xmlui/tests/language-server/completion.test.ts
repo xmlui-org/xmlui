@@ -3,7 +3,7 @@ import {
   handleCompletion,
   handleCompletionResolve,
 } from "../../src/language-server/services/completion";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
+import { createXmlUiParser, toDbgString } from "../../src/parsers/xmlui-parser";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
@@ -120,6 +120,26 @@ describe("Completion", () => {
     expect(resolvedItem).toMatchObject(expected);
     expect(docs).toContain(widthDescription);
   });
+
+  it("dumdum", () => {
+    const suggestions = completeAtPoundSign("<Button><#f").map(({ label }) => label);
+    //expect(suggestions[0]).toBe("/Button");
+
+  // findTokenAtPos(`<A# t="true">`) = {
+  //   
+  //   chainAt: [ContentListNode, ElementNode, AttributeListNode, Attribute, AttrubuteKeyNode, Identifier"t"],
+  //   chainBef: [ContentListNode, Elementknode, ElementNameNode, Identifier"A"],
+  //   sharedParents: 2
+  // }
+  //                                  -> AttributeListNode, Attribute, AttrubuteKeyNode, Identifier"t"
+  //                                /
+  // ContentListNode -> ElementNode 
+  //                                \
+  //                                 -> ElementNameNode, Identifier"A"
+  //
+  // 
+  // így használjuk legikább: chainAt.at(-1)
+  });
 });
 
 function completeAtPoundSign(source: string) {
@@ -133,8 +153,9 @@ function completeAtPoundSign(source: string) {
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
 
-  const parseResult = parser.parse();
 
+  const parseResult = parser.parse();
+  console.log(toDbgString(parseResult.node, parser.getText));
   return handleCompletion(
     { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
     position,
