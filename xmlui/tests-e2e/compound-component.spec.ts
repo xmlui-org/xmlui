@@ -1,5 +1,6 @@
 import { SKIP_REASON } from "../src/testing/component-test-helpers";
 import { expect, test } from "../src/testing/fixtures";
+import { initApp } from "../src/testing/themed-app-test-helpers";
 
 test("static coumpound component renders", async ({ page, initTestBed }) => {
   const EXPECTED_TEXT = "Test content text";
@@ -73,7 +74,7 @@ test("ChildSlot rendered in compound components", async ({ page, initTestBed }) 
 
 test("Default slot rendered in compound components", async ({ page, initTestBed }) => {
   const EXPECTED_DEFAULT_SLOT = "Default slot content";
-  await initTestBed(`<Custom />`, {
+  await initTestBed(`<Custom></Custom>`, {
     components: [
       `
       <Component name="Custom">
@@ -330,8 +331,40 @@ ${EXPECTED_VALUE2}
   await expect(page.getByText(EXPECTED_VALUE2)).toBeVisible();
 });
 
+test("Markdown with multiple slots", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Hello, world!";
+  const EXPECTED_VALUE2 = "Here I am";
+
+  await initApp(page, {
+    // NOTE: This test runs, but TS is unhappy about the components property
+    //@ts-ignore
+    components: `
+        <Component name="Custom">
+          <VStack>
+            <Markdown>
+              <Slot />
+              <Slot />
+            </Markdown>
+          </VStack>
+        </Component>
+        `,
+    entryPoint: `
+      <Custom>
+        <![CDATA[
+## ${EXPECTED_VALUE1}
+
+${EXPECTED_VALUE2}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  const bodyText = await page.locator('body').innerText();
+  expect(bodyText).toBe(`${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`);
+});
+
 test.fixme(
-  "Markdown with multiple slots",
+  "Markdown with multiple slots - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Second EXPECTED_VALUE2 has a null at the end"),
   async ({ page, initTestBed }) => {
     const EXPECTED_VALUE1 = "Hello, world!";
@@ -609,8 +642,26 @@ test("$this works in compound components", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
 });
 
+test("call api with id works in compound components", async ({ page }) => {
+  await initApp(page, {
+    // NOTE: This test runs, but TS is unhappy about the components property
+    //@ts-ignore
+    components: `
+        <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
+        </Component>
+    `,
+    entryPoint: `
+        <TestButton id="buttonComponent" onClick="buttonComponent.incrementInside()"/>
+    `,
+  });
+
+  await page.getByTestId("buttonComponent").click();
+  await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
+});
+
 test.fixme(
-  "call api with id works in compound components",
+  "call api with id works in compound components - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Event does not fire"),
   async ({ page, initTestBed }) => {
     await initTestBed(

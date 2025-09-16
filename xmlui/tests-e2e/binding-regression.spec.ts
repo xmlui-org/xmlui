@@ -1,5 +1,6 @@
 import { SKIP_REASON } from "../src/testing/component-test-helpers";
 import { expect, test } from "../src/testing/fixtures";
+import { initApp } from "../src/testing/themed-app-test-helpers";
 
 test("Increment counter through arrow function works", async ({ page, initTestBed }) => {
   await initTestBed(`
@@ -98,8 +99,106 @@ test("Array.map works with the binding engine", async ({ page, initTestBed }) =>
   await expect(page.getByTestId("button")).toHaveText('[{"id":1},{"id":2},{"id":3}]');
 });
 
+test("Compound components works", async ({ page }) => {
+  await initApp(page, {
+    name: "Compound component",
+    components: [
+      {
+        name: "AnotherTestButton",
+        component: {
+          type: "Button",
+          uid: "test button inner compound inner1",
+          props: {
+            debug: true,
+            label: "{$props.label}",
+          },
+          events: {
+            click: "emitEvent('click')",
+          },
+        },
+      },
+      {
+        name: "TestButton",
+        component: {
+          type: "Stack",
+          props: {
+            debug: true,
+          },
+          children: [
+            {
+              type: "Button",
+              uid: "test button inner1",
+              testId: "button1",
+              props: {
+                debug: true,
+                label: "{$props.label1}",
+              },
+              events: {
+                click: "emitEvent('click1')",
+              },
+            },
+            {
+              type: "Button",
+              testId: "button2",
+              uid: "test button inner2",
+              props: {
+                debug: true,
+                label: "{$props.label2}",
+              },
+              events: {
+                click: "emitEvent('click2')",
+              },
+            },
+            {
+              type: "AnotherTestButton",
+              testId: "button3",
+              uid: "test button inner compound",
+              props: {
+                debug: true,
+                label: "{$props.label3}",
+              },
+              events: {
+                click: "emitEvent('click3')",
+              },
+            },
+          ],
+        },
+      },
+    ],
+    entryPoint: {
+      type: "TestButton",
+      vars: {
+        counter1: 0,
+        counter2: 0,
+        counter3: 0,
+      },
+      uid: "test button used",
+      props: {
+        debug: true,
+        label1: "Button1 {counter1}",
+        label2: "Button2 {counter2}",
+        label3: "Button3 {counter3}",
+      },
+      events: {
+        click1: "counter1++",
+        click2: "counter2++",
+        click3: "counter3++",
+      },
+    },
+  });
+  await page.getByTestId("button1").click();
+  await page.getByTestId("button1").click();
+  await page.getByTestId("button1").click();
+  await expect(page.getByTestId("button1")).toHaveText("Button1 3");
+  await page.getByTestId("button2").click();
+  await page.getByTestId("button2").click();
+  await expect(page.getByTestId("button2")).toHaveText("Button2 2");
+  await page.getByTestId("button3").click();
+  await expect(page.getByTestId("button3")).toHaveText("Button3 1");
+});
+
 test.fixme(
-  "Compound components work",
+  "Compound components work - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Events not firing, must be translation issue from JSON from XMLUI"),
   async ({ page, initTestBed }) => {
     await initTestBed(
@@ -243,8 +342,114 @@ test("Setting null-values variable works", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("button")).toHaveText("0");
 });
 
+test("Async hell", async ({ page }) => {
+  await initApp(page, {
+    entryPoint: {
+      type: "Stack",
+      vars: {
+        asyncValue: {
+          valami: {
+            counter: 0,
+            counter2: 0,
+          },
+        },
+        stuff: {
+          a: {
+            b: {
+              c: 0,
+            },
+          },
+        },
+        results: {},
+
+        getResult: "{()=> { delay(100); return asyncValue.valami.counter} }",
+        set1: `{()=> {
+      if( !results['set1'] ){ results['set1'] = {}; }
+      results['set1'].setting = true;
+      asyncValue.valami.counter += 1;
+      results['set1'].value = asyncValue.valami.counter; 
+      results['set1'].setting = false;
+     }}`,
+        set2: `{()=> {
+      if(!results['set2']){ results['set2'] = {}; };
+      results['set2'].setting = true;
+      const res = getResult();
+      asyncValue.valami.counter2 += res; 
+      results['set2'].value = asyncValue.valami.counter2; 
+      results['set2'].setting = false;
+    }}`,
+      },
+      children: [
+        {
+          type: "Text",
+          testId: "text1",
+          props: {
+            value: "{JSON.stringify(asyncValue.valami)}",
+          },
+        },
+        {
+          type: "Text",
+          testId: "text2",
+          props: {
+            value: "{JSON.stringify(results)}",
+          },
+        },
+        {
+          type: "Stack",
+          children: [
+            {
+              type: "Button",
+              testId: "button1",
+              props: {},
+              events: {
+                click: "set1();",
+              },
+            },
+          ],
+          events: {
+            mounted: "set1()",
+          },
+        },
+        {
+          type: "Stack",
+          children: [
+            {
+              type: "Button",
+              testId: "button2",
+              props: {},
+              events: {
+                click: "set2();",
+              },
+            },
+          ],
+          events: {
+            mounted: "set2()",
+          },
+        },
+      ],
+    },
+  });
+
+  await expect(page.getByTestId("text1")).toHaveText('{"counter":1,"counter2":1}');
+  await expect(page.getByTestId("text2")).toHaveText(
+    '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}'
+  );
+  await page.getByTestId("button1").click();
+  await delay(200);
+  await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":1}');
+  await expect(page.getByTestId("text2")).toHaveText(
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}'
+  );
+  await page.getByTestId("button2").click();
+  await delay(200);
+  await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":3}');
+  await expect(page.getByTestId("text2")).toHaveText(
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}'
+  );
+});
+
 test.fixme(
-  "Async hell",
+  "Async hell - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Events do not fire correctly"),
   async ({ page, initTestBed }) => {
     await initTestBed(`
