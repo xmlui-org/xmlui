@@ -388,9 +388,10 @@ export default class RestApiProxy {
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);
+    const hasBody = body !== undefined;
 
     const aggregatedHeaders = omitBy(
-      { ...(body ? this.getHeaders() : headersWithoutContentType), ...headers },
+      { ...(hasBody ? this.getHeaders() : headersWithoutContentType), ...headers },
       isUndefined,
     ) as Record<string, string>;
     if (includeClientTxId) {
@@ -405,7 +406,7 @@ export default class RestApiProxy {
     }
 
     let requestBody;
-    if (rawBody) {
+    if (rawBody !== undefined) {
       requestBody = rawBody;
     } else {
       if (payloadType === "multipart-form" || payloadType === "form") {
@@ -423,7 +424,7 @@ export default class RestApiProxy {
           aggregatedHeaders["Content-Type"] = "application/x-www-form-urlencoded";
         }
       } else {
-        requestBody = body ? JSON.stringify(body) : undefined;
+        requestBody = hasBody ? JSON.stringify(body) : undefined;
       }
     }
 
