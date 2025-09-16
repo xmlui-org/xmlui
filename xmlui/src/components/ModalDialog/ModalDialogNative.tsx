@@ -132,6 +132,7 @@ export const ModalDialog = React.forwardRef(
       closeButtonVisible = defaultProps.closeButtonVisible,
       onOpen,
       onClose,
+      className,
       ...rest
     }: ModalProps,
     ref,
@@ -194,7 +195,7 @@ export const ModalDialog = React.forwardRef(
     const Content = (
       <Dialog.Content
         {...rest}
-        className={classnames(styles.content)}
+        className={classnames(styles.content, className)}
         onPointerDownOutside={(event) => {
           if (
             event.target instanceof Element &&
