@@ -78,6 +78,12 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.swapCancelAndSave,
     },
+    hideButtonRowUntilDirty: {
+      description:
+        `This property hides the button row until the form data is modified (dirty).`,
+      type: "boolean",
+      defaultValue: defaultProps.hideButtonRowUntilDirty,
+    },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
       description:
@@ -136,6 +142,7 @@ export const FormMd = createMetadata({
     "textColor-ValidationDisplay-warning": "$color-warning",
     "textColor-ValidationDisplay-info": "$color-info",
     "textColor-ValidationDisplay-valid": "$color-valid",
+    "marginTop-buttonRow-Form": "$space-4"
   },
 });
 
