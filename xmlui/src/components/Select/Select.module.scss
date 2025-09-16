@@ -34,7 +34,7 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
     }
 
-    &:focus {
+    &:focus-visible {
       outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
       outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
       outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
