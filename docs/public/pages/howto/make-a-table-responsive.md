@@ -14,7 +14,7 @@
   { name: 'Eva Brown', email: 'eva@company.com', department: 'HR', status: 'active', salary: '75k' }
 ]}">
   <VStack>
-    <HStack justify="space-between" align="center">
+    <HStack>
       <Text size="lg" weight="bold">Responsive People Table</Text>
       <Badge value="Current: {mediaSize.size}" color="blue" />
     </HStack>
