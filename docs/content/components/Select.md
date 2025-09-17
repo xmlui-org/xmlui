@@ -462,8 +462,8 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |

@@ -280,8 +280,8 @@ This API allows you to get or set the value of the component. If no value is set
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-warning--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |

@@ -193,8 +193,8 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption-validation | 2px | 2px |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | $space-1_5 | $space-1_5 |

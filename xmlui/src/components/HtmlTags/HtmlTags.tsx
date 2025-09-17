@@ -2328,7 +2328,7 @@ export const HtmlTrMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTr),
   defaultThemeVars: {
-    "fontSize-HtmlTr": "$fontSize-small",
+    "fontSize-HtmlTr": "$fontSize-sm",
     "backgroundColor-row-HtmlTr": "inherit",
     //"backgroundColor-HtmlTr--hover": "$color-primary-50",
   },
