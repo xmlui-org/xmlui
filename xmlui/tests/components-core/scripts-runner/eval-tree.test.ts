@@ -3,7 +3,7 @@ import { describe, expect, it, assert } from "vitest";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   evalBinding,
-  evalBindingExpression
+  evalBindingExpression,
 } from "../../../src/components-core/script-runner/eval-tree-sync";
 import { createEvalContext } from "./test-helpers";
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
@@ -22,16 +22,16 @@ describe("Evaluate binding expression tree (exp)", () => {
     { src: "0x12_ae", exp: 0x12ae },
     {
       src: "123456789123456789123456789",
-      exp: BigInt("123456789123456789123456789")
+      exp: BigInt("123456789123456789123456789"),
     },
     { src: '"Hello"', exp: "Hello" },
 
     { src: "Math", exp: Math },
     { src: "Math", con: { Math: 123 }, exp: 123 },
     { src: "::Math", exp: Math },
-    { src: "::Math", con: { Math: 123 }, exp: Math }
+    { src: "::Math", con: { Math: 123 }, exp: Math },
   ];
-  literalCases.forEach(c => {
+  literalCases.forEach((c) => {
     it(`Eval literal: ${c.src}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -66,9 +66,9 @@ describe("Evaluate binding expression tree (exp)", () => {
     { src: "alma", con: { alma: "abc", banana: 223 }, exp: "abc" },
     { src: "alma", con: { alma: true, banana: 223 }, exp: true },
     { src: "alma", con: { alma: false, banana: 223 }, exp: false },
-    { src: "alma", con: { alma: 123.5, banana: 223 }, exp: 123.5 }
+    { src: "alma", con: { alma: 123.5, banana: 223 }, exp: 123.5 },
   ];
-  identifierCases.forEach(c => {
+  identifierCases.forEach((c) => {
     it(`Eval identifier: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -91,11 +91,11 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "alma.b.d.length",
       con: { alma: { b: { c: 123, d: "hello" } } },
-      exp: 5
+      exp: 5,
     },
-    { src: "Math.sin", con: { alma: "banana" }, exp: Math.sin }
+    { src: "Math.sin", con: { alma: "banana" }, exp: Math.sin },
   ];
-  memberAccessCases.forEach(c => {
+  memberAccessCases.forEach((c) => {
     it(`Eval member access: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -115,19 +115,19 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: 'alma["b"]["c"]',
       con: { alma: { b: { c: 123, d: 234 } } },
-      exp: 123
+      exp: 123,
     },
     {
       src: 'alma["b"]["d"]',
       con: { alma: { b: { c: 123, d: 234 } } },
-      exp: 234
+      exp: 234,
     },
     { src: 'alma["length"]', con: { alma: "banana" }, exp: 6 },
     { src: "alma[0]", con: { alma: [1, true, "banana"] }, exp: 1 },
     { src: "alma[1]", con: { alma: [1, true, "banana"] }, exp: true },
-    { src: "alma[2]", con: { alma: [1, true, "banana"] }, exp: "banana" }
+    { src: "alma[2]", con: { alma: [1, true, "banana"] }, exp: "banana" },
   ];
-  calculatedMemberAccessCases.forEach(c => {
+  calculatedMemberAccessCases.forEach((c) => {
     it(`Eval member access: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -151,20 +151,20 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "alma?.b?.c",
       con: { pear: { b: { c: 123, d: 234 } }, alma: undefined },
-      exp: undefined
+      exp: undefined,
     },
     {
       src: "alma?.b?.c",
       con: { alma: { b: { w: 123, d: 234 } } },
-      exp: undefined
+      exp: undefined,
     },
     {
       src: "alma?.b?.c",
       con: { pear: { b: { w: 123, d: 234 } }, alma: undefined },
-      exp: undefined
-    }
+      exp: undefined,
+    },
   ];
-  optionalMemberAccessCases.forEach(c => {
+  optionalMemberAccessCases.forEach((c) => {
     it(`Eval member access: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -188,20 +188,20 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "alma.b.c",
       con: { pear: { b: { c: 123, d: 234 } }, alma: undefined },
-      exp: undefined
+      exp: undefined,
     },
     {
       src: "alma.b.c",
       con: { alma: { b: { w: 123, d: 234 } } },
-      exp: undefined
+      exp: undefined,
     },
     {
       src: "alma.b.c",
       con: { pear: { b: { w: 123, d: 234 } }, alma: undefined },
-      exp: undefined
-    }
+      exp: undefined,
+    },
   ];
-  defaultedMemberAccessCases.forEach(c => {
+  defaultedMemberAccessCases.forEach((c) => {
     it(`Eval forced optional member access: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -213,7 +213,7 @@ describe("Evaluate binding expression tree (exp)", () => {
       const context = createEvalContext({
         localContext: c.con,
         appContext: {},
-        options: { defaultToOptionalMemberAccess: true }
+        options: { defaultToOptionalMemberAccess: true },
       });
       const value = evalBinding(expr, context);
       expect(value).equal(c.exp);
@@ -225,21 +225,21 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "1, a+b, alma.b.c",
       con: { alma: { b: { c: 123, d: 234 } }, a: 0, b: 0 },
-      exp: 123
+      exp: 123,
     },
     {
       src: "2, a+b, alma.b.d",
       con: { alma: { b: { c: 123, d: 234 } }, a: 0, b: 0 },
-      exp: 234
+      exp: 234,
     },
     { src: "1, 2, 3, alma.length", con: { alma: "banana" }, exp: 6 },
     {
       src: "alma, alma, alma.b.d.length",
       con: { alma: { b: { c: 123, d: "hello" } } },
-      exp: 5
-    }
+      exp: 5,
+    },
   ];
-  sequenceCases.forEach(c => {
+  sequenceCases.forEach((c) => {
     it(`Eval calculated member access: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -258,20 +258,20 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "[ alma.a, alma.b]",
       con: { alma: { a: 234, b: 123 } },
-      exp: [234, 123]
+      exp: [234, 123],
     },
     {
       src: '[ "banana", alma.a, alma.b]',
       con: { alma: { a: 234, b: 123 } },
-      exp: ["banana", 234, 123]
+      exp: ["banana", 234, 123],
     },
     {
       src: '[ "banana", alma.a, alma.b.c]',
       con: { alma: { a: 234, b: { f: false, c: true } } },
-      exp: ["banana", 234, true]
-    }
+      exp: ["banana", 234, true],
+    },
   ];
-  arrayLiteralCases.forEach(c => {
+  arrayLiteralCases.forEach((c) => {
     it(`Array literal: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -293,45 +293,45 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "{ a: alma.a, b: alma.b }",
       con: { alma: { a: 234, b: 123 } },
-      exp: { a: 234, b: 123 }
+      exp: { a: 234, b: 123 },
     },
     {
       src: "{ a: true, b: alma.b }",
       con: { alma: { a: 234, b: 123 } },
-      exp: { a: true, b: 123 }
+      exp: { a: true, b: 123 },
     },
     {
       src: '{ a: alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { a: 234, b: "banana" }
+      exp: { a: 234, b: "banana" },
     },
     {
       src: '{ "q": alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { q: 234, b: "banana" }
+      exp: { q: 234, b: "banana" },
     },
     {
       src: '{ 123: alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { 123: 234, b: "banana" }
+      exp: { 123: 234, b: "banana" },
     },
     {
       src: '{ [1+2]: alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { 3: 234, b: "banana" }
+      exp: { 3: 234, b: "banana" },
     },
     {
       src: '{ ["abc".length]: alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { 3: 234, b: "banana" }
+      exp: { 3: 234, b: "banana" },
     },
     {
       src: '{ ["app" + "le"]: alma.a, b: "banana" }',
       con: { alma: { a: 234, b: 123 } },
-      exp: { apple: 234, b: "banana" }
+      exp: { apple: 234, b: "banana" },
     },
   ];
-  objectLiteralCases.forEach(c => {
+  objectLiteralCases.forEach((c) => {
     it(`Array literal: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -363,7 +363,7 @@ describe("Evaluate binding expression tree (exp)", () => {
     { src: "typeof alma.b", con: { alma: { b: {} } }, exp: "object" },
     { src: "typeof alma.b", con: { alma: { b: [1, 2, 3] } }, exp: "object" },
   ];
-  unaryCases.forEach(c => {
+  unaryCases.forEach((c) => {
     it(`Unary operation: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -386,7 +386,7 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "123456789123456789 + 123456789123456789123",
       con: {},
-      exp: BigInt("123580245912580245912")
+      exp: BigInt("123580245912580245912"),
     },
     { src: '"👍" + "🚀"', con: {}, exp: "👍🚀" },
     { src: '"Hello," + " World!"', con: {}, exp: "Hello, World!" },
@@ -424,7 +424,7 @@ describe("Evaluate binding expression tree (exp)", () => {
     { src: "alma.b ?? 12", con: { alma: { b: undefined } }, exp: 12 },
     { src: "alma.b ?? 12", con: { alma: { b: 234 } }, exp: 234 },
   ];
-  binaryCases.forEach(c => {
+  binaryCases.forEach((c) => {
     it(`Binary operation: ${c.src}/${JSON.stringify(c.con)}`, () => {
       const context = createEvalContext({ localContext: c.con });
       const value = evalBindingExpression(c.src, context);
@@ -435,26 +435,26 @@ describe("Evaluate binding expression tree (exp)", () => {
   const exponentialCases = [
     {
       src: "2**3",
-      exp: 8
+      exp: 8,
     },
     {
       src: "2**3**2",
-      exp: 512
+      exp: 512,
     },
     {
       src: "4**2**3",
-      exp: 65536
+      exp: 65536,
     },
     {
       src: "1.5**2",
-      exp: 2.25
+      exp: 2.25,
     },
     {
       src: "1.5**2**3",
-      exp: 25.62890625
-    }
+      exp: 25.62890625,
+    },
   ];
-  exponentialCases.forEach(c => {
+  exponentialCases.forEach((c) => {
     it(`Conditional: ${c.src}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -473,20 +473,20 @@ describe("Evaluate binding expression tree (exp)", () => {
     {
       src: "Math.sin(0)",
       con: { alma: { a: 234, b: 123 } },
-      exp: 0
+      exp: 0,
     },
     {
       src: "Math.cos(0.0)",
       con: { alma: { a: 234, b: 123 } },
-      exp: 1
+      exp: 1,
     },
     {
       src: "alma.mul(2, alma.mul(3,4)) + Math.cos(0)",
       con: { alma: { mul: (a: any, b: any) => a * b, b: 123 } },
-      exp: 25
-    }
+      exp: 25,
+    },
   ];
-  functionInvocationCases.forEach(c => {
+  functionInvocationCases.forEach((c) => {
     it(`Function call: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -504,11 +504,11 @@ describe("Evaluate binding expression tree (exp)", () => {
   const itemReferenceCases = [
     {
       src: "$item",
-      con: { "$item": 123 },
-      exp: 123
-    }
+      con: { $item: 123 },
+      exp: 123,
+    },
   ];
-  itemReferenceCases.forEach(c => {
+  itemReferenceCases.forEach((c) => {
     it(`Item reference: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -528,16 +528,16 @@ describe("Evaluate binding expression tree (exp)", () => {
       src: "alma.b",
       con: { pear: 123 },
       aCon: { alma: { b: 234 } },
-      exp: 234
+      exp: 234,
     },
     {
       src: "alma.b",
       con: { alma: { b: 123 } },
       aCon: { alma: { b: 234 } },
-      exp: 123
-    }
+      exp: 123,
+    },
   ];
-  appContextCases.forEach(c => {
+  appContextCases.forEach((c) => {
     it(`App context: ${c.src}/${JSON.stringify(c.con)}`, () => {
       // --- Arrange
       const wParser = new Parser(c.src);
@@ -649,11 +649,11 @@ describe("Evaluate binding expression tree (exp)", () => {
     if (!expr) return;
     const context = createEvalContext({
       localContext: {
-        myFunc (...args: any[]) {
+        myFunc(...args: any[]) {
           return args.join(":");
-        }
+        },
       },
-      appContext: {}
+      appContext: {},
     });
     const value = evalBinding(expr, context);
     expect(value).equal("1:2:3:4:5");
@@ -671,11 +671,11 @@ describe("Evaluate binding expression tree (exp)", () => {
     try {
       const context = createEvalContext({
         localContext: {
-          myFunc (...args: any[]) {
+          myFunc(...args: any[]) {
             return args.join(":");
-          }
+          },
         },
-        appContext: {}
+        appContext: {},
       });
       evalBinding(expr, context);
     } catch (err: any) {
@@ -697,9 +697,9 @@ describe("Evaluate binding expression tree (exp)", () => {
     try {
       const context = createEvalContext({
         localContext: {
-          delay: async (time: number) => new Promise(resolve => setTimeout(resolve, time))
+          delay: async (time: number) => new Promise((resolve) => setTimeout(resolve, time)),
         },
-        appContext: {}
+        appContext: {},
       });
       evalBinding(expr, context);
     } catch (err: any) {
@@ -720,11 +720,11 @@ describe("Evaluate binding expression tree (exp)", () => {
     const context = createEvalContext({
       localContext: {
         delay: async (time: number) => {
-          new Promise(resolve => setTimeout(resolve, time));
+          new Promise((resolve) => setTimeout(resolve, time));
           return 123;
-        }
+        },
       },
-      appContext: {}
+      appContext: {},
     });
     const value = await evalBindingAsync(expr, context, undefined);
 
@@ -743,8 +743,8 @@ describe("Evaluate binding expression tree (exp)", () => {
     const context = createEvalContext({ localContext: { alma: {} } });
     const value = evalBinding(expr, context);
     expect(value).equal(true);
-    expect(context.localContext.alma).equal(undefined)
-  })
+    expect(context.localContext.alma).equal(undefined);
+  });
 
   it("delete alma.b #1", () => {
     // --- Arrange
@@ -757,8 +757,8 @@ describe("Evaluate binding expression tree (exp)", () => {
     const context = createEvalContext({ localContext: { alma: {} } });
     const value = evalBinding(expr, context);
     expect(value).equal(true);
-    expect(context.localContext.alma.b).equal(undefined)
-  })
+    expect(context.localContext.alma.b).equal(undefined);
+  });
 
   it("delete alma.b #2", () => {
     // --- Arrange
@@ -771,8 +771,8 @@ describe("Evaluate binding expression tree (exp)", () => {
     const context = createEvalContext({ localContext: { alma: { b: "hello" } } });
     const value = evalBinding(expr, context);
     expect(value).equal(true);
-    expect(context.localContext.alma.b).equal(undefined)
-  })
+    expect(context.localContext.alma.b).equal(undefined);
+  });
 
   it("delete 123", () => {
     // --- Arrange
@@ -785,7 +785,7 @@ describe("Evaluate binding expression tree (exp)", () => {
     const context = createEvalContext({});
     const value = evalBinding(expr, context);
     expect(value).equal(false);
-  })
+  });
 
   it("|| regression #1", () => {
     // --- Arrange
@@ -796,12 +796,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = evalBinding(expr, context);
     expect(value).equal(123);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("|| regression #2", () => {
     // --- Arrange
@@ -812,12 +812,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = evalBinding(expr, context);
     expect(value).equal(true);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("|| regression #3 (async)", async () => {
     // --- Arrange
@@ -828,12 +828,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = await evalBindingAsync(expr, context, context.mainThread);
     expect(value).equal(123);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("|| regression #4 (async)", async () => {
     // --- Arrange
@@ -844,12 +844,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = await evalBindingAsync(expr, context, context.mainThread);
     expect(value).equal(true);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("&& regression #1", () => {
     // --- Arrange
@@ -860,12 +860,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = evalBinding(expr, context);
     expect(value).equal("");
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("&& regression #2", () => {
     // --- Arrange
@@ -876,12 +876,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = evalBinding(expr, context);
     expect(value).equal(false);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("&& regression #3 (async)", async () => {
     // --- Arrange
@@ -892,12 +892,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = await evalBindingAsync(expr, context, context.mainThread);
     expect(value).equal(0);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it("&& regression #4 (async)", async () => {
     // --- Arrange
@@ -908,12 +908,12 @@ describe("Evaluate binding expression tree (exp)", () => {
     expect(expr).not.equal(null);
     if (!expr) return;
     const context = createEvalContext({
-      localContext: { a: 0 }
+      localContext: { a: 0 },
     });
     const value = await evalBindingAsync(expr, context, context.mainThread);
     expect(value).equal(false);
     expect(context.localContext.a).equal(0);
-  })
+  });
 
   it(`Evals template literals`, () => {
     // --- Arrange
@@ -921,7 +921,7 @@ describe("Evaluate binding expression tree (exp)", () => {
 
     // --- Act/Assert
     const expr = wParser.parseExpr();
-    const context = createEvalContext({ localContext: {var1: "c", undef: undefined} });
+    const context = createEvalContext({ localContext: { var1: "c", undef: undefined } });
     const value = evalBinding(expr, context);
     expect(value).to.equal("XYa5bcdundefinedNaNnull${1+2}");
   });
@@ -932,8 +932,21 @@ describe("Evaluate binding expression tree (exp)", () => {
 
     // --- Act/Assert
     const expr = wParser.parseExpr();
-    const context = createEvalContext({ localContext: {var1: "c", undef: undefined} });
+    const context = createEvalContext({ localContext: { var1: "c", undef: undefined } });
     const value = await evalBindingAsync(expr, context, context.mainThread);
     expect(value).to.equal("XYa5bcdundefinedNaNnull${1+2}");
+  });
+
+  it(`template literal method call`, async () => {
+    // --- Arrange
+    const wParser = new Parser("`a  `.trim()");
+
+    // --- Act/Assert
+    const expr = wParser.parseExpr();
+    const context = createEvalContext({
+      localContext: {},
+    });
+    const value = await evalBindingAsync(expr, context, context.mainThread);
+    expect(value).to.equal("a");
   });
 });
