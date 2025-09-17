@@ -1,8 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { ButtonMd } from "../../../src/components/Button/Button";
+import type { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
-import { StackMd } from "../../../src/components/Stack/Stack";
+import type { StackMd } from "../../../src/components/Stack/Stack";
 
 describe("Xmlui transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
@@ -25,9 +25,7 @@ describe("Xmlui transform - attributes", () => {
 
   it("Invalid attribute name fails #3", () => {
     try {
-      transformSource(
-        "<Component name='MyStack' invaAttr='a'><Stack /></Component>",
-      );
+      transformSource("<Component name='MyStack' invaAttr='a'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T021")).equal(true);
@@ -36,9 +34,7 @@ describe("Xmlui transform - attributes", () => {
 
   it("Invalid attribute name fails #4", () => {
     try {
-      transformSource(
-        "<Component invaAttr='a' name='MyStack'><Stack /></Component>",
-      );
+      transformSource("<Component invaAttr='a' name='MyStack'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T021")).equal(true);
@@ -65,6 +61,21 @@ describe("Xmlui transform - attributes", () => {
   it("when works", () => {
     const cd = transformSource("<Stack when='isOpen' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
+    expect(cd.props ?? {}).not.toHaveProperty("when");
     expect(cd.when).equal("isOpen");
+  });
+
+  it("uses works with 1 value", () => {
+    const cd = transformSource("<Stack uses='isOpen' />") as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.props ?? {}).not.toHaveProperty("uses");
+    expect(cd.uses).deep.equal(["isOpen"]);
+  });
+
+  it("uses works with multiple values", () => {
+    const cd = transformSource("<Stack uses='isOpen, isClosed' />") as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.props ?? {}).not.toHaveProperty("uses");
+    expect(cd.uses).deep.equal(["isOpen", "isClosed"]);
   });
 });

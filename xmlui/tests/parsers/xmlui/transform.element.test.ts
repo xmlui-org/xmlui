@@ -535,7 +535,7 @@ describe("Xmlui transform - child elements", () => {
       }
     });
 
-    it("uses works #1", () => {
+    it("uses works with 2 values", () => {
       const cd = transformSource(`
       <Stack>
         <uses value="something, other"/>
@@ -543,6 +543,27 @@ describe("Xmlui transform - child elements", () => {
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.uses).deep.equal(["something", "other"]);
+    });
+
+    it("uses tag works with uses attribute", () => {
+      const cd = transformSource(`
+      <Stack uses="one">
+        <uses value="something, other"/>
+      </Stack>
+    `) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect(cd.uses).deep.equal(["one", "something", "other"]);
+    });
+
+    it("uses tags works with uses attribute", () => {
+      const cd = transformSource(`
+      <Stack uses="one">
+        <uses value="something, other"/>
+        <uses value="another"/>
+      </Stack>
+    `) as ComponentDef;
+      expect(cd.type).equal("Stack");
+      expect(cd.uses).deep.equal(["one", "something", "other", "another"]);
     });
   });
 
