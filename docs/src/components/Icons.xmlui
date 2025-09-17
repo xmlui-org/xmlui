@@ -30,7 +30,7 @@
             <Items data="{names}">
                 <VStack width="12.5%" verticalAlignment="center" horizontalAlignment="center" marginBottom="$space-8" gap="$space-2">
                     <Icon padding="$space-2" name="{$item}" height="40px" width="40px" boxShadow="$boxShadow-spread-2"/>
-                    <Text fontSize="$fontSize-smaller">
+                    <Text fontSize="$fontSize-xs">
                         {$item}
                     </Text>
                 </VStack>

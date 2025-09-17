@@ -112,7 +112,7 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-MenuItem--disabled | $textColor--disabled | $textColor--disabled |
 | [color](../styles-and-themes/common-units/#color)-MenuItem--hover | inherit | inherit |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-MenuItem | $fontFamily | $fontFamily |
-| [fontSize](../styles-and-themes/common-units/#size)-MenuItem | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-MenuItem | $fontSize-sm | $fontSize-sm |
 | [gap](../styles-and-themes/common-units/#size)-MenuItem | $space-2 | $space-2 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-MenuItem | $space-3 | $space-3 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-MenuItem | $space-2 | $space-2 |

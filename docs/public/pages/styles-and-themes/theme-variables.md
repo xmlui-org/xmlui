@@ -187,25 +187,40 @@ You can use these app-bound theme variables within an app:
 | **`fontFamily‑monospace`** | This theme variable specifies the font family for text elements marked with "monospace". |
 | **`fontFamily‑sans‑serif`** | This theme variable specifies the font family for text elements marked with "sans-serif". |
 | **`fontSize`** | This theme variable sets the default font size of text elements. |
-| **`fontSize‑gigantic`** | This theme variable sets the font size bigger than `fontSize-large` and `fonstSize‑gigantic`. |
-| **`fontSize‑large`** | This theme variable sets the font size between `fontSize-medium` and `fonstSize‑gigantic`. |
-| **`fontSize‑medium`** | This theme variable sets the font size between `fontSize-normal` and `fonstSize-large`. |
-| **`fontSize‑normal`** | This theme variable sets the size of the default font. |
-| **`fontSize‑small`** | This theme variable sets the font size between `fontSize-smaller` and `fonstSize‑normal`. |
-| **`fontSize‑smaller`** | This theme variable sets the font size between `fontSize-small` and `fonstSize-tiny`. |
-| **`fontSize‑tiny`** | This theme variable sets the font size smaller than `fontSize-smaller`. |
+| **`fontSize‑tiny`** | The smallest font size available in the XMLUI styling system. |
+| **`fontSize‑xs`** | A font size between `fontSize-tiny` and `fonstSize‑sm`. |
+| **`fontSize‑sm`** | A font size between `fontSize-xs` and `fonstSize-base`. |
+| **`fontSize‑base`** | A font size between `fontSize-sm` and `fonstSize-lg`. |
+| **`fontSize‑lg`** | A font size between `fontSize-base` and `fonstSize-xl`. |
+| **`fontSize‑xl`** | A font size between `fontSize-lg` and `fonstSize-2xl`. |
+| **`fontSize‑2xl`** | A font size between `fontSize-xl` and `fonstSize-3xl`. |
+| **`fontSize‑3xl`** | A font size between `fontSize-2xl` and `fonstSize-4xl`. |
+| **`fontSize‑4xl`** | A font size between `fontSize-3xl` and `fonstSize-5xl`. |
+| **`fontSize‑5xl`** | A font size between `fontSize-4xl` and `fonstSize-6xl`. |
+| **`fontSize‑6xl`** | A font size between `fontSize-5l` and `fonstSize-7xl`. |
+| **`fontSize‑7xl`** | A font size between `fontSize-6l` and `fonstSize-8xl`. |
+| **`fontSize‑8xl`** | A font size between `fontSize-7xl` and `fonstSize-9xl`. |
+| **`fontSize‑9xl`** | The tallest font size available in the XMLUI styling system. |
 | **`fontWeight`** | This theme variable sets the weight of the default font. |
 | **`fontWeight‑bold`** | This theme variable sets the font's weight marked as bold (when using any text variant with a weight set to `bold`). |
 | **`fontWeight‑extra‑bold`** | This theme variable sets the font's weight marked as extra-bold (when using any text variant with a weight set to `extra-bold`). |
 | **`fontWeight‑light`** | This theme variable sets the font's weight marked as light (when using any text variant with a weight set to `light`). |
 | **`fontWeight‑normal`** | This theme variable sets the font's weight marked as normal (when using any text variant with a weight set to `normal`). |
 | **`fontWeight‑medium`** | This theme variable sets the font's weight marked as medium (when using any text variant with a weight set to `medium`). |
-| **`lineHeight‑loose`** | This theme variable sets the line heights of elements using the "loose" (meaning, "bigger than relaxed") trait. |
-| **`lineHeight‑none`** | This theme variable sets the line heights of elements using the "none" (meaning, "no line-height specification") trait. |
-| **`lineHeight‑normal`** | This theme variable sets the line heights of elements using the "normal" (meaning, "bigger than snug but less than relaxed") trait. |
-| **`lineHeight‑relaxed`** | This theme variable sets the line heights of elements using the "relaxed" (meaning, "bigger than normal but less than loose") trait. |
-| **`lineHeight‑snug`** | This theme variable sets the line heights of elements using the "snug" (meaning, "bigger than none but less than normal") trait. |
-| **`lineHeight‑tight`** | This theme variable sets the line heights of elements using the "tight" (meaning, "bigger than none") trait. |
+| **`lineHeight‑tiny`** | The suggested line height for text with `fontSize-tiny`. |
+| **`lineHeight‑xs`** | The suggested line height for text with `fontSize-xs`. |
+| **`lineHeight‑sm`** | The suggested line height for text with `fontSize-sm`. |
+| **`lineHeight‑base`** | The suggested line height for text with `fontSize-base`. |
+| **`lineHeight‑lg`** | The suggested line height for text with `fontSize-lg`. |
+| **`lineHeight‑xl`** | The suggested line height for text with `fontSize-xl`. |
+| **`lineHeight‑2xl`** | The suggested line height for text with `fontSize-2xl`. |
+| **`lineHeight‑3xl`** | The suggested line height for text with `fontSize-3xl`. |
+| **`lineHeight‑4xl`** | The suggested line height for text with `fontSize-4xl`. |
+| **`lineHeight‑5xl`** | The suggested line height for text with `fontSize-5xl`. |
+| **`lineHeight‑6xl`** | The suggested line height for text with `fontSize-6xl`. |
+| **`lineHeight‑7xl`** | The suggested line height for text with `fontSize-7xl`. |
+| **`lineHeight‑8xl`** | The suggested line height for text with `fontSize-8xl`. |
+| **`lineHeight‑9xl`** | The suggested line height for text with `fontSize-9xl`. |
 | **`maxWidth‑desktop`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`. |
 | **`maxWidth‑content`** | This theme variable sets the maximum width of the app's content. If the viewport is broader, the content will have margins to the left and right, keeping the width at the specified maximum. |
 | **`maxWidth‑desktop`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`. |
@@ -733,91 +748,211 @@ These theme variables set the default font styles:
 
 ### Line Height
 
-These theme variables define a set of line heights:
+These theme variables define a set of line heights relative to the font size:
 
-```xmlui-pg name="Line Height"
+```xmlui-pg name="Line Height" height="400px"
 <App>
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-none:</Text>
-    <Text lineHeight="$lineHeight-none" backgroundColor="$color-surface-300">This is an example text</Text>
+    <Text width="160px" variant="strong">lineHeight-tiny:</Text>
+    <Text 
+      fontSize="$fontSize-tiny"
+      lineHeight="lineHeight-tiny"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-tight:</Text>
+    <Text width="160px" variant="strong">lineHeight-xs:</Text>
     <Text 
-      lineHeight="$lineHeight-tight" 
-      backgroundColor="$color-surface-300">This is an example text</Text>
+      fontSize="$fontSize-xs"
+      lineHeight="lineHeight-xs"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-snug:</Text>
+    <Text width="160px" variant="strong">lineHeight-sm:</Text>
     <Text 
-      lineHeight="$lineHeight-snug"
-      backgroundColor="$color-surface-300">This is an example text</Text>
+      fontSize="$fontSize-sm"
+      lineHeight="lineHeight-sm"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-normal:</Text>
+    <Text width="160px" variant="strong">lineHeight-base:</Text>
     <Text 
-      lineHeight="$lineHeight-normal" 
-      backgroundColor="$color-surface-300">This is an example text</Text>
+      fontSize="$fontSize-base"
+      lineHeight="lineHeight-base"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-relaxed:</Text>
+    <Text width="160px" variant="strong">lineHeight-xl:</Text>
     <Text 
-      lineHeight="$lineHeight-relaxed" 
-      backgroundColor="$color-surface-300">This is an example text</Text>
+      fontSize="$fontSize-xl"
+      lineHeight="lineHeight-xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="180px" variant="strong">lineHeight-loose:</Text>
+    <Text width="160px" variant="strong">lineHeight-2xl:</Text>
     <Text 
-      lineHeight="$lineHeight-loose" 
-      backgroundColor="$color-surface-300">This is an example text</Text>
+      fontSize="$fontSize-2xl"
+      lineHeight="lineHeight-2xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-3xl:</Text>
+    <Text 
+      fontSize="$fontSize-3xl"
+      lineHeight="lineHeight-3xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-4xl:</Text>
+    <Text 
+      fontSize="$fontSize-4xl"
+      lineHeight="lineHeight-4xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-5xl:</Text>
+    <Text 
+      fontSize="$fontSize-5xl"
+      lineHeight="lineHeight-5xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-6xl:</Text>
+    <Text 
+      fontSize="$fontSize-6xl"
+      lineHeight="lineHeight-6xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-7xl:</Text>
+    <Text 
+      fontSize="$fontSize-7xl"
+      lineHeight="lineHeight-7xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-8xl:</Text>
+    <Text 
+      fontSize="$fontSize-8xl"
+      lineHeight="lineHeight-8xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">lineHeight-9xl:</Text>
+    <Text 
+      fontSize="$fontSize-9xl"
+      lineHeight="lineHeight-9xl"
+      backgroundColor="lightblue" 
+      paddingHorizontal="$space-2"
+    >Example</Text>
   </HStack>
 </App>
 ```
 
 ### Font Size
 
-The `fontSize` theme variables allow you to set your themes' normal font size (`fontSize-normal`). You can use this set of theme variables to define font sizes relative to `fontSize`:
+The `fontSize` theme variables allow you to set your themes' normal font size (`fontSize-base`). You can use this set of theme variables to define font sizes relative to `fontSize`:
 
-```xmlui-pg name="Font Size"
+```xmlui-pg name="Font Size" height="400px"
 <App>
   <HStack verticalAlignment="center">
     <Text width="160px" variant="strong">fontSize-tiny:</Text>
-    <Text fontSize="$fontSize-tiny">This is an example text</Text>
+    <Text fontSize="$fontSize-tiny">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-smaller:</Text>
-    <Text fontSize="$fontSize-smaller">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-xs:</Text>
+    <Text fontSize="$fontSize-xs">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-small:</Text>
-    <Text fontSize="$fontSize-small">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-sm:</Text>
+    <Text fontSize="$fontSize-sm">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-normal:</Text>
-    <Text fontSize="$fontSize-normal">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-base:</Text>
+    <Text fontSize="$fontSize-base">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-medium:</Text>
-    <Text fontSize="$fontSize-medium">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-xl:</Text>
+    <Text fontSize="$fontSize-xl">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-large:</Text>
-    <Text fontSize="$fontSize-large">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-2xl:</Text>
+    <Text fontSize="$fontSize-2xl">Example</Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">fontSize-gigantic:</Text>
-    <Text fontSize="$fontSize-gigantic">This is an example text</Text>
+    <Text width="160px" variant="strong">fontSize-3xl:</Text>
+    <Text fontSize="$fontSize-3xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-4xl:</Text>
+    <Text fontSize="$fontSize-4xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-5xl:</Text>
+    <Text fontSize="$fontSize-5xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-6xl:</Text>
+    <Text fontSize="$fontSize-6xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-7xl:</Text>
+    <Text fontSize="$fontSize-7xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-8xl:</Text>
+    <Text fontSize="$fontSize-8xl">Example</Text>
+  </HStack>
+
+  <HStack verticalAlignment="center">
+    <Text width="160px" variant="strong">fontSize-9xl:</Text>
+    <Text fontSize="$fontSize-9xl">Example</Text>
   </HStack>
 </App>
 ```

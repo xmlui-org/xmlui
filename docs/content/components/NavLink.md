@@ -276,7 +276,7 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--hover | $color-primary-600 | $color-primary-600 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--pressed | $color-primary-500 | $color-primary-500 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
-| [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | $fontWeight-normal | $fontWeight-normal |

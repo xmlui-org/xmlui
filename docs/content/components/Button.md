@@ -384,7 +384,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-secondary-ghost | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-secondary-outlined | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Button-secondary-solid | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Button | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Button | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Button-attention-ghost | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Button-attention-outlined | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Button-attention-solid | *none* | *none* |

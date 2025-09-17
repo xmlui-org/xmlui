@@ -1,7 +1,7 @@
 <Component name="PageNotFound">
   <CVStack>
-    <Text fontSize="$fontSize-gigantic" fontWeight="bold" color="$color-primary-800">404</Text>
-    <Text fontSize="$fontSize-large" fontWeight="bold" color="$color-primary-800">Page not found</Text>
+    <Text fontSize="$fontSize-5xl" fontWeight="bold" color="$color-primary-800">404</Text>
+    <Text fontSize="$fontSize-2xl" fontWeight="bold" color="$color-primary-800">Page not found</Text>
     <Text>
       The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
     </Text>

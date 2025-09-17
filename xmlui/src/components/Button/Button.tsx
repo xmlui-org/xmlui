@@ -110,7 +110,7 @@ export const ButtonMd = createMetadata({
     [`width-${COMP}`]: "fit-content",
     [`height-${COMP}`]: "fit-content",
     [`borderRadius-${COMP}`]: "$borderRadius",
-    [`fontSize-${COMP}`]: "$fontSize-small",
+    [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
     [`backgroundColor-${COMP}-primary`]: "$color-primary-500",
     [`backgroundColor-${COMP}-attention`]: "$backgroundColor-attention",

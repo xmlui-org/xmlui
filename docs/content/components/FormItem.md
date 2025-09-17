@@ -542,7 +542,7 @@ Removes the item specified by its index from the list held by the FormItem. The 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-FormItemLabel | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel-required | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |
