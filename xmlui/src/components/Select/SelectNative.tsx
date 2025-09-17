@@ -696,7 +696,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
       <SelectItem
         ref={ref}
         className={classnames(styles.selectItem, className)}
-        value={value + ""}
+        value={value}
         textValue={label || visibleContentRef.current?.textContent}
         disabled={!enabled}
         onClick={(event) => {

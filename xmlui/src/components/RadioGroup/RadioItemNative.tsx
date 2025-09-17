@@ -5,6 +5,7 @@ import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { noop } from "../../components-core/constants";
 
 import classnames from "classnames";
+import { convertOptionValue } from "../Option/OptionNative";
 
 export const defaultProps = {
   checked: false,
@@ -47,19 +48,18 @@ export const UnwrappedRadioItem = ({
   disabled,
   onDidChange = noop,
 }: UnwrappedRadioItemProps) => {
-
   const onInputChange = useCallback(
     (_: React.MouseEvent<HTMLButtonElement>) => {
       onDidChange(value);
     },
     [onDidChange, value],
   );
-  
+
   return (
     <InnerRadioGroup.Item
       className={classnames(styles.radioOption, statusStyles)}
       id={id}
-      value={value}
+      value={convertOptionValue(value)}
       checked={checked}
       disabled={disabled}
       onClick={onInputChange}
