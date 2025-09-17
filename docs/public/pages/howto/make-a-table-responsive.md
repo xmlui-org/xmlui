@@ -15,7 +15,7 @@
 ]}">
   <VStack>
     <HStack>
-      <Text size="lg" weight="bold">Responsive People Table</Text>
+      <Text size="lg">Responsive People Table</Text>
       <Badge value="Current: {mediaSize.size}" color="blue" />
     </HStack>
     <Text size="sm" color="gray">Resize your browser window to see columns progressively hide</Text>
@@ -32,7 +32,7 @@
 
       <!-- Essential: Name - always show -->
       <Column header="Name" bindTo="name" width="150px">
-        <Text weight="medium">{$item.name}</Text>
+        <Text>{$item.name}</Text>
       </Column>
 
       <!-- Priority: Email - hide on xs screens -->
