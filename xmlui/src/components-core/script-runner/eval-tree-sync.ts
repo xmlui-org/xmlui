@@ -250,7 +250,10 @@ function evalTemplateLiteral(
     thisStack.pop();
     return evaledValue;
   });
-  return evalTemplateLiteralCore(segmentValues);
+  const value = evalTemplateLiteralCore(segmentValues);
+  setExprValue(expr, { value }, thread);
+  thisStack.push(value);
+  return value;
 }
 
 function evalMemberAccess(
