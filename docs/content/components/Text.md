@@ -468,7 +468,11 @@ This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `hasOverflow` [#hasoverflow]
+
+Returns true when the displayed text overflows its container boundaries.
+
+**Signature**: `hasOverflow(): boolean`
 
 ## Styling [#styling]
 
@@ -501,15 +505,15 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-keyboard | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-mono | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
-| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-xs | $fontSize-xs |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-small | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-small | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sub | $fontSize-xs | $fontSize-xs |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-subheading | $fontSize-H6 | $fontSize-H6 |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-subtitle | $fontSize-xl | $fontSize-xl |
@@ -531,9 +535,21 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-tableheading | $fontWeight-bold | $fontWeight-bold |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-caption | 0.05rem | 0.05rem |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-subheading | 0.04em | 0.04em |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-code | $lineHeight-xs | $lineHeight-xs |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-codefence | 1.5 | 1.5 |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-keyboard | $lineHeight-sm | $lineHeight-sm |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
-| [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-placeholder | $lineHeight-xs | $lineHeight-xs |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-sample | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-secondary | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-sub | $lineHeight-xs | $lineHeight-xs |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-subheading | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-subtitle | $lineHeight-xl | $lineHeight-xl |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-sup | $lineHeight-xs | $lineHeight-xs |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-tableheading | $lineHeight-sm | $lineHeight-sm |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-title | $lineHeight-2xl | $lineHeight-2xl |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |

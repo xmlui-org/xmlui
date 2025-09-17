@@ -144,7 +144,7 @@ export const FancyButtonMd = createMetadata({
 
     [`paddingHorizontal-${COMP}-xl`]: "$space-10",
     [`paddingVertical-${COMP}-xl`]: "$space-4",
-    [`fontSize-${COMP}-xl`]: "$fontSize-larger",
+    [`fontSize-${COMP}-xl`]: "$fontSize-4xl",
     [`gap-${COMP}-xl`]: "$space-5",
 
     // Common colors

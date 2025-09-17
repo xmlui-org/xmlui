@@ -139,6 +139,12 @@ This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
+### `hasOverflow` [#hasoverflow]
+
+Returns true when the displayed text overflows the bounds of this heading component.
+
+**Signature**: `hasOverflow()`
+
 ### `scrollIntoView` [#scrollintoview]
 
 Scrolls the heading into view.

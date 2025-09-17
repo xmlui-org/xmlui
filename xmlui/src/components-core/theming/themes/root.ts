@@ -198,37 +198,38 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontFamily": "$fontFamily-sans-serif",
 
     // --- Various font sizes (relative to the current context)
-    "fontSize-gigantic": "3rem",
-    "fontSize-larger": "2.15rem",
-    "fontSize-code": "0.85rem",
-    
-    // --- Default line height values (relative to the base unit, "space-base")
-    "lineHeight-none": "1",
-    "lineHeight-tight": "1.25",
-    "lineHeight-snug": "1.375",
-    "lineHeight-normal": "1.5",
-    "lineHeight-loose": "2",
-
-    // --- Various font sizes (relative to the current context)
     "fontSize-tiny": "0.625rem",
     "fontSize-xs": "0.75rem",
+    "fontSize-code": "0.85rem",
     "fontSize-sm": "0.875rem",
     "fontSize-base": "1rem",
     "fontSize-lg": "1.125rem",
     "fontSize-xl": "1.25rem",
     "fontSize-2xl": "1.5rem",
     "fontSize-3xl": "1.875rem",
+    "fontSize-4xl": "2.25rem",
+    "fontSize-5xl": "3rem",
+    "fontSize-6xl": "3.75rem",
+    "fontSize-7xl": "4.5rem",
+    "fontSize-8xl": "6rem",
+    "fontSize-9xl": "8rem",
 
 
     // --- Various line height values
-    "lineHeight-tiny": "calc(0.85 / 0.625)",
-    "lineHeight-xs": "calc(1 / 0.75)",
-    "lineHeight-sm": "calc(1.25 / 0.875)",
-    "lineHeight-base": "calc(1.5 / 1)",
-    "lineHeight-lg": "calc(1.75 / 1.125)",
-    "lineHeight-xl": "calc(1.75 / 1.25)",
-    "lineHeight-2xl": "calc(2 / 1.5)",
-    "lineHeight-3xl": "calc(2.25 / 1.875)",
+    "lineHeight-tiny": "calc(0.85 / 0.625)", // 1.36
+    "lineHeight-xs": "calc(1 / 0.75)", // 1.33
+    "lineHeight-sm": "calc(1.25 / 0.875)", // 1.43
+    "lineHeight-base": "calc(1.5 / 1)", // 1.5
+    "lineHeight-lg": "calc(1.75 / 1.125)", // 1.56
+    "lineHeight-xl": "calc(1.75 / 1.25)", // 1.4
+    "lineHeight-2xl": "calc(2 / 1.5)", // 1.33
+    "lineHeight-3xl": "calc(2.25 / 1.875)", // 1.2
+    "lineHeight-4xl": "calc(2.5 / 2.25)", // 1.11
+    "lineHeight-5xl": "1",
+    "lineHeight-6xl": "1",
+    "lineHeight-7xl": "1",
+    "lineHeight-8xl": "1",
+    "lineHeight-9xl": "1",
 
     // --- The default font size
     "fontSize": "$fontSize-base",

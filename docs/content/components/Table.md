@@ -1641,7 +1641,7 @@ This method selects the row with the specified ID. This method has no effect if 
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-heading-Table | $fontSize-tiny | $fontSize-tiny |
-| [fontSize](../styles-and-themes/common-units/#size)-row-Table | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-row-Table | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-heading-Table | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-row-Table | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-heading-Table--focus | $outlineColor--focus | $outlineColor--focus |

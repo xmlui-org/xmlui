@@ -14462,7 +14462,7 @@ export default {
       "fontSize-Text-title": "$fontSize-2xl",
       "fontSize-Text-subtitle": "$fontSize-xl",
       "fontSize-Text-small": "$fontSize-sm",
-      "lineHeight-Text-small": "$lineHeight-tight",
+      "lineHeight-Text-small": "$lineHeight-sm",
       "letterSpacing-Text-caption": "0.05rem",
       "fontSize-Text-placeholder": "$fontSize-xs",
       "fontFamily-Text-codefence": "$fontFamily-monospace",

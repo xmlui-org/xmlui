@@ -9,6 +9,10 @@ The `App` component is the root container that defines your application's overal
 
 ## Properties [#properties]
 
+### `autoDetectTone` (default: false) [#autodetecttone-default-false]
+
+This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use "light" or "dark" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.
+
 ### `defaultTheme` [#defaulttheme]
 
 This property sets the app's default theme.
