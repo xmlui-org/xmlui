@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useId,
   useMemo,
+  useRef,
 } from "react";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import classnames from "classnames";
@@ -21,10 +22,12 @@ import type { Option, ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
+import { convertOptionValue } from "../Option/OptionNative";
 
 type RadioGroupProps = {
   id?: string;
   initialValue?: string;
+  autofocus?: boolean;
   value?: string;
   enabled?: boolean;
   style?: CSSProperties;
@@ -71,6 +74,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
     id,
     value = defaultProps.value,
     initialValue = defaultProps.initialValue,
+    autofocus,
     enabled = defaultProps.enabled,
     validationStatus = defaultProps.validationStatus,
     label,
@@ -92,25 +96,23 @@ export const RadioGroup = forwardRef(function RadioGroup(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [focused, setFocused] = React.useState(false);
+  const radioGroupRef = useRef<HTMLDivElement>(null);
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    let _initialValue = initialValue;
-    if (typeof initialValue !== "string") {
-      // Check if the value can be safely converted to string
-      if (
-        initialValue != null &&
-        typeof initialValue !== "object" &&
-        typeof initialValue !== "function" &&
-        !Number.isNaN(initialValue)
-      ) {
-        _initialValue = String(initialValue);
-      } else {
-        _initialValue = defaultProps.initialValue;
+    updateState({ value: convertOptionValue(initialValue) }, { initial: true });
+  }, [initialValue, updateState]);
+
+  // --- Handle autofocus by focusing the first radio option
+  useEffect(() => {
+    if (autofocus && radioGroupRef.current) {
+      // Find the first radio item element
+      const firstRadioItem = radioGroupRef.current.querySelector('[role="radio"]');
+      if (firstRadioItem) {
+        (firstRadioItem as HTMLElement).focus();
       }
     }
-    updateState({ value: _initialValue }, { initial: true });
-  }, [initialValue, updateState]);
+  }, [autofocus]);
 
   // --- Handle the value change events for this input
 
@@ -180,6 +182,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
           className={className}
         >
           <InnerRadioGroup.Root
+            ref={radioGroupRef}
             id={id}
             onBlur={handleOnBlur}
             onFocus={handleOnFocus}
