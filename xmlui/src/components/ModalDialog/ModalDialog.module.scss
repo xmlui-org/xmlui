@@ -90,7 +90,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   .dialogTitle {
     flex: 1;
     margin-bottom: $marginBottom-title-ModalDialog;
-    font-size: t.$fontSize-large;
+    font-size: t.$fontSize-2xl;
   }
 
   .innerContent {

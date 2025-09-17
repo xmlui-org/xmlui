@@ -164,7 +164,7 @@ export const MenuItemMd = createMetadata({
     [`color-${MICOMP}`]: "$textColor-primary",
     [`color-${MICOMP}--disabled`]: "$textColor--disabled",
     [`fontFamily-${MICOMP}`]: "$fontFamily",
-    [`fontSize-${MICOMP}`]: "$fontSize-small",
+    [`fontSize-${MICOMP}`]: "$fontSize-sm",
     [`paddingVertical-${MICOMP}`]: "$space-2",
     [`paddingHorizontal-${MICOMP}`]: "$space-3",
     [`backgroundColor-${MICOMP}--hover`]: "$backgroundColor-dropdown-item--hover",

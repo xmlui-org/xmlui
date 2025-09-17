@@ -172,14 +172,6 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-warning": "$color-warn-700",
     "color-error": "$color-danger-500",
 
-    // --- Default line height values (relative to the base unit, "space-base")
-    "lineHeight-none": "1",
-    "lineHeight-tight": "1.25",
-    "lineHeight-snug": "1.375",
-    "lineHeight-normal": "1.5",
-    "lineHeight-relaxed": "1.625",
-    "lineHeight-loose": "2",
-
     // --- The sans-serif font set
     "fontFamily-sans-serif":
       "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
@@ -208,17 +200,38 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- Various font sizes (relative to the current context)
     "fontSize-gigantic": "3rem",
     "fontSize-larger": "2.15rem",
-    "fontSize-large": "1.5rem",
-    "fontSize-medium": "1.25rem",
-    "fontSize-semimedium": "1.125rem",
-    "fontSize-normal": "1rem",
-    "fontSize-small": "0.875rem",
     "fontSize-code": "0.85rem",
-    "fontSize-smaller": "0.75rem",
+    
+    // --- Default line height values (relative to the base unit, "space-base")
+    "lineHeight-none": "1",
+    "lineHeight-tight": "1.25",
+    "lineHeight-snug": "1.375",
+    "lineHeight-normal": "1.5",
+    "lineHeight-loose": "2",
+
+    // --- Various font sizes (relative to the current context)
     "fontSize-tiny": "0.625rem",
+    "fontSize-xs": "0.75rem",
+    "fontSize-sm": "0.875rem",
+    "fontSize-base": "1rem",
+    "fontSize-lg": "1.125rem",
+    "fontSize-xl": "1.25rem",
+    "fontSize-2xl": "1.5rem",
+    "fontSize-3xl": "1.875rem",
+
+
+    // --- Various line height values
+    "lineHeight-tiny": "calc(0.85 / 0.625)",
+    "lineHeight-xs": "calc(1 / 0.75)",
+    "lineHeight-sm": "calc(1.25 / 0.875)",
+    "lineHeight-base": "calc(1.5 / 1)",
+    "lineHeight-lg": "calc(1.75 / 1.125)",
+    "lineHeight-xl": "calc(1.75 / 1.25)",
+    "lineHeight-2xl": "calc(2 / 1.5)",
+    "lineHeight-3xl": "calc(2.25 / 1.875)",
 
     // --- The default font size
-    "fontSize": "$fontSize-normal",
+    "fontSize": "$fontSize-base",
 
     // --- Predefined gap sizes
     "gap-none": "$space-0",

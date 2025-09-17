@@ -43,7 +43,7 @@ export const TableOfContentsMd = createMetadata({
     [`padding-${COMP}`]: "$space-2",
     [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
     [`textColor-${COMP_CHILD}--hover`]: "$textColor-primary",
-    [`fontSize-${COMP_CHILD}`]: "$fontSize-small",
+    [`fontSize-${COMP_CHILD}`]: "$fontSize-sm",
     [`wordWrap-${COMP_CHILD}`]: "break-word",
 
     [`paddingVertical-${COMP_CHILD}`]: "$space-1",

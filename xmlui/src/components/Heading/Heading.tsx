@@ -119,10 +119,10 @@ export const H1Md = createMetadata({
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H1}`]: "$fontSize-large",
+    [`fontSize-${H1}`]: "$fontSize-2xl",
     [`marginTop-${H1}`]: "0",
     [`marginBottom-${H1}`]: "0",
-    [`fontSize-${H1}-markdown`]: "$fontSize-large",
+    [`fontSize-${H1}-markdown`]: "$fontSize-2xl",
     [`marginTop-${H1}-markdown`]: "0",
     [`marginBottom-${H1}-markdown`]: "$space-6",
     light: {
@@ -150,7 +150,7 @@ export const H2Md = createMetadata({
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H2}`]: "$fontSize-medium",
+    [`fontSize-${H2}`]: "$fontSize-xl",
     [`marginTop-${H2}`]: "0",
     [`marginBottom-${H2}`]: "0",
     [`marginTop-${H2}-markdown`]: "$space-10",
@@ -180,7 +180,7 @@ export const H3Md = createMetadata({
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H3}`]: "$fontSize-normal",
+    [`fontSize-${H3}`]: "$fontSize-base",
     [`marginTop-${H3}`]: "0",
     [`marginBottom-${H3}`]: "0",
     [`marginTop-${H3}-markdown`]: "$space-6",
@@ -210,7 +210,7 @@ export const H4Md = createMetadata({
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H4}`]: "$fontSize-small",
+    [`fontSize-${H4}`]: "$fontSize-sm",
     [`marginTop-${H4}`]: "0",
     [`marginBottom-${H4}`]: "0",
     [`marginTop-${H4}-markdown`]: "$space-5",
@@ -240,7 +240,7 @@ export const H5Md = createMetadata({
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H5}`]: "$fontSize-smaller",
+    [`fontSize-${H5}`]: "$fontSize-xs",
     [`marginTop-${H5}`]: "0",
     [`marginBottom-${H5}`]: "0",
     [`marginTop-${H5}-markdown`]: "0",
