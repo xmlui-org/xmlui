@@ -3,7 +3,7 @@ import {
   handleCompletion,
   handleCompletionResolve,
 } from "../../src/language-server/services/completion";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
+import { createXmlUiParser, toDbgString } from "../../src/parsers/xmlui-parser";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
@@ -120,6 +120,31 @@ describe("Completion", () => {
     expect(resolvedItem).toMatchObject(expected);
     expect(docs).toContain(widthDescription);
   });
+
+  it("closing element 1st after opening tag & element creation", () => {
+    const suggestions = completeAtPoundSign("<Button><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, cursor not at end", () => {
+    const suggestions = completeAtPoundSign("<Button><#A").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr", () => {
+    const suggestions = completeAtPoundSign("<Button attr=><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr list", () => {
+    const suggestions = completeAtPoundSign("<Button attr=' :><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("suggest all components if no identifier provided", () => {
+    const suggestions = completeAtPoundSign("<><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(Object.keys(mockMetadata));
+  });
 });
 
 function completeAtPoundSign(source: string) {
@@ -133,8 +158,9 @@ function completeAtPoundSign(source: string) {
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
 
-  const parseResult = parser.parse();
 
+  const parseResult = parser.parse();
+  //console.log(toDbgString(parseResult.node, parser.getText));
   return handleCompletion(
     { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
     position,
