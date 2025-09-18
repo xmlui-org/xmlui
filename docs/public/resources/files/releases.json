@@ -1,5 +1,69 @@
 [
   {
+    "tag_name": "xmlui@0.10.11",
+    "published_at": "2025-09-18T05:57:44Z",
+    "changes": [
+      {
+        "description": "feat: style the error report colors and spaces in the browser for xmlui syntax errors",
+        "commit_sha": "8c76c8d"
+      },
+      {
+        "description": "RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.",
+        "commit_sha": "d56c3e5"
+      },
+      {
+        "description": "Add FancyButton to xmlui-website-blocks",
+        "commit_sha": "e42d367"
+      },
+      {
+        "description": "feat: BarChart - add tooltip position tracking",
+        "commit_sha": "f539526"
+      },
+      {
+        "description": "Review Option handling in Select and RadioGroup",
+        "commit_sha": "19ce234"
+      },
+      {
+        "description": "feat: add animation support to all relevant components via animation and animationOptions props",
+        "commit_sha": "455b6c0"
+      },
+      {
+        "description": "feat: add support for 'uses' property",
+        "commit_sha": "e90dc73"
+      },
+      {
+        "description": "Update fontSize and lineHeight themes and style (may break existing xmlui code)",
+        "commit_sha": "819b563"
+      },
+      {
+        "description": "Add the autoDetectTone property to App",
+        "commit_sha": "b57dfa2"
+      },
+      {
+        "description": "Update Checkbox and Switch with click event metadata",
+        "commit_sha": "9dd0f97"
+      },
+      {
+        "description": "Select accepts null as an option value; it converts a value to a string no longer",
+        "commit_sha": "19ce234"
+      },
+      {
+        "description": "Extend Text and Heading APIs with hasOverflow",
+        "commit_sha": "898346d"
+      },
+      {
+        "description": "Fix RestApiProxy to deliver response status when no error body specified",
+        "commit_sha": "705dd04"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.11.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.11/xmlui-0.10.11.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.10",
     "published_at": "2025-09-09T12:43:31Z",
     "changes": [
@@ -212,58 +276,6 @@
       {
         "name": "xmlui-0.10.1.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.1/xmlui-0.10.1.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.0",
-    "published_at": "2025-08-19T12:16:45Z",
-    "changes": [
-      {
-        "description": "Add tooltip behavior to visible components",
-        "commit_sha": "000a311"
-      },
-      {
-        "description": "Rework inline styling system, prepare for responsive styling",
-        "commit_sha": "eb8b958"
-      },
-      {
-        "description": "Added features to the Pagination component: page size selector dropdown control. Also added the following props: layout orientation and layout order reversal.",
-        "commit_sha": "6d0ce52"
-      },
-      {
-        "description": "feat: add theme variable support for LineChart stroke width",
-        "commit_sha": "8c98f33"
-      },
-      {
-        "description": "feat: add didChange event handler to Tabs component",
-        "commit_sha": "ef86593"
-      },
-      {
-        "description": "test: create e2e tests for chart components",
-        "commit_sha": "da5f4e7"
-      },
-      {
-        "description": "Integrated the new Pagination component with Table.",
-        "commit_sha": "47c7a2d"
-      },
-      {
-        "description": "Add \"activated\" event to TabItem",
-        "commit_sha": "740f904"
-      },
-      {
-        "description": "Add \"parts\" to component metadata",
-        "commit_sha": "5009c52"
-      },
-      {
-        "description": "Remove \"from\" from the list or reserved script keywords, as no longer used",
-        "commit_sha": "2f5ec32"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.0.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.0/xmlui-0.10.0.js"
       }
     ]
   }
