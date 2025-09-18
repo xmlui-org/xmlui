@@ -7,12 +7,12 @@ import { expect, test } from "../../testing/fixtures";
 test.describe("Open/Close", () => {
   test("Imperative open - without params", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
+      <Fragment>
         <Button testId="button" onClick="modal.open()">open modal (imperative)</Button>
         <ModalDialog id="modal">
           <Text testId="textInModal">Hello</Text>
         </ModalDialog>
-      </App>
+      </Fragment>
     `);
 
     await expect(page.getByTestId("textInModal")).not.toBeVisible();
@@ -22,12 +22,12 @@ test.describe("Open/Close", () => {
 
   test("Imperative open - with param inside", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
+      <Fragment>
         <Button testId="button" onClick="modal.open('PARAM_VALUE')">open modal (imperative)</Button>
         <ModalDialog id="modal">
           <Text testId="textInModal">{$param}</Text>
         </ModalDialog>
-      </App>
+      </Fragment>
     `);
 
     await page.getByTestId("button").click();
@@ -36,13 +36,13 @@ test.describe("Open/Close", () => {
 
   test("Imperative open - with multiple param inside", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
+      <Fragment>
         <Button testId="button" onClick="modal.open('PARAM_VALUE1', 'PARAM_VALUE2')">open modal (imperative)</Button>
         <ModalDialog id="modal">
           <Text testId="textInModal1">{$params[0]}</Text>
           <Text testId="textInModal2">{$params[1]}</Text>
         </ModalDialog>
-      </App>
+      </Fragment>
     `);
 
     await page.getByTestId("button").click();
@@ -52,10 +52,10 @@ test.describe("Open/Close", () => {
 
   test("Imperative open - with param in title", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
+      <Fragment>
         <Button testId="button" onClick="modal.open('PARAM_VALUE')">open modal (imperative)</Button>
         <ModalDialog id="modal" title="{$param}"/>
-      </App>
+      </Fragment>
     `);
 
     await page.getByTestId("button").click();
@@ -64,13 +64,13 @@ test.describe("Open/Close", () => {
 
   test("Declarative open/close", async ({ page, initTestBed }) => {
     await initTestBed(`
-    <App var.isOpen="{false}">
+    <Fragment var.isOpen="{false}">
       <Button testId="button" onClick="isOpen = true">open modal</Button>
       <ModalDialog when="{isOpen}" onClose="isOpen = false" testId="modal">
         <Text testId="textInModal">Hello</Text>
       </ModalDialog>
       <Text testId="isOpen">{isOpen + ''}</Text>
-    </App>
+    </Fragment>
   `);
 
     await expect(page.getByTestId("textInModal")).not.toBeVisible();
@@ -82,5 +82,43 @@ test.describe("Open/Close", () => {
     await page.getByTestId("modal").getByRole("button").click();
     await expect(page.getByTestId("textInModal")).not.toBeVisible();
     await expect(page.getByTestId("isOpen")).toHaveText("false");
+  });
+
+  test("maxWidth works", async ({ page, initTestBed, createModalDialogDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open modal (imperative)</Button>
+        <ModalDialog id="modal" maxWidth="250px">
+          <Text testId="textInModal">Hello</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const modal = await createModalDialogDriver("modal");
+
+    await expect(modal.component).not.toBeVisible();
+    await expect(page.getByTestId("textInModal")).not.toBeVisible();
+    await page.getByTestId("button").click();
+    await expect(modal.component).toBeVisible();
+    await expect(modal.component).toHaveCSS("max-width", "250px");
+    await expect(page.getByTestId("textInModal")).toBeVisible();
+  });
+
+  test("backgroundColor works", async ({ page, initTestBed, createModalDialogDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open()">open modal (imperative)</Button>
+        <ModalDialog id="modal" backgroundColor="rgb(255, 255, 0)">
+          <Text testId="textInModal">Hello</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const modal = await createModalDialogDriver("modal");
+
+    await page.getByTestId("button").click();
+    await expect(modal.component).toBeVisible();
+    await expect(modal.component).toHaveCSS("background-color", "rgb(255, 255, 0)");
+    await expect(page.getByTestId("textInModal")).toBeVisible();
   });
 });

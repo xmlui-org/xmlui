@@ -75,7 +75,7 @@ test("compound component renders without namespace (no name-conflict with core c
 });
 
 test.fixme(
-  "extension renders with namespace (component-ns)",
+  "extension renders with namespace (component-ns) - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
   async ({ page, initTestBed }) => {
     await initTestBed(`
@@ -87,7 +87,7 @@ test.fixme(
 );
 
 test.fixme(
-  "extension renders with namespace (component-ns:namespace)",
+  "extension renders with namespace (component-ns:namespace) - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
   async ({ page, initTestBed }) => {
     await initTestBed(`
@@ -109,7 +109,7 @@ test("extension doesn't render without namespace", async ({ page, initTestBed })
 });
 
 test.fixme(
-  "XMLUIExtensions extension does render without namespace",
+  "XMLUIExtensions extension does render without namespace - fix!",
   SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
   async ({ page, initTestBed }) => {
     await initTestBed(`

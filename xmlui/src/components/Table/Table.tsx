@@ -230,7 +230,7 @@ export const TableMd = createMetadata({
     [`fontSize-heading-${COMP}`]: "$fontSize-tiny",
     [`fontWeight-heading-${COMP}`]: "$fontWeight-bold",
     [`textTransform-heading-${COMP}`]: "uppercase",
-    [`fontSize-row-${COMP}`]: "$fontSize-small",
+    [`fontSize-row-${COMP}`]: "$fontSize-sm",
     // [`backgroundColor-${COMP}`]: "transparent",
     // [`backgroundColor-row-${COMP}`]: "inherit",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,

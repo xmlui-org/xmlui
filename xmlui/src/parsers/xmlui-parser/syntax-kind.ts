@@ -10,15 +10,24 @@ export const enum SyntaxKind {
 
   // Effective tokens
   Identifier = 5,
-  OpenNodeStart = 6, // "<"
-  CloseNodeStart = 7, // "</"
-  NodeEnd = 8, // ">"
-  NodeClose = 9, // "/>"
-  Colon = 10, // ":"
-  Equal = 11, // "="
+  /** < */
+  OpenNodeStart = 6,
+  /** </ */
+  CloseNodeStart = 7,
+  /** > */
+  NodeEnd = 8,
+  /** /> */
+  NodeClose = 9,
+  /** : */
+  Colon = 10,
+  /** = */
+  Equal = 11,
+  /** string literal */
   StringLiteral = 12,
-  CData = 13, // "<![CDATA[" ... "]]>"
-  Script = 14, // <script>...</script>
+  /** <![CDATA[ ... ]]> */
+  CData = 13,
+  /** <script>...</script> */
+  Script = 14,
 
   // A token created by the parser which contains arbitrary text, but not the '<' character
   TextNode = 15,

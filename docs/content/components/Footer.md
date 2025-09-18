@@ -53,7 +53,7 @@ This component does not expose any methods.
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Footer | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Footer | $fontSize-sm | $fontSize-sm |
 | [gap](../styles-and-themes/common-units/#size)-Footer | $space-normal | $space-normal |
 | [height](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [margin](../styles-and-themes/common-units/#size)-Footer | 0 auto | 0 auto |

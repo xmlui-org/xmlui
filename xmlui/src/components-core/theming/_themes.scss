@@ -61,7 +61,7 @@ $THEME-VAR-PREFIX: xmlui;
     @if ($num > 1) {
       $offset: (-1 * $num) - 1;
     }
-    //@if(string.index(#{$fallbackValue}, 'fontSize-small')) {
+    //@if(string.index(#{$fallbackValue}, 'fontSize-sm')) {
     //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
     //  @debug 'concatet:' + var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
     //  @debug 'concat 2:' + var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue});
@@ -771,12 +771,11 @@ $borderColor--disabled: createVar(borderColor--disabled);
 $backgroundColor--selected: createVar(backgroundColor--selected);
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
-$fontSize-smaller: createVar(fontSize-smaller);
-$fontSize-small: createVar(fontSize-small);
-$fontSize-normal: createVar(fontSize-normal);
-$fontSize-medium: createVar(fontSize-medium);
-$fontSize-large: createVar(fontSize-large);
-$fontSize-larger: createVar(fontSize-larger);
+$fontSize-xs: createVar(fontSize-xs);
+$fontSize-sm: createVar(fontSize-sm);
+$fontSize-base: createVar(fontSize-base);
+$fontSize-xl: createVar(fontSize-xl);
+$fontSize-2xl: createVar(fontSize-2xl);
 
 $backgroundColor-overlay: createVar(backgroundColor-overlay);
 $color-info: createVar(color-info);

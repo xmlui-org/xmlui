@@ -93,11 +93,20 @@ export const Heading = forwardRef(function Heading(
     }
   }, []);
 
+  const hasOverflow = useCallback(() => {
+    if (elementRef.current) {
+      const element = elementRef.current;
+      return element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight;
+    }
+    return false;
+  }, []);
+
   useEffect(() => {
     registerComponentApi?.({
       scrollIntoView,
+      hasOverflow,
     });
-  }, [registerComponentApi, scrollIntoView]);
+  }, [registerComponentApi, scrollIntoView, hasOverflow]);
 
   useEffect(() => {
     if (elementRef.current) {

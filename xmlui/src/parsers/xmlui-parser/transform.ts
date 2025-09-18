@@ -389,7 +389,8 @@ export function nodeToComponentDef(
       comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script);
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
-        comp.scriptError = parser.errors;
+        const errMsg = parser.errors[0];
+        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
       } else {
         comp.scriptError = err;
       }
@@ -444,6 +445,9 @@ export function nodeToComponentDef(
         return;
       case "when":
         comp.when = value;
+        return;
+      case "uses":
+        comp.uses = splitUsesValue(value);
         return;
       default:
         if (startSegment === "var") {
@@ -692,14 +696,14 @@ export function nodeToComponentDef(
     }
   }
 
-  function collectUsesElements(comp: ComponentDef | CompoundComponentDef, uses: Node): void {
+  function collectUsesElements(comp: ComponentDef | CompoundComponentDef, usesNode: Node): void {
     // --- Compound component do not have a uses
     if (!isComponent(comp)) {
       reportError("T009", "uses");
       return;
     }
 
-    const attributes = getAttributes(uses).map(segmentAttr);
+    const attributes = getAttributes(usesNode).map(segmentAttr);
     const valueAttr = attributes.find((attr) => attr.name === "value");
     if (!valueAttr?.value || attributes.length !== 1) {
       reportError("T015", "uses");
@@ -707,7 +711,12 @@ export function nodeToComponentDef(
     }
 
     // --- Extract the value
-    comp.uses ??= valueAttr.value.split(",").map((v) => v.trim());
+    const usesValues = splitUsesValue(valueAttr.value);
+    if (comp.uses) {
+      comp.uses.push(...usesValues);
+    } else {
+      comp.uses = usesValues;
+    }
   }
 
   function segmentAttr(attr: Node): {
@@ -1313,4 +1322,8 @@ function getNamespaceResolvedComponentName(
  */
 export function stripOnPrefix(name: string) {
   return name[2].toLowerCase() + name.substring(3);
+}
+
+function splitUsesValue(value: string) {
+  return value.split(",").map((v) => v.trim());
 }

@@ -86,7 +86,7 @@ export const RadioGroupMd = createMetadata({
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
     [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
     
-    [`fontSize-${RGOption}`]: "$fontSize-small",
+    [`fontSize-${RGOption}`]: "$fontSize-sm",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
   },
 });
@@ -106,6 +106,7 @@ export const radioGroupRenderer = createComponentRenderer(
   }) => {
     return (
       <RadioGroup
+        autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         className={className}
         initialValue={extractValue(node.props.initialValue)}

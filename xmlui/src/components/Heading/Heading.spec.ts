@@ -955,3 +955,191 @@ test.describe("Integration", () => {
     }
   });
 });
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("API", () => {
+  test("hasOverflow returns true when heading text overflows horizontally", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="200px">
+          <H1 id="overflowHeading" maxLines="{1}" 
+            value="This is a very long heading text that should definitely overflow when constrained to a small width" 
+          />
+          <Button onClick="testState = overflowHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow returns true when heading text overflows with maxLines constraint", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="200px">
+          <H2 id="overflowHeading" maxLines="{2}" value="This is a very long heading text that will wrap to multiple lines and should overflow beyond the maxLines constraint when the container is wide enough to allow wrapping" />
+          <Button onClick="testState = overflowHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow returns false when heading text fits within container", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="300px" height="100px">
+          <H3 id="normalHeading" value="Short heading" />
+          <Button onClick="testState = normalHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow returns false for empty heading text", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px" height="50px">
+          <H4 id="emptyHeading" value="" />
+          <Button onClick="testState = emptyHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow returns false for heading with no size constraints", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <H5 id="unconstrainedHeading" value="This heading has no width or height constraints so it should not overflow" />
+        <Button onClick="testState = unconstrainedHeading.hasOverflow()" />
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow works with different heading levels", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <H1 id="h1Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <H2 id="h2Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <H3 id="h3Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <H4 id="h4Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <H5 id="h5Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <H6 id="h6Text" maxLines="{1}" value="This is a very long heading that should overflow" />
+          <Button onClick="testState = { 
+            h1: h1Text.hasOverflow(), 
+            h2: h2Text.hasOverflow(), 
+            h3: h3Text.hasOverflow(), 
+            h4: h4Text.hasOverflow(), 
+            h5: h5Text.hasOverflow(), 
+            h6: h6Text.hasOverflow() 
+          }" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    const result = await testStateDriver.testState();
+    expect(result.h1).toBe(true);
+    expect(result.h2).toBe(true);
+    expect(result.h3).toBe(true);
+    expect(result.h4).toBe(true);
+    expect(result.h5).toBe(true);
+    expect(result.h6).toBe(true);
+  });
+
+  test("hasOverflow returns correct result after content changes", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.headingText="Short">
+        <Stack width="100px">
+          <H1 id="dynamicHeading" value="{headingText}" maxLines="{1}" />
+          <Button testId="checkBtn" onClick="testState = dynamicHeading.hasOverflow()" />
+          <Button testId="changeBtn" onClick="headingText = 'This is a very long heading text that will definitely overflow the container'" />
+        </Stack>
+      </Fragment>
+    `);
+
+    // Check initial state (should not overflow)
+    await page.getByTestId("checkBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+
+    // Change content to overflow
+    await page.getByTestId("changeBtn").click();
+    await page.getByTestId("checkBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow handles null/undefined values gracefully", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <H2 id="nullHeading" value="{null}" />
+          <Button onClick="testState = nullHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow works with generic Heading component", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Heading id="genericHeading" level="h3" maxLines="{1}" value="This is a very long heading text that should overflow" />
+          <Button onClick="testState = genericHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow works with nested content instead of value prop", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <H1 id="nestedHeading" maxLines="{1}">
+            This is a very long heading with nested content that should definitely overflow the container width
+          </H1>
+          <Button onClick="testState = nestedHeading.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+});

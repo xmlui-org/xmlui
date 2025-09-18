@@ -153,7 +153,7 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
 
   .pageSizeLabel {
     color: $textColor-selector-Pagination;
-    font-size: t.$fontSize-small;
+    font-size: t.$fontSize-sm;
   }
 
   .pageSizeSelect {
@@ -162,7 +162,7 @@ $textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
     border: 1px solid $borderColor-Pagination;
     border-radius: $borderRadius-selector-Pagination;
     padding: t.$space-1 t.$space-2;
-    font-size: t.$fontSize-small;
+    font-size: t.$fontSize-sm;
 
     .paginationVertical & {
       align-self: center;

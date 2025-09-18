@@ -521,7 +521,9 @@ export default class RestApiProxy {
             : respObject,
           response.status,
         );
-      } catch {}
+      } catch {
+        return new GenericBackendError("<No error description>", response.status);
+      }
     }
 
     return new Error(

@@ -296,7 +296,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
   .paginationLabel {
     color: $textColor-pagination-Table;
-    font-size: t.$fontSize-small;
+    font-size: t.$fontSize-sm;
   }
 
   .paginationSelect {

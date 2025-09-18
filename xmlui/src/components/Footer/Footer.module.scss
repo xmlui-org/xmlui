@@ -28,6 +28,7 @@ $margin-Footer: createThemeVar("margin-#{$component}");
   .outerWrapper{
     @include t.borderVars($themeVars, $component);
     background-color: $backgroundColor-Footer;
+    color: $textColor-Footer;
     height: $height-Footer;
   }
 
@@ -42,7 +43,6 @@ $margin-Footer: createThemeVar("margin-#{$component}");
     font-size: $fontSize-Footer;
     align-items: $verticalAlignment-Footer;
     max-width: $maxWidth-content-Footer;
-    color: $textColor-Footer;
     margin: $margin-Footer;
 
     &.full{

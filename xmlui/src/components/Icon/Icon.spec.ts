@@ -417,49 +417,52 @@ test.describe("Accessibility", () => {
     await expect.poll(testStateDriver.testState).toEqual("activated");
   });
 
-  test.fixme(
+  test(
     "icon can receive focus via tabIndex when clickable",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Icon name="home" onClick="testState = 'clicked'" tabIndex="0"/>`);
+    async ({ initTestBed, createIconDriver }) => {
+      await initTestBed(`<Icon testId="icon" name="home" onClick="testState = 'clicked'" />`);
 
-      const icon = page.getByTestId("test-id-component");
-
-      // Check that the icon has tabIndex attribute
-      const tabIndex = await icon.getAttribute("tabindex");
-      expect(tabIndex).toBe("0");
+      const icon = (await createIconDriver("icon")).svgIcon;
 
       // For SVG elements, we test focus capability by checking if it can be found after focus
+      await expect(icon).toBeVisible();
       await icon.focus();
-      const activeElement = await page.evaluate(() =>
-        document.activeElement?.getAttribute("data-testid"),
-      );
-      expect(activeElement).toBe("test-id-component");
+      await expect(icon).toBeFocused();
     },
   );
 
-  test.fixme(
-    "icon supports keyboard activation with tabIndex when clickable",
-    async ({ initTestBed, page }) => {
-      const { testStateDriver } = await initTestBed(`
-      <Icon name="home" onClick="testState = 'space-activated'" tabIndex="0"/>
-    `);
+  test(
+    "icon supports keyboard activation with Enter",
+    async ({ initTestBed, createIconDriver }) => {
+      const testBed = await initTestBed(`<Icon testId="icon" name="home" onClick="testState = 'clicked';" />`);
+      const { testStateDriver } = testBed;
 
-      const icon = page.getByTestId("test-id-component");
+      const driver = await createIconDriver("icon");
+      const icon = driver.svgIcon;
 
-      // Focus the icon and verify it's focused
-      await icon.focus();
-      const activeElement = await page.evaluate(() =>
-        document.activeElement?.getAttribute("data-testid"),
-      );
-      expect(activeElement).toBe("test-id-component");
-
-      // For SVG elements, Space key might not trigger click by default
-      // Let's test Enter key instead which is more reliable for SVG elements
+      // For SVG elements, we test focus capability by checking if it can be found after focus
+      await expect(icon).toBeVisible();
       await icon.press("Enter");
-
-      await expect.poll(testStateDriver.testState).toEqual("space-activated");
+      expect(await testStateDriver.testState()).toBe("clicked");
     },
   );
+
+  test(
+    "icon supports keyboard activation with Space",
+    async ({ initTestBed, createIconDriver }) => {
+      const testBed = await initTestBed(`<Icon testId="icon" name="home" onClick="testState = 'clicked';" />`);
+      const { testStateDriver } = testBed;
+
+      const driver = await createIconDriver("icon");
+      const icon = driver.svgIcon;
+
+      // For SVG elements, we test focus capability by checking if it can be found after focus
+      await expect(icon).toBeVisible();
+      await icon.press("Space");
+      expect(await testStateDriver.testState()).toBe("clicked");
+    },
+  );
+
 });
 
 // =============================================================================

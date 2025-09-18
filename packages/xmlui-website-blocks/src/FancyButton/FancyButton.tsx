@@ -108,7 +108,7 @@ export const FancyButtonMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${COMP}`]: "$fontSize-small",
+    [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
     [`gap-${COMP}`]: "$space-2",
     [`backgroundColor-${COMP}--disabled`]: "$backgroundColor--disabled",
@@ -124,27 +124,27 @@ export const FancyButtonMd = createMetadata({
     // Size variant theme variables
     [`paddingHorizontal-${COMP}-xs`]: "$space-3",
     [`paddingVertical-${COMP}-xs`]: "$space-1_5",
-    [`fontSize-${COMP}-xs`]: "$fontSize-smaller",
+    [`fontSize-${COMP}-xs`]: "$fontSize-xs",
     [`gap-${COMP}-xs`]: "$space-2",
 
     [`paddingHorizontal-${COMP}-sm`]: "$space-4",
     [`paddingVertical-${COMP}-sm`]: "$space-2",
-    [`fontSize-${COMP}-sm`]: "$fontSize-small",
+    [`fontSize-${COMP}-sm`]: "$fontSize-sm",
     [`gap-${COMP}-sm`]: "$space-2_5",
 
     [`paddingHorizontal-${COMP}-md`]: "$space-5",
     [`paddingVertical-${COMP}-md`]: "$space-2_5",
-    [`fontSize-${COMP}-md`]: "$fontSize-medium",
+    [`fontSize-${COMP}-md`]: "$fontSize-xl",
     [`gap-${COMP}-md`]: "$space-3",
 
     [`paddingHorizontal-${COMP}-lg`]: "$space-8",
     [`paddingVertical-${COMP}-lg`]: "$space-3",
-    [`fontSize-${COMP}-lg`]: "$fontSize-large",
+    [`fontSize-${COMP}-lg`]: "$fontSize-2xl",
     [`gap-${COMP}-lg`]: "$space-4",
 
     [`paddingHorizontal-${COMP}-xl`]: "$space-10",
     [`paddingVertical-${COMP}-xl`]: "$space-4",
-    [`fontSize-${COMP}-xl`]: "$fontSize-larger",
+    [`fontSize-${COMP}-xl`]: "$fontSize-4xl",
     [`gap-${COMP}-xl`]: "$space-5",
 
     // Common colors

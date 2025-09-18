@@ -183,7 +183,7 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem-level-4 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem-level-5 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-TableOfContentsItem-level-6 | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-TableOfContentsItem | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-TableOfContentsItem | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-3 | *none* | *none* |

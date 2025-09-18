@@ -59,7 +59,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
   });
 
-  test.skip("autoFocus sets focus on the first Option on page load", async ({
+  test("autoFocus sets focus on the first Option on page load", async ({
     initTestBed,
     page,
   }) => {
@@ -126,7 +126,7 @@ test.describe("Basic Functionality", () => {
     await expect(options.nth(2)).not.toBeChecked();
   });
 
-  test("initialValue sets the initial selected option (number initialValue, string options)", async ({
+  test("initialValue does not set the initial selected option (number initialValue, string options)", async ({
     initTestBed,
     page,
   }) => {
@@ -139,11 +139,11 @@ test.describe("Basic Functionality", () => {
     `);
     const options = page.getByRole("radiogroup").getByRole("radio");
     await expect(options.nth(0)).not.toBeChecked();
-    await expect(options.nth(1)).toBeChecked();
+    await expect(options.nth(1)).not.toBeChecked();
     await expect(options.nth(2)).not.toBeChecked();
   });
 
-  test("initialValue sets the initial selected option (string initialValue, number options)", async ({
+  test("initialValue does not set the initial selected option (string initialValue, number options)", async ({
     initTestBed,
     page,
   }) => {
@@ -156,7 +156,7 @@ test.describe("Basic Functionality", () => {
     `);
     const options = page.getByRole("radiogroup").getByRole("radio");
     await expect(options.nth(0)).not.toBeChecked();
-    await expect(options.nth(1)).toBeChecked();
+    await expect(options.nth(1)).not.toBeChecked();
     await expect(options.nth(2)).not.toBeChecked();
   });
 
@@ -175,7 +175,7 @@ test.describe("Basic Functionality", () => {
     await expect(options.nth(1)).not.toBeChecked();
   });
 
-  test("initialValue sets the initial selected option (boolean initialValue, string options)", async ({
+  test("initialValue does not set the initial selected option (boolean initialValue, string options)", async ({
     initTestBed,
     page,
   }) => {
@@ -186,11 +186,11 @@ test.describe("Basic Functionality", () => {
       </RadioGroup>
     `);
     const options = page.getByRole("radiogroup").getByRole("radio");
-    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
     await expect(options.nth(1)).not.toBeChecked();
   });
 
-  test("initialValue sets the initial selected option (string initialValue, boolean options)", async ({
+  test("initialValue does not set the initial selected option (string initialValue, boolean options)", async ({
     initTestBed,
     page,
   }) => {
@@ -201,22 +201,33 @@ test.describe("Basic Functionality", () => {
       </RadioGroup>
     `);
     const options = page.getByRole("radiogroup").getByRole("radio");
-    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
     await expect(options.nth(1)).not.toBeChecked();
   });
 
-  ["undefined", "null"].forEach((value) => {
-    test(`${value} does not render Radio Option`, async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("undefined does not render Radio Option", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <RadioGroup>
         <Option value="1">Option 1</Option>
-        <Option value="{${value}}">Option 2</Option>
+        <Option value="{undefined}">Option 2</Option>
       </RadioGroup>
     `);
-      const optionLabels = page.getByRole("radiogroup").locator("label");
-      await expect(optionLabels).toHaveCount(1);
-      await expect(optionLabels.first()).toHaveText("Option 1");
-    });
+    const optionLabels = page.getByRole("radiogroup").locator("label");
+    await expect(optionLabels).toHaveCount(1);
+    await expect(optionLabels.first()).toHaveText("Option 1");
+  });
+
+  test("null renders Radio Option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option value="1">Option 1</Option>
+        <Option value="{null}">Option 2</Option>
+      </RadioGroup>
+    `);
+    const optionLabels = page.getByRole("radiogroup").locator("label");
+    await expect(optionLabels).toHaveCount(2);
+    await expect(optionLabels.first()).toHaveText("Option 1");
+    await expect(optionLabels.nth(1)).toHaveText("Option 2");
   });
 
   [

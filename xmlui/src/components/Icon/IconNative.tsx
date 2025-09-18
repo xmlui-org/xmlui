@@ -15,14 +15,25 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   fallback?: string;
   style?: CSSProperties;
   className?: string;
+  tabIndex?: number;
+  onKeyDown?: React.KeyboardEventHandler<any>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Icon = forwardRef(function Icon(
-  { name, fallback, style, className, size, onClick, ...restProps }: IconBaseProps,
+  { name, fallback, style, className, size, onClick, tabIndex, onKeyDown, ...restProps }: IconBaseProps,
   ref: ForwardedRef<HTMLElement>,
 ) {
   const iconRenderer = useFindIconRenderer(name, fallback);
+
+  // Handle keyboard events for clickable icons
+  const handleKeyDown = (event: React.KeyboardEvent<any>) => {
+    if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      onClick(event as any);
+    }
+    onKeyDown?.(event);
+  };
 
   const computedSize = typeof size === "string" ? mapSizeToIconPack(size) : size;
   const width = computedSize || restProps.width;
@@ -40,6 +51,8 @@ export const Icon = forwardRef(function Icon(
       "--icon-height": height,
     },
     onClick,
+    onKeyDown: handleKeyDown,
+    tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
   };
 
   // ---
@@ -60,14 +73,30 @@ const CustomIcon = forwardRef(function CustomIcon(
   props: IconBaseProps & { size?: string; url: string },
   ref: ForwardedRef<HTMLElement>,
 ) {
-  const { url, width, height, name, style, className, ...rest } = props;
+  const { url, width, height, name, style, className, onClick, onKeyDown, tabIndex, ...rest } = props;
+
+  // Handle keyboard events for clickable icons
+  const handleKeyDown = (event: React.KeyboardEvent<any>) => {
+    if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      onClick(event as any);
+    }
+    onKeyDown?.(event);
+  };
 
   const resourceUrl = useResourceUrl(url);
   const isSvgIcon = resourceUrl?.toLowerCase()?.endsWith(".svg");
   const customSvgIconRenderer = useCustomSvgIconRenderer(resourceUrl);
 
   if (resourceUrl && isSvgIcon) {
-    const renderedIcon = customSvgIconRenderer?.({ style, className, ...rest });
+    const renderedIcon = customSvgIconRenderer?.({ 
+      style, 
+      className, 
+      onClick,
+      onKeyDown: handleKeyDown,
+      tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
+      ...rest 
+    });
     if (!renderedIcon) {
       //to prevent layout shift
       return (
@@ -76,6 +105,9 @@ const CustomIcon = forwardRef(function CustomIcon(
           ref={ref as ForwardedRef<HTMLSpanElement>}
           style={style}
           className={className}
+          onClick={onClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
         />
       );
     }
@@ -88,6 +120,9 @@ const CustomIcon = forwardRef(function CustomIcon(
       src={resourceUrl}
       style={{ width, height, ...style }}
       alt={name}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
       {...(rest as any)}
     />
   );

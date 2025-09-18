@@ -48,9 +48,7 @@ jobs:
       - name: Install node dependencies
         run: npm ci --prefer-offline
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.2.1
-        with:
-          max-age: 1mo
+        uses: rharkor/caching-for-turbo@v2.3.1
       - name: Store Playwright's Version
         run: |
           PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
