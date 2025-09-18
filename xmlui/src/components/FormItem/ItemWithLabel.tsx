@@ -59,9 +59,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  // --- HACK: the "rest" may contain a "layoutContext" property with undefined value, and it
-  // --- would issue a warning in React.
-  if ((rest as any).layoutContext === undefined) {
+  // --- HACK: the "rest" may contain a "layoutContext" property that React doesn't recognize
+  // --- as a valid DOM attribute, which would issue a warning in React.
+  if ((rest as any).layoutContext !== undefined) {
     delete (rest as any).layoutContext;
   }
   // --- END HACK
