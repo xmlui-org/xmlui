@@ -31,11 +31,11 @@ import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import {
-  PART_END_ADORNMENT,
-  PART_INPUT,
-  PART_START_ADORNMENT,
-} from "../../components-core/parts";
+import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+import { current } from "immer";
+
+const PART_SPINNER_UP = "spinnerUp";
+const PART_SPINNER_DOWN = "spinnerDown";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -226,6 +226,10 @@ export const NumberBox = forwardRef(function NumberBox(
     switch (event.data) {
       case "-":
         shouldPreventDefault = true;
+        if (zeroOrPositive) {
+          // --- No minus sign allowed
+          break;
+        }
         if (expPos === -1) {
           // --- Change the first char to "-" if we are before the exponential separator and it's not already there
           if (!currentValue.startsWith("-")) {
@@ -256,6 +260,27 @@ export const NumberBox = forwardRef(function NumberBox(
               currentPos - 1,
             );
           }
+        }
+        break;
+      case "0":
+        // --- Prevent leading zeros (before decimal or exponential separator)
+        if (currentValue === "0") {
+          shouldPreventDefault = true;
+        }
+        break;
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+        // --- Prevent leading zero (before decimal or exponential separator)
+        if (currentValue === "0" && currentPos === 1) {
+          setNewValue(event.data, 1);
+          shouldPreventDefault = true;
         }
         break;
       case DECIMAL_SEPARATOR:
@@ -475,6 +500,7 @@ export const NumberBox = forwardRef(function NumberBox(
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
+              data-part-id={PART_SPINNER_UP}
               data-spinner="up"
               type="button"
               role="spinbutton"
@@ -488,6 +514,7 @@ export const NumberBox = forwardRef(function NumberBox(
               <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
             <Button
+              data-part-id={PART_SPINNER_DOWN}
               data-spinner="down"
               type="button"
               role="spinbutton"

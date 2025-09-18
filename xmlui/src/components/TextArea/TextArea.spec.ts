@@ -143,23 +143,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue(longText);
   });
 
-  test.fixme(
-    "component handles rapid input changes efficiently",
-    SKIP_REASON.REFACTOR("Rewrite: test does not test anything meaningful"),
-    async ({ initTestBed, createTextAreaDriver }) => {
-      await initTestBed(`<TextArea />`);
-      const driver = await createTextAreaDriver();
-
-      // Type rapidly
-      await driver.field.pressSequentially("rapid typing test", { delay: 25 });
-      await expect(driver.field).toHaveValue("rapid typing test");
-
-      await driver.field.clear();
-      await driver.field.pressSequentially("another fast test", { delay: 10 });
-      await expect(driver.field).toHaveValue("another fast test");
-    },
-  );
-
   test("component prop changes update display correctly", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment var.rows="{3}">
@@ -632,25 +615,6 @@ test.describe("Performance", () => {
     await expect(textarea).toHaveValue("ab");
   });
 
-  test.skip("component memory usage stays stable", SKIP_REASON.TEST_NOT_WORKING("This does not test what it says"), async ({ initTestBed, page }) => {
-    // Test multiple instances don't cause memory leaks
-    const configurations = [
-      { label: "Comments 1", rows: "3" },
-      { label: "Comments 2", rows: "5" },
-      { label: "Comments 3", rows: "7" },
-    ];
-
-    for (const config of configurations) {
-      await initTestBed(`<TextArea testId="input" label="${config.label}" rows="${config.rows}" />`);
-      await expect(page.getByTestId("input")).toBeVisible();
-      await expect(page.getByRole("textbox")).toHaveAttribute("rows", config.rows);
-    }
-
-    // Verify final state is clean
-    await initTestBed(`<TextArea testId="input" label="Final Test" />`);
-    await expect(page.getByTestId("input")).toBeVisible();
-  });
-
   test("component handles large content efficiently", async ({ initTestBed, page }) => {
     const largeContent = "Large content line.\n".repeat(1000);
     await initTestBed(`<TextArea />`);
@@ -796,23 +760,6 @@ test.describe("Integration", () => {
     // Test focus API integration
     await focusBtn.click();
     await expect(textarea1).toBeFocused();
-  });
-
-  test.fixme("component handles complex validation scenarios", SKIP_REASON.REFACTOR("This does not test what it says in the description"), async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <TextArea 
-        required="true"
-        maxLength="100"
-        validationStatus="error"
-        label="Required Comments"
-      />
-    `);
-    const textarea = page.getByRole("textbox");
-
-    // Component should show error state
-    await expect(textarea).toHaveAttribute("required");
-    await expect(textarea).toHaveAttribute("maxlength", "100");
-    await expect(page.getByText("Required Comments")).toContainText("*");
   });
 
   test("component works in nested component structures", async ({ initTestBed, page }) => {
