@@ -10,10 +10,10 @@
 
 **Context variables available during execution:**
 
-- `$error`: Error details (available in `errorNotificationMessage` and `error` event)
+- `$error`: Error details (available in `errorNotificationMessage`)
 - `$param`: The first parameter passed to `execute()` method
 - `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
-- `$result`: Response data (available in `completedNotificationMessage` and `success` event)
+- `$result`: Response data (available in `completedNotificationMessage`)
 
 ## Properties [#properties]
 
