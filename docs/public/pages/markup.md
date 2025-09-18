@@ -37,17 +37,17 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
     <Text>Search for station amenities</Text>
     <HStack verticalAlignment="center" >
       <FormItem bindTo="station" />
-      <FormItem 
-        type="checkbox" 
-        label="wifi" 
-        bindTo="wifi" 
-        labelPosition="start" 
+      <FormItem
+        type="checkbox"
+        label="wifi"
+        bindTo="wifi"
+        labelPosition="start"
       />
-      <FormItem 
-        type="checkbox" 
-        label="toilets" 
-        bindTo="toilets" 
-        labelPosition="start" 
+      <FormItem
+        type="checkbox"
+        label="toilets"
+        bindTo="toilets"
+        labelPosition="start"
       />
     </HStack>
     <property name="buttonRowTemplate">
@@ -100,6 +100,35 @@ The same variable name can be declared in nested scopes. The engine resolves the
     <Text>{title}</Text>
   </VStack>
 </App>
+```
+
+### Multiple instances
+
+<Text>Each counter is a separate instance of `CounterTest` with its own local component variables.</Text>
+
+```xmlui-pg  name="Isolated component instances"
+---app display
+<App>
+    <HStack horizontalAlignment="center">
+      <VStack>
+        <Text variant="caption">Counter Instance 1</Text>
+        <CounterTest instance="1" />
+      </VStack>
+      <Stack width="10rem"/>
+      <VStack>
+        <Text variant="caption">Counter Instance 2</Text>
+        <CounterTest instance="2" />
+      </VStack>
+    </HStack>
+</App>
+---comp display
+<Component name="CounterTest" var.count="{0}">
+    <Text>Counter ID: {$props.instance}</Text>
+    <Text>Count: {count}</Text>
+    <Button onClick="count = count + 1">
+      Increment {$props.id}
+    </Button>
+</Component>
 ```
 
 ### Reactive variables
