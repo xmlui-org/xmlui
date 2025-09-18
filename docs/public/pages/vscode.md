@@ -6,6 +6,7 @@
 - Code formatting for .xmlui files
 - Diagnostics for errors
 
-Get the [VSIX](https://github.com/xmlui-org/xmlui/releases?q=vscode&expanded=true).
+Find the extension on the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=xmlui.xmlui-vscode)
+or download the [VSIX](https://github.com/xmlui-org/xmlui/releases?q=vscode&expanded=true).
 
 
