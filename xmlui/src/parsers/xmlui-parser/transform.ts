@@ -389,7 +389,8 @@ export function nodeToComponentDef(
       comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script);
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
-        comp.scriptError = parser.errors;
+        const errMsg = parser.errors[0];
+        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
       } else {
         comp.scriptError = err;
       }

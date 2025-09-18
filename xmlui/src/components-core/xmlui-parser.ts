@@ -579,6 +579,7 @@ function getCompoundCompName(node: Node, getText: GetText) {
   }
   return undefined;
 }
+
 function addDisplayFieldsToErrors(
   errors: ParseError[],
   source: string,
