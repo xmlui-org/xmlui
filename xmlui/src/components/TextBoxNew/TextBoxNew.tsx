@@ -29,7 +29,7 @@ import { TextBoxNew, defaultProps } from "./TextBoxNewNative";
 const COMP = "TextBoxNew";
 
 export const TextBoxNewMd = createMetadata({
-  status: "stable",
+  status: "in progress",
   description:
     "`TextBoxNew` captures user text input for forms, search fields, and data entry " +
     "with support for validation, icons, and formatting hints.",
