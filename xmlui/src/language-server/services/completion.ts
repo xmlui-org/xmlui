@@ -95,16 +95,19 @@ export function handleCompletion(
     case SyntaxKind.OpenNodeStart:
       const defaultCompNames = allComponentNames(metaByComp);
       const closestElementNodeSuspect = chainBeforePos.at(-2);
-      
+
       if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
-        const matchingNode = getFirstNodeFromAncestorChain(chainBeforePos.slice(0, -3), SyntaxKind.ElementNode);
+        const matchingNode = getFirstNodeFromAncestorChain(
+          chainBeforePos.slice(0, -3),
+          SyntaxKind.ElementNode,
+        );
         if (!matchingNode) return defaultCompNames;
 
         const compName = getNameFromElement(matchingNode, getText);
         if (!compName) return defaultCompNames;
 
-        const compNameSuggestion = componentCompletionItem("/" + compName);
-        return [compNameSuggestion, ...defaultCompNames];
+        const compNameSuggestion = componentCompletionItem("/" + compName, 0);
+        return [compNameSuggestion, ...defaultCompNames.map((c) => ({ ...c, sortText: "1" }))];
       }
       return defaultCompNames;
 
@@ -163,7 +166,7 @@ function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {
 }
 
 /**
- * Retrieves the name from an ElementNode 
+ * Retrieves the name from an ElementNode
  * @param elementNode has to point to a ElementNode
  * @returns
  */
@@ -278,10 +281,21 @@ function attributeCompletionItem(
   };
 }
 
-function componentCompletionItem(componentName: string): XmluiCompletionItem {
+function componentCompletionItem(
+  componentName: string,
+  sortingOrder?: number,
+): XmluiCompletionItem {
+  const sortText =
+    sortingOrder !== undefined &&
+    sortingOrder !== 0 &&
+    sortingOrder !== null &&
+    !isNaN(sortingOrder)
+      ? sortingOrder.toString()
+      : "";
   return {
     label: componentName,
     kind: CompletionItemKind.Constructor,
+    sortText,
     data: {
       metadataAccessInfo: {
         componentName,
