@@ -8,8 +8,9 @@ import * as docGen from "./common/docs-generation";
 import {
   compNameForTagNameNode,
   findTagNameNodeInStack,
+  getFirstNodeFromAncestorChain,
   insideClosingTag,
-  pathToNodeInAscendands,
+  visitAncestorsInChain,
 } from "./common/syntax-node-utilities";
 import {
   addOnPrefix,
@@ -83,7 +84,7 @@ export function handleCompletion(
   if (!findRes) {
     return null;
   }
-  const { chainAtPos, chainBeforePos, sharedParents } = findRes;
+  const { chainAtPos, chainBeforePos } = findRes;
 
   if (findRes.chainBeforePos === undefined) {
     return handleCompletionInsideToken(chainAtPos, position, metaByComp, getText);
@@ -92,17 +93,34 @@ export function handleCompletion(
   const nodeBefore = chainBeforePos.at(-1);
   switch (nodeBefore.kind) {
     case SyntaxKind.OpenNodeStart:
-      return allComponentNames(metaByComp);
-    case SyntaxKind.CloseNodeStart:
-      //TODO: this can be substituted for an function that finds the first ElementNode up the tree
-      const closestElementNodeSuspect = chainBeforePos.at(-2) ?? chainAtPos.at(sharedParents - 1);
+      const defaultCompNames = allComponentNames(metaByComp);
+      const closestElementNodeSuspect = chainBeforePos.at(-2);
+      
       if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
-        return matchingTagName(closestElementNodeSuspect, metaByComp, getText);
+        const matchingNode = getFirstNodeFromAncestorChain(chainBeforePos.slice(0, -3), SyntaxKind.ElementNode);
+        if (!matchingNode) return defaultCompNames;
+
+        const compName = getNameFromElement(matchingNode, getText);
+        if (!compName) return defaultCompNames;
+
+        const compNameSuggestion = componentCompletionItem("/" + compName);
+        return [compNameSuggestion, ...defaultCompNames];
+      }
+      return defaultCompNames;
+
+    case SyntaxKind.CloseNodeStart: {
+      //TODO: this can be substituted for an function that finds the first ElementNode up the tree
+      const closestElementNodeSuspect = chainBeforePos.at(-2);
+      if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
+        const compName = getNameFromElement(closestElementNodeSuspect, getText);
+        if (!compName) return allComponentNames(metaByComp);
+        return [componentCompletionItem(compName)];
       } else {
         return allComponentNames(metaByComp);
       }
+    }
     case SyntaxKind.Identifier:
-      const pathToElementNode = pathToNodeInAscendands(
+      const pathToElementNode = visitAncestorsInChain(
         chainBeforePos,
         (n) => n.kind === SyntaxKind.ElementNode,
       );
@@ -111,8 +129,9 @@ export function handleCompletion(
         parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end;
       if (completeCompName) {
         if (pathToElementNode && insideClosingTag(pathToElementNode)) {
-          const elementNode = pathToElementNode.at(-1);
-          return matchingTagName(elementNode, metaByComp, getText);
+          const compName = getNameFromElement(pathToElementNode.at(-1), getText);
+          if (!compName) return allComponentNames(metaByComp);
+          return [componentCompletionItem(compName)];
         }
         return allComponentNames(metaByComp);
       }
@@ -144,19 +163,16 @@ function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {
 }
 
 /**
- *
+ * Retrieves the name from an ElementNode 
  * @param elementNode has to point to a ElementNode
  * @returns
  */
-function matchingTagName(
-  elementNode: Node,
-  metaByComp: MetadataProvider,
-  getText: GetText,
-): CompletionItem[] | null {
+function getNameFromElement(elementNode: Node, getText: GetText): string | null {
   const nameNode = elementNode.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
   if (nameNode === undefined) {
-    return allComponentNames(metaByComp);
+    return null;
   }
+  // --- Handle namespaces
   const colonIdx = nameNode.children!.findIndex((c) => c.kind === SyntaxKind.Colon);
   let nameSpace: string | undefined = undefined;
   let nameIdentSearchSpace = nameNode.children!;
@@ -170,11 +186,11 @@ function matchingTagName(
   }
   const nameIdent = nameIdentSearchSpace.find((c) => c.kind === SyntaxKind.Identifier);
   if (nameIdent === undefined) {
-    return allComponentNames(metaByComp);
+    return null;
   }
   name = getText(nameIdent);
   const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-  return [componentCompletionItem(value)];
+  return value;
 }
 
 function handleCompletionInsideToken(
@@ -199,7 +215,9 @@ function handleCompletionInsideToken(
         previousNode.kind === SyntaxKind.CloseNodeStart &&
         tagNameNodeParent.kind === SyntaxKind.ElementNode
       ) {
-        return matchingTagName(tagNameNodeParent, metaByComp, getText);
+        const compName = getNameFromElement(tagNameNodeParent, getText);
+        if (!compName) return allComponentNames(metaByComp);
+        return [componentCompletionItem(compName)];
       }
       return allComponentNames(metaByComp);
     }

@@ -121,24 +121,29 @@ describe("Completion", () => {
     expect(docs).toContain(widthDescription);
   });
 
-  it("dumdum", () => {
-    const suggestions = completeAtPoundSign("<Button><#f").map(({ label }) => label);
-    //expect(suggestions[0]).toBe("/Button");
+  it("closing element 1st after opening tag & element creation", () => {
+    const suggestions = completeAtPoundSign("<Button><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
 
-  // findTokenAtPos(`<A# t="true">`) = {
-  //   
-  //   chainAt: [ContentListNode, ElementNode, AttributeListNode, Attribute, AttrubuteKeyNode, Identifier"t"],
-  //   chainBef: [ContentListNode, Elementknode, ElementNameNode, Identifier"A"],
-  //   sharedParents: 2
-  // }
-  //                                  -> AttributeListNode, Attribute, AttrubuteKeyNode, Identifier"t"
-  //                                /
-  // ContentListNode -> ElementNode 
-  //                                \
-  //                                 -> ElementNameNode, Identifier"A"
-  //
-  // 
-  // így használjuk legikább: chainAt.at(-1)
+  it("closing element 1st after opening tag & element creation, cursor not at end", () => {
+    const suggestions = completeAtPoundSign("<Button><#A").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr", () => {
+    const suggestions = completeAtPoundSign("<Button attr=><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr list", () => {
+    const suggestions = completeAtPoundSign("<Button attr=' :><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("suggest all components if no identifier provided", () => {
+    const suggestions = completeAtPoundSign("<><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(Object.keys(mockMetadata));
   });
 });
 
@@ -155,7 +160,7 @@ function completeAtPoundSign(source: string) {
 
 
   const parseResult = parser.parse();
-  console.log(toDbgString(parseResult.node, parser.getText));
+  //console.log(toDbgString(parseResult.node, parser.getText));
   return handleCompletion(
     { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
     position,

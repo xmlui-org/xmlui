@@ -54,13 +54,19 @@ export function insideClosingTag(pathToElementNode:Node[]): boolean {
   return false;
 }
 
-export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) => boolean): Node[] | null {
+/**
+* Visits ancestors in the chain from the innermost to the outermost node.
+* @param chain The chain of nodes to visit.
+* @param predicate A function that takes a node and returns a boolean.
+* @returns An array of nodes from the innermost to the node that satisfies the predicate, or null if no such node is found.
+*/
+export function visitAncestorsInChain(chain: Node[], predicate: (node: Node) => boolean): Node[] | null {
   let currentIdx = -1;
   let current = chain.at(currentIdx);
   let path = [current];
 
-  while(current){
-    if(predicate(current)){
+  while(current) {
+    if(predicate(current)) {
       return path;
     }
     currentIdx--;
@@ -68,6 +74,37 @@ export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) =>
     path.push(current)
   }
   return null;
+}
+
+/**
+ * Finds the first ancestor node of a specific kind in a chain of nodes.
+ * @param chain The chain of nodes to search through.
+ * @param kind The SyntaxKind to look for.
+ * @returns The first ancestor node of the specified kind, or null if not found.
+ */
+export function getFirstNodeFromAncestorChain(chain: Node[], kind: SyntaxKind): Node | null {
+  for (let i = chain.length - 1; i >= 0; i--) {
+    if (chain[i].kind === kind) {
+      return chain[i];
+    }
+  }
+  return null;
+}
+
+/**
+ * Finds all ancestor nodes of a specific kind in a chain of nodes.
+ * @param chain The chain of nodes to search through.
+ * @param kind The SyntaxKind to look for.
+ * @returns An array of ancestor nodes of the specified kind.
+ */
+export function getAllRelevantNodesFromAncestorChain(chain: Node[], kind: SyntaxKind): Node[] {
+  const relevantNodes: Node[] = [];
+  for (let i = chain.length - 1; i >= 0; i--) {
+    if (chain[i].kind === kind) {
+      relevantNodes.push(chain[i]);
+    }
+  }
+  return relevantNodes;
 }
 
 /**
