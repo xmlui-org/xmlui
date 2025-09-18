@@ -2,7 +2,6 @@ import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - errors", () => {
-
   it("Missing name in compound component", () => {
     try {
       transformSource("<Component />");
@@ -212,7 +211,9 @@ describe("Xmlui transform - errors", () => {
 
   it("Cannot mix field and item children #1", () => {
     try {
-      transformSource("<Stack><property name='my'><field name='my' /><item value='3'/></property></Stack>");
+      transformSource(
+        "<Stack><property name='my'><field name='my' /><item value='3'/></property></Stack>",
+      );
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T017");
@@ -221,7 +222,14 @@ describe("Xmlui transform - errors", () => {
 
   it("Cannot mix field and item children #2", () => {
     try {
-      transformSource("<Stack><property name='my'><item value='3'/><field name='my' /></property></Stack>");
+      transformSource(
+        `<Stack>
+          <property name='my'>
+            <item value='3'/>
+            <field name='my' />
+          </property>
+        </Stack>`,
+      );
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T017");
@@ -234,6 +242,22 @@ describe("Xmlui transform - errors", () => {
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T018");
+    }
+  });
+
+  it("throws script errors in script tag", () => {
+    try {
+      transformSource(`
+        <App>
+          <script>
+            var a =;
+          </script>
+          <Text>Hello World!</Text>
+        </App>
+      `);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).include("W001");
     }
   });
 });
