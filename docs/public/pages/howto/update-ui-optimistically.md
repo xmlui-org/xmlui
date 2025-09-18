@@ -20,15 +20,13 @@ For immediate user feedback, use component variables to update UI state instantl
     method="post"
     url="/api/posts/{$param}/favorite"
     inProgressNotificationMessage="Favoriting post..."
-    completedNotificationMessage="Post favorited!"
-    errorNotificationMessage="Failed to favorite post" />
+    completedNotificationMessage="Post favorited!" />
   <APICall
     id="unfavoritePost"
     method="post"
     url="/api/posts/{$param}/unfavorite"
     inProgressNotificationMessage="Unfavoriting post..."
-    completedNotificationMessage="Post unfavorited!"
-    errorNotificationMessage="Failed to unfavorite post" />
+    completedNotificationMessage="Post unfavorited!" />
   <DataSource
     id="timelineData"
     url="/api/timeline"
@@ -36,9 +34,9 @@ For immediate user feedback, use component variables to update UI state instantl
 
   <VStack gap="$space-4" padding="$space-4">
     <Items data="{timelineData}">
-      <Card padding="$space-3" marginBottom="$space-2" var.localFavorited="{null}" var.localFavoritesCount="{null}">
-        <VStack gap="$space-2">
-          <Text variant="h6">{$item.author}</Text>
+      <Card var.localFavorited="{null}" var.localFavoritesCount="{null}">
+        <VStack>
+          <Text>{$item.author}</Text>
           <Text>{$item.content}</Text>
           <HStack gap="$space-4" verticalAlignment="center">
             <HStack gap="$space-1" verticalAlignment="center">
