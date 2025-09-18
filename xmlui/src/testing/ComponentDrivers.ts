@@ -514,18 +514,22 @@ export class FormDriver extends ComponentDriver {
     );
   }
 
-  getSubmitButton() {
-    return this.component.locator("button[type='submit']");
+  get submitButton() {
+    return this.getByPartName("submitButton");
+  }
+
+  get cancelButton() {
+    return this.getByPartName("cancelButton");
   }
 
   async hasSubmitButton() {
-    return (await this.getSubmitButton().count()) > 0;
+    return (await this.submitButton.count()) > 0;
   }
 
   async submitForm(trigger: SubmitTrigger = "click") {
     if (trigger === "keypress") {
-      if ((await this.hasSubmitButton()) && (await this.getSubmitButton().isEnabled())) {
-        await this.getSubmitButton().focus();
+      if ((await this.hasSubmitButton()) && (await this.submitButton.isEnabled())) {
+        await this.submitButton.focus();
       }
       await this.locator.locator("input").waitFor();
       const firstInputChild = this.locator.locator("input");
@@ -534,7 +538,7 @@ export class FormDriver extends ComponentDriver {
       }
       await this.page.keyboard.press("Enter");
     } else if (trigger === "click") {
-      await this.getSubmitButton().click();
+      await this.submitButton.click();
     }
   }
 

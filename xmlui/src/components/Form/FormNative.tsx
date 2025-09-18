@@ -50,6 +50,9 @@ import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
 
+const PART_CANCEL_BUTTON = "cancelButton";
+const PART_SUBMIT_BUTTON = "submitButton";
+
 export const getByPath = (obj: any, path: string) => {
   return get(obj, path);
 };
@@ -228,7 +231,7 @@ type Props = {
   onSubmit?: OnSubmit;
   onCancel?: OnCancel;
   onReset?: OnReset;
-  onSuccess?: (result: any)=>void;
+  onSuccess?: (result: any) => void;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -356,7 +359,7 @@ const Form = forwardRef(function (
       const filteredSubject = cleanUpSubject(formState.subject);
 
       const result = await onSubmit?.(filteredSubject, {
-        passAsDefaultBody: true
+        passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
       await onSuccess?.(result);
@@ -437,6 +440,7 @@ const Form = forwardRef(function (
   const cancelButton =
     cancelLabel === "" ? null : (
       <Button
+        data-part-id={PART_CANCEL_BUTTON}
         key="cancel"
         type="button"
         themeColor={"secondary"}
@@ -448,7 +452,7 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button key="submit" type={"submit"} disabled={!isEnabled}>
+      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled}>
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
