@@ -143,10 +143,10 @@ export const APICallMd = createMetadata({
     },
     $result: {
       description:
-        "Response data (available in `completedNotificationMessage` and `success` event)",
+        "Response data (available in `completedNotificationMessage`)",
     },
     $error: {
-      description: "Error details (available in `errorNotificationMessage` and `error` event)",
+      description: "Error details (available in `errorNotificationMessage`)",
     },
   },
   apis: {
@@ -166,7 +166,7 @@ export const APICallMd = createMetadata({
 export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
-  ({ node, registerComponentApi, uid, extractValue }) => {
+  ({ node, registerComponentApi, uid }) => {
     return (
       <APICallNative registerComponentApi={registerComponentApi} node={node as any} uid={uid} />
     );
