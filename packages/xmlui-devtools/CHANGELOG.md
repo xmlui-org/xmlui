@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.20
+
+### Patch Changes
+
+- 819b563: Update fontSize and lineHeight themes and style (may break existing xmlui code)
+
 ## 0.1.19
 
 ### Patch Changes
