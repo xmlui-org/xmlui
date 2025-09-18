@@ -2,7 +2,7 @@
 
 For immediate user feedback, use component variables to update UI state instantly, providing a responsive experience while the backend processes the request.
 
-```xmlui-pg copy display {54} name="Click the Like button"
+```xmlui-pg copy display name="Click the Like button - immediate feedback"
 ---comp display
 <Component name="SocialButton">
   <Button
@@ -15,24 +15,6 @@ For immediate user feedback, use component variables to update UI state instantl
 </Component>
 ---app display
 <App>
-  <DataSource
-    id="timelineData"
-    url="/api/timeline"
-    method="GET" />
-  <VStack gap="$space-4" padding="$space-4">
-    <Items data="{timelineData}">
-      <Card>
-        <VStack gap="$space-2">
-          <Text>{$item.author}</Text>
-          <Text>{$item.content}</Text>
-          <LikeButton item="{$item}" />
-        </VStack>
-      </Card>
-    </Items>
-  </VStack>
-</App>
----comp display
-<Component name="LikeButton" var.localFavorited="{null}" var.localFavoritesCount="{null}">
   <APICall
     id="favoritePost"
     method="post"
@@ -47,44 +29,59 @@ For immediate user feedback, use component variables to update UI state instantl
     inProgressNotificationMessage="Unfavoriting post..."
     completedNotificationMessage="Post unfavorited!"
     errorNotificationMessage="Failed to unfavorite post" />
-  <HStack gap="$space-4" verticalAlignment="center">
-    <HStack gap="$space-1" verticalAlignment="center">
-      <SocialButton icon="reply" />
-      <Text variant="caption">{$props.item.replies_count}</Text>
-    </HStack>
-    <HStack gap="$space-1" verticalAlignment="center">
-      <SocialButton icon="trending-up" />
-      <Text variant="caption">{$props.item.reblogs_count}</Text>
-    </HStack>
-    <HStack gap="$space-1" verticalAlignment="center">
-      <SocialButton
-        icon="like"
-        themeColor="{(localFavorited !== null ? localFavorited : $props.item.favourited) ? 'attention' : 'secondary'}">
-        <event name="click">
-          // Get current state (local takes precedence)
-          const currentFavorited = localFavorited !== null ? localFavorited : $props.item.favourited;
-          const currentCount = localFavoritesCount !== null ? localFavoritesCount : ($props.item.favourites_count || 0);
+  <DataSource
+    id="timelineData"
+    url="/api/timeline"
+    method="GET" />
 
-          // Update UI optimistically
-          localFavorited = !currentFavorited;
-          localFavoritesCount = currentFavorited ?
-            Math.max(0, currentCount - 1) :
-            currentCount + 1;
+  <VStack gap="$space-4" padding="$space-4">
+    <Items data="{timelineData}">
+      <Card padding="$space-3" marginBottom="$space-2" var.localFavorited="{null}" var.localFavoritesCount="{null}">
+        <VStack gap="$space-2">
+          <Text variant="h6">{$item.author}</Text>
+          <Text>{$item.content}</Text>
+          <HStack gap="$space-4" verticalAlignment="center">
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton icon="reply" />
+              <Text variant="caption">{$item.replies_count}</Text>
+            </HStack>
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton icon="trending-up" />
+              <Text variant="caption">{$item.reblogs_count}</Text>
+            </HStack>
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton
+                icon="like"
+                themeColor="{(localFavorited !== null ? localFavorited : $item.favourited) ? 'attention' : 'secondary'}">
+                <event name="click">
+                  // Get current state (local takes precedence)
+                  const currentFavorited = localFavorited !== null ? localFavorited : $item.favourited;
+                  const currentCount = localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0);
 
-          // Make API call
-          if (currentFavorited) {
-            unfavoritePost.execute($props.item.id).then(() => timelineData.refetch());
-          } else {
-            favoritePost.execute($props.item.id).then(() => timelineData.refetch());
-          }
-        </event>
-      </SocialButton>
-      <Text variant="caption">
-        {localFavoritesCount !== null ? localFavoritesCount : ($props.item.favourites_count || 0)}
-      </Text>
-    </HStack>
-  </HStack>
-</Component>
+                  // Update UI optimistically
+                  localFavorited = !currentFavorited;
+                  localFavoritesCount = currentFavorited ?
+                    Math.max(0, currentCount - 1) :
+                    currentCount + 1;
+
+                  // Make API call
+                  if (currentFavorited) {
+                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
+                  } else {
+                    favoritePost.execute($item.id).then(() => timelineData.refetch());
+                  }
+                </event>
+              </SocialButton>
+              <Text variant="caption">
+                {localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0)}
+              </Text>
+            </HStack>
+          </HStack>
+        </VStack>
+      </Card>
+    </Items>
+  </VStack>
+</App>
 ---api
 {
   "apiUrl": "/api",
@@ -147,3 +144,4 @@ For immediate user feedback, use component variables to update UI state instantl
   }
 }
 ```
+
