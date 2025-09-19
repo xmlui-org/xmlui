@@ -160,6 +160,27 @@ This event is triggered when value of AutoComplete has changed.
 
 This event is triggered when the AutoComplete has received the focus.
 
+### `itemCreated` [#itemcreated]
+
+This event is triggered when a new item is created by the user (if `creatable` is enabled).
+
+Add a few new items not in the options list. The following markup will display them:
+
+```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
+</App>
+```
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the AutoComplete has lost the focus.
