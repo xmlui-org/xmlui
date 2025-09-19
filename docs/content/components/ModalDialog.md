@@ -192,6 +192,13 @@ This method imperatively opens the modal dialog. You can pass an arbitrary numbe
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`content`**: The main content area of the modal dialog.
+- **`title`**: The title area of the modal dialog.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
