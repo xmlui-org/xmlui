@@ -121,21 +121,55 @@ export function Loader({
   // Track query key changes to detect what triggers API calls
   const prevQueryKey = usePrevious(queryKey);
   useEffect(() => {
-    if (prevQueryKey && JSON.stringify(prevQueryKey) !== JSON.stringify(queryKey)) {
+    // Safe comparison that handles circular references
+    const safeCompare = (obj1, obj2) => {
+      try {
+        const safeStringify = (obj) => JSON.stringify(obj, (key, value) => {
+          if (typeof value === 'object' && value !== null) {
+            if (value.nextLink || value.prevLink || key === 'linkMap') {
+              return '[Circular/Large Object]';
+            }
+          }
+          return value;
+        });
+        return safeStringify(obj1) !== safeStringify(obj2);
+      } catch (e) {
+        // Fallback to reference comparison if stringify fails
+        return obj1 !== obj2;
+      }
+    };
+    
+    if (prevQueryKey && safeCompare(prevQueryKey, queryKey)) {
       if (logReactivity) {
+        // Safe stringify that handles circular references
+        const safeStringify = (obj) => {
+          try {
+            return JSON.stringify(obj, (key, value) => {
+              if (typeof value === 'object' && value !== null) {
+                // Skip circular references and large objects
+                if (value.nextLink || value.prevLink || key === 'linkMap') {
+                  return '[Circular/Large Object]';
+                }
+              }
+              return value;
+            });
+          } catch (e) {
+            return '[Stringify Error: ' + e.message + ']';
+          }
+        };
+        
         console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
-        console.log(`  Previous:`, JSON.stringify(prevQueryKey));
-        console.log(`  Current:`, JSON.stringify(queryKey));
+        console.log(`  Previous:`, safeStringify(prevQueryKey));
+        console.log(`  Current:`, safeStringify(queryKey));
         console.log(`  Diff Analysis:`, {
           prevLength: Array.isArray(prevQueryKey) ? prevQueryKey.length : 'not-array',
           currLength: Array.isArray(queryKey) ? queryKey.length : 'not-array',
           uidChanged: prevQueryKey[0] !== queryKey[0],
-          paramChanged: JSON.stringify(prevQueryKey[1]) !== JSON.stringify(queryKey[1]),
-          prevParam: prevQueryKey[1],
-          currParam: queryKey[1],
+          paramChanged: safeStringify(prevQueryKey[1]) !== safeStringify(queryKey[1]),
+          prevParamType: typeof prevQueryKey[1],
+          currParamType: typeof queryKey[1],
         });
         console.log(`  This will trigger a new API call at:`, Date.now());
-        console.log(`  Stack trace:`, new Error().stack?.split('\n').slice(1, 5).map(line => line.trim()));
       }
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);
