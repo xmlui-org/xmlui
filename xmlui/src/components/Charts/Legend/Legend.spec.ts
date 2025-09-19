@@ -63,8 +63,8 @@ test.describe("Basic Functionality", () => {
     test("Legend renders within BarChart", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="600px"
           height="400px"
@@ -352,8 +352,8 @@ test.describe("Basic Functionality", () => {
     test("works with LineChart", async ({ initTestBed, page }) => {
       await initTestBed(`
         <LineChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
