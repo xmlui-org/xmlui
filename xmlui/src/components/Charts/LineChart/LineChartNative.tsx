@@ -132,7 +132,7 @@ export const LineChart = forwardRef(function LineChart({
       if (!tooltipRenderer) return <TooltipContent {...props}/>;
 
       const payloadArray: Array<{ label: string; value: any; color: string }> = [];
-      
+
       if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
         const originalPayload = props.payload[0].payload;
         // Transform dataKeys into array of objects with label, value, and color
@@ -196,8 +196,8 @@ export const LineChart = forwardRef(function LineChart({
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [data, nameKey, xAxisHeight, safeData.length, fontSize]);
-  
+  }, [data, nameKey, xAxisHeight, safeData?.length || 0, fontSize]);
+
   // The stroke width of the lines
   const strokeWidth = getThemeVar("width-line-LineChart");
 
@@ -221,7 +221,7 @@ export const LineChart = forwardRef(function LineChart({
       <div
         ref={forwardedRef}
         className={classnames(className, styles.wrapper)}
-        style={{ flexGrow: 1, ...style}} 
+        style={{ flexGrow: 1, ...style}}
       >
         <ResponsiveContainer
           ref={containerRef}
