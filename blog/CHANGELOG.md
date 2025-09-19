@@ -1,5 +1,16 @@
 # xmlui-blog
 
+## 0.0.9
+
+### Patch Changes
+
+- eb6454f: refactor: change LineChart/BarChart property names
+- Updated dependencies [f12a042]
+- Updated dependencies [8731eb8]
+- Updated dependencies [eb6454f]
+- Updated dependencies [1210852]
+  - xmlui@0.10.12
+
 ## 0.0.8
 
 ### Patch Changes

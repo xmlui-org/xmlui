@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.10.12
+
+### Patch Changes
+
+- f12a042: fix: report errors in script tag
+- 8731eb8: Avatar does not issue a resource URL warning when "url" is not specified
+- eb6454f: refactor: change LineChart/BarChart property names
+- 1210852: Fix the layout property usage of ModalDialog
+
 ## 0.10.11
 
 ### Patch Changes
