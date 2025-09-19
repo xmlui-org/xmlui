@@ -17,8 +17,18 @@ import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
-// Reactivity logging check - HARDCODED FOR DEBUGGING
-const logReactivity = true; // typeof window !== 'undefined' && (window as any).logReactivity;
+// Reactivity logging check - gated by window.logReactivity
+const getLogReactivity = (): boolean | { [key: string]: any } | null => {
+  if (typeof window === 'undefined') return false;
+  const config = (window as any).logReactivity;
+  if (typeof config === 'boolean') return config;
+  if (typeof config === 'object' && config !== null) {
+    // Check the master switch first
+    if (config.enabled === false) return false;
+    return config;
+  }
+  return false;
+};
 
 /**
  * The properties of the Loader component
@@ -63,9 +73,11 @@ export function Loader({
   const appContext = useAppContext();
   const {initialized} = useApiInterceptorContext();
 
+  const logConfig = getLogReactivity();
+
   // Track appContext changes
   const prevAppContext = usePrevious(appContext);
-  if (logReactivity && prevAppContext && prevAppContext !== appContext) {
+  if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevAppContext && prevAppContext !== appContext) {
     console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
       timestamp: Date.now(),
       // Simple comparison without deep inspection to avoid circular refs
@@ -75,7 +87,7 @@ export function Loader({
 
   // Track state changes
   const prevState = usePrevious(state);
-  if (logReactivity && prevState && prevState !== state) {
+  if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevState && prevState !== state) {
     console.log(`[🚨 STATE CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
       timestamp: Date.now(),
       // Simple comparison without deep inspection to avoid circular refs
@@ -84,39 +96,43 @@ export function Loader({
   }
 
   // Log every render of Loader with more context
-  if (logReactivity) {
+  if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components) {
     console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' rendering`, {
       timestamp: Date.now(),
-      stackTrace: new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()),
+      stackTrace: logConfig.stackTraces ? new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()) : undefined,
     });
   }
 
   const queryKey = useMemo(() => {
     const extractedParam = extractParam(state, loader.props, appContext);
     const key = queryId ? queryId : [uid, extractedParam];
-    
-    if (logReactivity) {
+
+    if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
       console.log(`[🔍 QUERY KEY CALC] DataSource '${loader.props.id || loader.uid}':`, {
         uid,
         timestamp: Date.now(),
-        // Avoid deep logging to prevent circular refs
-        hasExtractedParam: !!extractedParam,
+        queryKey: key,
+        extractedParam: extractedParam,
+        url: loader.props.url,
+        hasQueryId: !!queryId,
       });
     }
-    
+
     return key;
   }, [appContext, loader.props, queryId, state, uid]);
-  
+
   // Track query key changes to detect what triggers API calls
   const prevQueryKey = usePrevious(queryKey);
   useEffect(() => {
     // Simple reference comparison to avoid circular reference issues
     if (prevQueryKey && prevQueryKey !== queryKey) {
-      if (logReactivity) {
+      if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
         console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
-        console.log(`  Previous (ref):`, prevQueryKey);
-        console.log(`  Current (ref):`, queryKey);
-        console.log(`  This will trigger a new API call at:`, Date.now());
+        console.log(`  Previous:`, prevQueryKey);
+        console.log(`  Current:`, queryKey);
+        console.log(`  URL:`, loader.props.url);
+        console.log(`  Timestamp:`, Date.now());
+        console.log(`  This will trigger a new API call`);
       }
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);

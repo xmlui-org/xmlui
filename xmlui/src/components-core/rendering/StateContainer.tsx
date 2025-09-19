@@ -47,8 +47,18 @@ import {
 } from "./ContainerWrapper";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 
-// Reactivity logging check - HARDCODED FOR DEBUGGING
-const logReactivity = true; // typeof window !== "undefined" && (window as any).logReactivity;
+// Reactivity logging check - gated by window.logReactivity
+const getLogReactivity = (): boolean | { [key: string]: any } | null => {
+  if (typeof window === 'undefined') return false;
+  const config = (window as any).logReactivity;
+  if (typeof config === 'boolean') return config;
+  if (typeof config === 'object' && config !== null) {
+    // Check the master switch first
+    if (config.enabled === false) return false;
+    return config;
+  }
+  return false;
+};
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -94,25 +104,37 @@ export const StateContainer = memo(
     );
 
     // Log StateContainer re-renders with parent state change tracking
+    const logConfig = getLogReactivity();
     const prevParentState = usePrevious(parentState);
-    if (logReactivity && node.uid) {
+    if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components && node.uid) {
       console.log(`[StateContainer Render] Component '${node.uid}' rendering`, {
         parentStateKeys: Object.keys(parentState),
         stateFromOutsideKeys: Object.keys(stateFromOutside),
         nodeUses: node.uses,
       });
-      
-      if (prevParentState && prevParentState !== parentState) {
+
+      if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
+        const changes = Object.keys(parentState).reduce((acc, key) => {
+          if (prevParentState[key] !== parentState[key]) {
+            acc[key] = { from: prevParentState[key], to: parentState[key] };
+          }
+          return acc;
+        }, {} as Record<string, any>);
+
         console.log(`[🔄 Parent State Changed] Component '${node.uid}' parent state changed:`, {
           prevKeys: Object.keys(prevParentState),
           newKeys: Object.keys(parentState),
-          changes: Object.keys(parentState).reduce((acc, key) => {
-            if (prevParentState[key] !== parentState[key]) {
-              acc[key] = { from: prevParentState[key], to: parentState[key] };
-            }
-            return acc;
-          }, {} as Record<string, any>),
+          changes: changes,
+          timestamp: Date.now(),
         });
+
+        // Cascade tracing: Check if this state change might trigger DataSource refetches
+        if (logConfig.cascade && Object.keys(changes).length > 0) {
+          console.log(`[🔗 CASCADE TRIGGER] State change in '${node.uid}' may trigger DataSource refetches:`, {
+            changedKeys: Object.keys(changes),
+            timestamp: Date.now(),
+          });
+        }
       }
     }
 
@@ -151,7 +173,7 @@ export const StateContainer = memo(
       }, [componentState, componentApis]),
     );
 
-    const localVarsStateContext = useCombinedState(
+    const localVarsStateContext = useStateMerge(
       stateFromOutside,
       componentStateWithApis,
       node.contextVars,
@@ -209,7 +231,7 @@ export const StateContainer = memo(
     );
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
-    const combinedState = useCombinedState(
+    const combinedState = useStateMerge(
       stateFromOutside,
       node.contextVars,
       mergedWithVars,
@@ -292,14 +314,15 @@ const useRoutingParams = () => {
   const routeParams = useParams();
   const location = useLocation();
   const linkInfoContext = useLinkInfoContext();
-  
+
   // Track individual routing dependencies
   const prevLocation = usePrevious(location);
   const prevQueryParams = usePrevious(queryParams);
   const prevRouteParams = usePrevious(routeParams);
   const prevLinkInfoContext = usePrevious(linkInfoContext);
-  
-  if (logReactivity) {
+
+  const routingLogConfig = getLogReactivity();
+  if (routingLogConfig && typeof routingLogConfig === 'object' && routingLogConfig !== null && routingLogConfig.routing) {
     if (prevLocation && prevLocation !== location) {
       console.log('[🚸 LOCATION CHANGED]', {
         prevPathname: prevLocation.pathname,
@@ -350,7 +373,8 @@ const useRoutingParams = () => {
 
   // Log routing changes with detailed analysis
   const prevRoutingState = usePrevious(routingState);
-  if (logReactivity && prevRoutingState && prevRoutingState !== routingState) {
+  const routingStateLogConfig = getLogReactivity();
+  if (routingStateLogConfig && typeof routingStateLogConfig === 'object' && routingStateLogConfig !== null && routingStateLogConfig.routing && prevRoutingState && prevRoutingState !== routingState) {
     console.log('[🚨 ROUTING CHANGED]', {
       timestamp: Date.now(),
       routingChanged: true,
@@ -387,31 +411,25 @@ function extractScopedState(
   return pick(parentState, uses);
 }
 
-// This hook combines state properties in a list of states so that a particular state property in a higher
-// argument index overrides the same-named state property in a lower argument index.
-function useCombinedState(...states: (ContainerState | undefined)[]) {
-  const combined: ContainerState = useMemo(() => {
+// This hook merges multiple state objects with precedence: later arguments override earlier ones.
+// Used to combine parent state, component state, context vars, and routing params into a single state object.
+function useStateMerge(...states: (ContainerState | undefined)[]) {
+  // Stabilize the states array to prevent infinite loops
+  const stableStates = useMemo(() => states, [states.length, ...states.map(s => s === EMPTY_OBJECT ? 'empty' : Object.keys(s || {}).join(','))]);
+
+  const merged: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
-    states.forEach((state = EMPTY_OBJECT, index) => {
+    stableStates.forEach((state = EMPTY_OBJECT, index) => {
       // console.log("st", state);
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
       // console.log("ret", ret);
     });
-    
-    if (logReactivity) {
-      console.log('[useCombinedState] State combination result:', {
-        stateCount: states.length,
-        stateKeys: states.map((s, i) => `State ${i}: [${Object.keys(s || {})}]`),
-        resultKeys: Object.keys(ret),
-        resultLength: Object.keys(ret).length,
-      });
-    }
-    
+
     return ret;
-  }, [states]);
-  return useShallowCompareMemoize(combined);
+  }, [stableStates]);
+  return useShallowCompareMemoize(merged);
 }
 
 // This hook combines state properties in a list of states so that a particular state property in a higher
@@ -454,8 +472,13 @@ function useVars(
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
   const resolvedVars = useMemo(() => {
-    if (logReactivity && Object.keys(vars).length > 0) {
-      console.log('[useVars Resolution] Starting variable resolution for:', Object.keys(vars));
+    const varsLogConfig = getLogReactivity();
+    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables && Object.keys(vars).length > 0) {
+      // Only log if there are non-standard variables (not just $props, emitEvent, etc.)
+      const nonStandardVars = Object.keys(vars).filter(key => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(key));
+      if (nonStandardVars.length > 0) {
+        console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars);
+      }
     }
     const ret: any = {};
 
@@ -573,7 +596,7 @@ function useVars(
             );
 
           // Enhanced variable change tracking
-          if (logReactivity) {
+          if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
             const prevValue = memoedVars.current.get(`${key}-prevValue`);
             if (prevValue !== undefined && prevValue !== ret[key]) {
               console.log(
@@ -591,16 +614,20 @@ function useVars(
             }
             memoedVars.current.set(`${key}-prevValue`, ret[key]);
 
-            console.log(
-              '[Reactivity Debug] Variable resolved:',
-              key,
-              'Value:',
-              ret[key],
-              'Dependencies:',
-              dependencies,
-              'Component:',
-              componentUid || 'unknown',
-            );
+            // Only log variable resolution for non-standard variables to reduce noise
+            const nonStandardVars = Object.keys(vars).filter(k => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(k));
+            if (nonStandardVars.includes(key)) {
+              console.log(
+                '[useVars Resolution] Variable resolved:',
+                key,
+                'Value:',
+                ret[key],
+                'Dependencies:',
+                dependencies,
+                'Component:',
+                componentUid || 'unknown',
+              );
+            }
           }
         }
       }
