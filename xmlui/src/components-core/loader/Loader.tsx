@@ -63,9 +63,40 @@ export function Loader({
   const appContext = useAppContext();
   const {initialized} = useApiInterceptorContext();
 
-  // Log every render of Loader
+  // Track appContext changes
+  const prevAppContext = usePrevious(appContext);
+  if (logReactivity && prevAppContext && prevAppContext !== appContext) {
+    console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
+      prevKeys: Object.keys(prevAppContext),
+      newKeys: Object.keys(appContext),
+      timestamp: Date.now(),
+      // Compare specific properties that might be changing
+      changedProps: Object.keys(appContext).filter(key => 
+        prevAppContext[key] !== appContext[key]
+      ),
+    });
+  }
+
+  // Track state changes
+  const prevState = usePrevious(state);
+  if (logReactivity && prevState && prevState !== state) {
+    console.log(`[🚨 STATE CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
+      prevKeys: Object.keys(prevState),
+      newKeys: Object.keys(state),
+      timestamp: Date.now(),
+      // Compare specific properties that might be changing
+      changedProps: Object.keys(state).filter(key => 
+        prevState[key] !== state[key]
+      ),
+    });
+  }
+
+  // Log every render of Loader with more context
   if (logReactivity) {
-    console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' rendering`);
+    console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' rendering`, {
+      timestamp: Date.now(),
+      stackTrace: new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()),
+    });
   }
 
   const queryKey = useMemo(() => {
@@ -73,19 +104,15 @@ export function Loader({
     const key = queryId ? queryId : [uid, extractedParam];
     
     if (logReactivity) {
-      console.log(`[Loader QueryKey Detail] DataSource '${loader.props.id || loader.uid}':`, {
-        queryId,
+      console.log(`[🔍 QUERY KEY CALC] DataSource '${loader.props.id || loader.uid}':`, {
         uid,
         extractedParam,
-        // Deep log the state and props
+        fullKey: key,
         stateKeys: Object.keys(state),
-        stateValues: state,
         propsKeys: Object.keys(loader.props),
-        propsValues: loader.props,
         appContextKeys: Object.keys(appContext),
-        // Don't log full appContext values as they can be huge
+        timestamp: Date.now(),
       });
-      console.log(`[Loader QueryKey] DataSource '${loader.props.id || loader.uid}' queryKey:`, key);
     }
     
     return key;
@@ -97,9 +124,18 @@ export function Loader({
     if (prevQueryKey && JSON.stringify(prevQueryKey) !== JSON.stringify(queryKey)) {
       if (logReactivity) {
         console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
-        console.log(`  Previous:`, prevQueryKey);
-        console.log(`  Current:`, queryKey);
-        console.log(`  This will trigger a new API call`);
+        console.log(`  Previous:`, JSON.stringify(prevQueryKey));
+        console.log(`  Current:`, JSON.stringify(queryKey));
+        console.log(`  Diff Analysis:`, {
+          prevLength: Array.isArray(prevQueryKey) ? prevQueryKey.length : 'not-array',
+          currLength: Array.isArray(queryKey) ? queryKey.length : 'not-array',
+          uidChanged: prevQueryKey[0] !== queryKey[0],
+          paramChanged: JSON.stringify(prevQueryKey[1]) !== JSON.stringify(queryKey[1]),
+          prevParam: prevQueryKey[1],
+          currParam: queryKey[1],
+        });
+        console.log(`  This will trigger a new API call at:`, Date.now());
+        console.log(`  Stack trace:`, new Error().stack?.split('\n').slice(1, 5).map(line => line.trim()));
       }
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);

@@ -304,7 +304,7 @@ const useRoutingParams = () => {
     return result;
   }, [queryParams]);
 
-  return useMemo(() => {
+  const routingState = useMemo(() => {
     return {
       $pathname: location.pathname,
       $routeParams: routeParams,
@@ -312,6 +312,18 @@ const useRoutingParams = () => {
       $linkInfo: linkInfo,
     };
   }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
+
+  // Log routing changes
+  const prevRoutingState = usePrevious(routingState);
+  if (logReactivity && prevRoutingState && JSON.stringify(prevRoutingState) !== JSON.stringify(routingState)) {
+    console.log('[🚨 ROUTING CHANGED]', {
+      previous: prevRoutingState,
+      current: routingState,
+      timestamp: Date.now(),
+    });
+  }
+
+  return routingState;
 };
 
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
