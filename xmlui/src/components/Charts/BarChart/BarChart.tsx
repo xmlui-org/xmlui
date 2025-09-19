@@ -18,10 +18,9 @@ export const BarChartMd = createMetadata({
         `This property is used to provide the component with data to display.` +
         `The data needs to be an array of objects.`,
     },
-    xKeys: {
+    yKeys: {
       description:
-        "This property specifies the keys in the data objects that should be used for rendering the bars." +
-        `E.g. 'id' or 'key'.`,
+        "Specifies the key in the data objects that will be used to label the different data series.",
       valueType: "string",
     },
     stacked: {
@@ -41,9 +40,10 @@ export const BarChartMd = createMetadata({
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.layout,
     },
-    yKey: {
+    xKey: {
       description:
-        "Specifies the key in the data objects that will be used to label the different data series.",
+        "This property specifies the keys in the data objects that should be used for rendering the bars." +
+        `E.g. 'id' or 'key'.`,
       valueType: "string",
     },
     hideX: {
@@ -105,8 +105,8 @@ export const barChartComponentRenderer = createComponentRenderer(
         tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.orientation)}
-        nameKey={extractValue(node.props?.yKey)}
-        dataKeys={extractValue(node.props?.xKeys)}
+        nameKey={extractValue(node.props?.xKey)}
+        dataKeys={extractValue(node.props?.yKeys)}
         stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
         hideX={extractValue.asOptionalBoolean(node.props?.hideX)}
         hideY={extractValue.asOptionalBoolean(node.props?.hideY)}

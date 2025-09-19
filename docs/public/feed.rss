@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>XMLUI Blog</title>
+    <link>https://docs.xmlui.org</link>
+    <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 19 Sep 2025 11:50:06 GMT</lastBuildDate>
+
+  </channel>
+</rss>

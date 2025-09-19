@@ -175,8 +175,8 @@ A `tooltipTemplate` may be able to use the `$tooltip` context variable.
       <Card height="400px">
         <LineChart
           data="{starData}"
-          dataKeys="{['xmlui_stars', 'xmlui_test_server_stars', 'xmlui_invoice_stars', 'xmlui_mcp_stars']}"
-          nameKey="star_date"
+          yKeys="{['xmlui_stars', 'xmlui_test_server_stars', 'xmlui_invoice_stars', 'xmlui_mcp_stars']}"
+          xKey="star_date"
           showLegend="true"
           tickFormatterX="{formatDateWithoutYear}">
           <property name="tooltipTemplate">
@@ -204,7 +204,7 @@ A `tooltipTemplate` may be able to use the `$tooltip` context variable.
                         height="8px"
                         backgroundColor="{$item.color}" />
                       <Text fontSize="$fontSize-smaller">
-                        {$item.dataKey}
+                        {$item.label}
                       </Text>
                     </HStack>
                   </Column>
