@@ -103,39 +103,24 @@ export const StateContainer = memo(
       useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
 
-    // Log StateContainer re-renders with parent state change tracking
+    // Lightweight logging - only when explicitly enabled
     const logConfig = getLogReactivity();
-    const prevParentState = usePrevious(parentState);
+    const prevParentState = logConfig ? usePrevious(parentState) : undefined;
+
+    // Only log if explicitly enabled
     if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components && node.uid) {
-      console.log(`[StateContainer Render] Component '${node.uid}' rendering`, {
-        parentStateKeys: Object.keys(parentState),
-        stateFromOutsideKeys: Object.keys(stateFromOutside),
-        nodeUses: node.uses,
-      });
+      // Use setTimeout to move logging off the render path
+      setTimeout(() => {
+        console.log(`[StateContainer Render] Component '${node.uid}' rendering`);
 
-      if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
-        const changes = Object.keys(parentState).reduce((acc, key) => {
-          if (prevParentState[key] !== parentState[key]) {
-            acc[key] = { from: prevParentState[key], to: parentState[key] };
+        if (logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
+          console.log(`[🔄 Parent State Changed] Component '${node.uid}' parent state changed`);
+
+          if (logConfig.cascade) {
+            console.log(`[🔗 CASCADE TRIGGER] State change in '${node.uid}' may trigger DataSource refetches`);
           }
-          return acc;
-        }, {} as Record<string, any>);
-
-        console.log(`[🔄 Parent State Changed] Component '${node.uid}' parent state changed:`, {
-          prevKeys: Object.keys(prevParentState),
-          newKeys: Object.keys(parentState),
-          changes: changes,
-          timestamp: Date.now(),
-        });
-
-        // Cascade tracing: Check if this state change might trigger DataSource refetches
-        if (logConfig.cascade && Object.keys(changes).length > 0) {
-          console.log(`[🔗 CASCADE TRIGGER] State change in '${node.uid}' may trigger DataSource refetches:`, {
-            changedKeys: Object.keys(changes),
-            timestamp: Date.now(),
-          });
         }
-      }
+      }, 0);
     }
 
     // --- All state manipulation happens through the container reducer, which is created here.
@@ -323,32 +308,21 @@ const useRoutingParams = () => {
 
   const routingLogConfig = getLogReactivity();
   if (routingLogConfig && typeof routingLogConfig === 'object' && routingLogConfig !== null && routingLogConfig.routing) {
-    if (prevLocation && prevLocation !== location) {
-      console.log('[🚸 LOCATION CHANGED]', {
-        prevPathname: prevLocation.pathname,
-        currPathname: location.pathname,
-        prevSearch: prevLocation.search,
-        currSearch: location.search,
-        prevHash: prevLocation.hash,
-        currHash: location.hash,
-        timestamp: Date.now(),
-      });
-    }
-    if (prevQueryParams && prevQueryParams !== queryParams) {
-      console.log('[🚸 QUERY PARAMS CHANGED]', {
-        timestamp: Date.now(),
-      });
-    }
-    if (prevRouteParams && prevRouteParams !== routeParams) {
-      console.log('[🚸 ROUTE PARAMS CHANGED]', {
-        timestamp: Date.now(),
-      });
-    }
-    if (prevLinkInfoContext && prevLinkInfoContext !== linkInfoContext) {
-      console.log('[🚸 LINK INFO CONTEXT CHANGED]', {
-        timestamp: Date.now(),
-      });
-    }
+    // Use setTimeout to move logging off the render path
+    setTimeout(() => {
+      if (prevLocation && prevLocation !== location) {
+        console.log('[🚸 LOCATION CHANGED]', location.pathname);
+      }
+      if (prevQueryParams && prevQueryParams !== queryParams) {
+        console.log('[🚸 QUERY PARAMS CHANGED]');
+      }
+      if (prevRouteParams && prevRouteParams !== routeParams) {
+        console.log('[🚸 ROUTE PARAMS CHANGED]');
+      }
+      if (prevLinkInfoContext && prevLinkInfoContext !== linkInfoContext) {
+        console.log('[🚸 LINK INFO CONTEXT CHANGED]');
+      }
+    }, 0);
   }
   const linkInfo = useMemo(() => {
     return linkInfoContext?.linkMap?.get(location.pathname) || EMPTY_OBJECT;
@@ -414,21 +388,15 @@ function extractScopedState(
 // This hook merges multiple state objects with precedence: later arguments override earlier ones.
 // Used to combine parent state, component state, context vars, and routing params into a single state object.
 function useStateMerge(...states: (ContainerState | undefined)[]) {
-  // Stabilize the states array to prevent infinite loops
-  const stableStates = useMemo(() => states, [states.length, ...states.map(s => s === EMPTY_OBJECT ? 'empty' : Object.keys(s || {}).join(','))]);
-
   const merged: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
-    stableStates.forEach((state = EMPTY_OBJECT, index) => {
-      // console.log("st", state);
+    states.forEach((state = EMPTY_OBJECT, index) => {
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
-      // console.log("ret", ret);
     });
-
     return ret;
-  }, [stableStates]);
+  }, [states]);
   return useShallowCompareMemoize(merged);
 }
 
@@ -471,13 +439,15 @@ function useVars(
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
+  const varsLogConfig = getLogReactivity();
   const resolvedVars = useMemo(() => {
-    const varsLogConfig = getLogReactivity();
-    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables && Object.keys(vars).length > 0) {
+    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
       // Only log if there are non-standard variables (not just $props, emitEvent, etc.)
       const nonStandardVars = Object.keys(vars).filter(key => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(key));
       if (nonStandardVars.length > 0) {
-        console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars);
+        setTimeout(() => {
+          console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars);
+        }, 0);
       }
     }
     const ret: any = {};
@@ -595,39 +565,15 @@ function useVars(
               appContextDepValues,
             );
 
-          // Enhanced variable change tracking
+          // Lightweight variable change tracking
           if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
             const prevValue = memoedVars.current.get(`${key}-prevValue`);
             if (prevValue !== undefined && prevValue !== ret[key]) {
-              console.log(
-                '[🔄 Variable Change] Variable',
-                key,
-                'changed from:',
-                prevValue,
-                'to:',
-                ret[key],
-                'Dependencies:',
-                dependencies,
-                'Component:',
-                componentUid || 'unknown',
-              );
+              setTimeout(() => {
+                console.log(`[🔄 Variable Change] ${key} changed in ${componentUid || 'unknown'}`);
+              }, 0);
             }
             memoedVars.current.set(`${key}-prevValue`, ret[key]);
-
-            // Only log variable resolution for non-standard variables to reduce noise
-            const nonStandardVars = Object.keys(vars).filter(k => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(k));
-            if (nonStandardVars.includes(key)) {
-              console.log(
-                '[useVars Resolution] Variable resolved:',
-                key,
-                'Value:',
-                ret[key],
-                'Dependencies:',
-                dependencies,
-                'Component:',
-                componentUid || 'unknown',
-              );
-            }
           }
         }
       }

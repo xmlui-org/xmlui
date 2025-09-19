@@ -270,7 +270,7 @@ export function BarChart({
     return () => window.removeEventListener("resize", calc);
     // See note above: leaving out yAxisWidth may stop recursive calls but is hacky
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
+  }, [data, chartMargin.left, chartMargin.right, layout, validData?.length || 0, xAxisHeight]);
 
   const [tooltipElement, setTooltipElement] = useState<HTMLElement | null>(null);
   const observer = useRef<ResizeObserver>();
@@ -308,7 +308,7 @@ export function BarChart({
   const customTooltipRenderer = useCallback(
     (props: any) => {
       const tooltipContent = safeTooltipRenderer(props);
-      
+
       return (
         <div
           ref={(el) => {
