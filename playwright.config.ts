@@ -1,11 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
 // import dotenv from 'dotenv';
-// import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 /**
@@ -14,8 +14,6 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = 3211;
 export default defineConfig({
-  /* We're using the root directory since both src/components and tests-e2e folders are included */
-  //testDir: "./src/components",
   /* Run tests in files in parallel */
   fullyParallel: true,
   testMatch: "*.spec.ts",
@@ -39,7 +37,7 @@ export default defineConfig({
     trace: "on-first-retry",
     serviceWorkers: "allow",
     /* Grants specified permissions to the browser context. */
-    permissions: ['clipboard-read', 'clipboard-write'],
+    permissions: ["clipboard-read", "clipboard-write"],
   },
 
   /* Global timeout settings */
@@ -52,11 +50,35 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "non-smoke",
-      grepInvert: /@smoke/
+      name: "xmlui",
+      testDir: "./xmlui",
+      grepInvert: /@smoke/,
     },
     {
-      name: "smoke",
+      name: "xmlui-smoke",
+      testDir: "./xmlui",
+      grep: /@smoke/,
+    },
+    {
+      name: "extensions",
+      testDir: "./packages",
+      grepInvert: /@smoke/,
+    },
+    {
+      name: "extensions-smoke",
+      testDir: "./packages",
+      grep: /@smoke/,
+    },
+    {
+      name: "all",
+      testDir: ".",
+      testIgnore: ["**/node_modules/**"],
+      grepInvert: /@smoke/,
+    },
+    {
+      name: "all-smoke",
+      testDir: ".",
+      testIgnore: ["**/node_modules/**"],
       grep: /@smoke/,
     },
   ],
@@ -64,10 +86,11 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? `npx serve src/testing/infrastructure/dist -p ${port}`
-      : `npm run start-test-bed -- --port ${port}`,
+      ? `npx serve xmlui/src/testing/infrastructure/dist -p ${port}`
+      : `cd xmlui && npm run start-test-bed -- --port ${port}`,
     timeout: 50 * 1000,
     port,
     reuseExistingServer: !process.env.CI,
+    cwd: path.resolve(__dirname),
   },
 });
