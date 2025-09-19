@@ -97,28 +97,6 @@ export function BarChart({
   const validData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
   const { getThemeVar } = useTheme();
 
-  const safeTooltipRenderer = useCallback(
-    (props: any) => {
-      if (!tooltipRenderer) return <TooltipContent {...props} />;
-
-      const payloadObject: Record<string, any> = {};
-
-      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
-        Object.assign(payloadObject, props.payload[0].payload);
-      }
-
-      // Extract tooltip data from Recharts props
-      const tooltipData = {
-        label: props.label,
-        payload: payloadObject,
-        active: props.active,
-      };
-
-      return tooltipRenderer(tooltipData);
-    },
-    [tooltipRenderer],
-  );
-
   const colorValues = useMemo(() => {
     return [
       getThemeVar("color-primary-500"),
@@ -159,6 +137,38 @@ export function BarChart({
       getThemeVar("color-secondary-700"),
     ];
   }, [getThemeVar]);
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
+
+      const payloadArray: Array<{ label: string; value: any; color: string }> = [];
+
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        const originalPayload = props.payload[0].payload;
+        // Transform dataKeys into array of objects with label, value, and color
+        dataKeys?.forEach((dataKey, index) => {
+          if (dataKey in originalPayload) {
+            payloadArray.push({
+              label: dataKey,
+              value: originalPayload[dataKey],
+              color: colorValues[index] || colorValues[0]
+            });
+          }
+        });
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadArray,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer, dataKeys, colorValues],
+  );
 
   const config = useMemo(() => {
     return Object.assign(
