@@ -148,7 +148,7 @@ function DataLoader({
           // Extract SQL query from the body or rawBody
           let sqlQuery: string = "";
           let sqlParams: any[] = [];
-          
+
           // Try to extract SQL query and parameters from body or rawBody
           if (body && typeof body === 'object') {
             //console.log("[SQL DataLoader] Using body object:", body);
@@ -216,11 +216,11 @@ function DataLoader({
           // Parse response as JSON
           const jsonResult = await response.json();
           //console.log("[SQL DataLoader] Response data:", jsonResult);
-          
+
           // Check the structure of the response
           if (jsonResult && typeof jsonResult === 'object') {
             //console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
-            
+
             // If response has rows property, check if it's in expected format
             if (jsonResult.rows) {
               //console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
@@ -228,18 +228,18 @@ function DataLoader({
               // if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
               //   console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
               // }
-              
+
               // Return rows directly for easier table rendering
               return jsonResult.rows;
             }
-            
+
             // Check for other common SQL result formats
             if (jsonResult.results) {
               //console.log("[SQL DataLoader] Response has 'results' property");
               return jsonResult.results;
             }
           }
-          
+
           return jsonResult;
         } catch (error) {
           console.error("Error executing SQL query:", error);
@@ -286,10 +286,10 @@ function DataLoader({
     (isInProgress) => {
       //console.log("[DataLoader] inProgress() called with isInProgress:", isInProgress);
       //console.log("[DataLoader] dataType:", loader.props.dataType);
-      
+
       loaderInProgressChanged(isInProgress);
       //console.log("[DataLoader] After loaderInProgressChanged() call");
-      
+
       const inProgressMessage = extractParam(
         stateRef.current.state,
         loader.props.inProgressNotificationMessage,
@@ -315,7 +315,7 @@ function DataLoader({
       // console.log("[DataLoader] loaded() called with data:", data);
       // console.log("[DataLoader] loaded() pageInfo:", pageInfo);
       // console.log("[DataLoader] loader.props.dataType:", loader.props.dataType);
-      
+
       // if (loader.props.dataType === "sql") {
       //   console.log("[SQL DataLoader] Processing SQL result data in loaded()");
       //   console.log("[SQL DataLoader] Data type:", typeof data);
@@ -324,10 +324,10 @@ function DataLoader({
       //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
       //   }
       // }
-      
+
       loaderLoaded(data, pageInfo);
       // console.log("[DataLoader] After loaderLoaded() call");
-      
+
       const completedMessage = extractParam(
         {
           ...stateRef.current.state,
