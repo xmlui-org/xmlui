@@ -1,11 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
 // import dotenv from 'dotenv';
-// import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 /**
@@ -50,11 +50,23 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "non-smoke",
+      name: "xmlui-non-smoke",
+      testDir: "./xmlui",
       grepInvert: /@smoke/,
     },
     {
-      name: "smoke",
+      name: "xmlui-smoke",
+      testDir: "./xmlui",
+      grep: /@smoke/,
+    },
+    {
+      name: "extensions-non-smoke",
+      testDir: "./packages",
+      grepInvert: /@smoke/,
+    },
+    {
+      name: "extensions-smoke",
+      testDir: "./packages",
       grep: /@smoke/,
     },
   ],
@@ -62,10 +74,11 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? `npx serve src/testing/infrastructure/dist -p ${port}`
-      : `npm run start-test-bed -- --port ${port}`,
+      ? `npx serve xmlui/src/testing/infrastructure/dist -p ${port}`
+      : `cd xmlui && npm run start-test-bed -- --port ${port}`,
     timeout: 50 * 1000,
     port,
     reuseExistingServer: !process.env.CI,
+    cwd: path.resolve(__dirname),
   },
 });

@@ -11,9 +11,6 @@
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "test:unit": "vitest run",
-    "test:e2e-non-smoke": "playwright test --project non-smoke",
-    "test:e2e-smoke": "playwright test --project smoke",
-    "test:e2e-ui": "playwright test --ui",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "prepublishOnly": "clean-package",
@@ -217,6 +214,10 @@
         "./syntax/textmate": {
           "import": "./dist/lib/syntax-textmate.js",
           "require": "./dist/lib/syntax-textmate.js"
+        },
+        "./testing": {
+          "import": "./dist/lib/testing.js",
+          "require": "./dist/lib/testing.js"
         }
       }
     }
@@ -257,6 +258,10 @@
     "./syntax/textmate": {
       "import": "./src/syntax/textMate/index.ts",
       "require": "./src/syntax/textMate/index.ts"
+    },
+    "./testing": {
+      "import": "./src/testing/index.ts",
+      "require": "./src/testing/index.ts"
     }
   },
   "browserslist": {

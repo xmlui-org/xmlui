@@ -7,7 +7,7 @@ import ViteYaml from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
-import copy from 'rollup-plugin-copy';
+import copy from "rollup-plugin-copy";
 // @ts-ignore
 import * as packageJson from "./package.json";
 
@@ -68,39 +68,40 @@ export default ({ mode = "lib" }) => {
           ),
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
+          testing: path.resolve("src", "testing", "index.ts"),
         },
         formats: ["es"] as any,
       };
     }
   }
-  let plugins = mode === "metadata"
-    ? [ViteXmlui({})]
-    : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+  let plugins =
+    mode === "metadata"
+      ? [ViteXmlui({})]
+      : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
-  if(mode === "lib"){
-    plugins.push(copy({
-      hook: 'writeBundle',
-      targets: [
-        {
-          src: [
-            'src/**/*.scss',
-            '!src/**/*.module.scss'
-          ],
-          dest: 'dist/lib/scss',
-          rename: (name, extension, fullPath) => {
-            //we do this to preserve the folder structure of the scss files
-            // e.g. src/components/button/Button.scss should be copied to dist/lib/scss/components/button/Button.scss
-            // and not to dist/lib/scss/Button.scss
-            // fullPath will be something like 'src/components/button/Button.scss'
-            // We want to remove the 'src/' prefix to get the relative path
-            const relativePath = fullPath.replace('src/', '');
+  if (mode === "lib") {
+    plugins.push(
+      copy({
+        hook: "writeBundle",
+        targets: [
+          {
+            src: ["src/**/*.scss", "!src/**/*.module.scss"],
+            dest: "dist/lib/scss",
+            rename: (name, extension, fullPath) => {
+              //we do this to preserve the folder structure of the scss files
+              // e.g. src/components/button/Button.scss should be copied to dist/lib/scss/components/button/Button.scss
+              // and not to dist/lib/scss/Button.scss
+              // fullPath will be something like 'src/components/button/Button.scss'
+              // We want to remove the 'src/' prefix to get the relative path
+              const relativePath = fullPath.replace("src/", "");
 
-            // This returns 'components/button/Button.scss'
-            return relativePath;
-          }
-        }
-      ]
-    }));
+              // This returns 'components/button/Button.scss'
+              return relativePath;
+            },
+          },
+        ],
+      }),
+    );
   }
   return defineConfig({
     resolve: {
@@ -127,7 +128,7 @@ export default ({ mode = "lib" }) => {
         external:
           mode === "standalone"
             ? []
-            : [...Object.keys(packageJson.dependencies), "react/jsx-runtime"],
+            : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
           globals: {
             react: "React",
@@ -137,6 +138,6 @@ export default ({ mode = "lib" }) => {
         },
       },
     },
-    plugins: plugins
+    plugins: plugins,
   });
 };

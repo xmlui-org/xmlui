@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "ES6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "xmlui": ["./xmlui/src/index.ts"],
+      "xmlui/testing": ["./xmlui/src/testing/index.ts"],
+      "xmlui/parser": ["./xmlui/src/parsers/xmlui-parser/index.ts"],
+      "xmlui/*": ["./xmlui/src/*"]
+    }
+  },
+  "include": [
+    "xmlui/src/**/*",
+    "packages/*/src/**/*",
+    "packages/*/*.ts",
+    "packages/*/demo/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules",
+    "**/dist",
+    "**/build",
+    "**/*.js",
+    "!**/*.spec.ts",
+    "!**/*.test.ts"
+  ],
+  "ts-node": {
+    "esm": true
+  }
+}
