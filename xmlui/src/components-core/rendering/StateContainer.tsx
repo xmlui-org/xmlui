@@ -292,6 +292,41 @@ const useRoutingParams = () => {
   const routeParams = useParams();
   const location = useLocation();
   const linkInfoContext = useLinkInfoContext();
+  
+  // Track individual routing dependencies
+  const prevLocation = usePrevious(location);
+  const prevQueryParams = usePrevious(queryParams);
+  const prevRouteParams = usePrevious(routeParams);
+  const prevLinkInfoContext = usePrevious(linkInfoContext);
+  
+  if (logReactivity) {
+    if (prevLocation && prevLocation !== location) {
+      console.log('[🚸 LOCATION CHANGED]', {
+        prevPathname: prevLocation.pathname,
+        currPathname: location.pathname,
+        prevSearch: prevLocation.search,
+        currSearch: location.search,
+        prevHash: prevLocation.hash,
+        currHash: location.hash,
+        timestamp: Date.now(),
+      });
+    }
+    if (prevQueryParams && prevQueryParams !== queryParams) {
+      console.log('[🚸 QUERY PARAMS CHANGED]', {
+        timestamp: Date.now(),
+      });
+    }
+    if (prevRouteParams && prevRouteParams !== routeParams) {
+      console.log('[🚸 ROUTE PARAMS CHANGED]', {
+        timestamp: Date.now(),
+      });
+    }
+    if (prevLinkInfoContext && prevLinkInfoContext !== linkInfoContext) {
+      console.log('[🚸 LINK INFO CONTEXT CHANGED]', {
+        timestamp: Date.now(),
+      });
+    }
+  }
   const linkInfo = useMemo(() => {
     return linkInfoContext?.linkMap?.get(location.pathname) || EMPTY_OBJECT;
   }, [linkInfoContext?.linkMap, location.pathname]);
@@ -313,12 +348,24 @@ const useRoutingParams = () => {
     };
   }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
 
-  // Log routing changes
+  // Log routing changes with detailed analysis
   const prevRoutingState = usePrevious(routingState);
   if (logReactivity && prevRoutingState && prevRoutingState !== routingState) {
     console.log('[🚨 ROUTING CHANGED]', {
       timestamp: Date.now(),
       routingChanged: true,
+      // Safe detailed comparison
+      pathnameChanged: prevRoutingState.$pathname !== routingState.$pathname,
+      queryParamsChanged: prevRoutingState.$queryParams !== routingState.$queryParams,
+      routeParamsChanged: prevRoutingState.$routeParams !== routingState.$routeParams,
+      linkInfoChanged: prevRoutingState.$linkInfo !== routingState.$linkInfo,
+      // Log actual values for debugging
+      currentPathname: routingState.$pathname,
+      prevPathname: prevRoutingState.$pathname,
+      currentQueryParamsKeys: Object.keys(routingState.$queryParams || {}),
+      prevQueryParamsKeys: Object.keys(prevRoutingState.$queryParams || {}),
+      currentRouteParamsKeys: Object.keys(routingState.$routeParams || {}),
+      prevRouteParamsKeys: Object.keys(prevRoutingState.$routeParams || {}),
     });
   }
 
