@@ -1465,29 +1465,6 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("textbox")).toHaveValue("0");
   });
 
-  test.skip(
-    "integers: leading 0s are removed on blur",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      await page.getByRole("textbox").fill("0000123");
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
-
-  test.skip(
-    "integers: leading 0s are removed on blur (copy)",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<NumberBox />`);
-      await clipboard.write("0000123");
-      await clipboard.paste(page.getByRole("textbox"));
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
-
   test("standalone minus sign is permitted if field is not blurred yet", async ({
     initTestBed,
     page,
@@ -1497,16 +1474,14 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("textbox")).toHaveValue("-");
   });
 
-  test.skip(
-    "minus sign is not applied if it comes after number",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      await page.getByRole("textbox").fill("123");
-      await page.getByRole("textbox").fill("-");
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
+  test("minus sign is applied correctly if it comes after number", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    await page.getByRole("textbox").pressSequentially("123-");
+    await expect(page.getByRole("textbox")).toHaveValue("-123");
+  });
 
   test("placing decimal separator between the numbers of an integer results in a float", async ({
     initTestBed,
@@ -1535,44 +1510,43 @@ test.describe("Other Edge Cases", () => {
     await expect(input).toHaveValue("1.23456");
   });
 
-  test.skip(
-    "placing decimal separator before an integer adds a leading 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      const input = page.getByRole("textbox");
+  test("placing decimal separator before an integer adds a leading 0 (#1)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
 
-      await input.fill("12");
-      await input.press("ArrowLeft");
-      await input.press("ArrowLeft");
-      await input.press(".");
+    await input.fill("12");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press(".");
 
-      await expect(input).toHaveValue("0.12");
-    },
-  );
+    await expect(input).toHaveValue("0.12");
+  });
 
-  test.skip(
-    "placing decimal separator after an integer adds a trailing 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      const input = page.getByRole("textbox");
+  test("placing decimal separator before an integer adds a leading 0 (#2)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
 
-      await input.fill("12");
-      await input.press(".");
-      await expect(input).toHaveValue("12.0");
-    },
-  );
+    await input.fill("");
+    await input.press(".");
 
-  test.skip(
-    "adding floating point to the beginning of 0 does adds a leading 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+    await expect(input).toHaveValue("0.");
+  });
 
-  test.skip(
-    "adding floating point to the end of 0 adds a trailing 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+  test("adding floating point to the end adds a trailing 0 when blurred", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.pressSequentially("123.");
+    await input.blur();
+    await expect(input).toHaveValue("123.0");
+  });
 });
