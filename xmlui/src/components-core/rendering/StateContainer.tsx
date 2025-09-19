@@ -31,7 +31,7 @@ import { createContainerReducer } from "../rendering/reducer";
 import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
-import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
+import { useReferenceTrackedApi, useShallowCompareMemoize, usePrevious } from "../utils/hooks";
 import { Container } from "./Container";
 import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
 import { useAppContext } from "../AppContext";
@@ -46,6 +46,9 @@ import {
   StatePartChangedFn,
 } from "./ContainerWrapper";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
+
+// Reactivity logging check - HARDCODED FOR DEBUGGING
+const logReactivity = true; // typeof window !== "undefined" && (window as any).logReactivity;
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -89,6 +92,29 @@ export const StateContainer = memo(
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
+
+    // Log StateContainer re-renders with parent state change tracking
+    const prevParentState = usePrevious(parentState);
+    if (logReactivity && node.uid) {
+      console.log(`[StateContainer Render] Component '${node.uid}' rendering`, {
+        parentStateKeys: Object.keys(parentState),
+        stateFromOutsideKeys: Object.keys(stateFromOutside),
+        nodeUses: node.uses,
+      });
+      
+      if (prevParentState && prevParentState !== parentState) {
+        console.log(`[🔄 Parent State Changed] Component '${node.uid}' parent state changed:`, {
+          prevKeys: Object.keys(prevParentState),
+          newKeys: Object.keys(parentState),
+          changes: Object.keys(parentState).reduce((acc, key) => {
+            if (prevParentState[key] !== parentState[key]) {
+              acc[key] = { from: prevParentState[key], to: parentState[key] };
+            }
+            return acc;
+          }, {} as Record<string, any>),
+        });
+      }
+    }
 
     // --- All state manipulation happens through the container reducer, which is created here.
     // --- This reducer allow collecting state changes for debugging purposes. The `debugView`
@@ -167,6 +193,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContext,
       useRef<MemoedVars>(new Map()),
+      node.uid,
     );
     const localVarsStateContextWithPreResolvedLocalVars = useShallowCompareMemoize({
       ...preResolvedLocalVars,
@@ -178,6 +205,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars,
+      node.uid,
     );
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
@@ -306,13 +334,23 @@ function extractScopedState(
 function useCombinedState(...states: (ContainerState | undefined)[]) {
   const combined: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
-    states.forEach((state = EMPTY_OBJECT) => {
+    states.forEach((state = EMPTY_OBJECT, index) => {
       // console.log("st", state);
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
       // console.log("ret", ret);
     });
+    
+    if (logReactivity) {
+      console.log('[useCombinedState] State combination result:', {
+        stateCount: states.length,
+        stateKeys: states.map((s, i) => `State ${i}: [${Object.keys(s || {})}]`),
+        resultKeys: Object.keys(ret),
+        resultLength: Object.keys(ret).length,
+      });
+    }
+    
     return ret;
   }, [states]);
   return useShallowCompareMemoize(combined);
@@ -352,11 +390,15 @@ function useVars(
   fnDeps: Record<string, Array<string>> = EMPTY_OBJECT,
   componentState: ContainerState,
   memoedVars: MutableRefObject<MemoedVars>,
+  componentUid?: string,
 ): ContainerState {
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
   const resolvedVars = useMemo(() => {
+    if (logReactivity && Object.keys(vars).length > 0) {
+      console.log('[useVars Resolution] Starting variable resolution for:', Object.keys(vars));
+    }
     const ret: any = {};
 
     Object.entries(vars).forEach(([key, value]) => {
@@ -471,6 +513,37 @@ function useVars(
               stateDepValues,
               appContextDepValues,
             );
+
+          // Enhanced variable change tracking
+          if (logReactivity) {
+            const prevValue = memoedVars.current.get(`${key}-prevValue`);
+            if (prevValue !== undefined && prevValue !== ret[key]) {
+              console.log(
+                '[🔄 Variable Change] Variable',
+                key,
+                'changed from:',
+                prevValue,
+                'to:',
+                ret[key],
+                'Dependencies:',
+                dependencies,
+                'Component:',
+                componentUid || 'unknown',
+              );
+            }
+            memoedVars.current.set(`${key}-prevValue`, ret[key]);
+
+            console.log(
+              '[Reactivity Debug] Variable resolved:',
+              key,
+              'Value:',
+              ret[key],
+              'Dependencies:',
+              dependencies,
+              'Component:',
+              componentUid || 'unknown',
+            );
+          }
         }
       }
     });
