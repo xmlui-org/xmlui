@@ -48,24 +48,26 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test.skip("has correct accessibility structure", async ({
+  test("has correct accessibility structure", async ({
     initTestBed,
     createAppHeaderDriver,
   }) => {
     // TODO: review these Copilot-created tests
-    await initTestBed(`<AppHeader testId="header" title="Accessible Header" />`);
-    const driver = await createAppHeaderDriver();
+    await initTestBed(`<App><AppHeader testId="header" title="Accessible Header" /></App>`);
+    const driver = await createAppHeaderDriver("header");
 
     // AppHeader should have a role of "banner"
     await expect(driver.component).toHaveAttribute("role", "banner");
   });
 
-  test.skip("properly handles focus management", async ({ initTestBed, page }) => {
-    // TODO: review these Copilot-created tests
-    await initTestBed(`<AppHeader testId="header">
-      <NavLink testId="headerLink1" to="#">Link 1</NavLink>
-      <NavLink testId="headerLink2" to="#">Link 2</NavLink>
-    </AppHeader>`);
+  test("properly handles focus management", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <AppHeader testId="header">
+          <NavLink testId="headerLink1" to="#">Link 1</NavLink>
+          <NavLink testId="headerLink2" to="#">Link 2</NavLink>
+        </AppHeader>
+      </App>`);
 
     // Test that links within the header are keyboard focusable
     await page.getByTestId("headerLink1").focus();
