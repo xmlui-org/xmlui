@@ -12,8 +12,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -29,8 +29,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -57,8 +57,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -80,8 +80,8 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
@@ -102,16 +102,21 @@ The BarChart component accommodates the size of its parent unless you set it exp
         { 'sprint': 'Sprint 3', 'A': 48, 'B': 35 },
         { 'sprint': 'Sprint 4', 'A': 72, 'B': 58 }
        ]}"
-    xKeys="{['A', 'B']}"
-    yKey="sprint"
+    yKeys="{['A', 'B']}"
+    xKey="sprint"
   >
     <property name="tooltipTemplate">
         <VStack backgroundColor='white' padding="$space-2">
           <Text fontWeight='bold'>{$tooltip.label}</Text>
-          <HStack>
-            <Text color='blue'>Series A: {$tooltip.payload.A}</Text>
-            <Text color='green'>Series B: {$tooltip.payload.B}</Text>
-          </HStack>
+          <Items data="{$tooltip.payload}">
+              <HStack gap="$space-2" verticalAlignment="center">
+                  <Stack
+                      width="8px"
+                      height="8px"
+                      backgroundColor="{$item.color}" />
+                  <Text>{$item.label}: {$item.value}</Text>
+              </HStack>
+          </Items>
         </VStack>
     </property>
   </BarChart>
