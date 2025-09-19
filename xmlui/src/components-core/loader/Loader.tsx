@@ -121,71 +121,12 @@ export function Loader({
   // Track query key changes to detect what triggers API calls
   const prevQueryKey = usePrevious(queryKey);
   useEffect(() => {
-    // Safe comparison that handles circular references
-    const safeCompare = (obj1, obj2) => {
-      try {
-        const safeStringify = (obj) => {
-          const seen = new WeakSet();
-          return JSON.stringify(obj, (key, value) => {
-            if (typeof value === 'object' && value !== null) {
-              // Detect circular references
-              if (seen.has(value)) {
-                return '[Circular Reference]';
-              }
-              seen.add(value);
-              
-              // Skip known problematic objects
-              if (value.nextLink || value.prevLink || key === 'linkMap' || key === 'linkInfo') {
-                return '[Skipped Object]';
-              }
-            }
-            return value;
-          });
-        };
-        return safeStringify(obj1) !== safeStringify(obj2);
-      } catch (e) {
-        // Fallback to reference comparison if stringify fails
-        return obj1 !== obj2;
-      }
-    };
-    
-    if (prevQueryKey && safeCompare(prevQueryKey, queryKey)) {
+    // Simple reference comparison to avoid circular reference issues
+    if (prevQueryKey && prevQueryKey !== queryKey) {
       if (logReactivity) {
-        // Safe stringify that handles circular references
-        const safeStringify = (obj) => {
-          try {
-            const seen = new WeakSet();
-            return JSON.stringify(obj, (key, value) => {
-              if (typeof value === 'object' && value !== null) {
-                // Detect circular references
-                if (seen.has(value)) {
-                  return '[Circular Reference]';
-                }
-                seen.add(value);
-                
-                // Skip known problematic objects
-                if (value.nextLink || value.prevLink || key === 'linkMap' || key === 'linkInfo') {
-                  return '[Skipped Object]';
-                }
-              }
-              return value;
-            });
-          } catch (e) {
-            return '[Stringify Error: ' + (e instanceof Error ? e.message : String(e)) + ']';
-          }
-        };
-        
         console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
-        console.log(`  Previous:`, safeStringify(prevQueryKey));
-        console.log(`  Current:`, safeStringify(queryKey));
-        console.log(`  Diff Analysis:`, {
-          prevLength: Array.isArray(prevQueryKey) ? prevQueryKey.length : 'not-array',
-          currLength: Array.isArray(queryKey) ? queryKey.length : 'not-array',
-          uidChanged: prevQueryKey[0] !== queryKey[0],
-          paramChanged: safeStringify(prevQueryKey[1]) !== safeStringify(queryKey[1]),
-          prevParamType: typeof prevQueryKey[1],
-          currParamType: typeof queryKey[1],
-        });
+        console.log(`  Previous (ref):`, prevQueryKey);
+        console.log(`  Current (ref):`, queryKey);
         console.log(`  This will trigger a new API call at:`, Date.now());
       }
     }
