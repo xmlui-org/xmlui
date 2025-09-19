@@ -17,10 +17,7 @@ test("renders with default props", async ({ initTestBed, createAutoCompleteDrive
 
 test("displays placeholder text", async ({ initTestBed, page }) => {
   const placeholder = "Search for an option";
-  await initTestBed(`
-    <AutoComplete placeholder="${placeholder}" />
-  `);
-
+  await initTestBed(`<AutoComplete placeholder="${placeholder}" />`);
   await expect(page.getByPlaceholder(placeholder)).toBeVisible();
 });
 
