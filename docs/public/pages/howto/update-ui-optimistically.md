@@ -52,4 +52,3 @@
 **Expected:** Each button click makes a network request and triggers error event
 **Actual:** Only first click works, subsequent clicks do nothing (no network request, no error event)
 
-**Root Cause:** The combination of APICall error events + DataSource/Items + $item context variables causes APICall to become permanently broken after first error.

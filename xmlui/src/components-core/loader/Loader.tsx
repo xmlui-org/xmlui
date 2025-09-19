@@ -17,6 +17,9 @@ import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
+// Reactivity logging check - HARDCODED FOR DEBUGGING
+const logReactivity = true; // typeof window !== 'undefined' && (window as any).logReactivity;
+
 /**
  * The properties of the Loader component
  */
@@ -59,6 +62,47 @@ export function Loader({
   const { uid } = loader;
   const appContext = useAppContext();
   const {initialized} = useApiInterceptorContext();
+
+  // Log every render of Loader
+  if (logReactivity) {
+    console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' rendering`);
+  }
+
+  const queryKey = useMemo(() => {
+    const extractedParam = extractParam(state, loader.props, appContext);
+    const key = queryId ? queryId : [uid, extractedParam];
+    
+    if (logReactivity) {
+      console.log(`[Loader QueryKey Detail] DataSource '${loader.props.id || loader.uid}':`, {
+        queryId,
+        uid,
+        extractedParam,
+        // Deep log the state and props
+        stateKeys: Object.keys(state),
+        stateValues: state,
+        propsKeys: Object.keys(loader.props),
+        propsValues: loader.props,
+        appContextKeys: Object.keys(appContext),
+        // Don't log full appContext values as they can be huge
+      });
+      console.log(`[Loader QueryKey] DataSource '${loader.props.id || loader.uid}' queryKey:`, key);
+    }
+    
+    return key;
+  }, [appContext, loader.props, queryId, state, uid]);
+  
+  // Track query key changes to detect what triggers API calls
+  const prevQueryKey = usePrevious(queryKey);
+  useEffect(() => {
+    if (prevQueryKey && JSON.stringify(prevQueryKey) !== JSON.stringify(queryKey)) {
+      if (logReactivity) {
+        console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
+        console.log(`  Previous:`, prevQueryKey);
+        console.log(`  Current:`, queryKey);
+        console.log(`  This will trigger a new API call`);
+      }
+    }
+  }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);
 
   // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
   // --- its data source.
