@@ -124,14 +124,24 @@ export function Loader({
     // Safe comparison that handles circular references
     const safeCompare = (obj1, obj2) => {
       try {
-        const safeStringify = (obj) => JSON.stringify(obj, (key, value) => {
-          if (typeof value === 'object' && value !== null) {
-            if (value.nextLink || value.prevLink || key === 'linkMap') {
-              return '[Circular/Large Object]';
+        const safeStringify = (obj) => {
+          const seen = new WeakSet();
+          return JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+              // Detect circular references
+              if (seen.has(value)) {
+                return '[Circular Reference]';
+              }
+              seen.add(value);
+              
+              // Skip known problematic objects
+              if (value.nextLink || value.prevLink || key === 'linkMap' || key === 'linkInfo') {
+                return '[Skipped Object]';
+              }
             }
-          }
-          return value;
-        });
+            return value;
+          });
+        };
         return safeStringify(obj1) !== safeStringify(obj2);
       } catch (e) {
         // Fallback to reference comparison if stringify fails
@@ -144,11 +154,18 @@ export function Loader({
         // Safe stringify that handles circular references
         const safeStringify = (obj) => {
           try {
+            const seen = new WeakSet();
             return JSON.stringify(obj, (key, value) => {
               if (typeof value === 'object' && value !== null) {
-                // Skip circular references and large objects
-                if (value.nextLink || value.prevLink || key === 'linkMap') {
-                  return '[Circular/Large Object]';
+                // Detect circular references
+                if (seen.has(value)) {
+                  return '[Circular Reference]';
+                }
+                seen.add(value);
+                
+                // Skip known problematic objects
+                if (value.nextLink || value.prevLink || key === 'linkMap' || key === 'linkInfo') {
+                  return '[Skipped Object]';
                 }
               }
               return value;
