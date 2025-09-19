@@ -154,7 +154,7 @@ export function Loader({
               return value;
             });
           } catch (e) {
-            return '[Stringify Error: ' + e.message + ']';
+            return '[Stringify Error: ' + (e instanceof Error ? e.message : String(e)) + ']';
           }
         };
         
