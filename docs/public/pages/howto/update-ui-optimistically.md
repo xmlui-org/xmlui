@@ -1,92 +1,145 @@
-# Update UI Optimistically
+# Update UI optimistically
 
-This example demonstrates a performance issue where updating component variables causes ALL DataSources to re-render and trigger fresh API calls, even when they have no dependency on the changed variables.
+For immediate user feedback, use component variables to update UI state instantly, providing a responsive experience while the backend processes the request.
 
-**Try this:**
-1. Open browser console to see debug logs
-2. Click "Update Local State" button
-3. Notice ALL DataSources re-render simultaneously after the state update
-
-```xmlui-pg noHeader
----app
+```xmlui-pg copy display name="Click the Like button - immediate feedback"
+---comp display
+<Component name="SocialButton">
+  <Button
+    borderRadius="50%"
+    icon="{$props.icon}"
+    variant="outlined"
+    themeColor="{$props.themeColor || 'secondary'}"
+    size="xs"
+    onClick="{emitEvent('click')}" />
+</Component>
+---app display
 <App>
-  <CascadeDemo />
+  <APICall
+    id="favoritePost"
+    method="post"
+    url="/api/posts/{$param}/favorite"
+    inProgressNotificationMessage="Favoriting post..."
+    completedNotificationMessage="Post favorited!" />
+  <APICall
+    id="unfavoritePost"
+    method="post"
+    url="/api/posts/{$param}/unfavorite"
+    inProgressNotificationMessage="Unfavoriting post..."
+    completedNotificationMessage="Post unfavorited!" />
+  <DataSource
+    id="timelineData"
+    url="/api/timeline"
+    method="GET" />
+
+  <VStack gap="$space-4" padding="$space-4">
+    <Items data="{timelineData}">
+      <Card var.localFavorited="{null}" var.localFavoritesCount="{null}">
+        <VStack>
+          <Text>{$item.author}</Text>
+          <Text>{$item.content}</Text>
+          <HStack gap="$space-4" verticalAlignment="center">
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton icon="reply" />
+              <Text variant="caption">{$item.replies_count}</Text>
+            </HStack>
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton icon="trending-up" />
+              <Text variant="caption">{$item.reblogs_count}</Text>
+            </HStack>
+            <HStack gap="$space-1" verticalAlignment="center">
+              <SocialButton
+                icon="like"
+                themeColor="{(localFavorited !== null ? localFavorited : $item.favourited) ? 'attention' : 'secondary'}">
+                <event name="click">
+                  // Get current state (local takes precedence)
+                  const currentFavorited = localFavorited !== null ? localFavorited : $item.favourited;
+                  const currentCount = localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0);
+
+                  // Update UI optimistically
+                  localFavorited = !currentFavorited;
+                  localFavoritesCount = currentFavorited ?
+                    Math.max(0, currentCount - 1) :
+                    currentCount + 1;
+
+                  // Make API call
+                  if (currentFavorited) {
+                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
+                  } else {
+                    favoritePost.execute($item.id).then(() => timelineData.refetch());
+                  }
+                </event>
+              </SocialButton>
+              <Text variant="caption">
+                {localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0)}
+              </Text>
+            </HStack>
+          </HStack>
+        </VStack>
+      </Card>
+    </Items>
+  </VStack>
 </App>
 ---api
 {
   "apiUrl": "/api",
+  "initialize": "$state.posts = [
+    {
+      id: '1',
+      content: 'This is a great post about XMLUI!',
+      author: 'John Developer',
+      favourited: false,
+      favourites_count: 5,
+      replies_count: 2,
+      reblogs_count: 1
+    },
+    {
+      id: '2',
+      content: 'Learning optimistic UI updates!',
+      author: 'Jane Designer',
+      favourited: true,
+      favourites_count: 12,
+      replies_count: 4,
+      reblogs_count: 3
+    }
+  ]",
   "operations": {
-    "get_post_1": {
-      "url": "/posts/1",
+    "get-timeline": {
+      "url": "/timeline",
       "method": "get",
-      "handler": "console.log('📡 DataSource 1 API called at:', Date.now()); return { id: 1, title: 'Post 1', body: 'Content for post 1' }"
+      "handler": "return $state.posts"
     },
-    "get_post_2": {
-      "url": "/posts/2", 
-      "method": "get",
-      "handler": "console.log('📡 DataSource 2 API called at:', Date.now()); return { id: 2, title: 'Post 2', body: 'Content for post 2' }"
+    "favorite-post": {
+      "url": "/posts/:id/favorite",
+      "method": "post",
+      "pathParamTypes": {
+        "id": "string"
+      },
+      "handler": "
+        delay(2000);
+        const post = $state.posts.find(p => p.id === $pathParams.id);
+        if (post) {
+          post.favourited = true;
+          post.favourites_count += 1;
+        }
+      "
     },
-    "get_post_3": {
-      "url": "/posts/3",
-      "method": "get", 
-      "handler": "console.log('📡 DataSource 3 API called at:', Date.now()); return { id: 3, title: 'Post 3', body: 'Content for post 3' }"
-    },
-    "trigger_state_update": {
-      "url": "/trigger",
-      "method": "get",
-      "handler": "console.log('🟢 API completed - will update local state next'); return { success: true, timestamp: Date.now() }"
+    "unfavorite-post": {
+      "url": "/posts/:id/unfavorite",
+      "method": "post",
+      "pathParamTypes": {
+        "id": "string"
+      },
+      "handler": "
+        delay(2000);
+        const post = $state.posts.find(p => p.id === $pathParams.id);
+        if (post) {
+          post.favourited = false;
+          post.favourites_count -= 1;
+        }
+      "
     }
   }
 }
----comp display
-<Component name="CascadeDemo" var.localState="{null}">
-  
-  <!-- Three independent DataSources that should NOT re-render when localState changes -->
-  <DataSource id="dataSource1" url="/api/posts/1" />
-  <DataSource id="dataSource2" url="/api/posts/2" />
-  <DataSource id="dataSource3" url="/api/posts/3" />
-  
-  <APICall
-    id="triggerUpdate"
-    method="get"
-    url="/api/trigger"
-    errorNotificationMessage="API call failed">
-    <event name="success">
-      console.log('🔄 About to update localState - watch for DataSource re-renders...');
-      
-      // This local state update should NOT cause unrelated DataSources to re-render
-      localState = 'updated_' + Date.now();
-      
-      console.log('✅ Local state updated to:', localState);
-      console.log('❌ Check if DataSources re-rendered above (they should not!)');
-    </event>
-  </APICall>
-
-  <VStack gap="1rem" padding="2rem">
-    <Text variant="h1">XMLUI State Update Cascade Bug Demo</Text>
-    
-    <Alert type="warning">
-      Open browser console and click the button below. You'll see that updating localState triggers ALL DataSources to re-render and make fresh API calls.
-    </Alert>
-    
-    <Button onDidClick="triggerUpdate.execute()">
-      Update Local State (Watch Console)
-    </Button>
-    
-    <Text><strong>Local State:</strong> {localState || 'null'}</Text>
-    
-    <VStack gap="0.5rem">
-      <Text variant="h2">DataSource Status (should not change when button clicked):</Text>
-      <Text>📊 DataSource 1: {dataSource1.loading ? 'Loading...' : `Loaded - ${dataSource1.value?.title}`}</Text>
-      <Text>📊 DataSource 2: {dataSource2.loading ? 'Loading...' : `Loaded - ${dataSource2.value?.title}`}</Text>
-      <Text>📊 DataSource 3: {dataSource3.loading ? 'Loading...' : `Loaded - ${dataSource3.value?.title}`}</Text>
-    </VStack>
-    
-    <Alert type="info">
-      <strong>Expected:</strong> Only localState should update when button clicked.<br/>
-      <strong>Actual:</strong> All DataSources re-render and make fresh API calls.<br/>
-      <strong>Evidence:</strong> Check console for "📡 DataSource X API called" logs after clicking.
-    </Alert>
-  </VStack>
-</Component>
 ```
+
