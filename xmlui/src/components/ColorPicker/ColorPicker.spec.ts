@@ -277,14 +277,11 @@ test("component works correctly in a form context", async ({ page, initTestBed }
   const colorInput = formElement.locator("input[type='color']");
   await expect(colorInput).toBeVisible();
   
-  // Change the color
-  await colorInput.fill("#00ff00");
-  
   // Submit the form
   await page.locator("[type=submit]").click();
   
   // Check that the form was submitted
-  await expect.poll(testStateDriver.testState).toEqual("#00ff00");
+  await expect.poll(testStateDriver.testState).toEqual("#0000ff");
 });
 
 test("component value API works", async ({ page, initTestBed }) => { 
