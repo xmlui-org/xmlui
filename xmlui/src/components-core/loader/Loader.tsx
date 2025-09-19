@@ -67,13 +67,9 @@ export function Loader({
   const prevAppContext = usePrevious(appContext);
   if (logReactivity && prevAppContext && prevAppContext !== appContext) {
     console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
-      prevKeys: Object.keys(prevAppContext),
-      newKeys: Object.keys(appContext),
       timestamp: Date.now(),
-      // Compare specific properties that might be changing
-      changedProps: Object.keys(appContext).filter(key => 
-        prevAppContext[key] !== appContext[key]
-      ),
+      // Simple comparison without deep inspection to avoid circular refs
+      contextChanged: true,
     });
   }
 
@@ -81,13 +77,9 @@ export function Loader({
   const prevState = usePrevious(state);
   if (logReactivity && prevState && prevState !== state) {
     console.log(`[🚨 STATE CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
-      prevKeys: Object.keys(prevState),
-      newKeys: Object.keys(state),
       timestamp: Date.now(),
-      // Compare specific properties that might be changing
-      changedProps: Object.keys(state).filter(key => 
-        prevState[key] !== state[key]
-      ),
+      // Simple comparison without deep inspection to avoid circular refs
+      stateChanged: true,
     });
   }
 
@@ -106,12 +98,9 @@ export function Loader({
     if (logReactivity) {
       console.log(`[🔍 QUERY KEY CALC] DataSource '${loader.props.id || loader.uid}':`, {
         uid,
-        extractedParam,
-        fullKey: key,
-        stateKeys: Object.keys(state),
-        propsKeys: Object.keys(loader.props),
-        appContextKeys: Object.keys(appContext),
         timestamp: Date.now(),
+        // Avoid deep logging to prevent circular refs
+        hasExtractedParam: !!extractedParam,
       });
     }
     

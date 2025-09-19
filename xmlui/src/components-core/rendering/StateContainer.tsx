@@ -315,11 +315,10 @@ const useRoutingParams = () => {
 
   // Log routing changes
   const prevRoutingState = usePrevious(routingState);
-  if (logReactivity && prevRoutingState && JSON.stringify(prevRoutingState) !== JSON.stringify(routingState)) {
+  if (logReactivity && prevRoutingState && prevRoutingState !== routingState) {
     console.log('[🚨 ROUTING CHANGED]', {
-      previous: prevRoutingState,
-      current: routingState,
       timestamp: Date.now(),
+      routingChanged: true,
     });
   }
 
