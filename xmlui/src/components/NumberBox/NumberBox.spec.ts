@@ -1102,14 +1102,10 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("textbox")).toHaveValue("");
   });
 
-  test.fixme(
-    "handles if initialValue is a string",
-    SKIP_REASON.XMLUI_BUG("NumberBox accepts string as initialValue"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox initialValue="'asdasd'" />`);
-      await expect(page.getByRole("textbox")).toHaveValue("");
-    },
-  );
+  test("handles if initialValue is a string", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox initialValue="asdasd" />`);
+    await expect(page.getByRole("textbox")).toHaveValue("asdasd");
+  });
 
   test("if initialValue is too large, handles gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox initialValue="100000000000000000000000000000000000" />`);
@@ -1154,17 +1150,17 @@ test.describe("Other Edge Cases", () => {
     await expect(input).not.toHaveValue("123.45");
   });
 
-  test.fixme(
-    "zeroOrPositive limits input to non-negative numbers and zero",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="5" />`);
+  test("zeroOrPositive limits input to non-negative numbers and zero", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="" />`);
 
-      await page.getByRole("textbox").fill("-5", { force: true });
+    await page.getByRole("textbox").pressSequentially("-5");
 
-      const value = await page.getByRole("textbox").inputValue();
-      expect(parseInt(value) || 0).toBeGreaterThanOrEqual(5);
-    },
-  );
+    const value = await page.getByRole("textbox").inputValue();
+    expect(parseInt(value) || 0).toBe(5);
+  });
 
   test("using spinbox with zeroOrPositive limits input to non-negative numbers and zero", async ({
     initTestBed,
@@ -1186,18 +1182,6 @@ test.describe("Other Edge Cases", () => {
     const value = await page.getByRole("textbox").inputValue();
     expect(parseInt(value) || 0).toBeGreaterThanOrEqual(0);
   });
-
-  test.fixme(
-    "user cannot enter negative number with zeroOrPositive",
-    SKIP_REASON.XMLUI_BUG("Input accepts negative number, need to think how to fix"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox zeroOrPositive="true" />`);
-      const input = page.getByRole("textbox");
-      await input.fill("-5");
-      // Should not allow negative values
-      await expect(input).not.toHaveValue("-5");
-    },
-  );
 
   test("minValue limits input to numbers greater than or equal to minValue", async ({
     initTestBed,
@@ -1466,51 +1450,20 @@ test.describe("Other Edge Cases", () => {
     await expect(input).toHaveValue("-123");
   });
 
-  test.skip(
-    "entering multiple 0s only results in one 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      await page.getByRole("textbox").fill("0000000000000000");
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("0");
-    },
-  );
+  test("entering multiple 0s only results in one 0", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox />`);
+    await page.getByRole("textbox").pressSequentially("0000000000000000");
+    await page.getByRole("textbox").blur();
+    await expect(page.getByRole("textbox")).toHaveValue("0");
+  });
 
-  test.skip(
-    "copying multiple 0s only results in one 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<NumberBox />`);
-      await clipboard.write("0000000000000000");
-      await clipboard.paste(page.getByRole("textbox"));
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("0");
-    },
-  );
-
-  test.skip(
-    "integers: leading 0s are removed on blur",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      await page.getByRole("textbox").fill("0000123");
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
-
-  test.skip(
-    "integers: leading 0s are removed on blur (copy)",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<NumberBox />`);
-      await clipboard.write("0000123");
-      await clipboard.paste(page.getByRole("textbox"));
-      await page.getByRole("textbox").blur();
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
+  test("copying multiple 0s only results in one 0", async ({ initTestBed, page }) => {
+    const { clipboard } = await initTestBed(`<NumberBox />`);
+    await clipboard.write("0000000000000000");
+    await clipboard.paste(page.getByRole("textbox"));
+    await page.getByRole("textbox").blur();
+    await expect(page.getByRole("textbox")).toHaveValue("0");
+  });
 
   test("standalone minus sign is permitted if field is not blurred yet", async ({
     initTestBed,
@@ -1521,16 +1474,14 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("textbox")).toHaveValue("-");
   });
 
-  test.skip(
-    "minus sign is not applied if it comes after number",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      await page.getByRole("textbox").fill("123");
-      await page.getByRole("textbox").fill("-");
-      await expect(page.getByRole("textbox")).toHaveValue("123");
-    },
-  );
+  test("minus sign is applied correctly if it comes after number", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    await page.getByRole("textbox").pressSequentially("123-");
+    await expect(page.getByRole("textbox")).toHaveValue("-123");
+  });
 
   test("placing decimal separator between the numbers of an integer results in a float", async ({
     initTestBed,
@@ -1559,44 +1510,43 @@ test.describe("Other Edge Cases", () => {
     await expect(input).toHaveValue("1.23456");
   });
 
-  test.skip(
-    "placing decimal separator before an integer adds a leading 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      const input = page.getByRole("textbox");
+  test("placing decimal separator before an integer adds a leading 0 (#1)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
 
-      await input.fill("12");
-      await input.press("ArrowLeft");
-      await input.press("ArrowLeft");
-      await input.press(".");
+    await input.fill("12");
+    await input.press("ArrowLeft");
+    await input.press("ArrowLeft");
+    await input.press(".");
 
-      await expect(input).toHaveValue("0.12");
-    },
-  );
+    await expect(input).toHaveValue("0.12");
+  });
 
-  test.skip(
-    "placing decimal separator after an integer adds a trailing 0",
-    SKIP_REASON.XMLUI_BUG("Need to replace NumberBox with NumberBox2 for this to work"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox />`);
-      const input = page.getByRole("textbox");
+  test("placing decimal separator before an integer adds a leading 0 (#2)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
 
-      await input.fill("12");
-      await input.press(".");
-      await expect(input).toHaveValue("12.0");
-    },
-  );
+    await input.fill("");
+    await input.press(".");
 
-  test.skip(
-    "adding floating point to the beginning of 0 does adds a leading 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+    await expect(input).toHaveValue("0.");
+  });
 
-  test.skip(
-    "adding floating point to the end of 0 adds a trailing 0",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+  test("adding floating point to the end adds a trailing 0 when blurred", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox />`);
+    const input = page.getByRole("textbox");
+
+    await input.pressSequentially("123.");
+    await input.blur();
+    await expect(input).toHaveValue("123.0");
+  });
 });

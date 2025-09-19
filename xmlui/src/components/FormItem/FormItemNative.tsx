@@ -48,7 +48,6 @@ import { useValidation, useValidationDisplay } from "./Validations";
 import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
-import { NumberBox2 } from "../NumberBox/NumberBox2Native";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
@@ -330,26 +329,6 @@ export const FormItem = memo(function FormItem({
           maxLength={maxTextLength ?? validations?.maxLength}
           gap={gap}
         ></NumberBox>
-      );
-      break;
-    }
-    // NOTE: This is a prototype for the new number field
-    // works as good as the regular number field but untested
-    // in production.
-    case "integer2":
-    case "number2": {
-      formControl = (
-        <NumberBox2
-          {...rest}
-          initialValue={initialValue}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          min={validations.minValue}
-          max={validations.maxValue}
-          integersOnly={type === "integer2"}
-        />
       );
       break;
     }
