@@ -63,8 +63,8 @@ test.describe("Basic Functionality", () => {
     test("TooltipContent renders in BarChart on hover", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -114,8 +114,8 @@ test.describe("Basic Functionality", () => {
       // The indicator prop would be passed through chart tooltip configuration
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -162,8 +162,8 @@ test.describe("Basic Functionality", () => {
     test("displays multiple data series correctly", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['sales', 'profit']}"
+          xKey="name"
+          yKeys="{['sales', 'profit']}"
           data="{${multiSeriesData}}"
           width="400px"
           height="400px"
@@ -318,8 +318,8 @@ test.describe("Basic Functionality", () => {
       // Test in LineChart context
       await initTestBed(`
         <LineChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
