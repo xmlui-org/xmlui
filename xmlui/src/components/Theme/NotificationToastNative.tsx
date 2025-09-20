@@ -110,9 +110,8 @@ const CustomToastRenderer = ({
     return null;
   }
 
-  // Sort toasts by creation time, newest first (highest createdAt) - only show visible toasts
+  // Sort toasts by creation time, newest first (highest createdAt) - show all toasts
   const sortedToasts = [...toasts]
-    .filter(t => t.visible) // Only show visible toasts
     .sort((a, b) => b.createdAt - a.createdAt);
 
   // Immediate detection during render - check for new toasts right now
@@ -150,9 +149,10 @@ const CustomToastRenderer = ({
       newToastDetectedRef.current !== t.id;
 
     const toastClassName = classnames(styles.toast, {
-      [styles.animating]: shouldAnimate,
+      [styles.animating]: shouldAnimate, // Keep the zoomIn entry animation
       [styles.hidden]: isHiddenForShift,
-      [styles.visible]: !isHiddenForShift,
+      [styles.visible]: t.visible && !isHiddenForShift,
+      [styles.flyingOut]: !t.visible, // Simply apply flyingOut to non-visible toasts
     });
 
     // Get the icon based on toast type
