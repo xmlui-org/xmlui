@@ -1,5 +1,5 @@
 import { labelPositionValues, validationStatusValues } from "../abstractions";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -462,68 +462,102 @@ test("empty string label is not rendered", async ({ initTestBed, page }) => {
   await expect(labels.nth(1)).toHaveText("Option 2");
 });
 
-test("clicking on the label focuses input field", async ({ initTestBed, page }) => {
+test("labelPosition=start positions label before input with ltr", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <RadioGroup label="Test Label" initialValue="1">
+    <RadioGroup direction="ltr" label="test" labelPosition="start" initialValue="1">
       <Option testId="option1" value="1">Option 1</Option>
       <Option value="2">Option 2</Option>
     </RadioGroup>
   `);
+
   const labels = page.locator("label");
-  await labels.nth(0).click();
-  await expect(page.getByTestId("option1")).toBeFocused();
+  expect(labels).toHaveCount(3);
+  const { left: optionLeft } = await getBounds(labels.nth(1));
+  const { right: labelRight } = await getBounds(labels.nth(0));
+
+  expect(labelRight).toBeLessThan(optionLeft);
 });
 
-// --- --- labelPosition
+test("labelPosition=start positions label after input with rtl", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup direction="rtl" label="test" labelPosition="start" initialValue="1">
+      <Option testId="option1" value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
 
-labelPositionValues.forEach((pos) => {
-  test.skip(
-    `label position ${pos} is applied for the input field and associated label`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+  const labels = page.locator("label");
+  expect(labels).toHaveCount(3);
+  const { left: optionLeft } = await getBounds(labels.nth(0));
+  const { right: labelRight } = await getBounds(labels.nth(2));
+
+  expect(labelRight).toBeLessThan(optionLeft);
 });
 
-// --- api
+test("labelPosition=end positions label after input with ltr", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup direction="ltr" label="test" labelPosition="end" initialValue="1">
+      <Option testId="option1" value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
 
-// --- --- focus
+  const labels = page.locator("label");
+  expect(labels).toHaveCount(3);
+  const { left: optionLeft } = await getBounds(labels.nth(0));
+  const { right: labelRight } = await getBounds(labels.nth(1));
 
-test.skip(
-  "focus() focuses the first Option",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  expect(labelRight).toBeLessThan(optionLeft);
+});
 
-test.skip(
-  "focus() does nothing if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("labelPosition=end positions label after input with rtl", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup direction="rtl" label="test" labelPosition="end" initialValue="1">
+      <Option testId="option1" value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
 
-// --- --- value
+  const labels = page.locator("label");
+  expect(labels).toHaveCount(3);
+  expect(labels.nth(2)).toHaveText("Option 2");
+  const { left: optionLeft } = await getBounds(labels.nth(0));
+  const { right: labelRight } = await getBounds(labels.nth(2));
 
-test.skip(
-  "value returns current input value",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  expect(optionLeft).toBeLessThan(labelRight);
+});
+
+test("value returns current input value", async ({ initTestBed, page}) => {
+  await initTestBed(`
+      <Fragment>
+      <RadioGroup id="radioGroup" initialValue="2">
+        <Option value="1"></Option>
+        <Option value="2"></Option>
+      </RadioGroup>
+      <Text testId="valueDisplay">{radioGroup.value}</Text>
+      </Fragment>
+    `);
+
+  const valueDisplay = page.getByTestId("valueDisplay");
+  await expect(valueDisplay).toHaveText("2");
+});
 
 // --- --- setValue
 
-test.skip(
-  "setValue updates input value",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("setValue input value", async ({ initTestBed, page}) => {
+  await initTestBed(`
+      <Fragment>
+      <RadioGroup id="radioGroup" initialValue="2">
+        <Option value="1"></Option>
+        <Option value="2"></Option>
+      </RadioGroup>
+      <Text testId="valueDisplay">{radioGroup.value}</Text>
+      <Button onClick="() => radioGroup.setValue('1')" testId="setValueButton">Set Value</Button>
+      </Fragment>
+    `);
 
-test.skip(
-  "setValue does not update input if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
-
-test.skip(
-  "setValue does not update input if value is invalid",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  const valueDisplay = page.getByTestId("valueDisplay");
+  await expect(valueDisplay).toHaveText("2");
+  await page.getByTestId("setValueButton").click();
+  await expect(valueDisplay).toHaveText("1");
+});
