@@ -190,7 +190,6 @@ export const ModalDialog = React.forwardRef(
           return doClose();
         },
       };
-      console.log('Modal context value created:', contextValue);
       return contextValue;
     }, [doClose]);
 
