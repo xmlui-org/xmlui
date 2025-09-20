@@ -59,10 +59,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
   });
 
-  test("autoFocus sets focus on the first Option on page load", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("autoFocus sets focus on the first Option on page load", async ({ initTestBed, page }) => {
     await initTestBed(`
       <RadioGroup autoFocus="true">
         <Option value="1">Option 1</Option>
@@ -358,44 +355,124 @@ test.describe("Basic Functionality", () => {
   });
 });
 
-// --- --- validationStatus
-
-const validationStatuses = validationStatusValues.filter((v) => v !== "none");
-validationStatuses.forEach((status) => {
-  test.skip(
-    `validation status ${status} is applied correctly`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {
-      // border color matches the one specified in current theme
+test("validationStatus 'none' is applied correctly", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `
+    <RadioGroup validationStatus="none" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `,
+    {
+      testThemeVars: {
+        "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
+      },
     },
   );
+  const options = page.getByRole("radiogroup").getByRole("radio");
+  expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+  expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
 });
 
-test.skip(
-  "only one option should have validation status 'error' or 'warning",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("validationStatus 'error' is applied correctly", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `
+    <RadioGroup validationStatus="error" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `,
+    {
+      testThemeVars: {
+        "borderColor-RadioGroupOption-error": "rgb(255, 32, 0)",
+        "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
+      },
+    },
+  );
+  const options = page.getByRole("radiogroup").getByRole("radio");
+  expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(255, 32, 0)");
+  expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+});
 
-// --- --- label
+test("validationStatus 'warning' is applied correctly", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `
+    <RadioGroup validationStatus="warning" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `,
+    {
+      testThemeVars: {
+        "borderColor-RadioGroupOption-warning": "rgb(255, 180, 0)",
+        "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
+      },
+    },
+  );
+  const options = page.getByRole("radiogroup").getByRole("radio");
+  expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(255, 180, 0)");
+  expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+});
 
-test.skip(
-  "label is rendered if provided",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("validationStatus 'valid' is applied correctly", async ({ initTestBed, page }) => {
+  await initTestBed(
+    `
+    <RadioGroup validationStatus="valid" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `,
+    {
+      testThemeVars: {
+        "borderColor-RadioGroupOption-success": "rgb(0, 180, 0)",
+        "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
+      },
+    },
+  );
+  const options = page.getByRole("radiogroup").getByRole("radio");
+  expect(options.nth(1)).toHaveCSS("border-top-color", "rgb(80, 80, 80)");
+  expect(options.nth(0)).toHaveCSS("border-top-color", "rgb(0, 180, 0)");
+});
 
-test.skip(
-  "empty string label is not rendered",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("label is rendered if provided", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup label="Test Label" initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
+  const labels = page.locator("label");
+  await expect(labels).toHaveCount(3);
+  await expect(labels.nth(0)).toHaveText("Test Label");
+  await expect(labels.nth(1)).toHaveText("Option 1");
+  await expect(labels.nth(2)).toHaveText("Option 2");
+});
 
-test.skip(
-  "clicking on the label focuses input field",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("empty string label is not rendered", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup initialValue="1">
+      <Option value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
+
+  const labels = page.locator("label");
+  await expect(labels).toHaveCount(2);
+  await expect(labels.nth(0)).toHaveText("Option 1");
+  await expect(labels.nth(1)).toHaveText("Option 2");
+});
+
+test("clicking on the label focuses input field", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <RadioGroup label="Test Label" initialValue="1">
+      <Option testId="option1" value="1">Option 1</Option>
+      <Option value="2">Option 2</Option>
+    </RadioGroup>
+  `);
+  const labels = page.locator("label");
+  await labels.nth(0).click();
+  await expect(page.getByTestId("option1")).toBeFocused();
+});
 
 // --- --- labelPosition
 
