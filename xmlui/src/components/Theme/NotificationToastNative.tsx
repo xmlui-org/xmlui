@@ -44,7 +44,6 @@ const CustomToastRenderer = ({
   // Update global modal state when this instance's modal context changes
   useEffect(() => {
     if (modalOnly && isInsideModal) {
-      console.log(`🚪 [MODAL] Modal opening`);
       if (!isAnyModalOpen) {
         // Modal is opening - IMMEDIATELY start handoff to prevent any flicker
         // Set handoff flag synchronously FIRST, before any async operations
@@ -54,8 +53,6 @@ const CustomToastRenderer = ({
         setHiddenNewToastId(null);
         newToastDetectedRef.current = null;
         
-        console.log(`🧹 [MODAL] Handoff started immediately - animation disabled`);
-        
         // Notify all instances immediately that handoff is in progress
         notifyModalStateChange();
         
@@ -63,14 +60,12 @@ const CustomToastRenderer = ({
         const timer = setTimeout(() => {
           isAnyModalOpen = true;
           handoffInProgress = false;
-          console.log(`✅ [MODAL] Handoff complete - modal instance now active`);
           notifyModalStateChange(); // Notify all instances
         }, 50);
         
         // Return cleanup that handles both timeout and modal closing
         return () => {
           clearTimeout(timer);
-          console.log(`🚪 [MODAL] Modal closing - returning control to theme`);
           isAnyModalOpen = false;
           handoffInProgress = false;
           notifyModalStateChange(); // Notify all instances
@@ -80,7 +75,6 @@ const CustomToastRenderer = ({
     
     // If modal closed (modalOnly=true but isInsideModal=false), ensure cleanup
     if (modalOnly && !isInsideModal && isAnyModalOpen) {
-      console.log(`🚪 [MODAL] Modal already closed - ensuring cleanup`);
       isAnyModalOpen = false;
       handoffInProgress = false;
       notifyModalStateChange(); // Notify all instances
@@ -91,11 +85,6 @@ const CustomToastRenderer = ({
   useEffect(() => {
     const currentToastIds = toasts.map(t => t.id);
     const previousToastIds = previousToastsRef.current;
-    
-    console.log(`[${modalOnly ? 'MODAL' : 'THEME'}] Toasts changed:`, {
-      count: currentToastIds.length,
-      ids: currentToastIds.map(id => id.slice(0, 8))
-    });
     
     // Detect new toasts (that weren't in the previous list)
     const newToastIds = currentToastIds.filter(id => !previousToastIds.includes(id));
@@ -108,14 +97,12 @@ const CustomToastRenderer = ({
     
     if (newToastIds.length > 0 && !handoffInProgress) {
       const newestToastId = newToastIds[0]; // Get the newest toast
-      console.log(`🎬 [${modalOnly ? 'MODAL' : 'THEME'}] New toast detected, starting two-phase animation:`, newestToastId.slice(0, 8));
       
       // Phase 1: Immediately mark the new toast as hidden (this confirms the render-time hiding)
       setHiddenNewToastId(newestToastId);
       
       // Phase 2: After 200ms delay, show the new toast with entrance animation
       setTimeout(() => {
-        console.log(`🎬 [${modalOnly ? 'MODAL' : 'THEME'}] Phase 2: Showing new toast:`, newestToastId.slice(0, 8));
         setHiddenNewToastId(null);
         newToastDetectedRef.current = null; // Clear the ref as well
       }, 200);
@@ -132,16 +119,6 @@ const CustomToastRenderer = ({
   } else {
     shouldRenderToasts = modalOnly ? isInsideModal : !isAnyModalOpen;
   }
-
-  // Debug logging 
-  console.log(`[${modalOnly ? 'MODAL' : 'THEME'}] Render decision:`, {
-    toastCount: toasts.length,
-    shouldRender: shouldRenderToasts,
-    isInsideModal,
-    isAnyModalOpen,
-    handoffInProgress,
-    modalOnly
-  });
 
   // Don't render anything if we're not in the right context
   if (!shouldRenderToasts) {
@@ -163,7 +140,6 @@ const CustomToastRenderer = ({
   // If we detect a new toast during render, immediately mark it for hiding
   if (newToastIds.length > 0 && !handoffInProgress && newToastDetectedRef.current !== newToastIds[0]) {
     newToastDetectedRef.current = newToastIds[0];
-    console.log(`🚨 [${modalOnly ? 'MODAL' : 'THEME'}] IMMEDIATE: New toast detected during render:`, newToastIds[0].slice(0, 8));
   }
 
     const toastElements = sortedToasts.map((t, index) => {
@@ -180,8 +156,6 @@ const CustomToastRenderer = ({
     // CRITICAL: During handoff, NEVER hide any toasts regardless of animation state
     const isHiddenForShift = !handoffInProgress && (hiddenNewToastId === t.id || newToastDetectedRef.current === t.id);
     const shouldAnimate = isNewToast && isNewestToast && !handoffInProgress && hiddenNewToastId !== t.id && newToastDetectedRef.current !== t.id;
-    
-    console.log(`🎭 [${modalOnly ? 'MODAL' : 'THEME'}] Toast ${t.id.slice(0, 8)} - isNew: ${isNewToast}, isNewest: ${isNewestToast}, isHidden: ${isHiddenForShift}, shouldAnimate: ${shouldAnimate}, handoff: ${handoffInProgress}, hiddenId: ${hiddenNewToastId?.slice(0, 8) || 'null'}, refId: ${newToastDetectedRef.current?.slice(0, 8) || 'null'}`);
     
     const toastClassName = classnames(styles.toast, {
       [styles.animating]: shouldAnimate,
@@ -251,8 +225,6 @@ const CustomToastRenderer = ({
       </div>
     );
   }
-
-  console.log(`🌐 [THEME] Rendering ${toastElements.length} toasts outside modal, using portal`);
 
   // Otherwise, render to document.body with portal
   return createPortal(
