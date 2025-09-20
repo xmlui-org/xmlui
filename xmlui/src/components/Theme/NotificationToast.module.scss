@@ -1,0 +1,126 @@
+// NotificationToast.module.scss
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Define theme variables with fallback defaults
+$backgroundColor-NotificationToast: createThemeVar("backgroundColor-NotificationToast") !default;
+$borderColor-NotificationToast: createThemeVar("borderColor-NotificationToast") !default;
+$textColor-NotificationToast: createThemeVar("textColor-NotificationToast") !default;
+$shadowColor-NotificationToast: createThemeVar("shadowColor-NotificationToast") !default;
+$borderRadius-NotificationToast: createThemeVar("borderRadius-NotificationToast") !default;
+$padding-NotificationToast: createThemeVar("padding-NotificationToast") !default;
+$maxWidth-NotificationToast: createThemeVar("maxWidth-NotificationToast") !default;
+$containerSpacing-NotificationToast: createThemeVar("containerSpacing-NotificationToast") !default;
+$toastSpacing-NotificationToast: createThemeVar("toastSpacing-NotificationToast") !default;
+
+// Fallback values if theme variables are not defined
+$backgroundColor-NotificationToast: white !default;
+$borderColor-NotificationToast: #e1e5e9 !default;
+$textColor-NotificationToast: inherit !default;
+$shadowColor-NotificationToast: rgba(0, 0, 0, 0.15) !default;
+$borderRadius-NotificationToast: 4px !default;
+$padding-NotificationToast: 12px 16px !default;
+$maxWidth-NotificationToast: 300px !default;
+$containerSpacing-NotificationToast: 20px !default;
+$toastSpacing-NotificationToast: 68px !default;
+
+// --- This part defines the CSS styles
+
+// Toast animations
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Toast container styles
+.toastContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
+.toastContainerInner {
+  position: absolute;
+  top: $containerSpacing-NotificationToast;
+  right: $containerSpacing-NotificationToast;
+  pointer-events: auto;
+  width: $maxWidth-NotificationToast;
+}
+
+.toastWrapper {
+  position: relative;
+}
+
+// Modal-specific container styles
+.modalContainer {
+  position: absolute;
+  top: $containerSpacing-NotificationToast;
+  right: $containerSpacing-NotificationToast;
+  z-index: 999999;
+  pointer-events: none;
+  width: $maxWidth-NotificationToast;
+}
+
+.modalContainerInner {
+  position: relative;
+  pointer-events: auto;
+}
+
+// Individual toast styles
+.toast {
+  position: absolute;
+  right: 0;
+  background-color: $backgroundColor-NotificationToast;
+  padding: $padding-NotificationToast;
+  border-radius: $borderRadius-NotificationToast;
+  box-shadow: 0 4px 12px $shadowColor-NotificationToast;
+  cursor: pointer;
+  max-width: $maxWidth-NotificationToast;
+  word-break: break-word;
+  border: 1px solid $borderColor-NotificationToast;
+  color: $textColor-NotificationToast;
+  transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  transform: scale(1);
+
+  &.animating {
+    animation: zoomIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+// Hidden toaster container style
+.hiddenToaster {
+  display: none;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

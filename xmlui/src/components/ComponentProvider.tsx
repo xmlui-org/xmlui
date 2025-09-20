@@ -95,6 +95,7 @@ import {
 } from "./DropdownMenu/DropdownMenu";
 import { expandableItemComponentRenderer } from "./ExpandableItem/ExpandableItem";
 import { themeComponentRenderer } from "./Theme/Theme";
+import { notificationToastComponentRenderer } from "./Theme/NotificationToast";
 import { merge } from "lodash-es";
 import type { ComponentRegistryEntry } from "./ComponentRegistryContext";
 import { ComponentRegistryContext } from "./ComponentRegistryContext";
@@ -584,6 +585,7 @@ export class ComponentRegistry {
     }
     this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
+    this.registerCoreComponent(notificationToastComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
 

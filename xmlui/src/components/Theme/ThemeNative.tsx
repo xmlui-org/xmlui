@@ -12,7 +12,7 @@ import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import { NotificationToast } from "./NotificationToast";
+import { NotificationToastNative } from "./NotificationToastNative";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
 import {
@@ -194,7 +194,7 @@ export function Theme({
           {renderChild(node.children)}
           {children}
         </ErrorBoundary>
-        <NotificationToast toastDuration={toastDuration} />
+        <NotificationToastNative toastDuration={toastDuration} />
       </>
       // </ThemeContext.Provider>
     );
