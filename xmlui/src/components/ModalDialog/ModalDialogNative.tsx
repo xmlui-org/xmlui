@@ -176,7 +176,7 @@ export const ModalDialog = React.forwardRef(
 
     const registeredForms = useRef(new Set());
     const modalVisibilityContextValue = useMemo(() => {
-      return {
+      const contextValue = {
         registerForm: (id: string) => {
           registeredForms.current.add(id);
         },
@@ -190,6 +190,8 @@ export const ModalDialog = React.forwardRef(
           return doClose();
         },
       };
+      console.log('Modal context value created:', contextValue);
+      return contextValue;
     }, [doClose]);
 
     if (!root) {
@@ -223,7 +225,7 @@ export const ModalDialog = React.forwardRef(
         <div className={styles.innerContent} style={{ gap: style?.gap }}>
           <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
             {children}
-            <NotificationToastNative />
+            <NotificationToastNative modalOnly={true} />
           </ModalVisibilityContext.Provider>
         </div>
         {closeButtonVisible && (

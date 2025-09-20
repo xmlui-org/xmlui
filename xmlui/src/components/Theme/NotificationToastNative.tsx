@@ -5,13 +5,32 @@ import classnames from "classnames";
 import { ModalVisibilityContext } from "../ModalDialog/ModalVisibilityContext";
 import styles from "./NotificationToast.module.scss";
 
+// Global state to track if any modal is open
+let isAnyModalOpen = false;
+
 // Custom toast component that renders in the right place
-const CustomToastRenderer = ({ toastDuration }: { toastDuration?: number }) => {
+const CustomToastRenderer = ({ 
+  toastDuration, 
+  modalOnly = false 
+}: { 
+  toastDuration?: number; 
+  modalOnly?: boolean; 
+}) => {
   const { toasts } = useToasterStore();
   const modalContext = useContext(ModalVisibilityContext);
   const isInsideModal = modalContext !== null;
   const previousToastsRef = useRef<string[]>([]);
   const [showingNewToast, setShowingNewToast] = useState<string | null>(null);
+
+  // Update global modal state when this instance's modal context changes
+  useEffect(() => {
+    if (modalOnly && isInsideModal) {
+      isAnyModalOpen = true;
+      return () => {
+        isAnyModalOpen = false;
+      };
+    }
+  }, [modalOnly, isInsideModal]);
 
   // Detect when a new toast is added
   useEffect(() => {
@@ -43,6 +62,28 @@ const CustomToastRenderer = ({ toastDuration }: { toastDuration?: number }) => {
     previousToastsRef.current = currentToastIds;
   }, [toasts]);
 
+  // Debug logging
+  console.log('CustomToastRenderer debug:', {
+    modalOnly,
+    modalContext,
+    isInsideModal,
+    isAnyModalOpen,
+    toastsLength: toasts.length
+  });
+
+  // Only render toasts if we're in the right context
+  // For modal instance: only render if we're inside a modal
+  // For theme instance: only render if no modal is open
+  const shouldRenderToasts = modalOnly ? isInsideModal : !isAnyModalOpen;
+
+  console.log('shouldRenderToasts:', shouldRenderToasts, 'for modalOnly:', modalOnly);
+
+  // Don't render anything if we're not in the right context
+  if (!shouldRenderToasts) {
+    console.log('Not rendering toasts for this instance');
+    return null;
+  }
+
   if (toasts.length === 0) {
     return null;
   }
@@ -61,6 +102,29 @@ const CustomToastRenderer = ({ toastDuration }: { toastDuration?: number }) => {
       [styles.hidden]: shouldHideTemporarily,
       [styles.visible]: !shouldHideTemporarily,
     });
+
+    // Get the icon based on toast type
+    const getToastIcon = () => {
+      switch (t.type) {
+        case 'success':
+          return (
+            <span className={`${styles.toastIcon} ${styles.toastIconSuccess}`}>
+              ✓
+            </span>
+          );
+        case 'error':
+          return (
+            <span className={`${styles.toastIcon} ${styles.toastIconError}`}>
+              ✕
+            </span>
+          );
+        case 'loading':
+          return <span className={styles.toastIcon}>⏳</span>;
+        case 'blank':
+        default:
+          return null;
+      }
+    };
     
     return (
       <div
@@ -72,21 +136,39 @@ const CustomToastRenderer = ({ toastDuration }: { toastDuration?: number }) => {
         }}
         onClick={() => toast.dismiss(t.id)}
       >
-        {typeof t.message === 'function' ? t.message(t) : t.message}
+        <div className={styles.toastContent}>
+          {getToastIcon()}
+          <div className={styles.toastMessage}>
+            {typeof t.message === 'function' ? t.message(t) : t.message}
+          </div>
+        </div>
       </div>
     );
   });
 
   // If we're inside a modal, render directly (no portal needed)
   if (isInsideModal) {
+    console.log('Rendering toasts inside modal, isInsideModal:', isInsideModal);
     return (
-      <div className={styles.modalContainer}>
+      <div 
+        className={styles.modalContainer}
+        style={{ 
+          // Force the top offset to ensure it's applied
+          top: '60px',
+          position: 'absolute',
+          right: '20px',
+          zIndex: 999999,
+          backgroundColor: 'rgba(255, 0, 0, 0.1)' // Debug: red tint to see container
+        }}
+      >
         <div className={styles.modalContainerInner}>
           {toastElements}
         </div>
       </div>
     );
   }
+
+  console.log('Rendering toasts outside modal, using portal');
 
   // Otherwise, render to document.body with portal
   return createPortal(
@@ -113,20 +195,27 @@ export const defaultProps = {
 type NotificationToastProps = {
   toastDuration?: number;
   style?: CSSProperties;
+  modalOnly?: boolean; // New prop to control whether this instance is for modals only
 };
 
 let toasterMounted = false;
 
 export const NotificationToastNative = ({ 
   toastDuration = defaultProps.toastDuration,
-  style 
+  style,
+  modalOnly = false
 }: NotificationToastProps) => {
   const [shouldRender, setShouldRender] = useState(false);
+  const [shouldRenderToaster, setShouldRenderToaster] = useState(false);
 
   useEffect(() => {
+    // Always allow this instance to render
+    setShouldRender(true);
+    
+    // But only initialize the global toaster once
     if (!toasterMounted) {
       toasterMounted = true;
-      setShouldRender(true);
+      setShouldRenderToaster(true);
     }
   }, []);
 
@@ -134,14 +223,16 @@ export const NotificationToastNative = ({
 
   return (
     <div style={style}>
-      {/* Hidden toaster just to initialize the toast system */}
-      <Toaster
-        position={"top-right"}
-        containerStyle={TOASTER_CONTAINER_STYLE}
-        toastOptions={{ style: { padding: "12px 16px" }, duration: toastDuration }}
-      />
+      {/* Only render the hidden toaster initialization if this is the first instance */}
+      {shouldRenderToaster && (
+        <Toaster
+          position={"top-right"}
+          containerStyle={TOASTER_CONTAINER_STYLE}
+          toastOptions={{ style: { padding: "12px 16px" }, duration: toastDuration }}
+        />
+      )}
       {/* Our custom toast renderer */}
-      <CustomToastRenderer toastDuration={toastDuration} />
+      <CustomToastRenderer toastDuration={toastDuration} modalOnly={modalOnly} />
     </div>
   );
 };

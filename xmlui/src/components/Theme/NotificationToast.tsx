@@ -32,6 +32,9 @@ export const NotificationToastMd = createMetadata({
     "maxWidth-NotificationToast": "300px",
     "containerSpacing-NotificationToast": "20px",
     "toastSpacing-NotificationToast": "68px",
+    "iconSuccessBackground-NotificationToast": "#10b981",
+    "iconErrorBackground-NotificationToast": "#ef4444",
+    "modalTopOffset-NotificationToast": "60px",
   },
 });
 

@@ -18,6 +18,9 @@ $padding-NotificationToast: createThemeVar("padding-NotificationToast") !default
 $maxWidth-NotificationToast: createThemeVar("maxWidth-NotificationToast") !default;
 $containerSpacing-NotificationToast: createThemeVar("containerSpacing-NotificationToast") !default;
 $toastSpacing-NotificationToast: createThemeVar("toastSpacing-NotificationToast") !default;
+$iconSuccessBackground-NotificationToast: createThemeVar("iconSuccessBackground-NotificationToast") !default;
+$iconErrorBackground-NotificationToast: createThemeVar("iconErrorBackground-NotificationToast") !default;
+$modalTopOffset-NotificationToast: createThemeVar("modalTopOffset-NotificationToast") !default;
 
 // Fallback values if theme variables are not defined
 $backgroundColor-NotificationToast: white !default;
@@ -29,6 +32,9 @@ $padding-NotificationToast: 12px 16px !default;
 $maxWidth-NotificationToast: 300px !default;
 $containerSpacing-NotificationToast: 20px !default;
 $toastSpacing-NotificationToast: 68px !default;
+$iconSuccessBackground-NotificationToast: #10b981 !default;
+$iconErrorBackground-NotificationToast: #ef4444 !default;
+$modalTopOffset-NotificationToast: 60px !default;
 
 // --- This part defines the CSS styles
 
@@ -73,8 +79,8 @@ $toastSpacing-NotificationToast: 68px !default;
 
 // Modal-specific container styles
 .modalContainer {
-  position: absolute;
-  top: $containerSpacing-NotificationToast;
+  position: absolute !important;
+  top: $modalTopOffset-NotificationToast !important;
   right: $containerSpacing-NotificationToast;
   z-index: 999999;
   pointer-events: none;
@@ -113,6 +119,40 @@ $toastSpacing-NotificationToast: 68px !default;
   &.visible {
     opacity: 1;
   }
+}
+
+.toastContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.toastIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+
+.toastIconSuccess {
+  background-color: $iconSuccessBackground-NotificationToast;
+}
+
+.toastIconError {
+  background-color: $iconErrorBackground-NotificationToast;
+}
+
+.toastMessage {
+  flex: 1;
+  color: inherit;
 }
 
 // Hidden toaster container style
