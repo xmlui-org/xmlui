@@ -5,8 +5,14 @@ import classnames from "classnames";
 import { ModalVisibilityContext } from "../ModalDialog/ModalVisibilityContext";
 import styles from "./NotificationToast.module.scss";
 
-// Global state to track if any modal is open
+// Global state to track if any modal is open - using a simple event system
 let isAnyModalOpen = false;
+let handoffInProgress = false;
+const modalStateListeners = new Set<() => void>();
+
+const notifyModalStateChange = () => {
+  modalStateListeners.forEach(listener => listener());
+};
 
 // Custom toast component that renders in the right place
 const CustomToastRenderer = ({ 
@@ -20,67 +26,125 @@ const CustomToastRenderer = ({
   const modalContext = useContext(ModalVisibilityContext);
   const isInsideModal = modalContext !== null;
   const previousToastsRef = useRef<string[]>([]);
-  const [showingNewToast, setShowingNewToast] = useState<string | null>(null);
+  const [hiddenNewToastId, setHiddenNewToastId] = useState<string | null>(null); // Track toast that's temporarily hidden during shift animation
+  const newToastDetectedRef = useRef<string | null>(null); // Immediate detection during render
+  const [, forceUpdate] = useState({});
+
+  // Listen for modal state changes to force re-render
+  useEffect(() => {
+    const listener = () => {
+      forceUpdate({});
+    };
+    modalStateListeners.add(listener);
+    return () => {
+      modalStateListeners.delete(listener);
+    };
+  }, [modalOnly]);
 
   // Update global modal state when this instance's modal context changes
   useEffect(() => {
     if (modalOnly && isInsideModal) {
-      isAnyModalOpen = true;
-      return () => {
-        isAnyModalOpen = false;
-      };
+      console.log(`🚪 [MODAL] Modal opening`);
+      if (!isAnyModalOpen) {
+        // Modal is opening - IMMEDIATELY start handoff to prevent any flicker
+        // Set handoff flag synchronously FIRST, before any async operations
+        handoffInProgress = true;
+        
+        // Clear animation state to ensure no hiding during handoff
+        setHiddenNewToastId(null);
+        newToastDetectedRef.current = null;
+        
+        console.log(`🧹 [MODAL] Handoff started immediately - animation disabled`);
+        
+        // Notify all instances immediately that handoff is in progress
+        notifyModalStateChange();
+        
+        // Short delay to complete the transition
+        const timer = setTimeout(() => {
+          isAnyModalOpen = true;
+          handoffInProgress = false;
+          console.log(`✅ [MODAL] Handoff complete - modal instance now active`);
+          notifyModalStateChange(); // Notify all instances
+        }, 50);
+        
+        // Return cleanup that handles both timeout and modal closing
+        return () => {
+          clearTimeout(timer);
+          console.log(`🚪 [MODAL] Modal closing - returning control to theme`);
+          isAnyModalOpen = false;
+          handoffInProgress = false;
+          notifyModalStateChange(); // Notify all instances
+        };
+      }
+    }
+    
+    // If modal closed (modalOnly=true but isInsideModal=false), ensure cleanup
+    if (modalOnly && !isInsideModal && isAnyModalOpen) {
+      console.log(`🚪 [MODAL] Modal already closed - ensuring cleanup`);
+      isAnyModalOpen = false;
+      handoffInProgress = false;
+      notifyModalStateChange(); // Notify all instances
     }
   }, [modalOnly, isInsideModal]);
 
-  // Detect when a new toast is added
+  // Simple tracking of toast IDs for animation purposes
   useEffect(() => {
     const currentToastIds = toasts.map(t => t.id);
     const previousToastIds = previousToastsRef.current;
     
-    // Reset showing state when no toasts
-    if (toasts.length === 0) {
-      setShowingNewToast(null);
-      previousToastsRef.current = [];
-      return;
-    }
+    console.log(`[${modalOnly ? 'MODAL' : 'THEME'}] Toasts changed:`, {
+      count: currentToastIds.length,
+      ids: currentToastIds.map(id => id.slice(0, 8))
+    });
     
-    // Find newly added toasts
+    // Detect new toasts (that weren't in the previous list)
     const newToastIds = currentToastIds.filter(id => !previousToastIds.includes(id));
     
-    if (newToastIds.length > 0) {
+    // Clear hidden state if there are no toasts
+    if (currentToastIds.length === 0) {
+      setHiddenNewToastId(null);
+      newToastDetectedRef.current = null;
+    }
+    
+    if (newToastIds.length > 0 && !handoffInProgress) {
       const newestToastId = newToastIds[0]; // Get the newest toast
+      console.log(`🎬 [${modalOnly ? 'MODAL' : 'THEME'}] New toast detected, starting two-phase animation:`, newestToastId.slice(0, 8));
       
-      // First, let existing toasts shift down (no new toast visible yet)
-      setShowingNewToast(null);
+      // Phase 1: Immediately mark the new toast as hidden (this confirms the render-time hiding)
+      setHiddenNewToastId(newestToastId);
       
-      // After a delay, show the new toast with animation
+      // Phase 2: After 200ms delay, show the new toast with entrance animation
       setTimeout(() => {
-        setShowingNewToast(newestToastId);
-      }, 150); // 150ms delay to let existing toasts settle
+        console.log(`🎬 [${modalOnly ? 'MODAL' : 'THEME'}] Phase 2: Showing new toast:`, newestToastId.slice(0, 8));
+        setHiddenNewToastId(null);
+        newToastDetectedRef.current = null; // Clear the ref as well
+      }, 200);
     }
     
     previousToastsRef.current = currentToastIds;
-  }, [toasts]);
-
-  // Debug logging
-  console.log('CustomToastRenderer debug:', {
-    modalOnly,
-    modalContext,
-    isInsideModal,
-    isAnyModalOpen,
-    toastsLength: toasts.length
-  });
+  }, [toasts, modalOnly, handoffInProgress]);
 
   // Only render toasts if we're in the right context
-  // For modal instance: only render if we're inside a modal
-  // For theme instance: only render if no modal is open
-  const shouldRenderToasts = modalOnly ? isInsideModal : !isAnyModalOpen;
+  let shouldRenderToasts;
+  if (handoffInProgress) {
+    // During handoff, let the existing instance continue rendering to avoid flicker
+    shouldRenderToasts = modalOnly ? false : true;
+  } else {
+    shouldRenderToasts = modalOnly ? isInsideModal : !isAnyModalOpen;
+  }
 
-  console.log('shouldRenderToasts:', shouldRenderToasts, 'for modalOnly:', modalOnly);
+  // Debug logging 
+  console.log(`[${modalOnly ? 'MODAL' : 'THEME'}] Render decision:`, {
+    toastCount: toasts.length,
+    shouldRender: shouldRenderToasts,
+    isInsideModal,
+    isAnyModalOpen,
+    handoffInProgress,
+    modalOnly
+  });
 
   // Don't render anything if we're not in the right context
   if (!shouldRenderToasts) {
-    console.log('Not rendering toasts for this instance');
     return null;
   }
 
@@ -91,16 +155,38 @@ const CustomToastRenderer = ({
   // Sort toasts by creation time, newest first (highest createdAt)
   const sortedToasts = [...toasts].sort((a, b) => b.createdAt - a.createdAt);
 
-  const toastElements = sortedToasts.map((t, index) => {
+  // Immediate detection during render - check for new toasts right now
+  const currentToastIds = toasts.map(t => t.id);
+  const previousToastIds = previousToastsRef.current;
+  const newToastIds = currentToastIds.filter(id => !previousToastIds.includes(id));
+  
+  // If we detect a new toast during render, immediately mark it for hiding
+  if (newToastIds.length > 0 && !handoffInProgress && newToastDetectedRef.current !== newToastIds[0]) {
+    newToastDetectedRef.current = newToastIds[0];
+    console.log(`🚨 [${modalOnly ? 'MODAL' : 'THEME'}] IMMEDIATE: New toast detected during render:`, newToastIds[0].slice(0, 8));
+  }
+
+    const toastElements = sortedToasts.map((t, index) => {
     const topPosition = index * 68; // Each toast is 68px below the previous one
     const isNewestToast = index === 0;
-    const shouldShowWithAnimation = isNewestToast && showingNewToast === t.id;
-    const shouldHideTemporarily = isNewestToast && showingNewToast !== t.id;
+    
+    // Find if this toast is newly added by comparing with previous toasts
+    const isNewToast = !previousToastIds.includes(t.id);
+    
+    // Two-phase animation logic with immediate detection:
+    // Phase 1: New toast is hidden while existing toasts shift down
+    // Phase 2: New toast appears with entrance animation
+    // Use ref for immediate detection during render AND state for persistent tracking
+    // CRITICAL: During handoff, NEVER hide any toasts regardless of animation state
+    const isHiddenForShift = !handoffInProgress && (hiddenNewToastId === t.id || newToastDetectedRef.current === t.id);
+    const shouldAnimate = isNewToast && isNewestToast && !handoffInProgress && hiddenNewToastId !== t.id && newToastDetectedRef.current !== t.id;
+    
+    console.log(`🎭 [${modalOnly ? 'MODAL' : 'THEME'}] Toast ${t.id.slice(0, 8)} - isNew: ${isNewToast}, isNewest: ${isNewestToast}, isHidden: ${isHiddenForShift}, shouldAnimate: ${shouldAnimate}, handoff: ${handoffInProgress}, hiddenId: ${hiddenNewToastId?.slice(0, 8) || 'null'}, refId: ${newToastDetectedRef.current?.slice(0, 8) || 'null'}`);
     
     const toastClassName = classnames(styles.toast, {
-      [styles.animating]: shouldShowWithAnimation,
-      [styles.hidden]: shouldHideTemporarily,
-      [styles.visible]: !shouldHideTemporarily,
+      [styles.animating]: shouldAnimate,
+      [styles.hidden]: isHiddenForShift,
+      [styles.visible]: !isHiddenForShift,
     });
 
     // Get the icon based on toast type
@@ -131,8 +217,8 @@ const CustomToastRenderer = ({
         key={t.id}
         className={toastClassName}
         style={{
-          top: `${topPosition}px`, // Dynamic position based on index
-          zIndex: 1000 - index, // Newest on top
+          top: `${topPosition}px`,
+          zIndex: 1000 - index,
         }}
         onClick={() => toast.dismiss(t.id)}
       >
@@ -148,17 +234,15 @@ const CustomToastRenderer = ({
 
   // If we're inside a modal, render directly (no portal needed)
   if (isInsideModal) {
-    console.log('Rendering toasts inside modal, isInsideModal:', isInsideModal);
     return (
       <div 
         className={styles.modalContainer}
         style={{ 
-          // Force the top offset to ensure it's applied
-          top: '60px',
-          position: 'absolute',
+          position: 'fixed',
+          top: '80px', // Offset to avoid modal header
           right: '20px',
           zIndex: 999999,
-          backgroundColor: 'rgba(255, 0, 0, 0.1)' // Debug: red tint to see container
+          pointerEvents: 'auto'
         }}
       >
         <div className={styles.modalContainerInner}>
@@ -168,7 +252,7 @@ const CustomToastRenderer = ({
     );
   }
 
-  console.log('Rendering toasts outside modal, using portal');
+  console.log(`🌐 [THEME] Rendering ${toastElements.length} toasts outside modal, using portal`);
 
   // Otherwise, render to document.body with portal
   return createPortal(
@@ -189,7 +273,7 @@ const TOASTER_CONTAINER_STYLE: CSSProperties = {
 
 // Define default props for the component
 export const defaultProps = {
-  toastDuration: 5000,
+  toastDuration: 5000, // Back to 5 seconds
 };
 
 type NotificationToastProps = {
