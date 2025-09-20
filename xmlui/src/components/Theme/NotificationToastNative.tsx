@@ -109,20 +109,12 @@ const CustomToastRenderer = ({
   }, [toasts, modalOnly, handoffInProgress]);
 
   // Only render toasts if we're in the right context
-  let shouldRenderToasts;
-  if (handoffInProgress) {
-    // During handoff, let the existing instance continue rendering to avoid flicker
-    shouldRenderToasts = modalOnly ? false : true;
-  } else {
-    shouldRenderToasts = modalOnly ? isInsideModal : !isAnyModalOpen;
-  }
+  const shouldRenderToasts = handoffInProgress 
+    ? !modalOnly 
+    : modalOnly ? isInsideModal : !isAnyModalOpen;
 
-  // Don't render anything if we're not in the right context
-  if (!shouldRenderToasts) {
-    return null;
-  }
-
-  if (toasts.length === 0) {
+  // Don't render anything if we're not in the right context or have no toasts
+  if (!shouldRenderToasts || toasts.length === 0) {
     return null;
   }
 
@@ -131,8 +123,7 @@ const CustomToastRenderer = ({
 
   // Immediate detection during render - check for new toasts right now
   const currentToastIds = toasts.map(t => t.id);
-  const previousToastIds = previousToastsRef.current;
-  const newToastIds = currentToastIds.filter(id => !previousToastIds.includes(id));
+  const newToastIds = currentToastIds.filter(id => !previousToastsRef.current.includes(id));
   
   // If we detect a new toast during render, immediately mark it for hiding
   if (newToastIds.length > 0 && !handoffInProgress && newToastDetectedRef.current !== newToastIds[0]) {
@@ -144,7 +135,7 @@ const CustomToastRenderer = ({
     const isNewestToast = index === 0;
     
     // Find if this toast is newly added by comparing with previous toasts
-    const isNewToast = !previousToastIds.includes(t.id);
+    const isNewToast = !previousToastsRef.current.includes(t.id);
     
     // Two-phase animation logic with immediate detection:
     // Phase 1: New toast is hidden while existing toasts shift down
@@ -208,13 +199,7 @@ const CustomToastRenderer = ({
     return (
       <div 
         className={styles.modalContainer}
-        style={{ 
-          position: 'fixed',
-          top: '80px', // Offset to avoid modal header
-          right: '20px',
-          zIndex: 999999,
-          pointerEvents: 'auto'
-        }}
+        style={MODAL_CONTAINER_STYLE}
       >
         <div className={styles.modalContainerInner}>
           {toastElements}
@@ -238,6 +223,14 @@ const CustomToastRenderer = ({
 
 const TOASTER_CONTAINER_STYLE: CSSProperties = {
   display: "none", // Hide the original toaster since we're using custom rendering
+};
+
+const MODAL_CONTAINER_STYLE: CSSProperties = {
+  position: 'fixed',
+  top: '80px',
+  right: '20px',
+  zIndex: 999999,
+  pointerEvents: 'auto'
 };
 
 // Define default props for the component
