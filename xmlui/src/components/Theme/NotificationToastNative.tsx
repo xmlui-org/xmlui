@@ -53,14 +53,11 @@ const CustomToastRenderer = ({
         setHiddenNewToastId(null);
         newToastDetectedRef.current = null;
         
-        // Notify all instances immediately that handoff is in progress
-        notifyModalStateChange();
-        
         // Short delay to complete the transition
         const timer = setTimeout(() => {
           isAnyModalOpen = true;
           handoffInProgress = false;
-          notifyModalStateChange(); // Notify all instances
+          notifyModalStateChange(); // Notify all instances of final state
         }, 50);
         
         // Return cleanup that handles both timeout and modal closing
