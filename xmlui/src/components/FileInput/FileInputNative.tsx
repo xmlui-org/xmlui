@@ -140,12 +140,18 @@ export const FileInput = ({
   }, [_initialValue, updateState]);
 
   // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    onFocus?.();
+  const handleOnFocus = useCallback((e: React.FocusEvent) => {
+    // Only fire onFocus if focus is coming from outside the component
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onFocus?.();
+    }
   }, [onFocus]);
 
-  const handleOnBlur = useCallback(() => {
-    onBlur?.();
+  const handleOnBlur = useCallback((e: React.FocusEvent) => {
+    // Only fire onBlur if focus is leaving the component entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onBlur?.();
+    }
   }, [onBlur]);
 
   const focus = useCallback(() => {

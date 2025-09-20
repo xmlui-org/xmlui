@@ -285,27 +285,17 @@ test("gotFocus event fires on focus", async ({ initTestBed, page, createFileInpu
   await expect.poll(testStateDriver.testState).toEqual("focused");
 });
 
-test.skip("component event handlers work correctly", async ({
-  initTestBed,
-  createFileInputDriver,
-}) => {
-  // FileInput gotFocus and lostFocus do not seem to work.
-  // TODO: Focus/blur event handling needs investigation
+test("lostFocus event fires on blue", async ({ initTestBed, page, createFileInputDriver }) => {
   const { testStateDriver } = await initTestBed(`
-    <FileInput 
-      onGotFocus="testState = 'focused'"
-      onLostFocus="testState = 'blurred'"
-    />
-  `);
-  const driver = await createFileInputDriver();
+      <FileInput testId="fileInput" onLostFocus="testState = 'blurred'" />
+    `);
 
-  // Focus and blur the wrapper button that triggers events
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').focus();
-  await expect.poll(testStateDriver.testState).toEqual("focused");
-
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').blur();
+  const driver = await createFileInputDriver("fileInput");
+  await driver.getTextBox().focus();
+  await driver.getTextBox().blur();
   await expect.poll(testStateDriver.testState).toEqual("blurred");
 });
+
 
 test("component supports custom button templates", async ({
   initTestBed,
