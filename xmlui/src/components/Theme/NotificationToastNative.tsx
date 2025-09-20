@@ -110,8 +110,10 @@ const CustomToastRenderer = ({
     return null;
   }
 
-  // Sort toasts by creation time, newest first (highest createdAt)
-  const sortedToasts = [...toasts].sort((a, b) => b.createdAt - a.createdAt);
+  // Sort toasts by creation time, newest first (highest createdAt) - only show visible toasts
+  const sortedToasts = [...toasts]
+    .filter(t => t.visible) // Only show visible toasts
+    .sort((a, b) => b.createdAt - a.createdAt);
 
   // Immediate detection during render - check for new toasts right now
   const currentToastIds = toasts.map((t) => t.id);
