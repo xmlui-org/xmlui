@@ -582,12 +582,11 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("option")).toHaveCount(2);
   });
 
-  test.skip("null values are handled gracefully", async ({
+  test("null values are handled gracefully", async ({
     initTestBed,
     page,
     createSelectDriver,
   }) => {
-    // This test is skipped because null values are converted to strings in XMLUI
     await initTestBed(`
       <Select>
         <Option label="{null}" value="null_label" />
@@ -602,12 +601,11 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("option", { name: "Valid Option" })).toBeVisible();
   });
 
-  test.skip("undefined values are handled gracefully", async ({
+  test("undefined values are handled gracefully", async ({
     initTestBed,
     page,
     createSelectDriver,
   }) => {
-    // This test is skipped because undefined values are converted to strings in XMLUI
     await initTestBed(`
       <Select>
         <Option label="{undefined}" value="undefined_label" />
