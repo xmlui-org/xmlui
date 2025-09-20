@@ -19,6 +19,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { NotificationToast } from "../Theme/NotificationToast";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -222,6 +223,7 @@ export const ModalDialog = React.forwardRef(
         <div className={styles.innerContent} style={{ gap: style?.gap }}>
           <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
             {children}
+            <NotificationToast />
           </ModalVisibilityContext.Provider>
         </div>
         {closeButtonVisible && (
