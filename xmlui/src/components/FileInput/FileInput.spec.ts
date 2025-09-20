@@ -31,7 +31,10 @@ test("component handles disabled state", async ({ initTestBed, createFileInputDr
   expect(await driver.isEnabled()).toBe(false);
 });
 
-test("component supports multiple file selection", async ({ initTestBed, createFileInputDriver }) => {
+test("component supports multiple file selection", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput multiple="true"/>`);
   const driver = await createFileInputDriver();
   expect(await driver.isMultiple()).toBe(true);
@@ -61,42 +64,62 @@ test("component accepts file type array", async ({ initTestBed, createFileInputD
 // ACCESSIBILITY TESTS (REQUIRED)
 // =============================================================================
 
-test("component has correct accessibility attributes", async ({ initTestBed, createFileInputDriver }) => {
+test("component has correct accessibility attributes", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput label="Upload Document"/>`);
   const driver = await createFileInputDriver();
-  await expect(driver.getBrowseButton()).toHaveRole('button');
-  await expect(driver.getHiddenInput()).toHaveAttribute('type', 'file');
+  await expect(driver.getBrowseButton()).toHaveRole("button");
+  await expect(driver.getHiddenInput()).toHaveAttribute("type", "file");
 });
 
-test.skip("component is keyboard accessible", async ({ initTestBed, createFileInputDriver }) => {
-  // TODO: Focus event handling needs investigation
-  const { testStateDriver } = await initTestBed(`
-    <FileInput onFocus="testState = 'focused'"/>
+test("component is keyboard accessible", async ({ page, initTestBed, createFileInputDriver }) => {
+  await initTestBed(`
+    <VStack>
+      <FileInput testId="fileInput" label="Input" />
+    </VStack>
   `);
-  const driver = await createFileInputDriver();
-  
-  // Focus the main wrapper button which has the focus handler
-  await driver.component.locator('button[class*="_textBoxWrapper_"]').focus();
-  await expect.poll(testStateDriver.testState).toEqual('focused');
+
+  const driver = await createFileInputDriver("fileInput");
+
+  await driver.getTextBox().focus();
+  await expect(driver.getTextBox()).toBeFocused();
 });
 
 test("component supports tab navigation", async ({ initTestBed, createFileInputDriver }) => {
-  await initTestBed(`<FileInput autoFocus="true"/>`);
-  const driver = await createFileInputDriver();
-  // Check that the component is focusable
+  await initTestBed(`
+    <VStack>
+      <FileInput testId="fileInput" label="Input" />
+    </VStack>
+  `);
+
+  const driver = await createFileInputDriver("fileInput");
+
+  await driver.getTextBox().focus();
+  await expect(driver.getTextBox()).toBeFocused();
+
+  await driver.getTextBox().press("Tab");
   await expect(driver.getBrowseButton()).toBeVisible();
   await expect(driver.getBrowseButton()).not.toBeDisabled();
+  await expect(driver.getBrowseButton()).toBeFocused();
 });
 
-test("component has hidden file input for screen readers", async ({ initTestBed, createFileInputDriver }) => {
+test("component has hidden file input for screen readers", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput/>`);
   const driver = await createFileInputDriver();
   const hiddenInput = driver.getHiddenInput();
   await expect(hiddenInput).toBeAttached();
-  await expect(hiddenInput).toHaveAttribute('type', 'file');
+  await expect(hiddenInput).toHaveAttribute("type", "file");
 });
 
-test("component textbox is readonly for accessibility", async ({ initTestBed, createFileInputDriver }) => {
+test("component textbox is readonly for accessibility", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput/>`);
   const driver = await createFileInputDriver();
   expect(await driver.hasReadOnlyAttribute()).toBe(true);
@@ -106,7 +129,10 @@ test("component textbox is readonly for accessibility", async ({ initTestBed, cr
 // VISUAL STATE TESTS
 // =============================================================================
 
-test("component applies theme variables correctly", async ({ initTestBed, createFileInputDriver }) => {
+test("component applies theme variables correctly", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput/>`, {
     testThemeVars: {
       "backgroundColor-Button": "rgb(255, 0, 0)",
@@ -125,7 +151,10 @@ test("component shows validation states", async ({ initTestBed, createFileInputD
   await expect(driver.getTextBox()).toBeVisible();
 });
 
-test("component supports different button variants", async ({ initTestBed, createFileInputDriver }) => {
+test("component supports different button variants", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput variant="outline"/>`);
   const driver = await createFileInputDriver();
   // Check that variant prop is passed through
@@ -133,7 +162,10 @@ test("component supports different button variants", async ({ initTestBed, creat
   await expect(driver.getBrowseButton()).toContainText("Browse");
 });
 
-test("component supports different button sizes", async ({ initTestBed, createFileInputDriver }) => {
+test("component supports different button sizes", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput buttonSize="lg"/>`);
   const driver = await createFileInputDriver();
   await expect(driver.getBrowseButton()).toHaveClass(/lg/);
@@ -149,7 +181,10 @@ test("component supports button positioning", async ({ initTestBed, createFileIn
 // EDGE CASE TESTS (CRITICAL)
 // =============================================================================
 
-test("component handles null and undefined props gracefully", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles null and undefined props gracefully", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput/>`);
   const driver = await createFileInputDriver();
   await expect(driver.component).toBeVisible();
@@ -162,14 +197,20 @@ test("component handles empty acceptsFileType", async ({ initTestBed, createFile
   expect(await driver.getAcceptedFileTypes()).toBe("");
 });
 
-test("component handles special characters in placeholder", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles special characters in placeholder", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput placeholder="Select file with émojis 🚀 & quotes"/>`);
   const driver = await createFileInputDriver();
   const placeholder = await driver.getPlaceholder();
   expect(placeholder).toBe("Select file with émojis 🚀 & quotes");
 });
 
-test("component handles conflicting multiple and directory props", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles conflicting multiple and directory props", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput multiple="false" directory="true"/>`);
   const driver = await createFileInputDriver();
   // Directory mode should enable multiple files
@@ -177,7 +218,10 @@ test("component handles conflicting multiple and directory props", async ({ init
   expect(await driver.isMultiple()).toBe(true);
 });
 
-test("component handles empty file selection gracefully", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles empty file selection gracefully", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`<FileInput/>`);
   const driver = await createFileInputDriver();
   expect(await driver.getSelectedFiles()).toBe("");
@@ -187,17 +231,20 @@ test("component handles empty file selection gracefully", async ({ initTestBed, 
 // PERFORMANCE TESTS
 // =============================================================================
 
-test("component handles rapid button clicks efficiently", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles rapid button clicks efficiently", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   const { testStateDriver } = await initTestBed(`
     <FileInput onFocus="testState = ++testState || 1"/>
   `);
   const driver = await createFileInputDriver();
-  
+
   // Multiple rapid clicks should not cause issues
   await driver.getBrowseButton().click();
   await driver.getBrowseButton().click();
   await driver.getBrowseButton().click();
-  
+
   await expect(driver.component).toBeVisible();
 });
 
@@ -205,7 +252,10 @@ test("component handles rapid button clicks efficiently", async ({ initTestBed, 
 // INTEGRATION TESTS
 // =============================================================================
 
-test("component works correctly in different layout contexts", async ({ initTestBed, createFileInputDriver }) => {
+test("component works correctly in different layout contexts", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`
     <VStack>
       <FileInput label="Layout Test"/>
@@ -225,7 +275,20 @@ test("component works in form context", async ({ initTestBed, createFileInputDri
   await expect(driver.component).toBeVisible();
 });
 
-test.skip("component event handlers work correctly", async ({ initTestBed, createFileInputDriver }) => {
+test("gotFocus event fires on focus", async ({ initTestBed, page, createFileInputDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+      <FileInput testId="fileInput" onGotFocus="testState = 'focused'" />
+    `);
+
+  const driver = await createFileInputDriver("fileInput");
+  await driver.getTextBox().focus();
+  await expect.poll(testStateDriver.testState).toEqual("focused");
+});
+
+test.skip("component event handlers work correctly", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   // FileInput gotFocus and lostFocus do not seem to work.
   // TODO: Focus/blur event handling needs investigation
   const { testStateDriver } = await initTestBed(`
@@ -235,16 +298,19 @@ test.skip("component event handlers work correctly", async ({ initTestBed, creat
     />
   `);
   const driver = await createFileInputDriver();
-  
+
   // Focus and blur the wrapper button that triggers events
   await driver.component.locator('button[class*="_textBoxWrapper_"]').focus();
-  await expect.poll(testStateDriver.testState).toEqual('focused');
-  
+  await expect.poll(testStateDriver.testState).toEqual("focused");
+
   await driver.component.locator('button[class*="_textBoxWrapper_"]').blur();
-  await expect.poll(testStateDriver.testState).toEqual('blurred');
+  await expect.poll(testStateDriver.testState).toEqual("blurred");
 });
 
-test("component supports custom button templates", async ({ initTestBed, createFileInputDriver }) => {
+test("component supports custom button templates", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`
     <FileInput>
       <property name="buttonIcon">
@@ -257,7 +323,10 @@ test("component supports custom button templates", async ({ initTestBed, createF
   await expect(driver.getBrowseButton()).toContainText("Browse");
 });
 
-test("component handles label positioning correctly", async ({ initTestBed, createFileInputDriver }) => {
+test("component handles label positioning correctly", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
   await initTestBed(`
     <FileInput 
       label="Upload Document"

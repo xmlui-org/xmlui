@@ -1,5 +1,5 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useId, useRef } from "react";
+import { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from "react";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -139,6 +139,11 @@ export const FileInput = ({
     updateState({ value: _initialValue }, { initial: true });
   }, [_initialValue, updateState]);
 
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
+
   const handleOnBlur = useCallback(() => {
     onBlur?.();
   }, [onBlur]);
@@ -167,11 +172,6 @@ export const FileInput = ({
     useFsAccessApi: directory === false,
   });
 
-  // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    onFocus?.();
-  }, [onFocus]);
-
   const doOpen = useEvent(() => {
     open();
   });
@@ -194,8 +194,6 @@ export const FileInput = ({
       labelBreak={labelBreak}
       required={required}
       enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
       style={style}
       className={className}
       isInputTemplateUsed={true}
@@ -205,13 +203,14 @@ export const FileInput = ({
           [styles.buttonStart]: buttonPosition === "start",
           [styles.buttonEnd]: buttonPosition === "end",
         })}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        tabIndex={-1}
       >
         <button
           id={id}
           {...getRootProps({
             tabIndex: 0,
-            onFocus: handleOnFocus,
-            onBlur: handleOnBlur,
             disabled: !enabled,
             className: styles.textBoxWrapper,
             onClick: open,

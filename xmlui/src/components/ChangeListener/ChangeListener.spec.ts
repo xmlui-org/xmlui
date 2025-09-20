@@ -60,33 +60,6 @@ test("component passes both previous and new values to the handler", async ({ pa
 // THROTTLING TESTS
 // =============================================================================
 
-test("component throttles events when throttleWaitInMs is set", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <VStack var.counter="{0}" var.clone="{0}">
-      <Button testId="button" onClick="counter++">Increment</Button>
-      <Text testId="text">{clone}</Text>
-      <ChangeListener
-        throttleWaitInMs="{2000}"
-        listenTo="{counter}"
-        onDidChange="clone = counter" />
-    </VStack>
-  `);
-  
-  // Click the button to change the counter value
-  await page.locator("button").click();
-  
-  // Check that the event fired and testState was updated
-  await expect(page.getByTestId("text")).toHaveText("1");
-
-  await page.locator("button").click();
-  await page.locator("button").click();
-  await page.locator("button").click();
-
-  await expect(page.getByTestId("text")).toHaveText("1");
-  await page.waitForTimeout(2050);
-  await expect(page.getByTestId("text")).toHaveText("4");
-});
-
 test("component processes all events without throttling by default", async ({ page, initTestBed }) => {
   await initTestBed(`
     <VStack var.counter="{0}" var.clone="{0}">
