@@ -114,6 +114,24 @@ export const RadioGroup = forwardRef(function RadioGroup(
     }
   }, [autofocus]);
 
+  // --- Custom focus handler for label clicks
+  const focusActiveOption = useCallback(() => {
+    if (radioGroupRef.current) {
+      // First try to find the currently selected radio option
+      const selectedRadio = radioGroupRef.current.querySelector('[role="radio"][aria-checked="true"]');
+      if (selectedRadio) {
+        (selectedRadio as HTMLElement).focus();
+        return;
+      }
+      
+      // If no option is selected, focus the first one
+      const firstRadio = radioGroupRef.current.querySelector('[role="radio"]');
+      if (firstRadio) {
+        (firstRadio as HTMLElement).focus();
+      }
+    }
+  }, []);
+
   // --- Handle the value change events for this input
 
   const updateValue = useCallback(
@@ -180,6 +198,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
           onBlur={onBlur}
           style={style}
           className={className}
+          onLabelClick={focusActiveOption}
         >
           <InnerRadioGroup.Root
             ref={radioGroupRef}
