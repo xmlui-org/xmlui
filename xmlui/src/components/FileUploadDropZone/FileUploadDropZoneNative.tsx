@@ -140,7 +140,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
 
   const rootRef = getComposedRef(ref, forwardedRef);
   return (
-    <div {...rootProps} ref={rootRef}>
+    <div {...rootProps} data-drop-enabled={!disabled} ref={rootRef}>
       <input {...getInputProps()} />
       {children}
       {(isDragActive && isDragAccept) && (

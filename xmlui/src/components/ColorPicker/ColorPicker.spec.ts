@@ -117,7 +117,7 @@ test("component is keyboard accessible", async ({ page, initTestBed }) => {
 // VISUAL STATE TESTS
 // =============================================================================
 
-test.skip("component shows different validation states correctly", async ({ page, initTestBed }) => {
+test("component shows different validation states correctly", async ({ page, initTestBed }) => {
   // Error state
   await initTestBed(`<ColorPicker validationStatus="error" />`, {});
   let colorInput = page.locator("input[type='color']");
