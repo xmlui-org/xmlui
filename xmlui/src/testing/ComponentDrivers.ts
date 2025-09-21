@@ -454,12 +454,38 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 
   async triggerDrop(files: string[] = ["test.txt"]) {
-    // Simulate file drop event
-    await this.component.dispatchEvent("drop", {
-      dataTransfer: {
-        files: files.map((name) => ({ name, type: "text/plain", size: 100 })),
-      },
+    // Simulate file drop event by creating File objects and using setInputFiles
+    const hiddenInput = this.getHiddenInput();
+    
+    // Create temporary files for testing
+    const fileObjects = files.map((name) => {
+      return {
+        name,
+        mimeType: "text/plain",
+        buffer: Buffer.from("test content")
+      };
     });
+    
+    // Set files on the hidden input
+    await hiddenInput.setInputFiles(fileObjects);
+    
+    // Trigger the drop event with a proper structure
+    await this.component.evaluate((element, fileNames) => {
+      // Create a proper drop event
+      const event = new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer()
+      });
+      
+      // Add files to dataTransfer if needed for component logic
+      fileNames.forEach((fileName: string) => {
+        const file = new File(["test content"], fileName, { type: "text/plain" });
+        event.dataTransfer?.items.add(file);
+      });
+      
+      element.dispatchEvent(event);
+    }, files);
   }
 
   async triggerPaste() {
