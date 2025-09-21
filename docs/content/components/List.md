@@ -1376,13 +1376,13 @@ Available values: `top` **(default)**, `bottom`
 
 ```xmlui /scrollAnchor="bottom"/
 <App>
-  <List scrollAnchor="bottom" data='{[...]}' />
+  <List scrollAnchor="bottom" data='{[...]}' height="300px" />
 </App>
 ```
 
-```xmlui-pg name="Example: scrollAnchor" height="400px"
+```xmlui-pg name="Example: scrollAnchor" height="380px"
 <App>
-  <List scrollAnchor="bottom" data='{[
+  <List scrollAnchor="bottom" height="300px" data='{[
   {
     id: 0,
     name: "Apples",
