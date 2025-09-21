@@ -242,7 +242,6 @@ import {
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
-import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
@@ -486,9 +485,6 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
       this.registerCoreComponent(carouselItemComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_RadioItem !== "false") {
-      this.registerCoreComponent(radioItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
