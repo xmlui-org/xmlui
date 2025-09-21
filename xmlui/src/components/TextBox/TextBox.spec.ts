@@ -724,31 +724,6 @@ test.describe("Edge Cases", () => {
     await page.getByRole("textbox").fill(veryLongText);
     await expect(page.getByRole("textbox")).toHaveValue(veryLongText);
   });
-
-  test.skip(
-    "component handles copy operation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<TextBox initialValue="copy this text" />`);
-      const textbox = page.getByRole("textbox");
-
-      await clipboard.copy(textbox);
-      expect(await clipboard.read()).toBe("copy this text");
-    },
-  );
-
-  test.skip(
-    "component handles paste operation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<TextBox />`);
-      const textbox = page.getByRole("textbox");
-
-      await clipboard.write("pasted text");
-      await clipboard.paste(textbox);
-      await expect(textbox).toHaveValue("pasted text");
-    },
-  );
 });
 
 // =============================================================================
