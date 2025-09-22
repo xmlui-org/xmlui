@@ -212,6 +212,20 @@ export const StateContainer = memo(
 
         console.log(`[StateContainer Render] Component '${node.uid}' rendering`, hierarchyInfo);
 
+        // Cascade detection for component renders
+        if (typeof logConfig === 'object' && logConfig !== null && logConfig.cascade) {
+          // Check if this is part of a cascade by looking at recent renders
+          const isExcessive = trackRenderFrequency(node.uid);
+          if (isExcessive) {
+            console.log(`[🔗 CASCADE DETECTED] Component '${node.uid}' is part of a render cascade`, {
+              likelyCause: 'query_invalidation_or_state_cascade',
+              interactionTriggered: interactionContext ? true : false,
+              hasChildren: (node.children?.length || 0) > 0,
+              childCount: node.children?.length || 0
+            });
+          }
+        }
+
         if (typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
           // Analyze what changed in parent state
           const parentStateKeys = Object.keys(parentState || {});

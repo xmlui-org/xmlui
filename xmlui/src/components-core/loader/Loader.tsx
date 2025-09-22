@@ -204,6 +204,20 @@ export function Loader({
         console.warn(`[🐌 SLOW RENDER] DataSource '${dataSourceId}' took ${renderDuration.toFixed(2)}ms`);
       }
     }, 0);
+
+    // Cascade detection for DataSource renders
+    if (typeof logConfig === 'object' && logConfig !== null && logConfig.cascade) {
+      // Check if this is part of a cascade by looking at recent renders
+      const recentRenders = dataSourceRenderCounts.get(dataSourceId);
+      if (recentRenders && recentRenders.count > 3) {
+        console.log(`[🔗 CASCADE DETECTED] DataSource '${dataSourceId}' is part of a render cascade`, {
+          renderCount: recentRenders.count,
+          timeWindow: RENDER_COUNT_WINDOW / 1000 + 's',
+          likelyCause: 'query_invalidation',
+          interactionTriggered: interactionContext ? true : false
+        });
+      }
+    }
   }
 
   const queryKey = useMemo(() => {
