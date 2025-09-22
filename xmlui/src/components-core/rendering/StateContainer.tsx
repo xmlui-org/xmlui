@@ -66,6 +66,10 @@ const renderCounts = new Map<string, { count: number; lastReset: number }>();
 const RENDER_COUNT_WINDOW = 5000; // 5 second window
 const EXCESSIVE_RENDER_THRESHOLD = 10;
 
+// Variable resolution cascade tracking
+const variableResolutionCounts = new Map<string, { count: number; lastReset: number }>();
+const VARIABLE_CASCADE_THRESHOLD = 5; // 5 rapid resolutions = cascade
+
 const trackRenderFrequency = (componentId: string): boolean => {
   const now = Date.now();
   const existing = renderCounts.get(componentId);
@@ -85,6 +89,21 @@ const trackRenderFrequency = (componentId: string): boolean => {
   }
 
   return isExcessive;
+};
+
+const trackVariableResolutionCascade = (componentId: string): boolean => {
+  const now = Date.now();
+  const existing = variableResolutionCounts.get(componentId);
+
+  if (!existing || now - existing.lastReset > RENDER_COUNT_WINDOW) {
+    variableResolutionCounts.set(componentId, { count: 1, lastReset: now });
+    return false;
+  }
+
+  const isCascade = existing.count >= VARIABLE_CASCADE_THRESHOLD;
+  existing.count++;
+
+  return isCascade;
 };
 
 /**
@@ -402,7 +421,7 @@ export const StateContainer = memo(
         if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.variables) {
           const interactionContext = getInteractionContext();
           console.log(`[🔄 REACTIVE CHANGE] State variable '${key}' changed`, {
-            component: node.uid,
+            component: node.uid || 'StateContainer',
             path: pathArray.join('.'),
             newValue: typeof newValue === 'object' ? `{${Object.keys(newValue || {}).join(', ')}}` : newValue,
             target: target,
@@ -629,12 +648,39 @@ function useVars(
       );
 
       if (nonStandardVars.length > 0) {
-        console.log(`[🔍 REACTIVE VARS] Resolving ${nonStandardVars.length} reactive variables`, {
-          component: componentUid || 'unknown',
-          variables: nonStandardVars,
-          interactionTriggered: !!interactionContext,
-          dependencyChain: 'state_change → variable_resolution → component_render'
-        });
+        // Better component identification - try multiple sources
+        const componentId = componentUid ||
+          (typeof window !== 'undefined' && (window as any).currentComponentUid) ||
+          'useVars-hook';
+
+        // Check for cascade in variable resolution using the identified component
+        const isCascade = trackVariableResolutionCascade(componentId);
+
+        // Get the current count for cascade detection
+        const now = Date.now();
+        const existing = variableResolutionCounts.get(componentId);
+        const isNewCascade = isCascade && existing && existing.count === VARIABLE_CASCADE_THRESHOLD;
+
+        // Only log variable resolution if it's not part of a cascade (to reduce noise)
+        if (!isCascade) {
+          console.log(`[🔍 REACTIVE VARS] Resolving ${nonStandardVars.length} reactive variables`, {
+            component: componentId,
+            variables: nonStandardVars,
+            interactionTriggered: !!interactionContext,
+            dependencyChain: 'state_change → variable_resolution → component_render'
+          });
+        }
+
+        // Log cascade detection only once when it starts
+        if (isNewCascade && varsLogConfig.cascade) {
+          console.log(`[🔗 VARIABLE CASCADE] Component '${componentId}' is resolving variables as part of a cascade`, {
+            component: componentId,
+            variables: nonStandardVars,
+            cascadeReason: 'rapid_variable_resolution',
+            interactionTriggered: !!interactionContext,
+            resolutionCount: existing.count
+          });
+        }
       }
     }
 
