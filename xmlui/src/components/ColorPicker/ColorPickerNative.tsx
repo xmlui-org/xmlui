@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -29,18 +29,16 @@ type Props = {
   readOnly?: boolean;
   enabled?: boolean;
   validationStatus?: ValidationStatus;
-  debounceDelayInMs?: number;
 };
 
 export const defaultProps: Pick<
   Props,
-  "initialValue" | "value" | "enabled" | "validationStatus" | "debounceDelayInMs"
+  "initialValue" | "value" | "enabled" | "validationStatus"
 > = {
   initialValue: "#000000",
   value: "#000000",
   enabled: true,
   validationStatus: "none",
-  debounceDelayInMs: 200,
 };
 
 export const ColorPicker = forwardRef(
@@ -65,13 +63,12 @@ export const ColorPicker = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
-      debounceDelayInMs = defaultProps.debounceDelayInMs,
       ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
     const inputRef = useRef(null);
-    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [isPending, startTransition] = useTransition();
 
     const updateValue = useCallback(
       (value: string) => {
@@ -81,42 +78,29 @@ export const ColorPicker = forwardRef(
       [onDidChange, updateState],
     );
 
-    const debouncedUpdateValue = useCallback(
+    const updateValueWithTransition = useCallback(
       (value: string, immediate = false) => {
-        if (debounceTimeoutRef.current) {
-          clearTimeout(debounceTimeoutRef.current);
-        }
-
         if (immediate) {
           updateValue(value);
         } else {
-          debounceTimeoutRef.current = setTimeout(() => {
+          startTransition(() => {
             updateValue(value);
-          }, debounceDelayInMs);
+          });
         }
       },
-      [updateValue, debounceDelayInMs],
+      [updateValue, startTransition],
     );
 
     const onInputChange = useCallback(
       (event: any) => {
-        debouncedUpdateValue(event.target.value);
+        updateValueWithTransition(event.target.value);
       },
-      [debouncedUpdateValue],
+      [updateValueWithTransition],
     );
 
     useEffect(() => {
       updateState({ value: initialValue }, { initial: true });
     }, [initialValue, updateState]);
-
-    // Cleanup timeout on unmount
-    useEffect(() => {
-      return () => {
-        if (debounceTimeoutRef.current) {
-          clearTimeout(debounceTimeoutRef.current);
-        }
-      };
-    }, []);
 
     // --- Manage obtaining and losing the focus
     const handleOnFocus = useCallback(() => {
@@ -124,11 +108,6 @@ export const ColorPicker = forwardRef(
     }, [onFocus]);
 
     const handleOnBlur = useCallback(() => {
-      // Immediately update state when focus is lost (flush any pending debounced update)
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-        debounceTimeoutRef.current = null;
-      }
       onBlur?.();
     }, [onBlur]);
 
@@ -137,7 +116,7 @@ export const ColorPicker = forwardRef(
     }, []);
 
     const setValue = useEvent((newValue) => {
-      debouncedUpdateValue(newValue, true); // Immediate update for programmatic changes
+      updateValueWithTransition(newValue, true); // Immediate update for programmatic changes
     });
 
     useEffect(() => {
