@@ -34,6 +34,27 @@ window.logReactivity = {
   stackTraces: true
 };
 
+// Quick setup helper for improved debugging
+window.setupReactivityDebugging = function(options = {}) {
+  console.log('[🔧 REACTIVITY DEBUG] Quick setup - use for focused debugging:', {
+    focusComponents: 'Array of component IDs to focus on',
+    level: 'minimal | detailed | verbose',
+    actionableOnly: 'boolean - only show logs with suggested actions'
+  });
+  
+  if (options.focusComponents && Array.isArray(options.focusComponents)) {
+    window.logReactivity.focusComponents = options.focusComponents;
+    console.log('[🎯 FOCUS] Only logging components:', options.focusComponents);
+  }
+  
+  if (options.actionableOnly) {
+    window.logReactivity.actionableOnly = true;
+    console.log('[💡 ACTIONABLE] Only showing logs with suggested actions');
+  }
+  
+  return 'Debugging configured! Open DevTools to see focused logs.';
+};
+
 // Global interaction tracking state
 window.lastInteractionTime = 0;
 window.lastInteractionType = '';

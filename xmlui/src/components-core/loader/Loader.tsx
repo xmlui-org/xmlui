@@ -16,6 +16,7 @@ import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
+import { ReactivityDebugger } from "../../debug/reactivity-debug";
 
 // Helper to check if render was triggered by recent user interaction
 const getInteractionContext = () => {
@@ -49,7 +50,7 @@ const trackDataSourceRenderFrequency = (dataSourceId: string): boolean => {
   const isExcessive = existing.count > EXCESSIVE_RENDER_THRESHOLD;
 
   if (isExcessive && existing.count === EXCESSIVE_RENDER_THRESHOLD + 1) {
-    console.warn(`[🚨 DATASOURCE STORM] DataSource '${dataSourceId}' rendered ${existing.count} times in ${RENDER_COUNT_WINDOW/1000}s`);
+    ReactivityDebugger.logRenderStorm(dataSourceId, existing.count, RENDER_COUNT_WINDOW);
   }
 
   return isExcessive;
@@ -264,25 +265,8 @@ export function Loader({
   useEffect(() => {
     // Simple reference comparison to avoid circular reference issues
     if (prevQueryKey && prevQueryKey !== queryKey) {
-      if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
-        const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
-        console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${dataSourceId}' queryKey changed:`);
-        console.log(`  Previous:`, prevQueryKey);
-        console.log(`  Current:`, queryKey);
-        console.log(`  URL:`, loader.props.url);
-        console.log(`  This will trigger a new API call`);
-
-        // Enhanced API call tracking
-        if (logConfig.apiTracking) {
-          console.log(`[🔄 API REFETCH] DataSource '${dataSourceId}' triggering new request`, {
-            url: loader.props.url,
-            reason: 'query_key_changed',
-            previousKey: prevQueryKey,
-            newKey: queryKey,
-            timestamp: Date.now()
-          });
-        }
-      }
+      const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+      ReactivityDebugger.logQueryKeyChange(dataSourceId, prevQueryKey, queryKey, loader.props.url);
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);
 
