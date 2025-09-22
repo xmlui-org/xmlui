@@ -157,5 +157,5 @@ test("collapsed in horizontal app layout if current page is same as link in grou
       </NavGroup>
     </App>`);
   await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
 });
