@@ -359,8 +359,10 @@ ${EXPECTED_VALUE2}
     `,
   });
 
-  const bodyText = await page.locator('body').innerText();
-  expect(bodyText).toBe(`${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`);
+  const bodyText = await page.locator("body").innerText();
+  expect(bodyText).toBe(
+    `${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`,
+  );
 });
 
 test("Markdown with a single+default slot", async ({ page, initTestBed }) => {
@@ -699,4 +701,33 @@ test("$this works in Queue event handler", async ({ page, initTestBed }) => {
   await page.getByTestId("button").click();
   await expect(page.getByTestId("processed")).toHaveText("2");
   await expect(page.getByTestId("queueLength")).toHaveText("0");
+});
+
+test("method works with script", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `
+    <Fragment var.msg="">
+      <MyComp id="myComp"/>
+      <Button testId="trigger" onClick="() => msg = myComp.greet()">Greet</Button>
+      <H2 testId="greeting">{msg}</H2>
+    </Fragment>
+  `,
+    {
+      components: [
+        `
+        <Component name="MyComp">
+          <script>
+            var hello="Hello from MyComp!"
+          </script>
+          <Text>{hello}</Text>
+          <method name="greet">() => hello</method>
+        </Component>
+      `,
+      ],
+    },
+  );
+
+  const button = page.getByTestId("trigger");
+  await button.click();
+  await expect(page.getByTestId("greeting")).toHaveText("Hello from MyComp!");
 });

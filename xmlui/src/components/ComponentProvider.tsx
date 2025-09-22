@@ -973,13 +973,17 @@ export class ComponentRegistry {
     { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
     namespace: string,
   ) {
+    console.log(
+      `Registering compound component ${compoundComponentDef.name}`,
+      compoundComponentDef,
+    );
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
         return (
           <CompoundComponent
             api={compoundComponentDef.api}
-            scriptCollected={compoundComponentDef.scriptCollected}
+            scriptCollected={compoundComponentDef.component.scriptCollected}
             compound={compoundComponentDef.component as ComponentDef}
             {...rendererContext}
           />
