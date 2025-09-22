@@ -1,5 +1,20 @@
 # xmlui-vscode
 
+## 0.10.13
+
+### Patch Changes
+
+- Updated dependencies [9401ee0]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [243b7fa]
+- Updated dependencies [eb62858]
+  - xmlui@0.10.13
+
 ## 0.10.12
 
 ### Patch Changes
