@@ -66,7 +66,7 @@ export const CompoundComponent = forwardRef(
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
-      const containerNode: ContainerWrapperDef = {
+      return {
         type: "Container",
         uses: EMPTY_ARRAY,
         api,
@@ -81,8 +81,6 @@ export const CompoundComponent = forwardRef(
         },
         children: [rest],
       };
-      console.log("Compound container node", containerNode, "rest", rest, "sc", scriptCollected);
-      return containerNode;
     }, [api, compound, scriptCollected, uid]);
 
     const emitEvent = useEvent((eventName, ...args) => {
