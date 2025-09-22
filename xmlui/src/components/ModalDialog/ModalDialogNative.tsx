@@ -199,7 +199,7 @@ export const ModalDialog = React.forwardRef(
         onPointerDownOutside={(event) => {
           if (
             event.target instanceof Element &&
-            event.target.closest("._debug-inspect-button") !== null
+            (event.target.closest("._debug-inspect-button") !== null || event.target.localName === "com-1password-button")
           ) {
             //we prevent the auto modal close on clicking the inspect button
             event.preventDefault();
