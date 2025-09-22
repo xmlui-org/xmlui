@@ -19,11 +19,16 @@ export interface ReactivityDebugConfig {
 
 export class ReactivityDebugger {
   private static config: ReactivityDebugConfig = {
-    enabled: false,
+    enabled: true,  // Changed: enable by default but with smart defaults
     level: 'minimal',
-    focus: {},
+    focus: {
+      renderStorms: true,  // Always show render storms - they're critical
+      apiCalls: true,      // Always show API issues - they're actionable
+      stateChanges: false, // Off by default - too noisy
+      userInteractions: false // Off by default - too noisy
+    },
     output: {
-      actionable: true,
+      actionable: true,      // Only show actionable logs by default
       correlateEvents: true,
       suppressNoisy: true
     }

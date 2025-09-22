@@ -2,9 +2,23 @@
 
 A centralized debugging system for XMLUI reactivity issues, focused on providing actionable insights rather than overwhelming logs.
 
+## Default Behavior (No Configuration Needed)
+
+**✅ WITHOUT any setup, you'll see:**
+- 🚨 Render storms with suggested fixes
+- 🔄 Unnecessary API refetches with explanations  
+- 🔗 Render cascades that might indicate problems
+- 💡 Only logs that include actionable suggestions
+
+**❌ You WON'T see (unless you configure it):**
+- Verbose component render logs
+- Every state change (too noisy)
+- All user interactions (too noisy)
+- Stack traces (use `verbose` level for these)
+
 ## Quick Start
 
-The debugging system is automatically initialized. In your browser console, use:
+The debugging system works out of the box with smart defaults. To customize:
 
 ```javascript
 // Focus debugging on specific components only
@@ -13,10 +27,16 @@ setupReactivityDebugging({
   actionableOnly: true
 })
 
-// Example: Debug only render storms for a specific component
+// See everything (verbose mode)
 setupReactivityDebugging({
-  focusComponents: ['problematic-component'],
-  level: 'detailed'
+  level: 'verbose',
+  focusComponents: ['problematic-component']
+})
+
+// Debug all state changes (noisy but thorough)
+setupReactivityDebugging({
+  level: 'detailed',
+  actionableOnly: false
 })
 ```
 

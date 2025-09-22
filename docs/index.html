@@ -16,22 +16,22 @@
   <script>
 window.logReactivity = {
   enabled: true,
-  components: true,
-  stateChanges: true,
-  queryKeys: true,
-  variables: true,
+  components: false,        // Off by default - too noisy
+  stateChanges: false,      // Off by default - too noisy  
+  queryKeys: true,          // Keep - shows API refetches
+  variables: false,         // Off by default - too noisy
   routing: false,
-  apiTracking: true,
-  dataFlow: true,
+  apiTracking: true,        // Keep - actionable API insights
+  dataFlow: false,          // Off by default - too noisy
   userInteractions: {
-    enabled: true,
-    domEvents: true,           // Global DOM capture
-    reactEvents: true,         // React synthetic events
-    xmluiEvents: true,        // XMLUI component events
-    correlateWithRenders: true // Link interactions to subsequent renders
+    enabled: false,         // Off by default - too noisy
+    domEvents: false,
+    reactEvents: false,
+    xmluiEvents: false,
+    correlateWithRenders: true
   },
-  cascade: true,
-  stackTraces: true
+  cascade: true,            // Keep - shows render cascades
+  stackTraces: false        // Off by default - use 'verbose' level for these
 };
 
 // Quick setup helper for improved debugging
