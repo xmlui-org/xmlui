@@ -127,21 +127,12 @@ export function Loader({
       (appContext as any)?.[key] !== (prevAppContext as any)?.[key]
     );
 
-    console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${dataSourceId}':`, {
-      timestamp: Date.now(),
-      contextChanged: true,
-      changedKeys: changedKeys.length > 0 ? changedKeys : 'reference_change',
-      triggerChain: logConfig.causality ? 'appContext → queryKey → refetch' : undefined
-    });
-
-    // Track data source behavior patterns
-    if (logConfig.dataFlow) {
-      console.log(`[🌐 DATA SOURCE BEHAVIOR] '${dataSourceId}' context change`, {
-        url: loader.props.url,
-        changeType: 'context_driven_refetch',
-        dataFlow: 'external_api → component_state'
-      });
-    }
+    // Use ReactivityDebugger for app context changes
+    ReactivityDebugger.logQueryInvalidation(
+      dataSourceId, 
+      'app_context_change', 
+      `keys: ${changedKeys.length > 0 ? changedKeys.join(',') : 'reference_change'}`
+    );
   }
 
   // Enhanced state change tracking
@@ -149,22 +140,12 @@ export function Loader({
   if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevState && prevState !== state) {
     const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
 
-    // Analyze state changes
-    const stateKeys = Object.keys(state || {});
-    const prevStateKeys = Object.keys(prevState || {});
-    const addedKeys = stateKeys.filter(k => !prevStateKeys.includes(k));
-    const removedKeys = prevStateKeys.filter(k => !stateKeys.includes(k));
-    const changedKeys = stateKeys.filter(k =>
-      prevStateKeys.includes(k) && (state as any)?.[k] !== (prevState as any)?.[k]
+    // Use ReactivityDebugger for state changes
+    ReactivityDebugger.logQueryInvalidation(
+      dataSourceId,
+      'component_state_change',
+      'local_state_updated'
     );
-
-    console.log(`[🚨 STATE CHANGED] DataSource '${dataSourceId}':`, {
-      timestamp: Date.now(),
-      stateChanged: true,
-      added: addedKeys.length > 0 ? addedKeys : undefined,
-      removed: removedKeys.length > 0 ? removedKeys : undefined,
-      changed: changedKeys.length > 0 ? changedKeys : 'reference_change'
-    });
   }
 
   // Enhanced render logging with deduplication and performance tracking
