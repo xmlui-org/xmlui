@@ -254,6 +254,16 @@ export const StateContainer = memo(
               interactionType: "parent_to_child_state_flow",
             });
           }
+
+          // Track reactive flow from state changes to renders
+          if (typeof logConfig === 'object' && logConfig !== null && logConfig.variables) {
+            console.log(`[⚡ REACTIVE FLOW] Component '${node.uid}' re-rendered due to reactive changes`, {
+              component: node.uid,
+              interactionTriggered: interactionContext ? true : false,
+              renderReason: interactionContext ? 'user_interaction' : 'reactive_state_change',
+              flow: 'state_change → variable_resolution → component_render → ui_update'
+            });
+          }
         }
 
         // Flag slow renders
@@ -387,6 +397,22 @@ export const StateContainer = memo(
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
+
+        // Track reactive variable changes
+        if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.variables) {
+          const interactionContext = getInteractionContext();
+          console.log(`[🔄 REACTIVE CHANGE] State variable '${key}' changed`, {
+            component: node.uid,
+            path: pathArray.join('.'),
+            newValue: typeof newValue === 'object' ? `{${Object.keys(newValue || {}).join(', ')}}` : newValue,
+            target: target,
+            action: action,
+            interactionTriggered: !!interactionContext,
+            isLocal: key in componentStateRef.current || key in resolvedLocalVars,
+            willPropagate: !node.uses || node.uses.includes(key)
+          });
+        }
+
         if (key in componentStateRef.current || key in resolvedLocalVars) {
           // --- Sign that a state field (or a part of it) has changed
           dispatch({
@@ -405,7 +431,7 @@ export const StateContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, node.uses, parentStatePartChanged],
+      [resolvedLocalVars, node.uses, parentStatePartChanged, logConfig, node.uid],
     );
 
     return (
@@ -595,17 +621,21 @@ function useVars(
 
   const varsLogConfig = getLogReactivity();
   const resolvedVars = useMemo(() => {
-    // Only log resolution triggers for slow variables or when explicitly enabled
-    if (
-      varsLogConfig &&
-      typeof varsLogConfig === "object" &&
-      varsLogConfig !== null &&
-      varsLogConfig.variables &&
-      varsLogConfig.verbose
-    ) {
-      setTimeout(() => {
-        console.log(`[🚀 RESOLUTION TRIGGER] Variable resolution triggered by dependency change`);
-      }, 0);
+    // Track reactive variable resolution
+    if (varsLogConfig && typeof varsLogConfig === "object" && varsLogConfig !== null && varsLogConfig.variables) {
+      const interactionContext = getInteractionContext();
+      const nonStandardVars = Object.keys(vars).filter(
+        (key) => !["$props", "emitEvent", "hasEventHandler", "updateState"].includes(key),
+      );
+
+      if (nonStandardVars.length > 0) {
+        console.log(`[🔍 REACTIVE VARS] Resolving ${nonStandardVars.length} reactive variables`, {
+          component: componentUid || 'unknown',
+          variables: nonStandardVars,
+          interactionTriggered: !!interactionContext,
+          dependencyChain: 'state_change → variable_resolution → component_render'
+        });
+      }
     }
 
     if (
@@ -623,6 +653,11 @@ function useVars(
         setTimeout(() => {
           const resolutionDuration = performance.now() - resolutionStart;
 
+          // Check conditions for logging
+          const isSlowResolution = resolutionDuration > 20;
+          const isCascade = componentUid ? trackRenderFrequency(componentUid) : false;
+          const interactionContext = getInteractionContext();
+
           // Analyze variable content and complexity
           const variableAnalysis = nonStandardVars.map((varName) => {
             const varValue = vars[varName];
@@ -639,30 +674,7 @@ function useVars(
             return analysis;
           });
 
-          console.log("[useVars Resolution] Starting variable resolution for:", nonStandardVars, {
-            variableCount: nonStandardVars.length,
-            resolutionTime: resolutionDuration.toFixed(2) + "ms",
-            dependencyChain: "vars → componentState → resolvedVars",
-            variableAnalysis: variableAnalysis,
-          });
-
-          // Flag performance issues
-          if (nonStandardVars.length > 10) {
-            console.warn(
-              `[⚠️ MANY VARIABLES] Resolving ${nonStandardVars.length} variables may impact performance`,
-            );
-          }
-          if (resolutionDuration > 20) {
-            console.warn(
-              `[⚠️ SLOW VARIABLE RESOLUTION] Resolution took ${resolutionDuration.toFixed(2)}ms`,
-              {
-                slowVariables: variableAnalysis.filter(
-                  (v: any) =>
-                    (v.type === "array" && v.length > 100) || (v.type === "object" && v.keys > 50),
-                ),
-              },
-            );
-          }
+          // Variable resolution logging disabled - focus on higher-level reactive flow instead
         }, 0);
       }
     }
@@ -997,10 +1009,6 @@ function useVars(
             return analysis;
           });
 
-          console.log("[✅ useVars Resolution Complete]", {
-            resolvedVariables: nonStandardVars,
-            resolvedAnalysis: resolvedAnalysis,
-          });
         }, 0);
       }
     }
