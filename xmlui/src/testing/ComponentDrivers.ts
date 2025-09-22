@@ -454,12 +454,38 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 
   async triggerDrop(files: string[] = ["test.txt"]) {
-    // Simulate file drop event
-    await this.component.dispatchEvent("drop", {
-      dataTransfer: {
-        files: files.map((name) => ({ name, type: "text/plain", size: 100 })),
-      },
+    // Simulate file drop event by creating File objects and using setInputFiles
+    const hiddenInput = this.getHiddenInput();
+    
+    // Create temporary files for testing
+    const fileObjects = files.map((name) => {
+      return {
+        name,
+        mimeType: "text/plain",
+        buffer: Buffer.from("test content")
+      };
     });
+    
+    // Set files on the hidden input
+    await hiddenInput.setInputFiles(fileObjects);
+    
+    // Trigger the drop event with a proper structure
+    await this.component.evaluate((element, fileNames) => {
+      // Create a proper drop event
+      const event = new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer()
+      });
+      
+      // Add files to dataTransfer if needed for component logic
+      fileNames.forEach((fileName: string) => {
+        const file = new File(["test content"], fileName, { type: "text/plain" });
+        event.dataTransfer?.items.add(file);
+      });
+      
+      element.dispatchEvent(event);
+    }, files);
   }
 
   async triggerPaste() {
@@ -514,18 +540,22 @@ export class FormDriver extends ComponentDriver {
     );
   }
 
-  getSubmitButton() {
-    return this.component.locator("button[type='submit']");
+  get submitButton() {
+    return this.getByPartName("submitButton");
+  }
+
+  get cancelButton() {
+    return this.getByPartName("cancelButton");
   }
 
   async hasSubmitButton() {
-    return (await this.getSubmitButton().count()) > 0;
+    return (await this.submitButton.count()) > 0;
   }
 
   async submitForm(trigger: SubmitTrigger = "click") {
     if (trigger === "keypress") {
-      if ((await this.hasSubmitButton()) && (await this.getSubmitButton().isEnabled())) {
-        await this.getSubmitButton().focus();
+      if ((await this.hasSubmitButton()) && (await this.submitButton.isEnabled())) {
+        await this.submitButton.focus();
       }
       await this.locator.locator("input").waitFor();
       const firstInputChild = this.locator.locator("input");
@@ -534,7 +564,7 @@ export class FormDriver extends ComponentDriver {
       }
       await this.page.keyboard.press("Enter");
     } else if (trigger === "click") {
-      await this.getSubmitButton().click();
+      await this.submitButton.click();
     }
   }
 

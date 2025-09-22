@@ -64,6 +64,7 @@ import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
 import { TimerDriver } from "./drivers/TimerDriver";
 import { DateInputDriver } from "./drivers/DateInputDriver";
+import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 
 export { expect } from "./assertions";
 
@@ -543,7 +544,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(DateInputDriver, testIdOrLocator);
     });
-  }
+  },
+  createModalDialogDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ModalDialogDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -619,4 +625,5 @@ type TestDriverExtenderProps = {
   createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
   createTimerDriver: ComponentDriverMethod<TimerDriver>;
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
+  createModalDialogDriver: ComponentDriverMethod<ModalDialogDriver>;
 };

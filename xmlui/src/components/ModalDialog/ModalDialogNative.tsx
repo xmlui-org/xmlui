@@ -20,6 +20,9 @@ import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 
+const PART_TITLE = "title";
+const PART_CONTENT = "content";
+
 // Default props for ModalDialog component
 export const defaultProps = {
   fullScreen: false,
@@ -130,9 +133,9 @@ export const ModalDialog = React.forwardRef(
       fullScreen = defaultProps.fullScreen,
       title,
       closeButtonVisible = defaultProps.closeButtonVisible,
+      className,
       onOpen,
       onClose,
-      className,
       ...rest
     }: ModalProps,
     ref,
@@ -195,6 +198,7 @@ export const ModalDialog = React.forwardRef(
     const Content = (
       <Dialog.Content
         {...rest}
+        data-part-id={PART_CONTENT}
         className={classnames(styles.content, className)}
         onPointerDownOutside={(event) => {
           if (
@@ -210,7 +214,7 @@ export const ModalDialog = React.forwardRef(
       >
         {!!title && (
           <Dialog.Title style={{ marginTop: 0 }}>
-            <header id="dialogTitle" className={styles.dialogTitle}>
+            <header id="dialogTitle" className={styles.dialogTitle} data-part-id={PART_TITLE}>
               {title}
             </header>
           </Dialog.Title>

@@ -814,7 +814,10 @@ async function evalTemplateLiteralAsync(
     const evaledValue = await completeExprValue(expr.segments[i], thread);
     segmentValues[i] = evaledValue;
   }
-  return evalTemplateLiteralCore(segmentValues);
+  const value = evalTemplateLiteralCore(segmentValues);
+  setExprValue(expr, { value }, thread);
+  thisStack.push(value);
+  return value;
 }
 
 export async function completeExprValue(expr: Expression, thread: LogicalThread): Promise<any> {

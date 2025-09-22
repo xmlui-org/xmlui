@@ -16,6 +16,14 @@ export const ModalDialogMd = createMetadata({
     "ideal for forms, confirmations, detailed views, or any content that requires " +
     "focused user attention. Dialogs are programmatically opened using the `open()` " +
     "method and can receive parameters for dynamic content.",
+    parts: {
+    content: {
+      description: "The main content area of the modal dialog.",
+    },
+    title: {
+      description: "The title area of the modal dialog.",
+    }
+  },
   props: {
     fullScreen: {
       description:

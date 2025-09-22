@@ -65,7 +65,6 @@ import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdap
 import { formComponentRenderer } from "./Form/Form";
 import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
-import { numberBox2ComponentRenderer } from "./NumberBox/NumberBox2";
 import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
 import { navPanelRenderer } from "./NavPanel/NavPanel";
@@ -243,7 +242,6 @@ import {
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
-import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
@@ -488,9 +486,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
       this.registerCoreComponent(carouselItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_RadioItem !== "false") {
-      this.registerCoreComponent(radioItemComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
@@ -554,7 +549,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
-      this.registerCoreComponent(numberBox2ComponentRenderer);
       this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
       this.registerCoreComponent(fileInputRenderer);

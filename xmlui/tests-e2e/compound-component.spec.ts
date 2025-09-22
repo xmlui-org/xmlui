@@ -363,44 +363,6 @@ ${EXPECTED_VALUE2}
   expect(bodyText).toBe(`${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`);
 });
 
-// NOTE: This fails because initTestBed has a hidden Text component that has null in it, and Playwright sees that.
-/* test.fixme(
-  "Markdown with multiple slots - fix!",
-  SKIP_REASON.TEST_NOT_WORKING("Second EXPECTED_VALUE2 has a null at the end"),
-  async ({ page, initTestBed }) => {
-    const EXPECTED_VALUE1 = "Hello, world!";
-    const EXPECTED_VALUE2 = "Here I am";
-    await initTestBed(
-      `
-      <Custom>
-        <![CDATA[
-## ${EXPECTED_VALUE1}
-
-${EXPECTED_VALUE2}
-        ]]>
-      </Custom>
-    `,
-      {
-        components: [
-          `
-      <Component name="Custom">
-        <VStack>
-          <Markdown>
-            <Slot />
-            <Slot />
-          </Markdown>
-        </VStack>
-      </Component>
-    `,
-        ],
-      },
-    );
-    expect(page.locator("body")).toHaveText(
-      `${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`,
-    );
-  },
-); */
-
 test("Markdown with a single+default slot", async ({ page, initTestBed }) => {
   const EXPECTED_VALUE1 = "Howdy!";
   const EXPECTED_VALUE2 = "Hello, world!";

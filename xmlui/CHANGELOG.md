@@ -1,5 +1,32 @@
 # xmlui
 
+## 0.10.12
+
+### Patch Changes
+
+- f12a042: fix: report errors in script tag
+- 8731eb8: Avatar does not issue a resource URL warning when "url" is not specified
+- eb6454f: refactor: change LineChart/BarChart property names
+- 1210852: Fix the layout property usage of ModalDialog
+
+## 0.10.11
+
+### Patch Changes
+
+- 8c76c8d: feat: style the error report colors and spaces in the browser for xmlui syntax errors
+- d56c3e5: RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.
+- e42d367: Add FancyButton to xmlui-website-blocks
+- f539526: feat: BarChart - add tooltip position tracking
+- 19ce234: Review Option handling in Select and RadioGroup
+- 455b6c0: feat: add animation support to all relevant components via animation and animationOptions props
+- e90dc73: feat: add support for 'uses' property
+- 819b563: Update fontSize and lineHeight themes and style (may break existing xmlui code)
+- b57dfa2: Add the autoDetectTone property to App
+- 9dd0f97: Update Checkbox and Switch with click event metadata
+- 19ce234: Select accepts null as an option value; it converts a value to a string no longer
+- 898346d: Extend Text and Heading APIs with hasOverflow
+- 705dd04: Fix RestApiProxy to deliver response status when no error body specified
+
 ## 0.10.10
 
 ### Patch Changes

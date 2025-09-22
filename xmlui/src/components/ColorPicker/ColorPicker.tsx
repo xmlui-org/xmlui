@@ -77,8 +77,8 @@ export const colorPickerComponentRenderer = createComponentRenderer(
     registerComponentApi,
     updateState,
   }) => {
+    const readOnly = extractValue.asOptionalBoolean(node.props?.readOnly, false);
     const enabled = extractValue.asOptionalBoolean(node.props?.enabled, true);
-    const readonly = extractValue.asOptionalBoolean(node.props?.readOnly, false);
     return (
       <ColorPicker
         validationStatus={extractValue(node.props.validationStatus)}
@@ -91,7 +91,8 @@ export const colorPickerComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         className={className}
         required={extractValue.asOptionalBoolean(node.props?.required)}
-        enabled={enabled && !readonly}
+        enabled={enabled && !readOnly}
+        readOnly={readOnly}
         autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}
         label={extractValue(node.props?.label)}
         labelPosition={extractValue(node.props?.labelPosition)}

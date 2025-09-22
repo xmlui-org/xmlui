@@ -29,16 +29,18 @@ type Props = {
   readOnly?: boolean;
   enabled?: boolean;
   validationStatus?: ValidationStatus;
+  debounceDelayInMs?: number;
 };
 
 export const defaultProps: Pick<
   Props,
-  "initialValue" | "value" | "enabled" | "validationStatus"
+  "initialValue" | "value" | "enabled" | "validationStatus" | "debounceDelayInMs"
 > = {
   initialValue: "#000000",
   value: "#000000",
   enabled: true,
   validationStatus: "none",
+  debounceDelayInMs: 200,
 };
 
 export const ColorPicker = forwardRef(
@@ -52,9 +54,10 @@ export const ColorPicker = forwardRef(
       onBlur = noop,
       registerComponentApi,
       enabled = defaultProps.enabled,
+      readOnly,
       value = defaultProps.value,
       autoFocus,
-      tabIndex = -1,
+      tabIndex = 0,
       label,
       labelPosition,
       labelWidth,
@@ -62,11 +65,13 @@ export const ColorPicker = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
+      debounceDelayInMs = defaultProps.debounceDelayInMs,
       ...rest
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
     const inputRef = useRef(null);
+    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const updateValue = useCallback(
       (value: string) => {
@@ -76,16 +81,42 @@ export const ColorPicker = forwardRef(
       [onDidChange, updateState],
     );
 
+    const debouncedUpdateValue = useCallback(
+      (value: string, immediate = false) => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+
+        if (immediate) {
+          updateValue(value);
+        } else {
+          debounceTimeoutRef.current = setTimeout(() => {
+            updateValue(value);
+          }, debounceDelayInMs);
+        }
+      },
+      [updateValue, debounceDelayInMs],
+    );
+
     const onInputChange = useCallback(
       (event: any) => {
-        updateValue(event.target.value);
+        debouncedUpdateValue(event.target.value);
       },
-      [updateValue],
+      [debouncedUpdateValue],
     );
 
     useEffect(() => {
       updateState({ value: initialValue }, { initial: true });
     }, [initialValue, updateState]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+      return () => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+      };
+    }, []);
 
     // --- Manage obtaining and losing the focus
     const handleOnFocus = useCallback(() => {
@@ -93,6 +124,11 @@ export const ColorPicker = forwardRef(
     }, [onFocus]);
 
     const handleOnBlur = useCallback(() => {
+      // Immediately update state when focus is lost (flush any pending debounced update)
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
+      }
       onBlur?.();
     }, [onBlur]);
 
@@ -101,7 +137,7 @@ export const ColorPicker = forwardRef(
     }, []);
 
     const setValue = useEvent((newValue) => {
-      updateValue(newValue);
+      debouncedUpdateValue(newValue, true); // Immediate update for programmatic changes
     });
 
     useEffect(() => {
@@ -137,14 +173,15 @@ export const ColorPicker = forwardRef(
           disabled={!enabled}
           onFocus={handleOnFocus}
           onChange={onInputChange}
+          readOnly={readOnly}
           autoFocus={autoFocus}
+          tabIndex={tabIndex}
           onBlur={handleOnBlur}
           required={required}
           type="color"
           inputMode="text"
           ref={inputRef}
           value={value}
-          tabIndex={tabIndex}
         />
       </ItemWithLabel>
     );

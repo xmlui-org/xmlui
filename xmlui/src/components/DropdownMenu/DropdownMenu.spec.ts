@@ -58,7 +58,8 @@ test("handles menu item clicks", async ({ initTestBed, createDropdownMenuDriver,
   await expect.poll(testStateDriver.testState).toEqual("item1-clicked");
 
   // Menu should close after click
-  await expect(page.getByRole("menuitem")).not.toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).not.toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2" })).not.toBeVisible();
 });
 
 test("alignment='start' aligns popup menu left", async ({

@@ -106,6 +106,7 @@ export const radioGroupRenderer = createComponentRenderer(
   }) => {
     return (
       <RadioGroup
+        autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         className={className}
         initialValue={extractValue(node.props.initialValue)}

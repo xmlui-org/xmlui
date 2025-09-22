@@ -4,6 +4,8 @@ import { forwardRef, useEffect, useState } from "react";
 import styles from "./Spinner.module.scss";
 import classnames from "classnames";
 
+const PART_RING = "ring";
+
 export const defaultProps = {
   delay: 400,
   fullScreen: false,
@@ -54,7 +56,7 @@ export const Spinner = forwardRef(function Spinner(
             style={style}
             ref={forwardedRef}
           >
-            <div></div>
+            <div data-part-id={PART_RING}></div>
             <div></div>
             <div></div>
             <div></div>
@@ -71,7 +73,7 @@ export const Spinner = forwardRef(function Spinner(
         style={style}
         ref={forwardedRef}
       >
-        <div></div>
+        <div data-part-id={PART_RING}></div>
         <div></div>
         <div></div>
         <div></div>
