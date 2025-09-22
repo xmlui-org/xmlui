@@ -51,8 +51,11 @@ import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 const getInteractionContext = () => {
   if (typeof window === 'undefined') return null;
 
-  const timeSinceInteraction = Date.now() - (window as any).lastInteractionTime;
-  const isInteractionTriggered = timeSinceInteraction < 2000; // Within 2 seconds
+  const lastInteractionTime = (window as any).lastInteractionTime;
+  if (!lastInteractionTime) return null;
+
+  const timeSinceInteraction = Date.now() - lastInteractionTime;
+  const isInteractionTriggered = timeSinceInteraction < 5000; // Within 5 seconds
 
   return isInteractionTriggered ? {
     interactionType: (window as any).lastInteractionType,
@@ -100,8 +103,8 @@ const trackVariableResolutionCascade = (componentId: string): boolean => {
     return false;
   }
 
-  const isCascade = existing.count >= VARIABLE_CASCADE_THRESHOLD;
   existing.count++;
+  const isCascade = existing.count >= VARIABLE_CASCADE_THRESHOLD;
 
   return isCascade;
 };
