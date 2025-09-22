@@ -103,9 +103,10 @@ export class ReactivityDebugger {
     componentId: string,
     message: string,
     data: any,
-    suggestedAction?: string
+    suggestedAction?: string,
+    logCategory: keyof ReactivityDebugConfig['focus'] = 'stateChanges'
   ) {
-    if (!this.shouldLog('stateChanges', componentId)) return;
+    if (!this.shouldLog(logCategory, componentId)) return;
 
     // Check if we should only show actionable logs
     const windowConfig = typeof window !== 'undefined' ? (window as any).logReactivity : null;
@@ -166,7 +167,8 @@ export class ReactivityDebugger {
       componentId,
       `${renderCount} renders in ${timeWindow/1000}s`,
       { renderCount, timeWindow, threshold: this.RENDER_STORM_THRESHOLD },
-      suggestedAction
+      suggestedAction,
+      'renderStorms'
     );
   }
 
@@ -187,7 +189,8 @@ export class ReactivityDebugger {
         url,
         changeType: typeof oldKey !== typeof newKey ? 'type_change' : 'value_change'
       },
-      suggestedAction
+      suggestedAction,
+      'apiCalls'
     );
   }
 
