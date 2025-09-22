@@ -47,6 +47,20 @@ import {
 } from "./ContainerWrapper";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 
+// Helper to check if render was triggered by recent user interaction
+const getInteractionContext = () => {
+  if (typeof window === 'undefined') return null;
+
+  const timeSinceInteraction = Date.now() - (window as any).lastInteractionTime;
+  const isInteractionTriggered = timeSinceInteraction < 2000; // Within 2 seconds
+
+  return isInteractionTriggered ? {
+    interactionType: (window as any).lastInteractionType,
+    timeSinceInteraction,
+    target: (window as any).lastInteractionTarget
+  } : null;
+};
+
 // Render frequency tracking for detecting excessive re-renders
 const renderCounts = new Map<string, { count: number; lastReset: number }>();
 const RENDER_COUNT_WINDOW = 5000; // 5 second window
@@ -170,6 +184,7 @@ export const StateContainer = memo(
       // Use setTimeout to move logging off the render path
       setTimeout(() => {
         const renderDuration = performance.now() - renderStart;
+        const interactionContext = getInteractionContext();
 
         // Build component hierarchy context
         const hierarchyInfo = {
@@ -178,6 +193,14 @@ export const StateContainer = memo(
           childCount: node.children?.length || 0,
           renderDuration: renderDuration.toFixed(2) + "ms",
           renderStorm: isExcessiveRendering,
+          // Add interaction correlation
+          ...(interactionContext ? {
+            interactionTriggered: true,
+            interactionType: interactionContext.interactionType,
+            timeSinceInteraction: interactionContext.timeSinceInteraction + 'ms',
+            targetElement: interactionContext.target?.tagName,
+            targetId: interactionContext.target?.id
+          } : { interactionTriggered: false })
         };
 
         console.log(`[StateContainer Render] Component '${node.uid}' rendering`, hierarchyInfo);
@@ -582,7 +605,7 @@ function useVars(
           // Analyze variable content and complexity
           const variableAnalysis = nonStandardVars.map((varName) => {
             const varValue = vars[varName];
-            let analysis = { name: varName, type: typeof varValue };
+            let analysis: any = { name: varName, type: typeof varValue };
 
             if (Array.isArray(varValue)) {
               analysis = { ...analysis, type: "array", length: varValue.length };
@@ -613,7 +636,7 @@ function useVars(
               `[⚠️ SLOW VARIABLE RESOLUTION] Resolution took ${resolutionDuration.toFixed(2)}ms`,
               {
                 slowVariables: variableAnalysis.filter(
-                  (v) =>
+                  (v: any) =>
                     (v.type === "array" && v.length > 100) || (v.type === "object" && v.keys > 50),
                 ),
               },
@@ -926,7 +949,7 @@ function useVars(
         setTimeout(() => {
           const resolvedAnalysis = nonStandardVars.map((varName) => {
             const resolvedValue = ret[varName];
-            let analysis = { name: varName, type: typeof resolvedValue };
+            let analysis: any = { name: varName, type: typeof resolvedValue };
 
             if (Array.isArray(resolvedValue)) {
               analysis = { ...analysis, type: "array", length: resolvedValue.length };

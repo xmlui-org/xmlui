@@ -17,6 +17,20 @@ import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
+// Helper to check if render was triggered by recent user interaction
+const getInteractionContext = () => {
+  if (typeof window === 'undefined') return null;
+
+  const timeSinceInteraction = Date.now() - (window as any).lastInteractionTime;
+  const isInteractionTriggered = timeSinceInteraction < 2000; // Within 2 seconds
+
+  return isInteractionTriggered ? {
+    interactionType: (window as any).lastInteractionType,
+    timeSinceInteraction,
+    target: (window as any).lastInteractionTarget
+  } : null;
+};
+
 // Render frequency tracking for DataSources
 const dataSourceRenderCounts = new Map<string, { count: number, lastReset: number }>();
 const RENDER_COUNT_WINDOW = 5000; // 5 second window
@@ -157,6 +171,7 @@ export function Loader({
     const renderStart = performance.now();
     const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
     const isExcessiveRendering = trackDataSourceRenderFrequency(dataSourceId);
+    const interactionContext = getInteractionContext();
 
     // Detect malformed IDs
     if (dataSourceId.includes('undefined')) {
@@ -171,6 +186,14 @@ export function Loader({
       timestamp: Date.now(),
       renderStart,
       renderStorm: isExcessiveRendering,
+      // Add interaction correlation
+      ...(interactionContext ? {
+        interactionTriggered: true,
+        interactionType: interactionContext.interactionType,
+        timeSinceInteraction: interactionContext.timeSinceInteraction + 'ms',
+        targetElement: interactionContext.target?.tagName,
+        targetId: interactionContext.target?.id
+      } : { interactionTriggered: false }),
       stackTrace: logConfig.stackTraces ? new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()) : undefined,
     });
 

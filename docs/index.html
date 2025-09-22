@@ -21,12 +21,75 @@ window.logReactivity = {
   queryKeys: true,
   variables: true,
   routing: false,
-  apiTracking: true,        // Changed from apiCalls
-  dataFlow: true,           // Added
-  userInteractions: true,   // Added
+  apiTracking: true,
+  dataFlow: true,
+  userInteractions: {
+    enabled: true,
+    domEvents: true,           // Global DOM capture
+    reactEvents: true,         // React synthetic events  
+    xmluiEvents: true,        // XMLUI component events
+    correlateWithRenders: true // Link interactions to subsequent renders
+  },
   cascade: true,
   stackTraces: true
 };
+
+// Global interaction tracking state
+window.lastInteractionTime = 0;
+window.lastInteractionType = '';
+window.lastInteractionTarget = null;
+
+// Global DOM event capture for all user interactions
+if (window.logReactivity?.userInteractions?.domEvents) {
+  const interactionEvents = ['click', 'input', 'keydown', 'keyup', 'change', 'submit', 'focus', 'blur'];
+  
+  interactionEvents.forEach(eventType => {
+    document.addEventListener(eventType, (event) => {
+      const timestamp = Date.now();
+      window.lastInteractionTime = timestamp;
+      window.lastInteractionType = eventType;
+      window.lastInteractionTarget = {
+        tagName: event.target?.tagName,
+        id: event.target?.id,
+        className: event.target?.className,
+        textContent: event.target?.textContent?.substring(0, 50)
+      };
+
+      console.log(`[🌐 DOM INTERACTION] ${eventType.toUpperCase()} detected`, {
+        eventType,
+        target: event.target?.tagName,
+        targetId: event.target?.id,
+        targetClass: event.target?.className,
+        timestamp,
+        coordinates: eventType === 'click' ? { x: event.clientX, y: event.clientY } : undefined,
+        isXMLUIComponent: event.target?.closest('[data-xmlui-component]') ? true : false
+      });
+    }, { capture: true, passive: true });
+  });
+
+  // Track dynamically added event listeners
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const eventAttrs = ['onclick', 'onchange', 'oninput', 'onsubmit'];
+          eventAttrs.forEach(attr => {
+            if (node.hasAttribute?.(attr)) {
+              console.log(`[🔗 DYNAMIC EVENT] Handler added`, {
+                element: node.tagName,
+                id: node.id,
+                event: attr,
+                timestamp: Date.now()
+              });
+            }
+          });
+        }
+      });
+    });
+  });
+  
+  observer.observe(document.body, { childList: true, subtree: true });
+}
 
 </script>
   <script type="module" src="/index.ts"></script>
