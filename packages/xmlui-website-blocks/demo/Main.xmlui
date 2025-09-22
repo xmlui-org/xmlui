@@ -1,4 +1,5 @@
 <App>
+  <Hello />
   <HeroSection
     backgroundColor="lightblue"
     fullWidthBackground="false"

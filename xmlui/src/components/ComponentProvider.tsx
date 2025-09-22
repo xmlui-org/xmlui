@@ -903,8 +903,11 @@ export class ComponentRegistry {
   private extensionRegistered = (extension: Extension) => {
     extension.components?.forEach((c) => {
       if ("type" in c) {
-        //we handle just the js components for now
+        // --- This is a regular component
         this.registerComponentRenderer(c, extension.namespace);
+      } else if ("compoundComponentDef" in c) {
+        // --- This is a user defined component
+        this.registerCompoundComponentRenderer(c, extension.namespace);
       }
     });
   };

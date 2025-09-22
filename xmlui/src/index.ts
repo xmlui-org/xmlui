@@ -11,7 +11,10 @@ import type {
   CompoundComponentDef,
 } from "./abstractions/ComponentDefs";
 import { AppRoot } from "./components-core/rendering/AppRoot";
-import { createComponentRenderer } from "./components-core/renderers";
+import {
+  createComponentRenderer,
+  createUserDefinedComponentRenderer,
+} from "./components-core/renderers";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
@@ -53,11 +56,7 @@ import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
-import {
-  createMetadata,
-  d,
-  dComponent,
-} from "./components/metadata-helpers";
+import { createMetadata, d, dComponent } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -81,6 +80,7 @@ export {
   StandaloneApp,
   StandaloneExtensionManager,
   createComponentRenderer,
+  createUserDefinedComponentRenderer,
   createMetadata,
   d,
   dComponent,
