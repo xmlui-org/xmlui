@@ -192,7 +192,7 @@ export const StateContainer = memo(
     const prevParentState = logConfig ? usePrevious(parentState) : undefined;
 
     // Track render frequency using the new ReactivityDebugger system
-    const componentId = node.uid || node.tag || `component_${Math.random().toString(36).substr(2, 6)}`;
+    const componentId = node.uid || `component_${Math.random().toString(36).substr(2, 6)}`;
     const isExcessiveRendering = trackRenderFrequency(componentId);
 
     // No additional verbose logging needed - ReactivityDebugger handles this
