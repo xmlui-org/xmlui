@@ -19,6 +19,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { set } from "date-fns";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -203,7 +204,8 @@ export const ModalDialog = React.forwardRef(
         onPointerDownOutside={(event) => {
           if (
             event.target instanceof Element &&
-            (event.target.closest("._debug-inspect-button") !== null || event.target.localName === "com-1password-button")
+            (event.target.closest("._debug-inspect-button") !== null ||
+              event.target.localName === "com-1password-button")
           ) {
             //we prevent the auto modal close on clicking the inspect button
             event.preventDefault();
@@ -240,7 +242,22 @@ export const ModalDialog = React.forwardRef(
     );
 
     return (
-      <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            doOpen();
+          } else {
+            // Hack to avoid the issue with Radix UI
+            doClose();
+            // We need a hack becasue of an unsettled issue in Radix UI:
+            // https://github.com/shadcn-ui/ui/issues/1912
+            setTimeout(() => {
+              document.body.style.pointerEvents = "auto";
+            }, 100);
+          }
+        }}
+      >
         <Dialog.Portal container={root}>
           {isDialogRootInShadowDom && (
             /*
