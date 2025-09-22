@@ -170,12 +170,19 @@ export const StateContainer = memo(
     const logConfig = getLogReactivity();
     const prevParentState = logConfig ? usePrevious(parentState) : undefined;
 
+    // Debug logging to see if StateContainer logging is working
+    if (node.uid === 'root') {
+      console.log('[🔍 DEBUG] StateContainer render check', {
+        logConfig: logConfig,
+        components: typeof logConfig === 'object' && logConfig !== null ? logConfig.components : false,
+        nodeUid: node.uid
+      });
+    }
+
     // Enhanced component render logging with frequency tracking
     if (
       logConfig &&
-      typeof logConfig === "object" &&
-      logConfig !== null &&
-      logConfig.components &&
+      (logConfig === true || (typeof logConfig === "object" && logConfig !== null && logConfig.components)) &&
       node.uid
     ) {
       const renderStart = performance.now();
@@ -205,7 +212,7 @@ export const StateContainer = memo(
 
         console.log(`[StateContainer Render] Component '${node.uid}' rendering`, hierarchyInfo);
 
-        if (logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
+        if (typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
           // Analyze what changed in parent state
           const parentStateKeys = Object.keys(parentState || {});
           const prevParentStateKeys = Object.keys(prevParentState || {});
@@ -218,14 +225,14 @@ export const StateContainer = memo(
             cascadeRisk: node.children?.length || 0,
           });
 
-          if (logConfig.cascade) {
+          if (typeof logConfig === 'object' && logConfig !== null && logConfig.cascade) {
             console.log(
               `[🔗 CASCADE TRIGGER] State change in '${node.uid}' may cascade to ${node.children?.length || 0} children`,
             );
           }
 
           // Track component interaction patterns
-          if (logConfig.dataFlow) {
+          if (typeof logConfig === 'object' && logConfig !== null && logConfig.dataFlow) {
             console.log(`[🌊 COMPONENT INTERACTION] '${node.uid}' state change`, {
               hasChildren: (node.children?.length || 0) > 0,
               childComponents:

@@ -158,7 +158,15 @@ export const Container = memo(
       ) => {
         // Track async user interactions
         const logConfig = (window as any).logReactivity;
-        if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.userInteractions?.xmluiEvents) {
+        console.log('[🔍 DEBUG] XMLUI async event handler called', {
+          logConfig: logConfig,
+          userInteractions: logConfig?.userInteractions,
+          xmluiEvents: logConfig?.userInteractions?.xmluiEvents,
+          component: componentUid.description || 'unknown'
+        });
+
+        if (logConfig && typeof logConfig === 'object' && logConfig !== null &&
+            (logConfig.userInteractions === true || logConfig.userInteractions?.xmluiEvents)) {
           console.log(`[👆 XMLUI ASYNC EVENT] Event handler started`, {
             component: componentUid.description || 'unknown',
             eventName: options?.eventName || 'unnamed',
@@ -334,7 +342,8 @@ export const Container = memo(
           }
 
           // Log async event completion
-          if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.userInteractions?.xmluiEvents) {
+          if (logConfig && typeof logConfig === 'object' && logConfig !== null &&
+              (logConfig.userInteractions === true || logConfig.userInteractions?.xmluiEvents)) {
             console.log(`[✅ XMLUI ASYNC EVENT] Event handler completed`, {
               component: componentUid.description || 'unknown',
               eventName: options?.eventName || 'unnamed',
@@ -457,7 +466,15 @@ export const Container = memo(
             return (...eventArgs: any[]) => {
               // Track user interactions
               const logConfig = (window as any).logReactivity;
-              if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.userInteractions?.xmluiEvents) {
+              console.log('[🔍 DEBUG] XMLUI sync event handler called', {
+                logConfig: logConfig,
+                userInteractions: logConfig?.userInteractions,
+                xmluiEvents: logConfig?.userInteractions?.xmluiEvents,
+                component: uid.description || 'unknown'
+              });
+
+              if (logConfig && typeof logConfig === 'object' && logConfig !== null &&
+                  (logConfig.userInteractions === true || logConfig.userInteractions?.xmluiEvents)) {
                 console.log(`[👆 XMLUI SYNC EVENT] Event handler executed`, {
                   component: uid.description || 'unknown',
                   action: typeof arrowExpression === 'string' ? arrowExpression.substring(0, 50) + (arrowExpression.length > 50 ? '...' : '') : 'function',

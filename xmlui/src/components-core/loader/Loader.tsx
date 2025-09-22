@@ -167,7 +167,7 @@ export function Loader({
   }
 
   // Enhanced render logging with deduplication and performance tracking
-  if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components) {
+  if (logConfig && (logConfig === true || (typeof logConfig === 'object' && logConfig !== null && logConfig.components))) {
     const renderStart = performance.now();
     const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
     const isExcessiveRendering = trackDataSourceRenderFrequency(dataSourceId);

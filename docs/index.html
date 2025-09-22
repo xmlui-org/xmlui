@@ -26,7 +26,7 @@ window.logReactivity = {
   userInteractions: {
     enabled: true,
     domEvents: true,           // Global DOM capture
-    reactEvents: true,         // React synthetic events  
+    reactEvents: true,         // React synthetic events
     xmluiEvents: true,        // XMLUI component events
     correlateWithRenders: true // Link interactions to subsequent renders
   },
@@ -40,55 +40,66 @@ window.lastInteractionType = '';
 window.lastInteractionTarget = null;
 
 // Global DOM event capture for all user interactions
-if (window.logReactivity?.userInteractions?.domEvents) {
-  const interactionEvents = ['click', 'input', 'keydown', 'keyup', 'change', 'submit', 'focus', 'blur'];
-  
-  interactionEvents.forEach(eventType => {
-    document.addEventListener(eventType, (event) => {
-      const timestamp = Date.now();
-      window.lastInteractionTime = timestamp;
-      window.lastInteractionType = eventType;
-      window.lastInteractionTarget = {
-        tagName: event.target?.tagName,
-        id: event.target?.id,
-        className: event.target?.className,
-        textContent: event.target?.textContent?.substring(0, 50)
-      };
+function initializeInteractionTracking() {
+  if (window.logReactivity?.userInteractions === true || window.logReactivity?.userInteractions?.domEvents) {
+    const interactionEvents = ['click', 'input', 'keydown', 'keyup', 'change', 'submit', 'focus', 'blur'];
 
-      console.log(`[🌐 DOM INTERACTION] ${eventType.toUpperCase()} detected`, {
-        eventType,
-        target: event.target?.tagName,
-        targetId: event.target?.id,
-        targetClass: event.target?.className,
-        timestamp,
-        coordinates: eventType === 'click' ? { x: event.clientX, y: event.clientY } : undefined,
-        isXMLUIComponent: event.target?.closest('[data-xmlui-component]') ? true : false
-      });
-    }, { capture: true, passive: true });
-  });
+    interactionEvents.forEach(eventType => {
+      document.addEventListener(eventType, (event) => {
+        const timestamp = Date.now();
+        window.lastInteractionTime = timestamp;
+        window.lastInteractionType = eventType;
+        window.lastInteractionTarget = {
+          tagName: event.target?.tagName,
+          id: event.target?.id,
+          className: event.target?.className,
+          textContent: event.target?.textContent?.substring(0, 50)
+        };
 
-  // Track dynamically added event listeners
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-      mutation.addedNodes.forEach(node => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          const eventAttrs = ['onclick', 'onchange', 'oninput', 'onsubmit'];
-          eventAttrs.forEach(attr => {
-            if (node.hasAttribute?.(attr)) {
-              console.log(`[🔗 DYNAMIC EVENT] Handler added`, {
-                element: node.tagName,
-                id: node.id,
-                event: attr,
-                timestamp: Date.now()
-              });
-            }
-          });
-        }
+        console.log(`[🌐 DOM INTERACTION] ${eventType.toUpperCase()} detected`, {
+          eventType,
+          target: event.target?.tagName,
+          targetId: event.target?.id,
+          targetClass: event.target?.className,
+          timestamp,
+          coordinates: eventType === 'click' ? { x: event.clientX, y: event.clientY } : undefined,
+          isXMLUIComponent: event.target?.closest('[data-xmlui-component]') ? true : false
+        });
+      }, { capture: true, passive: true });
+    });
+
+    // Track dynamically added event listeners
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const eventAttrs = ['onclick', 'onchange', 'oninput', 'onsubmit'];
+            eventAttrs.forEach(attr => {
+              if (node.hasAttribute?.(attr)) {
+                console.log(`[🔗 DYNAMIC EVENT] Handler added`, {
+                  element: node.tagName,
+                  id: node.id,
+                  event: attr,
+                  timestamp: Date.now()
+                });
+              }
+            });
+          }
+        });
       });
     });
-  });
-  
-  observer.observe(document.body, { childList: true, subtree: true });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log('[🔧 INTERACTION TRACKING] Global DOM event capture initialized');
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeInteractionTracking);
+} else {
+  initializeInteractionTracking();
 }
 
 </script>
