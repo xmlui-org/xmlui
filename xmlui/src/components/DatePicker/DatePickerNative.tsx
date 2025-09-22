@@ -15,7 +15,6 @@ import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import Icon from "../Icon/IconNative";
-import { Item } from "@radix-ui/react-dropdown-menu";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
@@ -188,7 +187,7 @@ export const DatePicker = forwardRef(function DatePicker(
   ref: React.Ref<HTMLDivElement>,
 ) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
-  const [isMenuFocused, setIsMenuFocused] = useState(false);
+  const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
   const generatedId = useId();
@@ -206,8 +205,6 @@ export const DatePicker = forwardRef(function DatePicker(
     return undefined;
   }, [value, mode]);
 
-  console.log("sel", selected)
-
   useEffect(() => {
     if (!dateFormats.includes(dateFormat)) {
       throw new Error(
@@ -217,6 +214,7 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [dateFormat]);
 
   const startDate = useMemo(() => {
+    console.log(minValue, parse(minValue, dateFormat, new Date()));
     return minValue ? parse(minValue, dateFormat, new Date()) : undefined;
   }, [minValue, dateFormat]);
 
@@ -426,7 +424,7 @@ export const DatePicker = forwardRef(function DatePicker(
         setOpen(false);
       }
     },
-    [onDidChange, updateState, mode, dateFormat],
+    [onDidChange, updateState, mode, dateFormat, readOnly],
   );
 
   return inline ? (
