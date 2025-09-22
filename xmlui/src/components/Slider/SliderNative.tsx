@@ -10,6 +10,7 @@ import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 import { Tooltip } from "../Tooltip/TooltipNative";
+import { isNaN } from "lodash-es";
 
 export type Props = {
   id?: string;
@@ -66,18 +67,41 @@ export const defaultProps: Pick<
   minStepsBetweenThumbs: 1,
 };
 
+const parseValue = (val: string | number | undefined, defaultVal: number): number => {
+  if (typeof val === "number") {
+    return val;
+  } else if (typeof val === "string") {
+    const parsed = parseFloat(val);
+    if (!isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return defaultVal;
+};
+
 // Helper function to ensure value is properly formatted
-const formatValue = (val: number | number[] | undefined, defaultVal: number = 0): number[] => {
+const formatValue = (
+  val: number | number[] | undefined,
+  defaultVal: number = 0,
+  minVal?: number,
+  maxVal?: number,
+): number[] => {
+  const clampValue = (value: number): number => {
+    if (minVal !== undefined && value < minVal) return minVal;
+    if (maxVal !== undefined && value > maxVal) return maxVal;
+    return value;
+  };
+
   if (val === undefined) {
-    return [defaultVal];
+    return [clampValue(defaultVal)];
   }
   if (typeof val === "number") {
-    return [val];
+    return [clampValue(val)];
   }
   if (Array.isArray(val) && val.length > 0) {
-    return val;
+    return val.map(clampValue);
   }
-  return [defaultVal];
+  return [clampValue(defaultVal)];
 };
 
 export const Slider = forwardRef(
@@ -121,9 +145,13 @@ export const Slider = forwardRef(
     const inputRef = useRef(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const thumbRef = useRef(null);
+    min = parseValue(min, defaultProps.min);
+    max = parseValue(max, defaultProps.max);
 
     // Initialize localValue properly
-    const [localValue, setLocalValue] = React.useState<number[]>([]);
+    const [localValue, setLocalValue] = React.useState<number[]>(() =>
+      formatValue(value || initialValue, min, min, max),
+    );
     const [showTooltip, setShowTooltip] = React.useState(false);
     const onShowTooltip = useCallback(() => setShowTooltip(true), []);
     const onHideTooltip = useCallback(() => setShowTooltip(false), []);
@@ -135,7 +163,8 @@ export const Slider = forwardRef(
       if (typeof initialValue === "string") {
         try {
           // Try to parse as JSON first (for arrays)
-          initialVal = JSON.parse(initialValue);
+          const parsed = JSON.parse(initialValue);
+          initialVal = parsed;
         } catch (e) {
           // If not JSON, try to parse as number
           const num = parseFloat(initialValue);
@@ -144,15 +173,13 @@ export const Slider = forwardRef(
           }
         }
       } else if (typeof initialValue === "number") {
-        if (initialValue >= min && initialValue <= max) {
-          initialVal = initialValue;
-        }
-      } else {
-        initialVal = formatValue(initialValue, min);
+        initialVal = initialValue;
+      } else if (initialValue !== undefined) {
+        initialVal = initialValue;
       }
 
-      // Format the value properly
-      const formattedValue = formatValue(initialVal, min);
+      // Format the value properly - single call to formatValue with bounds checking
+      const formattedValue = formatValue(initialVal, min, min, max);
       setLocalValue(formattedValue);
 
       // Notify parent component
@@ -169,10 +196,10 @@ export const Slider = forwardRef(
     // Sync with external value changes
     useEffect(() => {
       if (value !== undefined) {
-        const formattedValue = formatValue(value, min);
+        const formattedValue = formatValue(value, min, min, max);
         setLocalValue(formattedValue);
       }
-    }, [value, min]);
+    }, [value, min, max]);
 
     const updateValue = useCallback(
       (value: number | number[]) => {
@@ -187,6 +214,9 @@ export const Slider = forwardRef(
 
     const onInputChange = useCallback(
       (value: number[]) => {
+        if (readOnly) {
+          return;
+        }
         setLocalValue(value);
 
         // 👇 Force the DOM element to reflect the latest value synchronously
@@ -200,20 +230,36 @@ export const Slider = forwardRef(
           updateValue(value[0]);
         }
       },
-      [updateValue],
+      [updateValue, readOnly],
     );
 
     // Component APIs
-    const handleOnFocus = useCallback((ev) => onFocus?.(ev), [onFocus]);
-
-    const handleOnBlur = useCallback((ev) => onBlur?.(ev), [onBlur]);
+    const handleOnFocus = useCallback(
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        thumbRef.current?.focus();
+        onFocus?.(ev);
+      },
+      [onFocus],
+    );
+    const handleOnBlur = useCallback(
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        thumbRef.current?.focus();
+        onBlur?.(ev);
+      },
+      [onBlur],
+    );
 
     const focus = useCallback(() => {
       inputRef.current?.focus();
     }, []);
 
     const setValue = useEvent((newValue) => {
-      updateValue(newValue);
+      if (readOnly || !enabled) {
+        return;
+      }
+      const formattedValue = formatValue(newValue, min, min, max);
+      const valueToUpdate = formattedValue.length === 1 ? formattedValue[0] : formattedValue;
+      updateValue(valueToUpdate);
     });
 
     useEffect(() => {
@@ -224,7 +270,7 @@ export const Slider = forwardRef(
     }, [focus, registerComponentApi, setValue]);
 
     // Ensure we always have at least one thumb
-    const displayValue = localValue.length > 0 ? localValue : [min];
+    const displayValue = localValue.length > 0 ? localValue : formatValue(undefined, min, min, max);
     return (
       <ItemWithLabel
         {...rest}
@@ -264,11 +310,10 @@ export const Slider = forwardRef(
             onMouseOver={onShowTooltip}
             onMouseLeave={onHideTooltip}
             onPointerDown={onShowTooltip}
-            aria-required={required}
             value={displayValue}
-            autoFocus={autoFocus}
           >
             <Track
+              data-track
               className={classnames(styles.sliderTrack, {
                 [styles.disabled]: !enabled,
                 [styles.readOnly]: readOnly,
@@ -279,6 +324,7 @@ export const Slider = forwardRef(
               style={rangeStyle ? { ...rangeStyle } : undefined}
             >
               <Range
+                data-range
                 className={classnames(styles.sliderRange, {
                   [styles.disabled]: !enabled,
                 })}
@@ -300,6 +346,8 @@ export const Slider = forwardRef(
                   style={thumbStyle ? { ...thumbStyle } : undefined}
                   id={id}
                   data-thumb-index={index}
+                  autoFocus={autoFocus}
+                  aria-required={required}
                 />
               </Tooltip>
             ))}

@@ -112,6 +112,8 @@ export const SliderMd = createMetadata({
     [`borderStyle-thumb-${COMP}`]: "solid",
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
+    [`backgroundColor-thumb-${COMP}--focus`]: "$color-primary",
+    [`boxShadow-thumb-${COMP}--focus`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--hover`]: "$color-primary",
     [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
