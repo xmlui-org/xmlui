@@ -70,6 +70,7 @@
             </NavGroup>
             <NavGroup label="How To">
                 <NavLink label="Expose a method from a component" to="/howto/expose-a-method-from-a-component" />
+                <NavLink label="Delegate a method" to="/howto/delegate-a-method" />
                 <NavLink label="React to button click not keystrokes" to="/howto/react-to-button-click-not-keystrokes" />
                 <NavLink label="Modify a value reported in a Column" to="/howto/modify-a-value-reported-in-a-column" />
                 <NavLink label="Filter and transform data from an API" to="/howto/filter-and-transform-data-from-an-api" />
@@ -372,6 +373,10 @@
             <Page url="/howto/expose-a-method-from-a-component">
                 <DocumentPageNoTOC url="/pages/howto/expose-a-method-from-a-component.md" />
             </Page>
+            <Page url="/howto/delegate-a-method">
+                <DocumentPageNoTOC url="/pages/howto/delegate-a-method.md" />
+            </Page>
+
             <Page url="/howto/react-to-button-click-not-keystrokes">
                 <DocumentPageNoTOC url="/pages/howto/react-to-button-click-not-keystrokes.md" />
             </Page>
