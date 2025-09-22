@@ -225,36 +225,14 @@ export function Loader({
     const extractedParam = extractParam(state, loader.props, appContext);
     const key = queryId ? queryId : [uid, extractedParam];
 
+    // Use ReactivityDebugger instead of old verbose logging
+    // Only log when queryKeys debugging is specifically requested
     if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
       const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
-
-      // Analyze dependencies that affect this query key
-      const dependencies = {
-        fromState: extractedParam && typeof extractedParam === 'object' ? Object.keys(extractedParam) : [],
-        fromProps: loader.props ? Object.keys(loader.props).filter(k => k !== 'children') : [],
-        fromContext: appContext ? Object.keys(appContext).slice(0, 5) : [], // Limit to avoid spam
-        hasCustomQueryId: !!queryId
-      };
-
-      console.log(`[🔍 QUERY KEY CALC] DataSource '${dataSourceId}':`, {
-        uid,
+      console.log(`[🔍 QUERY KEY CALC] ${dataSourceId}:`, {
         timestamp: Date.now(),
-        queryKey: key,
-        extractedParam: extractedParam,
-        url: loader.props.url,
-        dependencies,
-        memoizedFrom: ['appContext', 'loader.props', 'queryId', 'state', 'uid']
+        url: loader.props.url
       });
-
-      // Track API request patterns
-      if (logConfig.apiTracking && loader.props.url && typeof loader.props.url === 'string') {
-        console.log(`[🌐 API REQUEST] DataSource '${dataSourceId}' will fetch:`, {
-          url: loader.props.url,
-          method: loader.props.method || 'GET',
-          queryKeyChanged: true,
-          requestType: loader.props.url.includes('{') ? 'templated_url' : 'static_url'
-        });
-      }
     }
 
     return key;
