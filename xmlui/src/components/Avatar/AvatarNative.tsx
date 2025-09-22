@@ -80,7 +80,7 @@ function abbrevName(name: string | null): string | null {
       .split(" ")
       .filter((word) => !!word.trim().length)
       .map((word) => word[0].toUpperCase())
-      .slice(0, 2)
+      .slice(0, 3)
       .join("");
     return abbrev;
   }

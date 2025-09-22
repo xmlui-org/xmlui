@@ -186,7 +186,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Set up the mouse event handlers for the component
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
-    descriptor?.nonVisual || isApiBound,
+    descriptor?.nonVisual || isApiBound || isCompoundComponent,
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
