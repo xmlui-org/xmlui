@@ -224,11 +224,14 @@ export function Loader({
   const queryKey = useMemo(() => {
     const extractedParam = extractParam(state, loader.props, appContext);
     const key = queryId ? queryId : [uid, extractedParam];
+    const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+
+    // Track query key recalculations (not just changes)
+    ReactivityDebugger.logQueryInvalidation(dataSourceId, 'query_key_recalculation', 'dependencies_changed');
 
     // Use ReactivityDebugger instead of old verbose logging
     // Only log when queryKeys debugging is specifically requested
     if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
-      const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
       console.log(`[🔍 QUERY KEY CALC] ${dataSourceId}:`, {
         timestamp: Date.now(),
         url: loader.props.url
