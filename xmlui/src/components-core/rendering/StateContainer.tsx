@@ -46,6 +46,7 @@ import {
   StatePartChangedFn,
 } from "./ContainerWrapper";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
+import { ReactivityDebugger } from "../../debug/reactivity-debug";
 
 // Helper to check if render was triggered by recent user interaction
 const getInteractionContext = () => {
@@ -86,9 +87,7 @@ const trackRenderFrequency = (componentId: string): boolean => {
   const isExcessive = existing.count > EXCESSIVE_RENDER_THRESHOLD;
 
   if (isExcessive && existing.count === EXCESSIVE_RENDER_THRESHOLD + 1) {
-    console.warn(
-      `[🚨 RENDER STORM] Component '${componentId}' rendered ${existing.count} times in ${RENDER_COUNT_WINDOW / 1000}s`,
-    );
+    ReactivityDebugger.logRenderStorm(componentId, existing.count, RENDER_COUNT_WINDOW);
   }
 
   return isExcessive;
@@ -192,13 +191,10 @@ export const StateContainer = memo(
     const logConfig = getLogReactivity();
     const prevParentState = logConfig ? usePrevious(parentState) : undefined;
 
-    // Debug logging to see if StateContainer logging is working
-    if (node.uid === 'root') {
-      console.log('[🔍 DEBUG] StateContainer render check', {
-        logConfig: logConfig,
-        components: typeof logConfig === 'object' && logConfig !== null ? logConfig.components : false,
-        nodeUid: node.uid
-      });
+    // Track render frequency using the new ReactivityDebugger system
+    const isExcessiveRendering = trackRenderFrequency(node.uid || 'unnamed_component');
+    if (isExcessiveRendering) {
+      console.log('[🔍 DEBUG] Excessive rendering detected for:', node.uid);
     }
 
     // Enhanced component render logging with frequency tracking
