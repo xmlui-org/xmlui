@@ -6,6 +6,9 @@ import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import * as xmluiExports from "./index";
 
+// Import debug module to ensure it's included in standalone build and exports to window
+import './debug/reactivity-debug';
+
 const Xmlui = new StandaloneExtensionManager();
 
 document.addEventListener('DOMContentLoaded', function() {

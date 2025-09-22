@@ -61,6 +61,33 @@ export class ReactivityDebugger {
   }
 
   static shouldLog(category: keyof ReactivityDebugConfig['focus'], componentId?: string): boolean {
+    // Check window.logReactivity first for backward compatibility
+    if (typeof window !== 'undefined') {
+      const windowConfig = (window as any).logReactivity;
+      if (windowConfig && typeof windowConfig === 'object') {
+        if (!windowConfig.enabled) return false;
+        
+        // Map categories to window config properties
+        const categoryMap = {
+          renderStorms: windowConfig.cascade || windowConfig.components,
+          apiCalls: windowConfig.queryKeys || windowConfig.apiTracking,
+          stateChanges: windowConfig.stateChanges,
+          userInteractions: windowConfig.userInteractions
+        };
+        
+        const shouldLogCategory = categoryMap[category];
+        if (shouldLogCategory === false) return false;
+        
+        // Check component focusing
+        if (windowConfig.focusComponents && Array.isArray(windowConfig.focusComponents) && componentId) {
+          if (!windowConfig.focusComponents.includes(componentId)) return false;
+        }
+        
+        return shouldLogCategory !== false;
+      }
+    }
+    
+    // Fallback to internal config
     if (!this.config.enabled) return false;
     
     // If specific components are configured, only log those
@@ -80,6 +107,13 @@ export class ReactivityDebugger {
   ) {
     if (!this.shouldLog('stateChanges', componentId)) return;
 
+    // Check if we should only show actionable logs
+    const windowConfig = typeof window !== 'undefined' ? (window as any).logReactivity : null;
+    const actionableOnly = windowConfig?.actionableOnly ?? this.config.output.actionable;
+    
+    // Only show actionable logs if configured
+    if (actionableOnly && !suggestedAction) return;
+
     const logEntry = {
       category,
       componentId,
@@ -96,12 +130,10 @@ export class ReactivityDebugger {
       data: logEntry
     });
 
-    // Only show actionable logs if configured
-    if (this.config.output.actionable && !suggestedAction) return;
-
     console.group(`[${category}] ${componentId}: ${message}`);
     
-    if (this.config.level !== 'minimal') {
+    const level = windowConfig?.level ?? this.config.level;
+    if (level !== 'minimal') {
       console.log('Data:', data);
     }
     
@@ -110,7 +142,8 @@ export class ReactivityDebugger {
     }
 
     // Show correlated events if enabled
-    if (this.config.output.correlateEvents) {
+    const correlateEvents = windowConfig?.correlateEvents ?? this.config.output.correlateEvents;
+    if (correlateEvents) {
       this.showCorrelatedEvents(componentId);
     }
 
@@ -118,6 +151,8 @@ export class ReactivityDebugger {
   }
 
   static logRenderStorm(componentId: string, renderCount: number, timeWindow: number) {
+    console.log('[🔍 DEBUG] logRenderStorm called:', { componentId, renderCount, timeWindow, shouldLog: this.shouldLog('renderStorms', componentId) });
+    
     if (!this.shouldLog('renderStorms', componentId)) return;
     
     const suggestedAction = renderCount > 20 
@@ -136,6 +171,8 @@ export class ReactivityDebugger {
   }
 
   static logQueryKeyChange(componentId: string, oldKey: any, newKey: any, url?: string) {
+    console.log('[🔍 DEBUG] logQueryKeyChange called:', { componentId, shouldLog: this.shouldLog('apiCalls', componentId) });
+    
     if (!this.shouldLog('apiCalls', componentId)) return;
 
     const suggestedAction = this.analyzeQueryKeyChange(oldKey, newKey);
@@ -230,4 +267,11 @@ export function setupReactivityDebugging(options: {
       suppressNoisy: true
     }
   });
+}
+
+// Export to window for standalone builds
+if (typeof window !== 'undefined') {
+  (window as any).ReactivityDebugger = ReactivityDebugger;
+  (window as any).setupReactivityDebugging = setupReactivityDebugging;
+  console.log('[🔧 REACTIVITY DEBUG] ReactivityDebugger exported to window');
 }
