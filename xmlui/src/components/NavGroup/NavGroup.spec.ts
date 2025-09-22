@@ -1,28 +1,53 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-/**
- * NOTE: We don't have a way to test icons yet, so some test cases are not fully realized. (See skip reasons)
- * TODO: Add tests for icons
- */
-
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("component renders", async ({ initTestBed, createNavGroupDriver }) => {
+  test("component renders", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <NavGroup label="NavGroup">
+      <NavGroup testId="navGroup" label="NavGroup">
+      </NavGroup>`);
+    await expect(page.getByTestId("navGroup")).toBeVisible();
+  });
+
+  test("component renders with children", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <NavGroup label="NavGroup" testId="navGroup">
         <NavLink label="link" to="/" />
       </NavGroup>`);
-    await expect((await createNavGroupDriver()).component).toBeAttached();
+    await expect(page.getByTestId("navGroup")).toBeVisible();
   });
 });
 
-test.skip(
-  "collapsed in NavPanel + vertical app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {
-    await initTestBed(`
+test("component trigger has correct aria labels", async ({ initTestBed, page }) => {
+  await initTestBed(`
+      <NavGroup testId="navGroup" label="NavGroup">
+      </NavGroup>`);
+  const button = page.getByTestId("navGroup");
+  await expect(button).toBeVisible();
+  await expect(button).toHaveAttribute("aria-expanded", "false");
+  await button.click();
+  await expect(button).toHaveAttribute("aria-expanded", "true");
+});
+
+// TODO: depending on layout, different component lists are rendered - need to test for all of them
+/* test("component list content has correct aria labels", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <NavGroup testId="navGroup" label="NavGroup">
+      <NavLink label="link" to="/asd" />
+    </NavGroup>`);
+  const button = page.getByTestId("navGroup");
+  const content = page.getByRole('menuitem', { name: 'link' });
+
+  await button.click();
+
+  await expect(content).toBeVisible();
+  await expect(content).toHaveAttribute("aria-hidden", "false");
+}); */
+
+test("expanded in NavPanel + vertical app layout if current page is same as link in group", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
     <App layout="vertical">
       <NavPanel>
         <NavGroup testId="navGroup" label="NavGroup">
@@ -30,17 +55,25 @@ test.skip(
         </NavGroup>
       </NavPanel>
     </App>`);
-    await expect((await createNavGroupDriver("navGroup")).component).toBeAttached();
-  },
-);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+});
 
-test.skip(
-  "expanded in NavPanel + vertical app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {
-    await initTestBed(`
+test("collapsed in NavPanel + vertical app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="vertical">
+      <NavPanel>
+        <NavGroup testId="navGroup" label="NavGroup">
+          <NavLink label="link" to="/asd" />
+        </NavGroup>
+      </NavPanel>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+});
+
+test("expanded in NavPanel + vertical app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
     <App layout="vertical">
       <NavPanel>
         <NavGroup testId="navGroup" label="NavGroup">
@@ -48,56 +81,81 @@ test.skip(
         </NavGroup>
       </NavPanel>
     </App>`);
-    const driver = await createNavGroupDriver("navGroup");
-    await driver.click();
-    await expect(driver.component).toBeAttached();
-  },
-);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+});
 
-test.skip(
-  "collapsed in NavPanel + horizontal app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("collapsed in NavPanel + horizontal app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="horizontal">
+      <NavPanel>
+        <NavGroup testId="navGroup" label="NavGroup">
+          <NavLink label="link" to="/" />
+        </NavGroup>
+      </NavPanel>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+});
 
-test.skip(
-  "expanded in NavPanel + horizontal app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("click expands group in NavPanel + horizontal app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="horizontal">
+      <NavPanel>
+        <NavGroup testId="navGroup" label="NavGroup">
+          <NavLink label="link" to="/" />
+        </NavGroup>
+      </NavPanel>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "link" })).not.toBeVisible();
+  await page.getByTestId("navGroup").click();
+  await expect(page.getByRole("menuitem", { name: "link" })).toBeVisible();
+});
 
-test.skip(
-  "collapsed in vertical app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("collapsed in vertical app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="vertical">
+      <NavGroup testId="navGroup" label="NavGroup">
+        <NavLink label="link" to="/asd" />
+      </NavGroup>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+});
 
-test.skip(
-  "expanded in vertical app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("expanded in vertical app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="vertical">
+      <NavGroup testId="navGroup" label="NavGroup">
+        <NavLink label="link" to="/" />
+      </NavGroup>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+});
 
-test.skip(
-  "collapsed in horizontal app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("collapsed in horizontal app layout", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App layout="horizontal">
+      <NavGroup testId="navGroup" label="NavGroup">
+        <NavLink label="link" to="/asd" />
+      </NavGroup>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+});
 
-test.skip(
-  "expanded in horizontal app layout",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "This case is not fully realized since we don't have a way to test icons",
-  ),
-  async ({ initTestBed, createNavGroupDriver }) => {},
-);
+test("collapsed in horizontal app layout if current page is same as link in group", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
+    <App layout="horizontal">
+      <NavGroup testId="navGroup" label="NavGroup">
+        <NavLink label="link" to="/" />
+      </NavGroup>
+    </App>`);
+  await expect(page.getByTestId("navGroup")).toBeVisible();
+  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+});
