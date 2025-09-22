@@ -47,6 +47,30 @@ import {
 } from "./ContainerWrapper";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 
+// Render frequency tracking for detecting excessive re-renders
+const renderCounts = new Map<string, { count: number, lastReset: number }>();
+const RENDER_COUNT_WINDOW = 5000; // 5 second window
+const EXCESSIVE_RENDER_THRESHOLD = 10;
+
+const trackRenderFrequency = (componentId: string): boolean => {
+  const now = Date.now();
+  const existing = renderCounts.get(componentId);
+
+  if (!existing || (now - existing.lastReset) > RENDER_COUNT_WINDOW) {
+    renderCounts.set(componentId, { count: 1, lastReset: now });
+    return false;
+  }
+
+  existing.count++;
+  const isExcessive = existing.count > EXCESSIVE_RENDER_THRESHOLD;
+
+  if (isExcessive && existing.count === EXCESSIVE_RENDER_THRESHOLD + 1) {
+    console.warn(`[🚨 RENDER STORM] Component '${componentId}' rendered ${existing.count} times in ${RENDER_COUNT_WINDOW/1000}s`);
+  }
+
+  return isExcessive;
+};
+
 // Reactivity logging check - gated by window.logReactivity
 const getLogReactivity = (): boolean | { [key: string]: any } | null => {
   if (typeof window === 'undefined') return false;
@@ -107,18 +131,47 @@ export const StateContainer = memo(
     const logConfig = getLogReactivity();
     const prevParentState = logConfig ? usePrevious(parentState) : undefined;
 
-    // Only log if explicitly enabled
+    // Enhanced component render logging with frequency tracking
     if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components && node.uid) {
+      const renderStart = performance.now();
+      const isExcessiveRendering = trackRenderFrequency(node.uid);
+
       // Use setTimeout to move logging off the render path
       setTimeout(() => {
-        console.log(`[StateContainer Render] Component '${node.uid}' rendering`);
+        const renderDuration = performance.now() - renderStart;
+
+        // Build component hierarchy context
+        const hierarchyInfo = {
+          component: node.uid,
+          hasChildren: node.children && node.children.length > 0,
+          childCount: node.children?.length || 0,
+          renderDuration: renderDuration.toFixed(2) + 'ms',
+          renderStorm: isExcessiveRendering
+        };
+
+        console.log(`[StateContainer Render] Component '${node.uid}' rendering`, hierarchyInfo);
 
         if (logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
-          console.log(`[🔄 Parent State Changed] Component '${node.uid}' parent state changed`);
+          // Analyze what changed in parent state
+          const parentStateKeys = Object.keys(parentState || {});
+          const prevParentStateKeys = Object.keys(prevParentState || {});
+          const changedKeys = parentStateKeys.filter(k =>
+            (parentState as any)?.[k] !== (prevParentState as any)?.[k]
+          );
+
+          console.log(`[🔄 Parent State Changed] Component '${node.uid}':`, {
+            changedKeys: changedKeys.length > 0 ? changedKeys : 'reference_change',
+            cascadeRisk: node.children?.length || 0
+          });
 
           if (logConfig.cascade) {
-            console.log(`[🔗 CASCADE TRIGGER] State change in '${node.uid}' may trigger DataSource refetches`);
+            console.log(`[🔗 CASCADE TRIGGER] State change in '${node.uid}' may cascade to ${node.children?.length || 0} children`);
           }
+        }
+
+        // Flag slow renders
+        if (renderDuration > 16) {
+          console.warn(`[🐌 SLOW COMPONENT] '${node.uid}' took ${renderDuration.toFixed(2)}ms to render`);
         }
       }, 0);
     }
@@ -445,8 +498,19 @@ function useVars(
       // Only log if there are non-standard variables (not just $props, emitEvent, etc.)
       const nonStandardVars = Object.keys(vars).filter(key => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(key));
       if (nonStandardVars.length > 0) {
+        const resolutionStart = performance.now();
         setTimeout(() => {
-          console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars);
+          const resolutionDuration = performance.now() - resolutionStart;
+          console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars, {
+            variableCount: nonStandardVars.length,
+            resolutionTime: resolutionDuration.toFixed(2) + 'ms',
+            dependencyChain: 'vars → componentState → resolvedVars'
+          });
+
+          // Flag excessive variable resolution
+          if (nonStandardVars.length > 10) {
+            console.warn(`[⚠️ MANY VARIABLES] Resolving ${nonStandardVars.length} variables may impact performance`);
+          }
         }, 0);
       }
     }

@@ -14,7 +14,7 @@ This list is a live report on the status of London's tube stations.
 
 ```xmlui-pg name="London Tube Status"
 <App>
-  <List data="https://api.tfl.gov.uk/line/mode/tube/status">
+  <List id="tubeStatus" data="https://api.tfl.gov.uk/line/mode/tube/status">
      <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
   </List>
 </App>
@@ -28,7 +28,7 @@ When you reload the page you'll see fresh data.
 This is the XMLUI markup you'll see in the playground.
 
 ```xmlui
-<List data="https://api.tfl.gov.uk/line/mode/tube/status">
+<List id="tube-status" data="https://api.tfl.gov.uk/line/mode/tube/status">
   <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
 </List>
 ```

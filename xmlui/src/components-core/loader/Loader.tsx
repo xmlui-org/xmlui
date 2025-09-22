@@ -17,6 +17,30 @@ import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
+// Render frequency tracking for DataSources
+const dataSourceRenderCounts = new Map<string, { count: number, lastReset: number }>();
+const RENDER_COUNT_WINDOW = 5000; // 5 second window
+const EXCESSIVE_RENDER_THRESHOLD = 10;
+
+const trackDataSourceRenderFrequency = (dataSourceId: string): boolean => {
+  const now = Date.now();
+  const existing = dataSourceRenderCounts.get(dataSourceId);
+
+  if (!existing || (now - existing.lastReset) > RENDER_COUNT_WINDOW) {
+    dataSourceRenderCounts.set(dataSourceId, { count: 1, lastReset: now });
+    return false;
+  }
+
+  existing.count++;
+  const isExcessive = existing.count > EXCESSIVE_RENDER_THRESHOLD;
+
+  if (isExcessive && existing.count === EXCESSIVE_RENDER_THRESHOLD + 1) {
+    console.warn(`[🚨 DATASOURCE STORM] DataSource '${dataSourceId}' rendered ${existing.count} times in ${RENDER_COUNT_WINDOW/1000}s`);
+  }
+
+  return isExcessive;
+};
+
 // Reactivity logging check - gated by window.logReactivity
 const getLogReactivity = (): boolean | { [key: string]: any } | null => {
   if (typeof window === 'undefined') return false;
@@ -75,32 +99,76 @@ export function Loader({
 
   const logConfig = getLogReactivity();
 
-  // Track appContext changes
+  // Enhanced change tracking with diff analysis
   const prevAppContext = usePrevious(appContext);
   if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevAppContext && prevAppContext !== appContext) {
-    console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
+    const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+
+    // Analyze what changed in appContext
+    const changedKeys = Object.keys(appContext || {}).filter(key =>
+      (appContext as any)?.[key] !== (prevAppContext as any)?.[key]
+    );
+
+    console.log(`[🚨 APP CONTEXT CHANGED] DataSource '${dataSourceId}':`, {
       timestamp: Date.now(),
-      // Simple comparison without deep inspection to avoid circular refs
       contextChanged: true,
+      changedKeys: changedKeys.length > 0 ? changedKeys : 'reference_change',
+      triggerChain: logConfig.causality ? 'appContext → queryKey → refetch' : undefined
     });
   }
 
-  // Track state changes
+  // Enhanced state change tracking
   const prevState = usePrevious(state);
   if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevState && prevState !== state) {
-    console.log(`[🚨 STATE CHANGED] DataSource '${loader.props.id || loader.uid}':`, {
+    const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+
+    // Analyze state changes
+    const stateKeys = Object.keys(state || {});
+    const prevStateKeys = Object.keys(prevState || {});
+    const addedKeys = stateKeys.filter(k => !prevStateKeys.includes(k));
+    const removedKeys = prevStateKeys.filter(k => !stateKeys.includes(k));
+    const changedKeys = stateKeys.filter(k =>
+      prevStateKeys.includes(k) && (state as any)?.[k] !== (prevState as any)?.[k]
+    );
+
+    console.log(`[🚨 STATE CHANGED] DataSource '${dataSourceId}':`, {
       timestamp: Date.now(),
-      // Simple comparison without deep inspection to avoid circular refs
       stateChanged: true,
+      added: addedKeys.length > 0 ? addedKeys : undefined,
+      removed: removedKeys.length > 0 ? removedKeys : undefined,
+      changed: changedKeys.length > 0 ? changedKeys : 'reference_change'
     });
   }
 
-  // Log every render of Loader with more context
+  // Enhanced render logging with deduplication and performance tracking
   if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.components) {
-    console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' rendering`, {
+    const renderStart = performance.now();
+    const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+    const isExcessiveRendering = trackDataSourceRenderFrequency(dataSourceId);
+
+    // Detect malformed IDs
+    if (dataSourceId.includes('undefined')) {
+      console.warn(`[⚠️ MALFORMED ID] DataSource has undefined ID parts: '${dataSourceId}'`, {
+        propsId: loader.props.id,
+        uid: loader.uid,
+        url: loader.props.url
+      });
+    }
+
+    console.log(`[Loader Render] DataSource '${dataSourceId}' rendering`, {
       timestamp: Date.now(),
+      renderStart,
+      renderStorm: isExcessiveRendering,
       stackTrace: logConfig.stackTraces ? new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()) : undefined,
     });
+
+    // Track render completion
+    setTimeout(() => {
+      const renderDuration = performance.now() - renderStart;
+      if (renderDuration > 16) { // Flag slow renders (>1 frame)
+        console.warn(`[🐌 SLOW RENDER] DataSource '${dataSourceId}' took ${renderDuration.toFixed(2)}ms`);
+      }
+    }, 0);
   }
 
   const queryKey = useMemo(() => {
@@ -108,13 +176,24 @@ export function Loader({
     const key = queryId ? queryId : [uid, extractedParam];
 
     if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
-      console.log(`[🔍 QUERY KEY CALC] DataSource '${loader.props.id || loader.uid}':`, {
+      const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+
+      // Analyze dependencies that affect this query key
+      const dependencies = {
+        fromState: extractedParam && typeof extractedParam === 'object' ? Object.keys(extractedParam) : [],
+        fromProps: loader.props ? Object.keys(loader.props).filter(k => k !== 'children') : [],
+        fromContext: appContext ? Object.keys(appContext).slice(0, 5) : [], // Limit to avoid spam
+        hasCustomQueryId: !!queryId
+      };
+
+      console.log(`[🔍 QUERY KEY CALC] DataSource '${dataSourceId}':`, {
         uid,
         timestamp: Date.now(),
         queryKey: key,
         extractedParam: extractedParam,
         url: loader.props.url,
-        hasQueryId: !!queryId,
+        dependencies,
+        memoizedFrom: ['appContext', 'loader.props', 'queryId', 'state', 'uid']
       });
     }
 

@@ -8,11 +8,24 @@
   <link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
   <script>window.__PUBLIC_PATH = '/'</script>
   <base href="/">
-   <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-S7NYYDMNPR'); </script>	
+   <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-S7NYYDMNPR"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-S7NYYDMNPR'); </script>
 </head>
 
 <body>
   <div id="root"></div>
+  <script>
+window.logReactivity = {
+  enabled: true,
+  components: true,
+  stateChanges: true,
+  queryKeys: true,
+  variables: true,
+  routing: false,
+  apiCalls: true,
+  cascade: true,
+  stackTraces: true
+};
+</script>
   <script type="module" src="/index.ts"></script>
   <script type="text/javascript">
     window.transformStops = function(stops) {
