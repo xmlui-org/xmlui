@@ -119,6 +119,7 @@ export const NavGroup = forwardRef(function NavGroup(
     layoutIsVertical,
   ]);
 
+  debugger;
   return (
     <NavGroupContext.Provider value={navGroupContextValue}>
       {inline ? (
@@ -143,6 +144,7 @@ export const NavGroup = forwardRef(function NavGroup(
           renderChild={renderChild}
           ref={ref}
           to={to}
+          initiallyExpanded={initiallyExpanded}
           disabled={disabled}
         />
       )}
@@ -232,6 +234,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     node,
     to,
     disabled = false,
+    initiallyExpanded = false,
     ...rest
   }: {
     style?: CSSProperties;
@@ -241,6 +244,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     renderChild: RenderChildFn;
     to?: string;
     disabled?: boolean;
+    initiallyExpanded?: boolean;
   },
   ref,
 ) {
@@ -261,9 +265,10 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     Trigger = DropdownMenuSubTrigger as any;
     Content = DropdownMenuSubContent;
   }
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
+
   return (
-    <Wrapper {...rest} onOpenChange={(open) => setExpanded(open)}>
+    <Wrapper {...rest} open={expanded} onOpenChange={(open) => setExpanded(open)}>
       <Trigger asChild disabled={disabled}>
         <NavLink
           icon={icon}

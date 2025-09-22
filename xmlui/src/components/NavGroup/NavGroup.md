@@ -91,8 +91,6 @@ See the following for an example of all variants:
 
 %-PROP-START icon
 
-This property defines an optional icon to display along with the `NavGroup` label.
-
 Look at this example:
 
 ```xmlui-pg copy {3, 5} display name="Example: label and icon" height="280px"

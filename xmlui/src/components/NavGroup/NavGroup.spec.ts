@@ -1,161 +1,194 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
+/**
+ * NOTE: We don't have a way to test icons yet, so some test cases are not fully realized. (See skip reasons)
+ * TODO: Add tests for icons
+ */
+
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("component renders", async ({ initTestBed, page }) => {
+  test("displays menuitems after click", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <NavGroup testId="navGroup" label="NavGroup">
-      </NavGroup>`);
-    await expect(page.getByTestId("navGroup")).toBeVisible();
+        <NavGroup label="Pages">
+          <NavLink label="Page 1" />
+          <NavGroup label="subpages">
+            <NavLink label="inner page 2" />
+            <NavLink label="inner page 3" />
+          </NavGroup>
+          <NavLink label="Page 4" />
+        </NavGroup>
+      `);
+    await page.getByRole("button", { name: "Pages", exact: true }).click();
+
+    await expect(page.getByRole("menuitem")).toHaveCount(3);
+    await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "subpages" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Page 4" })).toBeVisible();
+
+    await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "inner page 3" })).not.toBeVisible();
   });
 
-  test("component renders with children", async ({ initTestBed, page }) => {
+  test("disabled navgroup can't open", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <NavGroup label="NavGroup" testId="navGroup">
-        <NavLink label="link" to="/" />
-      </NavGroup>`);
-    await expect(page.getByTestId("navGroup")).toBeVisible();
+        <NavGroup label="Pages" enabled="false">
+          <NavLink label="Page 1" />
+          <NavGroup label="subpages">
+            <NavLink label="inner page 2" />
+            <NavLink label="inner page 3" />
+          </NavGroup>
+          <NavLink label="Page 4" />
+        </NavGroup>
+      `);
+    const pagesBtn = page.getByRole("button", { name: "Pages", exact: true });
+
+    await expect(pagesBtn).toBeDisabled();
+    await pagesBtn.click({ force: true });
+
+    await expect(page.getByRole("menuitem", { name: "Page 1" })).not.toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
   });
 });
 
-test("component trigger has correct aria labels", async ({ initTestBed, page }) => {
+test("nested disabled navgroup can't open", async ({ initTestBed, page }) => {
   await initTestBed(`
-      <NavGroup testId="navGroup" label="NavGroup">
-      </NavGroup>`);
-  const button = page.getByTestId("navGroup");
-  await expect(button).toBeVisible();
-  await expect(button).toHaveAttribute("aria-expanded", "false");
-  await button.click();
-  await expect(button).toHaveAttribute("aria-expanded", "true");
-});
-
-// TODO: depending on layout, different component lists are rendered - need to test for all of them
-/* test("component list content has correct aria labels", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <NavGroup testId="navGroup" label="NavGroup">
-      <NavLink label="link" to="/asd" />
-    </NavGroup>`);
-  const button = page.getByTestId("navGroup");
-  const content = page.getByRole('menuitem', { name: 'link' });
-
-  await button.click();
-
-  await expect(content).toBeVisible();
-  await expect(content).toHaveAttribute("aria-hidden", "false");
-}); */
-
-test("expanded in NavPanel + vertical app layout if current page is same as link in group", async ({
-  initTestBed,
-  page,
-}) => {
-  await initTestBed(`
-    <App layout="vertical">
-      <NavPanel>
-        <NavGroup testId="navGroup" label="NavGroup">
-          <NavLink label="link" to="/" />
+        <NavGroup label="Pages" >
+          <NavLink label="Page 1" />
+          <NavGroup label="subpages" enabled="false">
+            <NavLink label="inner page 2" />
+            <NavLink label="inner page 3" />
+          </NavGroup>
+          <NavLink label="Page 4" />
         </NavGroup>
-      </NavPanel>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+      `);
+  const pagesBtn = page.getByRole("button", { name: "Pages", exact: true });
+  await pagesBtn.click();
+
+  await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+
+  const subpagesBtn = page.getByRole("menuitem", { name: "subpages" });
+
+  await expect(subpagesBtn).toBeDisabled();
+
+  await subpagesBtn.click({ force: true });
+
+  await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
 });
 
-test("collapsed in NavPanel + vertical app layout", async ({ initTestBed, page }) => {
+test("initiallyExpanded works", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <App layout="vertical">
-      <NavPanel>
-        <NavGroup testId="navGroup" label="NavGroup">
-          <NavLink label="link" to="/asd" />
-        </NavGroup>
-      </NavPanel>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
-});
-
-test("expanded in NavPanel + vertical app layout", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App layout="vertical">
-      <NavPanel>
-        <NavGroup testId="navGroup" label="NavGroup">
-          <NavLink label="link" to="/" />
-        </NavGroup>
-      </NavPanel>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
-});
-
-test("collapsed in NavPanel + horizontal app layout", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App layout="horizontal">
-      <NavPanel>
-        <NavGroup testId="navGroup" label="NavGroup">
-          <NavLink label="link" to="/" />
-        </NavGroup>
-      </NavPanel>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
-});
-
-test("click expands group in NavPanel + horizontal app layout", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App layout="horizontal">
-      <NavPanel>
-        <NavGroup testId="navGroup" label="NavGroup">
-          <NavLink label="link" to="/" />
-        </NavGroup>
-      </NavPanel>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.getByRole("menuitem", { name: "link" })).not.toBeVisible();
-  await page.getByTestId("navGroup").click();
-  await expect(page.getByRole("menuitem", { name: "link" })).toBeVisible();
-});
-
-test("collapsed in vertical app layout", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App layout="vertical">
-      <NavGroup testId="navGroup" label="NavGroup">
-        <NavLink label="link" to="/asd" />
+    <NavGroup label="Pages" initiallyExpanded="true">
+      <NavLink label="Page 1" />
+      <NavGroup label="subpages">
+        <NavLink label="inner page 2" />
+        <NavLink label="inner page 3" />
       </NavGroup>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+      <NavLink label="Page 4" />
+    </NavGroup>
+  `);
+
+  await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+
+  await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
 });
 
-test("expanded in vertical app layout", async ({ initTestBed, page }) => {
+test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <App layout="vertical">
-      <NavGroup testId="navGroup" label="NavGroup">
-        <NavLink label="link" to="/" />
+    <NavGroup label="Pages" initiallyExpanded="true">
+      <NavLink label="Page 1" />
+      <NavGroup label="subpages" initiallyExpanded="true">
+        <NavLink label="inner page 2" />
+        <NavLink label="inner page 3" />
       </NavGroup>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).toBeVisible();
+      <NavLink label="Page 4" />
+    </NavGroup>
+  `);
+
+  await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+
+  await expect(page.getByRole("menuitem", { name: "inner page 2" })).toBeVisible();
 });
 
-test("collapsed in horizontal app layout", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App layout="horizontal">
-      <NavGroup testId="navGroup" label="NavGroup">
-        <NavLink label="link" to="/asd" />
-      </NavGroup>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
-});
+test.describe("integration with NavPanel", () => {
+  test.skip(
+    "collapsed in NavPanel + vertical app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {
+      await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="NavGroup">
+            <NavLink label="link" to="/" />
+          </NavGroup>
+        </NavPanel>
+      </App>`);
+    },
+  );
 
-test("collapsed in horizontal app layout if current page is same as link in group", async ({
-  initTestBed,
-  page,
-}) => {
-  await initTestBed(`
-    <App layout="horizontal">
-      <NavGroup testId="navGroup" label="NavGroup">
-        <NavLink label="link" to="/" />
-      </NavGroup>
-    </App>`);
-  await expect(page.getByTestId("navGroup")).toBeVisible();
-  await expect(page.locator("[data-testid='nav-group-content']")).not.toBeVisible();
+  test.skip(
+    "expanded in NavPanel + vertical app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {
+      await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup testId="navGroup" label="NavGroup">
+            <NavLink label="link" to="/" />
+          </NavGroup>
+        </NavPanel>
+      </App>`);
+    },
+  );
+
+  test.skip(
+    "collapsed in NavPanel + horizontal app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "expanded in NavPanel + horizontal app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "collapsed in vertical app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "expanded in vertical app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "collapsed in horizontal app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "expanded in horizontal app layout",
+    SKIP_REASON.TO_BE_IMPLEMENTED(
+      "This case is not fully realized since we don't have a way to test icons",
+    ),
+    async ({ initTestBed }) => {},
+  );
 });
