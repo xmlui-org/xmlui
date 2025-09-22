@@ -115,14 +115,6 @@ export class ReactivityDebugger {
     // Only show actionable logs if configured AND there's no suggested action
     if (actionableOnly && !suggestedAction) return;
 
-    console.log('[🔍 DEBUG] logWithAction parameters:', {
-      category,
-      componentId,
-      actionableOnly,
-      hasSuggestedAction: !!suggestedAction,
-      suggestedAction
-    });
-
     const logEntry = {
       category,
       componentId,
@@ -139,7 +131,7 @@ export class ReactivityDebugger {
       data: logEntry
     });
 
-    console.group(`[${category}] ${componentId}: ${message}`);
+    console.log(`[${category}] ${componentId}: ${message}`);
     
     const level = windowConfig?.level ?? this.config.level;
     if (level !== 'minimal') {
@@ -155,8 +147,6 @@ export class ReactivityDebugger {
     if (correlateEvents) {
       this.showCorrelatedEvents(componentId);
     }
-
-    console.groupEnd();
   }
 
   static logRenderStorm(componentId: string, renderCount: number, timeWindow: number) {
