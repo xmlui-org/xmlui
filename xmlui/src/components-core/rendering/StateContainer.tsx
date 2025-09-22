@@ -494,6 +494,16 @@ function useVars(
 
   const varsLogConfig = getLogReactivity();
   const resolvedVars = useMemo(() => {
+    // Track what triggered this variable resolution
+    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+      setTimeout(() => {
+        console.log(`[🚀 RESOLUTION TRIGGER] Variable resolution triggered by dependency change`, {
+          dependencies: ['appContext', 'componentState', 'fnDeps', 'memoedVars', 'referenceTrackedApi', 'vars'],
+          timestamp: Date.now()
+        });
+      }, 0);
+    }
+
     if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
       // Only log if there are non-standard variables (not just $props, emitEvent, etc.)
       const nonStandardVars = Object.keys(vars).filter(key => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(key));
@@ -501,15 +511,38 @@ function useVars(
         const resolutionStart = performance.now();
         setTimeout(() => {
           const resolutionDuration = performance.now() - resolutionStart;
+
+          // Analyze variable content and complexity
+          const variableAnalysis = nonStandardVars.map(varName => {
+            const varValue = vars[varName];
+            let analysis = { name: varName, type: typeof varValue };
+
+            if (Array.isArray(varValue)) {
+              analysis = { ...analysis, type: 'array', length: varValue.length };
+            } else if (varValue && typeof varValue === 'object') {
+              analysis = { ...analysis, type: 'object', keys: Object.keys(varValue).length };
+            } else if (typeof varValue === 'string') {
+              analysis = { ...analysis, length: varValue.length };
+            }
+
+            return analysis;
+          });
+
           console.log('[useVars Resolution] Starting variable resolution for:', nonStandardVars, {
             variableCount: nonStandardVars.length,
             resolutionTime: resolutionDuration.toFixed(2) + 'ms',
-            dependencyChain: 'vars → componentState → resolvedVars'
+            dependencyChain: 'vars → componentState → resolvedVars',
+            variableAnalysis: variableAnalysis
           });
 
-          // Flag excessive variable resolution
+          // Flag performance issues
           if (nonStandardVars.length > 10) {
             console.warn(`[⚠️ MANY VARIABLES] Resolving ${nonStandardVars.length} variables may impact performance`);
+          }
+          if (resolutionDuration > 20) {
+            console.warn(`[⚠️ SLOW VARIABLE RESOLUTION] Resolution took ${resolutionDuration.toFixed(2)}ms`, {
+              slowVariables: variableAnalysis.filter(v => v.type === 'array' && v.length > 100 || v.type === 'object' && v.keys > 50)
+            });
           }
         }, 0);
       }
@@ -526,37 +559,68 @@ function useVars(
         } else {
           // --- Resolve each variable's value, without going into the details of arrays and objects
           if (!memoedVars.current.has(value)) {
+            // Track memoization cache miss
+            if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+              setTimeout(() => {
+                console.log(`[🆕 CACHE MISS] Variable '${key}' not in memoization cache, creating new entry`);
+              }, 0);
+            }
+
             memoedVars.current.set(value, {
               getDependencies: memoizeOne((value, referenceTrackedApi) => {
+                const depStart = performance.now();
+                let dependencies;
+
                 if (isParsedValue(value)) {
-                  return collectVariableDependencies(value.tree, referenceTrackedApi);
+                  dependencies = collectVariableDependencies(value.tree, referenceTrackedApi);
+                } else {
+                  // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
+                  const params = parseParameterString(value);
+                  let ret = new Set<string>();
+                  params.forEach((param) => {
+                    if (param.type === "expression") {
+                      ret = new Set([
+                        ...ret,
+                        ...collectVariableDependencies(param.value, referenceTrackedApi),
+                      ]);
+                    }
+                  });
+                  dependencies = Array.from(ret);
                 }
-                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
-                const params = parseParameterString(value);
-                let ret = new Set<string>();
-                params.forEach((param) => {
-                  if (param.type === "expression") {
-                    ret = new Set([
-                      ...ret,
-                      ...collectVariableDependencies(param.value, referenceTrackedApi),
-                    ]);
-                  }
-                });
-                return Array.from(ret);
+
+                // Log dependency calculation
+                if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+                  const depDuration = performance.now() - depStart;
+                  setTimeout(() => {
+                    console.log(`[🔗 DEPENDENCIES] Variable '${key}' depends on:`, {
+                      dependencies: dependencies,
+                      dependencyCount: dependencies.length,
+                      calculationTime: depDuration.toFixed(2) + 'ms',
+                      isParsed: isParsedValue(value)
+                    });
+                  }, 0);
+                }
+
+                return dependencies;
               }),
               obtainValue: memoizeOne(
                 (value, state, appContext, strict, deps, appContextDeps) => {
-                  // console.log(
-                  //   "VARS, BUST, obtain value called with",
-                  //   value,
-                  //   { state, appContext },
-                  //   {
-                  //     deps,
-                  //     appContextDeps,
-                  //   }
-                  // );
+                  const valueStart = performance.now();
+
+                  // Log value resolution attempt
+                  if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+                    setTimeout(() => {
+                      console.log(`[🔄 VALUE RESOLUTION] Variable '${key}' resolving value`, {
+                        hasDeps: deps && Object.keys(deps).length > 0,
+                        hasAppContextDeps: appContextDeps && Object.keys(appContextDeps).length > 0,
+                        depKeys: deps ? Object.keys(deps) : [],
+                        appContextDepKeys: appContextDeps ? Object.keys(appContextDeps) : []
+                      });
+                    }, 0);
+                  }
+
                   try {
-                    return isParsedValue(value)
+                    const result = isParsedValue(value)
                       ? evalBinding(value.tree, {
                           localContext: state,
                           appContext,
@@ -565,6 +629,20 @@ function useVars(
                           },
                         })
                       : extractParam(state, value, appContext, strict);
+
+                    // Log successful resolution
+                    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+                      const valueDuration = performance.now() - valueStart;
+                      setTimeout(() => {
+                        console.log(`[✅ VALUE RESOLVED] Variable '${key}' resolved successfully`, {
+                          resolutionTime: valueDuration.toFixed(2) + 'ms',
+                          resultType: Array.isArray(result) ? 'array' : typeof result,
+                          resultSize: Array.isArray(result) ? result.length : typeof result === 'string' ? result.length : undefined
+                        });
+                      }, 0);
+                    }
+
+                    return result;
                   } catch (e) {
                     console.log(state);
                     throw new ParseVarError(value, e);
@@ -599,25 +677,59 @@ function useVars(
           const stateContext: ContainerState = { ...ret, ...componentState };
 
           let dependencies: Array<string> = [];
+          const depResolutionStart = performance.now();
+
           if (fnDeps[key]) {
             dependencies = fnDeps[key];
+            // Log cache hit for function dependencies
+            if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+              setTimeout(() => {
+                console.log(`[💾 CACHE HIT] Variable '${key}' using cached function dependencies:`, dependencies);
+              }, 0);
+            }
           } else {
-            memoedVars.current
+            // Calculate dependencies - this might be a cache hit or miss in getDependencies memoization
+            const calculatedDeps = memoedVars.current
               .get(value)!
-              .getDependencies(value, referenceTrackedApi)
-              .forEach((dep) => {
-                if (fnDeps[dep]) {
-                  dependencies.push(...fnDeps[dep]);
-                } else {
-                  dependencies.push(dep);
-                }
-              });
+              .getDependencies(value, referenceTrackedApi);
+
+            calculatedDeps.forEach((dep) => {
+              if (fnDeps[dep]) {
+                dependencies.push(...fnDeps[dep]);
+              } else {
+                dependencies.push(dep);
+              }
+            });
             dependencies = [...new Set(dependencies)];
+
+            // Log dependency resolution
+            if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+              const depResolutionTime = performance.now() - depResolutionStart;
+              setTimeout(() => {
+                console.log(`[🔍 DEPENDENCY RESOLUTION] Variable '${key}' resolved dependencies`, {
+                  dependencies: dependencies,
+                  resolutionTime: depResolutionTime.toFixed(2) + 'ms',
+                  fromCache: false
+                });
+              }, 0);
+            }
           }
+
           const stateDepValues = pickFromObject(stateContext, dependencies);
           const appContextDepValues = pickFromObject(appContext, dependencies);
-          // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
 
+          // Log what dependency values were picked
+          if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+            setTimeout(() => {
+              console.log(`[📊 DEPENDENCY VALUES] Variable '${key}' dependency values:`, {
+                stateDepValues: Object.keys(stateDepValues),
+                appContextDepValues: Object.keys(appContextDepValues),
+                totalDependencies: dependencies.length
+              });
+            }, 0);
+          }
+
+          const obtainStart = performance.now();
           ret[key] = memoedVars.current
             .get(value)!
             .obtainValue(
@@ -628,6 +740,15 @@ function useVars(
               stateDepValues,
               appContextDepValues,
             );
+
+          // Log if obtainValue was a cache hit (fast) or cache miss (slow)
+          if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+            const obtainTime = performance.now() - obtainStart;
+            setTimeout(() => {
+              const cacheStatus = obtainTime < 1 ? 'CACHE HIT' : 'CACHE MISS';
+              console.log(`[${obtainTime < 1 ? '💾' : '🔄'} ${cacheStatus}] Variable '${key}' obtainValue took ${obtainTime.toFixed(2)}ms`);
+            }, 0);
+          }
 
           // Lightweight variable change tracking
           if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
@@ -642,6 +763,46 @@ function useVars(
         }
       }
     });
+
+    // Log completion of variable resolution with results
+    if (varsLogConfig && typeof varsLogConfig === 'object' && varsLogConfig !== null && varsLogConfig.variables) {
+      const nonStandardVars = Object.keys(vars).filter(key => !['$props', 'emitEvent', 'hasEventHandler', 'updateState'].includes(key));
+      if (nonStandardVars.length > 0) {
+        setTimeout(() => {
+          const resolvedAnalysis = nonStandardVars.map(varName => {
+            const resolvedValue = ret[varName];
+            let analysis = { name: varName, type: typeof resolvedValue };
+
+            if (Array.isArray(resolvedValue)) {
+              analysis = { ...analysis, type: 'array', length: resolvedValue.length };
+              // Sample first few items for arrays
+              if (resolvedValue.length > 0) {
+                analysis = { ...analysis, sample: resolvedValue.slice(0, 3) };
+              }
+            } else if (resolvedValue && typeof resolvedValue === 'object') {
+              analysis = { ...analysis, type: 'object', keys: Object.keys(resolvedValue).length };
+              // Sample first few keys for objects
+              const keys = Object.keys(resolvedValue).slice(0, 3);
+              if (keys.length > 0) {
+                analysis = { ...analysis, sampleKeys: keys };
+              }
+            } else if (typeof resolvedValue === 'string') {
+              analysis = { ...analysis, length: resolvedValue.length };
+              // Sample string content (truncated)
+              analysis = { ...analysis, preview: resolvedValue.substring(0, 50) + (resolvedValue.length > 50 ? '...' : '') };
+            }
+
+            return analysis;
+          });
+
+          console.log('[✅ useVars Resolution Complete]', {
+            resolvedVariables: nonStandardVars,
+            resolvedAnalysis: resolvedAnalysis
+          });
+        }, 0);
+      }
+    }
+
     return ret;
   }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
