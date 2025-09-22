@@ -291,22 +291,18 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Features Needing Investigation", () => {
-  test.skip("loading property shows loading state",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to identify correct loading selector"),
+  test("loading property shows loading state",
     async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' loading="true" testId="table">
+        <Table loading="true" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
-      
-      // Loading indicator should be visible - check for spinner or loading text
-      await expect(page.locator(".spinner")).toBeVisible();
+      await expect(page.getByRole("status").and(page.getByLabel("Loading"))).toBeVisible();
     }
   );
 
-  test.skip("row selection works with checkboxes",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Checkboxes are hidden via CSS styling"),
+  test("row selection works with checkboxes",
     async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table 
@@ -370,8 +366,7 @@ test.describe("Features Needing Investigation", () => {
     }
   );
 
-  test.skip("pagination works correctly",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Pagination controls need investigation"),
+  test("pagination works correctly",
     async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table 
@@ -382,8 +377,7 @@ test.describe("Features Needing Investigation", () => {
           <Column bindTo="name"/>
         </Table>
       `);
-      
-      // Look for pagination controls
+      await expect(page.locator("button[aria-label*='Previous page']")).toBeVisible();
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
     }
   );
@@ -543,12 +537,12 @@ test.describe("Edge Cases", () => {
 });
 
 // =============================================================================
-// THEME AND STYLING TESTS (SKIPPED)
+// THEME AND STYLING TESTS
 // =============================================================================
 
+// TODO: Need more theme variable tests!
 test.describe("Theme Variables and Styling", () => {
-  test.skip("applies heading background color theme variable",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Theme variable testing needs CSS inspection"),
+  test("applies heading background color theme variable",
     async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' testId="table">
@@ -560,22 +554,6 @@ test.describe("Theme Variables and Styling", () => {
       
       const header = page.locator("th").first();
       await expect(header).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    }
-  );
-
-  test.skip("applies cell padding theme variable",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Theme variable testing needs CSS inspection"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
-          <Column bindTo="name"/>
-        </Table>
-      `, {
-        testThemeVars: { "padding-cell-Table": "20px" },
-      });
-      
-      const cell = page.locator("td").first();
-      await expect(cell).toHaveCSS("padding", "20px");
     }
   );
 });
