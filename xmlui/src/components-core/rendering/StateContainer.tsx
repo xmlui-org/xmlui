@@ -192,106 +192,10 @@ export const StateContainer = memo(
     const prevParentState = logConfig ? usePrevious(parentState) : undefined;
 
     // Track render frequency using the new ReactivityDebugger system
-    const isExcessiveRendering = trackRenderFrequency(node.uid || 'unnamed_component');
-    if (isExcessiveRendering) {
-      console.log('[🔍 DEBUG] Excessive rendering detected for:', node.uid);
-    }
+    const componentId = node.uid || node.tag || `component_${Math.random().toString(36).substr(2, 6)}`;
+    const isExcessiveRendering = trackRenderFrequency(componentId);
 
-    // Enhanced component render logging with frequency tracking
-    if (
-      logConfig &&
-      (logConfig === true || (typeof logConfig === "object" && logConfig !== null && logConfig.components)) &&
-      node.uid
-    ) {
-      const renderStart = performance.now();
-      const isExcessiveRendering = trackRenderFrequency(node.uid);
-
-      // Use setTimeout to move logging off the render path
-      setTimeout(() => {
-        const renderDuration = performance.now() - renderStart;
-        const interactionContext = getInteractionContext();
-
-        // Build component hierarchy context
-        const hierarchyInfo = {
-          component: node.uid,
-          hasChildren: node.children && node.children.length > 0,
-          childCount: node.children?.length || 0,
-          renderDuration: renderDuration.toFixed(2) + "ms",
-          renderStorm: isExcessiveRendering,
-          // Add interaction correlation
-          ...(interactionContext ? {
-            interactionTriggered: true,
-            interactionType: interactionContext.interactionType,
-            timeSinceInteraction: interactionContext.timeSinceInteraction + 'ms',
-            targetElement: interactionContext.target?.tagName,
-            targetId: interactionContext.target?.id
-          } : { interactionTriggered: false })
-        };
-
-        console.log(`[StateContainer Render] Component '${node.uid}' rendering`, hierarchyInfo);
-
-        // Cascade detection for component renders
-        if (typeof logConfig === 'object' && logConfig !== null && logConfig.cascade) {
-          // Check if this is part of a cascade by looking at recent renders
-          const isExcessive = trackRenderFrequency(node.uid);
-          if (isExcessive) {
-            console.log(`[🔗 CASCADE DETECTED] Component '${node.uid}' is part of a render cascade`, {
-              likelyCause: 'query_invalidation_or_state_cascade',
-              interactionTriggered: interactionContext ? true : false,
-              hasChildren: (node.children?.length || 0) > 0,
-              childCount: node.children?.length || 0
-            });
-          }
-        }
-
-        if (typeof logConfig === 'object' && logConfig !== null && logConfig.stateChanges && prevParentState && prevParentState !== parentState) {
-          // Analyze what changed in parent state
-          const parentStateKeys = Object.keys(parentState || {});
-          const prevParentStateKeys = Object.keys(prevParentState || {});
-          const changedKeys = parentStateKeys.filter(
-            (k) => (parentState as any)?.[k] !== (prevParentState as any)?.[k],
-          );
-
-          console.log(`[🔄 Parent State Changed] Component '${node.uid}':`, {
-            changedKeys: changedKeys.length > 0 ? changedKeys : "reference_change",
-            cascadeRisk: node.children?.length || 0,
-          });
-
-          if (typeof logConfig === 'object' && logConfig !== null && logConfig.cascade) {
-            console.log(
-              `[🔗 CASCADE TRIGGER] State change in '${node.uid}' may cascade to ${node.children?.length || 0} children`,
-            );
-          }
-
-          // Track component interaction patterns
-          if (typeof logConfig === 'object' && logConfig !== null && logConfig.dataFlow) {
-            console.log(`[🌊 COMPONENT INTERACTION] '${node.uid}' state change`, {
-              hasChildren: (node.children?.length || 0) > 0,
-              childComponents:
-                node.children?.map((child) => child.uid || "unnamed").slice(0, 3) || [],
-              interactionType: "parent_to_child_state_flow",
-            });
-          }
-
-          // Track reactive flow from state changes to renders
-          if (typeof logConfig === 'object' && logConfig !== null && logConfig.variables) {
-            console.log(`[⚡ REACTIVE FLOW] Component '${node.uid}' re-rendered due to reactive changes`, {
-              component: node.uid,
-              interactionTriggered: interactionContext ? true : false,
-              renderReason: interactionContext ? 'user_interaction' : 'reactive_state_change',
-              flow: 'state_change → variable_resolution → component_render → ui_update'
-            });
-          }
-        }
-
-        // Flag slow renders
-        if (renderDuration > 16) {
-          console.warn(
-            `[🐌 SLOW COMPONENT] '${node.uid}' took ${renderDuration.toFixed(2)}ms to render`,
-          );
-        }
-      }, 0);
-    }
+    // No additional verbose logging needed - ReactivityDebugger handles this
 
     // --- All state manipulation happens through the container reducer, which is created here.
     // --- This reducer allow collecting state changes for debugging purposes. The `debugView`
