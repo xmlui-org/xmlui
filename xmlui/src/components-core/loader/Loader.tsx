@@ -194,7 +194,7 @@ export function Loader({
         targetElement: interactionContext.target?.tagName,
         targetId: interactionContext.target?.id
       } : { interactionTriggered: false }),
-      stackTrace: logConfig.stackTraces ? new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()) : undefined,
+      stackTrace: (typeof logConfig === 'object' && logConfig !== null && logConfig.stackTraces) ? new Error().stack?.split('\n').slice(1, 4).map(line => line.trim()) : undefined,
     });
 
     // Track render completion
