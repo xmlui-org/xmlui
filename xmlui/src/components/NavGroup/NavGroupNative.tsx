@@ -77,7 +77,7 @@ export const NavGroup = forwardRef(function NavGroup(
     renderChild,
     to,
     disabled = false,
-    initiallyExpanded,
+    initiallyExpanded = false,
     iconHorizontalCollapsed,
     iconHorizontalExpanded,
     iconVerticalCollapsed,
@@ -203,12 +203,15 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         icon={icon}
         to={to}
         disabled={disabled}
+        aria-expanded={expanded}
       >
         {label}
         <div style={{ flex: 1 }} />
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
+        data-testid="nav-group-content"
+        aria-hidden={!expanded}
         className={classnames(styles.groupContent, {
           [styles.expanded]: expanded,
         })}
