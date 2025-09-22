@@ -112,8 +112,16 @@ export class ReactivityDebugger {
     const windowConfig = typeof window !== 'undefined' ? (window as any).logReactivity : null;
     const actionableOnly = windowConfig?.actionableOnly ?? this.config.output.actionable;
     
-    // Only show actionable logs if configured
+    // Only show actionable logs if configured AND there's no suggested action
     if (actionableOnly && !suggestedAction) return;
+
+    console.log('[🔍 DEBUG] logWithAction parameters:', {
+      category,
+      componentId,
+      actionableOnly,
+      hasSuggestedAction: !!suggestedAction,
+      suggestedAction
+    });
 
     const logEntry = {
       category,
