@@ -73,7 +73,30 @@ const trackRenderFrequency = (componentId: string): boolean => {
   return isExcessive;
 };
 
-// Reactivity logging check - gated by window.logReactivity
+/**
+ * Reactivity logging configuration - gated by window.logReactivity
+ *
+ * Usage:
+ * window.logReactivity = {
+ *   // Core tracking
+ *   variables: true,        // Variable resolution and content analysis
+ *   components: true,       // Component render tracking
+ *   stateChanges: true,     // State change detection
+ *   queryKeys: true,        // Query key calculation
+ *
+ *   // Advanced tracking
+ *   dataFlow: true,         // Data flow and component interactions
+ *   apiTracking: true,      // API requests and refetches
+ *   userInteractions: true, // User clicks and form submissions
+ *   cascade: true,          // Component cascade effects
+ *   routing: true,          // Route changes
+ *   causality: true,        // Trigger chain analysis
+ *
+ *   // Debugging modes
+ *   verbose: true,          // Detailed logging (more noise)
+ *   stackTraces: true       // Include stack traces in logs
+ * }
+ */
 const getLogReactivity = (): boolean | { [key: string]: any } | null => {
   if (typeof window === "undefined") return false;
   const config = (window as any).logReactivity;
@@ -176,6 +199,16 @@ export const StateContainer = memo(
             console.log(
               `[🔗 CASCADE TRIGGER] State change in '${node.uid}' may cascade to ${node.children?.length || 0} children`,
             );
+          }
+
+          // Track component interaction patterns
+          if (logConfig.dataFlow) {
+            console.log(`[🌊 COMPONENT INTERACTION] '${node.uid}' state change`, {
+              hasChildren: (node.children?.length || 0) > 0,
+              childComponents:
+                node.children?.map((child) => child.uid || "unnamed").slice(0, 3) || [],
+              interactionType: "parent_to_child_state_flow",
+            });
           }
         }
 
@@ -644,7 +677,7 @@ function useVars(
                   varsLogConfig.variables
                 ) {
                   const depDuration = performance.now() - depStart;
-                  if (depDuration > 5 || varsLogConfig.verbose) {
+                  if (depDuration > 1 || varsLogConfig.verbose) {
                     setTimeout(() => {
                       console.log(`[🔗 DEPENDENCIES] Variable '${key}' depends on:`, {
                         dependencies: dependencies,
@@ -693,7 +726,7 @@ function useVars(
                       varsLogConfig.variables
                     ) {
                       const valueDuration = performance.now() - valueStart;
-                      if (valueDuration > 10 || varsLogConfig.verbose) {
+                      if (valueDuration > 5 || varsLogConfig.verbose) {
                         setTimeout(() => {
                           console.log(
                             `[✅ VALUE RESOLVED] Variable '${key}' resolved in ${valueDuration.toFixed(2)}ms`,
@@ -780,7 +813,7 @@ function useVars(
               varsLogConfig.variables
             ) {
               const depResolutionTime = performance.now() - depResolutionStart;
-              if (depResolutionTime > 5 || varsLogConfig.verbose) {
+              if (depResolutionTime > 1 || varsLogConfig.verbose) {
                 setTimeout(() => {
                   console.log(
                     `[🔍 DEPENDENCY RESOLUTION] Variable '${key}' resolved dependencies in ${depResolutionTime.toFixed(2)}ms`,
@@ -831,7 +864,7 @@ function useVars(
             varsLogConfig.variables
           ) {
             const obtainTime = performance.now() - obtainStart;
-            if (obtainTime > 10 || varsLogConfig.verbose) {
+            if (obtainTime > 5 || varsLogConfig.verbose) {
               setTimeout(() => {
                 const cacheStatus = obtainTime < 1 ? "CACHE HIT" : "CACHE MISS";
                 console.log(
@@ -849,12 +882,31 @@ function useVars(
             varsLogConfig.variables
           ) {
             const prevValue = memoedVars.current.get(`${key}-prevValue`);
-            if (prevValue !== undefined && prevValue !== ret[key]) {
+            const currentValue = ret[key];
+
+            if (prevValue !== undefined && prevValue !== currentValue) {
               setTimeout(() => {
-                console.log(`[🔄 Variable Change] ${key} changed in ${componentUid || "unknown"}`);
+                // Analyze what kind of change occurred
+                const changeType =
+                  Array.isArray(currentValue) && Array.isArray(prevValue)
+                    ? currentValue.length !== prevValue.length
+                      ? "array_size_change"
+                      : "array_content_change"
+                    : typeof currentValue !== typeof prevValue
+                      ? "type_change"
+                      : "value_change";
+
+                console.log(`[📊 DATA FLOW] Variable '${key}' changed`, {
+                  changeType,
+                  from: Array.isArray(prevValue) ? `array[${prevValue.length}]` : typeof prevValue,
+                  to: Array.isArray(currentValue)
+                    ? `array[${currentValue.length}]`
+                    : typeof currentValue,
+                  component: componentUid || "unknown",
+                });
               }, 0);
             }
-            memoedVars.current.set(`${key}-prevValue`, ret[key]);
+            memoedVars.current.set(`${key}-prevValue`, currentValue);
           }
         }
       }

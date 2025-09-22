@@ -433,6 +433,17 @@ export const Container = memo(
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
             return (...eventArgs: any[]) => {
+              // Track user interactions
+              const logConfig = (window as any).logReactivity;
+              if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.userInteractions) {
+                console.log(`[👆 USER INTERACTION] Event handler executed`, {
+                  component: uid,
+                  action: typeof arrowExpression === 'string' ? arrowExpression.substring(0, 50) + (arrowExpression.length > 50 ? '...' : '') : 'function',
+                  eventArgs: eventArgs.length,
+                  timestamp: Date.now()
+                });
+              }
+
               return runCodeSync(arrowExpression, ...eventArgs);
             };
           });

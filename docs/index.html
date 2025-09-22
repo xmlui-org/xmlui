@@ -21,10 +21,13 @@ window.logReactivity = {
   queryKeys: true,
   variables: true,
   routing: false,
-  apiCalls: true,
+  apiTracking: true,        // Changed from apiCalls
+  dataFlow: true,           // Added
+  userInteractions: true,   // Added
   cascade: true,
   stackTraces: true
 };
+
 </script>
   <script type="module" src="/index.ts"></script>
   <script type="text/javascript">

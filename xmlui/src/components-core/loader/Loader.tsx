@@ -41,7 +41,10 @@ const trackDataSourceRenderFrequency = (dataSourceId: string): boolean => {
   return isExcessive;
 };
 
-// Reactivity logging check - gated by window.logReactivity
+/**
+ * Reactivity logging configuration - gated by window.logReactivity
+ * See StateContainer.tsx for full documentation of available options
+ */
 const getLogReactivity = (): boolean | { [key: string]: any } | null => {
   if (typeof window === 'undefined') return false;
   const config = (window as any).logReactivity;
@@ -115,6 +118,15 @@ export function Loader({
       changedKeys: changedKeys.length > 0 ? changedKeys : 'reference_change',
       triggerChain: logConfig.causality ? 'appContext → queryKey → refetch' : undefined
     });
+
+    // Track data source behavior patterns
+    if (logConfig.dataFlow) {
+      console.log(`[🌐 DATA SOURCE BEHAVIOR] '${dataSourceId}' context change`, {
+        url: loader.props.url,
+        changeType: 'context_driven_refetch',
+        dataFlow: 'external_api → component_state'
+      });
+    }
   }
 
   // Enhanced state change tracking
@@ -195,6 +207,16 @@ export function Loader({
         dependencies,
         memoizedFrom: ['appContext', 'loader.props', 'queryId', 'state', 'uid']
       });
+
+      // Track API request patterns
+      if (logConfig.apiTracking && loader.props.url && typeof loader.props.url === 'string') {
+        console.log(`[🌐 API REQUEST] DataSource '${dataSourceId}' will fetch:`, {
+          url: loader.props.url,
+          method: loader.props.method || 'GET',
+          queryKeyChanged: true,
+          requestType: loader.props.url.includes('{') ? 'templated_url' : 'static_url'
+        });
+      }
     }
 
     return key;
@@ -206,12 +228,23 @@ export function Loader({
     // Simple reference comparison to avoid circular reference issues
     if (prevQueryKey && prevQueryKey !== queryKey) {
       if (logConfig && typeof logConfig === 'object' && logConfig !== null && logConfig.queryKeys) {
-        console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
+        const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+        console.log(`[🚨 REACTIVITY TRIGGER] DataSource '${dataSourceId}' queryKey changed:`);
         console.log(`  Previous:`, prevQueryKey);
         console.log(`  Current:`, queryKey);
         console.log(`  URL:`, loader.props.url);
-        console.log(`  Timestamp:`, Date.now());
         console.log(`  This will trigger a new API call`);
+
+        // Enhanced API call tracking
+        if (logConfig.apiTracking) {
+          console.log(`[🔄 API REFETCH] DataSource '${dataSourceId}' triggering new request`, {
+            url: loader.props.url,
+            reason: 'query_key_changed',
+            previousKey: prevQueryKey,
+            newKey: queryKey,
+            timestamp: Date.now()
+          });
+        }
       }
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);
