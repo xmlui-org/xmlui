@@ -10,6 +10,7 @@ import { useEvent } from "./utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
 import { EMPTY_ARRAY } from "./constants";
+import { mergeProps } from "./utils/mergeProps";
 
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
@@ -34,6 +35,12 @@ export const CompoundComponent = forwardRef(
       layoutContext,
       uid,
       updateState,
+      registerComponentApi,
+      extractResourceUrl,
+      appContext,
+      state,
+      lookupAction,
+      ...restProps
     }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,
   ) => {
@@ -137,6 +144,10 @@ export const CompoundComponent = forwardRef(
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),
+        ...mergeProps(
+          ret.props,
+          restProps
+        ),
       } as any);
     }
     return React.isValidElement(ret) ? ret : <>{ret}</>;

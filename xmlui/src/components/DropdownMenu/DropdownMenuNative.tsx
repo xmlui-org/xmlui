@@ -115,7 +115,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     >
       <ReactDropdownMenu.Trigger {...rest} asChild disabled={disabled} ref={ref as any}>
         {triggerTemplate ? (
-          <div>{triggerTemplate}</div>
+          triggerTemplate
         ) : (
           <Button
             icon={<Icon name={triggerButtonIcon} fallback="chevrondown" />}
