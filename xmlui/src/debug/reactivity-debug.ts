@@ -42,6 +42,14 @@ export class ReactivityDebugger {
   private static readonly CORRELATION_WINDOW_MS = 5000;
   private static readonly RENDER_STORM_THRESHOLD = 10;
 
+  // Track query invalidation cascades
+  private static queryInvalidationCounts = new Map<string, {
+    count: number;
+    lastReset: number;
+    invalidationChain: string[];
+  }>();
+  private static readonly INVALIDATION_CASCADE_THRESHOLD = 3;
+
   static configure(config: Partial<ReactivityDebugConfig>) {
     this.config = { ...this.config, ...config };
     
@@ -192,17 +200,46 @@ export class ReactivityDebugger {
     );
   }
 
-  static logUserInteraction(eventType: string, componentId?: string, target?: any) {
-    if (!this.shouldLog('userInteractions', componentId)) return;
+  static logQueryInvalidation(componentId: string, invalidatedBy?: string, reason?: string) {
+    if (!this.shouldLog('apiCalls', componentId)) return;
 
-    // Don't log if suppressing noisy logs and this is a common event
-    if (this.config.output.suppressNoisy && ['mousemove', 'scroll'].includes(eventType)) return;
+    const now = Date.now();
+    const existing = this.queryInvalidationCounts.get(componentId);
 
-    console.log(`[👆 USER INTERACTION] ${eventType}`, {
-      component: componentId || 'global',
-      target: target?.tagName || 'unknown',
-      timestamp: Date.now()
-    });
+    if (!existing || (now - existing.lastReset) > this.CORRELATION_WINDOW_MS) {
+      this.queryInvalidationCounts.set(componentId, {
+        count: 1,
+        lastReset: now,
+        invalidationChain: [invalidatedBy || 'unknown']
+      });
+    } else {
+      existing.count++;
+      if (invalidatedBy && !existing.invalidationChain.includes(invalidatedBy)) {
+        existing.invalidationChain.push(invalidatedBy);
+      }
+    }
+
+    const cascadeDetected = existing && existing.count >= this.INVALIDATION_CASCADE_THRESHOLD;
+    
+    if (cascadeDetected) {
+      const suggestedAction = this.analyzeCascadePattern(existing.invalidationChain);
+      
+      this.logWithAction(
+        '🔄 QUERY CASCADE',
+        componentId,
+        `Query invalidated ${existing.count} times in ${this.CORRELATION_WINDOW_MS/1000}s`,
+        {
+          invalidationChain: existing.invalidationChain,
+          cascadePattern: this.detectCascadePattern(existing.invalidationChain),
+          lastInvalidatedBy: invalidatedBy,
+          reason
+        },
+        suggestedAction,
+        'apiCalls'
+      );
+    } else {
+      console.log(`[🔄 QUERY INVALIDATED] ${componentId} invalidated by ${invalidatedBy || 'unknown'}${reason ? ' (' + reason + ')' : ''}`);
+    }
   }
 
   private static addToCorrelationWindow(componentId: string, event: any) {
@@ -227,6 +264,33 @@ export class ReactivityDebugger {
 
     const recentEvents = window.events.slice(-3); // Show last 3 events
     console.log('🔗 Related events:', recentEvents.map(e => `${e.type} (${Date.now() - e.timestamp}ms ago)`));
+  }
+
+  private static detectCascadePattern(invalidationChain: string[]): string {
+    if (invalidationChain.length <= 1) return 'single';
+    
+    const unique = new Set(invalidationChain);
+    if (unique.size === 1) return 'self_invalidation_loop';
+    if (unique.size === 2) return 'ping_pong_cascade';
+    if (invalidationChain.length > unique.size * 2) return 'circular_cascade';
+    return 'chain_cascade';
+  }
+
+  private static analyzeCascadePattern(invalidationChain: string[]): string {
+    const pattern = this.detectCascadePattern(invalidationChain);
+    
+    switch (pattern) {
+      case 'self_invalidation_loop':
+        return 'CRITICAL: Query is invalidating itself. Check for state updates in onLoaded callbacks or circular dependencies.';
+      case 'ping_pong_cascade':
+        return `WARNING: Two queries invalidating each other: ${[...new Set(invalidationChain)].join(' ↔ ')}. Review their invalidates properties or shared dependencies.`;
+      case 'circular_cascade':
+        return 'CRITICAL: Multiple queries in circular invalidation. Map out query dependencies and break the cycle.';
+      case 'chain_cascade':
+        return `WARNING: Query chain reaction detected: ${invalidationChain.join(' → ')}. Consider batching updates or reducing invalidation scope.`;
+      default:
+        return 'Review query invalidation logic and dependencies.';
+    }
   }
 
   private static analyzeQueryKeyChange(oldKey: any, newKey: any): string | undefined {

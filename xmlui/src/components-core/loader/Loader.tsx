@@ -266,6 +266,16 @@ export function Loader({
     // Simple reference comparison to avoid circular reference issues
     if (prevQueryKey && prevQueryKey !== queryKey) {
       const dataSourceId = loader.props.id || loader.uid || 'unnamed_datasource';
+      
+      // Detect if this is a query invalidation (vs initial load)
+      const isInvalidation = prevQueryKey !== null && prevQueryKey !== undefined;
+      
+      if (isInvalidation) {
+        // Try to determine what caused the invalidation
+        const reason = 'query_key_change';
+        ReactivityDebugger.logQueryInvalidation(dataSourceId, 'unknown', reason);
+      }
+      
       ReactivityDebugger.logQueryKeyChange(dataSourceId, prevQueryKey, queryKey, loader.props.url);
     }
   }, [queryKey, prevQueryKey, loader.props.id, loader.uid]);

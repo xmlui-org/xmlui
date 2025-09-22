@@ -117,7 +117,8 @@ export default ({ mode = "lib" }) => {
       },
     },
     build: {
-      minify: "terser",
+      //minify: "terser",
+      minify: false,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib: lib,
