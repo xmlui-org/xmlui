@@ -1,4 +1,4 @@
-import {
+import React, {
   forwardRef,
   memo,
   MutableRefObject,
@@ -180,6 +180,160 @@ export const StateContainer = memo(
       memoedVars,
     );
 
+    // Track component APIs for reactivity debugging
+    const componentId = node.uid || `component_${Math.random().toString(36).substr(2, 6)}`;
+    const componentName = node.type || 'Unknown';
+    const previousApis = useRef<Record<symbol, ComponentApi>>({});
+
+    React.useEffect(() => {
+      // Monitor component state changes (which includes API changes)
+      const currentState = componentState;
+      const prevState = previousApis.current;
+
+      // Check for component state changes
+      Object.entries(currentState).forEach(([key, value]) => {
+        if (typeof key === 'symbol' && key.description) {
+          // This is a component API
+          const prevApi = prevState[key];
+          if (!prevApi) {
+            // New API registered
+            console.log(`[🔍 COMPONENT API] ${key.description} registered:`, Object.keys(value));
+          } else {
+            // Check for API property changes
+            Object.entries(value).forEach(([apiKey, apiValue]) => {
+              if (prevApi[apiKey] !== apiValue) {
+                console.log(`[🔄 API CHANGE] ${key.description}.${apiKey}:`, {
+                  old: prevApi[apiKey],
+                  new: apiValue,
+                  timestamp: new Date().toLocaleTimeString()
+                });
+              }
+            });
+          }
+        }
+      });
+
+      // Update previous state for next comparison
+      previousApis.current = { ...currentState };
+    }, [componentState]);
+
+    // Track variables for reactivity debugging
+    const previousVars = useRef<ContainerState>({});
+    React.useEffect(() => {
+      // Simple console logging for reactivity debugging
+      const currentVars = resolvedLocalVars;
+      const prevVars = previousVars.current;
+
+
+      // Only log user-defined variables (those defined in var. attributes)
+      const userVars = Object.entries(currentVars).filter(([key]) =>
+        !key.startsWith('$') &&
+        !key.startsWith('_') &&
+        typeof currentVars[key] !== 'function' &&
+        // Only log variables that are actually defined in this component's var definitions
+        varDefinitions.hasOwnProperty(key)
+      );
+
+
+      // Only log components that have user-defined variables OR component IDs
+      const hasComponentId = node.props?.id;
+      if (userVars.length === 0 && !hasComponentId) {
+        return; // Skip logging for components with no user-defined variables or IDs
+      }
+
+
+
+
+      // Log component ID if it exists
+      if (hasComponentId) {
+        console.log(`[🔍 COMPONENT] ${componentName} with ID: ${hasComponentId}`);
+        console.log(`[🔍 DEBUG] All variables in this component:`, Object.keys(currentVars));
+        console.log(`[🔍 DEBUG] Var definitions:`, Object.keys(varDefinitions));
+        console.log(`[🔍 DEBUG] Current state:`, currentVars);
+      }
+
+      if (userVars.length > 0) {
+        userVars.forEach(([key, newValue]) => {
+          const oldValue = prevVars[key];
+
+          if (oldValue !== newValue) {
+            // Determine change source and dependencies
+            let changeSource: 'user' | 'computed' | 'external' = 'user';
+            let dependencies = functionDeps[key] || [];
+
+            // Check if this is a computed variable by looking at the variable definition
+            const varDefinition = varDefinitions[key];
+            if (varDefinition && typeof varDefinition === 'string' && varDefinition.includes('{')) {
+              // This is a computed variable (has an expression)
+              changeSource = 'computed';
+
+              // Extract dependencies from the expression manually if functionDeps is empty
+              if (dependencies.length === 0) {
+                const expression = varDefinition.replace(/[{}]/g, '').trim();
+                // Simple regex to find variable references in expressions
+                const varMatches = expression.match(/\b[a-zA-Z_$][a-zA-Z0-9_$]*\b/g) || [];
+                // Filter out common keywords and functions
+                dependencies = varMatches.filter(match =>
+                  !['true', 'false', 'null', 'undefined', 'new', 'Date', 'Math', 'console', 'window', 'document'].includes(match)
+                );
+              }
+            } else if (dependencies.length > 0) {
+              // Has dependencies, so it's computed
+              changeSource = 'computed';
+            }
+
+            // Console logging with actionable insights
+            console.log(`[🔄 REACTIVE CHANGE] ${componentName}.${key}:`, {
+              old: oldValue,
+              new: newValue,
+              source: changeSource,
+              dependencies: dependencies.length > 0 ? dependencies : 'none',
+              timestamp: new Date().toLocaleTimeString()
+            });
+
+            // Also log the values separately for better visibility
+            console.log(`  └─ ${key}: ${oldValue} → ${newValue} (${changeSource})`);
+          }
+        });
+
+        // Log dependency relationships for computed variables
+        const computedVars = userVars.filter(([key]) => {
+          const deps = functionDeps[key] || [];
+          const varDef = varDefinitions[key];
+          const isComputed = varDef && typeof varDef === 'string' && varDef.includes('{');
+          return deps.length > 0 || isComputed;
+        });
+
+        if (computedVars.length > 0) {
+          console.log(`[🔗 DEPENDENCIES] ${componentName} computed variables:`,
+            computedVars.map(([key, value]) => {
+              // Use manually extracted dependencies if functionDeps is empty
+              let dependencies = functionDeps[key] || [];
+              if (dependencies.length === 0) {
+                const varDef = varDefinitions[key];
+                if (varDef && typeof varDef === 'string' && varDef.includes('{')) {
+                  // Extract dependencies from the variable definition
+                  const matches = varDef.match(/\{([^}]+)\}/g);
+                  if (matches) {
+                    dependencies = matches.map(match => match.slice(1, -1).trim());
+                  }
+                }
+              }
+              return {
+                variable: key,
+                value,
+                dependsOn: dependencies,
+                definition: varDefinitions[key]
+              };
+            })
+          );
+        }
+      }
+
+      // Update previous values for next comparison
+      previousVars.current = { ...currentVars };
+    }, [resolvedLocalVars, componentId, functionDeps]);
+
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
     const combinedState = useCombinedState(
       stateFromOutside,
@@ -203,6 +357,7 @@ export const StateContainer = memo(
           });
         }),
       );
+
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);

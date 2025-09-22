@@ -297,12 +297,15 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const inputId = id || generatedId;
   const isInForm = useIsInsideForm();
 
+
+
   // Set initial state based on the initialValue prop
   useEffect(() => {
     if (initialValue !== undefined) {
       updateState({ value: initialValue }, { initial: true });
     }
   }, [initialValue, updateState]);
+
 
   // Observe the size of the reference element
   useEffect(() => {

@@ -120,6 +120,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
     return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);

@@ -203,6 +203,7 @@ export const selectComponentRenderer = createComponentRenderer(
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
+        id={extractValue.asOptionalString(node.props.id)}
         validationStatus={extractValue(node.props.validationStatus)}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}

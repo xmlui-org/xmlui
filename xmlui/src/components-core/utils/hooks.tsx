@@ -217,7 +217,7 @@ export function useColors(...colorNames: (string | ColorDef)[]) {
 }
 
 export function useReferenceTrackedApi(componentState: ContainerState) {
-  return useShallowCompareMemoize(
+  const result = useShallowCompareMemoize(
     useMemo(() => {
       const ret: Record<string, ComponentApi> = {};
       if (Reflect.ownKeys(componentState).length === 0) {
@@ -233,6 +233,50 @@ export function useReferenceTrackedApi(componentState: ContainerState) {
       return ret;
     }, [componentState]),
   );
+
+  // Debug: Track API changes with previous values
+  const prevResult = React.useRef<Record<string, ComponentApi>>({});
+  const hasLoggedInitial = React.useRef(false);
+
+  React.useEffect(() => {
+    if (Object.keys(result).length > 0) {
+      const prev = prevResult.current;
+
+      // Check for API changes
+      Object.entries(result).forEach(([key, api]) => {
+        if (key === 'lines' || key === 'tubeStations') {
+          const prevApi = prev[key];
+          if (!prevApi) {
+            // New API registered - only log once per component
+            if (!hasLoggedInitial.current) {
+              console.log(`[🔍 COMPONENT API] ${key} registered:`, Object.keys(api));
+              console.log(`[🔍 API VALUES] ${key}:`, api);
+              hasLoggedInitial.current = true;
+            }
+          } else {
+            // Check for API property changes - only log meaningful changes
+            Object.entries(api).forEach(([apiKey, apiValue]) => {
+              if (prevApi[apiKey] !== apiValue) {
+                // Only log non-function values or the 'value' property
+                if (typeof apiValue !== 'function' || apiKey === 'value') {
+                  console.log(`[🔄 API CHANGE] ${key}.${apiKey}:`, {
+                    old: prevApi[apiKey],
+                    new: apiValue,
+                    timestamp: new Date().toLocaleTimeString()
+                  });
+                }
+              }
+            });
+          }
+        }
+      });
+
+      // Update previous values
+      prevResult.current = { ...result };
+    }
+  }, [result]);
+
+  return result;
 }
 
 /**
