@@ -200,6 +200,26 @@ export class ReactivityDebugger {
     );
   }
 
+  static logRouteChange(from: string, to: string, routeData?: any) {
+  if (!this.shouldLog('apiCalls')) return; // Use apiCalls category for routing
+
+  const routeChangeInfo = {
+  from,
+  to,
+  timestamp: Date.now(),
+  routeData
+  };
+
+  console.log(`[🗺️ ROUTE CHANGE] ${from} → ${to}`, routeChangeInfo);
+  
+  // Add route changes to correlation window to connect with query cascades
+  this.addToCorrelationWindow('routing', {
+  type: '🗺️ ROUTE CHANGE',
+  timestamp: routeChangeInfo.timestamp,
+  data: routeChangeInfo
+  });
+  }
+
   static logQueryInvalidation(componentId: string, invalidatedBy?: string, reason?: string) {
     if (!this.shouldLog('apiCalls', componentId)) return;
 
