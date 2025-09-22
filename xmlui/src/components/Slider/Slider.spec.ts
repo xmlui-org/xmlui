@@ -166,15 +166,15 @@ test.describe("Basic Functionality", () => {
   test("readOnly prevents interaction", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>
-        <Slider id="slider" readOnly="true" />
-        <Text testId="slider-value" value="{slider.value}" />
+        <Slider id="mySlider" readOnly="true" />
+        <Text testId="slider-value" value="{mySlider.value}" />
       </Fragment>`);
     const slider = page.getByRole("slider");
     const sliderOffsetWidth = await page.locator("[data-track]").evaluate((el) => {
       return el.getBoundingClientRect().width;
     });
 
-    slider.hover();
+    await slider.hover();
     await page.mouse.down({ button: "left" });
     await page.mouse.move(sliderOffsetWidth, 0); // Attempt to drag to end
     await page.mouse.up();
