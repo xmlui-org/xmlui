@@ -1,7 +1,6 @@
 import type {
   ComponentDef,
   ComponentMetadata,
-  CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
 import type {
   ComponentRendererFn,
@@ -9,11 +8,6 @@ import type {
   CompoundComponentRendererInfo,
 } from "../abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
-import { compoundComponentDefFromSource } from "./utils/compound-utils";
-import { Parser } from "../parsers/scripting/Parser";
-import {
-  collectCodeBehindFromSource,
-} from "../parsers/scripting/code-behind-collect";
 
 /**
  * This helper function creates a component renderer definition from its arguments.
@@ -73,56 +67,35 @@ export function createLoaderRenderer<TMd extends ComponentMetadata>(
  * This helper function creates a user defined component renderer definition from its arguments.
  * @param metadata The metadata of the user-defined component
  * @param componentMarkup The XMLUI markup that defines the user-defined component
- * @param codeBehind Optional code-behind script that contains variable and function definitions 
+ * @param codeBehind Optional code-behind script that contains variable and function definitions
  * used by the component
  * @returns The view renderer definition composed of the arguments
  */
 export function createUserDefinedComponentRenderer<TMd extends ComponentMetadata>(
   metadata: TMd,
-  componentMarkup: string,
-  codeBehind?: string,
+  def: any,
+  codeBehind?: any,
 ): CompoundComponentRendererInfo {
   // --- Parse the component definition from the markup
-  const componentDef = compoundComponentDefFromSource("component", componentMarkup);
-  if (!isCompoundComponent(componentDef)) {
-    throw new Error("The parsed markup is not a user-defined component.");
-  }
-
   // --- Parse the optional code-behind script
-  if (codeBehind && codeBehind.trim().length > 0) {
-    const parser = new Parser(codeBehind);
-    try {
-      parser.parseStatements();
-    } catch (e) {
-      throw new Error(`Error parsing code-behind script: ${(e as Error).message}`);
+  const component = def.component.component;;
+  if (codeBehind) {
+    if (codeBehind.vars) {
+      component.vars ??= {};
+      component.vars = { ...component.vars, ...codeBehind.vars };
     }
-
-    try {
-      const collected = collectCodeBehindFromSource("component", codeBehind);
-      if (Object.keys(collected.moduleErrors ?? {}).length > 0) {
-        throw new Error("Error collecting from code-behind script");
-      }
-
-      if (collected.vars) {
-        componentDef.component.vars ??= {};
-        componentDef.component.vars = { ...componentDef.component.vars, ...collected.vars };
-      }
-      if (collected.functions) {
-        componentDef.component.functions ??= {};
-        componentDef.component.functions = { ...componentDef.component.functions, ...collected.functions };
-      }
-    } catch (e) {
-      throw new Error("Error collecting from code-behind script");
+    if (codeBehind.functions) {
+      component.functions ??= {};
+      component.functions = {
+        ...component.functions,
+        ...codeBehind.functions,
+      };
     }
   }
 
   // --- Done.
   return {
-    compoundComponentDef: componentDef,
+    compoundComponentDef: def.component,
     metadata,
   };
-}
-
-function isCompoundComponent(obj: any): obj is CompoundComponentDef {
-  return obj && obj.name && typeof obj.name === "string" && obj.component;
 }

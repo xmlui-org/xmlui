@@ -1,6 +1,6 @@
 import { createUserDefinedComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
-import componentSource from "./FormSection.xmlui?raw";
+import componentSource from "./FormSection.xmlui";
 
 const COMP = "FormSection";
 

@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-/// <reference types="vite-plugin-svgr/client" />
 
 // Type declarations for XMLUI files
 declare module "*.xmlui" {

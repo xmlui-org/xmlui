@@ -1,6 +1,6 @@
 import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
-import componentSource from "./Hello.xmlui?raw";
-import codeBehind from "./Hello.xmlui.xs?raw";
+import componentSource from "./Hello.xmlui";
+import codeBehind from "./Hello.xmlui.xs";
 
 const COMP = "Hello";
 
@@ -10,6 +10,8 @@ export const HelloMd = createMetadata({
     "A sample component",
   props: {},
 });
+
+console.log(componentSource);
 
 export const helloRenderer = createUserDefinedComponentRenderer(
   HelloMd,
