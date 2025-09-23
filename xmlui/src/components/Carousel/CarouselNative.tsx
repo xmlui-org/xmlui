@@ -97,8 +97,8 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     plugins,
   );
 
-  const prevIconName = prevIcon || orientation === "horizontal" ? "arrowleft" : "arrowup";
-  const nextIconName = nextIcon || orientation === "horizontal" ? "arrowright" : "arrowdown";
+  const prevIconName = prevIcon || (orientation === "horizontal" ? "arrowleft" : "arrowup");
+  const nextIconName = nextIcon || (orientation === "horizontal" ? "arrowright" : "arrowdown");
 
   useEffect(() => {
     if (autoplay) {

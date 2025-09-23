@@ -142,21 +142,6 @@ test.describe("Basic Functionality", () => {
     await page.waitForTimeout(200);
     await expect(slides.nth(1)).toBeInViewport();
   });
-
-  // TODO: handle vertical test
-  test.skip(
-    "component renders with vertical orientation",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`
-      <Carousel orientation="vertical">
-        <CarouselItem>Slide 1</CarouselItem>
-        <CarouselItem>Slide 2</CarouselItem>
-        <CarouselItem>Slide 3</CarouselItem>
-      </Carousel>
-    `);
-    },
-  );
 });
 
 // =============================================================================
@@ -356,8 +341,12 @@ test.describe("Edge Cases", () => {
     await expect(page.getByRole("region").getByRole("tablist")).not.toBeVisible();
 
     // Verify controls are not visible
-    await expect(page.getByRole("region").getByRole("button", { name: "Previous Slide" })).not.toBeVisible();
-    await expect(page.getByRole("region").getByRole("button", { name: "Next Slide" })).not.toBeVisible();
+    await expect(
+      page.getByRole("region").getByRole("button", { name: "Previous Slide" }),
+    ).not.toBeVisible();
+    await expect(
+      page.getByRole("region").getByRole("button", { name: "Next Slide" }),
+    ).not.toBeVisible();
   });
 });
 
@@ -381,47 +370,39 @@ test.describe("Integration", () => {
     await expect(page.getByRole("group").last()).toContainText("Card 2");
   });
 
-  test.skip(
-    "component handles custom control icon on Prev button",
-    SKIP_REASON.XMLUI_BUG("Icon does not show up"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(
-        `
+  test("component handles custom control icon on Prev button", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
           <Carousel controls="true" prevIcon="test">
             <CarouselItem>Slide 1</CarouselItem>
             <CarouselItem>Slide 2</CarouselItem>
           </Carousel>    
         `,
-        {
-          resources: {
-            "icon.test": "resources/bell.svg",
-          },
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
         },
-      );
-      const useElement = page.getByRole("button", { name: "Previous Slide" }).locator("svg use");
-      await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
-    },
-  );
+      },
+    );
+    const useElement = page.getByRole("button", { name: "Previous Slide" }).locator("svg use");
+    await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
+  });
 
-  test.skip(
-    "component handles custom control icon on Next button",
-    SKIP_REASON.XMLUI_BUG("Icon does not show up"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(
-        `
+  test("component handles custom control icon on Next button", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
           <Carousel controls="true" nextIcon="test">
             <CarouselItem>Slide 1</CarouselItem>
             <CarouselItem>Slide 2</CarouselItem>
           </Carousel>    
         `,
-        {
-          resources: {
-            "icon.test": "resources/bell.svg",
-          },
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
         },
-      );
-      const useElement = page.getByRole("button", { name: "Next Slide" }).locator("svg use");
-      await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
-    },
-  );
+      },
+    );
+    const useElement = page.getByRole("button", { name: "Next Slide" }).locator("svg use");
+    await expect(useElement).toHaveAttribute("href", expect.stringMatching(/#bell/));
+  });
 });
