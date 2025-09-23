@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.10.14
+
+### Patch Changes
+
+- 618049b: fix: Modal dialog scrolling issue
+- 215a142: Allow image to accept binary data (and use it instead of src)
+- 65b52e1: Allow user-defined components in extension packages
+- 0cc2178: Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.
+- 53d4ed9: Fixed feature to add custom icons for the Carousel prev/next page buttons.
+
 ## 0.10.13
 
 ### Patch Changes
