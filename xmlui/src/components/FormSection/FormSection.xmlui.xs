@@ -1,0 +1,1 @@
+var myVar = "Hello, World!";

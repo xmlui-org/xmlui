@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
+import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from 'rollup-plugin-copy';
@@ -74,7 +75,7 @@ export default ({ mode = "lib" }) => {
   }
   let plugins = mode === "metadata"
     ? []
-    : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })];
+    : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if(mode === "lib"){
     plugins.push(copy({
