@@ -1609,37 +1609,71 @@ This method selects the row with the specified ID. This method has no effect if 
 | [backgroundColor](../styles-and-themes/common-units/#color)-selected-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-cell-Table | 1px solid $borderColor | 1px solid $borderColor |
+| [border](../styles-and-themes/common-units/#border)-Table | 0px solid transparent | 0px solid transparent |
 | [borderBottom](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderBottom](../styles-and-themes/common-units/#border)-last-row-Table | $borderBottom-cell-Table | $borderBottom-cell-Table |
+| [borderBottom](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |
 | [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderLeft](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Table | $borderRadius | $borderRadius |
 | [borderRight](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderRight](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |
 | [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderTop](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderTopColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderTopStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderTopWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Table | *none* | *none* |
 | [borderVerticalColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Table | *none* | *none* |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-Table | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-heading-Table | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](../styles-and-themes/common-units/#size)-row-Table | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-heading-Table | $fontWeight-bold | $fontWeight-bold |
@@ -1648,12 +1682,12 @@ This method selects the row with the specified ID. This method has no effect if 
 | [outlineOffset](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineStyle](../styles-and-themes/common-units/#border)-heading-Table--focus | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineWidth](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [padding](../styles-and-themes/common-units/#size)-cell-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
-| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-cell-Table | $space-2 $space-1 $space-2 $space-2 | $space-2 $space-1 $space-2 $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 $space-1 $space-2 $space-2 | $space-2 $space-1 $space-2 $space-2 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-first-Table | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-0 | $space-0 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |

@@ -162,6 +162,8 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
@@ -218,5 +220,7 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
