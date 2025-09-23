@@ -1,4 +1,11 @@
-import { type CSSProperties, type HTMLAttributes, forwardRef } from "react";
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import classnames from "classnames";
 
 import styles from "./Image.module.scss";
@@ -9,6 +16,7 @@ import styles from "./Image.module.scss";
 type Props = {
   src?: string;
   alt?: string;
+  imageData?: Blob | any;
   fit?: "cover" | "contain";
   style?: CSSProperties;
   className?: string;
@@ -28,6 +36,7 @@ export const Image = forwardRef(function Img(
   {
     src,
     alt,
+    imageData,
     fit = defaultProps.fit,
     style,
     className,
@@ -39,12 +48,44 @@ export const Image = forwardRef(function Img(
   }: Props,
   ref,
 ) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  const blobToRender = useMemo(() => {
+    if (!imageData || !(imageData instanceof Blob)) {
+      return undefined;
+    }
+    return imageData;
+  }, [imageData]);
+
+  // Handle Blob data when src is empty
+  useEffect(() => {
+    if (!src && blobToRender) {
+      const url = URL.createObjectURL(blobToRender);
+      setBlobUrl(url);
+
+      // Cleanup function to revoke the blob URL
+      return () => {
+        URL.revokeObjectURL(url);
+        setBlobUrl(null);
+      };
+    } else {
+      // Clean up any existing blob URL if src is provided or imageData is not a Blob
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+        setBlobUrl(null);
+      }
+    }
+  }, [src, blobToRender]);
+
   src = safeConvertPropToString(src);
   alt = safeConvertPropToString(alt);
+
+  // Use blob URL if src is empty and we have a blob URL
+  const imageSrc = src || blobUrl;
   return (
     <img
       {...rest}
-      src={src}
+      src={imageSrc}
       ref={ref as any}
       alt={alt}
       loading={lazyLoad ? "lazy" : "eager"}

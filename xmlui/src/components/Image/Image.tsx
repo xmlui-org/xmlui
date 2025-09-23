@@ -18,6 +18,12 @@ export const ImageMd = createMetadata({
       "This property is used to indicate the source (path) of the image to display. " +
         "When not defined, no image is displayed.",
     ),
+    some: {
+      description: "Just a test property to check how unknown properties are handled",
+    },
+    data: d(
+      `This property contains the binary data that represents the image.`,
+    ),
     alt: d(`This optional property specifies an alternate text for the image.`),
     fit: {
       description:
@@ -56,7 +62,8 @@ export const imageComponentRenderer = createComponentRenderer(
   ({ node, extractValue, className, extractResourceUrl }) => {
     return (
       <Image
-        src={extractResourceUrl(node.props.src)}
+        src={node.props.src ? extractResourceUrl(node.props.src) : undefined}
+        imageData={extractValue(node.props.data)}
         alt={extractValue(node.props.alt)}
         fit={extractValue(node.props.fit)}
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
