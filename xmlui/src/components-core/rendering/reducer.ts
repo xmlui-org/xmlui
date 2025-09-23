@@ -124,6 +124,9 @@ export function createContainerReducer(debugView: IDebugViewContext) {
             }
           });
           storeNextValue(state);
+          if (state.projects) {
+            console.log("Projects var changed", state.projects);
+          }
         }
         break;
       }

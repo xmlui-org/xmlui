@@ -162,6 +162,7 @@ export const StateContainer = memo(
     // then resolve vars and replace function deps with the collected deps for that function
     //first resolve round (we do 2, to make sure that the order of the definitions doesn't cause problems)
     // e.g. 'testFn' uses $props, but $props is not resolved yet
+    console.log("Pre-resolving local vars");
     const preResolvedLocalVars = useVars(
       varDefinitions,
       functionDeps,
@@ -173,6 +174,7 @@ export const StateContainer = memo(
       ...localVarsStateContext,
     });
 
+    console.log("Resolving local vars");
     const resolvedLocalVars = useVars(
       varDefinitions,
       functionDeps,
@@ -364,6 +366,9 @@ function useVars(
         // --- We already resolved props in a compound component
         ret[key] = value;
       } else {
+        if (key === "projects") {
+          console.log("resolving 'projects'", value);
+        }
         if (!isParsedValue(value) && typeof value !== "string") {
           ret[key] = value;
         } else {
