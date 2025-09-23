@@ -1999,10 +1999,10 @@ export default {
         "description": "Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)"
       },
       "$result": {
-        "description": "Response data (available in `completedNotificationMessage` and `success` event)"
+        "description": "Response data (available in `completedNotificationMessage`)"
       },
       "$error": {
-        "description": "Error details (available in `errorNotificationMessage` and `error` event)"
+        "description": "Error details (available in `errorNotificationMessage`)"
       }
     },
     "apis": {
@@ -2097,6 +2097,11 @@ export default {
       "defaultTheme": {
         "description": "This property sets the app's default theme.",
         "valueType": "string"
+      },
+      "autoDetectTone": {
+        "description": "This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use \"light\" or \"dark\" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -2398,6 +2403,9 @@ export default {
       },
       "didChange": {
         "description": "This event is triggered when value of AutoComplete has changed."
+      },
+      "itemCreated": {
+        "description": "This event is triggered when a new item is created by the user (if `creatable` is enabled)."
       }
     },
     "apis": {
@@ -6254,6 +6262,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -6766,6 +6778,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -7231,9 +7247,11 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H1": "$fontSize-2xl",
+      "lineHeight-H1": "$lineHeight-2xl",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
       "fontSize-H1-markdown": "$fontSize-2xl",
+      "lineHeight-H1-markdown": "$lineHeight-2xl",
       "marginTop-H1-markdown": "0",
       "marginBottom-H1-markdown": "$space-6",
       "light": {},
@@ -7276,6 +7294,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -7741,8 +7763,11 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H2": "$fontSize-xl",
+      "lineHeight-H2": "$lineHeight-xl",
       "marginTop-H2": "0",
       "marginBottom-H2": "0",
+      "fontSize-H2-markdown": "$fontSize-xl",
+      "lineHeight-H2-markdown": "$lineHeight-xl",
       "marginTop-H2-markdown": "$space-10",
       "marginBottom-H2-markdown": "$space-3",
       "light": {},
@@ -7785,6 +7810,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -8249,9 +8278,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H3": "$fontSize-base",
+      "fontSize-H3": "$fontSize-lg",
+      "lineHeight-H3": "$lineHeight-lg",
       "marginTop-H3": "0",
       "marginBottom-H3": "0",
+      "fontSize-H3-markdown": "$fontSize-lg",
+      "lineHeight-H3-markdown": "$lineHeight-lg",
       "marginTop-H3-markdown": "$space-6",
       "marginBottom-H3-markdown": "$space-2",
       "light": {},
@@ -8294,6 +8326,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -8758,9 +8794,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H4": "$fontSize-sm",
+      "fontSize-H4": "$fontSize-base",
+      "lineHeight-H4": "$lineHeight-base",
       "marginTop-H4": "0",
       "marginBottom-H4": "0",
+      "fontSize-H4-markdown": "$fontSize-base",
+      "lineHeight-H4-markdown": "$lineHeight-base",
       "marginTop-H4-markdown": "$space-5",
       "marginBottom-H4-markdown": "$space-1",
       "light": {},
@@ -8803,6 +8842,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -9267,9 +9310,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H5": "$fontSize-xs",
+      "fontSize-H5": "$fontSize-sm",
+      "lineHeight-H5": "$lineHeight-sm",
       "marginTop-H5": "0",
       "marginBottom-H5": "0",
+      "fontSize-H5-markdown": "$fontSize-sm",
+      "lineHeight-H5-markdown": "$lineHeight-sm",
       "marginTop-H5-markdown": "0",
       "marginBottom-H5-markdown": "$space-0",
       "light": {},
@@ -9312,6 +9358,10 @@ export default {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -9776,9 +9826,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H6": "$fontSize-tiny",
+      "fontSize-H6": "$fontSize-xs",
+      "lineHeight-H6": "$lineHeight-xs",
       "marginTop-H6": "0",
       "marginBottom-H6": "0",
+      "fontSize-H6-markdown": "$fontSize-xs",
+      "lineHeight-H6-markdown": "$lineHeight-xs",
       "marginTop-H6-markdown": "0",
       "marginBottom-H6-markdown": "$space-0",
       "light": {},
@@ -10613,6 +10666,14 @@ export default {
   "ModalDialog": {
     "status": "stable",
     "description": "`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.",
+    "parts": {
+      "content": {
+        "description": "The main content area of the modal dialog."
+      },
+      "title": {
+        "description": "The title area of the modal dialog."
+      }
+    },
     "props": {
       "fullScreen": {
         "description": "Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).",
@@ -14354,6 +14415,12 @@ export default {
         ]
       }
     },
+    "apis": {
+      "hasOverflow": {
+        "description": "Returns true when the displayed text overflows its container boundaries.",
+        "signature": "hasOverflow(): boolean"
+      }
+    },
     "themeVars": {
       "marginTop-Text": "var(--xmlui-marginTop-Text)",
       "marginBottom-Text": "var(--xmlui-marginBottom-Text)",
@@ -14426,11 +14493,13 @@ export default {
       "borderRadius-Text": "$borderRadius",
       "borderStyle-Text": "solid",
       "fontSize-Text": "$fontSize-sm",
+      "lineHeight-Text": "$lineHeight-sm",
       "borderWidth-Text": "$space-0",
       "lineHeight-Text-codefence": "1.5",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
       "fontSize-Text-secondary": "$fontSize-sm",
+      "lineHeight-Text-secondary": "$lineHeight-sm",
       "fontStyle-Text-cite": "italic",
       "textColor-Text": "$textColor-primary",
       "fontFamily-Text": "$fontFamily",
@@ -14438,6 +14507,7 @@ export default {
       "fontSize-Text-codefence": "$fontSize-code",
       "fontFamily-Text-code": "$fontFamily-monospace",
       "fontSize-Text-code": "$fontSize-sm",
+      "lineHeight-Text-code": "$lineHeight-xs",
       "borderWidth-Text-code": "1px",
       "borderStyle-Text-code": "solid",
       "borderRadius-Text-code": "4px",
@@ -14447,29 +14517,37 @@ export default {
       "textDecorationLine-Text-inserted": "underline",
       "fontFamily-Text-keyboard": "$fontFamily-monospace",
       "fontSize-Text-keyboard": "$fontSize-sm",
+      "lineHeight-Text-keyboard": "$lineHeight-sm",
       "fontWeight-Text-keyboard": "$fontWeight-bold",
       "borderWidth-Text-keyboard": "1px",
       "paddingHorizontal-Text-keyboard": "$space-1",
       "fontFamily-Text-sample": "$fontFamily-monospace",
       "fontSize-Text-sample": "$fontSize-sm",
+      "lineHeight-Text-sample": "$lineHeight-sm",
       "fontSize-Text-sup": "$fontSize-xs",
+      "lineHeight-Text-sup": "$lineHeight-xs",
       "verticalAlignment-Text-sup": "super",
       "fontSize-Text-sub": "$fontSize-xs",
+      "lineHeight-Text-sub": "$lineHeight-xs",
       "verticalAlignment-Text-sub": "sub",
       "fontStyle-Text-var": "italic",
       "fontStyle-Text-em": "italic",
       "fontFamily-Text-mono": "$fontFamily-monospace",
       "fontSize-Text-title": "$fontSize-2xl",
+      "lineHeight-Text-title": "$lineHeight-2xl",
       "fontSize-Text-subtitle": "$fontSize-xl",
+      "lineHeight-Text-subtitle": "$lineHeight-xl",
       "fontSize-Text-small": "$fontSize-sm",
       "lineHeight-Text-small": "$lineHeight-sm",
       "letterSpacing-Text-caption": "0.05rem",
       "fontSize-Text-placeholder": "$fontSize-xs",
+      "lineHeight-Text-placeholder": "$lineHeight-xs",
       "fontFamily-Text-codefence": "$fontFamily-monospace",
       "paddingHorizontal-Text-codefence": "$space-4",
       "paddingVertical-Text-codefence": "$space-3",
       "paddingVertical-Text-paragraph": "$space-1",
       "fontSize-Text-subheading": "$fontSize-H6",
+      "lineHeight-Text-subheading": "$lineHeight-sm",
       "fontWeight-Text-subheading": "$fontWeight-bold",
       "letterSpacing-Text-subheading": "0.04em",
       "textTransform-Text-subheading": "uppercase",
@@ -14477,6 +14555,7 @@ export default {
       "marginBottom-Text-tableheading": "$space-4",
       "paddingHorizontal-Text-tableheading": "$space-1",
       "fontSize-Text-tableheading": "$fontSize-H6",
+      "lineHeight-Text-tableheading": "$lineHeight-sm",
       "fontWeight-Text-tableheading": "$fontWeight-bold",
       "backgroundColor-Text-code": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-code": "$color-surface-100",

@@ -238,6 +238,7 @@ type Props = {
   itemLabelWidth?: string;
   itemLabelPosition?: string; // type LabelPosition
   keepModalOpenOnSubmit?: boolean;
+  hideButtonRowUntilDirty?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -249,6 +250,7 @@ export const defaultProps: Pick<
   | "itemLabelBreak"
   | "keepModalOpenOnSubmit"
   | "swapCancelAndSave"
+  | "hideButtonRowUntilDirty"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -257,6 +259,7 @@ export const defaultProps: Pick<
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
   swapCancelAndSave: false,
+  hideButtonRowUntilDirty: false,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -296,6 +299,7 @@ const Form = forwardRef(function (
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
+    hideButtonRowUntilDirty,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -306,6 +310,14 @@ const Form = forwardRef(function (
   const requestModalFormClose = useModalFormClose();
 
   const isEnabled = enabled && !formState.submitInProgress;
+  const isDirty = useMemo(()=>{
+    return Object.entries(formState.interactionFlags).some(([key, flags])=>{
+      if(flags.isDirty){
+        return true;
+      }
+      return false;
+    });
+  }, [formState.interactionFlags]);
 
   const formContextValue = useMemo(() => {
     return {
@@ -466,6 +478,12 @@ const Form = forwardRef(function (
     });
   }, [doReset, updateData, registerComponentApi]);
 
+  let safeButtonRow = <>{buttonRow || (
+    <div className={styles.buttonRow}>
+      {swapCancelAndSave && [submitButton, cancelButton]}
+      {!swapCancelAndSave && [cancelButton, submitButton]}
+    </div>
+  )}</>;
   return (
     <>
       <form
@@ -480,12 +498,7 @@ const Form = forwardRef(function (
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>
-        {buttonRow || (
-          <div className={styles.buttonRow}>
-            {swapCancelAndSave && [submitButton, cancelButton]}
-            {!swapCancelAndSave && [cancelButton, submitButton]}
-          </div>
-        )}
+        {(!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
       </form>
       {confirmSubmitModalVisible && (
         <ModalDialog
@@ -592,6 +605,7 @@ export function FormWithContextVar({
       itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
       itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
       itemLabelWidth={extractValue.asOptionalString(node.props.itemLabelWidth)}
+      hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
       formState={formState}
       dispatch={dispatch}
       id={node.uid}

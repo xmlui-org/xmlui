@@ -642,7 +642,6 @@ export const Table = forwardRef(
         <table
           className={styles.table}
           ref={tableRef}
-          style={{ borderRight: "1px solid transparent" }}
         >
           {!hideHeader && (
             <thead style={{ height: headerHeight }} className={styles.headerWrapper}>

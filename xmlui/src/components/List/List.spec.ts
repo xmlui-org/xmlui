@@ -1008,21 +1008,42 @@ test.describe("Other Edge Cases", () => {
   });
 });
 
-scrollAnchoringValues.forEach((anchor) => {
-  test.skip(
-    `scrollAnchor scrolls to ${anchor}`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
+test("scrollAnchor scrolls to top", async ({ initTestBed, createListDriver }) => {
+  await initTestBed(`
+      <List data="{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}" height="100px" scrollAnchor="top">
+        <H2 value="Item {$itemIndex + 1}" backgroundColor="" />
+      </List>
+    `);
+  const driver = await createListDriver();
+
+  // Should still render items even with invalid idKey
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).toContainText("Item 1");
+  await expect(driver.component).toContainText("Item 2");
+  await expect(driver.component).not.toContainText("Item 9");
+  await expect(driver.component).not.toContainText("Item 10");
 });
 
-test.skip(
-  "pageInfo enables pagination",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed, createListDriver }) => {
-    await initTestBed(`
+test("scrollAnchor scrolls to bottom", async ({ initTestBed, createListDriver }) => {
+  await initTestBed(`
+      <List data="{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}" height="100px" scrollAnchor="bottom">
+        <H2 value="Item {$itemIndex + 1}" backgroundColor="" />
+      </List>
+    `);
+  const driver = await createListDriver();
+
+  // Should still render items even with invalid idKey
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).not.toContainText("Item 2");
+  await expect(driver.component).not.toContainText("Item 3");
+  await expect(driver.component).toContainText("Item 9");
+  await expect(driver.component).toContainText("Item 10");
+});
+
+test("pageInfo enables pagination", async ({ initTestBed, createListDriver }) => {
+  await initTestBed(`
       <List 
-        pageInfo="{page: 1}"
+        pageInfo="page: 1"
         data="{[
           {id: 1, name: 'Item 1'},
           {id: 2, name: 'Item 2'}
@@ -1030,10 +1051,9 @@ test.skip(
         <Text>{$item.name}</Text>
       </List>
     `);
-    const driver = await createListDriver();
+  const driver = await createListDriver();
 
-    // Component should render with pagination
-    await expect(driver.component).toBeVisible();
-    await expect(driver.component).toContainText("Item 1");
-  },
-);
+  // Component should render with pagination
+  await expect(driver.component).toBeVisible();
+  await expect(driver.component).toContainText("Item 1");
+});

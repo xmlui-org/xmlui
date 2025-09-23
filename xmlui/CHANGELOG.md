@@ -1,5 +1,28 @@
 # xmlui
 
+## 0.10.13
+
+### Patch Changes
+
+- 9401ee0: Added short debounce to ColorPicker to make changing color values with slider a bit smoother.
+- eb62858: fix: assigning new properties to objects in xmlui script
+- eb62858: fix: stricter empty body detection in RestApiProxy
+- eb62858: fix: TextArea autofocus
+- eb62858: fix: dropdownMenu overflow
+- eb62858: fix: ability to use user defined components in triggerTemplate (dropdownMenu)
+- eb62858: select: use focus-visible instead of focus for outline
+- 243b7fa: fix: modal dialog/toast issue
+- eb62858: form: hideButtonRowUntilDirty
+
+## 0.10.12
+
+### Patch Changes
+
+- f12a042: fix: report errors in script tag
+- 8731eb8: Avatar does not issue a resource URL warning when "url" is not specified
+- eb6454f: refactor: change LineChart/BarChart property names
+- 1210852: Fix the layout property usage of ModalDialog
+
 ## 0.10.11
 
 ### Patch Changes

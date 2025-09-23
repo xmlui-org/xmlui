@@ -49,30 +49,6 @@ test("component has proper semantic structure", async ({ initTestBed, createCode
   await expect(driver.component).toHaveClass(/codeBlock/);
 });
 
-test.skip("copy button is keyboard accessible", async ({ initTestBed, createCodeBlockDriver, page }) => {
-  // TODO: Review copy button visibility and keyboard interaction
-  await initTestBed(`
-    <CodeBlock>
-      <property name="textToCopy">test code</property>
-      <Text variant="codefence">test code</Text>
-    </CodeBlock>
-  `);
-  const driver = await createCodeBlockDriver();
-  
-  await page.context().grantPermissions(['clipboard-write', 'clipboard-read']);
-  
-  // Hover to show copy button
-  await driver.hoverContent();
-  await expect(driver.getCopyButton()).toBeVisible();
-  
-  // Focus and activate with keyboard
-  await driver.getCopyButton().focus();
-  await driver.getCopyButton().press('Enter');
-  
-  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboardText).toBe("test code");
-});
-
 test("component content is accessible to screen readers", async ({ initTestBed, createCodeBlockDriver }) => {
   await initTestBed(`
     <CodeBlock>
@@ -100,24 +76,6 @@ test("component applies theme variables correctly", async ({ initTestBed, create
   const driver = await createCodeBlockDriver();
   await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
   await expect(driver.component).toHaveCSS("border-radius", "8px");
-});
-
-test.skip("copy button appears on hover", async ({ initTestBed, createCodeBlockDriver }) => {
-  // TODO: Review copy button implementation and visibility patterns
-  await initTestBed(`
-    <CodeBlock>
-      <property name="textToCopy">hover test</property>
-      <Text variant="codefence">hover test</Text>
-    </CodeBlock>
-  `);
-  const driver = await createCodeBlockDriver();
-  
-  // Copy button should be hidden initially
-  await expect(driver.getCopyButton()).not.toBeVisible();
-  
-  // Hover over content to show copy button
-  await driver.hoverContent();
-  await expect(driver.getCopyButton()).toBeVisible();
 });
 
 // =============================================================================

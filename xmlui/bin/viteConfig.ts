@@ -42,8 +42,13 @@ export async function getViteConfig({
     define: overrides.define,
     resolve: {
       alias: overrides.resolve?.alias,
+      extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.xmlui', '.xmlui.xs', '.xs', ...(overrides.resolve?.extensions || [])],
     },
     css: overrides.css,
+    optimizeDeps: {
+      extensions: ['.xmlui', '.xmlui.xs', '.xs'],
+      ...overrides.optimizeDeps,
+    },
     build: {
       rollupOptions: {
         input: path.resolve(process.cwd(), "index.html"),

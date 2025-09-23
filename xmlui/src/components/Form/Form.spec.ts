@@ -1162,49 +1162,83 @@ test("data accepts relative URL endpoint", async ({
   await expect((await createTextBoxDriver(driver.input)).field).toHaveValue("John");
 });
 
-test.skip(
-  "cancel button uses default label if cancelLabel is not set",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("cancel button and save button use default label", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`
+      <Form testId="form">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
 
-test.skip("cancel button is rendered with cancelLabel", async ({ initTestBed }) => {});
+  const driver = await createFormDriver("form");
+  await expect(driver.cancelButton).toHaveText("Cancel");
+  await expect(driver.submitButton).toHaveText("Save");
+});
 
-// saveLabel
+test("cancel button is rendered with cancelLabel", async ({ initTestBed, createFormDriver }) => {
+  await initTestBed(`
+      <Form testId="form" cancelLabel="Abort">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
 
-test.skip(
-  "save button is rendered with default label if saveLabel is set to empty string",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  const driver = await createFormDriver("form");
+  await expect(driver.cancelButton).toHaveText("Abort");
+  await expect(driver.submitButton).toHaveText("Save");
+});
 
-test.skip(
-  "save button is rendered with saveLabel",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("save button is rendered with saveLabel", async ({ initTestBed, createFormDriver }) => {
+  await initTestBed(`
+      <Form testId="form" saveLabel="Submit">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
 
-// saveInProgressLabel
-
-test.skip(
-  "save in progress label shows up on submission",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
-
-test.skip(
-  "save in progress label does not get stuck after submission is done",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  const driver = await createFormDriver("form");
+  await expect(driver.cancelButton).toHaveText("Cancel");
+  await expect(driver.submitButton).toHaveText("Submit");
+});
 
 // swapCancelAndSave
 
-test.skip(
-  "built-in button row order flips if swapCancelAndSave is true",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("built-in button row order is default if swapCancelAndSave is false", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`
+      <Form testId="form" saveLabel="Submit">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
+
+  const driver = await createFormDriver("form");
+  const cancelBox = await driver.cancelButton.boundingBox();
+  const submitBox = await driver.submitButton.boundingBox();
+  expect(cancelBox.x).toBeLessThan(submitBox.x);
+});
+
+test("built-in button row order flips if swapCancelAndSave is true", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`
+      <Form testId="form" saveLabel="Submit" swapCancelAndSave="true">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
+
+  const driver = await createFormDriver("form");
+  const cancelBox = await driver.cancelButton.boundingBox();
+  const submitBox = await driver.submitButton.boundingBox();
+  expect(cancelBox.x).toBeGreaterThan(submitBox.x);
+});
 
 // --- submitUrl
 
@@ -1336,16 +1370,6 @@ test("user cannot submit with clientside errors present", async ({
   await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
-// --- canceling
-
-test.skip(
-  "cancel only triggers when enabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
-
-// --- reset: TODO
-
 // --- backend validation summary
 
 test("submitting with errors shows validation summary", async ({
@@ -1444,32 +1468,37 @@ test("field-related errors map to correct FormItems", async ({
   );
 });
 
-test.skip(
-  "field-related errors disappear if user updates FormItems",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("field-related errors disappear if user updates FormItems", async ({ initTestBed, page, createFormItemDriver }) => {
+  await initTestBed(
+    `
+      <Form testId="form">
+        <FormItem testId="testField" bindTo="test" label="test" required />
+        <FormItem testId="testField2" bindTo="test2" label="test2" />
+      </Form>`,
+  );
 
-// NOTE: this could be multiple tests
-test.skip(
-  "user can close all parts of the summary according to severity",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  const fieldDriver = await createFormItemDriver("testField");
+  const fieldDriver2 = await createFormItemDriver("testField2");
+  await fieldDriver.component.focus();
+  await fieldDriver.textBox.fill("a");
+  await fieldDriver.textBox.fill("", { timeout: 500 }); // trigger 'required' error
 
-test.skip(
-  "submitting with errors 2nd time after user close shows summary again",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+    fieldDriver.validationStatusTag,
+    "error",
+  );
 
-test.skip(
-  "Form shows confirmation dialog if warnings are present",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  //await fieldDriver.component.focus();
+  await fieldDriver.textBox.fill("a");
+  await fieldDriver.textBox.blur();
 
-// --- Smart Form Cases
+
+  await fieldDriver2.component.focus();
+  await page.waitForTimeout(200);
+
+  await fieldDriver2.textBox.fill("b");
+  expect(await fieldDriver.getValidationStatusIndicator()).not.toBeVisible();
+});
 
 const smartCrudInterceptor: ApiInterceptorDefinition = {
   initialize: `
@@ -1535,65 +1564,6 @@ test("create form works with submitUrl", async ({
     id: 11,
   });
 });
-
-test.skip(
-  "edit form works with data url",
-  SKIP_REASON.TEST_INFRA_BUG(`
-    Somehow the initTestBed does not initialize the Form properly,
-    thus the test will fail.
-    Doing the same with the "initApp" or initComponent functions will work.
-
-    Need to investigate.
-    `),
-  async ({ initTestBed, createFormDriver, createFormItemDriver, createTextBoxDriver }) => {
-    await initTestBed(
-      `
-      <Form submitUrl="/entities/10">
-        <FormItem bindTo="name" testId="nameInput"/>
-      </Form>
-    `,
-      { apiInterceptor: smartCrudInterceptor },
-    );
-    const formDriver = await createFormDriver();
-    const inputElement = (await createFormItemDriver("nameInput")).input;
-    const fieldDriver = await createTextBoxDriver(inputElement);
-
-    await expect(fieldDriver.field).toHaveValue("Smith");
-
-    await fieldDriver.field.fill("EDITED-Smith");
-    await formDriver.submitForm("click");
-
-    const response = await formDriver.getSubmitResponse();
-    expect(await response.json()).toEqual({
-      name: "EDITED-Smith",
-      id: 10,
-    });
-  },
-);
-// ORIGINAL TEST BELOW
-/*
-test("edit form works with data url", async ({ page }) => {
-  await initApp(page, {
-    entryPoint: `
-        <Form data="/entities/10">
-            <FormItem bindTo="name" testId="nameInput"/>
-        </Form>
-    `,
-    apiInterceptor: crudInterceptor,
-  });
-  await expect(page.getByTestId("nameInput").getByRole("textbox")).toHaveValue("Smith");
-  const responsePromise = page.waitForResponse((response) => response.url().includes("/entities"));
-  await page.getByTestId("nameInput").getByRole("textbox").fill("EDITED-Smith");
-  await page.locator("button[type='submit']").click();
-
-  const response = await responsePromise;
-  const responseBody = await response.json();
-  expect(responseBody).toEqual({
-    name: "EDITED-Smith",
-    id: 10,
-  });
-});
-*/
 
 test("regression: data url through modal context", async ({
   initTestBed,

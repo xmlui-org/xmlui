@@ -108,7 +108,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
             tempValueInLocalVars = tempValueInLocalVars?.[key];
             if (
               nsValue === undefined &&
-              tempValueInLocalVars === undefined &&
+              isPlainObject(tempValueInLocalVars) &&
               isPlainObject(target)
             ) {
               // if we are setting a new object's key, lodash defaults it to an array, if the key is a number.

@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -52,9 +52,10 @@ export const ColorPicker = forwardRef(
       onBlur = noop,
       registerComponentApi,
       enabled = defaultProps.enabled,
+      readOnly,
       value = defaultProps.value,
       autoFocus,
-      tabIndex = -1,
+      tabIndex = 0,
       label,
       labelPosition,
       labelWidth,
@@ -67,6 +68,7 @@ export const ColorPicker = forwardRef(
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
     const inputRef = useRef(null);
+    const [isPending, startTransition] = useTransition();
 
     const updateValue = useCallback(
       (value: string) => {
@@ -76,11 +78,24 @@ export const ColorPicker = forwardRef(
       [onDidChange, updateState],
     );
 
+    const updateValueWithTransition = useCallback(
+      (value: string, immediate = false) => {
+        if (immediate) {
+          updateValue(value);
+        } else {
+          startTransition(() => {
+            updateValue(value);
+          });
+        }
+      },
+      [updateValue, startTransition],
+    );
+
     const onInputChange = useCallback(
       (event: any) => {
-        updateValue(event.target.value);
+        updateValueWithTransition(event.target.value);
       },
-      [updateValue],
+      [updateValueWithTransition],
     );
 
     useEffect(() => {
@@ -101,7 +116,7 @@ export const ColorPicker = forwardRef(
     }, []);
 
     const setValue = useEvent((newValue) => {
-      updateValue(newValue);
+      updateValueWithTransition(newValue, true); // Immediate update for programmatic changes
     });
 
     useEffect(() => {
@@ -137,14 +152,15 @@ export const ColorPicker = forwardRef(
           disabled={!enabled}
           onFocus={handleOnFocus}
           onChange={onInputChange}
+          readOnly={readOnly}
           autoFocus={autoFocus}
+          tabIndex={tabIndex}
           onBlur={handleOnBlur}
           required={required}
           type="color"
           inputMode="text"
           ref={inputRef}
           value={value}
-          tabIndex={tabIndex}
         />
       </ItemWithLabel>
     );

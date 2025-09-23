@@ -56,6 +56,7 @@ import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "../constants";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
+import { mergeProps } from "../utils/mergeProps";
 
 type Props = {
   node: ContainerWrapperDef;
@@ -96,6 +97,7 @@ export const Container = memo(
       isImplicit,
       uidInfoRef: parentUidInfoRef,
       children,
+      ...rest
     }: Props,
     ref,
   ) {
@@ -531,7 +533,7 @@ export const Container = memo(
 
     // --- The container wraps the `renderChild` function to provide that to the child components
     const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, pRenderContext, uidInfoRef, ref) => {
+      (childNode, lc, pRenderContext, uidInfoRef, ref, rest) => {
         // TODO: Check if this is a valid use case
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
@@ -607,6 +609,7 @@ export const Container = memo(
           return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
             ? React.cloneElement(renderedChildren[0], {
                 ref: composeRefs(ref, (renderedChildren[0] as any).ref),
+                ...mergeProps(renderedChildren[0].props, rest)
               } as any)
             : renderedChildren[0];
         }
@@ -649,6 +652,7 @@ export const Container = memo(
       parentRenderContext,
       uidInfoRef,
       ref,
+      rest
     );
 
     const renderedLoaders = renderLoaders({

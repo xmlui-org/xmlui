@@ -1,11 +1,11 @@
 # Theme Variables
 
-The appearance of an xmlui app can be quickly customized with themes. The basic unit of a theme is a *theme variable*, which sets a particular visual trait of the app or a specific component, such as the background color, text weight, vertical padding, and others.
+The appearance of an xmlui app can be quickly customized with themes. The basic unit of a theme is a _theme variable_, which sets a particular visual trait of the app or a specific component, such as the background color, text weight, vertical padding, and others.
 
 Theme variables follow a naming convention: They compose identifier-like segments separated by a simple or double dash. Here are a few examples:
 
 ```text
-maxWidth-content 
+maxWidth-content
 borderColor-Card
 backgroundColor-checked-Switch
 outlineStyle-Checkbox-error--focus
@@ -26,18 +26,17 @@ Each theme variable starts with a name, identifying the visual attribute the par
 
 For example, the `maxWidth` property name has the same semantics as the `max-width` CSS style.
 
->[!INFO]
+> [!INFO]
 > Though there are exceptions, most theme variables are projected to the counterpart CSS style at the end of the day (using the same syntax and semantics). Also, only about one-tenth of CSS style names have their pair in xmlui.
 
 **`ComponentId`**
 
-Most theme variables belong to a specific component (we call them *component-bound theme variables*). A `ComponentId` always starts with an uppercase letter and follows Pascal-casing. If no `ComponentId` is in the variable name, we call it an *app-bound theme variable*.
+Most theme variables belong to a specific component (we call them _component-bound theme variables_). A `ComponentId` always starts with an uppercase letter and follows Pascal-casing. If no `ComponentId` is in the variable name, we call it an _app-bound theme variable_.
 
 For example, the `borderColor-Card` name uses the `Card` as `ComponentId`, suggesting that it sets the border color of the `Card` component.
 
->[!INFO]
-> We call theme variables without a `ComponentId` segment *app-bound* variables, as they do not belong to a particular component. They set some visual traits that belong to the entire app or multiple components.
-
+> [!INFO]
+> We call theme variables without a `ComponentId` segment _app-bound_ variables, as they do not belong to a particular component. They set some visual traits that belong to the entire app or multiple components.
 
 **`aspect-or-part`**
 
@@ -45,13 +44,12 @@ When a particular theme variable belongs to a part (or specific visual aspect) o
 
 **`variant`**
 
-Some components may have visual variants that use different style attributes. For example, a button has three different variants: `solid` (with background), `outlined` (with a border), and `ghost` (no border or background unless hovered). Adding the *variant* segment after `ComponentId` specifies the theme variable's particular variant.
+Some components may have visual variants that use different style attributes. For example, a button has three different variants: `solid` (with background), `outlined` (with a border), and `ghost` (no border or background unless hovered). Adding the _variant_ segment after `ComponentId` specifies the theme variable's particular variant.
 
 For example, the `borderColor-Button-outlined` theme variable sets the border color only for the `outlined` variant of buttons and keeps the border color of others intact.
 
->[!INFO]
+> [!INFO]
 > Some components (such as `Button`) have multiple properties representing a variant (it also has a `themeColor`). In this case, you can add multiple `variant` segments to the theme variable.
-
 
 **`state`**
 
@@ -61,186 +59,178 @@ The `state` segment of a theme variable specifies the particular state of the co
 
 This table summarizes the states you can use with theme variables:
 
-|Name|Description|
-|-|-|
-|`‑‑active`|The component is active. For example, the left mouse button is pressed while the pointer is over the component.|
-|`‑‑disabled`|The component is disabled; it does not accept user actions|
-|`‑‑focus`|The component has the keyboard focus and processes keypress-related events|
-|`‑‑hover`|Indicates the state when the mouse (pointer) hovers above the component's client area|
+| Name         | Description                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `‑‑active`   | The component is active. For example, the left mouse button is pressed while the pointer is over the component. |
+| `‑‑disabled` | The component is disabled; it does not accept user actions                                                      |
+| `‑‑focus`    | The component has the keyboard focus and processes keypress-related events                                      |
+| `‑‑hover`    | Indicates the state when the mouse (pointer) hovers above the component's client area                           |
 
 You can add multiple state segments to a theme variable to define a combined state. For example, the `‑‑active‑‑hover` combination defines a visual trait when the component is activated and hovered.
 
->[!INFO]
+> [!INFO]
 > You can use your custom state names for your components.
 
 ## Theme Property Names [#property-names]
 
 You can refer to numerous visual properties via the `propertyName` segment. The following table summarizes their names and descriptions:
 
-|Name|Description|
-|-|-|
-| **`backgroundColor`** | This property sets the [background color](/styles-and-themes/common-units#color) of an element. | 
-| **`borderBottom`** | This property is a shorthand to set an element's bottom border. It sets the values of `borderBottomWidth`, `borderBottomStyle` and `borderBottomColor`. | 
-| **`borderBottomColor`** | Sets the [color](/styles-and-themes/common-units#color) of an element's bottom border. | 
-| **`borderBottomStyle`** | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's bottom border. | 
-| **`borderBottomWidth`** | Sets the width of an element's bottom border. | 
-| **`borderColor`** | This property sets the [color](/styles-and-themes/common-units#color) of an element's border. | 
-| **`borderEndEndRadius`** | This property defines a logical border radius on an element, which maps to the bottom-right radius with a left-to-right rendering direction and to the bottom-left radius with a right-to-left. | 
-| **`borderEndStartRadius`** | This property defines a logical border radius on an element, which maps to the bottom-left radius with a left-to-right rendering direction and to the bottom-right radius with a right-to-left. | 
-| **`borderHorizontal`** | This property sets the traits of the left and right borders. | 
-| **`borderHorizontalColor`** | This property sets the [color](/styles-and-themes/common-units#color) of the left and right borders. | 
-| **`borderHorizontalStyle`** | This property sets the [style](/styles-and-themes/common-units#border-style) of the left and right borders. | 
-| **`borderHorizontalWidth`** | This property sets the [width](/styles-and-themes/common-units#size) of the left and right borders. | 
-| **`borderRadius`** | This property property [rounds](/styles-and-themes/common-units#border-rounding) the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners. | 
-| **`borderLeft`** | This property is a shorthand to set an element's left border. It sets the values of `borderLeftWidth`, `borderLeftStyle` and `borderLeftColor`. | 
-| **`borderLeftColor`** | Sets the [color](/styles-and-themes/common-units#color) of an element's left border. | 
-| **`borderLeftStyle`** | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's left border. | 
-| **`borderLeftWidth`** | Sets the [width](/styles-and-themes/common-units#size) of an element's left border. | 
-| **`borderRight`** | This property is a shorthand to set an element's right border. It sets the values of `borderRightWidth`, `borderRightStyle` and `borderRightColor`. | 
-| **`borderRightColor`** | Sets the [color](/styles-and-themes/common-units#color) of an element's right border. | 
-| **`borderRightStyle`** | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's right border. | 
-| **`borderRightWidth`** | Sets the [width](/styles-and-themes/common-units#size) of an element's right border. | 
-| **`borderStartEndRadius`** | This property defines a logical border radius on an element, which maps to the top-right radius with a left-to-right rendering direction and to the top-left radius with a right-to-left. | 
-| **`borderStartStartRadius`** | This property defines a logical border radius on an element, which maps to the top-left radius with a left-to-right rendering direction and to the top-right radius with a right-to-left. | 
-| **`borderStyle`** | This property sets the [style](/styles-and-themes/common-units#border-style) of an element's border. | 
-| **`borderTop`** | This property is a shorthand to set an element's top border. It sets the values of `borderTopWidth`, `borderTopStyle` and `borderTopColor`. | 
-| **`borderTopColor`** | Sets the [color](/styles-and-themes/common-units#color) of an element's top border. | 
-| **`borderTopStyle`** | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's top border. | 
-| **`borderTopWidth`** | Sets the width of an element's top border. | 
-| **`borderVertical`** | This property sets the traits of the top and bottom borders. | 
-| **`borderVerticalColor`** | This property sets the [color](/styles-and-themes/common-units#color) of the top and bottom borders. | 
-| **`borderVerticalStyle`** | This property sets the [style](/styles-and-themes/common-units#border-style) of the top and bottom borders. | 
-| **`borderVerticalWidth`** | This property sets the [width](/styles-and-themes/common-units#size) of the top and bottom borders. | 
-| **`borderWidth`** | This property sets the width of an element's border. | 
-| **`boxShadow`** | This property adds shadow effects around an element's frame. | 
-| **`fontFamily`** | Specifies a prioritized list of one or more [font family](/styles-and-themes/common-units#font-family) names and/or generic family names for the selected element. | 
-| **`fontSize`** | This property sets the size of the font. | 
-| **`fontStyle`** | This property sets whether a font should be styled with a normal, italic, or oblique face from its `fontFamily`. | 
-| **`fontWeight`** | Sets the [weight](/styles-and-themes/common-units#font-weight) (or boldness) of the font. | 
-| **`fontStretch`** | This property selects a normal, condensed, or expanded face from a font. | 
-| **`letterSpacing`** | This property sets the horizontal spacing behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together. | 
-| **`lineHeight`** | Sets the [height](/styles-and-themes/common-units#size) of a line box in which the text is displayed. | 
-| **`marginBottom`** | This property sets the [height](/styles-and-themes/common-units#size) of the margin area on the bottom of an element. | 
-| **`marginHorizontal`** | This property combines setting the values of the `marginLeft` and `marginRight` properties. | 
-| **`marginLeft`** | This property sets the [width](/styles-and-themes/common-units#size) of the margin area on the left of an element. | 
-| **`marginRight`** | This property sets the [width](/styles-and-themes/common-units#size) of the margin area on the right of an element. | 
-| **`marginTop`** | This property sets the [height](/styles-and-themes/common-units#size) of the margin area on the top of an element. | 
-| **`marginVertical`** | This property combines setting the values of the `marginTop` and `marginBottom` properties. | 
-| **`maxHeight`** | This property sets the maximum [height](/styles-and-themes/common-units#size) of an element. It prevents the used value of the height property from becoming larger than the value specified for `maxHeight`. | 
-| **`maxWidth`** | This property sets the maximum [width](/styles-and-themes/common-units#size) of an element. It prevents the used value of the width property from becoming larger than the value specified for `maxWidth`. | 
-| **`minHeight`** | This property sets the minimum [height](/styles-and-themes/common-units#size) of an element. It prevents the used value of the height property from becoming smaller than the value specified for `minHeight`. | 
-| **`minWidth`** | This property sets the minimum [width](/styles-and-themes/common-units#size) of an element. It prevents the used value of the width property from becoming smaller than the value specified for `minWidth`. | 
-| **`outlineColor`** | This property sets the [color](/styles-and-themes/common-units#color) of an element's outline. An outline is a line that is drawn around an element, outside the border. | 
-| **`outlineOffset`** | This property sets the space between an outline and the edge or border of a focused element. | 
-| **`outlineStyle`** | This property sets the style of an element's outline. | 
-| **`outlineWidth`** | property sets the [width](/styles-and-themes/common-units#size) of an element's outline. | 
-| **`overflowX`** | This property sets what shows when content overflows an element's left and right edges. This may be nothing, a scroll bar, or the overflow content. | 
-| **`overflowY`** | This property sets what shows when content overflows an element's top and bottom edges. This may be nothing, a scroll bar, or the overflow content. | 
-| **`paddingBottom`** | This property sets the [height](/styles-and-themes/common-units#size) of the padding area on the bottom of an element. | 
-| **`paddingHorizontal`** | This property combines setting the values of the `paddingLeft` and `paddingRight` properties. | 
-| **`paddingLeft`** | This property sets the [width](/styles-and-themes/common-units#size) of the padding area on the left of an element. | 
-| **`paddingRight`** | This property sets the [width](/styles-and-themes/common-units#size) of the padding area on the right of an element. | 
-| **`paddingTop`** | This property sets the [height](/styles-and-themes/common-units#size) of the padding area on the top of an element. | 
-| **`paddingVertical`** | This property combines setting the values of the `paddingTop` and `paddingBottom` properties. | 
-| **`textColor`** | This property sets the [color](/styles-and-themes/common-units#color) of the text used for rendering a component. |
-| **`textDecoration`** | This is a shorthand property that sets the appearance of decorative lines on text combining the `textDecorationLine`, `textDecorationColor`, `textDecorationStyle`, and `textDecorationThickness` properties. |
-| **`textDecorationColor`** | Sets the [color](/styles-and-themes/common-units#color) of decorations added to text by `textDecorationLine`. |
-| **`textDecorationLine`** | Sets the [kind](/styles-and-themes/common-units#text-decoration) of decoration that is used on text in an element, such as an underline or overline. |
-| **`textDecorationStyle`** | Sets the style of the decoration line that is used on text in an element, such as a line-through, underline, or overline. |
-| **`textDecorationThickness`** | Sets the stroke [thickness](/styles-and-themes/common-units#size) of the decoration line that is used on text in an element, such as a line-through, underline, or overline. |
-| **`textTransform`** | This property specifies how to capitalize an element's text. |
-| **`textUnderlineOffset`** | The offset [distance](/styles-and-themes/common-units#size) of an underlined text decoration line from its original position. |
+| Name                          | Description                                                                                                                                                                                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`backgroundColor`**         | This property sets the [background color](/styles-and-themes/common-units#color) of an element.                                                                                                                                                                                       |
+| **`borderBottom`**            | This property is a shorthand to set an element's bottom border. It sets the values of `borderBottomWidth`, `borderBottomStyle` and `borderBottomColor`.                                                                                                                               |
+| **`borderBottomColor`**       | Sets the [color](/styles-and-themes/common-units#color) of an element's bottom border.                                                                                                                                                                                                |
+| **`borderBottomStyle`**       | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's bottom border.                                                                                                                                                                                    |
+| **`borderBottomWidth`**       | Sets the width of an element's bottom border.                                                                                                                                                                                                                                         |
+| **`borderColor`**             | This property sets the [color](/styles-and-themes/common-units#color) of an element's border.                                                                                                                                                                                         |
+| **`borderEndEndRadius`**      | This property defines a logical border radius on an element, which maps to the bottom-right radius with a left-to-right rendering direction and to the bottom-left radius with a right-to-left.                                                                                       |
+| **`borderEndStartRadius`**    | This property defines a logical border radius on an element, which maps to the bottom-left radius with a left-to-right rendering direction and to the bottom-right radius with a right-to-left.                                                                                       |
+| **`borderHorizontal`**        | This property sets the traits of the left and right borders.                                                                                                                                                                                                                          |
+| **`borderHorizontalColor`**   | This property sets the [color](/styles-and-themes/common-units#color) of the left and right borders.                                                                                                                                                                                  |
+| **`borderHorizontalStyle`**   | This property sets the [style](/styles-and-themes/common-units#border-style) of the left and right borders.                                                                                                                                                                           |
+| **`borderHorizontalWidth`**   | This property sets the [width](/styles-and-themes/common-units#size) of the left and right borders.                                                                                                                                                                                   |
+| **`borderRadius`**            | This property property [rounds](/styles-and-themes/common-units#border-rounding) the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners.                                                        |
+| **`borderLeft`**              | This property is a shorthand to set an element's left border. It sets the values of `borderLeftWidth`, `borderLeftStyle` and `borderLeftColor`.                                                                                                                                       |
+| **`borderLeftColor`**         | Sets the [color](/styles-and-themes/common-units#color) of an element's left border.                                                                                                                                                                                                  |
+| **`borderLeftStyle`**         | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's left border.                                                                                                                                                                                      |
+| **`borderLeftWidth`**         | Sets the [width](/styles-and-themes/common-units#size) of an element's left border.                                                                                                                                                                                                   |
+| **`borderRight`**             | This property is a shorthand to set an element's right border. It sets the values of `borderRightWidth`, `borderRightStyle` and `borderRightColor`.                                                                                                                                   |
+| **`borderRightColor`**        | Sets the [color](/styles-and-themes/common-units#color) of an element's right border.                                                                                                                                                                                                 |
+| **`borderRightStyle`**        | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's right border.                                                                                                                                                                                     |
+| **`borderRightWidth`**        | Sets the [width](/styles-and-themes/common-units#size) of an element's right border.                                                                                                                                                                                                  |
+| **`borderStartEndRadius`**    | This property defines a logical border radius on an element, which maps to the top-right radius with a left-to-right rendering direction and to the top-left radius with a right-to-left.                                                                                             |
+| **`borderStartStartRadius`**  | This property defines a logical border radius on an element, which maps to the top-left radius with a left-to-right rendering direction and to the top-right radius with a right-to-left.                                                                                             |
+| **`borderStyle`**             | This property sets the [style](/styles-and-themes/common-units#border-style) of an element's border.                                                                                                                                                                                  |
+| **`borderTop`**               | This property is a shorthand to set an element's top border. It sets the values of `borderTopWidth`, `borderTopStyle` and `borderTopColor`.                                                                                                                                           |
+| **`borderTopColor`**          | Sets the [color](/styles-and-themes/common-units#color) of an element's top border.                                                                                                                                                                                                   |
+| **`borderTopStyle`**          | Sets the line [style](/styles-and-themes/common-units#border-style) of an element's top border.                                                                                                                                                                                       |
+| **`borderTopWidth`**          | Sets the width of an element's top border.                                                                                                                                                                                                                                            |
+| **`borderVertical`**          | This property sets the traits of the top and bottom borders.                                                                                                                                                                                                                          |
+| **`borderVerticalColor`**     | This property sets the [color](/styles-and-themes/common-units#color) of the top and bottom borders.                                                                                                                                                                                  |
+| **`borderVerticalStyle`**     | This property sets the [style](/styles-and-themes/common-units#border-style) of the top and bottom borders.                                                                                                                                                                           |
+| **`borderVerticalWidth`**     | This property sets the [width](/styles-and-themes/common-units#size) of the top and bottom borders.                                                                                                                                                                                   |
+| **`borderWidth`**             | This property sets the width of an element's border.                                                                                                                                                                                                                                  |
+| **`boxShadow`**               | This property adds shadow effects around an element's frame.                                                                                                                                                                                                                          |
+| **`fontFamily`**              | Specifies a prioritized list of one or more [font family](/styles-and-themes/common-units#font-family) names and/or generic family names for the selected element.                                                                                                                    |
+| **`fontSize`**                | This property sets the size of the font.                                                                                                                                                                                                                                              |
+| **`fontStyle`**               | This property sets whether a font should be styled with a normal, italic, or oblique face from its `fontFamily`.                                                                                                                                                                      |
+| **`fontWeight`**              | Sets the [weight](/styles-and-themes/common-units#font-weight) (or boldness) of the font.                                                                                                                                                                                             |
+| **`fontStretch`**             | This property selects a normal, condensed, or expanded face from a font.                                                                                                                                                                                                              |
+| **`letterSpacing`**           | This property sets the horizontal spacing behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together. |
+| **`lineHeight`**              | Sets the [height](/styles-and-themes/common-units#size) of a line box in which the text is displayed.                                                                                                                                                                                 |
+| **`marginBottom`**            | This property sets the [height](/styles-and-themes/common-units#size) of the margin area on the bottom of an element.                                                                                                                                                                 |
+| **`marginHorizontal`**        | This property combines setting the values of the `marginLeft` and `marginRight` properties.                                                                                                                                                                                           |
+| **`marginLeft`**              | This property sets the [width](/styles-and-themes/common-units#size) of the margin area on the left of an element.                                                                                                                                                                    |
+| **`marginRight`**             | This property sets the [width](/styles-and-themes/common-units#size) of the margin area on the right of an element.                                                                                                                                                                   |
+| **`marginTop`**               | This property sets the [height](/styles-and-themes/common-units#size) of the margin area on the top of an element.                                                                                                                                                                    |
+| **`marginVertical`**          | This property combines setting the values of the `marginTop` and `marginBottom` properties.                                                                                                                                                                                           |
+| **`maxHeight`**               | This property sets the maximum [height](/styles-and-themes/common-units#size) of an element. It prevents the used value of the height property from becoming larger than the value specified for `maxHeight`.                                                                         |
+| **`maxWidth`**                | This property sets the maximum [width](/styles-and-themes/common-units#size) of an element. It prevents the used value of the width property from becoming larger than the value specified for `maxWidth`.                                                                            |
+| **`minHeight`**               | This property sets the minimum [height](/styles-and-themes/common-units#size) of an element. It prevents the used value of the height property from becoming smaller than the value specified for `minHeight`.                                                                        |
+| **`minWidth`**                | This property sets the minimum [width](/styles-and-themes/common-units#size) of an element. It prevents the used value of the width property from becoming smaller than the value specified for `minWidth`.                                                                           |
+| **`outlineColor`**            | This property sets the [color](/styles-and-themes/common-units#color) of an element's outline. An outline is a line that is drawn around an element, outside the border.                                                                                                              |
+| **`outlineOffset`**           | This property sets the space between an outline and the edge or border of a focused element.                                                                                                                                                                                          |
+| **`outlineStyle`**            | This property sets the style of an element's outline.                                                                                                                                                                                                                                 |
+| **`outlineWidth`**            | property sets the [width](/styles-and-themes/common-units#size) of an element's outline.                                                                                                                                                                                              |
+| **`overflowX`**               | This property sets what shows when content overflows an element's left and right edges. This may be nothing, a scroll bar, or the overflow content.                                                                                                                                   |
+| **`overflowY`**               | This property sets what shows when content overflows an element's top and bottom edges. This may be nothing, a scroll bar, or the overflow content.                                                                                                                                   |
+| **`paddingBottom`**           | This property sets the [height](/styles-and-themes/common-units#size) of the padding area on the bottom of an element.                                                                                                                                                                |
+| **`paddingHorizontal`**       | This property combines setting the values of the `paddingLeft` and `paddingRight` properties.                                                                                                                                                                                         |
+| **`paddingLeft`**             | This property sets the [width](/styles-and-themes/common-units#size) of the padding area on the left of an element.                                                                                                                                                                   |
+| **`paddingRight`**            | This property sets the [width](/styles-and-themes/common-units#size) of the padding area on the right of an element.                                                                                                                                                                  |
+| **`paddingTop`**              | This property sets the [height](/styles-and-themes/common-units#size) of the padding area on the top of an element.                                                                                                                                                                   |
+| **`paddingVertical`**         | This property combines setting the values of the `paddingTop` and `paddingBottom` properties.                                                                                                                                                                                         |
+| **`textColor`**               | This property sets the [color](/styles-and-themes/common-units#color) of the text used for rendering a component.                                                                                                                                                                     |
+| **`textDecoration`**          | This is a shorthand property that sets the appearance of decorative lines on text combining the `textDecorationLine`, `textDecorationColor`, `textDecorationStyle`, and `textDecorationThickness` properties.                                                                         |
+| **`textDecorationColor`**     | Sets the [color](/styles-and-themes/common-units#color) of decorations added to text by `textDecorationLine`.                                                                                                                                                                         |
+| **`textDecorationLine`**      | Sets the [kind](/styles-and-themes/common-units#text-decoration) of decoration that is used on text in an element, such as an underline or overline.                                                                                                                                  |
+| **`textDecorationStyle`**     | Sets the style of the decoration line that is used on text in an element, such as a line-through, underline, or overline.                                                                                                                                                             |
+| **`textDecorationThickness`** | Sets the stroke [thickness](/styles-and-themes/common-units#size) of the decoration line that is used on text in an element, such as a line-through, underline, or overline.                                                                                                          |
+| **`textTransform`**           | This property specifies how to capitalize an element's text.                                                                                                                                                                                                                          |
+| **`textUnderlineOffset`**     | The offset [distance](/styles-and-themes/common-units#size) of an underlined text decoration line from its original position.                                                                                                                                                         |
 
 ## App-bound Traits [#app-bound-traits]
 
 You can use these app-bound theme variables within an app:
 
-| Theme Variable | Description |
-|-|-|
-| **`backgroundColor`** | This theme variable sets the background color of the xmlui app. |
-| **`backgroundColor‑dropdown‑item‑‑active`** | This property sets the background color of active elements of the items in dropdown components. |
-| **`backgroundColor‑dropdown‑item‑‑active‑‑hover`** | This property sets the background color of active, hovered elements of the items in dropdown components. |
-| **`backgroundColor‑dropdown‑item‑‑hover`** | This property sets the background color of hovered elements of the items in dropdown components. |
-| **`backgroundColor‑overlay`** | This property sets the background color of elements used as an overlay. |
-| **`backgroundColor‑attention`** | This theme variable sets the background color of components using the "attention" background color. |
-| **`backgroundColor‑‑disabled`** | This theme variable sets the background color of color of disabled compopnents. |
-| **`backgroundColor‑primary`** | This theme variable sets the background color of components using the "primary" background color. |
-| **`backgroundColor‑secondary`** | This theme variable sets the background color of components using the "secondary" background color. |
-| **`backgroundColor‑subtitle`** | This theme variable sets the background color of components using the "subtitle" variant. |
-| **`borderColor`** | This property sets the default border color of elements. |
-| **`borderColor‑‑disabled`** | This property sets the default border color of disabled elements. |
-| **`borderColor‑dropdown‑item`** | This property sets the default background color of items in dropdown components. |
-| **`borderRadius`** | You can specify the default rounding for all components that use border rounding. |
-| **`boxShadow‑md`** | A medium-size box shadow that gives an elevated look to a component. |
-| **`boxShadow‑spread`** | A box shadow that spreads around all edges of a component. |
-| **`boxShadow‑spread‑2‑xl`** | A box shadow that spreads around all edges of a component (more extended than `boxShadow‑spread‑2`). |
-| **`boxShadow‑spread‑2`** | A box shadow that spreads around all edges of a component (more extended than `boxShadow‑spread`). |
-| **`boxShadow‑xl`** | A box shadow that gives an elevated look to a component (bigger than `boxShadow-md`). |
-| **`boxShadow‑xxl`** | A box shadow that gives an elevated look to a component (bigger than `boxShadow-xl`). |
-| **`color-danger`** | This theme variable sets the base color shade for components using the "danger" color. |
-| **`color-info`** | This theme variable sets the base color shade for components using the "info" color. |
-| **`color-primary`** | This theme variable sets the base color shade for components using the primary color. |
-| **`color-secondary`** | This theme variable sets the base color shade for components using the secondary color. |
-| **`color-success`** | This theme variable sets the base color shade for components using the "success" color. |
-| **`color-surface`** | This theme variable sets the base color shade for surface areas (component backgrounds). |
-| **`color-warn`** | This theme variable sets the base color shade for components using the "warning" color. |
-| **`fontFamily‑monospace`** | This theme variable specifies the font family for text elements marked with "monospace". |
-| **`fontFamily‑sans‑serif`** | This theme variable specifies the font family for text elements marked with "sans-serif". |
-| **`fontSize`** | This theme variable sets the default font size of text elements. |
-| **`fontSize‑tiny`** | The smallest font size available in the XMLUI styling system. |
-| **`fontSize‑xs`** | A font size between `fontSize-tiny` and `fonstSize‑sm`. |
-| **`fontSize‑sm`** | A font size between `fontSize-xs` and `fonstSize-base`. |
-| **`fontSize‑base`** | A font size between `fontSize-sm` and `fonstSize-lg`. |
-| **`fontSize‑lg`** | A font size between `fontSize-base` and `fonstSize-xl`. |
-| **`fontSize‑xl`** | A font size between `fontSize-lg` and `fonstSize-2xl`. |
-| **`fontSize‑2xl`** | A font size between `fontSize-xl` and `fonstSize-3xl`. |
-| **`fontSize‑3xl`** | A font size between `fontSize-2xl` and `fonstSize-4xl`. |
-| **`fontSize‑4xl`** | A font size between `fontSize-3xl` and `fonstSize-5xl`. |
-| **`fontSize‑5xl`** | A font size between `fontSize-4xl` and `fonstSize-6xl`. |
-| **`fontSize‑6xl`** | A font size between `fontSize-5l` and `fonstSize-7xl`. |
-| **`fontSize‑7xl`** | A font size between `fontSize-6l` and `fonstSize-8xl`. |
-| **`fontSize‑8xl`** | A font size between `fontSize-7xl` and `fonstSize-9xl`. |
-| **`fontSize‑9xl`** | The tallest font size available in the XMLUI styling system. |
-| **`fontWeight`** | This theme variable sets the weight of the default font. |
-| **`fontWeight‑bold`** | This theme variable sets the font's weight marked as bold (when using any text variant with a weight set to `bold`). |
-| **`fontWeight‑extra‑bold`** | This theme variable sets the font's weight marked as extra-bold (when using any text variant with a weight set to `extra-bold`). |
-| **`fontWeight‑light`** | This theme variable sets the font's weight marked as light (when using any text variant with a weight set to `light`). |
-| **`fontWeight‑normal`** | This theme variable sets the font's weight marked as normal (when using any text variant with a weight set to `normal`). |
-| **`fontWeight‑medium`** | This theme variable sets the font's weight marked as medium (when using any text variant with a weight set to `medium`). |
-| **`lineHeight‑tiny`** | The suggested line height for text with `fontSize-tiny`. |
-| **`lineHeight‑xs`** | The suggested line height for text with `fontSize-xs`. |
-| **`lineHeight‑sm`** | The suggested line height for text with `fontSize-sm`. |
-| **`lineHeight‑base`** | The suggested line height for text with `fontSize-base`. |
-| **`lineHeight‑lg`** | The suggested line height for text with `fontSize-lg`. |
-| **`lineHeight‑xl`** | The suggested line height for text with `fontSize-xl`. |
-| **`lineHeight‑2xl`** | The suggested line height for text with `fontSize-2xl`. |
-| **`lineHeight‑3xl`** | The suggested line height for text with `fontSize-3xl`. |
-| **`lineHeight‑4xl`** | The suggested line height for text with `fontSize-4xl`. |
-| **`lineHeight‑5xl`** | The suggested line height for text with `fontSize-5xl`. |
-| **`lineHeight‑6xl`** | The suggested line height for text with `fontSize-6xl`. |
-| **`lineHeight‑7xl`** | The suggested line height for text with `fontSize-7xl`. |
-| **`lineHeight‑8xl`** | The suggested line height for text with `fontSize-8xl`. |
-| **`lineHeight‑9xl`** | The suggested line height for text with `fontSize-9xl`. |
-| **`maxWidth‑desktop`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`. |
-| **`maxWidth‑content`** | This theme variable sets the maximum width of the app's content. If the viewport is broader, the content will have margins to the left and right, keeping the width at the specified maximum. |
-| **`maxWidth‑desktop`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`. |
-| **`maxWidth‑desktop‑large`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a large desktop. When the viewport width is larger than `maxWidth-desktop` and smaller than or equal to this value, the app considers the current view as `large-desktop`. |
-| **`maxWidth‑landscape‑phone`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a phone in landscape mode. When the viewport width is larger than `maxWidth-phone` and smaller than or equal to this value, the app considers the current view as `landscape-phone`. |
-| **`maxWidth‑phone`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a phone in portrait mode. When the viewport width is smaller than or equal to this value, the app considers the current view as `phone`. |
-| **`maxWidth‑tablet`** | This theme variable sets the maximum width of the app's viewport, which makes it appear like a tablet (either in portrait or landscape mode). When the viewport width is larger than `maxWidth-landscape-phone` and smaller than or equal to this value, the app considers the current view as `tablet`. |
-| **`outlineColor‑‑focus`** | Set the color of the outline used for focused components. |
-| **`outlineOffset‑‑focus`** | Set the width of the outline used for focused components. |
-| **`outlineStyle‑‑focus`** | Set the style of the outline used for focused components. |
-| **`outlineWidth‑‑focus`** | Set the width of the outline used for focused components. |
-| **`textColor‑attention`** | This theme variable sets the color of text elements using the "attention" color. |
-| **`textColor‑‑disabled`** | This theme variable sets the color of disabled text elements. |
-| **`textColor‑primary`** | This theme variable sets the color of text elements using the "primary" color. |
-| **`textColor‑secondary`** | This theme variable sets the color of text elements using the "secondary" color. |
-| **`textColor‑subtitle`** | This theme variable sets the color of text elements using the "subtitle" variant. |
+| Theme Variable                                     | Description                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`backgroundColor`**                              | This theme variable sets the background color of the xmlui app.                                                                                                                                                                                                                                          |
+| **`backgroundColor‑dropdown‑item‑‑active`**        | This property sets the background color of active elements of the items in dropdown components.                                                                                                                                                                                                          |
+| **`backgroundColor‑dropdown‑item‑‑active‑‑hover`** | This property sets the background color of active, hovered elements of the items in dropdown components.                                                                                                                                                                                                 |
+| **`backgroundColor‑dropdown‑item‑‑hover`**         | This property sets the background color of hovered elements of the items in dropdown components.                                                                                                                                                                                                         |
+| **`backgroundColor‑overlay`**                      | This property sets the background color of elements used as an overlay.                                                                                                                                                                                                                                  |
+| **`backgroundColor‑attention`**                    | This theme variable sets the background color of components using the "attention" background color.                                                                                                                                                                                                      |
+| **`backgroundColor‑‑disabled`**                    | This theme variable sets the background color of color of disabled compopnents.                                                                                                                                                                                                                          |
+| **`backgroundColor‑primary`**                      | This theme variable sets the background color of components using the "primary" background color.                                                                                                                                                                                                        |
+| **`backgroundColor‑secondary`**                    | This theme variable sets the background color of components using the "secondary" background color.                                                                                                                                                                                                      |
+| **`backgroundColor‑subtitle`**                     | This theme variable sets the background color of components using the "subtitle" variant.                                                                                                                                                                                                                |
+| **`borderColor`**                                  | This property sets the default border color of elements.                                                                                                                                                                                                                                                 |
+| **`borderColor‑‑disabled`**                        | This property sets the default border color of disabled elements.                                                                                                                                                                                                                                        |
+| **`borderColor‑dropdown‑item`**                    | This property sets the default background color of items in dropdown components.                                                                                                                                                                                                                         |
+| **`borderRadius`**                                 | You can specify the default rounding for all components that use border rounding.                                                                                                                                                                                                                        |
+| **`boxShadow‑md`**                                 | A medium-size box shadow that gives an elevated look to a component.                                                                                                                                                                                                                                     |
+| **`boxShadow‑spread`**                             | A box shadow that spreads around all edges of a component.                                                                                                                                                                                                                                               |
+| **`boxShadow‑spread‑2‑xl`**                        | A box shadow that spreads around all edges of a component (more extended than `boxShadow‑spread‑2`).                                                                                                                                                                                                     |
+| **`boxShadow‑spread‑2`**                           | A box shadow that spreads around all edges of a component (more extended than `boxShadow‑spread`).                                                                                                                                                                                                       |
+| **`boxShadow‑xl`**                                 | A box shadow that gives an elevated look to a component (bigger than `boxShadow-md`).                                                                                                                                                                                                                    |
+| **`boxShadow‑xxl`**                                | A box shadow that gives an elevated look to a component (bigger than `boxShadow-xl`).                                                                                                                                                                                                                    |
+| **`color-danger`**                                 | This theme variable sets the base color shade for components using the "danger" color.                                                                                                                                                                                                                   |
+| **`color-info`**                                   | This theme variable sets the base color shade for components using the "info" color.                                                                                                                                                                                                                     |
+| **`color-primary`**                                | This theme variable sets the base color shade for components using the primary color.                                                                                                                                                                                                                    |
+| **`color-secondary`**                              | This theme variable sets the base color shade for components using the secondary color.                                                                                                                                                                                                                  |
+| **`color-success`**                                | This theme variable sets the base color shade for components using the "success" color.                                                                                                                                                                                                                  |
+| **`color-surface`**                                | This theme variable sets the base color shade for surface areas (component backgrounds).                                                                                                                                                                                                                 |
+| **`color-warn`**                                   | This theme variable sets the base color shade for components using the "warning" color.                                                                                                                                                                                                                  |
+| **`fontFamily‑monospace`**                         | This theme variable specifies the font family for text elements marked with "monospace".                                                                                                                                                                                                                 |
+| **`fontFamily‑sans‑serif`**                        | This theme variable specifies the font family for text elements marked with "sans-serif".                                                                                                                                                                                                                |
+| **`fontSize`**                                     | This theme variable sets the default font size of text elements.                                                                                                                                                                                                                                         |
+| **`fontSize‑tiny`**                                | The smallest font size available in the XMLUI styling system.                                                                                                                                                                                                                                            |
+| **`fontSize‑xs`**                                  | A font size between `fontSize-tiny` and `fonstSize‑sm`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑sm`**                                  | A font size between `fontSize-xs` and `fonstSize-base`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑base`**                                | A font size between `fontSize-sm` and `fonstSize-lg`.                                                                                                                                                                                                                                                    |
+| **`fontSize‑lg`**                                  | A font size between `fontSize-base` and `fonstSize-xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑xl`**                                  | A font size between `fontSize-lg` and `fonstSize-2xl`.                                                                                                                                                                                                                                                   |
+| **`fontSize‑2xl`**                                 | A font size between `fontSize-xl` and `fonstSize-3xl`.                                                                                                                                                                                                                                                   |
+| **`fontSize‑3xl`**                                 | A font size between `fontSize-2xl` and `fonstSize-4xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑4xl`**                                 | A font size between `fontSize-3xl` and `fonstSize-5xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑5xl`**                                 | A font size between `fontSize-4xl` and `fonstSize-6xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑6xl`**                                 | A font size between `fontSize-5l` and `fonstSize-7xl`.                                                                                                                                                                                                                                                   |
+| **`fontSize‑7xl`**                                 | A font size between `fontSize-6l` and `fonstSize-8xl`.                                                                                                                                                                                                                                                   |
+| **`fontSize‑8xl`**                                 | A font size between `fontSize-7xl` and `fonstSize-9xl`.                                                                                                                                                                                                                                                  |
+| **`fontSize‑9xl`**                                 | The tallest font size available in the XMLUI styling system.                                                                                                                                                                                                                                             |
+| **`fontWeight`**                                   | This theme variable sets the weight of the default font.                                                                                                                                                                                                                                                 |
+| **`fontWeight‑bold`**                              | This theme variable sets the font's weight marked as bold (when using any text variant with a weight set to `bold`).                                                                                                                                                                                     |
+| **`fontWeight‑extra‑bold`**                        | This theme variable sets the font's weight marked as extra-bold (when using any text variant with a weight set to `extra-bold`).                                                                                                                                                                         |
+| **`fontWeight‑light`**                             | This theme variable sets the font's weight marked as light (when using any text variant with a weight set to `light`).                                                                                                                                                                                   |
+| **`fontWeight‑normal`**                            | This theme variable sets the font's weight marked as normal (when using any text variant with a weight set to `normal`).                                                                                                                                                                                 |
+| **`fontWeight‑medium`**                            | This theme variable sets the font's weight marked as medium (when using any text variant with a weight set to `medium`).                                                                                                                                                                                 |
+| **`lineHeight‑loose`**                             | This theme variable sets the line heights of elements using the "loose" (meaning, "bigger than relaxed") trait.                                                                                                                                                                                          |
+| **`lineHeight‑none`**                              | This theme variable sets the line heights of elements using the "none" (meaning, "no line-height specification") trait.                                                                                                                                                                                  |
+| **`lineHeight‑normal`**                            | This theme variable sets the line heights of elements using the "normal" (meaning, "bigger than snug but less than relaxed") trait.                                                                                                                                                                      |
+| **`lineHeight‑relaxed`**                           | This theme variable sets the line heights of elements using the "relaxed" (meaning, "bigger than normal but less than loose") trait.                                                                                                                                                                     |
+| **`lineHeight‑snug`**                              | This theme variable sets the line heights of elements using the "snug" (meaning, "bigger than none but less than normal") trait.                                                                                                                                                                         |
+| **`lineHeight‑tight`**                             | This theme variable sets the line heights of elements using the "tight" (meaning, "bigger than none") trait.                                                                                                                                                                                             |
+| **`maxWidth‑desktop`**                             | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`.                                               |
+| **`maxWidth‑content`**                             | This theme variable sets the maximum width of the app's content. If the viewport is broader, the content will have margins to the left and right, keeping the width at the specified maximum.                                                                                                            |
+| **`maxWidth‑desktop`**                             | This theme variable sets the maximum width of the app's viewport, which makes it appear like a desktop. When the viewport width is larger than `maxWidth-tablet` and smaller than or equal to this value, the app considers the current view as `desktop`.                                               |
+| **`maxWidth‑desktop‑large`**                       | This theme variable sets the maximum width of the app's viewport, which makes it appear like a large desktop. When the viewport width is larger than `maxWidth-desktop` and smaller than or equal to this value, the app considers the current view as `large-desktop`.                                  |
+| **`maxWidth‑landscape‑phone`**                     | This theme variable sets the maximum width of the app's viewport, which makes it appear like a phone in landscape mode. When the viewport width is larger than `maxWidth-phone` and smaller than or equal to this value, the app considers the current view as `landscape-phone`.                        |
+| **`maxWidth‑phone`**                               | This theme variable sets the maximum width of the app's viewport, which makes it appear like a phone in portrait mode. When the viewport width is smaller than or equal to this value, the app considers the current view as `phone`.                                                                    |
+| **`maxWidth‑tablet`**                              | This theme variable sets the maximum width of the app's viewport, which makes it appear like a tablet (either in portrait or landscape mode). When the viewport width is larger than `maxWidth-landscape-phone` and smaller than or equal to this value, the app considers the current view as `tablet`. |
+| **`outlineColor‑‑focus`**                          | Set the color of the outline used for focused components.                                                                                                                                                                                                                                                |
+| **`outlineOffset‑‑focus`**                         | Set the width of the outline used for focused components.                                                                                                                                                                                                                                                |
+| **`outlineStyle‑‑focus`**                          | Set the style of the outline used for focused components.                                                                                                                                                                                                                                                |
+| **`outlineWidth‑‑focus`**                          | Set the width of the outline used for focused components.                                                                                                                                                                                                                                                |
+| **`textColor‑attention`**                          | This theme variable sets the color of text elements using the "attention" color.                                                                                                                                                                                                                         |
+| **`textColor‑‑disabled`**                          | This theme variable sets the color of disabled text elements.                                                                                                                                                                                                                                            |
+| **`textColor‑primary`**                            | This theme variable sets the color of text elements using the "primary" color.                                                                                                                                                                                                                           |
+| **`textColor‑secondary`**                          | This theme variable sets the color of text elements using the "secondary" color.                                                                                                                                                                                                                         |
+| **`textColor‑subtitle`**                           | This theme variable sets the color of text elements using the "subtitle" variant.                                                                                                                                                                                                                        |
 
 ## Colors in Themes
 
-XMLUI provides a palette of 77 colors for each theme out of the box. These colors are combinations of seven colors with 11 shades for each. 
+XMLUI provides a palette of 77 colors for each theme out of the box. These colors are combinations of seven colors with 11 shades for each.
 
 These theme variables represent the base colors:
 
@@ -273,7 +263,7 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -313,7 +303,7 @@ When selecting the primary color, choose one representing the middle shade (500)
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -355,7 +345,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -393,7 +383,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -431,7 +421,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -469,7 +459,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -507,7 +497,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -545,7 +535,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -583,7 +573,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ---comp
@@ -678,7 +668,7 @@ XMLUI declares these default color shade sets:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ```
@@ -686,6 +676,7 @@ XMLUI declares these default color shade sets:
 ### Validation Colors
 
 These colors represent validation states:
+
 - `color-info`: Color of components with informational messages
 - `color-valid`: Color signing valid state
 - `color-warning`: Color of warning
@@ -711,7 +702,7 @@ These colors represent validation states:
       horizontalAlignment="center"
       verticalAlignment="center">
       <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
-    </Stack>    
+    </Stack>
   </VStack>
 </Component>
 ```
@@ -723,6 +714,7 @@ You can influence the default font settings of a particular theme with the follo
 ### Font Family
 
 These theme variables set the default font styles:
+
 - `fontFamily`: The default font family used in the app
 - `fontFamily-sans-serif`: The default sans-serif font family used in the app
 - `fontFamily-monospace`: The default monospace font family used in the app
@@ -750,136 +742,72 @@ These theme variables set the default font styles:
 
 These theme variables define a set of line heights relative to the font size:
 
-```xmlui-pg name="Line Height" height="400px"
+```xmlui-pg name="Line Height"
 <App>
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-tiny:</Text>
-    <Text 
-      fontSize="$fontSize-tiny"
-      lineHeight="lineHeight-tiny"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-none:</Text>
+    <Text
+      lineHeight="$lineHeight-none" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-xs:</Text>
-    <Text 
-      fontSize="$fontSize-xs"
-      lineHeight="lineHeight-xs"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-tight:</Text>
+    <Text
+      lineHeight="$lineHeight-tight" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-sm:</Text>
-    <Text 
-      fontSize="$fontSize-sm"
-      lineHeight="lineHeight-sm"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-snug:</Text>
+    <Text
+      lineHeight="$lineHeight-snug" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-base:</Text>
-    <Text 
-      fontSize="$fontSize-base"
-      lineHeight="lineHeight-base"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-normal:</Text>
+    <Text
+      lineHeight="$lineHeight-normal" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-xl:</Text>
-    <Text 
-      fontSize="$fontSize-xl"
-      lineHeight="lineHeight-xl"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-relaxed:</Text>
+    <Text
+      lineHeight="$lineHeight-relaxed" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 
   <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-2xl:</Text>
-    <Text 
-      fontSize="$fontSize-2xl"
-      lineHeight="lineHeight-2xl"
-      backgroundColor="lightblue" 
+    <Text width="180px" variant="strong">lineHeight-loose:</Text>
+    <Text
+      lineHeight="$lineHeight-loose" 
+      backgroundColor="$color-surface-300"
       paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-3xl:</Text>
-    <Text 
-      fontSize="$fontSize-3xl"
-      lineHeight="lineHeight-3xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-4xl:</Text>
-    <Text 
-      fontSize="$fontSize-4xl"
-      lineHeight="lineHeight-4xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-5xl:</Text>
-    <Text 
-      fontSize="$fontSize-5xl"
-      lineHeight="lineHeight-5xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-6xl:</Text>
-    <Text 
-      fontSize="$fontSize-6xl"
-      lineHeight="lineHeight-6xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-7xl:</Text>
-    <Text 
-      fontSize="$fontSize-7xl"
-      lineHeight="lineHeight-7xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-8xl:</Text>
-    <Text 
-      fontSize="$fontSize-8xl"
-      lineHeight="lineHeight-8xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
-  </HStack>
-
-  <HStack verticalAlignment="center">
-    <Text width="160px" variant="strong">lineHeight-9xl:</Text>
-    <Text 
-      fontSize="$fontSize-9xl"
-      lineHeight="lineHeight-9xl"
-      backgroundColor="lightblue" 
-      paddingHorizontal="$space-2"
-    >Example</Text>
+    >
+      This is an example text
+    </Text>
   </HStack>
 </App>
 ```
@@ -1028,7 +956,7 @@ XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This s
 ```xmlui-pg name="Spacing"
 <App gap="$gap-tight">
   <Text value="The base value is: 0.25rem" variant="strong" />
-  
+
   <HStack>
     <Text value="space-0" width="$space-20" />
     <Stack width="$space-0" backgroundColor="$color-info" />
@@ -1206,18 +1134,21 @@ XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This s
 Besides the spacing theme variables, layout containers provide a few others that can be themed. Use these theme variables to provide consistent spacing with layout containers.
 
 **Gaps**:
+
 - `gap-none`: No gap
 - `gap-tight`: Less gap than the normal (layout container defaults)
 - `gap-normal`: Default layout container gap
 - `gap-loose`: More gap than the normal
 
 **Padding**:
+
 - `padding-none`: No padding
 - `padding-tight`: Less padding than the normal (layout container defaults)
 - `padding-normal`: Default layout container padding
 - `padding-loose`: More padding than the normal
 
 **General spacing** (padding, gaps, other spacing):
+
 - `padding-none`: No spacing
 - `padding-tight`: Less spacing than the normal
 - `padding-normal`: Default spacing

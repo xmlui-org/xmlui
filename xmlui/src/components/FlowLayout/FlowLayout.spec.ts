@@ -6,174 +6,209 @@ import { test, expect } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic functionality", () => {
-  test.skip("component renders with default props", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
-    await initTestBed(
-      `
-    <FlowLayout>
-      <Text>Item 1</Text>
-      <Text>Item 2</Text>
-      <Text>Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
+  test("component renders with default props", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text testId="item1">Item 1</Text>
+        <Text testId="item2">Item 2</Text>
+        <Text testId="item3">Item 3</Text>
+      </FlowLayout>
+    `);
 
     // Check that the component is visible
-    await expect(page.locator(".flow-layout")).toBeVisible();
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
     // Check that children are rendered
-    await expect(page.locator("text=Item 1")).toBeVisible();
-    await expect(page.locator("text=Item 2")).toBeVisible();
-    await expect(page.locator("text=Item 3")).toBeVisible();
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.width).toBeGreaterThan(0);
+    expect(rect2.width).toBeGreaterThan(0);
+    expect(rect3.width).toBeGreaterThan(0);
+    expect(rect1.x).toBe(rect2.x);
+    expect(rect2.x).toBe(rect3.x);
+    expect(rect1.y).toBeLessThan(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
   });
 
-  test.skip("component wraps items when they exceed container width", async ({
-    page,
-    initTestBed,
-  }) => {
-    // TODO: review these Copilot-created tests
+  test("component renders when widths specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout>
+        <Text testId="item1" width="80px">Item 1</Text>
+        <Text testId="item2" width="80px">Item 2</Text>
+        <Text testId="item3" width="80px">Item 3</Text>
+      </FlowLayout>
+    `);
 
-    await initTestBed(
-      `
-    <FlowLayout style="width: 200px">
-      <Text style="width: 100px">Item 1</Text>
-      <Text style="width: 100px">Item 2</Text>
-      <Text style="width: 100px">Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
-    // Check that Item 1 and Item 2 are on the same row
-    const item1Bounds = await page.locator("text=Item 1").boundingBox();
-    const item2Bounds = await page.locator("text=Item 2").boundingBox();
-    const item3Bounds = await page.locator("text=Item 3").boundingBox();
-
-    expect(item1Bounds.y).toBeCloseTo(item2Bounds.y, 0);
-    expect(item3Bounds.y).toBeGreaterThan(item1Bounds.y);
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.width).toBeLessThanOrEqual(80);
+    expect(rect2.width).toBeLessThanOrEqual(80);
+    expect(rect3.width).toBeLessThanOrEqual(80);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect2.x).toBeLessThan(rect3.x);
   });
 
-  test.skip("component applies gap correctly", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
+  test("component wraps items when they exceed container width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="280px">
+        <Text testId="item1" width="100px">Item 1</Text>
+        <Text testId="item2" width="100px">Item 2</Text>
+        <Text testId="item3" width="100px">Item 3</Text>
+      </FlowLayout>
+    `);
 
-    await initTestBed(
-      `
-    <FlowLayout gap="20px">
-      <Text>Item 1</Text>
-      <Text>Item 2</Text>
-      <Text>Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
-    // Get the bounding boxes of adjacent items
-    const item1Bounds = await page.locator("text=Item 1").boundingBox();
-    const item2Bounds = await page.locator("text=Item 2").boundingBox();
-
-    // Check that the horizontal gap is approximately 20px
-    const horizontalGap = item2Bounds.x - (item1Bounds.x + item1Bounds.width);
-    expect(horizontalGap).toBeCloseTo(20, 0);
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect1.x).toBe(rect3.x);
   });
 
-  test.skip("component applies columnGap and rowGap correctly", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
+  test("component applies gap correctly (#1)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="13px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
 
-    await initTestBed(
-      `
-    <FlowLayout columnGap="30px" rowGap="40px" style="width: 200px">
-      <Text style="width: 100px">Item 1</Text>
-      <Text style="width: 100px">Item 2</Text>
-      <Text style="width: 100px">Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
-    // Get the bounding boxes
-    const item1Bounds = await page.locator("text=Item 1").boundingBox();
-    const item2Bounds = await page.locator("text=Item 2").boundingBox();
-    const item3Bounds = await page.locator("text=Item 3").boundingBox();
-
-    // Check that the horizontal gap is approximately 30px
-    const horizontalGap = item2Bounds.x - (item1Bounds.x + item1Bounds.width);
-    expect(horizontalGap).toBeCloseTo(30, 0);
-
-    // Check that the vertical gap is approximately 40px
-    const verticalGap = item3Bounds.y - (item1Bounds.y + item1Bounds.height);
-    expect(verticalGap).toBeCloseTo(40, 0);
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x - (rect2.x + rect2.width)).toBe(13);
   });
 
-  test.skip("component applies theme variables correctly", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
+  test("component applies gap correctly (#2)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout gap="13px">
+        <Stack testId="item1">Item 1</Stack>
+        <Stack testId="item2">Item 2</Stack>
+        <Stack testId="item3">Item 3</Stack>
+      </FlowLayout>
+    `);
 
-    await initTestBed(
-      `
-    <FlowLayout>
-      <Text>Item 1</Text>
-      <Text>Item 2</Text>
-      <Text>Item 3</Text>
-    </FlowLayout>
-  `,
-      {
-        testThemeVars: {
-          "backgroundColor-FlowLayout": "rgb(240, 240, 240)",
-          "padding-FlowLayout": "20px",
-        },
-      },
-    );
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
-    // Check that theme variables are applied
-    await expect(page.locator(".flow-layout")).toHaveCSS("background-color", "rgb(240, 240, 240)");
-    await expect(page.locator(".flow-layout")).toHaveCSS("padding", "20px");
-  });
-});
-
-// =============================================================================
-// ACCESSIBILITY TESTS
-// =============================================================================
-
-test.describe("Accessibility tests", () => {
-  test.skip("component has correct accessibility attributes", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
-    await initTestBed(
-      `
-    <FlowLayout>
-      <Text>Item 1</Text>
-      <Text>Item 2</Text>
-      <Text>Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
-
-    // Check that the component has the correct role
-    await expect(page.locator(".flow-layout")).toHaveAttribute("role", "group");
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect2.y - (rect1.y + rect1.height)).toBe(13);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(13);
   });
 
-  test.skip("component is not focusable", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
+  test("component applies columnGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout columnGap="13px" gap="40px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
 
-    await initTestBed(
-      `
-    <FlowLayout>
-      <Text>Item 1</Text>
-      <Text>Item 2</Text>
-      <Text>Item 3</Text>
-    </FlowLayout>
-  `,
-      {},
-    );
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
 
-    // Flow layout should not be focusable as it's a container
-    const tabIndex = await page.locator(".flow-layout").getAttribute("tabindex");
-    expect(tabIndex).not.toBe("0");
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBe(rect3.y);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x - (rect2.x + rect2.width)).toBe(13);
+  });
 
-    await page.locator(".flow-layout").focus();
-    await expect(page.locator(".flow-layout")).not.toBeFocused();
+  test("component applies rowGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout rowGap="13px" gap="40px">
+        <Stack testId="item1">Item 1</Stack>
+        <Stack testId="item2">Item 2</Stack>
+        <Stack testId="item3">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect2.y - (rect1.y + rect1.height)).toBe(13);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(13);
+  });
+
+  test("component applies rowGap and columnGap correctly", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="280px" columnGap="13px" rowGap="19px" gap="40px">
+        <Stack testId="item1" width="100px">Item 1</Stack>
+        <Stack testId="item2" width="100px">Item 2</Stack>
+        <Stack testId="item3" width="100px">Item 3</Stack>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+    const item3 = page.getByTestId("item3");
+    const rect3 = await item3.boundingBox();
+
+    // Check that children are rendered
+    expect(rect1.height).toBe(rect2.height);
+    expect(rect2.height).toBe(rect3.height);
+    expect(rect1.y).toBe(rect2.y);
+    expect(rect2.y).toBeLessThan(rect3.y);
+    expect(rect1.x).toBeLessThan(rect2.x);
+    expect(rect2.x - (rect1.x + rect1.width)).toBe(13);
+    expect(rect3.x).toBe(rect1.x);
+    expect(rect3.y - (rect2.y + rect2.height)).toBe(19);
   });
 });
 
@@ -182,70 +217,49 @@ test.describe("Accessibility tests", () => {
 // =============================================================================
 
 test.describe("Edge cases", () => {
-  test.skip("component handles empty content gracefully", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
+  test("component handles empty content gracefully", async ({ page, initTestBed }) => {
+    await initTestBed(`<FlowLayout testId="flowLayout"></FlowLayout>`);
 
-    await initTestBed(`<FlowLayout></FlowLayout>`, {});
-
-    // Component should still render even without children
-    await expect(page.locator(".flow-layout")).toBeVisible();
+    const layout = page.getByTestId("flowLayout");
+    await expect(layout).toBeAttached();
+    await expect(layout).toBeEmpty();
   });
 
-  test.skip("component handles FlowItemBreak component", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
-    await initTestBed(
-      `
-      <FlowLayout>
-        <Text>Item 1</Text>
-        <Text>Item 2</Text>
-        <FlowItemBreak />
-        <Text>Item 3</Text>
-      </FlowLayout>
-    `,
-      {},
-    );
-
-    // Get the bounding boxes
-    const item1Bounds = await page.locator("text=Item 1").boundingBox();
-    const item2Bounds = await page.locator("text=Item 2").boundingBox();
-    const item3Bounds = await page.locator("text=Item 3").boundingBox();
-
-    // Items 1 and 2 should be on the same row
-    expect(item1Bounds.y).toBeCloseTo(item2Bounds.y, 0);
-
-    // Item 3 should be on a new row due to FlowItemBreak
-    expect(item3Bounds.y).toBeGreaterThan(item1Bounds.y);
-  });
-
-  test.skip("component handles very long items correctly", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
+  test("component handles very long items correctly (#1)", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <FlowLayout style="width: 200px">
-        <Text>This is a very long item that should wrap to the next line because it's too long</Text>
-        <Text>Short item</Text>
+      <FlowLayout width="200px">
+        <Text testId="item1">This is a very long item that should wrap to the next line because it's too long</Text>
+        <Text testId="item2">Short item</Text>
       </FlowLayout>
     `);
 
-    // The long item should be on its own line
-    const longItemBounds = await page.locator("text=This is a very long item").boundingBox();
-    const shortItemBounds = await page.locator("text=Short item").boundingBox();
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
 
-    // Short item should be on a different row than long item
-    expect(shortItemBounds.y).toBeGreaterThan(longItemBounds.y);
+    expect(rect2.y).toBeGreaterThan(rect1.y + rect1.height);
   });
 
-  test.skip("can render empty", async ({ page, initTestBed }) => {
-    await initTestBed(`<FlowLayout testId="layout"></FlowLayout>`);
-    await expect(page.getByTestId("layout")).toBeAttached();
-    await expect(page.getByTestId("layout")).toBeEmpty();
+  test("component handles very long items correctly (#2)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <FlowLayout width="200px">
+        <Text testId="item1">Short item</Text>
+        <Text testId="item2">This is a very long item that should wrap to the next line because it's too long</Text>
+      </FlowLayout>
+    `);
+
+    const item1 = page.getByTestId("item1");
+    const rect1 = await item1.boundingBox();
+    const item2 = page.getByTestId("item2");
+    const rect2 = await item2.boundingBox();
+
+    expect(rect2.y).toBeGreaterThan(rect1.y + rect1.height);
   });
 
   const PAGE_WIDTH = 1280;
 
-  // width should be exactly what the user sets
-  test.skip("1 item 25% width", async ({ page, initTestBed }) => {
+  test("1 item 25% width", async ({ page, initTestBed }) => {
     const itemHeight = "64px";
     const itemWidthPercent = "25%";
     await initTestBed(`
@@ -259,7 +273,7 @@ test.describe("Edge cases", () => {
   });
 
   // gap should be ignored because of 1 item
-  test.skip("1 item 25% width + gap", async ({ page, initTestBed }) => {
+  test("1 item 25% width + gap", async ({ page, initTestBed }) => {
     const itemHeight = "64px";
     const itemWidthPercent = "25%";
     const gap = "26px";
@@ -275,7 +289,7 @@ test.describe("Edge cases", () => {
   });
 
   // gap should be ignored because of 1 item
-  test.skip("1 item 100% width + gap", async ({ page, initTestBed }) => {
+  test("1 item 100% width + gap", async ({ page, initTestBed }) => {
     const itemHeight = "64px";
     const itemWidthPercent = "100%";
     const gap = "26px";
@@ -290,7 +304,7 @@ test.describe("Edge cases", () => {
     expect(width).toEqual(expectedWidth);
   });
 
-  test.skip("4 item 25% width", async ({ page, initTestBed }) => {
+  test("4 item 25% width", async ({ page, initTestBed }) => {
     const layoutWidth = "400px";
     const itemWidthPercent = "25%";
     const itemHeight = 64;
@@ -308,7 +322,7 @@ test.describe("Edge cases", () => {
     expect(layoutHeight).toEqual(itemHeight);
   });
 
-  test.skip("3 item 25% width, 1 item 25.1% wraps", async ({ page, initTestBed }) => {
+  test("3 item 25% width, 1 item 25.1% wraps", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidthPercent = "25%";
     const itemWidthPercentBigger = "25.1%";
@@ -328,7 +342,7 @@ test.describe("Edge cases", () => {
   });
 
   // When gap is specified and wrapping, a horizontal gap is applied
-  test.skip("wrap with gaps", async ({ page, initTestBed }) => {
+  test("wrap with gaps", async ({ page, initTestBed }) => {
     const layoutWidth = 400;
     const itemWidthPercent = "25%";
     const itemWidthPercentBigger = "25.1%";
@@ -349,7 +363,7 @@ test.describe("Edge cases", () => {
     expect(layoutHeight).toEqual(expectedHeight);
   });
 
-  test.skip("item with * width fills row", async ({ page, initTestBed }) => {
+  test("item with * width fills row", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidth = "*";
     await initTestBed(`
@@ -370,7 +384,7 @@ test.describe("Edge cases", () => {
   });
 
   // rowGap applies when wrapping
-  test.skip("wrap with rowGap", async ({ page, initTestBed }) => {
+  test("wrap with rowGap", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidthPercent = "50%";
     const rowGap = 24;
@@ -389,8 +403,7 @@ test.describe("Edge cases", () => {
     expect(layoutHeight).toEqual(expectedHeight);
   });
 
-  // columnGap applies when wrapping
-  test.skip("wrap with columnGap", async ({ page, initTestBed }) => {
+  test("wrap with columnGap", async ({ page, initTestBed }) => {
     const itemWidth = 200;
     const columnGap = 24;
     const layoutWidth = itemWidth + columnGap + itemWidth;
@@ -411,7 +424,7 @@ test.describe("Edge cases", () => {
   });
 
   // wrapping: columnGap & rowGap overrules gap prop
-  test.skip("columnGap & rowGap overrules gap", async ({ page, initTestBed }) => {
+  test("columnGap & rowGap overrules gap", async ({ page, initTestBed }) => {
     const itemWidth = 200;
     const columnGap = 24;
     const layoutWidth = itemWidth + columnGap + itemWidth;
@@ -439,7 +452,7 @@ test.describe("Edge cases", () => {
 
   // 4 items with 25% each perfectly fit in one row
   // gaps, borders, margins don't count when breaking into new lines
-  test.skip("no wrap from gap, border, margin", async ({ page, initTestBed }) => {
+  test("no wrap from gap, border, margin", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const width = "25%";
     const marginInline = 100;
@@ -456,7 +469,7 @@ test.describe("Edge cases", () => {
   });
 
   // Elements will cap at 100% width
-  test.skip("no horizontal overflow", async ({ page, initTestBed }) => {
+  test("no horizontal overflow", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const bigWidths = { percent: "120%", px: "1000000000px", em: "1000000000em" };
     await initTestBed(`
@@ -480,7 +493,7 @@ test.describe("Edge cases", () => {
   });
 
   // SpaceFillers can be used to break into new lines
-  test.skip("SpaceFiller adds line break", async ({ page, initTestBed }) => {
+  test("SpaceFiller adds line break", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidth = "20%";
     await initTestBed(`
@@ -500,7 +513,7 @@ test.describe("Edge cases", () => {
 
   // The layout properly handles overflow on the Y axis
   // The scrollbar must not overlap the rightmost element
-  test.skip("scrollbar on overflow Y", async ({ page, initTestBed }) => {
+  test("scrollbar on overflow Y", async ({ page, initTestBed }) => {
     const itemHeight = 128;
     await initTestBed(`
   <FlowLayout testId="layout" height="100px" columnGap="10px" overflowY="auto">
@@ -516,7 +529,7 @@ test.describe("Edge cases", () => {
 
   // The layout properly handles overflow on the Y axis
   // The scrollbar must not overlap the rightmost element
-  test.skip("scrollbar on overflow Y multi items", async ({ page, initTestBed }) => {
+  test("scrollbar on overflow Y multi items", async ({ page, initTestBed }) => {
     const itemHeight = 128;
     await initTestBed(`
   <FlowLayout testId="layout" height="100px" overflowY="auto">
@@ -531,7 +544,7 @@ test.describe("Edge cases", () => {
     expect(result).toEqual(true);
   });
 
-  test.skip("multiple star sized next to each other doesn't break", async ({
+  test("multiple star sized next to each other doesn't break", async ({
     page,
     initTestBed,
   }) => {
@@ -554,7 +567,7 @@ test.describe("Edge cases", () => {
     expect(blueWidth).toEqual(40);
   });
 
-  test.skip("SpaceFiller breaks star sized items", async ({ page, initTestBed }) => {
+  test("SpaceFiller breaks star sized items", async ({ page, initTestBed }) => {
     await initTestBed(`
     <FlowLayout testId="layout" width="100px" gap="10px">
       <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>
@@ -575,141 +588,5 @@ test.describe("Edge cases", () => {
     expect(redWidth).toEqual(20);
     expect(greenWidth).toEqual(70);
     expect(blueWidth).toEqual(100);
-  });
-
-  test.skip("boxShadow is not clipped", async ({ page, initTestBed }) => {
-    await initTestBed(`
-    <CHStack height="300px">
-      <FlowLayout testId="layout" width="500px" gap="10px">
-        <Stack height="50px" boxShadow="orangered 0px 0px 0px 100px"/>
-      </FlowLayout>
-    </CHStack>
-    `);
-    await expect(page).toHaveScreenshot();
-  });
-
-  // TODO: Review how to handle compound components in tests
-  // test("with compound components", async ({ page, initTestBed }) => {
-  //   const itemHeight = 128;
-
-  //   const itemWidth = PAGE_WIDTH / 4;
-  //   const gap = 10;
-  //   await initTestBed(`
-  //     <FlowLayout gap="${gap}px" testId="layout" width="${PAGE_WIDTH}px">
-  //       <InfoCard testId="item1" width="${itemWidth}px"/>
-  //       <InfoCard testId="item2" width="${itemWidth}px"/>
-  //       <InfoCard testId="item3" width="${itemWidth}px"/>
-  //       <InfoCard testId="item4" width="${itemWidth}px"/>
-  //     </FlowLayout>
-  //   `, {
-  //     components: [
-  //       {
-  //         `
-  //           <Component name="InfoCard">
-  //             <Stack backgroundColor="red" height="${itemHeight}px"/>
-  //           </Component>
-  //         `
-  //       }
-  //     ],
-  //   });
-
-  //   const { left: item2Left } = await getBounds(page.getByTestId("item2"));
-  //   const expectedItem2Left = itemWidth + gap;
-
-  //   const { height: layoutHeight } = await getBounds(page.getByTestId("layout"));
-  //   const expectedLayoutHeight = itemHeight + gap + itemHeight;
-
-  //   expect(item2Left).toEqual(expectedItem2Left);
-  //   expect(layoutHeight).toEqual(expectedLayoutHeight);
-  // });
-});
-
-// =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.describe("Performance tests", () => {
-  test.skip("component handles many items efficiently", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
-    // Create a FlowLayout with many items
-    const manyItems = Array(50)
-      .fill(0)
-      .map((_, i) => `<Text>Item ${i}</Text>`)
-      .join("");
-
-    await initTestBed(
-      `
-    <FlowLayout>
-      ${manyItems}
-    </FlowLayout>
-  `,
-      {},
-    );
-
-    // Check that all items are rendered
-    await expect(page.locator("text=Item 0")).toBeVisible();
-    await expect(page.locator("text=Item 49")).toBeVisible();
-
-    // Component should still be responsive
-    await expect(page.locator(".flow-layout")).toBeVisible();
-  });
-});
-
-// =============================================================================
-// INTEGRATION TESTS
-// =============================================================================
-
-test.describe("Integration tests", () => {
-  test.skip("component works correctly with different child component types", async ({
-    page,
-    initTestBed,
-  }) => {
-    // TODO: review these Copilot-created tests
-
-    await initTestBed(
-      `
-    <FlowLayout>
-      <Text>Text Item</Text>
-      <Button>Button Item</Button>
-      <Icon name="star" />
-      <Image src="placeholder.png" alt="Placeholder" />
-    </FlowLayout>
-  `,
-      {},
-    );
-
-    // Check that all different component types are rendered
-    await expect(page.locator("text=Text Item")).toBeVisible();
-    await expect(page.locator("button")).toBeVisible();
-    await expect(page.locator("svg")).toBeVisible();
-    await expect(page.locator("img")).toBeVisible();
-  });
-
-  test.skip("component works within a scroll container", async ({ page, initTestBed }) => {
-    // TODO: review these Copilot-created tests
-
-    await initTestBed(
-      `
-    <ScrollView style="height: 100px; overflow: auto;">
-      <FlowLayout>
-        ${Array(20)
-          .fill(0)
-          .map((_, i) => `<Text>Item ${i}</Text>`)
-          .join("")}
-      </FlowLayout>
-    </ScrollView>
-  `,
-      {},
-    );
-
-    // First items should be visible
-    await expect(page.locator("text=Item 0")).toBeVisible();
-
-    // Scroll to the bottom
-    await page.locator(".scroll-view").evaluate((el) => (el.scrollTop = el.scrollHeight));
-
-    // Last items should now be visible
-    await expect(page.locator("text=Item 19")).toBeVisible();
   });
 });

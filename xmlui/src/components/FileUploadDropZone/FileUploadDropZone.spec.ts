@@ -23,13 +23,13 @@ test("component displays children content", async ({ initTestBed, createFileUplo
   await expect(driver.component).toContainText("Or click to browse");
 });
 
-test.skip("component handles disabled state", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
+test("component handles disabled state", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
   // TODO: Disabled state handling needs investigation
   await initTestBed(`<FileUploadDropZone enabled="false">Upload Area</FileUploadDropZone>`);
   const driver = await createFileUploadDropZoneDriver();
   // Check that the component is visible but the input reflects disabled state
   await expect(driver.component).toBeVisible();
-  expect(await driver.isEnabled()).toBe(false);
+  await expect(driver.component).toHaveAttribute('data-drop-enabled', 'false');
 });
 
 test("component supports custom drop text", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
@@ -81,11 +81,10 @@ test("component supports keyboard interaction through children", async ({ initTe
   await expect(button).toBeFocused();
 });
 
-test.skip("component maintains semantic structure", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
-  // TODO: Complex child component rendering needs investigation
+test("component maintains semantic structure", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
   await initTestBed(`
     <FileUploadDropZone>
-      <Heading level="3">Upload Documents</Heading>
+      <H3>Upload Documents</H3>
       <Text>Supported formats: PDF, DOC, JPG</Text>
     </FileUploadDropZone>
   `);
@@ -261,8 +260,7 @@ test("component works in form context", async ({ initTestBed, createFileUploadDr
   await expect(driver.component).toBeVisible();
 });
 
-test.skip("component upload event handlers work correctly", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
-  // TODO: File upload event simulation needs investigation
+test("component upload event handlers work correctly", async ({ initTestBed, createFileUploadDropZoneDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <FileUploadDropZone onUpload="files => testState = files.length">
       Upload Area

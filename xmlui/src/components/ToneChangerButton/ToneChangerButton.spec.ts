@@ -485,32 +485,6 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByTestId("theme-state")).toHaveText("light");
   });
 
-  test("works correctly when theme is initialized in dark mode", async ({ initTestBed, page }) => {
-    // Skip this test as the tone="dark" initialization may not be supported
-    // This would require investigation of how theme initialization works
-    test.skip();
-    
-    await initTestBed(`
-      <App tone="dark">
-        <ToneChangerButton />
-        <Text testId="theme-state">{activeThemeTone}</Text>
-      </App>
-    `);
-    
-    const button = page.getByRole("button");
-    
-    // Should start in dark mode
-    await expect(page.getByTestId("theme-state")).toHaveText("dark");
-    
-    // Click to switch to light
-    await button.click();
-    await expect(page.getByTestId("theme-state")).toHaveText("light");
-    
-    // Click to switch back to dark
-    await button.click();
-    await expect(page.getByTestId("theme-state")).toHaveText("dark");
-  });
-
   test("handles empty string icon properties", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>

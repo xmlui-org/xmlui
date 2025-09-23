@@ -1,4 +1,3 @@
-
 import type { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 import { palette } from "./palette";
 
@@ -195,7 +194,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "outlineOffset--focus": "0",
 
     // --- The app's default font family
-    "fontFamily": "$fontFamily-sans-serif",
+    fontFamily: "$fontFamily-sans-serif",
 
     // --- Various font sizes (relative to the current context)
     "fontSize-tiny": "0.625rem",
@@ -214,25 +213,17 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-8xl": "6rem",
     "fontSize-9xl": "8rem",
 
+    // --- The default font size
+    fontSize: "$fontSize-base",
 
     // --- Various line height values
-    "lineHeight-tiny": "calc(0.85 / 0.625)", // 1.36
-    "lineHeight-xs": "calc(1 / 0.75)", // 1.33
-    "lineHeight-sm": "calc(1.25 / 0.875)", // 1.43
-    "lineHeight-base": "calc(1.5 / 1)", // 1.5
-    "lineHeight-lg": "calc(1.75 / 1.125)", // 1.56
-    "lineHeight-xl": "calc(1.75 / 1.25)", // 1.4
-    "lineHeight-2xl": "calc(2 / 1.5)", // 1.33
-    "lineHeight-3xl": "calc(2.25 / 1.875)", // 1.2
-    "lineHeight-4xl": "calc(2.5 / 2.25)", // 1.11
-    "lineHeight-5xl": "1",
-    "lineHeight-6xl": "1",
-    "lineHeight-7xl": "1",
-    "lineHeight-8xl": "1",
-    "lineHeight-9xl": "1",
-
-    // --- The default font size
-    "fontSize": "$fontSize-base",
+    // --- Default line height values (relative to the base unit, "space-base")
+    "lineHeight-none": "1",
+    "lineHeight-tight": "1.25",
+    "lineHeight-snug": "1.375",
+    "lineHeight-normal": "1.5",
+    "lineHeight-relaxed": "1.625",
+    "lineHeight-loose": "2",
 
     // --- Predefined gap sizes
     "gap-none": "$space-0",
@@ -253,7 +244,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "space-loose": "$space-8",
 
     // --- Font used for body
-    "fontWeight": "$fontWeight-normal",
+    fontWeight: "$fontWeight-normal",
 
     // --- Various default values (review them)
     "borderColor-dropdown-item": "$borderColor",
@@ -271,10 +262,8 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- The default maximum content width
     "maxWidth-content": "1320px",
 
-
-
     // --- Background colors
-    "backgroundColor": "$color-surface-subtle",
+    backgroundColor: "$color-surface-subtle",
     "backgroundColor-overlay": "rgba(0, 0, 0, 0.2)",
     "backgroundColor-dropdown-item--hover": $colorSurface50,
     "backgroundColor-dropdown-item--active": $colorSurface100,
@@ -282,7 +271,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "backgroundColor-tree-row--selected--before": $colorPrimary50,
 
     // --- Border colors
-    "borderColor": "rgb(from $color-surface-900 r g b / 0.1)",
+    borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
     "borderColor--disabled": $colorSurface100,
 
     // --- Text colors
@@ -328,7 +317,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-surface-subtle": "$color-surface-50",
 
         // --- Primary color shades (bluish)
-        "color-primary-50":  "$const-color-primary-50",
+        "color-primary-50": "$const-color-primary-50",
         "color-primary-100": "$const-color-primary-100",
         "color-primary-200": "$const-color-primary-200",
         "color-primary-300": "$const-color-primary-300",
@@ -342,21 +331,21 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-primary": "$const-color-primary-500",
 
         // --- Secondary color shades (steel-bluish)
-        "color-secondary-50" :  "$const-color-secondary-50" ,
-        "color-secondary-100":  "$const-color-secondary-100",
-        "color-secondary-200":  "$const-color-secondary-200",
-        "color-secondary-300":  "$const-color-secondary-300",
-        "color-secondary-400":  "$const-color-secondary-400",
-        "color-secondary-500":  "$const-color-secondary-500",
-        "color-secondary-600":  "$const-color-secondary-600",
-        "color-secondary-700":  "$const-color-secondary-700",
-        "color-secondary-800":  "$const-color-secondary-800",
-        "color-secondary-900":  "$const-color-secondary-900",
-        "color-secondary-950":  "$const-color-secondary-950",
+        "color-secondary-50": "$const-color-secondary-50",
+        "color-secondary-100": "$const-color-secondary-100",
+        "color-secondary-200": "$const-color-secondary-200",
+        "color-secondary-300": "$const-color-secondary-300",
+        "color-secondary-400": "$const-color-secondary-400",
+        "color-secondary-500": "$const-color-secondary-500",
+        "color-secondary-600": "$const-color-secondary-600",
+        "color-secondary-700": "$const-color-secondary-700",
+        "color-secondary-800": "$const-color-secondary-800",
+        "color-secondary-900": "$const-color-secondary-900",
+        "color-secondary-950": "$const-color-secondary-950",
         "color-secondary": "$const-color-secondary-500",
 
         // --- Warning color shades (orange shades)
-        "color-warn-50" : "$const-color-warn-50" ,
+        "color-warn-50": "$const-color-warn-50",
         "color-warn-100": "$const-color-warn-100",
         "color-warn-200": "$const-color-warn-200",
         "color-warn-300": "$const-color-warn-300",
@@ -370,7 +359,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-warn": "$const-color-warn-500",
 
         // --- Danger color shades (reddish)
-        "color-danger-50" : "$const-color-danger-50" ,
+        "color-danger-50": "$const-color-danger-50",
         "color-danger-100": "$const-color-danger-100",
         "color-danger-200": "$const-color-danger-200",
         "color-danger-300": "$const-color-danger-300",
@@ -385,7 +374,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-attention": "$const-color-danger-500",
 
         // --- Success color shades (greenish)
-        "color-success-50" : "$const-color-success-50" ,
+        "color-success-50": "$const-color-success-50",
         "color-success-100": "$const-color-success-100",
         "color-success-200": "$const-color-success-200",
         "color-success-300": "$const-color-success-300",
@@ -435,7 +424,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-surface-subtle": "$color-surface-50",
 
         // --- Primary color shades (bluish)
-        "color-primary-50":  "$const-color-primary-950",
+        "color-primary-50": "$const-color-primary-950",
         "color-primary-100": "$const-color-primary-900",
         "color-primary-200": "$const-color-primary-800",
         "color-primary-300": "$const-color-primary-700",
@@ -449,21 +438,21 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-primary": "$const-color-primary-500",
 
         // --- Secondary color shades (steel-bluish)
-        "color-secondary-50" :  "$const-color-secondary-950" ,
-        "color-secondary-100":  "$const-color-secondary-900",
-        "color-secondary-200":  "$const-color-secondary-800",
-        "color-secondary-300":  "$const-color-secondary-700",
-        "color-secondary-400":  "$const-color-secondary-600",
-        "color-secondary-500":  "$const-color-secondary-500",
-        "color-secondary-600":  "$const-color-secondary-400",
-        "color-secondary-700":  "$const-color-secondary-300",
-        "color-secondary-800":  "$const-color-secondary-200",
-        "color-secondary-900":  "$const-color-secondary-100",
-        "color-secondary-950":  "$const-color-secondary-50",
+        "color-secondary-50": "$const-color-secondary-950",
+        "color-secondary-100": "$const-color-secondary-900",
+        "color-secondary-200": "$const-color-secondary-800",
+        "color-secondary-300": "$const-color-secondary-700",
+        "color-secondary-400": "$const-color-secondary-600",
+        "color-secondary-500": "$const-color-secondary-500",
+        "color-secondary-600": "$const-color-secondary-400",
+        "color-secondary-700": "$const-color-secondary-300",
+        "color-secondary-800": "$const-color-secondary-200",
+        "color-secondary-900": "$const-color-secondary-100",
+        "color-secondary-950": "$const-color-secondary-50",
         "color-secondary": "$const-color-secondary-500",
 
         // --- Warning color shades (orange shades)
-        "color-warn-50" : "$const-color-warn-950" ,
+        "color-warn-50": "$const-color-warn-950",
         "color-warn-100": "$const-color-warn-900",
         "color-warn-200": "$const-color-warn-800",
         "color-warn-300": "$const-color-warn-700",
@@ -477,7 +466,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-warn": "$const-color-warn-500",
 
         // --- Danger color shades (reddish)
-        "color-danger-50" : "$const-color-danger-950" ,
+        "color-danger-50": "$const-color-danger-950",
         "color-danger-100": "$const-color-danger-900",
         "color-danger-200": "$const-color-danger-800",
         "color-danger-300": "$const-color-danger-700",
@@ -492,7 +481,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-attention": "$const-color-danger-400",
 
         // --- Success color shades (greenish)
-        "color-success-50" : "$const-color-success-950" ,
+        "color-success-50": "$const-color-success-950",
         "color-success-100": "$const-color-success-900",
         "color-success-200": "$const-color-success-800",
         "color-success-300": "$const-color-success-700",

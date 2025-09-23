@@ -103,7 +103,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
     if (!layoutContext?._insideModalFrame) {
       return (
         <ModalDialogFrame
-          isInitiallyOpen={node.when !== undefined}
+          isInitiallyOpen={extractValue(node.when) !== undefined}
           registerComponentApi={registerComponentApi}
           onClose={lookupEventHandler("close")}
           onOpen={lookupEventHandler("open")}

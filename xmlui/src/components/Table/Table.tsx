@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useRef, useState, memo } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -219,10 +219,10 @@ export const TableMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-heading-${COMP}`]: `$space-2 $space-0 $space-2 $space-2`,
-    [`padding-cell-${COMP}`]: "$space-2 $space-0 $space-2 $space-2",
+    [`padding-heading-${COMP}`]: `$space-2 $space-1 $space-2 $space-2`,
+    [`padding-cell-${COMP}`]: "$space-2 $space-1 $space-2 $space-2",
     [`paddingHorizontal-cell-first-${COMP}`]: "$space-5",
-    [`paddingHorizontal-cell-last-${COMP}`]: "$space-0",
+    [`paddingHorizontal-cell-last-${COMP}`]: "$space-1",
     [`border-cell-${COMP}`]: "1px solid $borderColor",
     [`outlineWidth-heading-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-heading-${COMP}--focus`]: "$outlineStyle--focus",
@@ -243,10 +243,13 @@ export const TableMd = createMetadata({
     [`backgroundColor-heading-${COMP}--active`]: "$color-surface-300",
     [`backgroundColor-heading-${COMP}`]: "$color-surface-100",
     [`textColor-heading-${COMP}`]: "$color-surface-500",
+    [`border-${COMP}`]: "0px solid transparent",
+    [`borderBottom-last-row-${COMP}`]: `$borderBottom-cell-${COMP}`,
+    [`borderRadius-${COMP}`]: "$borderRadius",
   },
 });
 
-const TableWithColumns = forwardRef(
+const TableWithColumns = memo(forwardRef(
   (
     {
       extractValue,
@@ -398,7 +401,7 @@ const TableWithColumns = forwardRef(
     }
     return tableContent;
   },
-);
+));
 TableWithColumns.displayName = "TableWithColumns";
 
 export const tableComponentRenderer = createComponentRenderer(

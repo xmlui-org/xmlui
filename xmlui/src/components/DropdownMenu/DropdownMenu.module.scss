@@ -35,13 +35,18 @@ $height-MenuSeparator: createThemeVar("height-MenuSeparator");
 $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 
 @layer components {
+
+  .DropdownMenuContent {
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+  }
+
   .DropdownMenuContent,
   .DropdownMenuSubContent {
     background-color: $backgroundColor-DropdownMenu;
     border-radius: $borderRadius-DropdownMenu;
     min-width: $minWidth-DropdowMenu;
     box-shadow: $boxShadow-DropdownMenu;
-    overflow: hidden;
     animation-duration: 400ms;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
@@ -105,6 +110,10 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     width: $width-MenuSeparator;
     height: $height-MenuSeparator;
     background-color: $color-MenuSeparator;
+
+    &:first-child, &:last-child{
+      display: none;
+    }
   }
 }
 

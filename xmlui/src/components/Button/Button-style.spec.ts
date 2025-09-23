@@ -86,14 +86,6 @@ buttonThemeValues.forEach((themeColor) => {
   });
 });
 
-// ["disabled", "hover", "active", "focused"].forEach((state) => {
-//   test.skip(
-//     `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
-//     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-//     async ({ initTestBed, createButtonDriver }) => {},
-//   );
-// });
-
 // fonts
 const EXPECTED_FONT_FAMILY = "Arial, sans-serif";
 const EXPECTED_FONT_SIZE = "20px";

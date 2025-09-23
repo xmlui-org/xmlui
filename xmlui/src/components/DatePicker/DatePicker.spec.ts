@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { format } from "date-fns";
 
@@ -5,285 +6,396 @@ import { format } from "date-fns";
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
-test.skip("component renders with default properties", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker />`, {});
-  
-  // Check that the component is visible
-  await expect(page.locator("button")).toBeVisible();
+test("component renders", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" />`);
+  await expect(page.getByTestId("datePicker")).toBeVisible();
 });
 
-test.skip("component displays initial value correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  const initialDate = "05/25/2024";
-  await initTestBed(`<DatePicker initialValue="${initialDate}" />`, {});
-
-  await expect(page.getByText(initialDate)).toBeVisible();
+test("component renders inline", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker inline testId="datePicker" />`);
+  await expect(page.getByTestId("datePicker")).toBeVisible();
 });
 
-test.skip("component opens calendar when clicked", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker />`, {});
-  
-  // Click the input to open calendar
-  await page.locator("button").click();
-  
-  // Check that calendar is visible
+test("component handles correct date format", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`,
+  );
+  await expect(page.getByTestId("datePicker")).toHaveText("05/25/2024");
+});
+
+test("component displays initialValue correctly (single)", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <DatePicker
+      initialValue="05/25/2024"
+      dateFormat="MM/dd/yyyy"
+      testId="datePicker"
+      mode="single"
+    />`);
+  await expect(page.getByText("05/25/2024")).toBeVisible();
+});
+
+test("component displays initialValue correctly (range)", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <DatePicker
+      initialValue="{{ from: '05/25/2024', to: '05/26/2024' }}"
+      dateFormat="MM/dd/yyyy"
+      mode="range"
+      testId="datePicker"
+    />`);
+  await expect(page.getByText("05/25/2024 - 05/26/2024")).toBeVisible();
+});
+
+test("component opens calendar when clicked", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" />`);
+  await page.getByTestId("datePicker").click();
   await expect(page.getByRole("menu")).toBeVisible();
 });
 
-test.skip("component allows date selection in single mode", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`
-    <Fragment>
-      <DatePicker id="datePicker" mode="single" dateFormat="MM/dd/yyyy" />
-      <Text id="text">Selected date: {datePicker.value}</Text>
-    </Fragment>
-  `, {});
-  
-  // Click to open calendar
-  await page.locator("#datePicker").click();
-  
-  // Select the 15th day of the current month
-  await page.locator(".rdp-day").filter({ hasText: "15" }).click();
-  
-  // Calendar should close after selection in single mode
-  await expect(page.getByRole("menu")).not.toBeVisible();
-  
-  // Get the current month and year to verify the selected date
-  const currentDate = new Date();
-  const expectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 15);
-  const formattedDate = format(expectedDate, "MM/dd/yyyy");
-  
-  await expect(page.getByTestId("text")).toContainText(`Selected date: ${formattedDate}`);
+test("component formats input to provided date format", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />`,
+  );
+  await expect(page.getByTestId("datePicker")).toHaveText("25-05-2024");
 });
 
-test.skip("component allows date range selection", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component allows date selection in single mode", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Fragment>
-      <DatePicker id="datePicker" mode="range" dateFormat="MM/dd/yyyy" />
-    </Fragment>
-  `, {});
-  
-  // Click to open calendar
-  await page.locator("#datePicker").click();
-  
-  // Select start date (1st of current month)
-  await page.locator(".rdp-day").filter({ hasText: "1" }).click();
-  
-  // Select end date (10th of current month)
-  await page.locator(".rdp-day").filter({ hasText: "10" }).click();
-  
-  // Get the current month and year to verify the selected date range
-  const currentDate = new Date();
-  const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 10);
-  const formattedStartDate = format(startDate, "MM/dd/yyyy");
-  const formattedEndDate = format(endDate, "MM/dd/yyyy");
-  
-  await expect(page.getByText(`${formattedStartDate} - ${formattedEndDate}`)).toBeVisible();
+    <DatePicker testId="datePicker" mode="single" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />
+  `);
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("menu")).toBeVisible();
+  await page.getByRole("grid", { name: "May" }).getByLabel("26").click();
+  await expect(page.getByTestId("datePicker")).toHaveText("05/26/2024");
+});
+
+test("date changes when selecting a new date in single mode", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <DatePicker testId="datePicker" mode="single" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />
+  `);
+  const datePicker = page.getByTestId("datePicker");
+  await datePicker.click();
+  await page.getByRole("grid", { name: "May" }).getByLabel("26").click();
+  await expect(page.getByTestId("datePicker")).toHaveText("05/26/2024");
+  await datePicker.click();
+  await page.getByRole("grid", { name: "May" }).getByLabel("27").click();
+  await expect(page.getByTestId("datePicker")).toHaveText("05/27/2024");
+});
+
+test("component allows date range selection", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" mode="range" dateFormat="MM/dd/yyyy" initialValue="{{ from: '05/25/2024', to: '05/26/2024' }}" />`,
+  );
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("menu")).toBeVisible();
+
+  await page.getByRole("grid", { name: "May" }).getByLabel("26").click();
+  await page.getByRole("grid", { name: "May" }).getByLabel("27").click();
+  await expect(page.getByTestId("datePicker")).toHaveText("05/26/2024 - 05/27/2024");
 });
 
 // =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test.skip("component has correct accessibility attributes", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker label="Birth Date" />`, {});
-  
-  // Check for proper ARIA attributes
-  await expect(page.locator("button")).toHaveAttribute("aria-haspopup", "dialog");
+test("component has correct accessibility attributes", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" />`);
+  await expect(page.getByTestId("datePicker")).toHaveAttribute("aria-haspopup", "true");
+  await expect(page.getByTestId("datePicker")).toHaveAttribute("aria-expanded", "false");
 });
 
-test.skip("component respects autoFocus property", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker autoFocus={true} />`, {});
-  
-  // Check that the input is automatically focused
-  await expect(page.locator("button")).toBeFocused();
+test("component is focusable via label", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" label="Birth Date" />`);
+  await page.getByText("Birth Date").click();
+  // --- clicking the label to focus the input opens up the dialog
+  await expect(
+    page.getByRole("menu").getByRole("button", { name: "Go to the Previous Month" }),
+  ).toBeFocused();
 });
 
-test.skip("component is keyboard navigable", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker />`, {});
-  
+test("component respects autoFocus property", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" autoFocus="true" />`);
+  await expect(page.getByTestId("datePicker")).toBeFocused();
+});
+
+test("component is keyboard navigable: open/close calendar menu", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" />`);
+
   // Focus the button
-  await page.locator("button").focus();
-  await expect(page.locator("button")).toBeFocused();
-  
+  await page.getByTestId("datePicker").focus();
+  await expect(page.getByTestId("datePicker")).toBeFocused();
+
   // Press Enter to open calendar
   await page.keyboard.press("Enter");
   await expect(page.getByRole("menu")).toBeVisible();
-  
+
   // Press Escape to close
   await page.keyboard.press("Escape");
   await expect(page.getByRole("menu")).not.toBeVisible();
 });
 
-test.skip("component fires proper focus events", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`
-    <App var.isFocused="false">
-      <Text testId="focusText">{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}</Text>
-      <DatePicker
-        id="datePicker"
-        gotFocus="isFocused = true"
-        lostFocus="isFocused = false"
-      />
-    </App>
-  `, {});
-  
-  // Focus the datepicker
-  await page.locator("#datePicker").focus();
-  await expect(page.getByTestId("focusText")).toHaveText("DatePicker focused");
-  
-  // Blur the datepicker
-  await page.locator("body").click(); // Click outside to blur
-  await expect(page.getByTestId("focusText")).toHaveText("DatePicker lost focus");
+test("component is keyboard navigable: navigate controls inside calendar menu", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" initialValue="05/25/2024" dateFormat="MM/dd/yyyy" />`,
+  );
+
+  // Focus the button
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("menu")).toBeVisible();
+  await expect(
+    page.getByRole("menu").getByRole("button", { name: "Go to the Previous Month" }),
+  ).toBeFocused();
+  // Tab to the calendar grid
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("menu").getByRole("button", { name: "Go to the Next Month" }),
+  ).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("menu").getByLabel("Choose the Month")).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("menu").getByLabel("Choose the Year")).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("25")).toBeFocused();
+});
+
+test("component is keyboard navigable: navigate days inside calendar menu", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" initialValue="05/15/2024" dateFormat="MM/dd/yyyy" />`,
+  );
+
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("menu")).toBeVisible();
+
+  // The back navigation button is focused first
+
+  // Tab to next nav button
+  await page.keyboard.press("Tab");
+  // Tab to month select
+  await page.keyboard.press("Tab");
+  // Tab to year select
+  await page.keyboard.press("Tab");
+  // Tab to the calendar grid
+  await page.keyboard.press("Tab");
+
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 7th")).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 8th")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 15th")).toBeFocused();
+});
+
+test("component is keyboard navigable: enter new date", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker testId="datePicker" initialValue="05/15/2024" dateFormat="MM/dd/yyyy"/>`,
+  );
+
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("menu")).toBeVisible();
+
+  // The back navigation button is focused first
+
+  // Tab to next nav button
+  await page.keyboard.press("Tab");
+  // Tab to month select
+  await page.keyboard.press("Tab");
+  // Tab to year select
+  await page.keyboard.press("Tab");
+  // Tab to the calendar grid
+  await page.keyboard.press("Tab");
+
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 14th")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("datePicker")).toHaveText("05/14/2024");
+  await expect(page.getByRole("menu")).not.toBeVisible();
+});
+
+test("component fires proper focus event on gotFocus", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <DatePicker testId="datePicker" onGotFocus="testState = 'focused'" />
+  `);
+  await page.getByTestId("datePicker").focus();
+  await expect.poll(testStateDriver.testState).toBe("focused");
+});
+
+test("component fires proper blur event on lostFocus", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <DatePicker testId="datePicker" onLostFocus="testState = 'blurred'" />
+  `);
+  await page.getByTestId("datePicker").focus();
+  await page.getByTestId("datePicker").blur();
+  await expect.poll(testStateDriver.testState).toBe("blurred");
 });
 
 // =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================
 
-test.skip("component shows different validation states", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component shows error validation states", async ({ page, initTestBed }) => {
   // Error state
-  await initTestBed(`<DatePicker validationStatus="error" />`, {});
-  await expect(page.locator("button")).toHaveClass(/error/);
-  
+  await initTestBed(`<DatePicker testId="datePicker" validationStatus="error" />`, {
+    testThemeVars: {
+      "borderColor-DatePicker-error": "rgb(220, 38, 38)",
+      "backgroundColor-DatePicker-error": "rgb(254, 202, 202)",
+      "textColor-DatePicker-error": "rgb(127, 29, 29)",
+    },
+  });
+  await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(220, 38, 38)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("background-color", "rgb(254, 202, 202)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("color", "rgb(127, 29, 29)");
+});
+
+test("component shows warning validation states", async ({ page, initTestBed }) => {
   // Warning state
-  await initTestBed(`<DatePicker validationStatus="warning" />`, {});
-  await expect(page.locator("button")).toHaveClass(/warning/);
-  
+  await initTestBed(`<DatePicker testId="datePicker" validationStatus="warning" />`, {
+    testThemeVars: {
+      "borderColor-DatePicker-warning": "rgb(255, 165, 0)",
+      "backgroundColor-DatePicker-warning": "rgb(255, 235, 156)",
+      "textColor-DatePicker-warning": "rgb(127, 29, 29)",
+    },
+  });
+  await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(255, 165, 0)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("background-color", "rgb(255, 235, 156)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("color", "rgb(127, 29, 29)");
+});
+
+test("component shows valid validation states", async ({ page, initTestBed }) => {
   // Valid state
-  await initTestBed(`<DatePicker validationStatus="valid" />`, {});
-  await expect(page.locator("button")).toHaveClass(/valid/);
+  await initTestBed(`<DatePicker testId="datePicker" validationStatus="valid" />`, {
+    testThemeVars: {
+      "borderColor-DatePicker-success": "rgb(0, 128, 0)",
+      "backgroundColor-DatePicker-success": "rgb(220, 255, 220)",
+      "textColor-DatePicker-success": "rgb(0, 100, 0)",
+    },
+  });
+  await expect(page.getByTestId("datePicker")).toHaveCSS("border-color", "rgb(0, 128, 0)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("background-color", "rgb(220, 255, 220)");
+  await expect(page.getByTestId("datePicker")).toHaveCSS("color", "rgb(0, 100, 0)");
 });
 
-test.skip("component displays placeholder text", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker placeholder="Select a date" />`, {});
-  
-  // Check that the placeholder is displayed
-  await expect(page.locator("button")).toContainText("Select a date");
+test("component displays placeholder text", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" placeholder="Select a date" />`);
+  await expect(page.getByTestId("datePicker")).toContainText("Select a date");
 });
 
-test.skip("component shows week numbers when enabled", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker showWeekNumber={true} />`, {});
-  
-  // Open the calendar
-  await page.locator("button").click();
-  
-  // Week numbers should be visible
+test("component shows week numbers when enabled", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" showWeekNumber="true" />`);
+  await page.getByTestId("datePicker").click();
   await expect(page.locator("[role='rowheader']").first()).toBeVisible();
 });
 
-test.skip("component renders with adornments", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component renders with adornments", async ({ page, initTestBed }) => {
   const startText = "From";
   const endText = "Select";
-  await initTestBed(`
+  await initTestBed(
+    `
     <DatePicker
+      testId="datePicker"
       startText="${startText}"
       endText="${endText}"
-      startIcon="calendar"
-      endIcon="calendar"
+      startIcon="test"
+      endIcon="test"
     />
-  `, {});
-  
-  // Check that adornments are displayed
+  `,
+    {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    },
+  );
   await expect(page.getByText(startText)).toBeVisible();
   await expect(page.getByText(endText)).toBeVisible();
-  await expect(page.locator("[data-icon-name='calendar']")).toBeVisible();
+  await expect(page.getByTestId("datePicker").locator("svg")).toHaveCount(2);
 });
 
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================
 
-test.skip("component handles disabled state correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker enabled={false} />`, {});
-  
-  // Check that the button is disabled
-  await expect(page.locator("button")).toBeDisabled();
-  
-  // Try to click the button
-  await page.locator("button").click({ force: true });
-  
-  // Calendar should not open
+test("component handles disabled state correctly", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" enabled="false" />`);
+  await expect(page.getByTestId("datePicker")).toBeDisabled();
+});
+
+test("disabled component does not react to user interactions", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" enabled="false" />`);
+  await page.getByTestId("datePicker").click({ force: true });
   await expect(page.getByRole("menu")).not.toBeVisible();
 });
 
-test.skip("component handles readOnly mode correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component handles readOnly mode correctly", async ({ page, initTestBed }) => {
   const initialDate = "05/25/2024";
-  await initTestBed(`<DatePicker readOnly={true} initialValue="${initialDate}" />`, {});
-  
-  // Initial value should be displayed
-  await expect(page.getByText(initialDate)).toBeVisible();
-  
-  // Click to open calendar
-  await page.locator("button").click();
-  
-  // Try to select a different date
-  await page.locator(".rdp-day").filter({ hasText: "1" }).click();
-  
+  await initTestBed(
+    `<DatePicker testId="datePicker" readOnly="true" initialValue="${initialDate}" dateFormat="MM/dd/yyyy" />`,
+  );
+  await page.getByTestId("datePicker").click();
+  await page.getByRole("grid", { name: "May" }).getByLabel("26").click();
+
   // The date should not change
-  await expect(page.getByText(initialDate)).toBeVisible();
+  await expect(page.getByTestId("datePicker")).toHaveText(initialDate);
 });
 
-test.skip("component handles minValue restrictions", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minValue = format(tomorrow, "MM/dd/yyyy");
-  
-  await initTestBed(`<DatePicker minValue="${minValue}" />`, {});
-  
-  // Open the calendar
-  await page.locator("button").click();
-  
-  // Today should be disabled
-  const today = new Date();
-  const todayDay = today.getDate().toString();
-  
-  // Find today's date in the calendar and check if it's disabled
-  const todayCell = page.locator(".rdp-day").filter({ hasText: todayDay }).first();
-  await expect(todayCell).toHaveClass(/disabled/);
-});
+test.fixme(
+  "component handles minValue restrictions",
+  SKIP_REASON.XMLUI_BUG("Prop does not work"),
+  async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<DatePicker
+        testId="datePicker"
+        mode="range"
+        minValue="05/25/2024"
+        dateFormat="MM/dd/yyyy"
+        initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
+      />`,
+    );
+    await page.getByTestId("datePicker").click();
+    await page.getByRole("grid", { name: "May" }).getByLabel("May 24th").click();
+    await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 24th")).toBeDisabled();
+  },
+);
 
-test.skip("component handles disabledDates correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test.fixme(
+  "component handles maxValue restrictions",
+  SKIP_REASON.XMLUI_BUG("Prop does not work"),
+  async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<DatePicker
+        testId="datePicker"
+        mode="range"
+        minValue="05/25/2024"
+        initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
+        dateFormat="MM/dd/yyyy"
+      />`,
+    );
+    await page.getByTestId("datePicker").click();
+    await page.getByRole("grid", { name: "May" }).getByLabel("May 24th").click();
+    await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 24th")).toBeDisabled();
+  },
+);
+
+test.fixme("component handles disabledDates correctly", async ({ page, initTestBed }) => {
   const today = new Date();
-  const testDayFormatted = format(new Date(today.getFullYear(), today.getMonth(), 15), "MM/dd/yyyy");
-  
+  const testDayFormatted = format(
+    new Date(today.getFullYear(), today.getMonth(), 15),
+    "MM/dd/yyyy",
+  );
+
   await initTestBed(`<DatePicker disabledDates={['${testDayFormatted}']} />`, {});
-  
+
   // Open the calendar
   await page.locator("button").click();
-  
+
   // The 15th day should be disabled
   const testDay = "15";
   const testDayCell = page.locator(".rdp-day").filter({ hasText: testDay }).first();
@@ -291,79 +403,55 @@ test.skip("component handles disabledDates correctly", async ({ page, initTestBe
 });
 
 // =============================================================================
-// PERFORMANCE TESTS
-// =============================================================================
-
-test.skip("component renders calendar efficiently", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  await initTestBed(`<DatePicker />`, {});
-  
-  // Open and close calendar multiple times
-  const button = page.locator("button");
-  
-  // First open/close
-  await button.click();
-  await expect(page.getByRole("menu")).toBeVisible();
-  await page.keyboard.press("Escape");
-  
-  // Second open/close
-  await button.click();
-  await expect(page.getByRole("menu")).toBeVisible();
-  await page.keyboard.press("Escape");
-  
-  // Third open/close
-  await button.click();
-  await expect(page.getByRole("menu")).toBeVisible();
-});
-
-// =============================================================================
 // INTEGRATION TESTS
 // =============================================================================
 
-test.skip("component works correctly within a form", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
-  const { testStateDriver } = await initTestBed(`
-    <Form onSubmit="testState = 'submitted'">
-      <DatePicker id="datePicker" required={true} />
-      <Button type="submit">Submit</Button>
-    </Form>
-  `, {});
-  
-  // Open calendar and select a date
-  await page.locator("#datePicker").click();
-  await page.locator(".rdp-day").filter({ hasText: "15" }).click();
-  
-  // Submit the form
-  await page.locator("button[type='submit']").click();
-  
-  // Check that form was submitted
-  await expect.poll(() => testStateDriver.testState).toEqual("submitted");
+test("component value API works", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <DatePicker id="datePicker" initialValue="05/25/2024" dateFormat="MM/dd/yyyy" />
+      <Text testId="text">{datePicker.value}</Text>
+    </Fragment>
+  `);
+  await expect(page.getByTestId("text")).toHaveText("05/25/2024");
 });
 
-test.skip("component API works correctly", async ({ page, initTestBed }) => {
-  // TODO: review these Copilot-created tests
-  
+test("component setValue API works", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <App>
-      <DatePicker id="picker" />
-      <Button
-        testId="setButton"
-        onClick="picker.setValue('05/25/2024')"
-      >Set Date</Button>
-      <Button
-        testId="focusButton"
-        onClick="picker.focus()"
-      >Focus DatePicker</Button>
-    </App>
-  `, {});
-  
-  // Test setValue API
-  await page.getByTestId("setButton").click();
-  await expect(page.getByText("05/25/2024")).toBeVisible();
-  
-  // Test focus API
-  await page.getByTestId("focusButton").click();
-  await expect(page.locator("#picker")).toBeFocused();
+    <Fragment>
+      <DatePicker id="datePicker" initialValue="05/25/2024" dateFormat="MM/dd/yyyy" />
+      <Button testId="btn" onClick="datePicker.setValue('06/01/2024')" />
+    </Fragment>
+  `);
+  await page.getByTestId("btn").click();
+  await expect(page.getByTestId("datePicker")).toHaveText("06/01/2024");
+});
+
+test("component focus API works", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <DatePicker id="datePicker" initialValue="05/25/2024" dateFormat="MM/dd/yyyy" />
+      <Button testId="focusBtn" onClick="datePicker.focus()" />
+    </Fragment>
+  `);
+  await page.getByTestId("focusBtn").click();
+  await expect(page.getByTestId("datePicker")).toBeFocused();
+});
+
+test("component works correctly within a form", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <Form onSubmit="(data) => testState = data.testField" data="{{ testField: '05/25/2024' }}">
+      <FormItem type="datePicker" label="Choose Date" bindTo="testField" />
+    </Form>
+  `);
+  const formElement = page.locator("form");
+  const dateInput = formElement.getByLabel("Choose Date");
+  await expect(dateInput).toBeVisible();
+  await expect(dateInput).toHaveText("05/25/2024");
+
+  // Submit the form
+  await page.locator("[type=submit]").click();
+
+  // Check that the form was submitted
+  await expect.poll(testStateDriver.testState).toEqual("05/25/2024");
 });
