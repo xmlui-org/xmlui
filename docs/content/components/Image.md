@@ -32,6 +32,10 @@ This property sets a preferred aspect ratio for the image, which will be used in
 </App>
 ```
 
+### `data` [#data]
+
+This property contains the binary data that represents the image.
+
 ### `fit` (default: "contain") [#fit-default-contain]
 
 This property sets how the image content should be resized to fit its container.

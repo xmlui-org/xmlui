@@ -18,9 +18,6 @@ export const ImageMd = createMetadata({
       "This property is used to indicate the source (path) of the image to display. " +
         "When not defined, no image is displayed.",
     ),
-    some: {
-      description: "Just a test property to check how unknown properties are handled",
-    },
     data: d(
       `This property contains the binary data that represents the image.`,
     ),
