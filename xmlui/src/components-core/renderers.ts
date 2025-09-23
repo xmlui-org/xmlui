@@ -73,21 +73,21 @@ export function createLoaderRenderer<TMd extends ComponentMetadata>(
  */
 export function createUserDefinedComponentRenderer<TMd extends ComponentMetadata>(
   metadata: TMd,
-  componentDef: any,
+  def: any,
   codeBehind?: any,
 ): CompoundComponentRendererInfo {
   // --- Parse the component definition from the markup
   // --- Parse the optional code-behind script
-  console.log(componentDef);
-  if (codeBehind && codeBehind.trim().length > 0) {
+  const component = def.component.component;;
+  if (codeBehind) {
     if (codeBehind.vars) {
-      componentDef.component.vars ??= {};
-      componentDef.component.vars = { ...componentDef.component.vars, ...codeBehind.vars };
+      component.vars ??= {};
+      component.vars = { ...component.vars, ...codeBehind.vars };
     }
     if (codeBehind.functions) {
-      componentDef.component.functions ??= {};
-      componentDef.component.functions = {
-        ...componentDef.component.functions,
+      component.functions ??= {};
+      component.functions = {
+        ...component.functions,
         ...codeBehind.functions,
       };
     }
@@ -95,7 +95,7 @@ export function createUserDefinedComponentRenderer<TMd extends ComponentMetadata
 
   // --- Done.
   return {
-    compoundComponentDef: componentDef,
+    compoundComponentDef: def.component,
     metadata,
   };
 }

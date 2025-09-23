@@ -1,10 +1,6 @@
 import { createUserDefinedComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import componentSource from "./FormSection.xmlui";
-import codeBehind from "./FormSection.xmlui.xs";
-
-console.log("FormSection loaded");
-console.log(codeBehind);
 
 const COMP = "FormSection";
 
@@ -57,5 +53,5 @@ export const FormSectionMd = createMetadata({
 
 export const formSectionRenderer = createUserDefinedComponentRenderer(
   FormSectionMd,
-  componentSource.component,
+  componentSource,
 );

@@ -22,8 +22,8 @@ export default ({ mode = "lib" }) => {
       lib = {
         entry: [path.resolve("src", "index-standalone.ts")],
         name: "xmlui",
-        formats: ["umd"],
-        fileName: (format) => `xmlui-standalone.${format}.js`,
+        formats: ["umd"] as any,
+        fileName: (format: any) => `xmlui-standalone.${format}.js`,
       };
       define = {
         "process.env": {
@@ -69,12 +69,12 @@ export default ({ mode = "lib" }) => {
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
         },
-        formats: ["es"],
+        formats: ["es"] as any,
       };
     }
   }
   let plugins = mode === "metadata"
-    ? []
+    ? [ViteXmlui({})]
     : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if(mode === "lib"){
@@ -121,7 +121,7 @@ export default ({ mode = "lib" }) => {
       minify: "terser",
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
-      lib: lib,
+      lib,
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
