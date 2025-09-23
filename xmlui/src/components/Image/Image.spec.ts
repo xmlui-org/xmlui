@@ -15,6 +15,17 @@ test.describe("Basic Functionality", () => {
     );
   });
 
+  test("displays image with valid data property", async ({ page, initTestBed }) => {
+    await initTestBed(`<Image testId="img" data="/resources/test-image-100x100.jpg" />`);
+    await expect(page.getByTestId("img")).toBeVisible();
+    
+    // Check that the src attribute contains a blob URL when using data property
+    // The Image component fetches the binary data and passes it as a Blob to ImageNative,
+    // which creates a blob URL and sets it as the src attribute
+    const img = page.getByTestId("img");
+    await expect(img).toHaveAttribute("src", /blob:/);
+  });
+
   test("handles invalid src gracefully", async ({ page, initTestBed }) => {
     await initTestBed(`<Image testId="img" src="/non/existent/bad/url.jpg" />`);
     await expect(page.getByTestId("img")).toBeVisible();
