@@ -123,7 +123,7 @@ test.describe("Open/Close", () => {
   });
 
 
-  test("content is scrollable in fullScreen mode", async ({ page, initTestBed, createModalDialogDriver }) => {
+  test("modal is scrollable in fullScreen mode and hides background content", async ({ page, initTestBed, createModalDialogDriver }) => {
     await initTestBed(`
       <Fragment>
         <!-- Background page content that should be completely hidden by the modal -->
