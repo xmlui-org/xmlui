@@ -29,40 +29,22 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
 <Component name="Files">
   <AppState id="selections" bucket="sharedSelections" initialValue="{{ selectedIds: [] }}" />
   <DataSource id="files" url="/api/files" />
-
-  <VStack>
-    <Text>Selected: {selections.value.selectedIds.length} items</Text>
-    <Tabs>
-      <TabItem label="Table View">
-        <TableView data="{files}" />
-      </TabItem>
-      <TabItem label="Tiles View">
-        <TilesView data="{files}" />
-      </TabItem>
-      <TabItem label="Debug">
-        <DebugView />
-      </TabItem>
-    </Tabs>
-  </VStack>
-</Component>
----comp display
-<Component name="DebugView">
-  <AppState id="selections" bucket="sharedSelections" />
-
-  <VStack>
-    <Text variant="h3">AppState Debug</Text>
-    <Card>
-      <VStack>
-        <Text variant="h4">selections.value</Text>
-        <Text variant="code">{JSON.stringify(selections.value, null, 2)}</Text>
-      </VStack>
-    </Card>
-  </VStack>
+  <Text>Selected: {selections.value.selectedIds.length} items</Text>
+  <Tabs>
+    <TabItem label="Table View">
+      <TableView data="{files}" />
+    </TabItem>
+    <TabItem label="Tiles View">
+      <TilesView data="{files}" />
+    </TabItem>
+    <TabItem label="Debug">
+      <DebugView />
+    </TabItem>
+  </Tabs>
 </Component>
 ---comp display
 <Component name="TableView">
   <AppState id="selections" bucket="sharedSelections" />
-
   <Card>
     <Table
       data="{$props.data}"
@@ -79,7 +61,6 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
 ---comp display
 <Component name="TilesView">
   <AppState id="selections" bucket="sharedSelections" />
-
   <List data="{$props.data}">
     <Card>
       <HStack verticalAlignment="center">
@@ -102,4 +83,22 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
     </Card>
   </List>
 </Component>
+---comp display
+<Component name="DebugView">
+  <AppState id="selections" bucket="sharedSelections" />
+  <Card>
+    <VStack>
+      <Text>selections.value</Text>
+      <Text variant="code">{JSON.stringify(selections.value, null, 2)}</Text>
+    </VStack>
+  </Card>
+</Component>
 ```
+
+The spread operator `...ids` takes all existing IDs from the array, and creates a new array with those IDs plus the new one.
+
+The filter method creates a new array with only items that meet a condition.
+
+Why create new arrays instead of modifying the existing one? XMLUI's reactivity system needs to detect changes. Modifying an existing array doesn't trigger updates
+Creating a new array tells XMLUI: "something changed, please update the UI".
+
