@@ -211,7 +211,6 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
-        data-testid="nav-group-content"
         aria-hidden={!expanded}
         className={classnames(styles.groupContent, {
           [styles.expanded]: expanded,

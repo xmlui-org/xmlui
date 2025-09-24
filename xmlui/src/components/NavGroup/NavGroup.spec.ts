@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
@@ -41,6 +42,32 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
     await expect(page.getByRole("menuitem", { name: "Page 1" })).not.toBeVisible();
     await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
+  });
+
+  test("component trigger has correct aria labels", async ({ initTestBed, page }) => {
+    await initTestBed(`<NavGroup testId="navGroup" label="NavGroup"/>`);
+    const button = page.getByTestId("navGroup");
+    await expect(button).toBeVisible();
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("expanded in vertical layout to show link of current page", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Current-upper">
+            <NavGroup label="Current">
+              <NavLink label="link-to-current-page" to="/" />
+            </NavGroup>
+          </NavGroup>
+        </NavPanel>
+      </App>`);
+    await expect(page.getByText("link-to-current-page")).toBeVisible();
   });
 });
 
@@ -86,8 +113,13 @@ test("initiallyExpanded works", async ({ initTestBed, page }) => {
   await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
 });
 
-test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
-  await initTestBed(`
+test.fixme(
+  "nested initiallyExpanded works",
+  SKIP_REASON.XMLUI_BUG(
+    "see https://github.com/radix-ui/primitives/issues/2551#issuecomment-2457236467 . The suggested workaround does not work for us, if you were to do it, you would see the hover effect not working for the inner most menu items.",
+  ),
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
     <NavGroup label="Pages" initiallyExpanded="true">
       <NavLink label="Page 1" />
       <NavGroup label="subpages" initiallyExpanded="true">
@@ -98,10 +130,11 @@ test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
     </NavGroup>
   `);
 
-  await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
 
-  await expect(page.getByRole("menuitem", { name: "inner page 2" })).toBeVisible();
-});
+    await expect(page.getByRole("menuitem", { name: "inner page 2" })).toBeVisible();
+  },
+);
 
 test("expands even without label", async ({ initTestBed, page }) => {
   await initTestBed(`
