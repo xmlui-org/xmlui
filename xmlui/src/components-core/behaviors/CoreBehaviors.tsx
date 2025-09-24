@@ -10,6 +10,9 @@ import {
   Tooltip 
 } from "../../components/Tooltip/TooltipNative";
 import type { Behavior } from "./BehaviorContext";
+import { MetadataProvider } from "../../language-server/services/common/metadata-utils";
+import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
+import { ComponentMetadata } from "../..";
 
 /**
  * Behavior for applying tooltips to components.
@@ -67,15 +70,20 @@ export const animationBehavior: Behavior = {
 export const labelBehavior: Behavior = {
   name: "label",
   canAttach: (node) => {
-    // This behavior can be attached if the component has a 'label' prop
-    // and is not a component that handles its own labeling.
-    if (!node.props?.label) {
-      return false;
-    }
-    
 
-    
-    return true;
+  /**
+   * This behavior can be attached if the component has a 'label' prop
+   * and is not a component that handles its own labeling.
+   */
+  const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+  const metadata: ComponentMetadata | undefined = metadataProvider.getComponent(node.type)?.getMetadata();
+
+  if (metadata?.props?.label) {
+    return false;
+  } else if (!node.props?.label) {
+    return false;
+  }
+  return true;
   },
   attach: (context, node) => {
     const { extractValue, node: componentNode, className } = context;
