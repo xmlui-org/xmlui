@@ -1,6 +1,6 @@
 # Sync selections between a Table view and a List view
 
-The Table view syncs selections automatically via `syncWithAppState`, while the Tiles view uses checkboxes that manually coordinate with AppState.
+The Table view syncs selections automatically via `syncWithAppState`, while the Tiles (List) view uses checkboxes that manually coordinate with AppState.
 
 ```xmlui-pg
 ---app
@@ -26,50 +26,59 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
   }
 }
 ---comp display
-<Component name="Files" var.view="table">
-  <AppState id="selections" initialValue="{{ selectedIds: [] }}" />
+<Component name="Files">
+  <AppState id="selections" bucket="sharedSelections" initialValue="{{ selectedIds: [] }}" />
   <DataSource id="files" url="/api/files" />
 
-  <HStack verticalAlignment="center">
-    <Button
-      label="Table View"
-      onClick="view = 'table'"
-      variant="{view === 'table' ? 'solid' : 'outlined'}"
-    />
-    <Button
-      label="Tiles View"
-      onClick="view = 'tiles'"
-      variant="{view === 'tiles' ? 'solid' : 'outlined'}"
-    />
+  <VStack>
     <Text>Selected: {selections.value.selectedIds.length} items</Text>
-  </HStack>
+    <Tabs>
+      <TabItem label="Table View">
+        <TableView data="{files}" />
+      </TabItem>
+      <TabItem label="Tiles View">
+        <TilesView data="{files}" />
+      </TabItem>
+      <TabItem label="Debug">
+        <DebugView />
+      </TabItem>
+    </Tabs>
+  </VStack>
+</Component>
+---comp display
+<Component name="DebugView">
+  <AppState id="selections" bucket="sharedSelections" />
 
-  <Fragment when="{view === 'table'}">
-    <TableView data="{files}" />
-  </Fragment>
-
-  <Fragment when="{view === 'tiles'}">
-    <TilesView data="{files}" />
-  </Fragment>
+  <VStack>
+    <Text variant="h3">AppState Debug</Text>
+    <Card>
+      <VStack>
+        <Text variant="h4">selections.value</Text>
+        <Text variant="code">{JSON.stringify(selections.value, null, 2)}</Text>
+      </VStack>
+    </Card>
+  </VStack>
 </Component>
 ---comp display
 <Component name="TableView">
-  <AppState id="selections" bucket="selections" />
+  <AppState id="selections" bucket="sharedSelections" />
 
-  <Table
-    data="{$props.data}"
-    rowsSelectable="true"
-    syncWithAppState="{selections}"
-    loading="{!$props.data}"
-  >
-    <Column bindTo="name" />
-    <Column bindTo="size" />
-    <Column bindTo="type" />
-  </Table>
+  <Card>
+    <Table
+      data="{$props.data}"
+      rowsSelectable="true"
+      syncWithAppState="{selections}"
+      loading="{!$props.data}"
+    >
+      <Column bindTo="name" />
+      <Column bindTo="size" />
+      <Column bindTo="type" />
+    </Table>
+  </Card>
 </Component>
 ---comp display
 <Component name="TilesView">
-  <AppState id="selections" bucket="selections" />
+  <AppState id="selections" bucket="sharedSelections" />
 
   <List data="{$props.data}">
     <Card>
