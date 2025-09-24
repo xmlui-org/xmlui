@@ -11,6 +11,12 @@ export const AppStateMd = createMetadata({
     "across your entire application. Unlike component variables that are scoped " +
     "locally, AppState allows any component to access and update shared state " +
     "without prop drilling.",
+  events: {
+    didUpdate: d(
+      "This event is fired when the AppState value is updated. The event provides " +
+        "the new state value as its parameter.",
+    ),
+  },
   props: {
     bucket: {
       description:
@@ -38,6 +44,35 @@ export const AppStateMd = createMetadata({
         newState: "An object that specifies the new state value.",
       },
     },
+    appendToList: {
+      signature: "appendToList(key: string, id: any)",
+      description:
+        "This method appends an item to an array in the application state object bound to the" +
+        " `AppState` instance.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to append to the array.",
+      },
+    },
+    removeFromList: {
+      signature: "removeFromList(key: string, id: any)",
+      description:
+        "This method removes an item from an array in the application state object bound to the" +
+        " `AppState` instance.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to remove from the array.",
+      },
+    },
+    listIncludes: {
+      signature: "listIncludes(key: string, id: any)",
+      description:
+        "This method checks if an array in the application state object contains a specific item.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to check for in the array.",
+      },
+    },
   },
   nonVisual: true,
 });
@@ -45,13 +80,14 @@ export const AppStateMd = createMetadata({
 export const appStateComponentRenderer = createComponentRenderer(
   COMP,
   AppStateMd,
-  ({ node, extractValue, updateState, registerComponentApi }) => {
+  ({ node, extractValue, updateState, registerComponentApi, lookupEventHandler }) => {
     return (
       <AppState
         bucket={extractValue(node.props.bucket)}
         initialValue={extractValue(node.props.initialValue)}
         updateState={updateState}
         registerComponentApi={registerComponentApi}
+        onDidUpdate={lookupEventHandler("didUpdate")}
       />
     );
   },

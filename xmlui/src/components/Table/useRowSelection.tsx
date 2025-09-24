@@ -1,4 +1,4 @@
-import { KeyboardEventHandler, useCallback, useEffect, useMemo, useState } from "react";
+import { KeyboardEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { union, uniq } from "lodash-es";
 
 import { useEvent } from "../../components-core/utils/misc";
@@ -93,6 +93,8 @@ export default function useRowSelection({
   enableMultiRowSelection,
   rowDisabledPredicate,
   onSelectionDidChange,
+  initiallySelected = EMPTY_ARRAY,
+  syncWithAppState,
 }: {
   items: Item[];
   visibleItems: Item[];
@@ -100,6 +102,8 @@ export default function useRowSelection({
   enableMultiRowSelection: boolean;
   rowDisabledPredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
+  initiallySelected?: string[];
+  syncWithAppState?: any;
 }): RowSelectionOperations {
   // --- The focused index in the row source (if there is any)
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
@@ -112,10 +116,176 @@ export default function useRowSelection({
     return visibleItems.map((item) => item[idKey]);
   }, [idKey, visibleItems]);
 
+  // --- Track if initial selection has been applied
+  const [initialSelectionApplied, setInitialSelectionApplied] = useState(false);
+
   // --- If the items change, refresh the selectable items (if the rows are selectable)
   useEffect(() => {
     refreshSelection(rowsSelectable ? items : EMPTY_ARRAY);
   }, [refreshSelection, items, rowsSelectable]);
+
+  // --- Handle AppState synchronization
+  // This implements bidirectional sync between Table selection and AppState.
+  // The approach uses React's useEffect pattern which is appropriate for React-to-React communication.
+  // The new AppState didUpdate event is more useful for non-React integrations.
+  const appStateSelection = syncWithAppState?.value?.selectedIds;
+  const prevAppStateSelection = usePrevious(appStateSelection);
+
+  // --- Track if we're currently updating to prevent loops
+  const [updatingFromAppState, setUpdatingFromAppState] = useState(false);
+  const updatingFromAppStateRef = useRef(false);
+
+  // --- Use refs to track the last known selections to prevent update loops
+  const lastAppStateSelectionRef = useRef<any[]>();
+  const lastTableSelectionRef = useRef<any[]>();
+  const isUpdatingToAppStateRef = useRef(false);
+
+  // --- Sync from AppState to table selection (when AppState changes externally)
+  useEffect(() => {
+    // Skip if not selectable, no sync, no selection, or we're currently updating FROM the table TO AppState
+    if (
+      !rowsSelectable ||
+      !syncWithAppState ||
+      !appStateSelection ||
+      updatingFromAppState ||
+      isUpdatingToAppStateRef.current
+    ) {
+      return;
+    }
+
+    // Only update if AppState selection actually changed and is different from our last update
+    const appStateChanged = appStateSelection !== prevAppStateSelection;
+    const isDifferentFromLastKnown =
+      JSON.stringify([...(appStateSelection || [])].sort()) !==
+      JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
+
+    if (appStateChanged && isDifferentFromLastKnown && items.length > 0) {
+      const validIds = appStateSelection.filter((id: string) =>
+        items.some((item) => item[idKey] === id),
+      );
+
+      const idsToSelect = enableMultiRowSelection ? validIds : validIds.slice(0, 1);
+
+      // Track what we're setting to prevent loop
+      lastAppStateSelectionRef.current = [...appStateSelection];
+      lastTableSelectionRef.current = [...idsToSelect];
+
+      // Set flag to prevent immediate feedback loop
+      updatingFromAppStateRef.current = true;
+      setSelectedRowIds(idsToSelect);
+      setInitialSelectionApplied(true);
+
+      // Reset the flag after React has processed the update
+      setTimeout(() => {
+        updatingFromAppStateRef.current = false;
+      }, 50);
+    }
+  }, [
+    appStateSelection,
+    prevAppStateSelection,
+    items,
+    rowsSelectable,
+    syncWithAppState,
+    idKey,
+    enableMultiRowSelection,
+    setSelectedRowIds,
+    updatingFromAppState,
+  ]);
+
+  // --- Sync from table selection to AppState (when user interacts with table)
+  useEffect(() => {
+    // Skip if not selectable, no sync, currently updating from AppState, or if we're in the middle of an AppState update
+    if (
+      !rowsSelectable ||
+      !syncWithAppState ||
+      updatingFromAppState ||
+      updatingFromAppStateRef.current
+    ) {
+      return;
+    }
+
+    const currentSelectionIds = selectedItems.map((item) => item[idKey]);
+    const appStateSelectionIds = appStateSelection || [];
+
+    // Only update if table selection is different from AppState and different from our last update
+    const tableChanged =
+      JSON.stringify([...currentSelectionIds].sort()) !==
+      JSON.stringify([...(lastTableSelectionRef.current || [])].sort());
+    const isDifferentFromAppState =
+      JSON.stringify([...currentSelectionIds].sort()) !==
+      JSON.stringify([...appStateSelectionIds].sort());
+
+    if (tableChanged && isDifferentFromAppState) {
+      // Track what we're updating to prevent loop
+      lastTableSelectionRef.current = [...currentSelectionIds];
+      lastAppStateSelectionRef.current = [...currentSelectionIds];
+
+      // Set flag to prevent immediate feedback from AppState
+      isUpdatingToAppStateRef.current = true;
+      setUpdatingFromAppState(true);
+
+      syncWithAppState.update?.({ selectedIds: currentSelectionIds });
+
+      // Reset the flags after React has processed the update
+      setTimeout(() => {
+        setUpdatingFromAppState(false);
+        isUpdatingToAppStateRef.current = false;
+      }, 100);
+    }
+  }, [
+    selectedItems,
+    syncWithAppState,
+    appStateSelection,
+    idKey,
+    rowsSelectable,
+    updatingFromAppState,
+  ]);
+
+  // --- Set initial selection when component mounts and items are available
+  // Use a separate effect that runs after the refresh to ensure timing is correct
+  useEffect(() => {
+    // If we have AppState sync, don't use initiallySelected
+    if (syncWithAppState) {
+      return;
+    }
+
+    if (
+      !rowsSelectable ||
+      !initiallySelected ||
+      initiallySelected.length === 0 ||
+      initialSelectionApplied
+    ) {
+      return;
+    }
+
+    // Only set initial selection when items are available and we haven't applied it yet
+    if (items.length > 0) {
+      // Use setTimeout to ensure this runs after the refreshSelection effect
+      const timeoutId = setTimeout(() => {
+        // Filter initiallySelected to only include IDs that exist in current items
+        const validIds = initiallySelected.filter((id) => items.some((item) => item[idKey] === id));
+
+        if (validIds.length > 0) {
+          // If multi-row selection is disabled, only select the first valid ID
+          const idsToSelect = enableMultiRowSelection ? validIds : [validIds[0]];
+          setSelectedRowIds(idsToSelect);
+          setInitialSelectionApplied(true);
+        }
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    items,
+    initiallySelected,
+    rowsSelectable,
+    idKey,
+    enableMultiRowSelection,
+    setSelectedRowIds,
+    initialSelectionApplied,
+    selectedItems,
+    syncWithAppState,
+  ]);
 
   // --- If the multi-row selection switches to disabled, keep only the first selected item
   const prevEnableMultiRowSelection = usePrevious(enableMultiRowSelection);
