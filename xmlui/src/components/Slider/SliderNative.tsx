@@ -271,47 +271,47 @@ export const Slider = forwardRef(
 
     // Ensure we always have at least one thumb
     const displayValue = localValue.length > 0 ? localValue : formatValue(undefined, min, min, max);
-    return (
-      <ItemWithLabel
-        {...rest}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-        className={className}
-        ref={forwardedRef}
-        id={id}
-        isInputTemplateUsed={true}
-      >
-        <div className={styles.sliderContainer} data-slider-container>
-          <Root
-            minStepsBetweenThumbs={minStepsBetweenThumbs}
-            ref={inputRef}
-            tabIndex={tabIndex}
-            aria-readonly={readOnly}
-            className={classnames(className, styles.sliderRoot, {
-              [styles.disabled]: !enabled,
-              [styles.readOnly]: readOnly,
-            })}
-            style={style}
-            max={max}
-            min={min}
-            inverted={inverted}
-            step={step}
-            disabled={!enabled}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-            onValueChange={onInputChange}
-            onMouseOver={onShowTooltip}
-            onMouseLeave={onHideTooltip}
-            onPointerDown={onShowTooltip}
-            value={displayValue}
-          >
+      return (
+        <ItemWithLabel
+          {...rest}
+          labelPosition={labelPosition as any}
+          label={label}
+          labelWidth={labelWidth}
+          labelBreak={labelBreak}
+          required={required}
+          enabled={enabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          style={style}
+          className={className}
+          ref={forwardedRef}
+          id={id}
+          isInputTemplateUsed={true}
+        >
+          <div className={styles.sliderContainer} data-slider-container>
+            <Root
+              minStepsBetweenThumbs={minStepsBetweenThumbs}
+              ref={inputRef}
+              tabIndex={tabIndex}
+              aria-readonly={readOnly}
+              className={classnames(className, styles.sliderRoot, {
+                [styles.disabled]: !enabled,
+                [styles.readOnly]: readOnly,
+              })}
+              style={style}
+              max={max}
+              min={min}
+              inverted={inverted}
+              step={step}
+              disabled={!enabled}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              onValueChange={onInputChange}
+              onMouseOver={onShowTooltip}
+              onMouseLeave={onHideTooltip}
+              onPointerDown={onShowTooltip}
+              value={displayValue}
+            >
             <Track
               data-track
               className={classnames(styles.sliderTrack, {

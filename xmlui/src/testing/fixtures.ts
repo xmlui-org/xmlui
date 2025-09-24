@@ -32,13 +32,11 @@ import {
   NavLinkDriver,
   NavPanelDriver,
   NoResultDriver,
-  NumberBoxDriver,
   OptionDriver,
   ProgressBarDriver,
   RadioGroupDriver,
   RangeDriver,
   SelectDriver,
-  SliderDriver,
   SplitterDriver,
   StackDriver,
   TestStateDriver,
@@ -65,6 +63,8 @@ import { TimerDriver } from "./drivers/TimerDriver";
 import { DateInputDriver } from "./drivers/DateInputDriver";
 import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
+import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
+import { SliderDriver } from "./drivers/SliderDriver";
 
 export { expect } from "./assertions";
 
@@ -345,11 +345,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(ItemsDriver, testIdOrLocator);
     });
   },
-  createSliderDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
-      return createDriver(SliderDriver, testIdOrLocator);
-    });
-  },
   createRangeDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(RangeDriver, testIdOrLocator);
@@ -398,6 +393,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createTextBoxDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(TextBoxDriver, testIdOrLocator);
+    });
+  },
+  createSliderDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SliderDriver, testIdOrLocator);
     });
   },
   createTextAreaDriver: async ({ createDriver }, use) => {
