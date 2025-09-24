@@ -43,7 +43,6 @@ import {
   StackDriver,
   TestStateDriver,
   TextAreaDriver,
-  TextBoxDriver,
   TextDriver,
   ValidationDisplayDriver,
   ValidationSummaryDriver,
@@ -65,6 +64,7 @@ import { TimeInputDriver } from "./drivers/TimeInputDriver";
 import { TimerDriver } from "./drivers/TimerDriver";
 import { DateInputDriver } from "./drivers/DateInputDriver";
 import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
+import { TextBoxDriver } from "./drivers/TextBoxDriver";
 
 export { expect } from "./assertions";
 

@@ -73,11 +73,7 @@ export const labelBehavior: Behavior = {
       return false;
     }
     
-    // Skip components that handle their own labeling
-    const skipComponents = ['TextBox'];
-    if (skipComponents.includes(node.type)) {
-      return false;
-    }
+
     
     return true;
   },
@@ -90,21 +86,24 @@ export const labelBehavior: Behavior = {
     const labelBreak = extractValue.asOptionalBoolean(componentNode.props.labelBreak);
     const required = extractValue.asOptionalBoolean(componentNode.props.required);
     const enabled = extractValue.asOptionalBoolean(componentNode.props.enabled, true);
-
+    const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
+    const style = extractValue(componentNode.props.style);
     const generatedId = useId();
-    componentNode.uid = generatedId;
 
     return (
       <ItemWithLabel
-        id={componentNode.uid || generatedId} // Using component's string UID for unique ID
+        id={componentNode.uid || generatedId}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
         labelBreak={labelBreak}
         required={required}
         enabled={enabled}
+        style={style}
         className={className}
         isInputTemplateUsed={true}
+        shrinkToLabel={shrinkToLabel}
+        testId={componentNode.testId}
       >
        {node}
       </ItemWithLabel>

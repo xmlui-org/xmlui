@@ -797,10 +797,6 @@ export class NumberBoxDriver extends ComponentDriver {
   }
 }
 
-// --- TextBox
-
-export class TextBoxDriver extends InputComponentDriver {}
-
 // --- TextArea
 
 export class TextAreaDriver extends InputComponentDriver {

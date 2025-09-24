@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef, useId } from "react";
+import { cloneElement, forwardRef, useContext, useId, createContext } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -8,8 +8,6 @@ import styles from "./FormItem.module.scss";
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
-
-// Component part names
 
 type ItemWithLabelProps = {
   id?: string;
@@ -30,6 +28,7 @@ type ItemWithLabelProps = {
   isInputTemplateUsed?: boolean;
   onLabelClick?: () => void;
   validationResult?: ReactNode;
+  testId?: string;
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
   labelBreak: true,
@@ -40,6 +39,7 @@ const numberRegex = /^[0-9]+$/;
 export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
+    testId,
     labelPosition = "top",
     style = {},
     className,
@@ -79,7 +79,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         className={className}
         id={inputId}
         ref={ref}
-      >
+        >
         {children}
       </Slot>
     );
@@ -93,7 +93,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
+    <div {...rest} data-testid={testId} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
@@ -127,7 +127,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined}>
+        <Slot data-part-id={PART_LABELED_ITEM} id={isInputTemplateUsed ? undefined : inputId} data-testid={undefined}>
           {children}
         </Slot>
       </div>
