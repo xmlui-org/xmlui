@@ -102,6 +102,8 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
+  initiallySelected?: string[];
+  syncWithAppState?: any;
   pageSizeOptions?: number[];
   currentPageIndex?: number;
   pageSize?: number;
@@ -176,6 +178,8 @@ export const Table = forwardRef(
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
+      initiallySelected = defaultProps.initiallySelected,
+      syncWithAppState,
       pageSizeOptions = defaultProps.pageSizeOptions,
       pageSize = pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0],
       currentPageIndex = 0,
@@ -252,6 +256,8 @@ export const Table = forwardRef(
       enableMultiRowSelection,
       rowDisabledPredicate,
       onSelectionDidChange,
+      initiallySelected,
+      syncWithAppState,
     });
 
     // --- Create data with order information whenever the items in the table change
@@ -904,6 +910,7 @@ export const defaultProps = {
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
+  initiallySelected: EMPTY_ARRAY,
   pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as SortingDirection,
   autoFocus: false,
