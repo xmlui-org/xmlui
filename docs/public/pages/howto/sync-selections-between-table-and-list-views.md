@@ -83,6 +83,10 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
     </Card>
   </List>
 </Component>
+---desc
+The spread operator `...ids` takes all existing IDs from the array, and creates a new array with those IDs plus the new one.
+
+The filter method creates a new array with only items that meet a condition.
 ---comp display
 <Component name="DebugView">
   <AppState id="selections" bucket="sharedSelections" />
@@ -95,10 +99,6 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
 </Component>
 ```
 
-The spread operator `...ids` takes all existing IDs from the array, and creates a new array with those IDs plus the new one.
 
-The filter method creates a new array with only items that meet a condition.
 
-Why create new arrays instead of modifying the existing one? XMLUI's reactivity system needs to detect changes. Modifying an existing array doesn't trigger updates
-Creating a new array tells XMLUI: "something changed, please update the UI".
 
