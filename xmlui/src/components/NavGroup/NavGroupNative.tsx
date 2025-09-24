@@ -119,7 +119,6 @@ export const NavGroup = forwardRef(function NavGroup(
     layoutIsVertical,
   ]);
 
-  debugger;
   return (
     <NavGroupContext.Provider value={navGroupContextValue}>
       {inline ? (
@@ -266,9 +265,18 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     Content = DropdownMenuSubContent;
   }
   const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [renderCount, setRenderCount] = useState(false);
+
+  useEffect(() => setRenderCount(true), []);
 
   return (
-    <Wrapper {...rest} open={expanded} onOpenChange={(open) => setExpanded(open)}>
+    <Wrapper
+      {...rest}
+      open={expanded}
+      onOpenChange={(open) => {
+        if (renderCount) setExpanded(open);
+      }}
+    >
       <Trigger asChild disabled={disabled}>
         <NavLink
           icon={icon}
@@ -279,7 +287,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         >
           {label}
           <div style={{ flex: 1 }} />
-          {level === 0 && <Icon name={iconVerticalExpanded} />}
+          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
             <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}

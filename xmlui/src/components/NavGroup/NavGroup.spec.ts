@@ -1,10 +1,4 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-
-/**
- * NOTE: We don't have a way to test icons yet, so some test cases are not fully realized. (See skip reasons)
- * TODO: Add tests for icons
- */
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("displays menuitems after click", async ({ initTestBed, page }) => {
@@ -109,86 +103,151 @@ test("nested initiallyExpanded works", async ({ initTestBed, page }) => {
   await expect(page.getByRole("menuitem", { name: "inner page 2" })).toBeVisible();
 });
 
-test.describe("integration with NavPanel", () => {
-  test.skip(
-    "collapsed in NavPanel + vertical app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {
-      await initTestBed(`
-      <App layout="vertical">
+test("expands even without label", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <NavGroup >
+      <NavLink label="Page 1" />
+      <NavGroup label="subpages">
+        <NavLink label="inner page 2" />
+        <NavLink label="inner page 3" />
+      </NavGroup>
+      <NavLink label="Page 4" />
+    </NavGroup>
+  `);
+
+  await expect(page.getByRole("menuitem", { name: "Page 1" })).not.toBeVisible();
+  await page.getByRole("button").click();
+  await expect(page.getByRole("menuitem", { name: "Page 1" })).toBeVisible();
+});
+
+test.describe("icon props", () => {
+  test("icon appears", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<App layout="vertical">
         <NavPanel>
-          <NavGroup testId="navGroup" label="NavGroup">
+          <NavGroup icon="bell" label="NavGroup">
             <NavLink label="link" to="/" />
           </NavGroup>
         </NavPanel>
-      </App>`);
-    },
-  );
+      </App>`,
+      {
+        resources: {
+          "icon.bell": "/resources/bell.svg",
+        },
+      },
+    );
+    await expect(page.getByTestId("bell-svg")).toBeVisible();
+  });
 
-  test.skip(
-    "expanded in NavPanel + vertical app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {
-      await initTestBed(`
-      <App layout="vertical">
+  test("iconHorizontal shows in horizontal layout submenu", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="horizontal">
         <NavPanel>
-          <NavGroup testId="navGroup" label="NavGroup">
-            <NavLink label="link" to="/" />
+          <NavGroup label="Send To">
+            <NavGroup icon="users" label="Team"
+              iconHorizontalExpanded="bell" iconHorizontalCollapsed="eye">
+              <NavLink label="Jane" />
+            </NavGroup>
           </NavGroup>
         </NavPanel>
-      </App>`);
-    },
-  );
+      </App>
+    `,
+      {
+        resources: {
+          "icon.bell": "/resources/bell.svg",
+          "icon.eye": "/resources/eye.svg",
+        },
+      },
+    );
 
-  test.skip(
-    "collapsed in NavPanel + horizontal app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    const bell = page.getByTestId("bell-svg");
+    const eye = page.getByTestId("eye-svg");
 
-  test.skip(
-    "expanded in NavPanel + horizontal app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    await expect(bell).not.toBeVisible();
+    await expect(eye).not.toBeVisible();
 
-  test.skip(
-    "collapsed in vertical app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    await page.getByRole("button", { name: "Send to" }).click();
 
-  test.skip(
-    "expanded in vertical app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    await expect(bell).not.toBeVisible();
+    await expect(eye).toBeVisible();
 
-  test.skip(
-    "collapsed in horizontal app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    await page.getByRole("menuitem", { name: "Team" }).hover();
 
-  test.skip(
-    "expanded in horizontal app layout",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "This case is not fully realized since we don't have a way to test icons",
-    ),
-    async ({ initTestBed }) => {},
-  );
+    await expect(bell).toBeVisible();
+    await expect(eye).not.toBeVisible();
+  });
+
+  test("iconVertical shows in horizontal layout top lvl navgroup", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="horizontal">
+        <NavPanel>
+          <NavGroup icon="users" label="Team"
+            iconVerticalExpanded="bell" iconVerticalCollapsed="eye">
+            <NavLink label="Jane" />
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        resources: {
+          "icon.bell": "/resources/bell.svg",
+          "icon.eye": "/resources/eye.svg",
+        },
+      },
+    );
+
+    const bell = page.getByTestId("bell-svg");
+    const eye = page.getByTestId("eye-svg");
+
+    await expect(bell).not.toBeVisible();
+    await expect(eye).toBeVisible();
+
+    await page.getByText("Team").click();
+
+    await expect(bell).toBeVisible();
+    await expect(eye).not.toBeVisible();
+  });
+
+  test("iconVertical shows in vertical layout submenu", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <NavGroup label="Send To">
+            <NavGroup icon="users" label="Team"
+              iconVerticalExpanded="bell" iconVerticalCollapsed="eye">
+              <NavLink label="Jane" />
+            </NavGroup>
+          </NavGroup>
+        </NavPanel>
+      </App>
+    `,
+      {
+        resources: {
+          "icon.bell": "/resources/bell.svg",
+          "icon.eye": "/resources/eye.svg",
+        },
+      },
+    );
+
+    const bell = page.getByTestId("bell-svg");
+    const eye = page.getByTestId("eye-svg");
+
+    await expect(bell).not.toBeVisible();
+
+    await page.getByText("Send to").click();
+
+    await expect(bell).not.toBeVisible();
+    await expect(eye).toBeVisible();
+
+    await page.getByText("Team").click();
+
+    await expect(bell).toBeVisible();
+    await expect(eye).not.toBeVisible();
+  });
 });
