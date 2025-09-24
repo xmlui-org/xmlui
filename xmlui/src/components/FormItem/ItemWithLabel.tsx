@@ -127,7 +127,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot data-part-id={PART_LABELED_ITEM} id={isInputTemplateUsed ? undefined : inputId} data-testid={undefined}>
+        <Slot data-part-id={PART_LABELED_ITEM} id={inputId} data-testid={undefined}>
           {children}
         </Slot>
       </div>
