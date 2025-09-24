@@ -615,6 +615,10 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
+### `initiallySelected` [#initiallyselected]
+
+An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`.
+
 ### `isPaginated` (default: false) [#ispaginated-default-false]
 
 This property adds pagination controls to the `Table`.
@@ -1212,6 +1216,10 @@ This property determines the sort order to be `ascending` or `descending`. This 
   </Table>
 </App>
 ```
+
+### `syncWithAppState` [#syncwithappstate]
+
+An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes.
 
 ## Events [#events]
 

@@ -86,6 +86,74 @@ type RowSelectionOperations = {
   selectionApi: SelectionApi;
 };
 
+/**
+ * Hook for managing table row selection with optional bidirectional AppState synchronization.
+ * 
+ * ## AppState Synchronization Mechanism
+ * 
+ * When `syncWithAppState` is provided, this hook implements a robust bidirectional synchronization
+ * between the table's selection state and an AppState instance. The synchronization prevents
+ * infinite loops using a state machine approach.
+ * 
+ * ### State Machine Design
+ * 
+ * The sync operates through three states:
+ * - `idle`: Normal state, ready to respond to changes from either side
+ * - `updating_to_appstate`: Currently propagating table selection → AppState (blocks AppState → table)
+ * - `updating_from_appstate`: Currently propagating AppState → table selection (blocks table → AppState)
+ * 
+ * ### Synchronization Flow
+ * 
+ * **AppState → Table (External Updates)**:
+ * 1. AppState.value.selectedIds changes externally (e.g., from another component)
+ * 2. Effect detects change and validates it's not from our own update (using source tracking)
+ * 3. Sets state to `updating_from_appstate` to block reverse sync
+ * 4. Updates table selection via setSelectedRowIds()
+ * 5. Uses requestAnimationFrame to reset state to `idle` after update completes
+ * 
+ * **Table → AppState (User Interaction)**:
+ * 1. User interacts with table (clicks, keyboard navigation)
+ * 2. selectedItems changes through normal table selection logic
+ * 3. Effect detects change and validates it's different from AppState
+ * 4. Sets state to `updating_to_appstate` to block reverse sync
+ * 5. Calls syncWithAppState.update({ selectedIds: [...] })
+ * 6. Uses requestAnimationFrame to reset state to `idle` after update completes
+ * 
+ * ### Loop Prevention Strategy
+ * 
+ * Multiple mechanisms prevent infinite loops:
+ * - **State Machine**: Directional blocking prevents simultaneous updates
+ * - **Source Tracking**: lastUpdateSourceRef tracks whether the last change came from 'table' or 'appstate'
+ * - **Value Tracking**: lastAppStateSelectionRef and lastTableSelectionRef track last known values
+ * - **Change Detection**: Only triggers updates when values actually differ using JSON.stringify comparison
+ * - **Frame-Based Reset**: Uses requestAnimationFrame instead of setTimeout for deterministic timing
+ * 
+ * ### Usage with AppState
+ * 
+ * ```typescript
+ * // In your component
+ * const appState = useAppState('myBucket');
+ * 
+ * // Pass to Table
+ * <Table 
+ *   items={data}
+ *   syncWithAppState={appState}
+ *   // ... other props
+ * />
+ * 
+ * // AppState will contain: { selectedIds: ['id1', 'id2', ...] }
+ * // Changes from either side are automatically synchronized
+ * ```
+ * 
+ * ### Precedence Rules
+ * 
+ * - When both `initiallySelected` and `syncWithAppState` are provided, `syncWithAppState` takes precedence
+ * - Multi-row selection limits are respected (single selection truncates to first ID)
+ * - Only valid item IDs (present in current `items` array) are synchronized
+ * 
+ * @param options Configuration object for row selection behavior
+ * @returns Row selection operations and state management interface
+ */
 export default function useRowSelection({
   items = EMPTY_ARRAY,
   visibleItems = items,
@@ -131,35 +199,39 @@ export default function useRowSelection({
   const appStateSelection = syncWithAppState?.value?.selectedIds;
   const prevAppStateSelection = usePrevious(appStateSelection);
 
-  // --- Track if we're currently updating to prevent loops
-  const [updatingFromAppState, setUpdatingFromAppState] = useState(false);
-  const updatingFromAppStateRef = useRef(false);
-
+  // --- State machine for sync direction control
+  const [syncState, setSyncState] = useState<'idle' | 'updating_to_appstate' | 'updating_from_appstate'>('idle');
+  
   // --- Use refs to track the last known selections to prevent update loops
   const lastAppStateSelectionRef = useRef<any[]>();
   const lastTableSelectionRef = useRef<any[]>();
-  const isUpdatingToAppStateRef = useRef(false);
+  
+  // --- Track the source of the last update to prevent echoing
+  const lastUpdateSourceRef = useRef<'table' | 'appstate' | null>(null);
 
   // --- Sync from AppState to table selection (when AppState changes externally)
   useEffect(() => {
-    // Skip if not selectable, no sync, no selection, or we're currently updating FROM the table TO AppState
+    // Skip if not selectable, no sync, no selection, or we're currently updating to AppState
     if (
       !rowsSelectable ||
       !syncWithAppState ||
       !appStateSelection ||
-      updatingFromAppState ||
-      isUpdatingToAppStateRef.current
+      syncState === 'updating_to_appstate'
     ) {
       return;
     }
 
-    // Only update if AppState selection actually changed and is different from our last update
+    // Only update if AppState selection actually changed and this wasn't caused by our own table update
     const appStateChanged = appStateSelection !== prevAppStateSelection;
     const isDifferentFromLastKnown =
       JSON.stringify([...(appStateSelection || [])].sort()) !==
       JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
+    const wasNotOurUpdate = lastUpdateSourceRef.current !== 'table';
 
-    if (appStateChanged && isDifferentFromLastKnown && items.length > 0) {
+    if (appStateChanged && isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
+      // Set state machine to indicate we're updating from AppState
+      setSyncState('updating_from_appstate');
+      
       const validIds = appStateSelection.filter((id: string) =>
         items.some((item) => item[idKey] === id),
       );
@@ -169,16 +241,10 @@ export default function useRowSelection({
       // Track what we're setting to prevent loop
       lastAppStateSelectionRef.current = [...appStateSelection];
       lastTableSelectionRef.current = [...idsToSelect];
+      lastUpdateSourceRef.current = 'appstate';
 
-      // Set flag to prevent immediate feedback loop
-      updatingFromAppStateRef.current = true;
       setSelectedRowIds(idsToSelect);
       setInitialSelectionApplied(true);
-
-      // Reset the flag after React has processed the update
-      setTimeout(() => {
-        updatingFromAppStateRef.current = false;
-      }, 50);
     }
   }, [
     appStateSelection,
@@ -189,17 +255,16 @@ export default function useRowSelection({
     idKey,
     enableMultiRowSelection,
     setSelectedRowIds,
-    updatingFromAppState,
+    syncState,
   ]);
 
   // --- Sync from table selection to AppState (when user interacts with table)
   useEffect(() => {
-    // Skip if not selectable, no sync, currently updating from AppState, or if we're in the middle of an AppState update
+    // Skip if not selectable, no sync, or currently updating from AppState
     if (
       !rowsSelectable ||
       !syncWithAppState ||
-      updatingFromAppState ||
-      updatingFromAppStateRef.current
+      syncState === 'updating_from_appstate'
     ) {
       return;
     }
@@ -207,30 +272,25 @@ export default function useRowSelection({
     const currentSelectionIds = selectedItems.map((item) => item[idKey]);
     const appStateSelectionIds = appStateSelection || [];
 
-    // Only update if table selection is different from AppState and different from our last update
+    // Only update if table selection is different from AppState, different from our last update, and wasn't caused by AppState
     const tableChanged =
       JSON.stringify([...currentSelectionIds].sort()) !==
       JSON.stringify([...(lastTableSelectionRef.current || [])].sort());
     const isDifferentFromAppState =
       JSON.stringify([...currentSelectionIds].sort()) !==
       JSON.stringify([...appStateSelectionIds].sort());
+    const wasNotAppStateUpdate = lastUpdateSourceRef.current !== 'appstate';
 
-    if (tableChanged && isDifferentFromAppState) {
+    if (tableChanged && isDifferentFromAppState && wasNotAppStateUpdate) {
+      // Set state machine to indicate we're updating to AppState
+      setSyncState('updating_to_appstate');
+      
       // Track what we're updating to prevent loop
       lastTableSelectionRef.current = [...currentSelectionIds];
       lastAppStateSelectionRef.current = [...currentSelectionIds];
-
-      // Set flag to prevent immediate feedback from AppState
-      isUpdatingToAppStateRef.current = true;
-      setUpdatingFromAppState(true);
+      lastUpdateSourceRef.current = 'table';
 
       syncWithAppState.update?.({ selectedIds: currentSelectionIds });
-
-      // Reset the flags after React has processed the update
-      setTimeout(() => {
-        setUpdatingFromAppState(false);
-        isUpdatingToAppStateRef.current = false;
-      }, 100);
     }
   }, [
     selectedItems,
@@ -238,8 +298,32 @@ export default function useRowSelection({
     appStateSelection,
     idKey,
     rowsSelectable,
-    updatingFromAppState,
+    syncState,
   ]);
+
+  // --- Reset sync state machine to idle when updates are complete
+  useEffect(() => {
+    if (syncState !== 'idle') {
+      // Reset to idle state in the next tick to allow the current update to complete
+      const resetTimer = requestAnimationFrame(() => {
+        setSyncState('idle');
+      });
+      
+      return () => cancelAnimationFrame(resetTimer);
+    }
+  }, [syncState, appStateSelection, selectedItems]);
+
+  // --- Clear update source when sync state becomes idle
+  useEffect(() => {
+    if (syncState === 'idle') {
+      // Use a separate frame to clear the source after the sync state is reset
+      const clearTimer = requestAnimationFrame(() => {
+        lastUpdateSourceRef.current = null;
+      });
+      
+      return () => cancelAnimationFrame(clearTimer);
+    }
+  }, [syncState]);
 
   // --- Set initial selection when component mounts and items are available
   // Use a separate effect that runs after the refresh to ensure timing is correct
@@ -260,8 +344,8 @@ export default function useRowSelection({
 
     // Only set initial selection when items are available and we haven't applied it yet
     if (items.length > 0) {
-      // Use setTimeout to ensure this runs after the refreshSelection effect
-      const timeoutId = setTimeout(() => {
+      // Use requestAnimationFrame to ensure this runs after the refreshSelection effect
+      const frameId = requestAnimationFrame(() => {
         // Filter initiallySelected to only include IDs that exist in current items
         const validIds = initiallySelected.filter((id) => items.some((item) => item[idKey] === id));
 
@@ -271,9 +355,9 @@ export default function useRowSelection({
           setSelectedRowIds(idsToSelect);
           setInitialSelectionApplied(true);
         }
-      }, 0);
+      });
 
-      return () => clearTimeout(timeoutId);
+      return () => cancelAnimationFrame(frameId);
     }
   }, [
     items,

@@ -101,7 +101,6 @@ function shouldReturnAsArrayBuffer(contentType: string): boolean {
     'application/x-tar',
     'application/gzip',
     'application/x-7z-compressed',
-    'application/octet-stream',
     'application/x-binary',
   ];
   
@@ -119,8 +118,10 @@ async function parseResponseBody(response: AxiosResponse | Response, logError = 
     if (isBinaryContentType(contentType)) {
       try {
         if (shouldReturnAsArrayBuffer(contentType)) {
+          console.log("Parsing response as ArrayBuffer due to content type:", contentType);
           resp = await response.clone().arrayBuffer();
         } else {
+          console.log("Parsing response as Blob due to content type:", contentType);
           resp = await response.clone().blob();
         }
       } catch (e) {
