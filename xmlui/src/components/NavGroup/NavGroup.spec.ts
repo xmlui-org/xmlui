@@ -155,7 +155,7 @@ test("expands even without label", async ({ initTestBed, page }) => {
 
 test.describe("icon props", () => {
   test("icon appears", async ({ initTestBed, page }) => {
-    await initTestBed(
+    const { testIcons } = await initTestBed(
       `<App layout="vertical">
         <NavPanel>
           <NavGroup icon="bell" label="NavGroup">
@@ -163,17 +163,12 @@ test.describe("icon props", () => {
           </NavGroup>
         </NavPanel>
       </App>`,
-      {
-        resources: {
-          "icon.bell": "/resources/bell.svg",
-        },
-      },
     );
-    await expect(page.getByTestId("bell-svg")).toBeVisible();
+    await expect(testIcons.bellIcon).toBeVisible();
   });
 
   test("iconHorizontal shows in horizontal layout submenu", async ({ initTestBed, page }) => {
-    await initTestBed(
+    const { testIcons } = await initTestBed(
       `
       <App layout="horizontal">
         <NavPanel>
@@ -186,16 +181,10 @@ test.describe("icon props", () => {
         </NavPanel>
       </App>
     `,
-      {
-        resources: {
-          "icon.bell": "/resources/bell.svg",
-          "icon.eye": "/resources/eye.svg",
-        },
-      },
     );
 
-    const bell = page.getByTestId("bell-svg");
-    const eye = page.getByTestId("eye-svg");
+    const bell = testIcons.bellIcon;
+    const eye = testIcons.eyeIcon;
 
     await expect(bell).not.toBeVisible();
     await expect(eye).not.toBeVisible();
@@ -215,7 +204,7 @@ test.describe("icon props", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(
+    const { testIcons } = await initTestBed(
       `
       <App layout="horizontal">
         <NavPanel>
@@ -226,16 +215,10 @@ test.describe("icon props", () => {
         </NavPanel>
       </App>
     `,
-      {
-        resources: {
-          "icon.bell": "/resources/bell.svg",
-          "icon.eye": "/resources/eye.svg",
-        },
-      },
     );
 
-    const bell = page.getByTestId("bell-svg");
-    const eye = page.getByTestId("eye-svg");
+    const bell = testIcons.bellIcon;
+    const eye = testIcons.eyeIcon;
 
     await expect(bell).not.toBeVisible();
     await expect(eye).toBeVisible();
@@ -247,7 +230,7 @@ test.describe("icon props", () => {
   });
 
   test("iconVertical shows in vertical layout submenu", async ({ initTestBed, page }) => {
-    await initTestBed(
+    const { testIcons } = await initTestBed(
       `
       <App layout="vertical">
         <NavPanel>
@@ -260,16 +243,10 @@ test.describe("icon props", () => {
         </NavPanel>
       </App>
     `,
-      {
-        resources: {
-          "icon.bell": "/resources/bell.svg",
-          "icon.eye": "/resources/eye.svg",
-        },
-      },
     );
 
-    const bell = page.getByTestId("bell-svg");
-    const eye = page.getByTestId("eye-svg");
+    const bell = testIcons.bellIcon;
+    const eye = testIcons.eyeIcon;
 
     await expect(bell).not.toBeVisible();
 
