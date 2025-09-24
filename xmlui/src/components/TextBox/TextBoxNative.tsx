@@ -45,10 +45,6 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   /**
    * When true and type is "password", displays a toggle icon to show/hide password text
@@ -122,10 +118,6 @@ export const TextBox = forwardRef(function TextBox(
     autoFocus,
     readOnly,
     tabIndex,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
     required,
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
