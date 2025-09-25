@@ -11,6 +11,9 @@ export const PdfMd = createMetadata({
       description: `This property defines the source URL of the pdf document to display.`,
       valueType: "string",
     },
+    data: d(
+      `This property contains the binary data that represents the PDF document.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -19,7 +22,8 @@ export const PdfMd = createMetadata({
   },
 });
 const PdfComponent = createComponentRenderer(COMP, PdfMd, ({ node, extractValue }) => {
-  return <LazyPdf src={extractValue(node.props.src)} />;
+  const props = node.props as typeof PdfMd.props;
+  return <LazyPdf src={extractValue(props!.src)} data={extractValue(props!.data)} />;
 });
 
 export default {

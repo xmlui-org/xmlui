@@ -3,7 +3,8 @@ import { Suspense, lazy, forwardRef } from "react";
 const Pdf = lazy(() => import("./Pdf"));
 
 interface Props {
-  src: string;
+  src?: string;
+  data?: any; // Binary data for PDF content
 }
 
 export const LazyPdf = forwardRef((props: Props, ref) => {
