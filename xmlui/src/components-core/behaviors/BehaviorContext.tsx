@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo } from "react";
 
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { animationBehavior, tooltipBehavior, labelBehavior } from "./CoreBehaviors";
-import { ComponentDef } from "../..";
+import { ComponentDef, ComponentMetadata } from "../..";
 
 /**
  * Defines the shape of a component behavior that can wrap a component with
@@ -21,7 +21,7 @@ export interface Behavior {
    * @param node The component definition.
    * @returns True if the behavior can be attached, otherwise false.
    */
-  canAttach: (node: ComponentDef) => boolean;
+  canAttach: (node: ComponentDef, metadata: ComponentMetadata) => boolean;
 
   /**
    * A function that attaches the behavior to the component's React node.
