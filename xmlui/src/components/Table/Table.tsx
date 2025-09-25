@@ -45,6 +45,16 @@ export const TableMd = createMetadata({
     ),
     headerHeight: d(`This optional property is used to specify the height of the table header.`),
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
+    initiallySelected: d(
+      `An array of IDs that should be initially selected when the table is rendered. ` +
+        `This property only has an effect when the rowsSelectable property is set to \`true\`.`
+    ),
+    syncWithAppState: d(
+      `An AppState instance to synchronize the table's selection state with. The table will ` +
+        `read from and write to the 'selectedIds' property of the AppState object. When provided, ` +
+        `this takes precedence over the initiallySelected property for initial selection. ` +
+        `You can use the AppState's didUpdate event to receive notifications when the selection changes.`
+    ),
     pageSize: d(
       `This property defines the number of rows to display per page when pagination is enabled.`,
     ),
@@ -392,6 +402,8 @@ const TableWithColumns = memo(forwardRef(
           showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
           showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
           showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
+          initiallySelected={extractValue(node.props.initiallySelected)}
+          syncWithAppState={extractValue(node.props.syncWithAppState)}
         />
       </>
     );

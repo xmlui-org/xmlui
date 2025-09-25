@@ -101,7 +101,6 @@ function shouldReturnAsArrayBuffer(contentType: string): boolean {
     'application/x-tar',
     'application/gzip',
     'application/x-7z-compressed',
-    'application/octet-stream',
     'application/x-binary',
   ];
   

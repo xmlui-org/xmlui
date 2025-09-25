@@ -46,11 +46,13 @@ export const SelectionStore = ({
 }: SelectionStoreProps) => {
   const [items, setItems] = useState<any[]>(selectedItems);
   const valueInitializedRef = useRef(false);
+  const currentItemsRef = useRef<any[]>(selectedItems);
 
   const refreshSelection = useEvent((allItems: any[] = EMPTY_ARRAY) => {
     const safeAllItems = allItems || EMPTY_ARRAY;
     const safeSelectedItems = selectedItems || EMPTY_ARRAY;
     setItems(safeAllItems);
+    currentItemsRef.current = safeAllItems; // Update the ref synchronously
     let value = safeAllItems.filter(
       (item) => !!safeSelectedItems.find((si) => si && item && si[idKey] === item[idKey]),
     );
@@ -63,7 +65,7 @@ export const SelectionStore = ({
   });
 
   const setSelectedRowIds = useEvent((rowIds: any) => {
-    const safeItems = items || EMPTY_ARRAY;
+    const safeItems = currentItemsRef.current || EMPTY_ARRAY; // Use ref instead of state
     updateState({ value: safeItems.filter((item) => rowIds.includes(item[idKey])) });
   });
 

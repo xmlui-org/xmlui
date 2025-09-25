@@ -92,6 +92,7 @@
                 <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 -->
                 <NavLink label="Make a table responsive" to="/howto/make-a-table-responsive" />
+                <NavLink label="Sync selections between table and list views" to="/howto/sync-selections-between-table-and-list-views" />
                 <!-- Add more links as additional files are created -->
             </NavGroup>
             <NavGroup label="Reference">
@@ -433,6 +434,9 @@
             </Page>
             <Page url="/howto/make-a-table-responsive">
                 <DocumentPageNoTOC url="/pages/howto/make-a-table-responsive.md" />
+            </Page>
+            <Page url="/howto/sync-selections-between-table-and-list-views">
+                <DocumentPageNoTOC url="/pages/howto/sync-selections-between-table-and-list-views.md" />
             </Page>
             <!-- Add more pages as additional files are created -->
             <Page url="/hosted-deployment">
