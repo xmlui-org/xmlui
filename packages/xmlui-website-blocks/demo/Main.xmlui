@@ -17,6 +17,8 @@
   <Pages>
     <Page url="/">
       <Image src="/resources/xmlui-logo.svg" />
+      <FancyButton label="Click me" />
+      <Button label="XMLUI button" />
     </Page>
     <Page url="/heroText">
       <HeroTextPage />

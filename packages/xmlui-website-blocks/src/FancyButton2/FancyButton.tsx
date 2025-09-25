@@ -1,20 +1,57 @@
-import styles from "./FancyButton.module.scss";
+import { createUserDefinedComponentRenderer, dClick, dGotFocus, dLostFocus } from "xmlui";
+import { createMetadata } from "xmlui";
+import componentSource from "./FancyButton.xmlui";
+import { PropertyValueDescription } from "xmlui/src/abstractions/ComponentDefs";
 
-import {
-  alignmentOptionMd,
-  sizeMd,
-  iconPositionMd,
-  buttonTypesMd,
-} from "../../../../xmlui/src/components/abstractions";
-import { createComponentRenderer } from "../../../../xmlui/src/components-core/renderers";
-import { parseScssVar } from "../../../../xmlui/src/components-core/theming/themeVars";
-import {
-  createMetadata,
-  dClick,
-  dGotFocus,
-  dLostFocus,
-} from "../../../../xmlui/src/components/metadata-helpers";
-import { FancyButton, defaultProps } from "./FancyButtonNative";
+export const alignmentOptionMd: PropertyValueDescription[] = [
+  { value: "center", description: "Place the content in the middle" },
+  {
+    value: "start",
+    description: "Justify the content to the left (to the right if in right-to-left)",
+  },
+  {
+    value: "end",
+    description: "Justify the content to the right (to the left if in right-to-left)",
+  },
+];
+
+export const sizeMd: PropertyValueDescription[] = [
+  { value: "xs", description: "Extra small" },
+  { value: "sm", description: "Small" },
+  { value: "md", description: "Medium" },
+  { value: "lg", description: "Large" },
+  { value: "xl", description: "Extra large" },
+];
+
+export const iconPositionMd: PropertyValueDescription[] = [
+  {
+    value: "start",
+    description:
+      "The icon will appear at the start (left side when the left-to-right direction is set)",
+  },
+  {
+    value: "end",
+    description:
+      "The icon will appear at the end (right side when the left-to-right direction is set)",
+  },
+];
+
+export const buttonTypesMd: PropertyValueDescription[] = [
+  {
+    value: "button",
+    description: "Regular behavior that only executes logic if explicitly determined.",
+  },
+  {
+    value: "submit",
+    description:
+      "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component.",
+  },
+  {
+    value: "reset",
+    description:
+      "Resets all the controls to their initial values. Using it is ill advised for UX reasons.",
+  },
+];
 
 const COMP = "FancyButton";
 
@@ -36,21 +73,21 @@ export const FancyButtonMd = createMetadata({
       description: "Indicates if the button should receive focus when the page loads.",
       isRequired: false,
       type: "boolean",
-      defaultValue: defaultProps.autoFocus,
+      defaultValue: false,
     },
     variant: {
       description: "The button variant determines the visual style and corner treatment.",
       isRequired: false,
       type: "string",
       availableValues: fancyButtonVariantMd,
-      defaultValue: defaultProps.variant,
+      defaultValue: "rounded",
     },
     size: {
       description: "Sets the size of the button.",
       isRequired: false,
       type: "string",
       availableValues: sizeMd,
-      defaultValue: defaultProps.size,
+      defaultValue: "md",
     },
     label: {
       description:
@@ -66,7 +103,7 @@ export const FancyButtonMd = createMetadata({
         `rarely need to set this property explicitly.`,
       availableValues: buttonTypesMd,
       valueType: "string",
-      defaultValue: defaultProps.type,
+      defaultValue: "button",
     },
     enabled: {
       description:
@@ -86,7 +123,7 @@ export const FancyButtonMd = createMetadata({
       description: `This optional string determines the location of the icon in the ${COMP}.`,
       availableValues: iconPositionMd,
       type: "string",
-      defaultValue: defaultProps.iconPosition,
+      defaultValue: "start",
     },
     contentPosition: {
       description:
@@ -94,7 +131,7 @@ export const FancyButtonMd = createMetadata({
         `inside the ${COMP} component.`,
       availableValues: alignmentOptionMd,
       type: "string",
-      defaultValue: defaultProps.contentPosition,
+      defaultValue: "center",
     },
     contextualLabel: {
       description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
@@ -106,7 +143,6 @@ export const FancyButtonMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
   },
-  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
@@ -179,34 +215,10 @@ export const FancyButtonMd = createMetadata({
     [`borderWidth-${COMP}-outlinedPill-md`]: "2.5px",
     [`borderWidth-${COMP}-outlinedPill-lg`]: "4px",
     [`borderWidth-${COMP}-outlinedPill-xl`]: "5px",
-
   },
 });
 
-export const fancyButtonComponentRenderer = createComponentRenderer(
-  "FancyButton",
+export const fancyButtonRenderer = createUserDefinedComponentRenderer(
   FancyButtonMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
-    const props = (node.props as typeof FancyButtonMd.props)!;
-    const label = extractValue.asDisplayText(props.label);
-    return (
-      <FancyButton
-        type={extractValue.asOptionalString(props.type)}
-        variant={extractValue.asOptionalString(props.variant)}
-        autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
-        size={extractValue.asOptionalString(props.size)}
-        icon={extractValue.asOptionalString(props.icon)}
-        iconPosition={extractValue.asOptionalString(props.iconPosition)}
-        contentPosition={extractValue.asOptionalString(props.contentPosition)}
-        enabled={extractValue.asOptionalBoolean(props.enabled)}
-        onClick={lookupEventHandler("click")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        className={className}
-        contextualLabel={extractValue.asOptionalString(props.contextualLabel)}
-      >
-        {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}
-      </FancyButton>
-    );
-  },
+  componentSource,
 );

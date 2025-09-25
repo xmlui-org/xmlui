@@ -11,8 +11,6 @@ export const HelloMd = createMetadata({
   props: {},
 });
 
-console.log(componentSource);
-
 export const helloRenderer = createUserDefinedComponentRenderer(
   HelloMd,
   componentSource,

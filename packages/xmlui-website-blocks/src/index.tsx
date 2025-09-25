@@ -1,6 +1,6 @@
 import { heroSectionComponentRenderer } from "./HeroSection/HeroSection";
 import { scrollToTopComponentRenderer } from "./ScrollToTop/ScrollToTop";
-import { fancyButtonComponentRenderer } from "./FancyButton/FancyButton";
+import { fancyButtonRenderer } from "./FancyButton2/FancyButton";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { helloRenderer } from "./Hello/Hello";
 
@@ -9,7 +9,7 @@ export default {
   components: [
     heroSectionComponentRenderer,
     scrollToTopComponentRenderer,
-    fancyButtonComponentRenderer,
+    fancyButtonRenderer,
     carouselComponentRenderer,
     helloRenderer
   ]
