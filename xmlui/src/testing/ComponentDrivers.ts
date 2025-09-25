@@ -672,10 +672,6 @@ export class MarkdownDriver extends ComponentDriver {
 
 export class ItemsDriver extends ComponentDriver {}
 
-// --- Slider
-
-export class SliderDriver extends ComponentDriver {}
-
 // --- Range
 
 export class RangeDriver extends ComponentDriver {}
@@ -772,34 +768,6 @@ export class SelectDriver extends ComponentDriver {
 // --- RadioGroup
 
 export class RadioGroupDriver extends ComponentDriver {}
-
-// --- NumberBox
-
-export class NumberBoxDriver extends ComponentDriver {
-  get field() {
-    return this.component.locator("input");
-  }
-
-  get label() {
-    return this.component.locator("label");
-  }
-
-  get placeholder() {
-    return this.field.getAttribute("placeholder");
-  }
-
-  get spinnerUpButton() {
-    return this.component.locator("button").and(this.component.locator("[data-spinner='up']"));
-  }
-
-  get spinnerDownButton() {
-    return this.component.locator("button").and(this.component.locator("[data-spinner='down']"));
-  }
-}
-
-// --- TextBox
-
-export class TextBoxDriver extends InputComponentDriver {}
 
 // --- TextArea
 

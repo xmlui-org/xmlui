@@ -54,10 +54,6 @@ export const TimeInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     hour24: {
       description: "Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)",
       valueType: "boolean",
@@ -198,10 +194,6 @@ export const timeInputComponentRenderer = createComponentRenderer(
         clearIcon={extractValue(node.props.clearIcon)}
         clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
         required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak, defaultProps.labelBreak)}
         startText={extractValue(node.props.startText)}
         startIcon={extractValue(node.props.startIcon)}
         endText={extractValue(node.props.endText)}
