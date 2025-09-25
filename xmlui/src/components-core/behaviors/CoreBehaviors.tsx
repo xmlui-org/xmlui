@@ -109,7 +109,6 @@ export const labelBehavior: Behavior = {
         enabled={enabled}
         style={style}
         className={className}
-        isInputTemplateUsed={true}
         shrinkToLabel={shrinkToLabel}
         testId={componentNode.testId}
       >

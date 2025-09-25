@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { cloneElement, forwardRef, useContext, useId, createContext } from "react";
+import { forwardRef, useId } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -8,6 +8,8 @@ import styles from "./FormItem.module.scss";
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
+
+// Component part names
 
 type ItemWithLabelProps = {
   id?: string;
@@ -79,7 +81,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         className={className}
         id={inputId}
         ref={ref}
-        >
+      >
         {children}
       </Slot>
     );
@@ -127,7 +129,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot data-part-id={PART_LABELED_ITEM} id={inputId} data-testid={undefined}>
+        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined} data-testid={undefined}>
           {children}
         </Slot>
       </div>

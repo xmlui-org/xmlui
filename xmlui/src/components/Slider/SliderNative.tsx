@@ -339,15 +339,15 @@ export const Slider = forwardRef(
                 open={showValues && showTooltip}
               >
                 <Thumb
+                  id={id}
+                  aria-required={required}
                   ref={index === 0 ? thumbRef : null}
                   className={classnames(styles.sliderThumb, {
                     [styles.disabled]: !enabled,
                   })}
                   style={thumbStyle ? { ...thumbStyle } : undefined}
-                  id={id}
                   data-thumb-index={index}
                   autoFocus={autoFocus}
-                  aria-required={required}
                 />
               </Tooltip>
             ))}
