@@ -88,6 +88,7 @@
                 <NavLink label="Use the same ModalDialog to add or edit" to="/howto/use-the-same-modaldialog-to-add-or-edit" />
                 <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
                 <NavLink label="Chain a DataSource refetch from an APICall.execute" to="/howto/chain-a-refetch" />
+                <NavLink label="Handle background operations" to="/howto/handle-background-operations" />
                 <!--
                 <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 -->
@@ -428,6 +429,9 @@
             </Page>
             <Page url="/howto/chain-a-refetch">
                 <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
+            </Page>
+            <Page url="/howto/handle-background-operations">
+                <DocumentPageNoTOC url="/pages/howto/handle-background-operations.md" />
             </Page>
             <Page url="/howto/update-ui-optimistically">
                 <DocumentPageNoTOC url="/pages/howto/update-ui-optimistically.md" />
