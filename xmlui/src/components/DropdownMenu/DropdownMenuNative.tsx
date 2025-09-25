@@ -209,23 +209,25 @@ type SubMenuItemProps = {
   triggerTemplate?: ReactNode;
 };
 
-export function SubMenuItem({ children, label, triggerTemplate }: SubMenuItemProps) {
-  const { root } = useTheme();
+export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(
+  function SubMenuItem({ children, label, triggerTemplate }, ref) {
+    const { root } = useTheme();
 
-  return (
-    <ReactDropdownMenu.Sub>
-      <ReactDropdownMenu.SubTrigger className={styles.DropdownMenuSubTrigger} asChild>
-        {triggerTemplate ? triggerTemplate : <div>{label}</div>}
-      </ReactDropdownMenu.SubTrigger>
-      <ReactDropdownMenu.Portal container={root}>
-        <ReactDropdownMenu.SubContent className={styles.DropdownMenuSubContent}>
-          {children}
-        </ReactDropdownMenu.SubContent>
-      </ReactDropdownMenu.Portal>
-    </ReactDropdownMenu.Sub>
-  );
-}
+    return (
+      <ReactDropdownMenu.Sub>
+        <ReactDropdownMenu.SubTrigger className={styles.DropdownMenuSubTrigger} asChild ref={ref}>
+          {triggerTemplate ? triggerTemplate : <div>{label}</div>}
+        </ReactDropdownMenu.SubTrigger>
+        <ReactDropdownMenu.Portal container={root}>
+          <ReactDropdownMenu.SubContent className={styles.DropdownMenuSubContent}>
+            {children}
+          </ReactDropdownMenu.SubContent>
+        </ReactDropdownMenu.Portal>
+      </ReactDropdownMenu.Sub>
+    );
+  },
+);
 
-export function MenuSeparator() {
-  return <ReactDropdownMenu.Separator className={styles.DropdownMenuSeparator} />;
-}
+export const MenuSeparator = forwardRef<HTMLDivElement>(function MenuSeparator(props, ref) {
+  return <ReactDropdownMenu.Separator ref={ref} className={styles.DropdownMenuSeparator} {...props} />;
+});

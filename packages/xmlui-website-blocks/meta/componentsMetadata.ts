@@ -2,7 +2,7 @@ import { HeroSectionMd } from "../src/HeroSection/HeroSection"
 import { ScrollToTopMd } from "../src/ScrollToTop/ScrollToTop"
 import { CarouselMd } from "../src/Carousel/Carousel"
 import { HelloMd } from "../src/Hello/Hello"
-import { FancyButtonMd } from "../src/FancyButton2/FancyButton"
+import { FancyButtonMd } from "../src/FancyButton/FancyButton"
 
 export const componentMetadata = {
   name: "Websites",

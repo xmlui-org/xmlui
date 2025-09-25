@@ -1,6 +1,6 @@
 import { heroSectionComponentRenderer } from "./HeroSection/HeroSection";
 import { scrollToTopComponentRenderer } from "./ScrollToTop/ScrollToTop";
-import { fancyButtonRenderer } from "./FancyButton2/FancyButton";
+import { fancyButtonRenderer } from "./FancyButton/FancyButton";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { helloRenderer } from "./Hello/Hello";
 
