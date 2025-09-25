@@ -530,8 +530,6 @@ test.describe("multiSelect", () => {
 
   test('labelPosition="start" is left in ltr language', async ({
     initTestBed,
-    browser,
-    createSelectDriver,
     page,
   }) => {
     await initTestBed(`
@@ -546,28 +544,24 @@ test.describe("multiSelect", () => {
     expect(labelX).toBeLessThan(selectX);
   });
 
-  test.skip('labelPosition="start" is right to select in rtl language', async ({ browser }) => {
-    // TODO: fix this test
-    // const rightToLeftLanguage = "ar";
-    // const context = await browser.newContext({
-    //   locale: rightToLeftLanguage,
-    // });
-    // const page = await context.newPage();
-    // await initComponent(page, {
-    //   entryPoint: `
-    //       <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
-    //         <Option value="1" label="One"/>
-    //         <Option value="2" label="Two"/>
-    //       </Select>
-    //     `,
-    // });
-    // const { x: labelX } = await page.getByText("hi there").boundingBox();
-    // const select = page.getByRole("button").or(page.getByRole("combobox")).first();
-    // const { x: selectX } = await select.boundingBox();
-    // expect(labelX).toBeGreaterThan(selectX);
-    // const checkedBrowserIsActuallyRTL_inThisTestCase = false;
-    // expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
+  test('labelPosition="start" is right in rtl language', async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack direction="rtl">
+        <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
+          <Option value="1" label="One" />
+          <Option value="2" label="Two" />
+        </Select>
+      </VStack>
+    `);
+    const { x: labelX } = await page.getByText("hi there").boundingBox();
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { x: selectX } = await select.boundingBox();
+    expect(labelX).toBeGreaterThan(selectX);
   });
+
 
   test("multiSelect autoFocus brings the focus to component", async ({
     initTestBed,

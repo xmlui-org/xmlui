@@ -110,13 +110,14 @@ export const viewportSizeMd: PropertyValueDescription[] = [
 export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
-export const sizeValues = ["xs", "sm", "md", "lg"] as const;
+export const sizeValues = ["xs", "sm", "md", "lg", "xl"] as const;
 export type SizeType = (typeof sizeValues)[number];
 export const sizeMd: PropertyValueDescription<SizeType>[] = [
   { value: "xs", description: "Extra small" },
   { value: "sm", description: "Small" },
   { value: "md", description: "Medium" },
   { value: "lg", description: "Large" },
+  { value: "xl", description: "Extra large" },
 ];
 export function isSizeType(value: any): value is SizeType {
   return sizeValues.includes(value);

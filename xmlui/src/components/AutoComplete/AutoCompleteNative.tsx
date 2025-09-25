@@ -33,6 +33,9 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "../Select/HiddenOption";
+import { PART_INPUT } from "../../components-core/parts";
+
+const PART_LIST_WRAPPER = "listWrapper";
 
 type AutoCompleteProps = {
   id?: string;
@@ -49,6 +52,7 @@ type AutoCompleteProps = {
   validationStatus?: ValidationStatus;
   onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onItemCreated?: (item: string) => void;
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   autoFocus?: boolean;
@@ -82,6 +86,7 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   onDidChange: noop,
   onFocus: noop,
   onBlur: noop,
+  onItemCreated: noop,
   initiallyOpen: false,
 };
 
@@ -97,6 +102,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     onDidChange = defaultProps.onDidChange,
     onFocus = defaultProps.onFocus,
     onBlur = defaultProps.onBlur,
+    onItemCreated = defaultProps.onItemCreated,
     registerComponentApi,
     emptyListTemplate,
     style,
@@ -188,7 +194,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       onDidChange(newSelectedValue);
       inputRef.current?.focus();
     },
-    [multi, value, updateState, onDidChange, inputRef.current],
+    [multi, value, updateState, onDidChange],
   );
 
   useEffect(() => {
@@ -233,7 +239,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   // Register component API for external interactions
   const focus = useCallback(() => {
     inputRef?.current?.focus();
-  }, [inputRef?.current]);
+  }, [inputRef]);
 
   const setValue = useEvent((newValue: string | string[]) => {
     updateState({ value: newValue });
@@ -306,7 +312,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
               >
                 <PopoverTrigger asChild>
                   <div
-                    id={inputId}
+                    data-part-id={PART_LIST_WRAPPER}
                     ref={setReferenceElement}
                     style={{ width: "100%", ...style }}
                     className={classnames(
@@ -365,9 +371,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
                           setOpen((prev) => !prev);
                         }
                       }}
-                      id={id}
+                      id={inputId}
+                      data-part-id={PART_INPUT}
                       readOnly={readOnly}
                       autoFocus={autoFocus}
+                      aria-expanded={open}
                       ref={inputRef}
                       value={inputValue}
                       disabled={!enabled}
@@ -420,7 +428,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       style={{ height: dropdownHeight }}
                     >
                       <CmdEmpty>{emptyListNode}</CmdEmpty>
-                      {creatable && <CreatableItem />}
+                      {creatable && <CreatableItem onNewItem={onItemCreated} />}
                       <CmdGroup>
                         {Array.from(options).map(({ value, label, enabled, keywords }) => (
                           <AutoCompleteOption
@@ -446,7 +454,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
   );
 });
 
-function CreatableItem() {
+type CreatableItemProps = {
+  onNewItem: (item: string) => void;
+};
+
+function CreatableItem({onNewItem}: CreatableItemProps) {
   const { value, options, inputValue, onChange, setOpen } = useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
@@ -468,6 +480,7 @@ function CreatableItem() {
       onSelect={(value) => {
         const newOption = { value, label: value, enabled: true };
         onOptionAdd(newOption);
+        onNewItem?.(value);
         onChange(value);
         setOpen(false);
       }}

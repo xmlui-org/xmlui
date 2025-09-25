@@ -64,6 +64,7 @@ import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
 import { TimerDriver } from "./drivers/TimerDriver";
 import { DateInputDriver } from "./drivers/DateInputDriver";
+import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 
 export { expect } from "./assertions";
 
@@ -100,11 +101,13 @@ class Clipboard {
       window.navigator.clipboard.read = async () => {
         throw new Error("Clipboard read not implemented in mocked environment");
       };
-      window.navigator.clipboard.writeText = async (text) => { this.content = text };
+      window.navigator.clipboard.writeText = async (text) => {
+        this.content = text;
+      };
       window.navigator.clipboard.write = async (items) => {
         throw new Error("Clipboard write not implemented in mocked environment");
       };
-    }
+    };
   }
 
   /**
@@ -194,6 +197,15 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
 
   initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
     await use(async (source: string, description?: TestBedDescription) => {
+      // Default test icon resources
+      const defaultTestResources = {
+        "icon.box": "/resources/box.svg",
+        "icon.doc": "/resources/doc.svg",
+        "icon.sun": "/resources/sun.svg",
+        "icon.eye": "/resources/eye.svg",
+        "icon.txt": "/resources/txt.svg",
+        "icon.bell": "/resources/bell.svg",
+      };
       // --- Initialize XMLUI App
       const { errors, component } = xmlUiMarkupToComponent(`
           <Fragment var.testState="{null}">
@@ -241,9 +253,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       }
       const themedDescription = mapThemeRelatedVars(description);
 
+      // Merge default test resources with any provided resources
+      const mergedResources = {
+        ...defaultTestResources,
+        ...themedDescription.resources,
+      };
+
       const _appDescription: StandaloneAppDescription = {
         name: "test bed app",
         ...themedDescription,
+        resources: mergedResources,
         components,
         entryPoint,
       };
@@ -261,11 +280,22 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       const { width, height } = page.viewportSize();
       await page.goto("/");
 
+      // Create test icon locators
+      const testIcons = {
+        boxIcon: page.getByTestId("box-svg"),
+        docIcon: page.getByTestId("doc-svg"),
+        sunIcon: page.getByTestId("sun-svg"),
+        eyeIcon: page.getByTestId("eye-svg"),
+        txtIcon: page.getByTestId("txt-svg"),
+        bellIcon: page.getByTestId("bell-svg"),
+      };
+
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
         clipboard,
         width: width ?? 0,
         height: height ?? 0,
+        testIcons,
       };
     });
   },
@@ -543,7 +573,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(DateInputDriver, testIdOrLocator);
     });
-  }
+  },
+  createModalDialogDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ModalDialogDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -563,6 +598,14 @@ type TestDriverExtenderProps = {
     clipboard: Clipboard;
     width: number;
     height: number;
+    testIcons: {
+      boxIcon: Locator;
+      docIcon: Locator;
+      sunIcon: Locator;
+      eyeIcon: Locator;
+      txtIcon: Locator;
+      bellIcon: Locator;
+    };
   }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
@@ -619,4 +662,5 @@ type TestDriverExtenderProps = {
   createTimeInputDriver: ComponentDriverMethod<TimeInputDriver>;
   createTimerDriver: ComponentDriverMethod<TimerDriver>;
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
+  createModalDialogDriver: ComponentDriverMethod<ModalDialogDriver>;
 };

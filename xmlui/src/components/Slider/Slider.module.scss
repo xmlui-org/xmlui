@@ -112,6 +112,10 @@ $componentName: "Slider";
       opacity: 0.5;
     }
 
+    &:focus-visible, &[data-focus] {
+      background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--focus");
+      box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--focus");
+    }
     &:hover, &[data-hover] {
       background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
       box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");

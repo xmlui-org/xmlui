@@ -13,8 +13,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -29,8 +29,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -101,8 +101,8 @@ A function that formats the X-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
@@ -122,8 +122,8 @@ A function that formats the Y-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -143,16 +143,21 @@ This property allows replacing the default template to display a tooltip.
         { 'sprint': 'Sprint 3', 'A': 48, 'B': 35 },
         { 'sprint': 'Sprint 4', 'A': 72, 'B': 58 }
        ]}"
-    xKeys="{['A', 'B']}"
-    yKey="sprint"
+    yKeys="{['A', 'B']}"
+    xKey="sprint"
   >
       <property name="tooltipTemplate">
         <VStack backgroundColor='white' padding="$space-2">
           <Text fontWeight='bold'>{$tooltip.label}</Text>
-          <HStack>
-            <Text color='blue'>Series A: {$tooltip.payload.A}</Text>
-            <Text color='green'>Series B: {$tooltip.payload.B}</Text>
-          </HStack>
+          <Items data="{$tooltip.payload}">
+            <HStack gap="$space-2" verticalAlignment="center">
+              <Stack
+                width="8px"
+                height="8px"
+                backgroundColor="{$item.color}" />
+              <Text>{$item.label}: {$item.value}</Text>
+            </HStack>
+          </Items>
         </VStack>
       </property>
   </LineChart>
@@ -165,13 +170,13 @@ The `tooltipTemplate` prop allows you to customize the appearance and content of
 - `$tooltip.payload`: An object containing all data values for the hovered point
 - `$tooltip.active`: Boolean indicating if the tooltip is currently active
 
-### `xKeys` [#xkeys]
-
-This property specifies the keys in the data objects that should be used for rendering the lines.
-
-### `yKey` [#ykey]
+### `xKey` [#xkey]
 
 The key in the data objects used for labeling different data series.
+
+### `yKeys` [#ykeys]
+
+This property specifies the keys in the data objects that should be used for rendering the lines.
 
 ## Events [#events]
 

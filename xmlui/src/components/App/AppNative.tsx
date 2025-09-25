@@ -54,6 +54,7 @@ type Props = {
   logoLight?: string;
   defaultTone?: string;
   defaultTheme?: string;
+  autoDetectTone?: boolean;
   applyDefaultContentPadding?: boolean;
 };
 
@@ -63,6 +64,7 @@ export const defaultProps: Pick<
   | "noScrollbarGutters"
   | "defaultTone"
   | "defaultTheme"
+  | "autoDetectTone"
   | "onReady"
   | "onMessageReceived"
 > = {
@@ -70,6 +72,7 @@ export const defaultProps: Pick<
   noScrollbarGutters: false,
   defaultTone: undefined,
   defaultTheme: undefined,
+  autoDetectTone: false,
   onReady: noop,
   onMessageReceived: noop,
 };
@@ -93,6 +96,7 @@ export function App({
   logoLight,
   defaultTone,
   defaultTheme,
+  autoDetectTone = defaultProps.autoDetectTone,
   renderChild,
   name,
   className,
@@ -119,9 +123,16 @@ export function App({
   useEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
+    
     if (defaultTone === "dark" || defaultTone === "light") {
       setActiveThemeTone(defaultTone as any);
+    } else if (autoDetectTone) {
+      // Auto-detect system theme preference when no defaultTone is set
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const detectedTone = systemPrefersDark ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
     }
+    
     if (defaultTheme) {
       setActiveThemeId(defaultTheme);
     }
@@ -129,7 +140,7 @@ export function App({
     return () => {
       mounted.current = false;
     };
-  }, [defaultTone, defaultTheme, setActiveThemeTone, setActiveThemeId, themes]);
+  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId, themes]);
 
   useEffect(() => {
     onReady();
@@ -146,6 +157,24 @@ export function App({
       window.removeEventListener("message", handleMessage);
     };
   }, [onMessageReceived]);
+
+  // Listen for system theme changes when autoDetectTone is enabled
+  useEffect(() => {
+    if (!autoDetectTone || defaultTone) return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      const detectedTone = e.matches ? "dark" : "light";
+      setActiveThemeTone(detectedTone);
+    };
+
+    mediaQuery.addEventListener('change', handleThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
+  }, [autoDetectTone, defaultTone, setActiveThemeTone]);
 
   // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
   // --- button. The exception is the condensed layout because we render a header in that case (otherwise,

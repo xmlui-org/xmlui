@@ -97,6 +97,10 @@ export const AutoCompleteMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
+    itemCreated: {
+      description: "This event is triggered when a new item is created by the user " + 
+      "(if `creatable` is enabled).",
+    }
   },
   apis: {
     focus: {
@@ -138,7 +142,7 @@ export const AutoCompleteMd = createMetadata({
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
-    [`fontSize-${COMP}-badge`]: "$fontSize-small",
+    [`fontSize-${COMP}-badge`]: "$fontSize-sm",
     [`borderRadius-${COMP}-badge`]: "$borderRadius",
     [`paddingHorizontal-${COMP}-badge`]: "$space-2",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
@@ -183,6 +187,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
+        onItemCreated={lookupEventHandler("itemCreated")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}

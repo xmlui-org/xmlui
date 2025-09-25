@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.10.10",
+  "version": "0.10.14",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -34,7 +34,7 @@
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "1.0.5",
-    "@radix-ui/react-dropdown-menu": "2.0.6",
+    "@radix-ui/react-dropdown-menu": "2.1.16",
     "@radix-ui/react-focus-scope": "1.0.4",
     "@radix-ui/react-hover-card": "1.0.7",
     "@radix-ui/react-popover": "^1.1.2",
@@ -44,6 +44,7 @@
     "@radix-ui/react-tabs": "1.1.0",
     "@radix-ui/react-tooltip": "^1.2.4",
     "@radix-ui/react-visually-hidden": "1.0.3",
+    "@react-spring/web": "^10.0.2",
     "@remix-run/react": "2.12.1",
     "@tanstack/react-query": "^4.36.1",
     "@tanstack/react-query-devtools": "^4.36.1",
@@ -130,7 +131,6 @@
     "@types/react-datepicker": "4.19.5",
     "@types/react-dom": "18.2.8",
     "@types/react-measure": "^2.0.8",
-    "@types/react-pdf": "5.7.2",
     "@types/react-window": "1.8.8",
     "@types/yargs": "17.0.31",
     "@typescript-eslint/eslint-plugin": "8.15.0",

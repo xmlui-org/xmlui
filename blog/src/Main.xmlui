@@ -1,0 +1,78 @@
+<Fragment>
+    <App
+        layout="vertical-full-header"
+        noScrollbarGutters="false"
+        when="{!window.location.hash.includes('/playground')}"
+        var.posts = `{[
+          {
+            title: "Welcome to the XMLUI blog!",
+            slug: "welcome-to-the-xmlui-blog",
+            author: "Jon Udell",
+            date: "2025-09-10",
+            image: "blog-scrabble.png"
+          },
+          {
+            title: "Lorem Ipsum!",
+            slug: "lorem-ipsum",
+            author: "H. Rackham",
+            date: "1914-06-03",
+            image: "lorem-ipsum.png"
+          }
+        ]}`
+        >
+        <AppHeader>
+            <property name="logoTemplate">
+                <Link to="https://xmlui.org/">
+                    <Logo height="$space-8" />
+                </Link>
+            </property>
+            <SpaceFiller />
+            <Search
+                data="{appGlobals.plainTextContent}"
+                when="{mediaSize.sizeIndex > 2}" />
+            <ToneSwitch />
+        </AppHeader>
+        <NavPanel
+            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+            <Stack
+                paddingHorizontal="$space-4"
+                paddingBottom="$space-4"
+                when="{mediaSize.sizeIndex <= 2}">
+                <Search data="{appGlobals.plainTextContent}" />
+            </Stack>
+            <NavGroup label="Recent posts" to="/blog" >
+              <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
+              <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
+            </NavGroup>
+        </NavPanel>
+        <Pages fallbackPath="/404">
+            <Page url="/">
+                <BlogOverview posts="{posts}" />
+            </Page>
+            <Page url="/blog">
+                <BlogOverview posts="{posts}" />
+            </Page>
+            <Page url="/blog/{posts[0].slug}">
+                <BlogPage post="{posts[0]}" />
+            </Page>
+            <Page url="/blog/{posts[1].slug}">
+                <BlogPage post="{posts[1]}" />
+            </Page>
+            <Page url="/404">
+                <PageNotFound />
+            </Page>
+        </Pages>
+        <Footer>
+            <CHStack width="*">
+                This site is an XMLUI™ app.
+                <SpaceFiller />
+                <Link
+                    to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
+                    target="_blank">
+                    <Button variant="ghost" icon="github" />
+                </Link>
+            </CHStack>
+        </Footer>
+    </App>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
+</Fragment>

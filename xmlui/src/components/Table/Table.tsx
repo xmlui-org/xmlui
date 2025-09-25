@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useRef, useState, memo } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -45,6 +45,16 @@ export const TableMd = createMetadata({
     ),
     headerHeight: d(`This optional property is used to specify the height of the table header.`),
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
+    initiallySelected: d(
+      `An array of IDs that should be initially selected when the table is rendered. ` +
+        `This property only has an effect when the rowsSelectable property is set to \`true\`.`
+    ),
+    syncWithAppState: d(
+      `An AppState instance to synchronize the table's selection state with. The table will ` +
+        `read from and write to the 'selectedIds' property of the AppState object. When provided, ` +
+        `this takes precedence over the initiallySelected property for initial selection. ` +
+        `You can use the AppState's didUpdate event to receive notifications when the selection changes.`
+    ),
     pageSize: d(
       `This property defines the number of rows to display per page when pagination is enabled.`,
     ),
@@ -219,10 +229,10 @@ export const TableMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-heading-${COMP}`]: `$space-2 $space-0 $space-2 $space-2`,
-    [`padding-cell-${COMP}`]: "$space-2 $space-0 $space-2 $space-2",
+    [`padding-heading-${COMP}`]: `$space-2 $space-1 $space-2 $space-2`,
+    [`padding-cell-${COMP}`]: "$space-2 $space-1 $space-2 $space-2",
     [`paddingHorizontal-cell-first-${COMP}`]: "$space-5",
-    [`paddingHorizontal-cell-last-${COMP}`]: "$space-0",
+    [`paddingHorizontal-cell-last-${COMP}`]: "$space-1",
     [`border-cell-${COMP}`]: "1px solid $borderColor",
     [`outlineWidth-heading-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-heading-${COMP}--focus`]: "$outlineStyle--focus",
@@ -230,7 +240,7 @@ export const TableMd = createMetadata({
     [`fontSize-heading-${COMP}`]: "$fontSize-tiny",
     [`fontWeight-heading-${COMP}`]: "$fontWeight-bold",
     [`textTransform-heading-${COMP}`]: "uppercase",
-    [`fontSize-row-${COMP}`]: "$fontSize-small",
+    [`fontSize-row-${COMP}`]: "$fontSize-sm",
     // [`backgroundColor-${COMP}`]: "transparent",
     // [`backgroundColor-row-${COMP}`]: "inherit",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
@@ -243,10 +253,13 @@ export const TableMd = createMetadata({
     [`backgroundColor-heading-${COMP}--active`]: "$color-surface-300",
     [`backgroundColor-heading-${COMP}`]: "$color-surface-100",
     [`textColor-heading-${COMP}`]: "$color-surface-500",
+    [`border-${COMP}`]: "0px solid transparent",
+    [`borderBottom-last-row-${COMP}`]: `$borderBottom-cell-${COMP}`,
+    [`borderRadius-${COMP}`]: "$borderRadius",
   },
 });
 
-const TableWithColumns = forwardRef(
+const TableWithColumns = memo(forwardRef(
   (
     {
       extractValue,
@@ -389,6 +402,8 @@ const TableWithColumns = forwardRef(
           showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
           showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
           showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
+          initiallySelected={extractValue(node.props.initiallySelected)}
+          syncWithAppState={extractValue(node.props.syncWithAppState)}
         />
       </>
     );
@@ -398,7 +413,7 @@ const TableWithColumns = forwardRef(
     }
     return tableContent;
   },
-);
+));
 TableWithColumns.displayName = "TableWithColumns";
 
 export const tableComponentRenderer = createComponentRenderer(

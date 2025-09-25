@@ -69,6 +69,10 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the message to display when the form submission fails.
 
+### `hideButtonRowUntilDirty` (default: false) [#hidebuttonrowuntildirty-default-false]
+
+This property hides the button row until the form data is modified (dirty).
+
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
 This property sets the message to display when the form is being submitted.
@@ -207,6 +211,7 @@ This method updates the form data with the change passed in its parameter. The p
 | [color](../styles-and-themes/common-units/#color)-accent-ValidationDisplay-warning | $color-warning | $color-warning |
 | [gap](../styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
 | [gap](../styles-and-themes/common-units/#size)-Form | $space-4 | $space-4 |
+| [marginTop](../styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
 | [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-error | $color-error |
 | [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-info | $color-info |
 | [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-valid | $color-valid |

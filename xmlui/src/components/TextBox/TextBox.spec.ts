@@ -111,23 +111,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("12345");
   });
 
-  test.fixme(
-    "component handles rapid input changes",
-    SKIP_REASON.REFACTOR("Rewrite: test does not test anything meaningful"),
-    async ({ initTestBed, createTextBoxDriver }) => {
-      await initTestBed(`<TextBox />`);
-      const driver = await createTextBoxDriver();
-
-      // Type rapidly
-      await driver.field.pressSequentially("rapid", { delay: 50 });
-      await expect(driver.field).toHaveValue("rapid");
-
-      await driver.field.clear();
-      await driver.field.pressSequentially("typing", { delay: 25 });
-      await expect(driver.field).toHaveValue("typing");
-    },
-  );
-
   test("can render startIcon", async ({ initTestBed, page }) => {
     await initTestBed(`<TextBox startIcon="search" />`);
     await expect(page.getByRole("img")).toBeVisible();
@@ -741,31 +724,6 @@ test.describe("Edge Cases", () => {
     await page.getByRole("textbox").fill(veryLongText);
     await expect(page.getByRole("textbox")).toHaveValue(veryLongText);
   });
-
-  test.skip(
-    "component handles copy operation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<TextBox initialValue="copy this text" />`);
-      const textbox = page.getByRole("textbox");
-
-      await clipboard.copy(textbox);
-      expect(await clipboard.read()).toBe("copy this text");
-    },
-  );
-
-  test.skip(
-    "component handles paste operation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test out new mocked clipboard with CI"),
-    async ({ initTestBed, page }) => {
-      const { clipboard } = await initTestBed(`<TextBox />`);
-      const textbox = page.getByRole("textbox");
-
-      await clipboard.write("pasted text");
-      await clipboard.paste(textbox);
-      await expect(textbox).toHaveValue("pasted text");
-    },
-  );
 });
 
 // =============================================================================

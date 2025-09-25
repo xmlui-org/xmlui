@@ -36,8 +36,7 @@ export const optionComponentRenderer = createComponentRenderer(
   OptionMd,
   ({ node, extractValue, className, renderChild, layoutContext }) => {
     const label = extractValue.asOptionalString(node.props.label);
-    const value = extractValue.asOptionalString(node.props.value);
-
+    let value = extractValue(node.props.value);
     if (label === undefined && value === undefined) {
       return null;
     }
@@ -48,7 +47,7 @@ export const optionComponentRenderer = createComponentRenderer(
     return (
       <OptionNative
         label={label || textNodeChild}
-        value={value || label}
+        value={value !== undefined && value !== "" ? value : label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         className={className}
         optionRenderer={

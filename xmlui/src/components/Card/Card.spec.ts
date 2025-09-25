@@ -168,21 +168,25 @@ test.describe("Event Handling", () => {
     await expect(page).not.toHaveURL(/\/test-link$/);
   });
 
-  test.skip(
-    "Link click does not interfere with Card click",
-    SKIP_REASON.XMLUI_BUG("Clicking linkTo does trigger click event"),
-    async ({ page, initTestBed, createCardDriver, createTextDriver }) => {
-      await initTestBed(`
+  test("Link click does not interfere with Card click", async ({
+    page,
+    initTestBed,
+    createCardDriver,
+    createTextDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
       <Card title="Title" linkTo="/test-link" onClick="testState = true">
         <Text testId="text-1" when="{testState}" value="visible" />
       </Card>
     `);
-      const title = (await createCardDriver()).component.getByRole("heading");
-      const textDriver = await createTextDriver("text-1");
 
-      await title.click();
-      await expect(textDriver.component).not.toBeVisible();
-      await expect(page).toHaveURL(/\/test-link$/);
-    },
-  );
+    const textDriver = await createTextDriver("text-1");
+    const title = (await createCardDriver()).component.getByRole("heading");
+
+    await expect(textDriver.component).not.toBeVisible();
+    await title.click();
+    await page.waitForTimeout(200);
+    await expect(page).toHaveURL(/\/test-link$/);
+    await expect(textDriver.component).toBeVisible();
+  });
 });

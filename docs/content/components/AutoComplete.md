@@ -160,6 +160,27 @@ This event is triggered when value of AutoComplete has changed.
 
 This event is triggered when the AutoComplete has received the focus.
 
+### `itemCreated` [#itemcreated]
+
+This event is triggered when a new item is created by the user (if `creatable` is enabled).
+
+Add a few new items not in the options list. The following markup will display them:
+
+```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
+</App>
+```
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the AutoComplete has lost the focus.
@@ -280,8 +301,8 @@ This API allows you to get or set the value of the component. If no value is set
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-warning--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |

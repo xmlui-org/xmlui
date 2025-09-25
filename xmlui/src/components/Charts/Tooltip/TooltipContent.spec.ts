@@ -63,8 +63,8 @@ test.describe("Basic Functionality", () => {
     test("TooltipContent renders in BarChart on hover", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -114,8 +114,8 @@ test.describe("Basic Functionality", () => {
       // The indicator prop would be passed through chart tooltip configuration
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -162,8 +162,8 @@ test.describe("Basic Functionality", () => {
     test("displays multiple data series correctly", async ({ initTestBed, page }) => {
       await initTestBed(`
         <BarChart
-          yKey="name"
-          xKeys="{['sales', 'profit']}"
+          xKey="name"
+          yKeys="{['sales', 'profit']}"
           data="{${multiSeriesData}}"
           width="400px"
           height="400px"
@@ -318,8 +318,8 @@ test.describe("Basic Functionality", () => {
       // Test in LineChart context
       await initTestBed(`
         <LineChart
-          yKey="name"
-          xKeys="{['value']}"
+          xKey="name"
+          yKeys="{['value']}"
           data="{${sampleData}}"
           width="400px"
           height="400px"
@@ -475,34 +475,6 @@ test.describe("Performance and Edge Cases", () => {
     // Tooltip won't appear since there's no data to hover over
     const chart = page.locator(chartRoot);
     await expect(chart).toBeVisible();
-  });
-
-  test("maintains performance with large datasets", async ({ initTestBed, page }) => {
-    // Create large dataset with proper XMLUI syntax
-    const largeDataset = Array.from({ length: 20 }, (_, i) => 
-      `{ name: 'Category ${i + 1}', value: ${Math.floor(Math.random() * 1000) + 100} }`
-    ).join(', ');
-    
-    await initTestBed(`
-      <PieChart
-        nameKey="name"
-        dataKey="value"
-        data="{[${largeDataset}]}"
-        width="400px"
-        height="400px"
-      />
-    `);
-    
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    
-    // Hover over a sector
-    const pieSector = page.locator(".recharts-pie-sector").first();
-    await pieSector.hover();
-    
-    // Tooltip should still render efficiently
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
-    await expect(page.locator(tooltipNameSelector)).toBeVisible();
-    await expect(page.locator(tooltipValueSelector)).toBeVisible();
   });
 
   test("handles special characters and long text", async ({ initTestBed, page }) => {

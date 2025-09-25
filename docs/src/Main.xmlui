@@ -2,7 +2,8 @@
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}">
+        when="{!window.location.hash.includes('/playground')}"
+        >
         <AppHeader>
             <property name="logoTemplate">
                 <Link to="https://xmlui.org/">
@@ -69,6 +70,7 @@
             </NavGroup>
             <NavGroup label="How To">
                 <NavLink label="Expose a method from a component" to="/howto/expose-a-method-from-a-component" />
+                <NavLink label="Delegate a method" to="/howto/delegate-a-method" />
                 <NavLink label="React to button click not keystrokes" to="/howto/react-to-button-click-not-keystrokes" />
                 <NavLink label="Modify a value reported in a Column" to="/howto/modify-a-value-reported-in-a-column" />
                 <NavLink label="Filter and transform data from an API" to="/howto/filter-and-transform-data-from-an-api" />
@@ -85,6 +87,12 @@
                 <NavLink label="Share a ModalDialog across components" to="/howto/share-a-modaldialog-across-components" />
                 <NavLink label="Use the same ModalDialog to add or edit" to="/howto/use-the-same-modaldialog-to-add-or-edit" />
                 <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
+                <NavLink label="Chain a DataSource refetch from an APICall.execute" to="/howto/chain-a-refetch" />
+                <!--
+                <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
+                -->
+                <NavLink label="Make a table responsive" to="/howto/make-a-table-responsive" />
+                <NavLink label="Sync selections between table and list views" to="/howto/sync-selections-between-table-and-list-views" />
                 <!-- Add more links as additional files are created -->
             </NavGroup>
             <NavGroup label="Reference">
@@ -273,6 +281,15 @@
             <Page url="/tutorial-12">
                 <DocumentPageNoTOC url="/pages/tutorial-12.md" />
             </Page>
+            <Page url="/blog">
+                <BlogOverview posts="{posts}" />
+            </Page>
+            <Page url="/blog/{posts[0].slug}">
+                <BlogPage post="{posts[0]}" />
+            </Page>
+            <Page url="/blog/{posts[1].slug}">
+                <BlogPage post="{posts[1]}" />
+            </Page>
             <Page url="/app-structure">
                 <DocumentPageNoTOC url="/pages/app-structure.md" />
             </Page>
@@ -357,6 +374,10 @@
             <Page url="/howto/expose-a-method-from-a-component">
                 <DocumentPageNoTOC url="/pages/howto/expose-a-method-from-a-component.md" />
             </Page>
+            <Page url="/howto/delegate-a-method">
+                <DocumentPageNoTOC url="/pages/howto/delegate-a-method.md" />
+            </Page>
+
             <Page url="/howto/react-to-button-click-not-keystrokes">
                 <DocumentPageNoTOC url="/pages/howto/react-to-button-click-not-keystrokes.md" />
             </Page>
@@ -404,6 +425,18 @@
             </Page>
             <Page url="/howto/paginate-a-list">
                 <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
+            </Page>
+            <Page url="/howto/chain-a-refetch">
+                <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
+            </Page>
+            <Page url="/howto/update-ui-optimistically">
+                <DocumentPageNoTOC url="/pages/howto/update-ui-optimistically.md" />
+            </Page>
+            <Page url="/howto/make-a-table-responsive">
+                <DocumentPageNoTOC url="/pages/howto/make-a-table-responsive.md" />
+            </Page>
+            <Page url="/howto/sync-selections-between-table-and-list-views">
+                <DocumentPageNoTOC url="/pages/howto/sync-selections-between-table-and-list-views.md" />
             </Page>
             <!-- Add more pages as additional files are created -->
             <Page url="/hosted-deployment">

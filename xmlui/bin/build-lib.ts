@@ -5,8 +5,15 @@ import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite
 import path from "path";
 import react from "@vitejs/plugin-react";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
+import { default as ViteXmlui } from "./vite-xmlui-plugin";
 
-export const buildLib = async ({ watchMode, mode = "production" }) => {
+export const buildLib = async ({
+  watchMode,
+  mode = "production",
+}: {
+  watchMode?: boolean;
+  mode?: string;
+}) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   const umdFileName = `${env.npm_package_name}.js`;
@@ -19,8 +26,11 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
   } catch (e) {
     // console.error(e);
   }
-  
+
   const config: UserConfig = {
+    resolve: {
+      extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui", ".xmlui.xs", ".xs"],
+    },
     esbuild: {
       target: "es2020",
     },
@@ -38,17 +48,20 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
       emptyOutDir: false,
       outDir: "dist",
       watch: watchMode ? {} : undefined,
-      sourcemap: watchMode ? "inline": false,
-      lib: mode === "metadata" ? {
-        entry: [path.resolve("meta", "componentsMetadata.ts")],
-        name: `${env.npm_package_name}-metadata`,
-        fileName: `${env.npm_package_name}-metadata`,
-      } : {
-        entry: [path.resolve("src", "index.tsx")],
-        formats: watchMode ? ["es"] : ["umd", "es"],
-        name: env.npm_package_name,
-        fileName: (format) => (format === "es" ? esFileName : umdFileName),
-      },
+      sourcemap: watchMode ? "inline" : false,
+      lib:
+        mode === "metadata"
+          ? {
+              entry: [path.resolve("meta", "componentsMetadata.ts")],
+              name: `${env.npm_package_name}-metadata`,
+              fileName: `${env.npm_package_name}-metadata`,
+            }
+          : {
+              entry: [path.resolve("src", "index.tsx")],
+              formats: watchMode ? ["es"] : ["umd", "es"],
+              name: env.npm_package_name,
+              fileName: (format) => (format === "es" ? esFileName : umdFileName),
+            },
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external: mode === "metadata" ? [] : ["react", "react-dom", "xmlui", "react/jsx-runtime"],
@@ -62,12 +75,15 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "jsx": "react/jsx-runtime"
+            jsx: "react/jsx-runtime",
           },
         },
       },
     },
-    plugins: mode === "metadata" ? [] : [react(), libInjectCss(), ...(overrides.plugins || [])],
+    plugins:
+      mode === "metadata"
+        ? [ViteXmlui({})]
+        : [react(), ViteXmlui({}), libInjectCss(), ...(overrides.plugins || [])],
   };
 
   await viteBuild(defineConfig(config));

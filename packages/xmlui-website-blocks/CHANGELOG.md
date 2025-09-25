@@ -1,5 +1,13 @@
 # xmlui-website-blocks
 
+## 0.1.3
+
+### Patch Changes
+
+- e42d367: Add FancyButton to xmlui-website-blocks
+- 8a3d5cd: Add HeroSection and ScrollToTop components to xmlui-website-blocks
+- 819b563: Update fontSize and lineHeight themes and style (may break existing xmlui code)
+
 ## 0.1.2
 
 ### Patch Changes

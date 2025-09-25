@@ -57,7 +57,7 @@ export const avatarComponentRenderer = createComponentRenderer(
       <Avatar
         className={className}
         size={node.props?.size}
-        url={extractResourceUrl(node.props.url)}
+        url={node.props.url ? extractResourceUrl(node.props.url) : undefined}
         name={extractValue(node.props.name)}
         onClick={lookupEventHandler("click")}
       />

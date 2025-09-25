@@ -33,6 +33,11 @@ import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import { useComponentStyle } from "../theming/StyleContext";
+import {
+  Animation,
+  parseAnimation,
+  parseAnimationOptions,
+} from "../../components/Animation/AnimationNative";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -181,19 +186,26 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Set up the mouse event handlers for the component
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
-    descriptor?.nonVisual || isApiBound,
+    descriptor?.nonVisual || isApiBound || isCompoundComponent,
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
-  const { getResourceUrl, themeVars } = useTheme();
+  const { getResourceUrl } = useTheme();
 
   // --- Obtain a function that can extract a resource URL from a logical URL
   const extractResourceUrl = useCallback(
-    (url?: string) => {
+    (url?: unknown) => {
       const extractedUrl = valueExtractor(url);
+      if (typeof extractedUrl !== "string" || extractedUrl.trim() === "") {
+        console.warn(
+          `Component '${safeNode.type}': ` +
+            `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
+        );
+        return undefined;
+      }
       return getResourceUrl(extractedUrl);
     },
-    [getResourceUrl, valueExtractor],
+    [getResourceUrl, valueExtractor, safeNode.type],
   );
 
   // --- Collect and compile the layout property values
@@ -219,6 +231,32 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
 
   // const className = useComponentStyle(cssProps);
+
+  // --- Check if the component has a tooltip property
+  const tooltipText = useMemo(
+    () => valueExtractor(safeNode.props?.tooltip, true),
+    [safeNode.props, valueExtractor],
+  );
+  // --- Check if the component has a tooltip property
+  const tooltipMarkdown = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  const tooltipOptions = useMemo(
+    () => valueExtractor(safeNode.props?.tooltipOptions, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  const animation = useMemo(
+    () => valueExtractor(safeNode.props?.animation, true),
+    [safeNode.props, valueExtractor],
+  );
+
+  const animationOptions = useMemo(
+    () => valueExtractor(safeNode.props?.animationOptions, true),
+    [safeNode.props, valueExtractor],
+  );
 
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
@@ -250,7 +288,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       uid,
     };
 
-
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
       // --- the compound component
@@ -266,7 +303,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- Render the component using the renderer function obtained from the component registry
       renderedNode = renderer(rendererContext);
     }
-
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.
@@ -379,37 +415,45 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         : renderedNode;
   }
 
-  // --- Check if the component has a tooltip property
-  const tooltipText = useMemo(
-    () => valueExtractor(safeNode.props?.tooltip, true),
-    [safeNode.props, valueExtractor],
-  );
+  const applyWrappers = (node: ReactNode) => {
+    // --- Handle animations and tooltips together
+    if (animation && (tooltipMarkdown || tooltipText)) {
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
+            {node}
+          </Animation>
+        </Tooltip>
+      );
+    }
 
-  // --- Check if the component has a tooltip property
-  const tooltipMarkdown = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
-    [safeNode.props, valueExtractor],
-  );
-  // --- Check if the component has a tooltipOptions property
-  const tooltipOptions = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipOptions, true),
-    [safeNode.props, valueExtractor],
-  );
+    // --- Handle animation
+    if (animation) {
+      const parsedAnimationOptions = parseAnimationOptions(animationOptions);
+      return (
+        <Animation animation={parseAnimation(animation)} {...parsedAnimationOptions}>
+          {node}
+        </Animation>
+      );
+    }
 
-  // --- Handle tooltips
-  if (tooltipMarkdown || tooltipText) {
-    // --- Obtain options
-    const parsedOptions = parseTooltipOptions(tooltipOptions);
+    // --- Handle tooltip
+    if (tooltipMarkdown || tooltipText) {
+      const parsedOptions = parseTooltipOptions(tooltipOptions);
+      return (
+        <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
+          {node}
+        </Tooltip>
+      );
+    }
 
-    return (
-      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-        {nodeToRender}
-      </Tooltip>
-    );
-  }
+    // --- No wrappers needed
+    return node;
+  };
 
-  // --- Done
-  return nodeToRender;
+  return applyWrappers(nodeToRender);
 });
 
 /**

@@ -12,7 +12,7 @@ See also the [refactoring](/refactoring) guide. Briefly: props flow down, events
   <DataSource id="products" url="/api/products" />
 
   <HStack alignItems="center">
-    <Text variant="strong" fontSize="$fontSize-large">Product Inventory</Text>
+    <Text variant="strong" fontSize="$fontSize-2xl">Product Inventory</Text>
     <SpaceFiller />
     <Button
       label="Add New Product"

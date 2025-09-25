@@ -205,8 +205,8 @@
       ]
     },
     "scriptTag": {
-      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(script)(\\s*>)",
-      "end": "(</)(\\2)(\\3)(\\s*>)",
+      "begin": "(\\s*<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(script)(\\s*>)",
+      "end": "(\\s*</)(\\2)(\\3)(\\s*>)",
       "contentName": "meta.embedded.block.javascript",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },

@@ -74,32 +74,6 @@ test("compound component renders without namespace (no name-conflict with core c
   await expect(page.getByTestId("button")).toHaveText("COMPOUND COMPONENT");
 });
 
-test.fixme(
-  "extension renders with namespace (component-ns)",
-  SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(`
-    <App xmlns:TEST_NS="component-ns">
-      <TEST_NS:TestComponent testId="testComp">EXTENSION CONTENT</TEST_NS:TestComponent>
-    </App>`);
-    await expect(page.getByTestId("testComp")).toHaveText("EXTENSION CONTENT");
-  },
-);
-
-test.fixme(
-  "extension renders with namespace (component-ns:namespace)",
-  SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(`
-    <App xmlns:ExtensionAlias="component-ns:TEST_NS">
-      <ExtensionAlias:TestComponent testId="testComp">
-        EXTENSION CONTENT
-      </ExtensionAlias:TestComponent>
-    </App>`);
-    await expect(page.getByTestId("testComp")).toHaveText("EXTENSION CONTENT");
-  },
-);
-
 test("extension doesn't render without namespace", async ({ page, initTestBed }) => {
   await initTestBed(`
     <App>
@@ -107,17 +81,3 @@ test("extension doesn't render without namespace", async ({ page, initTestBed })
     </App>`);
   await expect(page.getByTestId("testComp")).not.toBeVisible();
 });
-
-test.fixme(
-  "XMLUIExtensions extension does render without namespace",
-  SKIP_REASON.TEST_NOT_WORKING("Throws error on render"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(`
-    <App>
-      <TestComponentInXMLUIExtensionsNamespace testId="testComp">
-        EXTENSION CONTENT
-      </TestComponentInXMLUIExtensionsNamespace>
-    </App>`);
-    await expect(page.getByTestId("testComp")).toHaveText("EXTENSION CONTENT");
-  },
-);

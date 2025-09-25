@@ -1,5 +1,56 @@
 # xmlui
 
+## 0.10.14
+
+### Patch Changes
+
+- 618049b: fix: Modal dialog scrolling issue
+- 215a142: Allow image to accept binary data (and use it instead of src)
+- 65b52e1: Allow user-defined components in extension packages
+- 0cc2178: Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.
+- 53d4ed9: Fixed feature to add custom icons for the Carousel prev/next page buttons.
+
+## 0.10.13
+
+### Patch Changes
+
+- 9401ee0: Added short debounce to ColorPicker to make changing color values with slider a bit smoother.
+- eb62858: fix: assigning new properties to objects in xmlui script
+- eb62858: fix: stricter empty body detection in RestApiProxy
+- eb62858: fix: TextArea autofocus
+- eb62858: fix: dropdownMenu overflow
+- eb62858: fix: ability to use user defined components in triggerTemplate (dropdownMenu)
+- eb62858: select: use focus-visible instead of focus for outline
+- 243b7fa: fix: modal dialog/toast issue
+- eb62858: form: hideButtonRowUntilDirty
+
+## 0.10.12
+
+### Patch Changes
+
+- f12a042: fix: report errors in script tag
+- 8731eb8: Avatar does not issue a resource URL warning when "url" is not specified
+- eb6454f: refactor: change LineChart/BarChart property names
+- 1210852: Fix the layout property usage of ModalDialog
+
+## 0.10.11
+
+### Patch Changes
+
+- 8c76c8d: feat: style the error report colors and spaces in the browser for xmlui syntax errors
+- d56c3e5: RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.
+- e42d367: Add FancyButton to xmlui-website-blocks
+- f539526: feat: BarChart - add tooltip position tracking
+- 19ce234: Review Option handling in Select and RadioGroup
+- 455b6c0: feat: add animation support to all relevant components via animation and animationOptions props
+- e90dc73: feat: add support for 'uses' property
+- 819b563: Update fontSize and lineHeight themes and style (may break existing xmlui code)
+- b57dfa2: Add the autoDetectTone property to App
+- 9dd0f97: Update Checkbox and Switch with click event metadata
+- 19ce234: Select accepts null as an option value; it converts a value to a string no longer
+- 898346d: Extend Text and Heading APIs with hasOverflow
+- 705dd04: Fix RestApiProxy to deliver response status when no error body specified
+
 ## 0.10.10
 
 ### Patch Changes
