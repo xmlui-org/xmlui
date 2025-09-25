@@ -20,63 +20,6 @@ export type AnimationProps = {
   delay?: number;
 };
 
-// AnimationNative.tsx tetején
-interface AnimationTracker {
-  id: string;
-  promise: Promise<void>;
-  resolve: () => void;
-}
-
-// Globális registry az aktív animációkhoz
-const activeAnimations = new Map<string, AnimationTracker>();
-
-// Globális API az animációk kezeléséhez
-export const AnimationRegistry = {
-  registerAnimation: (id: string): Promise<void> => {
-    console.log(`🎬 Animation registered: ${id}`);
-    let resolve: () => void;
-    const promise = new Promise<void>((res) => {
-      resolve = res;
-    });
-
-    const tracker: AnimationTracker = {
-      id,
-      promise,
-      resolve: resolve!,
-    };
-
-    activeAnimations.set(id, tracker);
-    return promise;
-  },
-
-  completeAnimation: (id: string) => {
-    console.log(`✅ Animation completed: ${id}`);
-    const tracker = activeAnimations.get(id);
-    if (tracker) {
-      tracker.resolve();
-      activeAnimations.delete(id);
-    }
-  },
-
-  waitForAllAnimations: async (): Promise<void> => {
-    const promises = Array.from(activeAnimations.values()).map(
-      (tracker) => tracker.promise
-    );
-    
-    if (promises.length === 0) {
-      return Promise.resolve();
-    }
-
-    await Promise.all(promises);
-  },
-
-  hasActiveAnimations: (): boolean => {
-    const hasActive = activeAnimations.size > 0;
-    console.log(`🔍 Has active animations: ${hasActive} (count: ${activeAnimations.size})`);
-    return activeAnimations.size > 0;
-  },
-};
-
 const AnimatedComponent = animated(
   forwardRef(function InlineComponentDef(props: any, ref: ForwardedRef<any>) {
     const { children, ...rest } = props;
@@ -258,8 +201,6 @@ export const Animation = forwardRef(function Animation(
       reset,
       reverse: toggle,
       onRest: () => {
-        // Notify the registry that the animation has completed
-        AnimationRegistry.completeAnimation(animationId);
         onStop?.();
         if (loop) {
           if (reverse) {
@@ -275,8 +216,6 @@ export const Animation = forwardRef(function Animation(
         }
       },
       onStart: () => {
-        // Notify the registry that the animation has started
-        AnimationRegistry.registerAnimation(animationId);
         onStart?.();
       },
     }),

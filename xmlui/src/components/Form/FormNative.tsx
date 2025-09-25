@@ -49,7 +49,6 @@ import type { InteractionFlags, SingleValidationResult, ValidationResult } from 
 import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
-import { AnimationRegistry } from "../Animation/AnimationNative";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -395,13 +394,6 @@ const Form = forwardRef(function (
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
-        console.log(`🔄 Form reset triggered`);
-        // Wait for all animations to complete before resetting the form
-        if (AnimationRegistry.hasActiveAnimations()) {
-          console.log(`⏳ Waiting for animations before reset`);
-          await AnimationRegistry.waitForAllAnimations();
-        }
-
         flushSync(() => {
           doReset();
         });
