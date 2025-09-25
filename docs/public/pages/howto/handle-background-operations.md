@@ -1,34 +1,22 @@
 # Handle background operations
 
-Use the Queue component to manage sequential processing of background tasks with user feedback, perfect for batch operations like file imports or bulk updates.
+Use the Queue component for async processing that doesn't block user interaction.
 
 ```xmlui-pg copy display name="Background file processing with progress feedback"
----comp display
-<Component name="BackgroundProcessor" var.items="{[]}" var.processedCount="{0}" var.errorCount="{0}">
+---comp display {21-30} /uploadQueue/
+<Component name="BackgroundProcessor" var.items="{[]}" var.processedCount="{0}" var.errorCount="{0}" var.completed="{false}">
   <VStack gap="$space-4">
-    <!-- Sample data to upload -->
+    <!-- Single action button -->
     <Button
-      label="Load Sample Data"
+      label="Upload 5 Files"
       onClick="items = [
         { id: 1, filename: 'document.pdf', size: 2048576, type: 'application/pdf' },
         { id: 2, filename: 'image.jpg', size: 1024000, type: 'image/jpeg' },
         { id: 3, filename: 'corrupted-file.txt', size: 512, type: 'text/plain' },
         { id: 4, filename: 'data.csv', size: 4096000, type: 'text/csv' },
         { id: 5, filename: 'presentation.pptx', size: 8192000, type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }
-      ]"
-      variant="outlined"
-    />
-
-    <!-- Display loaded items -->
-    <Text when="{items.length > 0}">
-      Found {items.length} files ready to process
-    </Text>
-
-    <!-- Control button -->
-    <Button
-      label="Process All Files"
-      onClick="uploadQueue.enqueueItems(items)"
-      enabled="{items.length > 0 && uploadQueue.getQueueLength() === 0}"
+      ]; uploadQueue.enqueueItems(items)"
+      enabled="{!completed}"
       themeColor="primary"
     />
 
@@ -39,8 +27,7 @@ Use the Queue component to manage sequential processing of background tasks with
       onProcess="processing => {
         // Update progress
         processing.reportProgress(processedCount + 1);
-
-        // Make API call to upload objects (delay is handled server-side)
+        // Make API call to upload objects (delay happens server-side)
         const result = Actions.callApi({
           url: '/api/objects',
           method: 'POST',
@@ -58,6 +45,7 @@ Use the Queue component to manage sequential processing of background tasks with
       }"
       onComplete="() => {
         console.log('All files processed');
+        completed = true;
       }">
 
       <property name="progressFeedback">
@@ -80,12 +68,10 @@ Use the Queue component to manage sequential processing of background tasks with
     <!-- Status display -->
     <Card when="{uploadQueue.getQueueLength() > 0 || processedCount > 0}">
       <VStack>
-        <Text>Processing Status</Text>
-        <HStack>
+          <HStack>
           <Text>Queue length: {uploadQueue.getQueueLength()}</Text>
           <Text>Processed: {processedCount}</Text>
-          <Text>Errors: {errorCount}</Text>
-        </HStack>
+          </HStack>
       </VStack>
     </Card>
 
