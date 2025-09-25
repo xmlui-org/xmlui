@@ -1,5 +1,5 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, ForwardedRef, forwardRef, useEffect, useMemo, useState } from "react";
+import React, { Children, ForwardedRef, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { useCallback } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -18,6 +18,63 @@ export type AnimationProps = {
   loop?: boolean;
   once?: boolean;
   delay?: number;
+};
+
+// AnimationNative.tsx tetején
+interface AnimationTracker {
+  id: string;
+  promise: Promise<void>;
+  resolve: () => void;
+}
+
+// Globális registry az aktív animációkhoz
+const activeAnimations = new Map<string, AnimationTracker>();
+
+// Globális API az animációk kezeléséhez
+export const AnimationRegistry = {
+  registerAnimation: (id: string): Promise<void> => {
+    console.log(`🎬 Animation registered: ${id}`);
+    let resolve: () => void;
+    const promise = new Promise<void>((res) => {
+      resolve = res;
+    });
+
+    const tracker: AnimationTracker = {
+      id,
+      promise,
+      resolve: resolve!,
+    };
+
+    activeAnimations.set(id, tracker);
+    return promise;
+  },
+
+  completeAnimation: (id: string) => {
+    console.log(`✅ Animation completed: ${id}`);
+    const tracker = activeAnimations.get(id);
+    if (tracker) {
+      tracker.resolve();
+      activeAnimations.delete(id);
+    }
+  },
+
+  waitForAllAnimations: async (): Promise<void> => {
+    const promises = Array.from(activeAnimations.values()).map(
+      (tracker) => tracker.promise
+    );
+    
+    if (promises.length === 0) {
+      return Promise.resolve();
+    }
+
+    await Promise.all(promises);
+  },
+
+  hasActiveAnimations: (): boolean => {
+    const hasActive = activeAnimations.size > 0;
+    console.log(`🔍 Has active animations: ${hasActive} (count: ${activeAnimations.size})`);
+    return activeAnimations.size > 0;
+  },
 };
 
 const AnimatedComponent = animated(
@@ -186,6 +243,8 @@ export const Animation = forwardRef(function Animation(
   const [reset, setReset] = useState(false);
   const [count, setCount] = useState(0);
   const times = 1;
+  const animationId = useId();
+  
   const animationSettings = useMemo<any>(
     () => ({
       from: _animation.from,
@@ -199,6 +258,8 @@ export const Animation = forwardRef(function Animation(
       reset,
       reverse: toggle,
       onRest: () => {
+        // Notify the registry that the animation has completed
+        AnimationRegistry.completeAnimation(animationId);
         onStop?.();
         if (loop) {
           if (reverse) {
@@ -213,7 +274,11 @@ export const Animation = forwardRef(function Animation(
           }
         }
       },
-      onStart: () => onStart?.(),
+      onStart: () => {
+        // Notify the registry that the animation has started
+        AnimationRegistry.registerAnimation(animationId);
+        onStart?.();
+      },
     }),
     [
       _animation.config,
@@ -228,6 +293,7 @@ export const Animation = forwardRef(function Animation(
       reset,
       reverse,
       toggle,
+      animationId,
     ],
   );
 

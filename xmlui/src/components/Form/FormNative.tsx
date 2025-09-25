@@ -49,6 +49,7 @@ import type { InteractionFlags, SingleValidationResult, ValidationResult } from 
 import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
+import { AnimationRegistry } from "../Animation/AnimationNative";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -320,6 +321,11 @@ const Form = forwardRef(function (
   }, [formState.interactionFlags]);
 
   const formContextValue = useMemo(() => {
+    console.log(`📝 FormContext value changing:`, {
+      subject: formState.subject,
+      interactionFlags: formState.interactionFlags,
+      validationResults: formState.validationResults
+    });
     return {
       itemLabelBreak,
       itemLabelWidth,
@@ -349,6 +355,14 @@ const Form = forwardRef(function (
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
+    console.log(`🚀 Form submit started`);
+    console.log(`🔍 Initial values:`, {
+      initialValue,
+      EMPTY_OBJECT,
+      isEqual: initialValue === EMPTY_OBJECT,
+      initialValueType: typeof initialValue,
+      emptyObjectType: typeof EMPTY_OBJECT
+    });
     event?.preventDefault();
     if (!isEnabled) {
       return;
@@ -381,6 +395,13 @@ const Form = forwardRef(function (
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
+        console.log(`🔄 Form reset triggered`);
+        // Wait for all animations to complete before resetting the form
+        if (AnimationRegistry.hasActiveAnimations()) {
+          console.log(`⏳ Waiting for animations before reset`);
+          await AnimationRegistry.waitForAllAnimations();
+        }
+
         flushSync(() => {
           doReset();
         });
@@ -486,6 +507,7 @@ const Form = forwardRef(function (
   )}</>;
   return (
     <>
+    <div style={{display: "contents"}}>
       <form
         {...rest}
         style={style}
@@ -500,6 +522,7 @@ const Form = forwardRef(function (
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>
         {(!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
       </form>
+    </div>
       {confirmSubmitModalVisible && (
         <ModalDialog
           onClose={() => setConfirmSubmitModalVisible(false)}
