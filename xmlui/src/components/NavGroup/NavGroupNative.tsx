@@ -107,7 +107,11 @@ export const NavGroup = forwardRef(function NavGroup(
       layoutIsVertical,
       iconHorizontalCollapsed: iconHorizontalCollapsed ?? defaultProps.iconHorizontalCollapsed,
       iconHorizontalExpanded: iconHorizontalExpanded ?? defaultProps.iconHorizontalExpanded,
-      iconVerticalCollapsed: iconVerticalCollapsed ?? defaultProps.iconVerticalCollapsed,
+      iconVerticalCollapsed:
+        iconVerticalCollapsed ??
+        (level < 0 && !inline
+          ? defaultProps.iconVerticalExpanded
+          : defaultProps.iconVerticalCollapsed),
       iconVerticalExpanded: iconVerticalExpanded ?? defaultProps.iconVerticalExpanded,
     };
   }, [
@@ -117,6 +121,7 @@ export const NavGroup = forwardRef(function NavGroup(
     iconVerticalExpanded,
     level,
     layoutIsVertical,
+    inline,
   ]);
 
   return (
