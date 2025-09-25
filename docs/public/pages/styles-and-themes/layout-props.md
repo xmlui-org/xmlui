@@ -318,6 +318,10 @@ Sets the [top](/styles-and-themes/common-units#size) position of the component t
 
 This property is a shorthand for [transition effects](/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
 
+## `transform`
+
+This layout property lets you rotate, scale, skew, or translate an element. You can use the standard [CSS transform property](https://developer.mozilla.org/en-US/docs/Web/CSS/transform) format.
+
 ## `userSelect`
 
 This property controls whether the [user can select](/styles-and-themes/common-units#user-select) text.

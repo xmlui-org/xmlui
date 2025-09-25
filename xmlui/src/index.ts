@@ -51,6 +51,7 @@ import { LinkNative } from "./components/Link/LinkNative";
 import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
+import { Theme } from "./components/Theme/ThemeNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
@@ -121,4 +122,5 @@ export {
   StyleRegistry,
   useEvent,
   StandaloneComponent,
+  Theme
 };
