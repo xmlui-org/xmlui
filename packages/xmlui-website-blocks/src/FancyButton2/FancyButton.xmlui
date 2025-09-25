@@ -1,4 +1,5 @@
 <Component name="FancyButton">
   <Button autoFocus="{$props.autoFocus}" label="{$props.label}">
+    <Slot />
   </Button>
 </Component>
