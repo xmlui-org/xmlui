@@ -243,7 +243,6 @@ test.describe("Accessibility", () => {
     await initTestBed(`<Slider />`);
     await expect(page.getByRole("slider")).toBeVisible();
   });
-
   test("label is properly associated", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider label="Volume Control" />`);
     await page.getByText("Volume Control").click();

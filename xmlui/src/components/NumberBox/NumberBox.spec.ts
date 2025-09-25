@@ -123,14 +123,16 @@ test.describe("Basic Functionality", () => {
 
   // --- autoFocus prop
 
-  test("autoFocus focuses input on mount", async ({ initTestBed, page }) => {
+  test("autoFocus focuses input on mount", async ({ initTestBed, createNumberBoxDriver }) => {
     await initTestBed(`<NumberBox autoFocus="true" />`);
-    await expect(page.getByRole("textbox")).toBeFocused();
+    const driver = await createNumberBoxDriver();
+    await expect(driver.input).toBeFocused();
   });
 
-  test("autoFocus focuses input on mount with label", async ({ initTestBed, page }) => {
+  test("autoFocus focuses input on mount with label", async ({ initTestBed, createNumberBoxDriver }) => {
     await initTestBed(`<NumberBox autoFocus="true" label="Auto-focused input" />`);
-    await expect(page.getByLabel("Auto-focused input")).toBeFocused();
+    const driver = await createNumberBoxDriver();
+    await expect(driver.input).toBeFocused();
   });
 
   // --- placeholder prop
@@ -1346,16 +1348,20 @@ test.describe("Other Edge Cases", () => {
     await expect(input).toHaveValue("456");
   });
 
-  test("component works correctly in layout contexts", async ({ initTestBed, page }) => {
+  test("component works correctly in layout contexts", async ({ initTestBed, createNumberBoxDriver }) => {
     await initTestBed(`
       <Stack>
-        <NumberBox label="First" />
-        <NumberBox label="Second" />
+        <NumberBox label="First" testId="first"/>
+        <NumberBox label="Second" testId="second" />
       </Stack>
     `);
 
-    await expect(page.getByLabel("First")).toBeVisible();
-    await expect(page.getByLabel("Second")).toBeVisible();
+    const driver1 = await createNumberBoxDriver("first");
+    const driver2 = await createNumberBoxDriver("second");
+    await expect(driver1.input).toBeVisible();
+    await expect(driver1.label).toBeVisible();
+    await expect(driver2.input).toBeVisible();
+    await expect(driver2.label).toBeVisible();
   });
 
   test("component integrates with forms correctly", async ({ initTestBed, page }) => {

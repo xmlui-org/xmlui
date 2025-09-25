@@ -8,7 +8,6 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
@@ -46,10 +45,6 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   /**
    * When true and type is "password", displays a toggle icon to show/hide password text
@@ -123,10 +118,6 @@ export const TextBox = forwardRef(function TextBox(
     autoFocus,
     readOnly,
     tabIndex,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
     required,
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
@@ -135,8 +126,6 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
 
   // State to control password visibility
@@ -213,22 +202,9 @@ export const TextBox = forwardRef(function TextBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <ItemWithLabel
-      {...rest}
-      id={id}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      style={style}
-      className={className}
-      ref={ref}
-      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
-      isInputTemplateUsed={true}
-    >
       <div
+        {...rest}
+        ref={ref}
         className={classnames(styles.inputRoot, {
           [styles.disabled]: !enabled,
           [styles.readOnly]: readOnly,
@@ -248,6 +224,7 @@ export const TextBox = forwardRef(function TextBox(
         />
         <input
           id={id}
+          ref={inputRef}
           data-part-id={PART_INPUT}
           type={actualType}
           className={classnames(styles.input, {
@@ -261,7 +238,6 @@ export const TextBox = forwardRef(function TextBox(
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
           onKeyDown={onKeyDown}
-          ref={inputRef}
           readOnly={readOnly}
           autoFocus={autoFocus}
           tabIndex={enabled ? tabIndex : -1}
@@ -283,6 +259,5 @@ export const TextBox = forwardRef(function TextBox(
           />
         )}
       </div>
-    </ItemWithLabel>
   );
 });

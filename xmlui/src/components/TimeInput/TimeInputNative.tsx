@@ -17,7 +17,6 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
 // Import utilities and types from merged utils file
@@ -73,10 +72,6 @@ type Props = {
   endText?: string;
   endIcon?: string;
   gap?: string;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
@@ -90,10 +85,8 @@ export const defaultProps = {
   clearable: false,
   clearToInitialValue: true,
   required: false,
-  labelPosition: "top",
   readOnly: false,
   autoFocus: false,
-  labelBreak: false,
   emptyCharacter: "-",
 };
 
@@ -125,10 +118,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     endText,
     endIcon,
     gap,
-    label,
-    labelPosition = defaultProps.labelPosition,
-    labelWidth,
-    labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
@@ -694,6 +683,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         <div className={styles.inputGroup}>
           {/* Hour input */}
           <HourInput
+            id={id}
             amPm={amPm}
             autoFocus={autoFocus}
             disabled={!enabled}
@@ -791,25 +781,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       {endAdornment}
     </div>
   );
-
-  // Wrap with label if needed
-  if (label) {
-    return (
-      <ItemWithLabel
-        label={label}
-        labelPosition={labelPosition as any}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-      >
-        <>
-          {startAdornment}
-          {timeInputComponent}
-          {endAdornment}
-        </>
-      </ItemWithLabel>
-    );
-  }
 
   return timeInputComponent;
 });
@@ -918,6 +889,7 @@ type TimeInputElementProps = {
 
 // HourInput component
 type HourInputProps = {
+  id?: string;
   amPm?: AmPmType | null;
   maxTime?: string;
   minTime?: string;
