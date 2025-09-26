@@ -390,7 +390,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     let wrappedNode = node;
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
-        if (behavior.canAttach(rendererContext.node)) {
+        if (behavior.canAttach(rendererContext.node, descriptor)) {
           wrappedNode = behavior.attach(rendererContext, wrappedNode);
         }
       }

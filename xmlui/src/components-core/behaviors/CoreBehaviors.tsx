@@ -1,13 +1,13 @@
 import { useId } from "react";
-import { 
-  Animation, 
-  parseAnimation, 
-  parseAnimationOptions 
+import {
+  Animation,
+  parseAnimation,
+  parseAnimationOptions
 } from "../../components/Animation/AnimationNative";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
-import { 
-  parseTooltipOptions, 
-  Tooltip 
+import {
+  parseTooltipOptions,
+  Tooltip
 } from "../../components/Tooltip/TooltipNative";
 import type { Behavior } from "./BehaviorContext";
 import { MetadataProvider } from "../../language-server/services/common/metadata-utils";
@@ -69,21 +69,18 @@ export const animationBehavior: Behavior = {
  */
 export const labelBehavior: Behavior = {
   name: "label",
-  canAttach: (node) => {
+  canAttach: (node, metadata) => {
 
-  /**
-   * This behavior can be attached if the component has a 'label' prop
-   * and is not a component that handles its own labeling.
-   */
-  const metadataProvider = new MetadataProvider(collectedComponentMetadata);
-  const metadata: ComponentMetadata | undefined = metadataProvider.getComponent(node.type)?.getMetadata();
-
-  if (metadata?.props?.label) {
-    return false;
-  } else if (!node.props?.label) {
-    return false;
-  }
-  return true;
+    /**
+     * This behavior can be attached if the component has a 'label' prop
+     * and is not a component that handles its own labeling.
+     */
+    if (metadata?.props?.label) {
+      return false;
+    } else if (!node.props?.label) {
+      return false;
+    }
+    return true;
   },
   attach: (context, node) => {
     const { extractValue, node: componentNode, className } = context;
@@ -112,7 +109,7 @@ export const labelBehavior: Behavior = {
         shrinkToLabel={shrinkToLabel}
         testId={componentNode.testId}
       >
-       {node}
+        {node}
       </ItemWithLabel>
     );
   },
