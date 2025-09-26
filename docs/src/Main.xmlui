@@ -229,7 +229,9 @@
                 <NavLink label="Glossary" to="/glossary" />
             </NavGroup>
             <NavLink label="Model Context Protocol" to="/mcp" />
+<!--
             <NavLink label="News and reviews" to="/news-and-reviews" />
+-->
             <NavLink label="VSCode extension" to="/vscode" />
             <NavLink label="Change Log" to="/change-log" />
         </NavPanel>
