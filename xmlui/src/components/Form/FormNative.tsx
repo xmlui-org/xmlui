@@ -554,7 +554,6 @@ export const FormWithContextVar = forwardRef(function({
   className,
   lookupEventHandler,
   registerComponentApi,
-  ...rest
 }: {
   node: FormComponentDef;
   renderChild: RenderChildFn;
