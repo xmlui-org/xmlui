@@ -1,0 +1,19 @@
+<App>
+  <Tree 
+    dataFormat="flat"
+    data="{[
+      { uuid: 'A', title: 'Custom Root', type: 'folder' },
+      { uuid: 'B', title: 'Custom Child', type: 'code', parent: 'A' }
+    ]}"
+    idField="uuid"
+    labelField="title"
+    iconField="type"
+    parentField="parent">
+    <property name="itemTemplate">
+      <HStack verticalAlignment="center" spacing="8px">
+        <Icon when="{$item.type}" name="{$item.type}" />
+        <Text value="{$item.displayName}" />
+      </HStack>
+    </property>
+  </Tree>
+</App>

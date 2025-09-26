@@ -1,0 +1,12 @@
+<App>
+  <Tree 
+    dataFormat="hierarchy"
+    data="{{ id: 'simple', name: 'Simple Test', icon: 'folder' }}">
+    <property name="itemTemplate">
+      <HStack verticalAlignment="center" spacing="8px">
+        <Icon when="{$item.icon}" name="{$item.icon}" />
+        <Text value="{$item.displayName}" />
+      </HStack>
+    </property>
+  </Tree>
+</App>

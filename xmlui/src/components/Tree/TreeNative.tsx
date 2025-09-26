@@ -4,10 +4,12 @@ import {
   memo,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useState,
+  forwardRef,
 } from "react";
-import { FixedSizeList } from "react-window";
+import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import classnames from "classnames";
 
@@ -15,9 +17,14 @@ import styles from "./TreeComponent.module.scss";
 
 import type {
   FlatTreeNode,
+  TreeNode,
   UnPackedTreeData,
+  TreeFieldConfig,
+  TreeSelectionEvent,
+  TreeDataFormat,
+  DefaultExpansion,
 } from "../../components-core/abstractions/treeAbstractions";
-import { toFlatTree } from "../../components-core/utils/treeUtils";
+import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-core/utils/treeUtils";
 
 type TreeRowProps = {
   index: number;
@@ -28,25 +35,39 @@ type TreeRowProps = {
 /**
  * Describes the data attached to a particular tree row
  */
-type RowContext = {
+interface RowContext {
   nodes: FlatTreeNode[];
   toggleNode: (node: FlatTreeNode) => void;
   selectedUid?: string;
   itemRenderer: (item: any) => ReactNode;
-};
+  expandOnItemClick: boolean;
+  onItemClick?: (node: FlatTreeNode) => void;
+}
 
-const TreeRow = memo(function TreeRow({ index, style, data }: TreeRowProps) {
-  const { nodes, toggleNode, selectedUid, itemRenderer } = data;
+const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
+  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick } = data;
   const treeItem = nodes[index];
 
   const onToggleNode = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      if (event?.defaultPrevented) {
-        return;
-      }
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
       toggleNode(treeItem);
     },
     [toggleNode, treeItem],
+  );
+
+  const onItemClickHandler = useCallback(
+    (e: React.MouseEvent) => {
+      if (onItemClick) {
+        onItemClick(treeItem);
+      }
+      
+      // If expandOnItemClick is enabled and item has children, also toggle
+      if (expandOnItemClick && treeItem.hasChildren) {
+        toggleNode(treeItem);
+      }
+    },
+    [onItemClick, expandOnItemClick, treeItem, toggleNode],
   );
 
   return (
@@ -67,8 +88,8 @@ const TreeRow = memo(function TreeRow({ index, style, data }: TreeRowProps) {
         </div>
         <div
           className={styles.labelWrapper}
-          onClick={treeItem.selectable ? undefined : onToggleNode}
-          style={{ cursor: treeItem.selectable ? undefined : "pointer" }}
+          onClick={treeItem.selectable ? onItemClickHandler : onToggleNode}
+          style={{ cursor: "pointer" }}
         >
           {itemRenderer(treeItem)}
         </div>
@@ -82,20 +103,232 @@ const emptyTreeData: UnPackedTreeData = {
   treeItemsById: {},
 };
 
-export function TreeComponent({
-  data = emptyTreeData,
-  selectedUid,
-  itemRenderer,
-  className,
-}: {
-  data: UnPackedTreeData;
+// Imperative API for programmatic tree control
+export interface TreeRef {
+  // Expansion methods
+  expandAll(): void;
+  collapseAll(): void;
+  expandToLevel(level: number): void;
+  expandNode(nodeId: string): void;
+  collapseNode(nodeId: string): void;
+  
+  // Selection methods  
+  selectNode(nodeId: string): void;
+  clearSelection(): void;
+  
+  // Utility methods
+  getNodeById(nodeId: string): TreeNode | null;
+  getExpandedNodes(): string[];
+  getSelectedNode(): TreeNode | null;
+}
+
+interface TreeComponentProps {
+  data?: UnPackedTreeData | any;
+  dataFormat?: TreeDataFormat;
+  idField?: string;
+  labelField?: string;
+  iconField?: string;
+  iconExpandedField?: string;
+  iconCollapsedField?: string;
+  parentField?: string;
+  childrenField?: string;
+  selectedValue?: string;
   selectedUid?: string;
+  expandedValues?: string[];
+  defaultExpanded?: DefaultExpansion;
+  autoExpandToSelection?: boolean;
+  expandOnItemClick?: boolean;
+  onItemClick?: (node: FlatTreeNode) => void;
+  onSelectionChanged?: (event: TreeSelectionEvent) => void;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
-}) {
-  const { treeData, treeItemsById } = data;
-  const [expandedIds, setExpandedIds] = useState<string[]>([]);
-  const flatTreeData = useMemo(() => toFlatTree(treeData, expandedIds), [expandedIds, treeData]);
+}
+
+export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
+  data = emptyTreeData,
+  dataFormat = "native",
+  idField = "id",
+  labelField = "name",
+  iconField = "icon",
+  iconExpandedField = "iconExpanded",
+  iconCollapsedField = "iconCollapsed",
+  parentField = "parentId",
+  childrenField = "children",
+  selectedValue,
+  selectedUid,
+  expandedValues = [],
+  defaultExpanded = "none",
+  autoExpandToSelection = true,
+  expandOnItemClick = false,
+  onItemClick,
+  onSelectionChanged,
+  itemRenderer,
+  className,
+}, ref) => {
+  // Steps 3a & 3b: Transform data based on format
+  // Enhanced data transformation pipeline with validation and error handling
+  const transformedData = useMemo(() => {
+    // Return empty data if no data provided
+    if (!data) {
+      return emptyTreeData;
+    }
+
+    // Build field configuration with validation
+    const fieldConfig: TreeFieldConfig = {
+      idField: idField || "id",
+      labelField: labelField || "name", 
+      iconField,
+      iconExpandedField,
+      iconCollapsedField,
+      parentField,
+      childrenField,
+    };
+
+    try {
+      if (dataFormat === "flat") {
+        // Validation: Flat format requires array
+        if (!Array.isArray(data)) {
+          throw new Error(`TreeComponent: dataFormat='flat' requires array data, received: ${typeof data}`);
+        }
+
+        // Validation: Check for required fields in sample data
+        if (data.length > 0) {
+          const sampleItem = data[0];
+          if (typeof sampleItem !== "object" || sampleItem === null) {
+            throw new Error("TreeComponent: Flat data items must be objects");
+          }
+          if (!(fieldConfig.idField in sampleItem)) {
+            throw new Error(`TreeComponent: Required field '${fieldConfig.idField}' not found in flat data items`);
+          }
+          if (!(fieldConfig.labelField in sampleItem)) {
+            throw new Error(`TreeComponent: Required field '${fieldConfig.labelField}' not found in flat data items`);
+          }
+        }
+
+        return flatToNative(data, fieldConfig);
+        
+      } else if (dataFormat === "hierarchy") {
+        // Validation: Hierarchy format requires object or array
+        if (!data || (typeof data !== "object")) {
+          throw new Error(`TreeComponent: dataFormat='hierarchy' requires object or array data, received: ${typeof data}`);
+        }
+
+        // Validation: Check for required fields in hierarchy data
+        const checkHierarchyData = (item: any): void => {
+          if (typeof item !== "object" || item === null) {
+            throw new Error("TreeComponent: Hierarchy data items must be objects");
+          }
+          if (!(fieldConfig.idField in item)) {
+            throw new Error(`TreeComponent: Required field '${fieldConfig.idField}' not found in hierarchy data`);
+          }
+          if (!(fieldConfig.labelField in item)) {
+            throw new Error(`TreeComponent: Required field '${fieldConfig.labelField}' not found in hierarchy data`);
+          }
+        };
+
+        if (Array.isArray(data)) {
+          if (data.length > 0) {
+            checkHierarchyData(data[0]);
+          }
+        } else {
+          checkHierarchyData(data);
+        }
+
+        return hierarchyToNative(data, fieldConfig);
+        
+      } else {
+        // Native format (existing behavior)
+        if (data && typeof data === "object" && "treeData" in data) {
+          // Validation: Check native format structure
+          const nativeData = data as any;
+          if (!Array.isArray(nativeData.treeData)) {
+            throw new Error("TreeComponent: Native format requires 'treeData' to be an array");
+          }
+          if (!nativeData.treeItemsById || typeof nativeData.treeItemsById !== "object") {
+            throw new Error("TreeComponent: Native format requires 'treeItemsById' to be an object");
+          }
+          return data as UnPackedTreeData;
+        } else {
+          throw new Error("TreeComponent: dataFormat='native' requires UnPackedTreeData format with 'treeData' and 'treeItemsById' properties");
+        }
+      }
+    } catch (error) {
+      console.error("TreeComponent: Data transformation error:", error);
+      // Return empty data on error to prevent crashes
+      return emptyTreeData;
+    }
+  }, [data, dataFormat, idField, labelField, iconField, iconExpandedField, iconCollapsedField, parentField, childrenField]);
+
+  const { treeData, treeItemsById } = transformedData;
+
+  // Bidirectional ID mapping between source IDs and internal UIDs
+  const idMappings = useMemo(() => {
+    const sourceToUid = new Map<string, string>();
+    const uidToSource = new Map<string, string>();
+    
+    const collectMappings = (nodes: TreeNode[]) => {
+      nodes.forEach(node => {
+        // For transformed data, map key (source ID) to uid (internal ID)
+        if (node.key !== node.uid) {
+          sourceToUid.set(node.key, node.uid);
+          uidToSource.set(node.uid, node.key);
+        }
+        if (node.children) {
+          collectMappings(node.children);
+        }
+      });
+    };
+    
+    collectMappings(treeData);
+    
+    return { sourceToUid, uidToSource };
+  }, [treeData]);
+  
+  // Initialize expanded IDs based on defaultExpanded prop
+  const [expandedIds, setExpandedIds] = useState<string[]>(() => {
+    if (defaultExpanded === "first-level") {
+      return treeData.map(node => node.key);
+    } else if (defaultExpanded === "all") {
+      const allIds: string[] = [];
+      const collectIds = (nodes: TreeNode[]) => {
+        nodes.forEach(node => {
+          allIds.push(node.key);
+          if (node.children) {
+            collectIds(node.children);
+          }
+        });
+      };
+      collectIds(treeData);
+      return allIds;
+    } else if (Array.isArray(defaultExpanded)) {
+      return defaultExpanded;
+    }
+    return [];
+  });
+
+  // Icon resolution logic for base/expanded/collapsed states
+  const resolveIcon = useCallback((node: TreeNode, isExpanded: boolean, hasChildren: boolean) => {
+    // Priority: expanded/collapsed state icons > base icon > default
+    if (hasChildren) {
+      if (isExpanded && node.iconExpanded) {
+        return node.iconExpanded;
+      } else if (!isExpanded && node.iconCollapsed) {
+        return node.iconCollapsed;
+      }
+    }
+    
+    // Fall back to base icon or default folder/file icons
+    if (node.icon) {
+      return node.icon;
+    }
+    
+    // Default icons based on node type
+    return hasChildren ? 'folder' : 'code';
+  }, []);
+  
+  const flatTreeData = useMemo(() => {
+    return toFlatTree(treeData, expandedIds);
+  }, [expandedIds, treeData]);
 
   /**
    * ensure the selected item's parents are expanded on route change
@@ -123,12 +356,108 @@ export function TreeComponent({
       toggleNode,
       selectedUid,
       itemRenderer,
+      expandOnItemClick,
+      onItemClick,
     };
-  }, [flatTreeData, toggleNode, selectedUid, itemRenderer]);
+  }, [flatTreeData, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
-    return data.nodes[index].key;
+    const node = data.nodes[index];
+    return node?.key || node?.uid || `fallback-${index}`;
   }, []);
+
+  // Expose imperative API methods via ref
+  useImperativeHandle(ref, () => ({
+    // Expansion methods
+    expandAll: () => {
+      const allIds: string[] = [];
+      const collectIds = (nodes: TreeNode[]) => {
+        nodes.forEach(node => {
+          allIds.push(node.key);
+          if (node.children) {
+            collectIds(node.children);
+          }
+        });
+      };
+      collectIds(treeData);
+      setExpandedIds(allIds);
+    },
+    
+    collapseAll: () => {
+      setExpandedIds([]);
+    },
+    
+    expandToLevel: (level: number) => {
+      const levelIds: string[] = [];
+      const collectIdsToLevel = (nodes: TreeNode[], currentLevel: number = 0) => {
+        if (currentLevel >= level) return;
+        nodes.forEach(node => {
+          levelIds.push(node.key);
+          if (node.children && currentLevel < level - 1) {
+            collectIdsToLevel(node.children, currentLevel + 1);
+          }
+        });
+      };
+      collectIdsToLevel(treeData);
+      setExpandedIds(levelIds);
+    },
+    
+    expandNode: (nodeId: string) => {
+      // Convert source ID to internal ID if needed
+      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
+      setExpandedIds(prev => prev.includes(internalId) ? prev : [...prev, internalId]);
+    },
+    
+    collapseNode: (nodeId: string) => {
+      // Convert source ID to internal ID if needed  
+      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
+      setExpandedIds(prev => prev.filter(id => id !== internalId));
+    },
+
+    // Selection methods
+    selectNode: (nodeId: string) => {
+      // Convert source ID to internal ID if needed
+      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
+      const node = treeItemsById[internalId];
+      if (node && onSelectionChanged) {
+        onSelectionChanged({
+          type: 'selection',
+          selectedId: nodeId,
+          selectedItem: node, // Using the full node as the item
+          selectedNode: node,
+          previousId: selectedValue,
+        });
+      }
+    },
+    
+    clearSelection: () => {
+      if (onSelectionChanged) {
+        onSelectionChanged({
+          type: 'selection',
+          selectedId: '',
+          selectedItem: null,
+          selectedNode: null as any,
+          previousId: selectedValue,
+        });
+      }
+    },
+
+    // Utility methods
+    getNodeById: (nodeId: string) => {
+      // Convert source ID to internal ID if needed
+      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
+      return treeItemsById[internalId] || null;
+    },
+    
+    getExpandedNodes: () => {
+      // Return source IDs instead of internal IDs
+      return expandedIds.map(id => idMappings.uidToSource.get(id) || id);
+    },
+    
+    getSelectedNode: () => {
+      return selectedUid ? treeItemsById[selectedUid] || null : null;
+    },
+  }), [treeData, treeItemsById, idMappings, expandedIds, selectedUid, onSelectionChanged]);
 
   return (
     <div className={classnames(styles.wrapper, className)}>
@@ -148,4 +477,4 @@ export function TreeComponent({
       </AutoSizer>
     </div>
   );
-}
+});

@@ -1,0 +1,116 @@
+<App
+  var.hierarchyData=`{[
+    {
+      id: "root-1",
+      name: "Documents", 
+      icon: "folder",
+      children: [
+        {
+          id: "doc-1",
+          name: "Projects",
+          icon: "folder", 
+          children: [
+            { id: "proj-1", name: "Website Redesign.docx", icon: "document" },
+            { id: "proj-2", name: "Mobile App Specs.pdf", icon: "document" },
+            { id: "proj-3", name: "Database Schema.sql", icon: "code" }
+          ]
+        },
+        {
+          id: "doc-2",
+          name: "Personal", 
+          icon: "folder",
+          children: [
+            { id: "pers-1", name: "Resume.pdf", icon: "document" },
+            { id: "pers-2", name: "Cover Letter.docx", icon: "document" }
+          ]
+        },
+        { id: "doc-3", name: "README.md", icon: "document" }
+      ]
+    },
+    {
+      id: "root-2", 
+      name: "Images",
+      icon: "folder",
+      children: [
+        { id: "img-1", name: "vacation-2024.jpg", icon: "image" },
+        { id: "img-2", name: "profile-pic.png", icon: "image" },
+        {
+          id: "img-3",
+          name: "Screenshots",
+          icon: "folder",
+          children: [
+            { id: "screen-1", name: "bug-report-1.png", icon: "image" },
+            { id: "screen-2", name: "feature-demo.gif", icon: "image" }
+          ]
+        }
+      ]
+    },
+    {
+      id: "root-3",
+      name: "Downloads", 
+      icon: "folder",
+      children: [
+        { id: "dl-1", name: "installer.exe", icon: "application" },
+        { id: "dl-2", name: "user-manual.pdf", icon: "document" }
+      ]
+    }
+  ]}`
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Basic Hierarchy Tree Test</Text>
+      <Text>This demonstrates a Tree component with nested hierarchy data format.</Text>
+    </VStack>
+    
+    <Card padding="$space-3" height="400px">
+      <Tree
+        data="{hierarchyData}"
+        dataFormat="hierarchy"
+        idField="id"
+        labelField="name"
+        iconField="icon" 
+        childrenField="children"
+        selectedValue=""
+        defaultExpanded="first-level"
+        autoExpandToSelection="true"
+        onSelectionChanged="{(event) => console.log('Selected:', event)}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <Text when="{$item.icon === 'folder'}">📁</Text>
+            <Text when="{$item.icon === 'document'}">📄</Text>
+            <Text when="{$item.icon === 'image'}">🖼️</Text>
+            <Text when="{$item.icon === 'code'}">💻</Text>
+            <Text when="{$item.icon === 'application'}">⚙️</Text>
+            <Text when="{!['folder', 'document', 'image', 'code', 'application'].includes($item.icon)}">📄</Text>
+            <Text value="{$item.name}" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-3">
+        <Text variant="h3">Features Demonstrated:</Text>
+        <VStack gap="$space-1">
+          <Text><Text variant="strong">Hierarchy Data Format:</Text> Nested objects with children arrays</Text>
+          <Text><Text variant="strong">Custom Icons:</Text> Different icons for folders, documents, images, etc.</Text>
+          <Text><Text variant="strong">Default Expansion:</Text> First level automatically expanded</Text>
+          <Text><Text variant="strong">Selection Handling:</Text> Console logging when items are selected</Text>
+          <Text><Text variant="strong">Custom Rendering:</Text> Custom item template with emoji icons</Text>
+          <Text><Text variant="strong">Auto Expand to Selection:</Text> Tree expands to show selected items</Text>
+        </VStack>
+        
+        <VStack gap="$space-2">
+          <Text variant="body-emphasis">Try this:</Text>
+          <VStack gap="$space-1">
+            <Text>Click the expand/collapse arrows to navigate the tree</Text>
+            <Text>Click on any item to select it (check browser console for events)</Text>
+            <Text>Notice how folders and files have different icons</Text>
+            <Text>The first level starts expanded by default</Text>
+          </VStack>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>
