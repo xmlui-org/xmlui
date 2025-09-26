@@ -1,5 +1,17 @@
 # xmlui
 
+## 0.10.15
+
+### Patch Changes
+
+- 3c8ad14: Add the data property to the Pdf component
+- 5502fea: Add the "transform" layout property
+- e08f0ba: Add syncWithAppState and initiallySelected properties to Table
+- 5502fea: Fix MenuSeparator and SubMenuitem (forwardRef)
+- db618b5: fix: NavGroup componenet's iconVertical{Expanded,Collapsed} properties now apply based on it's 'open' state. Only the Expanded one was present before the fix.
+- a795b3d: Allow event handlers to use nested action components recursively
+- 5851c02: feat: introducing behaviors - tooltip, animation, label
+
 ## 0.10.14
 
 ### Patch Changes
