@@ -25,7 +25,7 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
     }
   }
 }
----comp display
+---comp display /selections/ /sharedSelections/ /selectedIds/
 <Component name="Files">
   <AppState id="selections" bucket="sharedSelections" initialValue="{{ selectedIds: [] }}" />
   <DataSource id="files" url="/api/files" />
@@ -42,7 +42,7 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
     </TabItem>
   </Tabs>
 </Component>
----comp display
+---comp display  /selections/ /sharedSelections/ /selectedIds/
 <Component name="TableView">
   <AppState id="selections" bucket="sharedSelections" />
   <Card>
@@ -58,7 +58,7 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
     </Table>
   </Card>
 </Component>
----comp display
+---comp display  /selections/ /sharedSelections/ /selectedIds/
 <Component name="TilesView">
   <AppState id="selections" bucket="sharedSelections" />
   <List data="{$props.data}">
@@ -87,7 +87,7 @@ The Table view syncs selections automatically via `syncWithAppState`, while the 
 The spread operator `...ids` takes all existing IDs from the array, and creates a new array with those IDs plus the new one.
 
 The filter method creates a new array with only items that meet a condition.
----comp display
+---comp display  /selections/ /sharedSelections/ /selectedIds/
 <Component name="DebugView">
   <AppState id="selections" bucket="sharedSelections" />
   <Card>
