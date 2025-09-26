@@ -1,5 +1,85 @@
 [
   {
+    "tag_name": "xmlui@0.10.14",
+    "published_at": "2025-09-23T12:57:26Z",
+    "changes": [
+      {
+        "description": "fix: Modal dialog scrolling issue",
+        "commit_sha": "618049b"
+      },
+      {
+        "description": "Allow image to accept binary data (and use it instead of src)",
+        "commit_sha": "215a142"
+      },
+      {
+        "description": "Allow user-defined components in extension packages",
+        "commit_sha": "65b52e1"
+      },
+      {
+        "description": "Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.",
+        "commit_sha": "0cc2178"
+      },
+      {
+        "description": "Fixed feature to add custom icons for the Carousel prev/next page buttons.",
+        "commit_sha": "53d4ed9"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.14.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.14/xmlui-0.10.14.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.13",
+    "published_at": "2025-09-22T08:53:46Z",
+    "changes": [
+      {
+        "description": "Added short debounce to ColorPicker to make changing color values with slider a bit smoother.",
+        "commit_sha": "9401ee0"
+      },
+      {
+        "description": "fix: assigning new properties to objects in xmlui script",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "fix: stricter empty body detection in RestApiProxy",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "fix: TextArea autofocus",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "fix: dropdownMenu overflow",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "fix: ability to use user defined components in triggerTemplate (dropdownMenu)",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "select: use focus-visible instead of focus for outline",
+        "commit_sha": "eb62858"
+      },
+      {
+        "description": "fix: modal dialog/toast issue",
+        "commit_sha": "243b7fa"
+      },
+      {
+        "description": "form: hideButtonRowUntilDirty",
+        "commit_sha": "eb62858"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.13.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.13/xmlui-0.10.13.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.12",
     "published_at": "2025-09-19T13:53:31Z",
     "changes": [
@@ -220,62 +300,6 @@
       {
         "name": "xmlui-0.10.4.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.4/xmlui-0.10.4.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.3",
-    "published_at": "2025-08-29T12:38:27Z",
-    "changes": [
-      {
-        "description": "Add solid overflow handling modes to Text",
-        "commit_sha": "2e512bb"
-      },
-      {
-        "description": "Remove the \"codefence\" Text variant",
-        "commit_sha": "46d1d18"
-      },
-      {
-        "description": "feat: support aligning cells in a Table row vertically",
-        "commit_sha": "6bc9ed1"
-      },
-      {
-        "description": "Add new, compound layout property name parsing",
-        "commit_sha": "0b1f983"
-      },
-      {
-        "description": "Text is displayed as inline (you can nest Text into Text)",
-        "commit_sha": "a2637f3"
-      },
-      {
-        "description": "Adding the \"part\" concept to native components",
-        "commit_sha": "eb4d592"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.3.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.3/xmlui-0.10.3.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.2",
-    "published_at": "2025-08-26T14:36:22Z",
-    "changes": [
-      {
-        "description": "fix: LineChart - sizing issue",
-        "commit_sha": "ff14e15"
-      },
-      {
-        "description": "feat: make input padding configurable via theme variables",
-        "commit_sha": "1451a94"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.2.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.2/xmlui-0.10.2.js"
       }
     ]
   }
