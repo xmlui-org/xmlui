@@ -1,19 +1,9 @@
 # Update UI optimistically
 
-For immediate user feedback, use component variables to update UI state instantly, providing a responsive experience while the backend processes the request.
+For immediate user feedback, use reactive variables like `localFavorited` and `localFavoritesCount` to update UI state instantly while API calls run in the background.
 
 ```xmlui-pg copy display name="Click the Like button - immediate feedback"
----comp display
-<Component name="SocialButton">
-  <Button
-    borderRadius="50%"
-    icon="{$props.icon}"
-    variant="outlined"
-    themeColor="{$props.themeColor || 'secondary'}"
-    size="xs"
-    onClick="{emitEvent('click')}" />
-</Component>
----app display
+---app display /localFavorited/ /localFavoritesCount/ {37-52}
 <App>
   <APICall
     id="favoritePost"
@@ -31,7 +21,6 @@ For immediate user feedback, use component variables to update UI state instantl
     id="timelineData"
     url="/api/timeline"
     method="GET" />
-
   <VStack gap="$space-4" padding="$space-4">
     <Items data="{timelineData}">
       <Card var.localFavorited="{null}" var.localFavoritesCount="{null}">
@@ -55,13 +44,11 @@ For immediate user feedback, use component variables to update UI state instantl
                   // Get current state (local takes precedence)
                   const currentFavorited = localFavorited !== null ? localFavorited : $item.favourited;
                   const currentCount = localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0);
-
                   // Update UI optimistically
                   localFavorited = !currentFavorited;
                   localFavoritesCount = currentFavorited ?
                     Math.max(0, currentCount - 1) :
                     currentCount + 1;
-
                   // Make API call
                   if (currentFavorited) {
                     unfavoritePost.execute($item.id).then(() => timelineData.refetch());
@@ -80,6 +67,16 @@ For immediate user feedback, use component variables to update UI state instantl
     </Items>
   </VStack>
 </App>
+---comp display {8}
+<Component name="SocialButton">
+  <Button
+    borderRadius="50%"
+    icon="{$props.icon}"
+    variant="outlined"
+    themeColor="{$props.themeColor || 'secondary'}"
+    size="xs"
+    onClick="{emitEvent('click')}" />
+</Component>
 ---api
 {
   "apiUrl": "/api",
@@ -143,3 +140,9 @@ For immediate user feedback, use component variables to update UI state instantl
 }
 ```
 
+The relationship between `onClick="{emitEvent('click')}"` in the `SocialButton` component and the `<event name="click">` handler in the main app demonstrates event propagation in XMLUI.
+
+The parent component catches the emitted click event and implements the optimistic UI update. This separation allows for:
+
+- Component reuse. `SocialButton` can be used anywhere without knowing what action the click should perform.
+- Flexible event handling. Different instances of `SocialButton` can handle clicks differently.
