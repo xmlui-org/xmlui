@@ -1,5 +1,5 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, ForwardedRef, forwardRef, useEffect, useMemo, useState } from "react";
+import React, { Children, ForwardedRef, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { useCallback } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -186,6 +186,8 @@ export const Animation = forwardRef(function Animation(
   const [reset, setReset] = useState(false);
   const [count, setCount] = useState(0);
   const times = 1;
+  const animationId = useId();
+  
   const animationSettings = useMemo<any>(
     () => ({
       from: _animation.from,
@@ -213,7 +215,9 @@ export const Animation = forwardRef(function Animation(
           }
         }
       },
-      onStart: () => onStart?.(),
+      onStart: () => {
+        onStart?.();
+      },
     }),
     [
       _animation.config,
@@ -228,6 +232,7 @@ export const Animation = forwardRef(function Animation(
       reset,
       reverse,
       toggle,
+      animationId,
     ],
   );
 
