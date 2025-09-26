@@ -10,7 +10,7 @@ import {
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
 import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
@@ -120,10 +120,11 @@ export function PieChart({
   labelListPosition = defaultProps.labelListPosition,
   innerRadius = defaultProps.innerRadius,
   children,
-  outerRadius = "60%",
+  outerRadius, // no default; we'll compute when undefined or "auto"
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
   const { getThemeVar } = useTheme();
+
   const colorValues = useMemo(() => {
     return [
       getThemeVar("color-primary-500"),
@@ -175,19 +176,65 @@ export function PieChart({
 
   const chartContextValue = useChartContextValue({ dataKey, nameKey });
 
+  // --- measurement for auto radius ---
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [box, setBox] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!wrapperRef.current || typeof window === "undefined" || !(window as any).ResizeObserver)
+      return;
+    const ro = new (window as any).ResizeObserver((entries: any[]) => {
+      const cr = entries[0]?.contentRect;
+      if (cr) setBox({ width: cr.width, height: cr.height });
+    });
+    ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Sizing heuristics
+  const RING_PADDING = 8;            // keep ring off the SVG edge
+  const LABEL_GUTTER_OUTSIDE = 16;   // space for connectors/labels
+  const LABEL_GUTTER_INSIDE = 6;     // small breathing room if labels inside/off
+  const MIN_RING_THICKNESS = 12;     // maintain legibility on small canvases
+
+  // Are labels drawn outside the ring?
+  const labelsOutside = !!showLabel || (showLabelList && labelListPosition === "outside");
+
+  // Resolve outerRadius: explicit value wins; otherwise compute from measured box
+  const resolvedOuterRadius = useMemo((): number | string => {
+    const wantsAuto =
+      outerRadius === undefined ||
+      (typeof outerRadius === "string" && outerRadius.toLowerCase() === "auto");
+
+    if (!wantsAuto) return outerRadius as number | string;
+
+    const base = Math.min(box.width, box.height) / 2;
+    const gutter = labelsOutside ? LABEL_GUTTER_OUTSIDE : LABEL_GUTTER_INSIDE;
+    const inner = Number(innerRadius) || 0;
+    const derived = Math.max(inner + MIN_RING_THICKNESS, base - gutter - RING_PADDING);
+
+    // Fallback before first measurement
+    if (!Number.isFinite(derived) || derived <= 0) {
+      return labelsOutside ? "72%" : "88%";
+    }
+    return derived;
+  }, [outerRadius, box.width, box.height, labelsOutside, innerRadius]);
+
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <div className={classnames(styles.wrapper, className)} style={style}>
+      <div ref={wrapperRef} className={classnames(styles.wrapper, className)} style={style}>
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-          <RPieChart>
+          <RPieChart
+            margin={{ top: 8, right: 8, bottom: labelsOutside ? 16 : 8, left: 8 }}
+          >
             <Tooltip content={<TooltipContent />} />
             <Pie
               data={chartData}
               dataKey={dataKey}
               nameKey={nameKey}
               innerRadius={innerRadius}
-              outerRadius={outerRadius}
+              outerRadius={resolvedOuterRadius}
               paddingAngle={1}
               activeShape={renderActiveShape}
               label={showLabel ? renderCustomizedLabel : false}

@@ -65,7 +65,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
         <BarChart
           orientation="horizontal"
           data="{ monthlyStatus }"
-          yKeys="{['paid_revenue', 'sent_revenue']}" 
+          yKeys="{['paid_revenue', 'sent_revenue']}"
           xKey="month"
           stacked="true"
           showLegend="true"

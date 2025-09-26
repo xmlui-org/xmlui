@@ -9,6 +9,7 @@ import type {
   ComponentLike,
   ComponentMetadata,
   CompoundComponentDef,
+  PropertyValueDescription,
 } from "./abstractions/ComponentDefs";
 import { AppRoot } from "./components-core/rendering/AppRoot";
 import {
@@ -51,12 +52,51 @@ import { LinkNative } from "./components/Link/LinkNative";
 import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
+import { Theme } from "./components/Theme/ThemeNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
-import { createMetadata, d, dComponent } from "./components/metadata-helpers";
+import {
+  createMetadata,
+  d,
+  dComponent,
+  dAutoFocus,
+  dClick,
+  dCollapse,
+  dDidChange,
+  dDidClose,
+  dDidOpen,
+  dEnabled,
+  dFocus,
+  dEndIcon,
+  dEndText,
+  dExpanded,
+  dExpand,
+  dGotFocus,
+  dIndeterminate,
+  dInitialValue,
+  dInternal,
+  dLabel,
+  dLabelBreak,
+  dLabelPosition,
+  dLabelWidth,
+  dLostFocus,
+  dMaxLength,
+  dMulti,
+  dOrientation,
+  dPlaceholder,
+  dReadonly,
+  dRequired,
+  dStartIcon,
+  dStartText,
+  dSetValueApi,
+  dTriggerTemplate,
+  dValidationStatus,
+  dValue,
+  dValueApi,
+} from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -64,6 +104,7 @@ export type {
   ComponentDef,
   ComponentRendererDef,
   CompoundComponentDef,
+  PropertyValueDescription,
   ComponentLike,
   StandaloneAppDescription,
   StandaloneJsonConfig,
@@ -84,6 +125,40 @@ export {
   createMetadata,
   d,
   dComponent,
+  dAutoFocus,
+  dClick,
+  dCollapse,
+  dDidChange,
+  dDidClose,
+  dDidOpen,
+  dEnabled,
+  dFocus,
+  dEndIcon,
+  dEndText,
+  dExpanded,
+  dExpand,
+  dGotFocus,
+  dIndeterminate,
+  dInitialValue,
+  dInternal,
+  dLabel,
+  dLabelBreak,
+  dLabelPosition,
+  dLabelWidth,
+  dLostFocus,
+  dMaxLength,
+  dMulti,
+  dOrientation,
+  dPlaceholder,
+  dReadonly,
+  dRequired,
+  dStartIcon,
+  dStartText,
+  dSetValueApi,
+  dTriggerTemplate,
+  dValidationStatus,
+  dValue,
+  dValueApi,
   parseScssVar,
   startApp,
   useTheme,
@@ -121,4 +196,5 @@ export {
   StyleRegistry,
   useEvent,
   StandaloneComponent,
+  Theme,
 };

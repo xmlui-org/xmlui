@@ -117,6 +117,19 @@ export const HeroSectionMd = createMetadata({
       type: "string",
     },
     backgroundTemplate: dComponent("The template for the background of the hero section"),
+    headerTone: {
+      description: "The tone for the header section, affecting text colors",
+      type: "string",
+      options: ["light", "dark", "reverse"],
+      defaultValue: "dark",
+    },
+    contentTone: {
+      description: "The tone for the content section, affecting text colors",
+      type: "string",
+      options: ["light", "dark", "reverse"],
+      defaultValue: "dark",
+    },
+    className: d("Additional CSS class names to apply to the hero section", undefined, "string"),
   },
   events: {
     ctaClick: d("Triggered when the call-to-action button is clicked"),
@@ -137,6 +150,10 @@ export const HeroSectionMd = createMetadata({
     [`fontSize-mainText-${COMP}`]: "1.4em",
     [`lineHeight-mainText-${COMP}`]: "1.1em",
     [`gap-mainText-${COMP}`]: "$space-4",
+    [`textColor-preamble-${COMP}`]: "$textColor-primary",
+    [`textColor-headline-${COMP}`]: "$textColor-primary",
+    [`textColor-subheadline-${COMP}`]: "$textColor-primary",
+    [`textColor-mainText-${COMP}`]: "$textColor-primary",
   },
 });
 
@@ -152,6 +169,8 @@ export const heroSectionComponentRenderer = createComponentRenderer(
         contentAlignment={extractValue(props.contentAlignment)}
         headerWidth={extractValue(props.headerWidth)}
         contentWidth={extractValue(props.contentWidth)}
+        headerTone={extractValue(props.headerTone)}
+        contentTone={extractValue(props.contentTone)}
         gap={extractValue(props.gap)}
         preamble={extractValue(props.preamble)}
         headline={extractValue(props.headline)}

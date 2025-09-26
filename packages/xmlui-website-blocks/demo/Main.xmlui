@@ -1,15 +1,42 @@
-<App>
-  <Hello />
-  <HeroSection
-    backgroundColor="lightblue"
-    fullWidthBackground="false"
-    headline="Modern Project Management
-            You Truly Own"
-    subheadline="A fast, intuitive tool you can host, shape, and trust."
-    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows."
-    ctaButtonIcon="home"
-    ctaButtonText="Go Home"
-    onCtaClick="() => toast('CTA Clicked')">
-    BlaBlaBla
-  </HeroSection>
+<App defaultTheme="default">
+  <AppHeader>
+    <SpaceFiller />
+    <ToneSwitch />
+  </AppHeader>
+  <NavPanel>
+    <NavGroup label="HeroSection">
+      <NavLink to="/heroText" label="Hero with text" />
+      <NavLink to="/heroTextAlign" label="Hero with aligned text" />
+      <NavLink to="/heroBackgroundBreakout" label="Hero background breakout" />
+      <NavLink to="/heroBackgrounds" label="Hero with backgrounds" />
+      <MenuSeparator />
+      <NavLink to="/heroContents" label="Hero with contents" />
+      <NavLink to="/heroTones" label="Hero with tones" />
+    </NavGroup>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Image src="/resources/xmlui-logo.svg" />
+      <FancyButton label="Click me" />
+      <Button label="XMLUI button" />
+    </Page>
+    <Page url="/heroText">
+      <HeroTextPage />
+    </Page>
+    <Page url="/heroTextAlign">
+      <HeroTextAlignPage />
+    </Page>
+    <Page url="/heroBackgroundBreakout">
+      <HeroBackgroundBreakoutPage />
+    </Page>
+    <Page url="/heroBackgrounds">
+      <HeroBackgroundsPage />
+    </Page>
+    <Page url="/heroContents">
+      <HeroContentsPage />
+    </Page>
+    <Page url="/heroTones">
+      <HeroTonesPage />
+    </Page>
+  </Pages>
 </App>

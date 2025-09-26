@@ -16,6 +16,8 @@ $mainText: "mainText-#{$component}";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, $headline);
 $themeVars: t.composeTextVars($themeVars, $subheadline);
+$themeVars: t.composeTextVars($themeVars, $preamble);
+$themeVars: t.composeTextVars($themeVars, $mainText);
 
 @layer components {
   .heroWrapper {
@@ -99,6 +101,7 @@ $themeVars: t.composeTextVars($themeVars, $subheadline);
   }
 
   .preamble {
+    @include t.textVars($themeVars, $preamble);
     white-space: pre-wrap;
     display: inline-block;
     margin: 0;
