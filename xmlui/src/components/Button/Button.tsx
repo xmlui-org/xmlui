@@ -10,9 +10,16 @@ import {
 } from "../abstractions";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
+import {
+  createMetadata,
+  dClick,
+  dGotFocus,
+  dLostFocus,
+  dOrientation,
+} from "../../components/metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { Button, defaultProps } from "./ButtonNative";
+import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
 
 const COMP = "Button";
 
@@ -170,6 +177,9 @@ export const buttonComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     const iconName = extractValue.asString(node.props.icon);
     const label = extractValue.asDisplayText(node.props.label);
+    const renderedChildren = hasRenderableChildren(node.children)
+      ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
+      : label;
     return (
       <Button
         type={extractValue.asOptionalString(node.props.type)}
@@ -188,7 +198,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         className={className}
         contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
       >
-        {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}
+        {renderedChildren}
       </Button>
     );
   },

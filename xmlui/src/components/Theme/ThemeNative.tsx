@@ -26,8 +26,8 @@ type Props = {
   id?: string;
   isRoot?: boolean;
   layoutContext?: LayoutContext;
-  renderChild: RenderChildFn;
-  node: ComponentDef;
+  renderChild?: RenderChildFn;
+  node?: ComponentDef;
   tone?: ThemeTone;
   toastDuration?: number;
   themeVars?: Record<string, string>;
@@ -183,7 +183,6 @@ export function Theme({
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";
     return (
-      // <ThemeContext.Provider value={currentThemeContextValue}>
       <>
         <Helmet>
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
@@ -191,19 +190,19 @@ export function Theme({
         </Helmet>
         <RootClasses classNames={rootClasses} />
         <ErrorBoundary node={node} location={"theme-root"}>
-          {renderChild(node.children)}
+          {renderChild && renderChild(node.children)}
           {children}
         </ErrorBoundary>
         <NotificationToast toastDuration={toastDuration} />
       </>
-      // </ThemeContext.Provider>
     );
   }
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
       <div className={classnames(styles.wrapper, className)}>
-        {renderChild(node.children, { ...layoutContext, themeClassName: className })}
+        {renderChild && renderChild(node.children, { ...layoutContext, themeClassName: className })}
+        {children}
       </div>
       {root &&
         createPortal(

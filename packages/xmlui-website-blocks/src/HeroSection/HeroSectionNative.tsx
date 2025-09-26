@@ -1,9 +1,10 @@
 import { forwardRef, ReactNode } from "react";
-import { Button, Icon, Breakout } from "xmlui";
+import { Button, Icon, Breakout, useTheme } from "xmlui";
 
 import styles from "./HeroSection.module.scss";
 
 import classnames from "classnames";
+import { Theme } from "xmlui";
 
 const PART_HEADER = "header";
 const PART_CONTENT = "content";
@@ -38,6 +39,8 @@ type Props = {
   imageHeight?: number | string;
   fullWidthBackground?: boolean;
   className?: string;
+  headerTone?: string;
+  contentTone?: string;
   onCtaClick?: () => void;
 };
 export const defaultProps: Pick<
@@ -75,24 +78,44 @@ export const HeroSection = forwardRef(
       imageHeight,
       fullWidthBackground = defaultProps.fullWidthBackground,
       className,
+      headerTone,
+      contentTone,
       onCtaClick,
     }: Props,
     ref: React.Ref<HTMLDivElement>,
   ) => {
     // Validate contentPlacement and default to "bottom" if invalid
     const validContentPlacements = ["left", "right", "bottom"] as const;
-    const effectiveContentPlacement = validContentPlacements.includes(contentPlacement as any) 
-      ? contentPlacement 
+    const effectiveContentPlacement = validContentPlacements.includes(contentPlacement as any)
+      ? contentPlacement
       : "bottom";
 
     // Default headerAlignment to "center" if not provided
     const effectiveHeaderAlignment = headerAlignment || "center";
+    const isHorizontal =
+      effectiveContentPlacement === "left" || effectiveContentPlacement === "right";
 
-    const isHorizontal = effectiveContentPlacement === "left" || effectiveContentPlacement === "right";
+    // Optional tone colors
+    const { activeThemeTone } = useTheme();
+    const effectiveTone = (prop?: string) => {
+      switch (prop) {
+        case "light":
+        case "dark":
+          return prop;
+        case "reverse":
+          return activeThemeTone === "light" ? "dark" : "light";
+        default:
+          return activeThemeTone;
+      }
+    };
+
+    let effectiveHeaderTone = effectiveTone(headerTone);
+    let effectiveContentTone = effectiveTone(contentTone);
 
     // Only render CTA button if there's content for it
-    const ctaButton = (ctaButtonTemplate || ctaButtonText) && (
-      ctaButtonTemplate || (
+    const ctaButton =
+      (ctaButtonTemplate || ctaButtonText) &&
+      (ctaButtonTemplate || (
         <Button
           data-part-id={PART_CTA_BUTTON}
           className={classnames(styles.ctaButton)}
@@ -101,8 +124,7 @@ export const HeroSection = forwardRef(
         >
           {ctaButtonText}
         </Button>
-      )
-    );
+      ));
 
     // Header section (preamble to CTA button)
     const headerSection = (
@@ -114,60 +136,43 @@ export const HeroSection = forwardRef(
           flexShrink: isHorizontal ? 0 : undefined,
         }}
       >
-        <div
-          data-part-id={PART_HEADING_SECTION}
-          className={classnames(styles.headingSection, {
-            [styles.start]: effectiveHeaderAlignment === "start",
-            [styles.center]: effectiveHeaderAlignment === "center",
-            [styles.end]: effectiveHeaderAlignment === "end",
-          })}
-        >
-          {preamble && (
-            <div
-              data-part-id={PART_PREAMBLE}
-              className={styles.preamble}
-            >
-              {preamble}
-            </div>
-          )}
-          {headline && (
-            <div
-              data-part-id={PART_HEADLINE}
-              className={styles.headline}
-            >
-              {headline}
-            </div>
-          )}
-          {subheadline && (
-            <div
-              data-part-id={PART_SUBHEADLINE}
-              className={styles.subheadline}
-            >
-              {subheadline}
-            </div>
-          )}
-          {mainTextTemplate && (
-            <div
-              data-part-id={PART_MAIN_TEXT}
-              className={styles.textWrapper}
-            >
-              {mainTextTemplate}
-            </div>
-          )}
-          {!mainTextTemplate && mainText && (
-            <div
-              data-part-id={PART_MAIN_TEXT}
-              className={styles.mainText}
-            >
-              {mainText}
-            </div>
-          )}
-          {ctaButton && (
-            <div className={styles.ctaButtonWrapper}>
-              {ctaButton}
-            </div>
-          )}
-        </div>
+        <Theme tone={effectiveHeaderTone}>
+          <div
+            data-part-id={PART_HEADING_SECTION}
+            className={classnames(styles.headingSection, {
+              [styles.start]: effectiveHeaderAlignment === "start",
+              [styles.center]: effectiveHeaderAlignment === "center",
+              [styles.end]: effectiveHeaderAlignment === "end",
+            })}
+          >
+            {preamble && (
+              <div data-part-id={PART_PREAMBLE} className={styles.preamble}>
+                {preamble}
+              </div>
+            )}
+            {headline && (
+              <div data-part-id={PART_HEADLINE} className={styles.headline}>
+                {headline}
+              </div>
+            )}
+            {subheadline && (
+              <div data-part-id={PART_SUBHEADLINE} className={styles.subheadline}>
+                {subheadline}
+              </div>
+            )}
+            {mainTextTemplate && (
+              <div data-part-id={PART_MAIN_TEXT} className={styles.textWrapper}>
+                {mainTextTemplate}
+              </div>
+            )}
+            {!mainTextTemplate && mainText && (
+              <div data-part-id={PART_MAIN_TEXT} className={styles.mainText}>
+                {mainText}
+              </div>
+            )}
+            {ctaButton && <div className={styles.ctaButtonWrapper}>{ctaButton}</div>}
+          </div>
+        </Theme>
       </div>
     );
 
@@ -181,16 +186,20 @@ export const HeroSection = forwardRef(
           [styles.contentEnd]: contentAlignment === "end",
         })}
       >
-        {image && (
-          <img
-            data-part-id={PART_IMAGE}
-            className={styles.image}
-            src={image}
-            style={{ width: imageWidth, height: imageHeight }}
-            aria-hidden
-          />
-        )}
-        {children}
+        <Theme tone={effectiveContentTone}>
+          <>
+            {image && (
+              <img
+                data-part-id={PART_IMAGE}
+                className={styles.image}
+                src={image}
+                style={{ width: imageWidth, height: imageHeight }}
+                aria-hidden
+              />
+            )}
+            {children}
+          </>
+        </Theme>
       </div>
     );
 
@@ -212,7 +221,8 @@ export const HeroSection = forwardRef(
         >
           {effectiveContentPlacement === "left" && contentSection}
           {headerSection}
-          {(effectiveContentPlacement === "right" || effectiveContentPlacement === "bottom") && contentSection}
+          {(effectiveContentPlacement === "right" || effectiveContentPlacement === "bottom") &&
+            contentSection}
         </div>
       </div>
     );
