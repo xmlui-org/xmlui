@@ -1,5 +1,11 @@
 # xmlui-website-blocks
 
+## 0.1.4
+
+### Patch Changes
+
+- d4133e2: Add HeroSection and ScrollToTop components to xmlui-website-blocks
+
 ## 0.1.3
 
 ### Patch Changes
