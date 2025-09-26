@@ -1,0 +1,169 @@
+<App
+  var.advancedData=`{[
+    {
+      id: "project-1",
+      name: "E-Commerce Platform",
+      icon: "project",
+      children: [
+        {
+          id: "feature-1",
+          name: "Shopping Cart",
+          icon: "feature",
+          children: [
+            { id: "task-1", name: "Add to Cart API", icon: "task" },
+            { id: "task-2", name: "Cart UI Component", icon: "task" }
+          ]
+        },
+        {
+          id: "feature-2", 
+          name: "Payment Integration",
+          icon: "feature"
+        }
+      ]
+    },
+    {
+      id: "project-2",
+      name: "Mobile App Redesign", 
+      icon: "project",
+      children: [
+        {
+          id: "feature-3",
+          name: "Navigation Redesign",
+          icon: "feature"
+        }
+      ]
+    }
+  ]}`
+  
+  var.selectedItemId=""
+  var.expandOnClick="false"
+  var.showDetails="true"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Advanced Features Tree Test</Text>
+      <Text>Interactive tree with selection, expansion modes, rich icons, and detailed information display.</Text>
+    </VStack>
+
+    <HStack gap="$space-4" verticalAlignment="top">
+      <Card padding="$space-3" width="60%" minHeight="600px">
+        <VStack gap="$space-3">
+          <HStack gap="$space-3" verticalAlignment="center">
+            <Text variant="h4">Project Tree</Text>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick="{() => { expandOnClick = expandOnClick === 'true' ? 'false' : 'true'; }}"
+            >
+              {expandOnClick === 'true' ? 'Disable' : 'Enable'} Click to Expand
+            </Button>
+          </HStack>
+          
+          <Tree
+            data="{advancedData}"
+            dataFormat="hierarchy"
+            idField="id"
+            labelField="name"
+            iconField="icon"
+            childrenField="children"
+            selectedValue="{selectedItemId}"
+            defaultExpanded="first-level"
+            autoExpandToSelection="true"
+            expandOnItemClick="{expandOnClick === 'true'}"
+            onSelectionChanged="{(event) => { 
+              selectedItemId = event.selectedId; 
+              console.log('Advanced Selection:', event);
+              console.log('Selected Item Details:', {
+                name: event.selectedItem?.name,
+                status: event.selectedItem?.status, 
+                priority: event.selectedItem?.priority,
+                progress: event.selectedItem?.progress
+              });
+            }}"
+          >
+            <property name="itemTemplate">
+              <HStack verticalAlignment="center" gap="$space-2">
+                <Text when="{$item.icon === 'project'}">📋</Text>
+                <Text when="{$item.icon === 'project-open'}">📂</Text>
+                <Text when="{$item.icon === 'project-closed'}">📁</Text>
+                <Text when="{$item.icon === 'feature'}">⚙️</Text>
+                <Text when="{$item.icon === 'task'}">✓</Text>
+                <Text value="{$item.name}" />
+                <Text when="{$item.status}" variant="caption" opacity="0.7">({$item.status})</Text>
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      </Card>
+
+      <Card when="{selectedItemId && showDetails === 'true'}" padding="$space-3" width="40%" minHeight="300px">
+        <VStack gap="$space-3">
+          <HStack gap="$space-2" verticalAlignment="center">
+            <Text variant="h4">Item Details</Text>
+            <Button 
+              size="sm" 
+              variant="ghost"
+              onClick="{() => { showDetails = 'false'; }}"
+            >
+              ✕
+            </Button>
+          </HStack>
+          
+          <VStack gap="$space-2">
+            <Text><Text variant="strong">Selected ID:</Text> {selectedItemId}</Text>
+            <Text when="{advancedData.find(p => p.id === selectedItemId)?.name}">
+              <Text variant="strong">Name:</Text> {advancedData.find(p => p.id === selectedItemId)?.name}
+            </Text>
+            <Text when="{advancedData.find(p => p.id === selectedItemId)?.status}">
+              <Text variant="strong">Status:</Text> {advancedData.find(p => p.id === selectedItemId)?.status}
+            </Text>
+            <Text when="{advancedData.find(p => p.id === selectedItemId)?.priority}">
+              <Text variant="strong">Priority:</Text> {advancedData.find(p => p.id === selectedItemId)?.priority}
+            </Text>
+            <Text when="{advancedData.find(p => p.id === selectedItemId)?.assignee}">
+              <Text variant="strong">Assignee:</Text> {advancedData.find(p => p.id === selectedItemId)?.assignee}
+            </Text>
+            <Text when="{advancedData.find(p => p.id === selectedItemId)?.dueDate}">
+              <Text variant="strong">Due Date:</Text> {advancedData.find(p => p.id === selectedItemId)?.dueDate}
+            </Text>
+          </VStack>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick="{() => { selectedItemId = ''; }}"
+          >
+            Clear Selection
+          </Button>
+        </VStack>
+      </Card>
+    </HStack>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-3">
+        <Text variant="h3">Advanced Features Demonstrated:</Text>
+        <VStack gap="$space-1">
+          <Text><Text variant="strong">Rich Icons:</Text> Different icons for projects, features, tasks with expanded/collapsed states</Text>
+          <Text><Text variant="strong">Status Badges:</Text> Color-coded status indicators (completed, in-progress, pending)</Text>
+          <Text><Text variant="strong">Priority Levels:</Text> Visual priority indicators (high, medium, low)</Text>
+          <Text><Text variant="strong">Progress Bars:</Text> Visual progress indicators with dynamic colors</Text>
+          <Text><Text variant="strong">Interactive Selection:</Text> Click items to see detailed information panel</Text>
+          <Text><Text variant="strong">Expand On Click:</Text> Toggle between expand-on-click and select-on-click modes</Text>
+          <Text><Text variant="strong">Multiple Event Handlers:</Text> Both onSelectionChanged and onItemClick events</Text>
+          <Text><Text variant="strong">Dynamic UI:</Text> Show/hide details panel, toggle interaction modes</Text>
+        </VStack>
+        
+        <VStack gap="$space-2">
+          <Text variant="body-emphasis">Interactive Controls:</Text>
+          <VStack gap="$space-1">
+            <Text>• Toggle "Click to Expand" mode to change click behavior</Text>
+            <Text>• Select items to see detailed information in the side panel</Text>
+            <Text>• Notice different icons for expanded/collapsed project states</Text>
+            <Text>• Observe color-coded status and priority indicators</Text>
+            <Text>• Watch progress bars reflect completion percentages</Text>
+          </VStack>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

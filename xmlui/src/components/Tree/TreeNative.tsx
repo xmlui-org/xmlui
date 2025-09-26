@@ -42,10 +42,11 @@ interface RowContext {
   itemRenderer: (item: any) => ReactNode;
   expandOnItemClick: boolean;
   onItemClick?: (node: FlatTreeNode) => void;
+  onSelection: (node: FlatTreeNode) => void;
 }
 
 const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
-  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick } = data;
+  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection } = data;
   const treeItem = nodes[index];
 
   const onToggleNode = useCallback(
@@ -58,6 +59,12 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
 
   const onItemClickHandler = useCallback(
     (e: React.MouseEvent) => {
+      // Always handle selection for selectable items
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+      }
+      
+      // Call optional onItemClick callback
       if (onItemClick) {
         onItemClick(treeItem);
       }
@@ -67,7 +74,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         toggleNode(treeItem);
       }
     },
-    [onItemClick, expandOnItemClick, treeItem, toggleNode],
+    [onSelection, onItemClick, expandOnItemClick, treeItem, toggleNode],
   );
 
   return (
@@ -88,7 +95,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         </div>
         <div
           className={styles.labelWrapper}
-          onClick={treeItem.selectable ? onItemClickHandler : onToggleNode}
+          onClick={onItemClickHandler}
           style={{ cursor: "pointer" }}
         >
           {itemRenderer(treeItem)}
@@ -165,6 +172,34 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   itemRenderer,
   className,
 }, ref) => {
+  // Internal selection state for uncontrolled usage
+  const [internalSelectedUid, setInternalSelectedUid] = useState<string>('');
+  
+  // Use external selectedUid if provided, otherwise use internal state
+  const effectiveSelectedUid = selectedUid !== undefined ? selectedUid : internalSelectedUid;
+
+  // Selection handler that manages both internal state and external callback
+  const handleSelection = useCallback((node: FlatTreeNode) => {
+    // Convert internal uid to source id for external API
+    const sourceId = node.uid; // This should be the source ID after ID mapping
+    
+    // Update internal state if not controlled
+    if (selectedUid === undefined) {
+      setInternalSelectedUid(node.key);
+    }
+    
+    // Call external callback if provided
+    if (onSelectionChanged) {
+      onSelectionChanged({
+        type: 'selection',
+        selectedId: sourceId,
+        selectedItem: node,
+        selectedNode: node,
+        previousId: effectiveSelectedUid,
+      });
+    }
+  }, [selectedUid, effectiveSelectedUid, onSelectionChanged]);
+
   // Steps 3a & 3b: Transform data based on format
   // Enhanced data transformation pipeline with validation and error handling
   const transformedData = useMemo(() => {
@@ -354,12 +389,13 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     return {
       nodes: flatTreeData,
       toggleNode,
-      selectedUid,
+      selectedUid: effectiveSelectedUid,
       itemRenderer,
       expandOnItemClick,
       onItemClick,
+      onSelection: handleSelection,
     };
-  }, [flatTreeData, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick]);
+  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
     const node = data.nodes[index];

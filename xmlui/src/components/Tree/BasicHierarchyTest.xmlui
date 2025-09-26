@@ -73,7 +73,7 @@
         selectedValue=""
         defaultExpanded="first-level"
         autoExpandToSelection="true"
-        onSelectionChanged="{(event) => console.log('Selected:', event)}"
+        onSelectionChanged="{(event) => { console.log('Selection Event:', event); console.log('Selected Item:', event.selectedItem?.name || 'None'); }}"
       >
         <property name="itemTemplate">
           <HStack verticalAlignment="center" gap="$space-2">
