@@ -43,7 +43,7 @@ When it renders a button, XMLUI works up the chain from the most specific settin
       <![CDATA[
 Here's a simple example to show how the cascade of specificity works. If we override `textColor-primary` it applies to both `Text` and `Markdown`.
 
-```xmlui-pg display noHeader
+```xmlui-pg display name="general color"
 <Theme textColor-primary="red">
   <Text>This is Text</Text>
   <Markdown>This is Markdown</Markdown>
@@ -52,7 +52,7 @@ Here's a simple example to show how the cascade of specificity works. If we over
 
 But we can target `Markdown` for different treatment with a more specific theme variable.
 
-```xmlui-pg display noHeader
+```xmlui-pg display name="general and specific"
 <Theme
   textColor-primary="red"
   textColor-Text-markdown="blue"

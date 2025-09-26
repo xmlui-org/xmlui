@@ -47,11 +47,11 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
 
 ```xmlui-pg
----app display
+---app display /line/
 <App>
   <TubeStops line="Bakerloo"/>
 </App>
----comp display
+---comp display /line/
 <Component name="TubeStops">
   <DataSource
     id="stops"

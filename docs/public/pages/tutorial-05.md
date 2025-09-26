@@ -3,13 +3,12 @@
 The `Dashboard` page continues with a donut chart that visualizes some of the same facts reported using `InfoCard`. We define it as a `Statuses` component whose width and title are defined by its containing `Dashboard` component. Here we'll use it standalone.
 
 ```xmlui-pg  noHeader
----app display copy
+---app display
 <App>
   <Statuses />
 </App>
 ---desc
 `Statuses` uses three critical properties of `DonutChart`.
-
 - `data`: The ubiquitous attribute that refers to data that may be defined literally or, as in this case, via an API call backed by a database query.
 - `dataKey`: The object key that holds data.
 - `nameKey`: The object key whose value is the data label.
@@ -46,7 +45,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 [PieChart](/components/PieChart) and [DonutChart](/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/components/BarChart) and [LineChart](/components/LineChart) can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
 
 ```xmlui-pg /data/ noHeader
----app display /data/
+---app display /data/ /xKey/ /yKeys/
 <App>
   <MonthlyStatus />
 </App>
@@ -65,8 +64,8 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
         <BarChart
           orientation="horizontal"
           data="{ monthlyStatus }"
-          yKeys="{['paid_revenue', 'sent_revenue']}"
           xKey="month"
+          yKeys="{['paid_revenue', 'sent_revenue']}"
           stacked="true"
           showLegend="true"
           tickFormatter="{(value) => {

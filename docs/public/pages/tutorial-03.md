@@ -2,8 +2,8 @@
 
 Let's explore a subset of the app's navigation.
 
-```xmlui-pg noHeader
----app copy display
+```xmlui-pg name="vertical layout"
+---app display {3}
 <App
   name="XMLUI Invoice"
   layout="vertical"
@@ -43,8 +43,8 @@ Let's explore a subset of the app's navigation.
 
 We've seen `vertical`, here's `horizontal`.
 
-```xmlui-pg  noHeader
----app
+```xmlui-pg name="horizontal layout"
+---app display {3}
 <App
   name="XMLUI Invoice"
   layout="horizontal"
