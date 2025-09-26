@@ -93,6 +93,7 @@
                 <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 -->
                 <NavLink label="Make a table responsive" to="/howto/make-a-table-responsive" />
+                <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
                 <NavLink label="Sync selections between table and list views" to="/howto/sync-selections-between-table-and-list-views" />
                 <!-- Add more links as additional files are created -->
             </NavGroup>
