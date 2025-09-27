@@ -1,49 +1,50 @@
+import { ComponentDef } from "../..";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
-import { TreeComponent } from "./TreeNative";
+import { TreeComponent, defaultProps } from "./TreeNative";
 
 const COMP = "Tree";
 
 export const TreeMd = createMetadata({
   status: "in progress",
-  description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for multiple data formats.`,
+  description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
   props: {
     data: {
       description: `The data source of the tree. Format depends on the dataFormat property.`,
       required: true,
     },
     dataFormat: {
-      description: `The input data structure format: "native" (current UnPackedTreeData), "flat" (array with parent relationships), or "hierarchy" (nested objects).`,
-      default: "native",
+      description: `The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).`,
+      default: defaultProps.dataFormat,
     },
     idField: {
       description: `The property name in source data for unique identifiers.`,
-      default: "id",
+      default: defaultProps.idField,
     },
     labelField: {
       description: `The property name in source data for display text.`,
-      default: "name",
+      default: defaultProps.labelField,
     },
     iconField: {
       description: `The property name in source data for icon identifiers.`,
-      default: "icon",
+      default: defaultProps.iconField,
     },
     iconExpandedField: {
       description: `The property name in source data for expanded state icons.`,
-      default: "iconExpanded",
+      default: defaultProps.iconExpandedField,
     },
     iconCollapsedField: {
       description: `The property name in source data for collapsed state icons.`,
-      default: "iconCollapsed",
+      default: defaultProps.iconCollapsedField,
     },
     parentField: {
       description: `The property name in source data for parent relationships (used in flat format).`,
-      default: "parentId",
+      default: defaultProps.parentField,
     },
     childrenField: {
       description: `The property name in source data for child arrays (used in hierarchy format).`,
-      default: "children",
+      default: defaultProps.childrenField,
     },
     selectedValue: {
       description: `The selected item ID in source data format.`,
@@ -53,19 +54,19 @@ export const TreeMd = createMetadata({
     },
     expandedValues: {
       description: `Array of expanded item IDs in source data format.`,
-      default: [],
+      default: defaultProps.expandedValues,
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
-      default: "none",
+      default: defaultProps.defaultExpanded,
     },
     autoExpandToSelection: {
       description: `Automatically expand the path to the selected item.`,
-      default: true,
+      default: defaultProps.autoExpandToSelection,
     },
     expandOnItemClick: {
       description: `Enable expansion/collapse by clicking anywhere on the item (not just the chevron).`,
-      default: false,
+      default: defaultProps.expandOnItemClick,
     },
     itemTemplate: dComponent("The template for each item in the tree."),
   },
@@ -84,6 +85,33 @@ export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
   ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+
+    // Default item template if none is provided:
+    //   <HStack verticalAlignment="center">
+    //     <Icon when="{$item.icon}" name="{$item.icon}" />
+    //     <Text value="{$item.name}" />
+    //   </HStack>
+    const defaultItemTemplate: ComponentDef = {
+      type: "HStack",
+      props: {
+        verticalAlignment: "center",
+      },
+      children: [
+        {
+          type: "Icon",
+          when: "{$item.icon}",
+          props: {
+            name: "{$item.icon}",
+          },
+        },
+        {
+          type: "Text",
+          props: {
+            value: "{$item.name}",
+          },
+        },
+      ],
+    };
     return (
       <TreeComponent
         className={className}
@@ -103,13 +131,36 @@ export const treeComponentRenderer = createComponentRenderer(
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
         onSelectionChanged={lookupEventHandler("selectionChanged")}
-        itemRenderer={(item: any) => {
-          return (
-            <MemoizedItem
-              node={node.props.itemTemplate as any}
-              item={item}
-              renderChild={renderChild}
-            />
+        itemRenderer={(flatTreeNode: any) => {
+          // ========================================
+          // $item Context Properties for Templates
+          // ========================================
+          // These properties are available in item templates via $item.propertyName
+          const itemContext = {
+            // Core identification properties
+            id: flatTreeNode.uid,                    // $item.id - Internal unique identifier
+            key: flatTreeNode.key,                   // $item.key - Source data ID
+            
+            // Display properties
+            name: flatTreeNode.displayName,          // $item.name - Primary display text
+            displayName: flatTreeNode.displayName,   // $item.displayName - Alternative access
+            
+            // State properties  
+            depth: flatTreeNode.depth,               // $item.depth - Nesting level (0-based)
+            isExpanded: flatTreeNode.isExpanded,     // $item.isExpanded - Expansion state
+            hasChildren: flatTreeNode.hasChildren,   // $item.hasChildren - Children indicator
+            
+            // All other TreeNode properties including:
+            // - icon, iconExpanded, iconCollapsed (from icon fields)
+            // - uid, path, parentIds, selectable, children (TreeNode internals)
+            // - All original source data properties (custom fields)
+            ...flatTreeNode,
+          };
+
+          return node.props.itemTemplate ? (
+            <MemoizedItem node={node.props.itemTemplate} item={itemContext} renderChild={renderChild} />
+          ) : (
+            <MemoizedItem node={defaultItemTemplate} item={itemContext} renderChild={renderChild} />
           );
         }}
       />

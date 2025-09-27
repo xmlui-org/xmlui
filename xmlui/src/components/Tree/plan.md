@@ -433,6 +433,212 @@ export function createSourceItemsMap(data: any, config: TreeFieldConfig): Map<st
 
 - **Method signature stability**: Follow Queue component patterns for consistent API design
 
+## E2E Testing Infrastructure Notes (Playwright)
+
+### Testing Framework Overview
+
+The Tree component uses **Playwright** for end-to-end testing with a custom XMLUI testing infrastructure that provides:
+
+- **Test Fixtures**: Located in `/src/testing/fixtures.ts` - provides `initTestBed` and component-specific driver factory functions
+- **Component Drivers**: Located in `/src/testing/drivers/` - page object models for interacting with components
+- **Test Helpers**: Located in `/src/testing/component-test-helpers.ts` - utilities for test setup and common patterns
+
+### Key Testing Patterns
+
+#### 1. Test Structure
+```typescript
+test("test description", async ({ initTestBed, createTreeDriver }) => {
+  // Setup test environment with XMLUI markup
+  await initTestBed(`
+    <Tree testId="tree" dataFormat="flat" data='{${JSON.stringify(testData)}}'>
+      <property name="itemTemplate">
+        <TestMarker tag="{$item.id}">
+          <Text value="{$item.name}" />
+        </TestMarker>
+      </property>
+    </Tree>
+  `);
+  
+  // Create driver for component interaction
+  const tree = await createTreeDriver("tree");
+  
+  // Assertions using playwright expect
+  await expect(tree.component).toBeVisible();
+});
+```
+
+#### 2. TestMarker Pattern for Component Testing
+**Critical Pattern**: Use `<TestMarker tag="{uniqueValue}">` in itemTemplate to create reliable test selectors:
+
+```xml
+<property name="itemTemplate">
+  <TestMarker tag="{$item.id}:{$item.depth}">
+    <HStack verticalAlignment="center">
+      <Icon name="folder" />
+      <Text value="{$item.name}" />
+    </HStack>
+  </TestMarker>
+</property>
+```
+
+Then access in tests with: `await expect(tree.getByMarker("1:0")).toBeVisible();`
+
+#### 3. TreeDriver Implementation (Current)
+Located in `/src/testing/drivers/TreeDriver.ts`:
+```typescript
+export class TreeDriver extends ComponentDriver {
+  getNodeById(nodeId: string): Locator {
+    return this.component.locator(`[data-tree-node-id="${nodeId}"]`).first();
+  }
+}
+```
+
+**TODO**: Expand TreeDriver with methods for:
+- `getByMarker(tag: string): Locator` - Access TestMarker elements
+- `getChevron(nodeId: string): Locator` - Access expand/collapse chevron
+- `getNodeByDepth(depth: number): Locator[]` - Get nodes at specific nesting level
+- `isNodeExpanded(nodeId: string): Promise<boolean>` - Check expansion state
+- `isNodeSelected(nodeId: string): Promise<boolean>` - Check selection state
+- `expandNode(nodeId: string): Promise<void>` - Programmatically expand node
+- `selectNode(nodeId: string): Promise<void>` - Programmatically select node
+
+### Test Organization
+
+#### Current Test Coverage Status
+The Tree.spec.ts file contains comprehensive test placeholders organized into:
+
+1. **Basic Functionality** ✅ (3 working tests)
+   - ✅ Component renders with default props 
+   - ✅ Displays flat data format correctly
+   - ✅ Displays hierarchy data format correctly
+   - 🚧 Custom field configuration (skipped - TO_BE_IMPLEMENTED)
+
+2. **Selection Management** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - selectedValue property handling
+   - selectedUid backwards compatibility 
+   - Programmatic selection changes
+   - selectionChanged event firing
+   - Null/undefined selection handling
+   - Invalid selection values handling
+
+3. **Expansion States** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - defaultExpanded: "none", "all", "first-level", array of IDs
+   - expandedValues controlled property
+   - Chevron click expansion toggle
+   - expandOnItemClick behavior
+   - autoExpandToSelection functionality
+
+4. **Icon Resolution** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - Basic icon display from iconField
+   - Expansion-specific icons (iconExpandedField/iconCollapsedField)
+   - Missing icon field handling
+
+5. **Custom Item Template** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - Default template rendering
+   - Custom template rendering
+   - Template context variable access ($item, $node, etc.)
+
+6. **Virtualization** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - Large dataset performance (1000+ nodes)
+   - Scroll position maintenance
+   - Dynamic height calculations with AutoSizer
+
+7. **Imperative API** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - expand/collapse/expandAll/collapseAll methods
+   - scrollToItem method
+   - getSelectedNode method
+   - refreshData method
+
+8. **Accessibility** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - ARIA attributes (role, aria-expanded, aria-selected)
+   - Keyboard navigation (Arrow keys, Enter/Space, Home/End)
+   - Focus management and indicators
+   - Screen reader compatibility
+   - High contrast mode support
+
+9. **Theme Variables** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+   - Tree background theme variables
+   - Tree item theme variables (selected, hover, text color)
+   - Indentation spacing theme variables
+   - Icon size and color theme variables
+
+10. **Edge Cases** 🚧 (all skipped - TO_BE_IMPLEMENTED)
+    - Empty/null/undefined data handling
+    - Malformed data structures
+    - Circular references in hierarchy data
+    - Duplicate IDs handling
+    - Orphaned nodes in flat data
+    - Deeply nested structures (performance limits)
+    - Frequent data updates (memory leak prevention)
+    - Invalid dataFormat values
+    - Missing required field configurations
+
+### Test Data Management
+
+#### Test Data Location
+- **testData.ts**: Contains comprehensive test datasets for different scenarios
+- **Inline test data**: Simple datasets defined directly in spec files for basic tests
+
+#### Key Test Datasets Available
+- `simpleFlatData`: 2-level hierarchy with 3 items
+- `multiLevelFlatData`: Multi-level project structure with 7 items  
+- `deepFlatData`: 4-level deep nesting test
+- `multipleRootFlatData`: Multiple root nodes scenario
+- `customFieldFlatData`: Custom field mapping test
+- `orphanedFlatData`: Edge case with missing parent references
+- **TODO**: Import and use these datasets instead of inline data
+
+### Testing Priorities for Next Steps
+
+#### Immediate Testing Goals (Step 4 Validation)
+1. **Expand TreeDriver** - Add missing driver methods for comprehensive component interaction
+2. **Selection Management Tests** - Validate selectedValue/selectedUid handling and selectionChanged events  
+3. **Expansion State Tests** - Verify defaultExpanded and expandedValues behavior
+4. **Data Format Tests** - Comprehensive validation of flat vs hierarchy format handling
+5. **Icon Resolution Tests** - Validate icon field mapping and state-specific icons
+
+#### Test Execution Commands
+- `npm run test:e2e-ui` - Run Playwright tests with UI interface
+- `npm run test:e2e-smoke` - Run smoke tests
+- `npm run test:e2e-non-smoke` - Run comprehensive test suite
+- **Tree-specific tests**: `npx playwright test src/components/Tree/Tree.spec.ts --reporter=line`
+- **Filter Tree tests**: Use `--grep "Tree"` or similar patterns in test commands
+
+#### Current Test Status (Last Run: Sept 27, 2025)
+```bash
+cd /Users/dotneteer/source/xmlui/xmlui && npx playwright test src/components/Tree/Tree.spec.ts --reporter=line
+Running 53 tests using 7 workers
+  50 skipped
+  3 passed (2.0s)
+```
+
+**Results Summary:**
+- ✅ **3 tests passing** - Basic functionality working correctly
+  - Component renders with default props (flat format)
+  - Displays flat data format correctly with defaultExpanded="all"  
+  - Displays hierarchy data format correctly with defaultExpanded="all"
+- 🚧 **50 tests skipped** - All marked `TO_BE_IMPLEMENTED` for comprehensive validation
+- ⚡ **Fast execution** - 2.0 seconds for focused Tree component testing
+- 🎯 **Efficient testing** - Use specific file path to avoid running entire test suite
+
+### Testing Best Practices Observed
+
+1. **Use TestMarker extensively** for reliable element selection in dynamic content
+2. **Test with realistic data** reflecting real-world usage patterns
+3. **Validate both visual state and internal state** using driver methods and expect assertions
+4. **Test accessibility** including keyboard navigation and ARIA attributes
+5. **Include edge cases** for robust component behavior validation
+6. **Performance testing** with large datasets to validate virtualization
+7. **Theme variable testing** to ensure proper CSS custom property integration
+
+### Test Implementation Notes
+
+- **Current Status**: Only 3 basic tests are implemented and passing
+- **Native data format dropped**: Tests focus on flat and hierarchy formats only
+- **Driver needs expansion**: TreeDriver currently minimal, needs comprehensive method suite
+- **Comprehensive test suite exists**: All test scenarios planned but marked as `test.skip` with `TO_BE_IMPLEMENTED` 
+- **TestMarker integration works**: Basic pattern validated in working tests
+
 ## API Usage Examples
 
 ### Example: Programmatic Tree Control

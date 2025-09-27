@@ -65,6 +65,7 @@ import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { SliderDriver } from "./drivers/SliderDriver";
+import { TreeDriver } from "./drivers/TreeDriver";
 
 export { expect } from "./assertions";
 
@@ -579,6 +580,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(ModalDialogDriver, testIdOrLocator);
     });
   },
+  createTreeDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TreeDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -663,4 +669,5 @@ type TestDriverExtenderProps = {
   createTimerDriver: ComponentDriverMethod<TimerDriver>;
   createDateInputDriver: ComponentDriverMethod<DateInputDriver>;
   createModalDialogDriver: ComponentDriverMethod<ModalDialogDriver>;
+  createTreeDriver: ComponentDriverMethod<TreeDriver>;
 };

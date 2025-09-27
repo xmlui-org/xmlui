@@ -47,7 +47,7 @@ export interface TreeSelectionEvent {
   previousId?: string;       // Previous selection
 }
 
-export type TreeDataFormat = 'native' | 'flat' | 'hierarchy';
+export type TreeDataFormat = 'flat' | 'hierarchy';
 
 export type DefaultExpansion = 'none' | 'all' | 'first-level' | string[];
 

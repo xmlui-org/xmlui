@@ -110,6 +110,22 @@ const emptyTreeData: UnPackedTreeData = {
   treeItemsById: {},
 };
 
+// Default props following XMLUI conventions
+export const defaultProps = {
+  dataFormat: "flat" as const,
+  idField: "id",
+  labelField: "name",
+  iconField: "icon",
+  iconExpandedField: "iconExpanded",
+  iconCollapsedField: "iconCollapsed",
+  parentField: "parentId",
+  childrenField: "children",
+  expandedValues: [] as string[],
+  defaultExpanded: "none" as const,
+  autoExpandToSelection: true,
+  expandOnItemClick: false,
+};
+
 // Imperative API for programmatic tree control
 export interface TreeRef {
   // Expansion methods
@@ -153,20 +169,20 @@ interface TreeComponentProps {
 
 export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   data = emptyTreeData,
-  dataFormat = "native",
-  idField = "id",
-  labelField = "name",
-  iconField = "icon",
-  iconExpandedField = "iconExpanded",
-  iconCollapsedField = "iconCollapsed",
-  parentField = "parentId",
-  childrenField = "children",
+  dataFormat = defaultProps.dataFormat,
+  idField = defaultProps.idField,
+  labelField = defaultProps.labelField,
+  iconField = defaultProps.iconField,
+  iconExpandedField = defaultProps.iconExpandedField,
+  iconCollapsedField = defaultProps.iconCollapsedField,
+  parentField = defaultProps.parentField,
+  childrenField = defaultProps.childrenField,
   selectedValue,
   selectedUid,
-  expandedValues = [],
-  defaultExpanded = "none",
-  autoExpandToSelection = true,
-  expandOnItemClick = false,
+  expandedValues = defaultProps.expandedValues,
+  defaultExpanded = defaultProps.defaultExpanded,
+  autoExpandToSelection = defaultProps.autoExpandToSelection,
+  expandOnItemClick = defaultProps.expandOnItemClick,
   onItemClick,
   onSelectionChanged,
   itemRenderer,
@@ -247,20 +263,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         return hierarchyToNative(data, fieldConfig);
         
       } else {
-        // Native format (existing behavior)
-        if (data && typeof data === "object" && "treeData" in data) {
-          // Validation: Check native format structure
-          const nativeData = data as any;
-          if (!Array.isArray(nativeData.treeData)) {
-            throw new Error("TreeComponent: Native format requires 'treeData' to be an array");
-          }
-          if (!nativeData.treeItemsById || typeof nativeData.treeItemsById !== "object") {
-            throw new Error("TreeComponent: Native format requires 'treeItemsById' to be an object");
-          }
-          return data as UnPackedTreeData;
-        } else {
-          throw new Error("TreeComponent: dataFormat='native' requires UnPackedTreeData format with 'treeData' and 'treeItemsById' properties");
-        }
+        throw new Error(`TreeComponent: Unsupported dataFormat '${dataFormat}'. Use 'flat' or 'hierarchy'.`);
       }
     } catch (error) {
       console.error("TreeComponent: Data transformation error:", error);
