@@ -1,5 +1,26 @@
 @use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Tree";
+
+// Tree component theme variables
+$backgroundColor-Tree-row--selected: createThemeVar("backgroundColor-#{$component}-row--selected");
+$backgroundColor-Tree-row--hover: createThemeVar("backgroundColor-#{$component}-row--hover");
+$textColor-Tree: createThemeVar("textColor-#{$component}");
+$textColor-Tree--selected: createThemeVar("textColor-#{$component}--selected");
+$textColor-Tree--hover: createThemeVar("textColor-#{$component}--hover");
+$borderColor-Tree-row--focus: createThemeVar("borderColor-#{$component}-row--focus");
+$outlineColor-Tree--focus: createThemeVar("outlineColor-#{$component}--focus");
+$outlineWidth-Tree--focus: createThemeVar("outlineWidth-#{$component}--focus");
+$outlineStyle-Tree--focus: createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus");
+
 @layer components {
   .wrapper {
     flex: 1;
@@ -12,21 +33,23 @@
     flex: 1;
     min-width: 0;
     height: 100%;
-    color: t.$textColor-primary;
+    color: $textColor-Tree;
     position: relative;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
     &.selected {
-      &:before{
-        content: '';
-        background-color: t.$backgroundColor-tree-row--selected--before;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        z-index: -1;
+      background-color: $backgroundColor-Tree-row--selected;
+      color: $textColor-Tree--selected;
+      
+      &:focus-visible {
+        outline: $outlineWidth-Tree--focus $outlineStyle-Tree--focus $outlineColor-Tree--focus;
+        outline-offset: $outlineOffset-Tree--focus;
       }
+    }
 
+    &:hover:not(.selected) {
+      background-color: $backgroundColor-Tree-row--hover;
+      color: $textColor-Tree--hover;
     }
 
     &:hover {
@@ -96,5 +119,10 @@
     opacity: 0;
     flex-shrink: 0;
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
 

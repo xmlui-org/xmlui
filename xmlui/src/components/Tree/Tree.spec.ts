@@ -1676,69 +1676,320 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("Imperative API", () => {
-    test.skip(
-      "exposes expand method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative expand(id) method
-        // TODO: Verify method expands specific node by ID
-        // TODO: Use component ref to call imperative methods
-      },
-    );
+    test("exposes expandNode method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:expand">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="expandBtn" testId="expand-node-btn" label="Expand Node 1" onClick="
+            treeApi.expandNode(1);
+            testState = { expandNodeCalled: true, nodeId: 1 };
+          " />
+        </Fragment>
+      `);
 
-    test.skip(
-      "exposes collapse method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative collapse(id) method
-        // TODO: Verify method collapses specific node by ID
-      },
-    );
+      const tree = await createTreeDriver("tree");
+      const expandButton = await createButtonDriver("expand-node-btn");
 
-    test.skip(
-      "exposes expandAll method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative expandAll() method
-        // TODO: Verify method expands all expandable nodes
-      },
-    );
+      // Initially, tree should be collapsed
+      await expect(tree.getByMarker("1:expand")).toBeVisible(); // Root visible
+      await expect(tree.getByMarker("2:expand")).not.toBeVisible(); // Child hidden
+      await expect(tree.getByMarker("3:expand")).not.toBeVisible(); // Child hidden
 
-    test.skip(
-      "exposes collapseAll method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative collapseAll() method
-        // TODO: Verify method collapses all expanded nodes
-      },
-    );
+      // Click expand specific node button
+      await expandButton.click();
+      
+      // Verify expandNode was called
+      await expect.poll(testStateDriver.testState).toEqual({ expandNodeCalled: true, nodeId: 1 });
 
-    test.skip(
-      "exposes scrollToItem method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative scrollToItem(id) method
-        // TODO: Verify method scrolls to specific item in virtual list
-      },
-    );
+      // Verify node 1's children are now visible but grandchildren are still hidden
+      await expect(tree.getByMarker("1:expand")).toBeVisible(); // Root visible
+      await expect(tree.getByMarker("2:expand")).toBeVisible(); // Child now visible  
+      await expect(tree.getByMarker("3:expand")).toBeVisible(); // Child now visible
+      await expect(tree.getByMarker("4:expand")).not.toBeVisible(); // Grandchild still hidden (node 2 not expanded)
+    });
 
-    test.skip(
-      "exposes getSelectedNode method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative getSelectedNode() method
-        // TODO: Verify method returns current selection data
-      },
-    );
+    test("exposes collapseNode method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:expand">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="collapseBtn" testId="collapse-btn" label="Collapse Node 1" onClick="
+            treeApi.collapseNode('1');
+            testState = { actionPerformed: 'collapseNode', nodeId: '1' };
+          " />
+        </Fragment>
+      `);
 
-    test.skip(
-      "exposes refreshData method",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test imperative refreshData() method
-        // TODO: Verify method forces data re-processing and re-render
-      },
-    );
+      const tree = await createTreeDriver("tree");
+      const collapseButton = await createButtonDriver("collapse-btn");
+
+      // Verify tree starts with all nodes visible (defaultExpanded="all")
+      await expect(tree.getByMarker("1:expand")).toBeVisible();
+      await expect(tree.getByMarker("2:expand")).toBeVisible();
+      await expect(tree.getByMarker("3:expand")).toBeVisible();
+      await expect(tree.getByMarker("4:expand")).toBeVisible();
+
+      // Click collapse node button
+      await collapseButton.click();
+      
+      // Verify node 1 children are now hidden
+      await expect(tree.getByMarker("1:expand")).toBeVisible(); // Root still visible
+      await expect(tree.getByMarker("2:expand")).not.toBeVisible(); // Child hidden
+      await expect(tree.getByMarker("3:expand")).not.toBeVisible(); // Child hidden
+      await expect(tree.getByMarker("4:expand")).not.toBeVisible(); // Grandchild hidden
+      
+      // Verify test state confirms action was performed
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        actionPerformed: 'collapseNode',
+        nodeId: '1'
+      });
+    });
+
+    test("exposes expandAll method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:expandall">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="expandBtn" testId="expand-all-btn" label="Expand All" onClick="
+            treeApi.expandAll();
+            testState = { expandAllCalled: true };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandButton = await createButtonDriver("expand-all-btn");
+
+      // Initially, tree should be collapsed (not expanded)
+      await expect(tree.getByMarker("2:expandall")).not.toBeVisible();
+      await expect(tree.getByMarker("4:expandall")).not.toBeVisible();
+
+      // Click expandAll button
+      await expandButton.click();
+      
+      // Verify expandAll was called
+      await expect.poll(testStateDriver.testState).toEqual({ expandAllCalled: true });
+
+      // Verify all nodes are now visible (expanded)
+      await expect(tree.getByMarker("1:expandall")).toBeVisible(); // Root
+      await expect(tree.getByMarker("2:expandall")).toBeVisible(); // Child
+      await expect(tree.getByMarker("3:expandall")).toBeVisible(); // Child  
+      await expect(tree.getByMarker("4:expandall")).toBeVisible(); // Grandchild
+    });
+
+    test("exposes collapseAll method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:collapseall">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="collapseBtn" testId="collapse-all-btn" label="Collapse All" onClick="
+            treeApi.collapseAll();
+            testState = { collapseAllCalled: true };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const collapseButton = await createButtonDriver("collapse-all-btn");
+
+      // Initially, tree should be fully expanded (defaultExpanded="all")
+      await expect(tree.getByMarker("1:collapseall")).toBeVisible(); // Root
+      await expect(tree.getByMarker("2:collapseall")).toBeVisible(); // Child
+      await expect(tree.getByMarker("3:collapseall")).toBeVisible(); // Child
+      await expect(tree.getByMarker("4:collapseall")).toBeVisible(); // Grandchild
+
+      // Click collapseAll button
+      await collapseButton.click();
+      
+      // Verify collapseAll was called
+      await expect.poll(testStateDriver.testState).toEqual({ collapseAllCalled: true });
+
+      // Verify only root nodes are visible (all collapsed)
+      await expect(tree.getByMarker("1:collapseall")).toBeVisible(); // Root still visible
+      await expect(tree.getByMarker("2:collapseall")).not.toBeVisible(); // Child hidden
+      await expect(tree.getByMarker("3:collapseall")).not.toBeVisible(); // Child hidden
+      await expect(tree.getByMarker("4:collapseall")).not.toBeVisible(); // Grandchild hidden
+    });
+
+    test("exposes scrollToItem method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="200px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:scroll">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="scrollBtn" testId="scroll-btn" label="Scroll to Item 4" onClick="
+            treeApi.scrollToItem('4');
+            testState = { actionPerformed: 'scrollToItem', itemId: '4' };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const scrollButton = await createButtonDriver("scroll-btn");
+
+      // Verify tree is visible
+      await expect(tree.getByMarker("1:scroll")).toBeVisible();
+
+      // Click scroll to item button
+      await scrollButton.click();
+      
+      // Verify test state confirms action was performed
+      // Note: Testing scrolling behavior in virtualized components is complex in tests
+      // So we mainly verify the API can be called without errors
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        actionPerformed: 'scrollToItem',
+        itemId: '4'
+      });
+    });
+
+    test("exposes getSelectedNode method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              selectedValue="2"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:selected">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="getSelectedBtn" testId="get-selected-btn" label="Get Selected" onClick="
+            const selectedNode = treeApi.getSelectedNode();
+            testState = { 
+              hasSelectedNode: selectedNode !== null,
+              selectedNodeKey: selectedNode?.key,
+              selectedNodeName: selectedNode?.displayName
+            };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const getSelectedButton = await createButtonDriver("get-selected-btn");
+
+      // Verify tree is visible with selection
+      await expect(tree.getByMarker("2:selected")).toBeVisible();
+
+      // Click get selected node button
+      await getSelectedButton.click();
+      
+      // Verify getSelectedNode returns correct data
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        hasSelectedNode: true,
+        selectedNodeKey: 2, 
+        selectedNodeName: "Child Item 1.1"
+      });
+    });
+
+    test("exposes refreshData method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:refresh">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="refreshBtn" testId="refresh-btn" label="Refresh Data" onClick="
+            treeApi.refreshData();
+            testState = { actionPerformed: 'refreshData' };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const refreshButton = await createButtonDriver("refresh-btn");
+
+      // Verify tree is visible with original data
+      await expect(tree.getByMarker("1:refresh")).toBeVisible();
+      await expect(tree.getByMarker("2:refresh")).toBeVisible();
+
+      // Click refresh data button
+      await refreshButton.click();
+      
+      // Verify test state confirms action was performed
+      // Note: refreshData forces re-processing but with same data, tree should remain the same
+      await expect.poll(testStateDriver.testState).toEqual({ 
+        actionPerformed: 'refreshData'
+      });
+      
+      // Tree should still be visible after refresh
+      await expect(tree.getByMarker("1:refresh")).toBeVisible();
+      await expect(tree.getByMarker("2:refresh")).toBeVisible();
+    });
   });
 });
 
@@ -1834,64 +2085,212 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test.skip(
-    "applies custom tree background theme variable",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test backgroundColor-Tree theme variable
-      // TODO: Verify custom background color is applied to tree container
-      await initTestBed(`<Tree testId="tree" data="{flatTreeData}" dataFormat="flat"/>`, {
+  test("applies custom selected tree item background color using testThemeVars", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(
+      `
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat"
+          defaultExpanded="all"
+          selectedValue="{2}"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:selected-theme">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+      `,
+      {
         testThemeVars: {
-          "backgroundColor-Tree": "rgb(240, 240, 240)",
+          "backgroundColor-Tree-row--selected": "rgb(255, 100, 100)",
+          "textColor-Tree--selected": "rgb(255, 255, 255)",
         },
-      });
-    },
-  );
+      }
+    );
+    
+    const tree = await createTreeDriver("tree");
+    const testMarker = tree.getByMarker("2:selected-theme");
+    
+    // Navigate up to find the rowWrapper (which has the theme styles applied)
+    // TestMarker -> labelWrapper -> rowWrapper
+    const selectedRowWrapper = testMarker.locator("../..");
+    
+    await expect(testMarker).toBeVisible();
+    await expect(selectedRowWrapper).toHaveCSS("background-color", "rgb(255, 100, 100)");
+    await expect(selectedRowWrapper).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
 
-  test.skip(
-    "applies custom tree item theme variables",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test tree item specific theme variables (hover, selected, etc.)
-      // TODO: Verify custom styling is applied to tree items
-      await initTestBed(`<Tree testId="tree" data="{flatTreeData}" dataFormat="flat"/>`, {
-        testThemeVars: {
-          "backgroundColor-TreeItem-selected": "rgb(0, 120, 215)",
-          "backgroundColor-TreeItem-hover": "rgb(230, 230, 230)",
-          "textColor-TreeItem": "rgb(0, 0, 0)",
-        },
-      });
-    },
-  );
+  test("applies custom selected tree item styling using Theme wrapper", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <Theme
+        backgroundColor-Tree-row--selected="rgb(0, 200, 100)"
+        textColor-Tree--selected="rgb(50, 50, 50)"
+        backgroundColor-Tree-row--hover="rgb(240, 240, 240)"
+      >
+        <VStack height="400px">
+          <Tree testId="tree" 
+            dataFormat="flat"
+            defaultExpanded="all"
+            selectedValue="{3}"
+            data='{${JSON.stringify(flatTreeData)}}'>
+            <property name="itemTemplate">
+              <TestMarker tag="{$item.id}:theme-wrapper">
+                <HStack verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </TestMarker>
+            </property>
+          </Tree>
+        </VStack>
+      </Theme>
+    `);
+    
+    const tree = await createTreeDriver("tree");
+    const testMarker = tree.getByMarker("3:theme-wrapper");
+    
+    // Navigate up to find the rowWrapper (which has the theme styles applied)
+    // TestMarker -> labelWrapper -> rowWrapper
+    const selectedRowWrapper = testMarker.locator("../..");
+    
+    await expect(testMarker).toBeVisible();
+    await expect(selectedRowWrapper).toHaveCSS("background-color", "rgb(0, 200, 100)");
+    await expect(selectedRowWrapper).toHaveCSS("color", "rgb(50, 50, 50)");
+    
+    // Verify non-selected item doesn't have selected styling
+    const nonSelectedMarker = tree.getByMarker("1:theme-wrapper");
+    const nonSelectedRowWrapper = nonSelectedMarker.locator("../..");
+    await expect(nonSelectedMarker).toBeVisible();
+    await expect(nonSelectedRowWrapper).not.toHaveCSS("background-color", "rgb(0, 200, 100)");
+  });
 
-  test.skip(
-    "applies custom indentation theme variable",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test Tree indentation/padding theme variables
-      // TODO: Verify custom indentation spacing for nested levels
-      await initTestBed(`<Tree testId="tree" data="{flatTreeData}" dataFormat="flat"/>`, {
+  test("applies custom tree text color theme variable", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(
+      `
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat"
+          defaultExpanded="all"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:text-color">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+      `,
+      {
         testThemeVars: {
-          "padding-TreeItem-indent": "2rem",
+          "textColor-Tree": "rgb(128, 0, 128)",
         },
-      });
-    },
-  );
+      }
+    );
+    
+    const tree = await createTreeDriver("tree");
+    const testMarker = tree.getByMarker("1:text-color");
+    
+    // Navigate up to find the rowWrapper (which has the theme styles applied)
+    // TestMarker -> labelWrapper -> rowWrapper
+    const rowWrapper = testMarker.locator("../..");
+    
+    await expect(testMarker).toBeVisible();
+    await expect(rowWrapper).toHaveCSS("color", "rgb(128, 0, 128)");
+  });
 
-  test.skip(
-    "applies custom icon theme variables",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test Tree icon size and color theme variables
-      // TODO: Verify custom icon styling is applied
-      await initTestBed(`<Tree testId="tree" data="{flatTreeData}" dataFormat="flat"/>`, {
+  test("applies custom hover state theme variables", async ({ initTestBed, createTreeDriver, page }) => {
+    await initTestBed(
+      `
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat"
+          defaultExpanded="all"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:hover-theme">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+      `,
+      {
         testThemeVars: {
-          "fontSize-TreeItem-icon": "1.2rem",
-          "textColor-TreeItem-icon": "rgb(100, 100, 100)",
+          "backgroundColor-Tree-row--hover": "rgb(255, 255, 0)",
+          "textColor-Tree--hover": "rgb(0, 0, 255)",
         },
-      });
-    },
-  );
+      }
+    );
+    
+    const tree = await createTreeDriver("tree");
+    const testMarker = tree.getByMarker("1:hover-theme");
+    
+    // Navigate up to find the rowWrapper (which has the theme styles applied)
+    // TestMarker -> labelWrapper -> rowWrapper
+    const rowWrapper = testMarker.locator("../..");
+    
+    await expect(testMarker).toBeVisible();
+    
+    // Hover over the item to trigger hover state
+    await rowWrapper.hover();
+    
+    // Note: In real scenarios, you might need to wait for CSS transitions
+    await expect(rowWrapper).toHaveCSS("background-color", "rgb(255, 255, 0)");
+    await expect(rowWrapper).toHaveCSS("color", "rgb(0, 0, 255)");
+  });
+
+  test("selection state overrides hover state styling", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(
+      `
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat"
+          defaultExpanded="all"
+          selectedValue="{2}"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:selection-priority">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+      `,
+      {
+        testThemeVars: {
+          "backgroundColor-Tree-row--selected": "rgb(200, 0, 0)",
+          "textColor-Tree--selected": "rgb(255, 255, 255)", 
+          "backgroundColor-Tree-row--hover": "rgb(0, 0, 200)",
+          "textColor-Tree--hover": "rgb(255, 255, 0)",
+        },
+      }
+    );
+    
+    const tree = await createTreeDriver("tree");
+    const testMarker = tree.getByMarker("2:selection-priority");
+    
+    // Navigate up to find the rowWrapper (which has the theme styles applied)
+    // TestMarker -> labelWrapper -> rowWrapper
+    const selectedRowWrapper = testMarker.locator("../..");
+    
+    await expect(testMarker).toBeVisible();
+    
+    // Hover over the selected item
+    await selectedRowWrapper.hover();
+    
+    // Selected state should take precedence over hover state
+    await expect(selectedRowWrapper).toHaveCSS("background-color", "rgb(200, 0, 0)");
+    await expect(selectedRowWrapper).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
 });
 
 // =============================================================================

@@ -1,8 +1,10 @@
 import { ComponentDef } from "../..";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
+import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
 
@@ -76,6 +78,76 @@ export const TreeMd = createMetadata({
       signature: `(event: TreeSelectionEvent) => void`,
     },
   },
+  apis: {
+    expandAll: {
+      description: `Expand all nodes in the tree.`,
+      signature: "expandAll(): void",
+    },
+    collapseAll: {
+      description: `Collapse all nodes in the tree.`,
+      signature: "collapseAll(): void",
+    },
+    expandToLevel: {
+      description: `Expand nodes up to the specified depth level (0-based).`,
+      signature: "expandToLevel(level: number): void",
+      parameters: {
+        level: "The maximum depth level to expand (0 = root level only)",
+      },
+    },
+    expandNode: {
+      description: `Expand a specific node by its source data ID.`,
+      signature: "expandNode(nodeId: string): void",
+      parameters: {
+        nodeId: "The ID of the node to expand (source data format)",
+      },
+    },
+    collapseNode: {
+      description: `Collapse a specific node by its source data ID.`,
+      signature: "collapseNode(nodeId: string): void", 
+      parameters: {
+        nodeId: "The ID of the node to collapse (source data format)",
+      },
+    },
+    selectNode: {
+      description: `Programmatically select a node by its source data ID.`,
+      signature: "selectNode(nodeId: string): void",
+      parameters: {
+        nodeId: "The ID of the node to select (source data format)",
+      },
+    },
+    clearSelection: {
+      description: `Clear the current selection.`,
+      signature: "clearSelection(): void",
+    },
+    getNodeById: {
+      description: `Get a tree node by its source data ID.`,
+      signature: "getNodeById(nodeId: string): TreeNode | null",
+      parameters: {
+        nodeId: "The ID of the node to retrieve (source data format)",
+      },
+    },
+    getExpandedNodes: {
+      description: `Get an array of currently expanded node IDs in source data format.`,
+      signature: "getExpandedNodes(): string[]",
+    },
+    getSelectedNode: {
+      description: `Get the currently selected tree node.`,
+      signature: "getSelectedNode(): TreeNode | null",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}-row--selected`]: "$color-primary-50",
+    [`backgroundColor-${COMP}-row--hover`]: "$color-surface-100",
+    [`textColor-${COMP}`]: "$textColor-primary",
+    [`textColor-${COMP}--selected`]: "$color-primary-900",
+    [`textColor-${COMP}--hover`]: "$textColor-primary",
+    [`borderColor-${COMP}-row--focus`]: "$color-primary-500",
+    [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
+    [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
+    [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
+    [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
+  },
 });
 
 /**
@@ -84,7 +156,7 @@ export const TreeMd = createMetadata({
 export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
 
     // Default item template if none is provided:
     //   <HStack verticalAlignment="center">
@@ -114,6 +186,7 @@ export const treeComponentRenderer = createComponentRenderer(
     };
     return (
       <TreeComponent
+        registerComponentApi={registerComponentApi}
         className={className}
         data={extractValue(node.props.data)}
         dataFormat={extractValue(node.props.dataFormat)}

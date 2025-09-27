@@ -12,6 +12,7 @@ import {
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import classnames from "classnames";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 import styles from "./TreeComponent.module.scss";
 
@@ -146,6 +147,7 @@ export interface TreeRef {
 }
 
 interface TreeComponentProps {
+  registerComponentApi?: RegisterComponentApiFn;
   data?: UnPackedTreeData | any;
   dataFormat?: TreeDataFormat;
   idField?: string;
@@ -168,6 +170,7 @@ interface TreeComponentProps {
 }
 
 export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
+  registerComponentApi,
   data = emptyTreeData,
   dataFormat = defaultProps.dataFormat,
   idField = defaultProps.idField,
@@ -458,7 +461,24 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     
     collapseNode: (nodeId: string) => {
       // nodeId is source ID, which matches TreeNode.key
-      setExpandedIds(prev => prev.filter(id => id !== nodeId));
+      // Find the node and collect all its descendants
+      const nodeToCollapse = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
+      if (nodeToCollapse) {
+        const idsToRemove = new Set<string>();
+        
+        // Recursively collect all descendant IDs
+        const collectDescendants = (node: TreeNode) => {
+          idsToRemove.add(String(node.key));
+          if (node.children) {
+            node.children.forEach(child => collectDescendants(child));
+          }
+        };
+        
+        collectDescendants(nodeToCollapse);
+        
+        // Remove all descendant IDs from expanded list
+        setExpandedIds(prev => prev.filter(id => !idsToRemove.has(String(id))));
+      }
     },
 
     // Selection methods
@@ -500,9 +520,119 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     },
     
     getSelectedNode: () => {
-      return selectedUid ? treeItemsById[selectedUid] || null : null;
+      if (!effectiveSelectedUid) return null;
+      // Find node by key (source ID) since effectiveSelectedUid contains the source ID
+      return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedUid)) || null;
     },
-  }), [treeData, treeItemsById, expandedIds, selectedUid, onSelectionChanged]);
+  }), [treeData, treeItemsById, expandedIds, effectiveSelectedUid, onSelectionChanged]);
+
+  // Register component API methods for external access
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        // Expansion methods
+        expandAll: () => {
+          const allIds: string[] = [];
+          const collectIds = (nodes: TreeNode[]) => {
+            nodes.forEach(node => {
+              allIds.push(node.key);
+              if (node.children) {
+                collectIds(node.children);
+              }
+            });
+          };
+          collectIds(treeData);
+          setExpandedIds(allIds);
+        },
+        
+        collapseAll: () => {
+          setExpandedIds([]);
+        },
+        
+        expandToLevel: (level: number) => {
+          const levelIds: string[] = [];
+          const collectIdsToLevel = (nodes: TreeNode[], currentLevel: number = 0) => {
+            if (currentLevel >= level) return;
+            nodes.forEach(node => {
+              levelIds.push(node.key);
+              if (node.children && currentLevel < level - 1) {
+                collectIdsToLevel(node.children, currentLevel + 1);
+              }
+            });
+          };
+          collectIdsToLevel(treeData);
+          setExpandedIds(levelIds);
+        },
+        
+        expandNode: (nodeId: string) => {
+          setExpandedIds(prev => prev.includes(nodeId) ? prev : [...prev, nodeId]);
+        },
+        
+        collapseNode: (nodeId: string) => {
+          // nodeId is source ID, which matches TreeNode.key
+          // Find the node and collect all its descendants
+          const nodeToCollapse = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
+          if (nodeToCollapse) {
+            const idsToRemove = new Set<string>();
+            
+            // Recursively collect all descendant IDs
+            const collectDescendants = (node: TreeNode) => {
+              idsToRemove.add(String(node.key));
+              if (node.children) {
+                node.children.forEach(child => collectDescendants(child));
+              }
+            };
+            
+            collectDescendants(nodeToCollapse);
+            
+            // Remove all descendant IDs from expanded list
+            setExpandedIds(prev => prev.filter(id => !idsToRemove.has(String(id))));
+          }
+        },
+
+        // Selection methods
+        selectNode: (nodeId: string) => {
+          const node = Object.values(treeItemsById).find(n => n.key === nodeId);
+          if (node && onSelectionChanged) {
+            onSelectionChanged({
+              type: 'selection',
+              selectedId: nodeId,
+              selectedItem: node,
+              selectedNode: node,
+              previousId: selectedValue,
+            });
+          }
+        },
+        
+        clearSelection: () => {
+          if (onSelectionChanged) {
+            onSelectionChanged({
+              type: 'selection',
+              selectedId: '',
+              selectedItem: null,
+              selectedNode: null as any,
+              previousId: selectedValue,
+            });
+          }
+        },
+
+        // Utility methods
+        getNodeById: (nodeId: string) => {
+          return Object.values(treeItemsById).find(n => n.key === nodeId) || null;
+        },
+        
+        getExpandedNodes: () => {
+          return expandedIds;
+        },
+        
+        getSelectedNode: () => {
+          if (!effectiveSelectedUid) return null;
+          // Find node by key (source ID) since effectiveSelectedUid contains the source ID
+          return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedUid)) || null;
+        },
+      });
+    }
+  }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedUid, onSelectionChanged, selectedValue, setExpandedIds]);
 
   return (
     <div className={classnames(styles.wrapper, className)}>
