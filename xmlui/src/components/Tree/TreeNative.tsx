@@ -44,11 +44,16 @@ interface RowContext {
   expandOnItemClick: boolean;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelection: (node: FlatTreeNode) => void;
+  focusedIndex: number;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
-  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection } = data;
+  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection, focusedIndex, onKeyDown, onFocus, onBlur } = data;
   const treeItem = nodes[index];
+  const isFocused = focusedIndex === index;
 
   const onToggleNode = useCallback(
     (e: React.MouseEvent) => {
@@ -83,7 +88,17 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
       <div
         className={classnames(styles.rowWrapper, {
           [styles.selected]: selectedUid === treeItem.key,
+          [styles.focused]: isFocused,
         })}
+        role="treeitem"
+        aria-level={treeItem.depth + 1}
+        aria-expanded={treeItem.hasChildren ? treeItem.isExpanded : undefined}
+        aria-selected={selectedUid === treeItem.key}
+        aria-label={treeItem.displayName}
+        tabIndex={isFocused ? 0 : -1}
+        onKeyDown={onKeyDown}
+        onFocus={onFocus}
+        onBlur={onBlur}
       >
         <div onClick={onToggleNode} className={styles.gutter}>
           <div style={{ width: treeItem.depth * 10 }} className={styles.depthPlaceholder} />
@@ -333,7 +348,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       });
     }
   }, [selectedUid, effectiveSelectedUid, onSelectionChanged]);
-  
+
   // Initialize expanded IDs based on defaultExpanded prop
   const [expandedIds, setExpandedIds] = useState<string[]>(() => {
     if (defaultExpanded === "first-level") {
@@ -375,6 +390,10 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     // Default icons based on node type
     return hasChildren ? 'folder' : 'code';
   }, []);
+
+  // Focus management for keyboard navigation
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [treeHasFocus, setTreeHasFocus] = useState<boolean>(false);
   
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds);
@@ -401,6 +420,97 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     }
   }, []);
 
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!treeHasFocus || flatTreeData.length === 0) return;
+
+    const currentIndex = focusedIndex >= 0 ? focusedIndex : 0;
+    let newIndex = currentIndex;
+    let handled = false;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        newIndex = Math.min(currentIndex + 1, flatTreeData.length - 1);
+        handled = true;
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault();
+        newIndex = Math.max(currentIndex - 1, 0);
+        handled = true;
+        break;
+        
+      case 'ArrowRight':
+        e.preventDefault();
+        if (currentIndex >= 0) {
+          const currentNode = flatTreeData[currentIndex];
+          if (currentNode.hasChildren && !currentNode.isExpanded) {
+            // Expand node
+            toggleNode(currentNode);
+          } else if (currentNode.hasChildren && currentNode.isExpanded && currentIndex + 1 < flatTreeData.length) {
+            // Move to first child
+            newIndex = currentIndex + 1;
+          }
+        }
+        handled = true;
+        break;
+        
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (currentIndex >= 0) {
+          const currentNode = flatTreeData[currentIndex];
+          if (currentNode.hasChildren && currentNode.isExpanded) {
+            // Collapse node
+            toggleNode(currentNode);
+          } else if (currentNode.depth > 0) {
+            // Move to parent - find previous node with smaller depth
+            for (let i = currentIndex - 1; i >= 0; i--) {
+              if (flatTreeData[i].depth < currentNode.depth) {
+                newIndex = i;
+                break;
+              }
+            }
+          }
+        }
+        handled = true;
+        break;
+        
+      case 'Home':
+        e.preventDefault();
+        newIndex = 0;
+        handled = true;
+        break;
+        
+      case 'End':
+        e.preventDefault();
+        newIndex = flatTreeData.length - 1;
+        handled = true;
+        break;
+        
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (currentIndex >= 0) {
+          const currentNode = flatTreeData[currentIndex];
+          // Handle selection
+          if (currentNode.selectable) {
+            handleSelection(currentNode);
+          }
+          // Handle expansion for Enter key
+          if (e.key === 'Enter' && currentNode.hasChildren) {
+            toggleNode(currentNode);
+          }
+        }
+        handled = true;
+        break;
+    }
+
+    if (handled && newIndex !== currentIndex) {
+      setFocusedIndex(newIndex);
+    }
+  }, [treeHasFocus, focusedIndex, flatTreeData, toggleNode, handleSelection]);
+
   const itemData = useMemo(() => {
     return {
       nodes: flatTreeData,
@@ -410,8 +520,12 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       expandOnItemClick,
       onItemClick,
       onSelection: handleSelection,
+      focusedIndex,
+      onKeyDown: handleKeyDown,
+      onFocus: () => setTreeHasFocus(true),
+      onBlur: () => setTreeHasFocus(false),
     };
-  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection]);
+  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection, focusedIndex, handleKeyDown]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
     const node = data.nodes[index];
@@ -634,8 +748,31 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     }
   }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedUid, onSelectionChanged, selectedValue, setExpandedIds]);
 
+  // Handle focus management for the tree container
+  const handleTreeFocus = useCallback(() => {
+    setTreeHasFocus(true);
+    if (focusedIndex === -1 && flatTreeData.length > 0) {
+      // Set initial focus to selected item or first item
+      const selectedIndex = flatTreeData.findIndex(node => String(node.key) === String(effectiveSelectedUid));
+      setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    }
+  }, [focusedIndex, flatTreeData, effectiveSelectedUid]);
+
+  const handleTreeBlur = useCallback(() => {
+    setTreeHasFocus(false);
+  }, []);
+
   return (
-    <div className={classnames(styles.wrapper, className)}>
+    <div 
+      className={classnames(styles.wrapper, className)}
+      role="tree"
+      aria-label="Tree navigation"
+      aria-multiselectable="false"
+      tabIndex={0}
+      onFocus={handleTreeFocus}
+      onBlur={handleTreeBlur}
+      onKeyDown={handleKeyDown}
+    >
       <AutoSizer>
         {({ width, height }) => (
           <FixedSizeList

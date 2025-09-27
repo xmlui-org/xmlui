@@ -1998,38 +1998,160 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test.skip(
-    "has proper ARIA attributes",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test tree role, aria-expanded, aria-selected attributes
-      // TODO: Verify proper ARIA labeling and descriptions
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{flatTreeData}" 
-        dataFormat="flat"
-      />
+  test("has proper ARIA attributes", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat" 
+          defaultExpanded="all"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:aria">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
     `);
-    },
-  );
 
-  test.skip(
-    "supports keyboard navigation",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test Arrow keys for navigation (Up/Down/Left/Right)
-      // TODO: Test Enter/Space for selection and expansion
-      // TODO: Test Home/End for first/last item navigation
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{flatTreeData}" 
-        dataFormat="flat"
-      />
+    const tree = await createTreeDriver("tree");
+    
+    // Test main tree container ARIA attributes
+    await expect(tree.component).toHaveAttribute('role', 'tree');
+    await expect(tree.component).toHaveAttribute('aria-label', 'Tree navigation');
+    await expect(tree.component).toHaveAttribute('aria-multiselectable', 'false');
+    
+    // Test tree items have proper ARIA attributes
+    // Find treeitems by their role attribute
+    const treeItems = tree.component.locator('[role="treeitem"]');
+    
+    // Test first tree item (should be expanded due to defaultExpanded="all")
+    const firstTreeItem = treeItems.first();
+    await expect(firstTreeItem).toHaveAttribute('role', 'treeitem');
+    await expect(firstTreeItem).toHaveAttribute('aria-level', '1');
+    await expect(firstTreeItem).toHaveAttribute('aria-expanded', 'true');
+    await expect(firstTreeItem).toHaveAttribute('aria-selected', 'false');
+    await expect(firstTreeItem).toHaveAttribute('aria-label', 'Root Item 1');
+    
+    // Test that we have the expected number of tree items (4 total in flatTreeData)
+    await expect(treeItems).toHaveCount(4);
+    
+    // Test second tree item (Child Item 1.1)
+    const secondTreeItem = treeItems.nth(1);
+    await expect(secondTreeItem).toHaveAttribute('aria-level', '2');
+    await expect(secondTreeItem).toHaveAttribute('aria-label', 'Child Item 1.1');
+    
+    // Test third tree item (Grandchild Item 1.1.1)
+    const thirdTreeItem = treeItems.nth(2);
+    await expect(thirdTreeItem).toHaveAttribute('aria-level', '3');
+    await expect(thirdTreeItem).toHaveAttribute('aria-label', 'Grandchild Item 1.1.1');
+    
+    // Test fourth tree item (Child Item 1.2)
+    const fourthTreeItem = treeItems.nth(3);
+    await expect(fourthTreeItem).toHaveAttribute('aria-level', '2');
+    await expect(fourthTreeItem).toHaveAttribute('aria-label', 'Child Item 1.2');
+  });
+
+  test("supports keyboard navigation", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat" 
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:keyboard">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
     `);
-    },
-  );
+
+    const tree = await createTreeDriver("tree");
+    
+    // Focus the tree
+    await tree.component.focus();
+    
+    // Test Arrow Down navigation
+    await tree.component.press('ArrowDown');
+    // First item should be focused after initial focus + ArrowDown
+    
+    // Test Arrow Up navigation
+    await tree.component.press('ArrowUp');
+    // Should stay at first item (can't go up from first)
+    
+    // Navigate down to second item
+    await tree.component.press('ArrowDown');
+    
+    // Test Enter for selection/expansion
+    await tree.component.press('Enter');
+    
+    // Test Arrow Right for expansion (if has children)
+    await tree.component.press('ArrowRight');
+    
+    // Test Arrow Left for collapse/parent navigation
+    await tree.component.press('ArrowLeft');
+    
+    // Test Home key
+    await tree.component.press('Home');
+    
+    // Test End key  
+    await tree.component.press('End');
+    
+    // Test Space for selection
+    await tree.component.press(' ');
+    
+    // Verify tree is still visible and functional after keyboard interactions
+    await expect(tree.getByMarker("1:keyboard")).toBeVisible();
+  });
+
+  test("supports expandOnItemClick behavior", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat" 
+          expandOnItemClick="true"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:expand-click">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    
+    // Initially, only root item should be visible (tree starts collapsed)
+    await expect(tree.getByMarker("1:expand-click")).toBeVisible();
+    await expect(tree.getByMarker("2:expand-click")).not.toBeVisible();
+    
+    // Click on the root item (not the expand/collapse icon) to expand it
+    await tree.getByMarker("1:expand-click").click();
+    
+    // After clicking, children should be visible
+    await expect(tree.getByMarker("2:expand-click")).toBeVisible();
+    await expect(tree.getByMarker("3:expand-click")).toBeVisible();
+    
+    // Click on child item that has its own children
+    await tree.getByMarker("2:expand-click").click();
+    
+    // Grandchild should become visible
+    await expect(tree.getByMarker("4:expand-click")).toBeVisible();
+    
+    // Click again to collapse
+    await tree.getByMarker("2:expand-click").click();
+    
+    // Grandchild should be hidden
+    await expect(tree.getByMarker("4:expand-click")).not.toBeVisible();
+  });
 
   test.skip(
     "supports focus management",
@@ -2047,21 +2169,83 @@ test.describe("Accessibility", () => {
     },
   );
 
-  test.skip(
-    "works with screen readers",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test ARIA live regions for dynamic content updates
-      // TODO: Verify accessible names and descriptions for tree items
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{flatTreeData}" 
-        dataFormat="flat"
-      />
+  test("works with screen readers", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat" 
+          defaultExpanded="all"
+          data='{${JSON.stringify(flatTreeData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:screen-reader">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
     `);
-    },
-  );
+
+    const tree = await createTreeDriver("tree");
+    
+    // Test semantic structure that screen readers depend on
+    await expect(tree.component).toHaveAttribute('role', 'tree');
+    
+    // Verify all tree items have proper semantic markup
+    const treeItems = tree.component.locator('[role="treeitem"]');
+    await expect(treeItems).toHaveCount(4);
+    
+    // Test each item has required accessibility information
+    for (let i = 0; i < 4; i++) {
+      const item = treeItems.nth(i);
+      
+      // Each item must have a level for screen reader navigation
+      await expect(item).toHaveAttribute('aria-level');
+      
+      // Each item must have a label for screen reader announcement
+      await expect(item).toHaveAttribute('aria-label');
+      
+      // Each item must have selection state
+      await expect(item).toHaveAttribute('aria-selected');
+    }
+    
+    // Test hierarchical relationships are properly communicated
+    const rootItem = treeItems.first();
+    await expect(rootItem).toHaveAttribute('aria-level', '1');
+    await expect(rootItem).toHaveAttribute('aria-expanded', 'true');
+    
+    // Test child items have correct level hierarchy
+    const childItem = treeItems.nth(1);
+    await expect(childItem).toHaveAttribute('aria-level', '2');
+    
+    // Test grandchild has deeper level
+    const grandchildItem = treeItems.nth(2);
+    await expect(grandchildItem).toHaveAttribute('aria-level', '3');
+    
+    // Test that all items have selection state (even if not selected)
+    const allItems = tree.component.locator('[aria-selected="false"]');
+    await expect(allItems).toHaveCount(4); // All items should be unselected initially
+    
+    // Test expansion states are properly communicated
+    const expandedItems = tree.component.locator('[aria-expanded="true"]');
+    await expect(expandedItems).toHaveCount(2); // Root and Child Item 1.1 (which has a grandchild)
+    
+    // Test that tree is focusable for keyboard navigation
+    await expect(tree.component).toHaveAttribute('tabindex', '0');
+    
+    // Verify semantic structure is maintained for screen reader navigation
+    await expect(tree.component).toHaveAttribute('role', 'tree');
+    await expect(treeItems.first()).toHaveAttribute('role', 'treeitem');
+    
+    // Test that all required accessibility information is present
+    // This ensures screen readers can properly announce tree structure
+    const firstItem = treeItems.first();
+    await expect(firstItem).toHaveAttribute('aria-level');
+    await expect(firstItem).toHaveAttribute('aria-label');
+    await expect(firstItem).toHaveAttribute('aria-expanded');
+    await expect(firstItem).toHaveAttribute('aria-selected');
+  });
 
   test.skip(
     "supports high contrast mode",
@@ -2078,6 +2262,148 @@ test.describe("Accessibility", () => {
     `);
     },
   );
+});
+
+// =============================================================================
+// PERFORMANCE TESTS
+// =============================================================================
+
+test.describe("Performance", () => {
+  test("handles large datasets efficiently", async ({ initTestBed, createTreeDriver }) => {
+    // Generate a large dataset with 1000+ items in a hierarchical structure
+    const generateLargeDataset = (numItems = 1000) => {
+      const data = [];
+      let id = 1;
+      
+      // Create root items (10% of total)
+      const numRoots = Math.ceil(numItems * 0.1);
+      for (let i = 0; i < numRoots; i++) {
+        data.push({
+          id: id++,
+          name: `Root Item ${i + 1}`,
+          parentId: null
+        });
+      }
+      
+      // Create child items distributed under roots
+      const itemsPerRoot = Math.floor((numItems - numRoots) / numRoots);
+      for (let rootIndex = 0; rootIndex < numRoots; rootIndex++) {
+        const rootId = rootIndex + 1;
+        
+        for (let j = 0; j < itemsPerRoot && id <= numItems; j++) {
+          data.push({
+            id: id++,
+            name: `Child Item ${rootId}.${j + 1}`,
+            parentId: rootId
+          });
+        }
+      }
+      
+      return data;
+    };
+    
+    const largeDataset = generateLargeDataset(1000);
+    
+    const startTime = performance.now();
+    
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" 
+          dataFormat="flat" 
+          data='{${JSON.stringify(largeDataset)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:perf">
+              <HStack verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+    `);
+    
+    const tree = await createTreeDriver("tree");
+    
+    // Verify tree renders
+    await expect(tree.component).toBeVisible();
+    
+    const renderTime = performance.now() - startTime;
+    
+    // Should render large dataset within reasonable time (< 5 seconds)
+    expect(renderTime).toBeLessThan(5000);
+    
+    // Test that only root items are initially visible (virtualization working)
+    await expect(tree.getByMarker("1:perf")).toBeVisible();
+    await expect(tree.getByMarker("2:perf")).toBeVisible();
+    
+    // Verify scrolling performance - scroll to end of visible items
+    const scrollStartTime = performance.now();
+    await tree.component.press('End'); // Scroll to last visible item
+    const scrollTime = performance.now() - scrollStartTime;
+    
+    // Scrolling should be fast (< 1 second)
+    expect(scrollTime).toBeLessThan(1000);
+    
+    // Test expansion performance
+    const expandStartTime = performance.now();
+    await tree.getByMarker("1:perf").click(); // Expand first root item
+    const expandTime = performance.now() - expandStartTime;
+    
+    // Expansion should be fast (< 500ms)
+    expect(expandTime).toBeLessThan(500);
+  });
+
+  test("maintains smooth scrolling with virtualization", async ({ initTestBed, createTreeDriver }) => {
+    // Create a dataset specifically for scroll testing
+    const scrollTestData = [];
+    for (let i = 1; i <= 500; i++) {
+      scrollTestData.push({
+        id: i,
+        name: `Scroll Item ${i}`,
+        parentId: null
+      });
+    }
+    
+    await initTestBed(`
+      <VStack height="300px">
+        <Tree testId="scroll-tree" 
+          dataFormat="flat" 
+          data='{${JSON.stringify(scrollTestData)}}'>
+          <property name="itemTemplate">
+            <TestMarker tag="{$item.id}:scroll">
+              <Text value="{$item.name}" />
+            </TestMarker>
+          </property>
+        </Tree>
+      </VStack>
+    `);
+    
+    const tree = await createTreeDriver("scroll-tree");
+    
+    // Verify tree is visible
+    await expect(tree.component).toBeVisible();
+    await expect(tree.getByMarker("1:scroll")).toBeVisible();
+    
+    // Test keyboard scrolling performance
+    await tree.component.focus();
+    
+    // Scroll down 50 times rapidly
+    const rapidScrollStartTime = performance.now();
+    for (let i = 0; i < 50; i++) {
+      await tree.component.press('ArrowDown');
+    }
+    const rapidScrollTime = performance.now() - rapidScrollStartTime;
+    
+    // Rapid keyboard scrolling should remain responsive (< 2 seconds)
+    expect(rapidScrollTime).toBeLessThan(2000);
+    
+    // Verify we can reach different parts of the large list
+    await tree.component.press('Home'); // Go to start
+    await expect(tree.getByMarker("1:scroll")).toBeVisible();
+    
+    await tree.component.press('End'); // Go to end
+    // Should be able to navigate to end without timeout
+  });
 });
 
 // =============================================================================

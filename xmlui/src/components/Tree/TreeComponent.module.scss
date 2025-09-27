@@ -47,6 +47,15 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
       }
     }
 
+    &.focused {
+      outline: $outlineWidth-Tree--focus $outlineStyle-Tree--focus $outlineColor-Tree--focus;
+      outline-offset: $outlineOffset-Tree--focus;
+      
+      &:not(.selected) {
+        border: 1px solid $borderColor-Tree-row--focus;
+      }
+    }
+
     &:hover:not(.selected) {
       background-color: $backgroundColor-Tree-row--hover;
       color: $textColor-Tree--hover;
