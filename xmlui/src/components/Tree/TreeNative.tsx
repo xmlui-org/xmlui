@@ -174,31 +174,6 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
 }, ref) => {
   // Internal selection state for uncontrolled usage
   const [internalSelectedUid, setInternalSelectedUid] = useState<string>('');
-  
-  // Use external selectedUid if provided, otherwise use internal state
-  const effectiveSelectedUid = selectedUid !== undefined ? selectedUid : internalSelectedUid;
-
-  // Selection handler that manages both internal state and external callback
-  const handleSelection = useCallback((node: FlatTreeNode) => {
-    // Convert internal uid to source id for external API
-    const sourceId = node.uid; // This should be the source ID after ID mapping
-    
-    // Update internal state if not controlled
-    if (selectedUid === undefined) {
-      setInternalSelectedUid(node.key);
-    }
-    
-    // Call external callback if provided
-    if (onSelectionChanged) {
-      onSelectionChanged({
-        type: 'selection',
-        selectedId: sourceId,
-        selectedItem: node,
-        selectedNode: node,
-        previousId: effectiveSelectedUid,
-      });
-    }
-  }, [selectedUid, effectiveSelectedUid, onSelectionChanged]);
 
   // Steps 3a & 3b: Transform data based on format
   // Enhanced data transformation pipeline with validation and error handling
@@ -319,6 +294,40 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     return { sourceToUid, uidToSource };
   }, [treeData]);
   
+  // Use selectedValue (source ID) directly since TreeNode.key is the source ID
+  const mappedSelectedUid = useMemo(() => {
+    if (selectedValue) {
+      // For flat/hierarchy formats, selectedValue is already the source ID (matches TreeNode.key)
+      return selectedValue;
+    }
+    return selectedUid;
+  }, [selectedValue, selectedUid]);
+  
+  // Use mapped selectedValue/selectedUid if provided, otherwise use internal state
+  const effectiveSelectedUid = mappedSelectedUid !== undefined ? mappedSelectedUid : internalSelectedUid;
+
+  // Selection handler that manages both internal state and external callback
+  const handleSelection = useCallback((node: FlatTreeNode) => {
+    // Use node.key as the source ID (this matches the original data ID)
+    const sourceId = node.key;
+    
+    // Update internal state if not controlled
+    if (selectedUid === undefined) {
+      setInternalSelectedUid(node.key);
+    }
+    
+    // Call external callback if provided
+    if (onSelectionChanged) {
+      onSelectionChanged({
+        type: 'selection',
+        selectedId: sourceId,
+        selectedItem: node,
+        selectedNode: node,
+        previousId: effectiveSelectedUid,
+      });
+    }
+  }, [selectedUid, effectiveSelectedUid, onSelectionChanged]);
+  
   // Initialize expanded IDs based on defaultExpanded prop
   const [expandedIds, setExpandedIds] = useState<string[]>(() => {
     if (defaultExpanded === "first-level") {
@@ -366,16 +375,17 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   }, [expandedIds, treeData]);
 
   /**
-   * ensure the selected item's parents are expanded on route change
+   * ensure the selected item's parents are expanded when selection changes
    */
   useEffect(() => {
-    if (selectedUid) {
-      const treeItem = treeItemsById[selectedUid];
+    if (autoExpandToSelection && effectiveSelectedUid) {
+      // Find node by key (source ID) since treeItemsById is indexed by uid
+      const treeItem = Object.values(treeItemsById).find(node => node.key === effectiveSelectedUid);
       if (treeItem) {
         setExpandedIds((prev) => [...prev, ...treeItem.parentIds]);
       }
     }
-  }, [selectedUid, treeItemsById]);
+  }, [autoExpandToSelection, effectiveSelectedUid, treeItemsById]);
 
   const toggleNode = useCallback((node: FlatTreeNode) => {
     if (!node.isExpanded) {
@@ -439,22 +449,19 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     },
     
     expandNode: (nodeId: string) => {
-      // Convert source ID to internal ID if needed
-      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
-      setExpandedIds(prev => prev.includes(internalId) ? prev : [...prev, internalId]);
+      // nodeId is source ID, which matches TreeNode.key
+      setExpandedIds(prev => prev.includes(nodeId) ? prev : [...prev, nodeId]);
     },
     
     collapseNode: (nodeId: string) => {
-      // Convert source ID to internal ID if needed  
-      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
-      setExpandedIds(prev => prev.filter(id => id !== internalId));
+      // nodeId is source ID, which matches TreeNode.key
+      setExpandedIds(prev => prev.filter(id => id !== nodeId));
     },
 
     // Selection methods
     selectNode: (nodeId: string) => {
-      // Convert source ID to internal ID if needed
-      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
-      const node = treeItemsById[internalId];
+      // Find node by key (source ID) since nodeId is source ID
+      const node = Object.values(treeItemsById).find(n => n.key === nodeId);
       if (node && onSelectionChanged) {
         onSelectionChanged({
           type: 'selection',
@@ -480,20 +487,19 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
 
     // Utility methods
     getNodeById: (nodeId: string) => {
-      // Convert source ID to internal ID if needed
-      const internalId = idMappings.sourceToUid.get(nodeId) || nodeId;
-      return treeItemsById[internalId] || null;
+      // Find node by key (source ID)
+      return Object.values(treeItemsById).find(n => n.key === nodeId) || null;
     },
     
     getExpandedNodes: () => {
-      // Return source IDs instead of internal IDs
-      return expandedIds.map(id => idMappings.uidToSource.get(id) || id);
+      // expandedIds already contains source IDs (keys)
+      return expandedIds;
     },
     
     getSelectedNode: () => {
       return selectedUid ? treeItemsById[selectedUid] || null : null;
     },
-  }), [treeData, treeItemsById, idMappings, expandedIds, selectedUid, onSelectionChanged]);
+  }), [treeData, treeItemsById, expandedIds, selectedUid, onSelectionChanged]);
 
   return (
     <div className={classnames(styles.wrapper, className)}>

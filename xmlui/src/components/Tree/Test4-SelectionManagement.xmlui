@@ -1,0 +1,78 @@
+<App
+  var.selectedId="item2"
+  var.selectionData="{[
+    { id: 'item1', name: 'First Item', icon: 'folder' },
+    { id: 'item2', name: 'Second Item', icon: 'file', parentId: 'item1' },
+    { id: 'item3', name: 'Third Item', icon: 'file', parentId: 'item1' },
+    { id: 'item4', name: 'Fourth Item', icon: 'folder' },
+    { id: 'item5', name: 'Fifth Item', icon: 'file', parentId: 'item4' }
+  ]}"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Test 4: Selection Management</Text>
+      <Text>Testing selectedValue prop, selection events, and ID mapping</Text>
+    </VStack>
+    
+    <HStack gap="$space-3">
+      <Button label="Select First" onClick="{() => updateState({ selectedId: 'item1' })}" />
+      <Button label="Select Second" onClick="{() => updateState({ selectedId: 'item2' })}" />
+      <Button label="Select Fifth" onClick="{() => updateState({ selectedId: 'item5' })}" />
+      <Button label="Clear Selection" onClick="{() => updateState({ selectedId: '' })}" />
+    </HStack>
+    
+    <Card padding="$space-3" height="250px">
+      <Tree
+        data="{selectionData}"
+        dataFormat="flat"
+        idField="id"
+        labelField="name"
+        iconField="icon"
+        parentField="parentId"
+        selectedValue="{selectedId}"
+        defaultExpanded="all"
+        autoExpandToSelection="true"
+        onSelectionChanged="{(event) => { 
+          console.log('Selection Management Event:', event);
+          console.log('Previous ID:', event.previousId);
+          console.log('New ID:', event.selectedId);
+          console.log('Item Name:', event.selectedItem?.name);
+          updateState({ selectedId: event.selectedId });
+        }}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <Text when="{$item.icon === 'folder'}">📁</Text>
+            <Text when="{$item.icon === 'file'}">📄</Text>
+            <Text value="{$item.name}" weight="{$isSelected ? 'bold' : 'normal'}" />
+            <Text when="{$isSelected}" value="← SELECTED" variant="accent" />
+            <Text value="[{$item.id}]" variant="caption" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-2">
+        <Text variant="h3">Current Selection: {selectedId || 'None'}</Text>
+        
+        <Text variant="h3">Selection Features:</Text>
+        <VStack gap="$space-1">
+          <Text>• selectedValue prop controls current selection</Text>
+          <Text>• onSelectionChanged event fires with proper payload</Text>
+          <Text>• autoExpandToSelection expands path to selected item</Text>
+          <Text>• ID mapping between source data and internal representation</Text>
+          <Text>• Buttons above test programmatic selection changes</Text>
+        </VStack>
+
+        <Text variant="h3">Expected Behavior:</Text>
+        <VStack gap="$space-1">
+          <Text>• Clicking buttons should change selection</Text>
+          <Text>• Selected item should show "← SELECTED" and bold text</Text>
+          <Text>• Tree should auto-expand to show selected items</Text>
+          <Text>• Console should log selection events with correct IDs</Text>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

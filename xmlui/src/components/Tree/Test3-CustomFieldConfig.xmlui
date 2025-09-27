@@ -1,0 +1,67 @@
+<App
+  var.customFieldData="{[
+    { nodeId: 'n1', displayName: 'Root Node', iconType: 'folder', hasExpanded: 'folder-open', hasCollapsed: 'folder-closed' },
+    { nodeId: 'n2', displayName: 'Child A', iconType: 'file', parent: 'n1' },
+    { nodeId: 'n3', displayName: 'Child B', iconType: 'folder', hasExpanded: 'folder-open', hasCollapsed: 'folder-closed', parent: 'n1' },
+    { nodeId: 'n4', displayName: 'Grandchild', iconType: 'file', parent: 'n3' }
+  ]}"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Test 3: Custom Field Configuration</Text>
+      <Text>Testing Tree component with non-standard field names and custom icons</Text>
+    </VStack>
+    
+    <Card padding="$space-3" height="250px">
+      <Tree
+        data="{customFieldData}"
+        dataFormat="flat"
+        idField="nodeId"
+        labelField="displayName"
+        iconField="iconType"
+        iconExpandedField="hasExpanded"
+        iconCollapsedField="hasCollapsed"
+        parentField="parent"
+        selectedValue="n4"
+        defaultExpanded="first-level"
+        onSelectionChanged="{(event) => { 
+          console.log('Custom Fields Selection:', event); 
+          console.log('Node ID:', event.selectedId);
+          console.log('Display Name:', event.selectedItem?.displayName);
+        }}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <Text when="{$item.iconType === 'folder'}">📁</Text>
+            <Text when="{$item.iconType === 'file'}">📄</Text>
+            <Text when="{!['folder', 'file'].includes($item.iconType)}">❓</Text>
+            <Text value="{$item.displayName}" />
+            <Text value="[{$item.nodeId}]" variant="caption" />
+            <Text when="{$isExpanded}" value="(expanded)" variant="body-2" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-2">
+        <Text variant="h3">Custom Field Mapping:</Text>
+        <VStack gap="$space-1">
+          <Text>• idField: "nodeId" (instead of "id")</Text>
+          <Text>• labelField: "displayName" (instead of "name")</Text>
+          <Text>• iconField: "iconType" (instead of "icon")</Text>
+          <Text>• parentField: "parent" (instead of "parentId")</Text>
+          <Text>• iconExpandedField: "hasExpanded"</Text>
+          <Text>• iconCollapsedField: "hasCollapsed"</Text>
+        </VStack>
+        
+        <Text variant="h3">Expected Results:</Text>
+        <VStack gap="$space-1">
+          <Text>• Tree should build correctly with custom field names</Text>
+          <Text>• Grandchild (n4) should be initially selected</Text>
+          <Text>• Node IDs should display correctly in brackets</Text>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

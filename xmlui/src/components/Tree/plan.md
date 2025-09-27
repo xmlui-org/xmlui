@@ -912,10 +912,51 @@ const hierarchyData = {
 ```
 **Expected**: Same 2-level tree structure from nested input
 
-#### Edge Cases to Test:
-- Empty data arrays
-- Orphaned nodes (parentId references non-existent parent)
-- Circular references in hierarchy
-- Single node trees
-- Deep nesting (5+ levels)
-- Custom field mappings
+## End-to-End Testing Strategy
+
+### Testing Process Overview
+
+The Tree component testing follows a systematic approach to ensure comprehensive coverage and regression prevention:
+
+#### Phase 1: Test Infrastructure Setup
+1. **Create Test Skeleton**: Generate comprehensive test case structure covering all Tree component features, data formats, props, events, and edge cases
+2. **Update Testing Infrastructure**: Enhance testing infrastructure to support Tree component validation and assertion patterns
+3. **Create Reference Test**: Manually create one working test case as a template for automated test generation
+4. **Pair Programming Implementation**: Collaboratively develop remaining test cases following established patterns
+
+#### Phase 2: Test Categories
+
+**Core Functionality Tests:**
+- Data Format Transformation (flat, hierarchy, native)
+- Selection Management and Event Handling  
+- Expansion State Management
+- Icon Resolution Logic
+- Custom Field Configuration
+- Imperative API Methods
+
+**Integration Tests:**
+- ExpandOnItemClick Behavior
+- Auto-Expand to Selection
+- Context Variable Exposure ($item, $depth, $isSelected, etc.)
+- Event Payload Validation
+
+**Edge Case & Error Handling:**
+- Invalid Data Formats
+- Missing Required Fields
+- Malformed Data Structures
+- Empty Data Sets
+- Circular References
+- Deep Nesting Scenarios
+
+**Backwards Compatibility:**
+- Native Format Support
+- selectedUid Prop Compatibility
+- Existing UnPackedTreeData Usage
+
+#### Phase 3: Automated Regression Testing
+- End-to-end test suite for automated validation
+- Visual regression detection for selection highlighting
+- Performance testing for large datasets
+- Cross-browser compatibility validation
+
+This testing strategy ensures complete coverage of Step 4 implementation features while providing a foundation for ongoing regression testing as new features are added.
