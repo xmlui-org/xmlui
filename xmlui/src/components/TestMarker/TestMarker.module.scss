@@ -1,0 +1,5 @@
+// TestMarker.module.scss - A testing utility component that wraps children without affecting layout
+
+.testMarker {
+  display: contents;
+}

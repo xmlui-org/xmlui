@@ -1,0 +1,113 @@
+<App
+  var.iconTestData="{[
+    { 
+      id: 'folder1', 
+      name: 'Smart Folder (changes icons)', 
+      icon: 'folder-closed', 
+      iconExpanded: 'folder-open',
+      iconCollapsed: 'folder-closed'
+    },
+    { 
+      id: 'file1', 
+      name: 'File in smart folder', 
+      icon: 'document', 
+      parentId: 'folder1' 
+    },
+    { 
+      id: 'folder2', 
+      name: 'Basic Folder (same icon)', 
+      icon: 'folder',
+      parentId: 'folder1'
+    },
+    { 
+      id: 'file2', 
+      name: 'Nested file', 
+      icon: 'code', 
+      parentId: 'folder2' 
+    },
+    { 
+      id: 'folder3', 
+      name: 'No Icon Folder (defaults)' 
+    },
+    { 
+      id: 'file3', 
+      name: 'No Icon File', 
+      parentId: 'folder3' 
+    }
+  ]}"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Test 6: Icon Resolution Logic</Text>
+      <Text>Testing icon prioritization: expanded/collapsed icons > base icon > defaults</Text>
+    </VStack>
+    
+    <Card padding="$space-3" height="250px">
+      <Tree
+        data="{iconTestData}"
+        dataFormat="flat"
+        idField="id"
+        labelField="name"
+        iconField="icon"
+        iconExpandedField="iconExpanded"
+        iconCollapsedField="iconCollapsed"
+        parentField="parentId"
+        defaultExpanded="none"
+        onSelectionChanged="{(event) => { 
+          console.log('Icon Test Selection:', event);
+          console.log('Resolved Icon:', event.selectedNode?.icon);
+        }}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <!-- Show actual resolved icon name -->
+            <Text value="[{$icon}]" variant="caption" />
+            
+            <!-- Visual icon representation -->
+            <Text when="{$icon === 'folder-open'}">📂</Text>
+            <Text when="{$icon === 'folder-closed'}">📁</Text>
+            <Text when="{$icon === 'folder'}">📁</Text>
+            <Text when="{$icon === 'document'}">📄</Text>
+            <Text when="{$icon === 'code'}">💻</Text>
+            <Text when="{!['folder-open', 'folder-closed', 'folder', 'document', 'code'].includes($icon)}">❓</Text>
+            
+            <Text value="{$item.name}" />
+            
+            <!-- Show icon source information -->
+            <Text when="{$item.iconExpanded && $isExpanded}" value="(expanded icon)" variant="body-2" />
+            <Text when="{$item.iconCollapsed && !$isExpanded && $hasChildren}" value="(collapsed icon)" variant="body-2" />
+            <Text when="{$item.icon && !($item.iconExpanded && $isExpanded) && !($item.iconCollapsed && !$isExpanded && $hasChildren)}" value="(base icon)" variant="body-2" />
+            <Text when="{!$item.icon}" value="(default icon)" variant="body-2" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-2">
+        <Text variant="h3">Icon Priority System:</Text>
+        <VStack gap="$space-1">
+          <Text>1. <Text weight="bold">Expanded Icon:</Text> Used when folder is expanded and iconExpanded is defined</Text>
+          <Text>2. <Text weight="bold">Collapsed Icon:</Text> Used when folder is collapsed and iconCollapsed is defined</Text>
+          <Text>3. <Text weight="bold">Base Icon:</Text> Used when icon is defined but no state-specific icon applies</Text>
+          <Text>4. <Text weight="bold">Default Icon:</Text> Used when no icon is defined (folder for containers, code for files)</Text>
+        </VStack>
+
+        <Text variant="h3">Test Items:</Text>
+        <VStack gap="$space-1">
+          <Text>• Smart Folder: Has different icons for expanded/collapsed states</Text>
+          <Text>• Basic Folder: Uses same icon regardless of state</Text>
+          <Text>• No Icon Folder: Falls back to default folder icon</Text>
+          <Text>• Files: Use their specified icons or defaults</Text>
+        </VStack>
+
+        <Text variant="h3">Expected Behavior:</Text>
+        <VStack gap="$space-1">
+          <Text>• Expand/collapse folders to see icon changes</Text>
+          <Text>• Resolved icon name appears in brackets [icon-name]</Text>
+          <Text>• Icon source is labeled (expanded/collapsed/base/default)</Text>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

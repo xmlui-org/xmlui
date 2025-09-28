@@ -34,6 +34,10 @@ export class ComponentDriver {
     return this.locator;
   }
 
+  getByMarker(tag: string): Locator {
+    return this.component.locator(`[data-test="${tag}"]`).first();
+  }
+
   getByPartName(part: string): Locator {
     return this.component.locator(`[data-part-id="${part}"]`).first();
   }

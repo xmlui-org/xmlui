@@ -1,0 +1,16 @@
+<App>
+  <Tree 
+    dataFormat="flat"
+    data="{[
+      { id: '1', name: 'Documents', icon: 'folder' },
+      { id: '2', name: 'File.txt', icon: 'code', parentId: '1' },
+      { id: '3', name: 'Photo.jpg', icon: 'email', parentId: '1' }
+    ]}">
+    <property name="itemTemplate">
+      <HStack verticalAlignment="center" spacing="8px">
+        <Icon when="{$item.icon}" name="{$item.icon}" />
+        <Text value="{$item.displayName}" />
+      </HStack>
+    </property>
+  </Tree>
+</App>

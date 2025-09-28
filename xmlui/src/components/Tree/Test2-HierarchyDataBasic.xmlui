@@ -1,0 +1,81 @@
+<App
+  var.hierarchyData="{[
+    {
+      id: 'root1',
+      name: 'Workspace',
+      icon: 'folder',
+      children: [
+        {
+          id: 'src',
+          name: 'src',
+          icon: 'folder',
+          children: [
+            { id: 'app', name: 'App.tsx', icon: 'code' },
+            { id: 'index', name: 'index.ts', icon: 'code' }
+          ]
+        },
+        { id: 'package', name: 'package.json', icon: 'code' }
+      ]
+    },
+    {
+      id: 'root2',
+      name: 'Documentation',
+      icon: 'folder',
+      children: [
+        { id: 'readme', name: 'README.md', icon: 'document' },
+        { id: 'guide', name: 'User Guide.pdf', icon: 'document' }
+      ]
+    }
+  ]}"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Test 2: Hierarchy Data Format</Text>
+      <Text>Testing Tree component with nested hierarchy structure using children arrays</Text>
+    </VStack>
+    
+    <Card padding="$space-3" height="300px">
+      <Tree
+        data="{hierarchyData}"
+        dataFormat="hierarchy"
+        idField="id"
+        labelField="name"
+        iconField="icon"
+        childrenField="children"
+        selectedValue="app"
+        defaultExpanded="all"
+        onSelectionChanged="{(event) => { 
+          console.log('Hierarchy Selection:', event); 
+          console.log('Selected:', event.selectedItem?.name);
+          console.log('Has Children:', event.selectedNode?.children?.length > 0);
+        }}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <Text when="{$item.icon === 'folder'}">📁</Text>
+            <Text when="{$item.icon === 'code'}">💻</Text>
+            <Text when="{$item.icon === 'document'}">📄</Text>
+            <Text when="{!['folder', 'code', 'document'].includes($item.icon)}">📄</Text>
+            <Text value="{$item.name}" />
+            <Text when="{$hasChildren}" value="({$node.children.length} items)" variant="body-2" />
+            <Text value="[{$item.id}]" variant="caption" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-2">
+        <Text variant="h3">Expected Results:</Text>
+        <VStack gap="$space-1">
+          <Text>• Two root folders: Workspace and Documentation</Text>
+          <Text>• Workspace should contain src folder and package.json</Text>
+          <Text>• src folder should contain App.tsx and index.ts</Text>
+          <Text>• App.tsx should be initially selected</Text>
+          <Text>• All levels should be expanded (defaultExpanded="all")</Text>
+          <Text>• Item IDs should be displayed in brackets</Text>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

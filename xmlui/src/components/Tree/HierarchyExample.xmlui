@@ -1,0 +1,21 @@
+<App>
+  <Tree 
+    dataFormat="hierarchy"
+    data="{({
+      id: 'root',
+      name: 'Project Root',
+      icon: 'folder',
+      children: [
+        { id: 'file1', name: 'README.md', icon: 'code' },
+        { id: 'file2', name: 'package.json', icon: 'code' }
+      ]
+    })}"
+    defaultExpanded="first-level">
+    <property name="itemTemplate">
+      <HStack verticalAlignment="center" spacing="8px">
+        <Icon when="{$item.icon}" name="{$item.icon}" />
+        <Text value="{$item.name}" />
+      </HStack>
+    </property>
+  </Tree>
+</App>

@@ -1,0 +1,78 @@
+<App
+  var.expansionMode="first-level"
+  var.treeData="{[
+    { id: 'level1a', name: 'Level 1A', icon: 'folder' },
+    { id: 'level2a', name: 'Level 2A', icon: 'folder', parentId: 'level1a' },
+    { id: 'level3a', name: 'Level 3A', icon: 'file', parentId: 'level2a' },
+    { id: 'level3b', name: 'Level 3B', icon: 'file', parentId: 'level2a' },
+    { id: 'level2b', name: 'Level 2B', icon: 'file', parentId: 'level1a' },
+    { id: 'level1b', name: 'Level 1B', icon: 'folder' },
+    { id: 'level2c', name: 'Level 2C', icon: 'file', parentId: 'level1b' }
+  ]}"
+>
+  <VStack padding="$space-4" gap="$space-4">
+    <VStack gap="$space-2">
+      <Text variant="h2">Test 5: Expansion State Management</Text>
+      <Text>Testing defaultExpanded options and expansion behavior</Text>
+    </VStack>
+    
+    <HStack gap="$space-2">
+      <Button label="None" onClick="{() => updateState({ expansionMode: 'none' })}" />
+      <Button label="First Level" onClick="{() => updateState({ expansionMode: 'first-level' })}" />
+      <Button label="All" onClick="{() => updateState({ expansionMode: 'all' })}" />
+      <Button label="Custom Array" onClick="{() => updateState({ expansionMode: ['level1a', 'level2a'] })}" />
+    </HStack>
+    
+    <Text>Current expansion mode: {JSON.stringify(expansionMode)}</Text>
+    
+    <Card padding="$space-3" height="300px">
+      <Tree
+        data="{treeData}"
+        dataFormat="flat"
+        idField="id"
+        labelField="name"
+        iconField="icon"
+        parentField="parentId"
+        defaultExpanded="{expansionMode}"
+        selectedValue="level3a"
+        autoExpandToSelection="false"
+        onSelectionChanged="{(event) => { 
+          console.log('Expansion Test Selection:', event);
+        }}"
+      >
+        <property name="itemTemplate">
+          <HStack verticalAlignment="center" gap="$space-2">
+            <Text value="{'  '.repeat($depth)}" />
+            <Text when="{$hasChildren && $isExpanded}">📂</Text>
+            <Text when="{$hasChildren && !$isExpanded}">📁</Text>
+            <Text when="{!$hasChildren}">📄</Text>
+            <Text value="{$item.name}" />
+            <Text value="(L{$depth + 1})" variant="body-2" />
+            <Text when="{$isExpanded}" value="[expanded]" variant="caption" />
+          </HStack>
+        </property>
+      </Tree>
+    </Card>
+
+    <Card padding="$space-3" backgroundColor="$surface-2">
+      <VStack gap="$space-2">
+        <Text variant="h3">Expansion Modes:</Text>
+        <VStack gap="$space-1">
+          <Text>• "none": All folders collapsed initially</Text>
+          <Text>• "first-level": Only top-level folders expanded</Text>
+          <Text>• "all": All folders expanded initially</Text>
+          <Text>• Array: Only specified IDs expanded</Text>
+        </VStack>
+
+        <Text variant="h3">Expected Behavior:</Text>
+        <VStack gap="$space-1">
+          <Text>• Buttons should change expansion state when clicked</Text>
+          <Text>• Tree structure should show 3 levels deep</Text>
+          <Text>• Folder icons should change based on expansion state</Text>
+          <Text>• autoExpandToSelection is disabled for this test</Text>
+          <Text>• Level indicators show depth (L1, L2, L3)</Text>
+        </VStack>
+      </VStack>
+    </Card>
+  </VStack>
+</App>

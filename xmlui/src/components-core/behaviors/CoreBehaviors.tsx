@@ -95,6 +95,7 @@ export const labelBehavior: Behavior = {
     const style = extractValue(componentNode.props.style);
     const generatedId = useId();
 
+    console.log("HERE!!!");
     return (
       <ItemWithLabel
         id={componentNode.uid || generatedId}
