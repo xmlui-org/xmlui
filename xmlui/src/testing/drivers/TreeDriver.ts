@@ -5,4 +5,8 @@ export class TreeDriver extends ComponentDriver {
   getNodeById(nodeId: string): Locator {
     return this.component.locator(`[data-tree-node-id="${nodeId}"]`).first();
   }
+
+  getNodeWrapperByMarker(marker: string): Locator {
+    return this.getByMarker(marker).locator("../..");
+  }
 }

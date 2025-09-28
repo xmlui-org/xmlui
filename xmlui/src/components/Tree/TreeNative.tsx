@@ -39,21 +39,27 @@ type TreeRowProps = {
 interface RowContext {
   nodes: FlatTreeNode[];
   toggleNode: (node: FlatTreeNode) => void;
-  selectedUid?: string;
+  selectedUid: string | undefined;
   itemRenderer: (item: any) => ReactNode;
   expandOnItemClick: boolean;
-  onItemClick?: (node: FlatTreeNode) => void;
+  onItemClick?: (item: FlatTreeNode) => void;
   onSelection: (node: FlatTreeNode) => void;
   focusedIndex: number;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
+  lastInteractionWasKeyboard: boolean;
+  setIgnoreNextBlur: (ignore: boolean) => void;
+  setLastInteractionWasKeyboard: (value: boolean) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 }
 
 const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
-  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection, focusedIndex, onKeyDown, onFocus, onBlur } = data;
+  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection, focusedIndex, lastInteractionWasKeyboard, setIgnoreNextBlur, setLastInteractionWasKeyboard, onKeyDown, onFocus, onBlur } = data;
   const treeItem = nodes[index];
-  const isFocused = focusedIndex === index;
+  const isFocused = focusedIndex === index && lastInteractionWasKeyboard;
+  
+  // Use string comparison to handle type mismatches between selectedUid and treeItem.key
+  const isSelected = String(selectedUid) === String(treeItem.key);
 
   const onToggleNode = useCallback(
     (e: React.MouseEvent) => {
@@ -67,7 +73,22 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
     (e: React.MouseEvent) => {
       // Always handle selection for selectable items
       if (treeItem.selectable) {
+        // Ensure tree container has focus for keyboard navigation
+        const treeContainer = (e.target as HTMLElement).closest('[role="tree"]') as HTMLElement;
+        if (treeContainer) {
+          // Ignore the next blur event that might be caused by refocusing
+          setIgnoreNextBlur(true);
+          // Always focus the tree container to enable keyboard navigation
+          treeContainer.focus();
+        }
+        
         onSelection(treeItem);
+        
+        // After a brief delay, enable keyboard interaction for the newly selected item
+        // This allows keyboard navigation to work from the clicked position
+        setTimeout(() => {
+          setLastInteractionWasKeyboard(true);
+        }, 100);
       }
       
       // Call optional onItemClick callback
@@ -87,13 +108,13 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
     <div style={{ ...style, width: "auto", minWidth: "100%", display: "flex" }}>
       <div
         className={classnames(styles.rowWrapper, {
-          [styles.selected]: selectedUid === treeItem.key,
+          [styles.selected]: isSelected,
           [styles.focused]: isFocused,
         })}
         role="treeitem"
         aria-level={treeItem.depth + 1}
         aria-expanded={treeItem.hasChildren ? treeItem.isExpanded : undefined}
-        aria-selected={selectedUid === treeItem.key}
+        aria-selected={isSelected}
         aria-label={treeItem.displayName}
         tabIndex={isFocused ? 0 : -1}
         onKeyDown={onKeyDown}
@@ -207,7 +228,10 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   className,
 }, ref) => {
   // Internal selection state for uncontrolled usage
-  const [internalSelectedUid, setInternalSelectedUid] = useState<string>('');
+  // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
+  const [internalSelectedUid, setInternalSelectedUid] = useState<string>(() => {
+    return (!onSelectionChanged && selectedValue) ? String(selectedValue) : '';
+  });
 
   // Steps 3a & 3b: Transform data based on format
   // Enhanced data transformation pipeline with validation and error handling
@@ -324,30 +348,12 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     return selectedUid;
   }, [selectedValue, selectedUid]);
   
-  // Use mapped selectedValue/selectedUid if provided, otherwise use internal state
-  const effectiveSelectedUid = mappedSelectedUid !== undefined ? mappedSelectedUid : internalSelectedUid;
+  // Use mapped selectedValue/selectedUid if provided AND onSelectionChanged exists (controlled mode),
+  // otherwise use internal state (uncontrolled mode)
+  const effectiveSelectedUid = (mappedSelectedUid !== undefined && onSelectionChanged) 
+    ? mappedSelectedUid 
+    : internalSelectedUid;
 
-  // Selection handler that manages both internal state and external callback
-  const handleSelection = useCallback((node: FlatTreeNode) => {
-    // Use node.key as the source ID (this matches the original data ID)
-    const sourceId = node.key;
-    
-    // Update internal state if not controlled
-    if (selectedUid === undefined) {
-      setInternalSelectedUid(node.key);
-    }
-    
-    // Call external callback if provided
-    if (onSelectionChanged) {
-      onSelectionChanged({
-        type: 'selection',
-        selectedId: sourceId,
-        selectedItem: node,
-        selectedNode: node,
-        previousId: effectiveSelectedUid,
-      });
-    }
-  }, [selectedUid, effectiveSelectedUid, onSelectionChanged]);
 
   // Initialize expanded IDs based on defaultExpanded prop
   const [expandedIds, setExpandedIds] = useState<string[]>(() => {
@@ -394,10 +400,47 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   // Focus management for keyboard navigation
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const [treeHasFocus, setTreeHasFocus] = useState<boolean>(false);
+  const [lastInteractionWasKeyboard, setLastInteractionWasKeyboard] = useState<boolean>(false);
+  const [ignoreNextBlur, setIgnoreNextBlur] = useState<boolean>(false);
   
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds);
   }, [expandedIds, treeData]);
+
+
+
+  // Selection handler that manages both internal state and external callback
+  const handleSelection = useCallback((node: FlatTreeNode, fromKeyboard: boolean = false) => {
+    // Use node.key as the source ID (this matches the original data ID)
+    const sourceId = node.key;
+    
+    // Update internal state if:
+    // 1. Not controlled by selectedUid prop, OR
+    // 2. No onSelectionChanged handler is provided (allows internal management even with selectedValue)
+    if (selectedUid === undefined || !onSelectionChanged) {
+      setInternalSelectedUid(node.key);
+    }
+    
+    // Always update focused index to match the selected item for both mouse and keyboard
+    const nodeIndex = flatTreeData.findIndex(item => item.key === node.key);
+    if (nodeIndex >= 0) {
+      setFocusedIndex(nodeIndex);
+    }
+    
+    // Set keyboard interaction flag - this controls whether focus styling is visible
+    setLastInteractionWasKeyboard(fromKeyboard);
+    
+    // Call external callback if provided
+    if (onSelectionChanged) {
+      onSelectionChanged({
+        type: 'selection',
+        selectedId: sourceId,
+        selectedItem: node,
+        selectedNode: node,
+        previousId: effectiveSelectedUid,
+      });
+    }
+  }, [selectedUid, effectiveSelectedUid, onSelectionChanged, flatTreeData, setFocusedIndex, focusedIndex, lastInteractionWasKeyboard]);
 
   /**
    * ensure the selected item's parents are expanded when selection changes
@@ -495,7 +538,9 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
           const currentNode = flatTreeData[currentIndex];
           // Handle selection
           if (currentNode.selectable) {
-            handleSelection(currentNode);
+            handleSelection(currentNode, true);
+            // Ensure focus stays on the current item after selection
+            newIndex = currentIndex;
           }
           // Handle expansion for Enter key
           if (e.key === 'Enter' && currentNode.hasChildren) {
@@ -506,8 +551,9 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         break;
     }
 
-    if (handled && newIndex !== currentIndex) {
+    if (handled) {
       setFocusedIndex(newIndex);
+      setLastInteractionWasKeyboard(true);
     }
   }, [treeHasFocus, focusedIndex, flatTreeData, toggleNode, handleSelection]);
 
@@ -521,11 +567,14 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       onItemClick,
       onSelection: handleSelection,
       focusedIndex,
+      lastInteractionWasKeyboard,
+      setIgnoreNextBlur,
+      setLastInteractionWasKeyboard,
       onKeyDown: handleKeyDown,
       onFocus: () => setTreeHasFocus(true),
       onBlur: () => setTreeHasFocus(false),
     };
-  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection, focusedIndex, handleKeyDown]);
+  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection, focusedIndex, lastInteractionWasKeyboard, setIgnoreNextBlur, setLastInteractionWasKeyboard, handleKeyDown]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
     const node = data.nodes[index];
@@ -751,16 +800,49 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   // Handle focus management for the tree container
   const handleTreeFocus = useCallback(() => {
     setTreeHasFocus(true);
-    if (focusedIndex === -1 && flatTreeData.length > 0) {
-      // Set initial focus to selected item or first item
-      const selectedIndex = flatTreeData.findIndex(node => String(node.key) === String(effectiveSelectedUid));
-      setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    
+    if (flatTreeData.length > 0) {
+      if (focusedIndex === -1) {
+        // No focus index set, initialize to selected item or first item
+        const selectedIndex = flatTreeData.findIndex(node => String(node.key) === String(effectiveSelectedUid));
+        const targetIndex = selectedIndex >= 0 ? selectedIndex : 0;
+        setFocusedIndex(targetIndex);
+        setLastInteractionWasKeyboard(true);
+      }
+      // Note: If focusedIndex is already set (from mouse click), we keep lastInteractionWasKeyboard as is
+      // This allows keyboard navigation to work from the clicked position without showing focus border immediately
     }
-  }, [focusedIndex, flatTreeData, effectiveSelectedUid]);
+  }, [focusedIndex, flatTreeData, effectiveSelectedUid, treeHasFocus, lastInteractionWasKeyboard]);
 
-  const handleTreeBlur = useCallback(() => {
+  const handleTreeBlur = useCallback((e: React.FocusEvent) => {
+    console.log('🔴 handleTreeBlur called:', {
+      ignoreNextBlur,
+      relatedTarget: e.relatedTarget,
+      currentTarget: e.currentTarget,
+      target: e.target
+    });
+    
+    if (ignoreNextBlur) {
+      console.log('🟡 handleTreeBlur ignored due to ignoreNextBlur flag');
+      setIgnoreNextBlur(false);
+      return;
+    }
+    
+    // Check if focus is moving to another element within the tree
+    const isMovingWithinTree = e.relatedTarget && 
+      e.currentTarget.contains(e.relatedTarget as Node);
+    
+    if (isMovingWithinTree) {
+      console.log('� handleTreeBlur ignored - focus moving within tree');
+      return;
+    }
+    
+    console.log('🔴 handleTreeBlur processing - clearing all focus state');
     setTreeHasFocus(false);
-  }, []);
+    // Clear focus styling when tree loses focus
+    setFocusedIndex(-1);
+    setLastInteractionWasKeyboard(false);
+  }, [ignoreNextBlur]);
 
   return (
     <div 
