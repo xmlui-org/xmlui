@@ -73,7 +73,7 @@ export const TreeMd = createMetadata({
     itemTemplate: dComponent("The template for each item in the tree."),
   },
   events: {
-    selectionChanged: {
+    selectionDidChange: {
       description: `Fired when the tree selection changes.`,
       signature: `(event: TreeSelectionEvent) => void`,
     },
@@ -203,7 +203,7 @@ export const treeComponentRenderer = createComponentRenderer(
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
-        onSelectionChanged={lookupEventHandler("selectionChanged")}
+        onSelectionChanged={lookupEventHandler("selectionDidChange")}
         itemRenderer={(flatTreeNode: any) => {
           // ========================================
           // $item Context Properties for Templates

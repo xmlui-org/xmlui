@@ -79,7 +79,7 @@ Array<{
 
 ### New Events
 
-#### selectionChanged
+#### selectionDidChange
 ```typescript
 interface TreeSelectionEvent {
   type: 'selection';
@@ -213,7 +213,7 @@ createBidirectionalMapping(sourceData: any, nativeData: UnPackedTreeData): IDMap
   ]"
   selectedValue="2"
   defaultExpanded="first-level"
-  selectionChanged="handleTreeSelection">
+  selectionDidChange="handleTreeSelection">
   
   <property name="itemTemplate">
     <HStack spacing="small">
@@ -277,7 +277,7 @@ createBidirectionalMapping(sourceData: any, nativeData: UnPackedTreeData): IDMap
   expandOnItemClick="true"
   data="{existingApiData}"
   selectedValue="{selectedNodeId}"
-  selectionChanged="handleNodeSelection">
+  selectionDidChange="handleNodeSelection">
   
   <property name="itemTemplate">
     <HStack>
@@ -297,7 +297,7 @@ createBidirectionalMapping(sourceData: any, nativeData: UnPackedTreeData): IDMap
 ### Phase 1: Enhanced User Interaction (Ready for Implementation)
 
 #### Priority 1: Selection Event Handling
-- Implement selectionChanged event with complete TreeSelectionEvent payload
+- Implement selectionDidChange event with complete TreeSelectionEvent payload
 - Add selectedValue prop validation and controlled selection
 - Test selection highlighting and CSS class application
 
@@ -324,7 +324,7 @@ createBidirectionalMapping(sourceData: any, nativeData: UnPackedTreeData): IDMap
 #### Step 5: Renderer Updates
 **File**: `TreeComponent.tsx`
 - Update `treeComponentRenderer` to handle new props
-- Add event handler mapping with `lookupEventHandler("selectionChanged")`
+- Add event handler mapping with `lookupEventHandler("selectionDidChange")`
 - Enhance context variables: `$depth`, `$isExpanded`, `$hasChildren`, `$isSelected`, `$path`, `$icon`
 - Add validation for field configuration including new icon fields
 - Add `expandOnItemClick` prop handling and validation
@@ -450,7 +450,7 @@ The Tree.spec.ts file contains comprehensive test placeholders organized into:
 4. **Selection Management** 🚧 (placeholder tests exist)
    - selectedValue property handling
    - selectedUid backwards compatibility 
-   - selectionChanged event firing
+   - selectionDidChange event firing
    - Selection highlighting validation
 
 5. **Icon Resolution** 🚧 (placeholder tests exist)
@@ -498,7 +498,7 @@ The Tree.spec.ts file contains comprehensive test placeholders organized into:
 
 #### Immediate Testing Goals (Step 4 Validation)
 1. **Expand TreeDriver** - Add missing driver methods for comprehensive component interaction
-2. **Selection Management Tests** - Validate selectedValue/selectedUid handling and selectionChanged events  
+2. **Selection Management Tests** - Validate selectedValue/selectedUid handling and selectionDidChange events  
 3. **Expansion State Tests** - Verify defaultExpanded and expandedValues behavior
 4. **Data Format Tests** - Comprehensive validation of flat vs hierarchy format handling
 5. **Icon Resolution Tests** - Validate icon field mapping and state-specific icons
@@ -578,7 +578,7 @@ The Tree component can now handle:
     dataFormat="flat"
     data="{fileSystemData}"
     selectedValue="{currentSelection}"
-    selectionChanged="handleFileSelection">
+    selectionDidChange="handleFileSelection">
     
     <property name="itemTemplate">
       <HStack>
@@ -597,7 +597,7 @@ The Tree component can now handle:
   id="projectTree"
   dataFormat="hierarchy"
   data="{projectStructure}"
-  selectionChanged="node => {
+  selectionDidChange="node => {
     // Auto-expand children when selecting a folder
     if (projectTree.hasChildren(node.selectedId)) {
       projectTree.expandNode(node.selectedId);
@@ -704,7 +704,7 @@ The Tree component can now handle:
   autoExpandToSelection="true"
   expandOnItemClick="false"
   data="{{}}"
-  selectionChanged="console.log">
+  selectionDidChange="console.log">
   
   <property name="itemTemplate">
     <Text value="Test Item" />
@@ -718,7 +718,7 @@ The Tree component can now handle:
 3. ✅ VS Code shows proper IntelliSense for new properties
 4. ✅ No console errors when component mounts
 5. ✅ Component metadata includes all new properties with descriptions
-6. ✅ `selectionChanged` event is properly registered in metadata
+6. ✅ `selectionDidChange` event is properly registered in metadata
 
 **Expected Console Output**: No errors, component should render with empty tree
 
@@ -808,7 +808,7 @@ console.log('All types compiled successfully', {
     autoExpandToSelection="true"
     expandOnItemClick="true"
     data="[]"
-    selectionChanged="event => console.log('Selection:', event)">
+    selectionDidChange="event => console.log('Selection:', event)">
     
     <property name="itemTemplate">
       <HStack>
@@ -895,7 +895,7 @@ This baseline test ensures Phase 1 changes don't break existing functionality.
 ### ✅ Step 1 Completed: Enhanced Metadata Design
 **Files Modified**: `TreeComponent.tsx`
 - Added all new properties to TreeMd with descriptions and defaults
-- Added `selectionChanged` event to metadata
+- Added `selectionDidChange` event to metadata
 - Updated renderer to pass all new props to TreeNative component
 - Added deprecation notice for `selectedUid`
 

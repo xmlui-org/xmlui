@@ -21,7 +21,7 @@
       selectedValue="5"
       defaultExpanded="first-level"
       height="300px"
-      onSelectionChanged="handleSelection1">
+      onSelectionDidChange="handleSelection1">
       
       <property name="itemTemplate">
         <HStack spacing="small">
@@ -66,7 +66,7 @@
       ]}"
       height="100px"
       selectedValue="root"
-      onSelectionChanged="handleSelection3">
+      onSelectionDidChange="handleSelection3">
       
       <property name="itemTemplate">
         <HStack spacing="small">
@@ -96,7 +96,7 @@
       ]}"
       defaultExpanded="all"
       height="200px"
-      onSelectionChanged="handleSelection4">
+      onSelectionDidChange="handleSelection4">
       
       <property name="itemTemplate">
         <HStack spacing="small">

@@ -349,7 +349,7 @@ onBlur={lookupEventHandler("lostFocus")}
 
 // Custom events with specific payloads
 onDidChange={lookupEventHandler("didChange")}
-onSelectionChanged={lookupEventHandler("selectionChanged")}
+onSelectionChanged={lookupEventHandler("selectionDidChange")}
 ```
 
 ### Renderer Examples

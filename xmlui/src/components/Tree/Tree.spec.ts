@@ -1369,7 +1369,7 @@ test.describe("Basic Functionality", () => {
     );
 
     test.skip(
-      "fires selectionChanged event",
+      "fires selectionDidChange event",
       SKIP_REASON.TO_BE_IMPLEMENTED(),
       async ({ initTestBed, page }) => {
         // TODO: Test onSelectionChanged event with correct TreeSelectionEvent structure
@@ -1380,7 +1380,7 @@ test.describe("Basic Functionality", () => {
           testId="tree" 
           data="{flatTreeData}" 
           dataFormat="flat"
-          onSelectionChanged="event => testState = event"
+          onSelectionDidChange="event => testState = event"
         />
       `);
       },

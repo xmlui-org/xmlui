@@ -62,7 +62,7 @@
         selectedValue=""
         defaultExpanded="first-level"
         autoExpandToSelection="true"
-        onSelectionChanged="{(event) => { console.log('Flat Data Selection:', event); console.log('Selected:', event.selectedItem?.name, '(' + event.selectedItem?.type + ')'); }}"
+        onSelectionDidChange="{(event) => { console.log('Flat Data Selection:', event); console.log('Selected:', event.selectedItem?.name, '(' + event.selectedItem?.type + ')'); }}"
       >
         <property name="itemTemplate">
           <HStack verticalAlignment="center" gap="$space-2">

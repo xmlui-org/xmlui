@@ -32,7 +32,7 @@
         selectedValue="{selectedId}"
         defaultExpanded="all"
         autoExpandToSelection="true"
-        onSelectionChanged="{(event) => { 
+        onSelectionDidChange="{(event) => { 
           console.log('Selection Management Event:', event);
           console.log('Previous ID:', event.previousId);
           console.log('New ID:', event.selectedId);
@@ -59,7 +59,7 @@
         <Text variant="h3">Selection Features:</Text>
         <VStack gap="$space-1">
           <Text>• selectedValue prop controls current selection</Text>
-          <Text>• onSelectionChanged event fires with proper payload</Text>
+          <Text>• onSelectionDidChange event fires with proper payload</Text>
           <Text>• autoExpandToSelection expands path to selected item</Text>
           <Text>• ID mapping between source data and internal representation</Text>
           <Text>• Buttons above test programmatic selection changes</Text>

@@ -53,7 +53,7 @@
         iconCollapsedField="iconCollapsed"
         parentField="parentId"
         defaultExpanded="none"
-        onSelectionChanged="{(event) => { 
+        onSelectionDidChange="{(event) => { 
           console.log('Icon Test Selection:', event);
           console.log('Resolved Icon:', event.selectedNode?.icon);
         }}"

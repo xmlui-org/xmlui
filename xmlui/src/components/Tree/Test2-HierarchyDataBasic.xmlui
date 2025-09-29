@@ -44,7 +44,7 @@
         childrenField="children"
         selectedValue="app"
         defaultExpanded="all"
-        onSelectionChanged="{(event) => { 
+        onSelectionDidChange="{(event) => { 
           console.log('Hierarchy Selection:', event); 
           console.log('Selected:', event.selectedItem?.name);
           console.log('Has Children:', event.selectedNode?.children?.length > 0);

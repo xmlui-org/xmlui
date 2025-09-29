@@ -26,7 +26,7 @@
         selectedValue="{selectedId}"
         defaultExpanded="first-level"
         autoExpandToSelection="true"
-        onSelectionChanged="{(event) => { 
+        onSelectionDidChange="{(event) => { 
           console.log('Selection Event:', event); 
           console.log('Selected ID:', event.selectedId);
           console.log('Selected Item:', event.selectedItem);

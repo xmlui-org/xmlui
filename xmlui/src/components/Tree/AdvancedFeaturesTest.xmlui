@@ -70,7 +70,7 @@
             defaultExpanded="first-level"
             autoExpandToSelection="true"
             expandOnItemClick="{expandOnClick === 'true'}"
-            onSelectionChanged="{(event) => { 
+            onSelectionDidChange="{(event) => { 
               selectedItemId = event.selectedId; 
               console.log('Advanced Selection:', event);
               console.log('Selected Item Details:', {
@@ -149,7 +149,7 @@
           <Text><Text variant="strong">Progress Bars:</Text> Visual progress indicators with dynamic colors</Text>
           <Text><Text variant="strong">Interactive Selection:</Text> Click items to see detailed information panel</Text>
           <Text><Text variant="strong">Expand On Click:</Text> Toggle between expand-on-click and select-on-click modes</Text>
-          <Text><Text variant="strong">Multiple Event Handlers:</Text> Both onSelectionChanged and onItemClick events</Text>
+          <Text><Text variant="strong">Multiple Event Handlers:</Text> Both onSelectionDidChange and onItemClick events</Text>
           <Text><Text variant="strong">Dynamic UI:</Text> Show/hide details panel, toggle interaction modes</Text>
         </VStack>
         
