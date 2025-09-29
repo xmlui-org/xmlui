@@ -185,9 +185,7 @@ interface TreeComponentProps {
   expandOnItemClick?: boolean;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
-  onNodeWillExpand?: (node: FlatTreeNode) => boolean | void;
   onNodeExpanded?: (node: FlatTreeNode) => void;
-  onNodeWillCollapse?: (node: FlatTreeNode) => boolean | void;
   onNodeCollapsed?: (node: FlatTreeNode) => void;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
@@ -212,9 +210,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   expandOnItemClick = defaultProps.expandOnItemClick,
   onItemClick,
   onSelectionChanged,
-  onNodeWillExpand,
   onNodeExpanded,
-  onNodeWillCollapse,
   onNodeCollapsed,
   itemRenderer,
   className,
@@ -444,14 +440,6 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
 
   const toggleNode = useCallback((node: FlatTreeNode) => {
     if (!node.isExpanded) {
-      // Fire nodeWillExpand event - check for cancellation
-      if (onNodeWillExpand) {
-        const result = onNodeWillExpand({ ...node, isExpanded: false });
-        if (result === false) {
-          return; // Cancel expansion
-        }
-      }
-      
       // Expanding the node
       setExpandedIds((prev) => [...prev, node.key]);
       
@@ -460,14 +448,6 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         onNodeExpanded({ ...node, isExpanded: true });
       }
     } else {
-      // Fire nodeWillCollapse event - check for cancellation
-      if (onNodeWillCollapse) {
-        const result = onNodeWillCollapse({ ...node, isExpanded: true });
-        if (result === false) {
-          return; // Cancel collapse
-        }
-      }
-      
       // Collapsing the node
       setExpandedIds((prev) => prev.filter((id) => id !== node.key));
       
@@ -476,7 +456,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         onNodeCollapsed({ ...node, isExpanded: false });
       }
     }
-  }, [onNodeWillExpand, onNodeExpanded, onNodeWillCollapse, onNodeCollapsed]);
+  }, [onNodeExpanded, onNodeCollapsed]);
 
   // Simplified keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -633,18 +613,10 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       // nodeId is source ID, which matches TreeNode.key
       const wasExpanded = expandedIds.includes(nodeId);
       if (!wasExpanded) {
-        // Find the node to fire the will event
-        const node = flatTreeData.find(n => String(n.key) === String(nodeId));
-        if (node && onNodeWillExpand) {
-          const result = onNodeWillExpand({ ...node, isExpanded: false });
-          if (result === false) {
-            return; // Cancel expansion
-          }
-        }
-        
         setExpandedIds(prev => [...prev, nodeId]);
         
         // Fire nodeDidExpand event
+        const node = flatTreeData.find(n => String(n.key) === String(nodeId));
         if (node && onNodeExpanded) {
           onNodeExpanded({ ...node, isExpanded: true });
         }
@@ -655,15 +627,6 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       // nodeId is source ID, which matches TreeNode.key
       const wasExpanded = expandedIds.includes(nodeId);
       if (!wasExpanded) return; // Nothing to collapse
-      
-      // Find the node to fire the will event
-      const node = flatTreeData.find(n => String(n.key) === String(nodeId));
-      if (node && onNodeWillCollapse) {
-        const result = onNodeWillCollapse({ ...node, isExpanded: true });
-        if (result === false) {
-          return; // Cancel collapse
-        }
-      }
       
       // Find the node and collect all its descendants
       const nodeToCollapse = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
@@ -684,8 +647,15 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         setExpandedIds(prev => prev.filter(id => !idsToRemove.has(String(id))));
         
         // Fire nodeDidCollapse event
-        if (node && onNodeCollapsed) {
-          onNodeCollapsed({ ...node, isExpanded: false });
+        if (nodeToCollapse && onNodeCollapsed) {
+          // Convert to FlatTreeNode format for the event
+          const flatNode: FlatTreeNode = {
+            ...nodeToCollapse,
+            isExpanded: false,
+            depth: nodeToCollapse.parentIds.length,
+            hasChildren: !!(nodeToCollapse.children && nodeToCollapse.children.length > 0),
+          };
+          onNodeCollapsed(flatNode);
         }
       }
     },
@@ -745,7 +715,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       // Find node by key (source ID) since effectiveSelectedId contains the source ID
       return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedId)) || null;
     },
-  }), [treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged]);
+  }), [treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged, flatTreeData, onNodeExpanded, onNodeCollapsed]);
 
   // Register component API methods for external access
   useEffect(() => {
@@ -883,7 +853,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         },
       });
     }
-  }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged, selectedValue, setExpandedIds, onNodeWillExpand, onNodeExpanded, onNodeWillCollapse, onNodeCollapsed, flatTreeData]);
+  }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged, selectedValue, setExpandedIds, onNodeExpanded, onNodeCollapsed, flatTreeData]);
 
     // Simplified focus management for the tree container
   const handleTreeFocus = useCallback(() => {

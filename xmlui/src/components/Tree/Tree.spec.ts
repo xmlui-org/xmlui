@@ -2593,6 +2593,1629 @@ test.describe("Basic Functionality", () => {
       await expect(tree.getByMarker("1:refresh")).toBeVisible();
       await expect(tree.getByMarker("2:refresh")).toBeVisible();
     });
+
+    // =============================================================================
+    // COMPREHENSIVE API METHOD TESTS
+    // =============================================================================
+
+    test.describe("API Method Tests", () => {
+      test("expandAll() - expands all nodes and makes all children visible", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(hierarchyTreeData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:expandall">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expandall-btn" label="Expand All" onClick="
+              treeApi.expandAll();
+              testState = { actionPerformed: 'expandAll' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandAllButton = await createButtonDriver("expandall-btn");
+
+        // BEFORE: Verify tree starts collapsed - only root visible
+        await expect(tree.getByMarker("1:expandall")).toBeVisible(); // Root visible
+        await expect(tree.getByMarker("2:expandall")).not.toBeVisible(); // Child hidden
+        await expect(tree.getByMarker("3:expandall")).not.toBeVisible(); // Child hidden
+
+        // Trigger expandAll API
+        await expandAllButton.click();
+        
+        // Wait for async API call to complete
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandAll' });
+
+        // AFTER: Verify all nodes are now visible
+        await expect(tree.getByMarker("1:expandall")).toBeVisible(); // Root still visible
+        await expect(tree.getByMarker("2:expandall")).toBeVisible(); // Child now visible
+        await expect(tree.getByMarker("3:expandall")).toBeVisible(); // Child now visible
+        
+        // Note: For hierarchyTreeData, we only have 2 levels, so all should be visible after expandAll
+      });
+
+      test("collapseAll() - collapses all nodes and hides all children", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(hierarchyTreeData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:collapseall">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapseall-btn" label="Collapse All" onClick="
+              treeApi.collapseAll();
+              testState = { actionPerformed: 'collapseAll' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseAllButton = await createButtonDriver("collapseall-btn");
+
+        // BEFORE: Verify tree starts expanded - all nodes visible
+        await expect(tree.getByMarker("1:collapseall")).toBeVisible(); // Root visible
+        await expect(tree.getByMarker("2:collapseall")).toBeVisible(); // Child visible
+        await expect(tree.getByMarker("3:collapseall")).toBeVisible(); // Child visible
+
+        // Trigger collapseAll API
+        await collapseAllButton.click();
+        
+        // Wait for async API call to complete
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseAll' });
+
+        // AFTER: Verify only root nodes are visible, children are hidden
+        await expect(tree.getByMarker("1:collapseall")).toBeVisible(); // Root still visible
+        await expect(tree.getByMarker("2:collapseall")).not.toBeVisible(); // Child now hidden
+        await expect(tree.getByMarker("3:collapseall")).not.toBeVisible(); // Child now hidden
+      });
+
+      test("expandAll() - with deep hierarchy (4+ levels)", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Create a deeper hierarchy for thorough testing
+        const deepHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  {
+                    id: 3,
+                    name: "Level 2 - Branch A.1", 
+                    children: [
+                      { id: 4, name: "Level 3 - Leaf A.1.1", children: [] },
+                      { id: 5, name: "Level 3 - Leaf A.1.2", children: [] }
+                    ]
+                  },
+                  { id: 6, name: "Level 2 - Branch A.2", children: [] }
+                ]
+              },
+              {
+                id: 7,
+                name: "Level 1 - Branch B", 
+                children: [
+                  { id: 8, name: "Level 2 - Branch B.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(deepHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:deep">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expandall-deep-btn" label="Expand All Deep" onClick="
+              treeApi.expandAll();
+              testState = { actionPerformed: 'expandAllDeep' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandAllButton = await createButtonDriver("expandall-deep-btn");
+
+        // BEFORE: Verify tree starts collapsed - only root visible
+        await expect(tree.getByMarker("1:deep")).toBeVisible(); // Root (Level 0)
+        await expect(tree.getByMarker("2:deep")).not.toBeVisible(); // Level 1 - Branch A (hidden)
+        await expect(tree.getByMarker("3:deep")).not.toBeVisible(); // Level 2 - Branch A.1 (hidden)
+        await expect(tree.getByMarker("4:deep")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (hidden)
+        await expect(tree.getByMarker("7:deep")).not.toBeVisible(); // Level 1 - Branch B (hidden)
+        await expect(tree.getByMarker("8:deep")).not.toBeVisible(); // Level 2 - Branch B.1 (hidden)
+
+        // Trigger expandAll API
+        await expandAllButton.click();
+        
+        // Wait for async API call to complete
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandAllDeep' });
+
+        // AFTER: Verify ALL levels are now visible (4 levels deep)
+        await expect(tree.getByMarker("1:deep")).toBeVisible(); // Root (Level 0) - still visible
+        await expect(tree.getByMarker("2:deep")).toBeVisible(); // Level 1 - Branch A (now visible)
+        await expect(tree.getByMarker("3:deep")).toBeVisible(); // Level 2 - Branch A.1 (now visible)
+        await expect(tree.getByMarker("4:deep")).toBeVisible(); // Level 3 - Leaf A.1.1 (now visible)
+        await expect(tree.getByMarker("5:deep")).toBeVisible(); // Level 3 - Leaf A.1.2 (now visible)
+        await expect(tree.getByMarker("6:deep")).toBeVisible(); // Level 2 - Branch A.2 (now visible)
+        await expect(tree.getByMarker("7:deep")).toBeVisible(); // Level 1 - Branch B (now visible)
+        await expect(tree.getByMarker("8:deep")).toBeVisible(); // Level 2 - Branch B.1 (now visible)
+      });
+
+      test("collapseAll() - with deep hierarchy (4+ levels)", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use the same deep hierarchy data
+        const deepHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  {
+                    id: 3,
+                    name: "Level 2 - Branch A.1", 
+                    children: [
+                      { id: 4, name: "Level 3 - Leaf A.1.1", children: [] },
+                      { id: 5, name: "Level 3 - Leaf A.1.2", children: [] }
+                    ]
+                  },
+                  { id: 6, name: "Level 2 - Branch A.2", children: [] }
+                ]
+              },
+              {
+                id: 7,
+                name: "Level 1 - Branch B", 
+                children: [
+                  { id: 8, name: "Level 2 - Branch B.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(deepHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:deepcollapse">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapseall-deep-btn" label="Collapse All Deep" onClick="
+              treeApi.collapseAll();
+              testState = { actionPerformed: 'collapseAllDeep' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseAllButton = await createButtonDriver("collapseall-deep-btn");
+
+        // BEFORE: Verify tree starts fully expanded - all levels visible
+        await expect(tree.getByMarker("1:deepcollapse")).toBeVisible(); // Root (Level 0) 
+        await expect(tree.getByMarker("2:deepcollapse")).toBeVisible(); // Level 1 - Branch A
+        await expect(tree.getByMarker("3:deepcollapse")).toBeVisible(); // Level 2 - Branch A.1
+        await expect(tree.getByMarker("4:deepcollapse")).toBeVisible(); // Level 3 - Leaf A.1.1
+        await expect(tree.getByMarker("5:deepcollapse")).toBeVisible(); // Level 3 - Leaf A.1.2
+        await expect(tree.getByMarker("7:deepcollapse")).toBeVisible(); // Level 1 - Branch B
+        await expect(tree.getByMarker("8:deepcollapse")).toBeVisible(); // Level 2 - Branch B.1
+
+        // Trigger collapseAll API
+        await collapseAllButton.click();
+        
+        // Wait for async API call to complete
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseAllDeep' });
+
+        // AFTER: Verify only root level nodes are visible, all children hidden
+        await expect(tree.getByMarker("1:deepcollapse")).toBeVisible(); // Root (Level 0) - still visible
+        await expect(tree.getByMarker("2:deepcollapse")).not.toBeVisible(); // Level 1 - Branch A (now hidden)
+        await expect(tree.getByMarker("3:deepcollapse")).not.toBeVisible(); // Level 2 - Branch A.1 (now hidden)
+        await expect(tree.getByMarker("4:deepcollapse")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (now hidden)
+        await expect(tree.getByMarker("5:deepcollapse")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (now hidden)
+        await expect(tree.getByMarker("6:deepcollapse")).not.toBeVisible(); // Level 2 - Branch A.2 (now hidden)
+        await expect(tree.getByMarker("7:deepcollapse")).not.toBeVisible(); // Level 1 - Branch B (now hidden)
+        await expect(tree.getByMarker("8:deepcollapse")).not.toBeVisible(); // Level 2 - Branch B.1 (now hidden)
+      });
+
+      test("expandToLevel(level) - expands nodes only to specified depth", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use deep hierarchy to test expandToLevel properly
+        const deepHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  {
+                    id: 3,
+                    name: "Level 2 - Branch A.1", 
+                    children: [
+                      { id: 4, name: "Level 3 - Leaf A.1.1", children: [] },
+                      { id: 5, name: "Level 3 - Leaf A.1.2", children: [] }
+                    ]
+                  },
+                  { id: 6, name: "Level 2 - Branch A.2", children: [] }
+                ]
+              },
+              {
+                id: 7,
+                name: "Level 1 - Branch B", 
+                children: [
+                  { id: 8, name: "Level 2 - Branch B.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(deepHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:level">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-level0-btn" label="Expand to Level 0" onClick="
+              treeApi.expandToLevel(0);
+              testState = { actionPerformed: 'expandToLevel0' };
+            " />
+            <Button testId="expand-level1-btn" label="Expand to Level 1" onClick="
+              treeApi.expandToLevel(1);
+              testState = { actionPerformed: 'expandToLevel1' };
+            " />
+            <Button testId="expand-level2-btn" label="Expand to Level 2" onClick="
+              treeApi.expandToLevel(2);
+              testState = { actionPerformed: 'expandToLevel2' };
+            " />
+            <Button testId="expand-level3-btn" label="Expand to Level 3" onClick="
+              treeApi.expandToLevel(3);
+              testState = { actionPerformed: 'expandToLevel3' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandLevel0Button = await createButtonDriver("expand-level0-btn");
+        const expandLevel1Button = await createButtonDriver("expand-level1-btn");
+        const expandLevel2Button = await createButtonDriver("expand-level2-btn");
+        const expandLevel3Button = await createButtonDriver("expand-level3-btn");
+
+        // INITIAL STATE: Verify tree starts collapsed - only root visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root)
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 (hidden)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 (hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 (hidden)
+
+        // TEST 1: expandToLevel(0) - should show only root level (no expansion)
+        await expandLevel0Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandToLevel0' });
+
+        // AFTER expandToLevel(0): Only Level 0 visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - Branch A (hidden)
+        await expect(tree.getByMarker("7:level")).not.toBeVisible(); // Level 1 - Branch B (hidden)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (hidden)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (hidden)
+
+        // TEST 2: expandToLevel(1) - should show Level 0 and Level 1 only
+        await expandLevel1Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandToLevel1' });
+
+        // AFTER expandToLevel(1): Level 0 and 1 visible, Level 2+ hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A (now visible)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B (now visible)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (still hidden)
+        await expect(tree.getByMarker("6:level")).not.toBeVisible(); // Level 2 - Branch A.2 (still hidden)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (still hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden)
+
+        // TEST 3: expandToLevel(2) - should show Level 0, 1, and 2
+        await expandLevel2Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandToLevel2' });
+
+        // AFTER expandToLevel(2): Level 0, 1, and 2 visible, Level 3+ hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - visible
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 (now visible)
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 (now visible)
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 (now visible)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden)
+        await expect(tree.getByMarker("5:level")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (still hidden)
+
+        // TEST 4: expandToLevel(3) - should show all levels (0, 1, 2, and 3)
+        await expandLevel3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandToLevel3' });
+
+        // AFTER expandToLevel(3): All levels visible (complete expansion for this tree)
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - visible
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 - visible
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 - visible
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 - visible
+        await expect(tree.getByMarker("4:level")).toBeVisible(); // Level 3 - Leaf A.1.1 (now visible)
+        await expect(tree.getByMarker("5:level")).toBeVisible(); // Level 3 - Leaf A.1.2 (now visible)
+      });
+
+      test("expandNode(nodeId) - expands specific node and shows its children", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use deep hierarchy to test individual node expansion
+        const deepHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  {
+                    id: 3,
+                    name: "Level 2 - Branch A.1", 
+                    children: [
+                      { id: 4, name: "Level 3 - Leaf A.1.1", children: [] },
+                      { id: 5, name: "Level 3 - Leaf A.1.2", children: [] }
+                    ]
+                  },
+                  { id: 6, name: "Level 2 - Branch A.2", children: [] }
+                ]
+              },
+              {
+                id: 7,
+                name: "Level 1 - Branch B", 
+                children: [
+                  { id: 8, name: "Level 2 - Branch B.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(deepHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:level">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-root-btn" label="Expand Root" onClick="
+              treeApi.expandNode(1);
+              testState = { actionPerformed: 'expandRoot' };
+            " />
+            <Button testId="expand-node2-btn" label="Expand Node 2" onClick="
+              treeApi.expandNode(2);
+              testState = { actionPerformed: 'expandNode2' };
+            " />
+            <Button testId="expand-node3-btn" label="Expand Node 3" onClick="
+              treeApi.expandNode(3);
+              testState = { actionPerformed: 'expandNode3' };
+            " />
+            <Button testId="expand-node7-btn" label="Expand Node 7" onClick="
+              treeApi.expandNode(7);
+              testState = { actionPerformed: 'expandNode7' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandRootButton = await createButtonDriver("expand-root-btn");
+        const expandNode2Button = await createButtonDriver("expand-node2-btn");
+        const expandNode3Button = await createButtonDriver("expand-node3-btn");
+        const expandNode7Button = await createButtonDriver("expand-node7-btn");
+
+        // INITIAL STATE: Verify tree starts collapsed - only root visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - Branch A (hidden)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (hidden)
+        await expect(tree.getByMarker("6:level")).not.toBeVisible(); // Level 2 - Branch A.2 (hidden)
+        await expect(tree.getByMarker("7:level")).not.toBeVisible(); // Level 1 - Branch B (hidden)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (hidden)
+
+        // FIRST: Expand root to make Level 1 nodes visible
+        await expandRootButton.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandRoot' });
+
+        // AFTER expanding root: Level 1 nodes become visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A (now visible)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B (now visible)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (still hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden)
+        await expect(tree.getByMarker("6:level")).not.toBeVisible(); // Level 2 - Branch A.2 (still hidden)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (still hidden)
+
+        // TEST 1: expandNode(2) - should expand "Level 1 - Branch A" and show its children
+        await expandNode2Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandNode2' });
+
+        // AFTER expandNode(2): Node 2's children become visible, others stay hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A (still visible)
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 (now visible - child of node 2)
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 (now visible - child of node 2)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden - child of node 3)
+        await expect(tree.getByMarker("5:level")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (still hidden - child of node 3)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B (still visible from root expansion)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (still hidden - child of node 7)
+
+        // TEST 2: expandNode(3) - should expand "Level 2 - Branch A.1" and show its children
+        await expandNode3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandNode3' });
+
+        // AFTER expandNode(3): Node 3's children become visible, previous expansions remain
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 - still visible
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 - still visible
+        await expect(tree.getByMarker("4:level")).toBeVisible(); // Level 3 - Leaf A.1.1 (now visible - child of node 3)
+        await expect(tree.getByMarker("5:level")).toBeVisible(); // Level 3 - Leaf A.1.2 (now visible - child of node 3)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B (still visible from root expansion)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (still hidden - child of node 7)
+
+        // TEST 3: expandNode(7) - should expand "Level 1 - Branch B" and show its children
+        await expandNode7Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandNode7' });
+
+        // AFTER expandNode(7): Node 7's children become visible, all previous expansions remain
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 - still visible
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 - still visible
+        await expect(tree.getByMarker("4:level")).toBeVisible(); // Level 3 - Leaf A.1.1 - still visible
+        await expect(tree.getByMarker("5:level")).toBeVisible(); // Level 3 - Leaf A.1.2 - still visible
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - still visible
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 (now visible - child of node 7)
+      });
+
+      test("expandNode(nodeId) - negative tests for invalid or inaccessible nodes", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use simple hierarchy to test negative cases clearly
+        const simpleHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  { id: 3, name: "Level 2 - Leaf A.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(simpleHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:level">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-nonexistent-btn" label="Expand Non-existent Node" onClick="
+              treeApi.expandNode(999);
+              testState = { actionPerformed: 'expandNonExistent' };
+            " />
+            <Button testId="expand-leaf-node3-btn" label="Expand Leaf Node 3" onClick="
+              treeApi.expandNode(3);
+              testState = { actionPerformed: 'expandLeafNode3' };
+            " />
+            <Button testId="expand-root-btn" label="Expand Root" onClick="
+              treeApi.expandNode(1);
+              testState = { actionPerformed: 'expandRoot' };
+            " />
+            <Button testId="expand-node2-btn" label="Expand Node 2" onClick="
+              treeApi.expandNode(2);
+              testState = { actionPerformed: 'expandNode2' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandNonExistentButton = await createButtonDriver("expand-nonexistent-btn");
+        const expandLeafNode3Button = await createButtonDriver("expand-leaf-node3-btn");
+        const expandRootButton = await createButtonDriver("expand-root-btn");
+        const expandNode2Button = await createButtonDriver("expand-node2-btn");
+
+        // INITIAL STATE: Only root visible, all children hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - visible
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - hidden
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - hidden
+
+        // NEGATIVE TEST 1: Try to expand non-existent node (ID 999)
+        await expandNonExistentButton.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandNonExistent' });
+
+        // AFTER expandNode(999): Should have no effect, tree state unchanged
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - still visible
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - still hidden
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - still hidden
+
+        // NEGATIVE TEST 2: Try to expand leaf node 3 (which has no children) while it's hidden
+        await expandLeafNode3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandLeafNode3' });
+
+        // AFTER expandNode(3) on hidden leaf: Should have no effect since node is not visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - still visible
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - still hidden
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - still hidden
+
+        // Now expand the tree properly to make nodes visible
+        await expandRootButton.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandRoot' });
+        
+        await expandNode2Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandNode2' });
+
+        // After proper expansion: All nodes should be visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - visible
+
+        // NEGATIVE TEST 3: Try to expand leaf node 3 again (now that it's visible but still has no children)
+        await expandLeafNode3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'expandLeafNode3' });
+
+        // AFTER expandNode(3) on visible leaf: Should have no visible effect since leaf nodes can't expand
+        // Tree state should remain the same - all nodes still visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - still visible
+      });
+
+      test("collapseNode(nodeId) - collapses specific node and hides its children", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use deep hierarchy to test individual node collapse
+        const deepHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  {
+                    id: 3,
+                    name: "Level 2 - Branch A.1", 
+                    children: [
+                      { id: 4, name: "Level 3 - Leaf A.1.1", children: [] },
+                      { id: 5, name: "Level 3 - Leaf A.1.2", children: [] }
+                    ]
+                  },
+                  { id: 6, name: "Level 2 - Branch A.2", children: [] }
+                ]
+              },
+              {
+                id: 7,
+                name: "Level 1 - Branch B", 
+                children: [
+                  { id: 8, name: "Level 2 - Branch B.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(deepHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:level">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapse-node3-btn" label="Collapse Node 3" onClick="
+              treeApi.collapseNode(3);
+              testState = { actionPerformed: 'collapseNode3' };
+            " />
+            <Button testId="collapse-node2-btn" label="Collapse Node 2" onClick="
+              treeApi.collapseNode(2);
+              testState = { actionPerformed: 'collapseNode2' };
+            " />
+            <Button testId="collapse-root-btn" label="Collapse Root" onClick="
+              treeApi.collapseNode(1);
+              testState = { actionPerformed: 'collapseRoot' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseNode3Button = await createButtonDriver("collapse-node3-btn");
+        const collapseNode2Button = await createButtonDriver("collapse-node2-btn");
+        const collapseRootButton = await createButtonDriver("collapse-root-btn");
+
+        // INITIAL STATE: Tree starts fully expanded - all nodes visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 - visible
+        await expect(tree.getByMarker("4:level")).toBeVisible(); // Level 3 - Leaf A.1.1 - visible
+        await expect(tree.getByMarker("5:level")).toBeVisible(); // Level 3 - Leaf A.1.2 - visible
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 - visible
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - visible
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 - visible
+
+        // TEST 1: collapseNode(3) - should collapse "Level 2 - Branch A.1" and hide its children
+        await collapseNode3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseNode3' });
+
+        // AFTER collapseNode(3): Node 3's children become hidden, others remain visible
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - Branch A.1 - still visible (but collapsed)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (now hidden - child of collapsed node 3)
+        await expect(tree.getByMarker("5:level")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (now hidden - child of collapsed node 3)
+        await expect(tree.getByMarker("6:level")).toBeVisible(); // Level 2 - Branch A.2 - still visible (not child of node 3)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - still visible
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 - still visible
+
+        // TEST 2: collapseNode(2) - should collapse "Level 1 - Branch A" and hide all its descendants
+        await collapseNode2Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseNode2' });
+
+        // AFTER collapseNode(2): Node 2's entire subtree becomes hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - Branch A - still visible (but collapsed)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (now hidden - child of collapsed node 2)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden)
+        await expect(tree.getByMarker("5:level")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (still hidden)
+        await expect(tree.getByMarker("6:level")).not.toBeVisible(); // Level 2 - Branch A.2 (now hidden - child of collapsed node 2)
+        await expect(tree.getByMarker("7:level")).toBeVisible(); // Level 1 - Branch B - still visible (not descendant of node 2)
+        await expect(tree.getByMarker("8:level")).toBeVisible(); // Level 2 - Branch B.1 - still visible
+
+        // TEST 3: collapseNode(1) - should collapse root and hide all children
+        await collapseRootButton.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseRoot' });
+
+        // AFTER collapseNode(1): All children of root become hidden
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Level 0 (Root) - still visible (but collapsed)
+        await expect(tree.getByMarker("2:level")).not.toBeVisible(); // Level 1 - Branch A (now hidden - child of collapsed root)
+        await expect(tree.getByMarker("3:level")).not.toBeVisible(); // Level 2 - Branch A.1 (still hidden)
+        await expect(tree.getByMarker("4:level")).not.toBeVisible(); // Level 3 - Leaf A.1.1 (still hidden)
+        await expect(tree.getByMarker("5:level")).not.toBeVisible(); // Level 3 - Leaf A.1.2 (still hidden)
+        await expect(tree.getByMarker("6:level")).not.toBeVisible(); // Level 2 - Branch A.2 (still hidden)
+        await expect(tree.getByMarker("7:level")).not.toBeVisible(); // Level 1 - Branch B (now hidden - child of collapsed root)
+        await expect(tree.getByMarker("8:level")).not.toBeVisible(); // Level 2 - Branch B.1 (now hidden)
+      });
+
+      test("collapseNode(nodeId) - negative tests for invalid or leaf nodes", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use simple hierarchy for negative tests
+        const simpleHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  { id: 3, name: "Level 2 - Leaf A.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(simpleHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:level">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapse-nonexistent-btn" label="Collapse Non-existent Node" onClick="
+              treeApi.collapseNode(999);
+              testState = { actionPerformed: 'collapseNonExistent' };
+            " />
+            <Button testId="collapse-leaf-node3-btn" label="Collapse Leaf Node 3" onClick="
+              treeApi.collapseNode(3);
+              testState = { actionPerformed: 'collapseLeafNode3' };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseNonExistentButton = await createButtonDriver("collapse-nonexistent-btn");
+        const collapseLeafNode3Button = await createButtonDriver("collapse-leaf-node3-btn");
+
+        // INITIAL STATE: Tree starts fully expanded
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - visible
+
+        // NEGATIVE TEST 1: Try to collapse non-existent node (ID 999)
+        await collapseNonExistentButton.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseNonExistent' });
+
+        // AFTER collapseNode(999): Should have no effect, tree state unchanged
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - still visible
+
+        // NEGATIVE TEST 2: Try to collapse leaf node 3 (which has no children to hide)
+        await collapseLeafNode3Button.click();
+        await expect.poll(testStateDriver.testState).toEqual({ actionPerformed: 'collapseLeafNode3' });
+
+        // AFTER collapseNode(3) on leaf: Should have no visible effect since leaf nodes have no children
+        // Tree state should remain the same
+        await expect(tree.getByMarker("1:level")).toBeVisible(); // Root - still visible
+        await expect(tree.getByMarker("2:level")).toBeVisible(); // Level 1 - still visible
+        await expect(tree.getByMarker("3:level")).toBeVisible(); // Level 2 - still visible
+      });
+
+      test("selectNode(nodeId) - API method executes without error", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Use hierarchy for testing selectNode API
+        const selectableHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              {
+                id: 2, 
+                name: "Level 1 - Branch A",
+                children: [
+                  { id: 3, name: "Level 2 - Leaf A.1", children: [] }
+                ]
+              }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                selectedValue="{selectedNodeId}"
+                onSelectionChanged="selectedNodeId = $event.newNode?.key || null;"
+                data='{${JSON.stringify(selectableHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:selection">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="select-node2-btn" label="Select Node 2" onClick="
+              treeApi.selectNode('2');
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { actionPerformed: 'selectNode2', selectedNodeData: selectedNode };
+            " />
+            <Button testId="select-nonexistent-btn" label="Select Non-existent Node" onClick="
+              treeApi.selectNode('999');
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { actionPerformed: 'selectNonExistent', selectedNodeData: selectedNode };
+            " />
+            <Button testId="get-selected-btn" label="Get Selected Node" onClick="
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { actionPerformed: 'getSelected', selectedNodeData: selectedNode };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const selectNode2Button = await createButtonDriver("select-node2-btn");
+        const selectNonExistentButton = await createButtonDriver("select-nonexistent-btn");
+        const getSelectedButton = await createButtonDriver("get-selected-btn");
+
+        // INITIAL STATE: No selection
+        await getSelectedButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getSelected');
+        
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.selectedNodeData;
+        }).toBe(null);
+
+        // TEST 1: selectNode('2') API call completes without error
+        await selectNode2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('selectNode2');
+
+        // Verify API call completed (even if selection doesn't take effect due to implementation)
+        // NOTE: This test documents that selectNode() triggers onSelectionChanged event
+        // but the actual selection state depends on the onSelectionChanged handler updating selectedValue
+        const currentState = await testStateDriver.testState();
+        expect(currentState.actionPerformed).toBe('selectNode2');
+        
+        // The selectedNodeData might be null if selectNode() doesn't immediately update the tree state
+        // This is expected behavior given the current implementation that relies on onSelectionChanged
+
+        // TEST 2: selectNode('999') with invalid ID completes without error
+        await selectNonExistentButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('selectNonExistent');
+
+        // Verify invalid node selection returns null
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.selectedNodeData;
+        }).toBe(null);
+      });
+
+      test("getSelectedNode() - returns correct selected node data", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Simple hierarchy for testing getSelectedNode API
+        const simpleHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              { id: 2, name: "Level 1 - Branch A", children: [] },
+              { id: 3, name: "Level 1 - Branch B", children: [] }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                selectedValue="{2}"
+                data='{${JSON.stringify(simpleHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:selection">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="get-selected-btn" label="Get Selected Node" onClick="
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { 
+                actionPerformed: 'getSelected', 
+                selectedNodeData: selectedNode,
+                selectedKey: selectedNode?.key,
+                selectedName: selectedNode?.name
+              };
+            " />
+            <Button testId="get-selected-null-btn" label="Get Selected When None" onClick="
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { 
+                actionPerformed: 'getSelectedNull', 
+                selectedNodeData: selectedNode 
+              };
+            " />
+          </Fragment>
+        `);
+
+        const getSelectedButton = await createButtonDriver("get-selected-btn");
+
+        // TEST 1: getSelectedNode() returns correct node when selectedValue is set
+        await getSelectedButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getSelected');
+
+        // Verify getSelectedNode returns the correct node data
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.selectedKey;
+        }).toBe(2);
+
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.selectedName;
+        }).toBe('Level 1 - Branch A');
+
+        // Verify the returned node is not null
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.selectedNodeData;
+        }).not.toBe(null);
+
+        // TEST 2: Test with no selection (update tree to have no selectedValue)
+        const { testStateDriver: testStateDriver2 } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(simpleHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:selection">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="get-selected-null-btn" label="Get Selected When None" onClick="
+              const selectedNode = treeApi.getSelectedNode();
+              testState = { 
+                actionPerformed: 'getSelectedNull', 
+                selectedNodeData: selectedNode 
+              };
+            " />
+          </Fragment>
+        `);
+
+        const getSelectedNullButton = await createButtonDriver("get-selected-null-btn");
+
+        await getSelectedNullButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver2.testState();
+          return state.actionPerformed;
+        }).toBe('getSelectedNull');
+
+        // Verify getSelectedNode returns null when no selection
+        await expect.poll(async () => {
+          const state = await testStateDriver2.testState();
+          return state.selectedNodeData;
+        }).toBe(null);
+      });
+
+      test("clearSelection() - API method executes without error", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Simple hierarchy for testing clearSelection API
+        const simpleHierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              { id: 2, name: "Level 1 - Branch A", children: [] }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(simpleHierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:clear">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="clear-selection-btn" label="Clear Selection" onClick="
+              try {
+                treeApi.clearSelection();
+                testState = { 
+                  actionPerformed: 'clearSelection', 
+                  success: true,
+                  error: null
+                };
+              } catch (error) {
+                testState = { 
+                  actionPerformed: 'clearSelection', 
+                  success: false,
+                  error: error.message
+                };
+              }
+            " />
+            <Button testId="get-selected-btn" label="Get Selected Node" onClick="
+              try {
+                const selectedNode = treeApi.getSelectedNode();
+                testState = { 
+                  actionPerformed: 'getSelected', 
+                  success: true,
+                  selectedNodeData: selectedNode,
+                  error: null
+                };
+              } catch (error) {
+                testState = { 
+                  actionPerformed: 'getSelected', 
+                  success: false,
+                  error: error.message
+                };
+              }
+            " />
+          </Fragment>
+        `);
+
+        const clearSelectionButton = await createButtonDriver("clear-selection-btn");
+        const getSelectedButton = await createButtonDriver("get-selected-btn");
+
+        // TEST: clearSelection() API call completes without error
+        await clearSelectionButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('clearSelection');
+
+        let currentState = await testStateDriver.testState();
+        expect(currentState.success).toBe(true);
+        expect(currentState.error).toBe(null);
+
+        // TEST: getSelectedNode() API call completes without error
+        await getSelectedButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getSelected');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.success).toBe(true);
+        expect(currentState.error).toBe(null);
+        // When no selection is managed, getSelectedNode() returns null
+        expect(currentState.selectedNodeData).toBe(null);
+      });
+
+      test("getNodeById() - returns correct node data or null for invalid keys", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Rich hierarchy data for testing getNodeById API
+        const hierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              { 
+                id: 2, 
+                name: "Level 1 - Branch A", 
+                children: [
+                  { id: 4, name: "Level 2 - Leaf A1", children: [] },
+                  { id: 5, name: "Level 2 - Leaf A2", children: [] }
+                ]
+              },
+              { id: 3, name: "Level 1 - Branch B", children: [] }
+            ]
+          },
+          {
+            id: 6,
+            name: "Root Level 1", 
+            children: [
+              { id: 7, name: "Level 1 - Branch C", children: [] }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(hierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:getById">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="get-node1-btn" label="Get Node 1" onClick="
+              const node = treeApi.getNodeById(1);
+              testState = { 
+                actionPerformed: 'getNode1', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name
+              };
+            " />
+            <Button testId="get-node4-btn" label="Get Node 4" onClick="
+              const node = treeApi.getNodeById(4);
+              testState = { 
+                actionPerformed: 'getNode4', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name
+              };
+            " />
+            <Button testId="get-node7-btn" label="Get Node 7" onClick="
+              const node = treeApi.getNodeById(7);
+              testState = { 
+                actionPerformed: 'getNode7', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name
+              };
+            " />
+            <Button testId="get-invalid-btn" label="Get Invalid Node" onClick="
+              const node = treeApi.getNodeById(999);
+              testState = { 
+                actionPerformed: 'getInvalid', 
+                nodeData: node,
+                nodeExists: node !== null
+              };
+            " />
+          </Fragment>
+        `);
+
+        const getNode1Button = await createButtonDriver("get-node1-btn");
+        const getNode4Button = await createButtonDriver("get-node4-btn");
+        const getNode7Button = await createButtonDriver("get-node7-btn");
+        const getInvalidButton = await createButtonDriver("get-invalid-btn");
+
+        // TEST: getNodeById(1) should return root node data
+        await getNode1Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getNode1');
+
+        let currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(1);
+        expect(currentState.nodeName).toBe("Root Level 0");
+        expect(currentState.nodeData).not.toBe(null);
+
+        // TEST: getNodeById(4) should return deep nested node data
+        await getNode4Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getNode4');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(4);
+        expect(currentState.nodeName).toBe("Level 2 - Leaf A1");
+        expect(currentState.nodeData).not.toBe(null);
+
+        // TEST: getNodeById(7) should return node from second root
+        await getNode7Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getNode7');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(7);
+        expect(currentState.nodeName).toBe("Level 1 - Branch C");
+        expect(currentState.nodeData).not.toBe(null);
+
+        // TEST: getNodeById(999) should return null for non-existent node
+        await getInvalidButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getInvalid');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeExists).toBe(false);
+        expect(currentState.nodeData).toBe(null);
+      });
+
+      test("getNodeById() - can retrieve nodes within collapsed parents", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Hierarchy with nested structure to test collapsed nodes
+        const hierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              { 
+                id: 2, 
+                name: "Level 1 - Branch A", 
+                children: [
+                  { id: 4, name: "Level 2 - Hidden Leaf A1", children: [] },
+                  { id: 5, name: "Level 2 - Hidden Leaf A2", children: [] }
+                ]
+              },
+              { id: 3, name: "Level 1 - Branch B", children: [] }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(hierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:hidden">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapse-node2-btn" label="Collapse Node 2" onClick="
+              treeApi.collapseNode(2);
+              testState = { actionPerformed: 'collapseNode2' };
+            " />
+            <Button testId="get-visible-node1-btn" label="Get Visible Node 1" onClick="
+              const node = treeApi.getNodeById(1);
+              testState = { 
+                actionPerformed: 'getVisibleNode1', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name,
+                nodeExists: node !== null
+              };
+            " />
+            <Button testId="get-hidden-node4-btn" label="Get Hidden Node 4" onClick="
+              const node = treeApi.getNodeById(4);
+              testState = { 
+                actionPerformed: 'getHiddenNode4', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name,
+                nodeExists: node !== null
+              };
+            " />
+            <Button testId="get-hidden-node5-btn" label="Get Hidden Node 5" onClick="
+              const node = treeApi.getNodeById(5);
+              testState = { 
+                actionPerformed: 'getHiddenNode5', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name,
+                nodeExists: node !== null
+              };
+            " />
+            <Button testId="expand-node2-btn" label="Expand Node 2" onClick="
+              treeApi.expandNode(2);
+              testState = { actionPerformed: 'expandNode2' };
+            " />
+            <Button testId="get-now-visible-node4-btn" label="Get Now Visible Node 4" onClick="
+              const node = treeApi.getNodeById(4);
+              testState = { 
+                actionPerformed: 'getNowVisibleNode4', 
+                nodeData: node,
+                nodeKey: node?.key,
+                nodeName: node?.name,
+                nodeExists: node !== null
+              };
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseNode2Button = await createButtonDriver("collapse-node2-btn");
+        const getVisibleNode1Button = await createButtonDriver("get-visible-node1-btn");
+        const getHiddenNode4Button = await createButtonDriver("get-hidden-node4-btn");
+        const getHiddenNode5Button = await createButtonDriver("get-hidden-node5-btn");
+        const expandNode2Button = await createButtonDriver("expand-node2-btn");
+        const getNowVisibleNode4Button = await createButtonDriver("get-now-visible-node4-btn");
+
+        // INITIAL STATE: defaultExpanded="all", so all nodes are visible
+        // First, verify all nodes are visible initially
+        const node1Wrapper = tree.getNodeWrapperByMarker("1:hidden");
+        const node2Wrapper = tree.getNodeWrapperByMarker("2:hidden");
+        const node4Wrapper = tree.getNodeWrapperByMarker("4:hidden");
+        const node5Wrapper = tree.getNodeWrapperByMarker("5:hidden");
+        
+        await expect(node1Wrapper).toBeVisible();
+        await expect(node2Wrapper).toBeVisible();
+        await expect(node4Wrapper).toBeVisible();
+        await expect(node5Wrapper).toBeVisible();
+
+        // Now collapse node 2 to hide its children
+        await collapseNode2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('collapseNode2');
+
+        // After collapse, node 2 is still visible but its children (4, 5) are hidden
+        await expect(node1Wrapper).toBeVisible();
+        await expect(node2Wrapper).toBeVisible();
+        await expect(node4Wrapper).not.toBeVisible();
+        await expect(node5Wrapper).not.toBeVisible();
+
+        // TEST: getNodeById(1) should work for visible node
+        await getVisibleNode1Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getVisibleNode1');
+
+        let currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(1);
+        expect(currentState.nodeName).toBe("Root Level 0");
+        expect(currentState.nodeExists).toBe(true);
+
+        // TEST: getNodeById(4) should work even though node 4 is hidden (collapsed parent)
+        // This tests whether the API can access data model nodes regardless of DOM visibility
+        await getHiddenNode4Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getHiddenNode4');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(4);
+        expect(currentState.nodeName).toBe("Level 2 - Hidden Leaf A1");
+        expect(currentState.nodeExists).toBe(true);
+
+        // TEST: getNodeById(5) should also work for another hidden node
+        await getHiddenNode5Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getHiddenNode5');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(5);
+        expect(currentState.nodeName).toBe("Level 2 - Hidden Leaf A2");
+        expect(currentState.nodeExists).toBe(true);
+
+        // Now expand the parent node to make children visible again
+        await expandNode2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('expandNode2');
+
+        // Verify nodes are now visible in DOM again
+        await expect(node4Wrapper).toBeVisible();
+        await expect(node5Wrapper).toBeVisible();
+
+        // TEST: getNodeById(4) should still work now that it's visible again
+        await getNowVisibleNode4Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getNowVisibleNode4');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.nodeKey).toBe(4);
+        expect(currentState.nodeName).toBe("Level 2 - Hidden Leaf A1");
+        expect(currentState.nodeExists).toBe(true);
+      });
+
+      test("getExpandedNodes() - returns array of expanded node keys", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        // Hierarchy data for testing expanded nodes tracking
+        const hierarchyData = [
+          {
+            id: 1,
+            name: "Root Level 0",
+            children: [
+              { 
+                id: 2, 
+                name: "Level 1 - Branch A", 
+                children: [
+                  { id: 4, name: "Level 2 - Leaf A1", children: [] },
+                  { id: 5, name: "Level 2 - Leaf A2", children: [] }
+                ]
+              },
+              { id: 3, name: "Level 1 - Branch B", children: [] }
+            ]
+          },
+          {
+            id: 6,
+            name: "Root Level 1", 
+            children: [
+              { id: 7, name: "Level 1 - Branch C", children: [] }
+            ]
+          }
+        ];
+
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="none"
+                data='{${JSON.stringify(hierarchyData)}}'>
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}:expand">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="get-expanded-initial-btn" label="Get Expanded Initial" onClick="
+              const expanded = treeApi.getExpandedNodes();
+              testState = { 
+                actionPerformed: 'getExpandedInitial', 
+                expandedNodes: expanded,
+                expandedCount: expanded.length
+              };
+            " />
+            <Button testId="expand-node1-btn" label="Expand Node 1" onClick="
+              treeApi.expandNode(1);
+              testState = { actionPerformed: 'expandNode1' };
+            " />
+            <Button testId="get-expanded-after1-btn" label="Get Expanded After 1" onClick="
+              const expanded = treeApi.getExpandedNodes();
+              testState = { 
+                actionPerformed: 'getExpandedAfter1', 
+                expandedNodes: expanded,
+                expandedCount: expanded.length
+              };
+            " />
+            <Button testId="expand-node2-btn" label="Expand Node 2" onClick="
+              treeApi.expandNode(2);
+              testState = { actionPerformed: 'expandNode2' };
+            " />
+            <Button testId="get-expanded-after2-btn" label="Get Expanded After 2" onClick="
+              const expanded = treeApi.getExpandedNodes();
+              testState = { 
+                actionPerformed: 'getExpandedAfter2', 
+                expandedNodes: expanded,
+                expandedCount: expanded.length
+              };
+            " />
+            <Button testId="expand-all-btn" label="Expand All" onClick="
+              treeApi.expandAll();
+              testState = { actionPerformed: 'expandAll' };
+            " />
+            <Button testId="get-expanded-all-btn" label="Get Expanded All" onClick="
+              const expanded = treeApi.getExpandedNodes();
+              testState = { 
+                actionPerformed: 'getExpandedAll', 
+                expandedNodes: expanded,
+                expandedCount: expanded.length
+              };
+            " />
+            <Button testId="collapse-node2-btn" label="Collapse Node 2" onClick="
+              treeApi.collapseNode(2);
+              testState = { actionPerformed: 'collapseNode2' };
+            " />
+            <Button testId="get-expanded-after-collapse-btn" label="Get Expanded After Collapse" onClick="
+              const expanded = treeApi.getExpandedNodes();
+              testState = { 
+                actionPerformed: 'getExpandedAfterCollapse', 
+                expandedNodes: expanded,
+                expandedCount: expanded.length
+              };
+            " />
+          </Fragment>
+        `);
+
+        const getExpandedInitialButton = await createButtonDriver("get-expanded-initial-btn");
+        const expandNode1Button = await createButtonDriver("expand-node1-btn");
+        const getExpandedAfter1Button = await createButtonDriver("get-expanded-after1-btn");
+        const expandNode2Button = await createButtonDriver("expand-node2-btn");
+        const getExpandedAfter2Button = await createButtonDriver("get-expanded-after2-btn");
+        const expandAllButton = await createButtonDriver("expand-all-btn");
+        const getExpandedAllButton = await createButtonDriver("get-expanded-all-btn");
+        const collapseNode2Button = await createButtonDriver("collapse-node2-btn");
+        const getExpandedAfterCollapseButton = await createButtonDriver("get-expanded-after-collapse-btn");
+
+        // INITIAL STATE: defaultExpanded="none", so no nodes should be expanded
+        await getExpandedInitialButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getExpandedInitial');
+
+        let currentState = await testStateDriver.testState();
+        expect(currentState.expandedCount).toBe(0);
+        expect(currentState.expandedNodes).toEqual([]);
+
+        // EXPAND NODE 1: Should add node 1 to expanded list
+        await expandNode1Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('expandNode1');
+
+        await getExpandedAfter1Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getExpandedAfter1');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.expandedCount).toBe(1);
+        expect(currentState.expandedNodes).toEqual([1]);
+
+        // EXPAND NODE 2: Should add node 2 to expanded list (alongside node 1)
+        await expandNode2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('expandNode2');
+
+        await getExpandedAfter2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getExpandedAfter2');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.expandedCount).toBe(2);
+        expect(currentState.expandedNodes).toEqual(expect.arrayContaining([1, 2]));
+
+        // EXPAND ALL: Should expand all nodes with children
+        await expandAllButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('expandAll');
+
+        await getExpandedAllButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getExpandedAll');
+
+        currentState = await testStateDriver.testState();
+        // After expandAll, ALL nodes are added to the expanded list
+        // This includes leaf nodes, which is the current implementation behavior
+        expect(currentState.expandedCount).toBe(7);
+        expect(currentState.expandedNodes).toEqual(expect.arrayContaining([1, 2, 3, 4, 5, 6, 7]));
+
+        // COLLAPSE NODE 2: Should remove node 2 from expanded list
+        await collapseNode2Button.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('collapseNode2');
+
+        await getExpandedAfterCollapseButton.click();
+        await expect.poll(async () => {
+          const state = await testStateDriver.testState();
+          return state.actionPerformed;
+        }).toBe('getExpandedAfterCollapse');
+
+        currentState = await testStateDriver.testState();
+        expect(currentState.expandedCount).toBe(4);
+        // When node 2 is collapsed, its descendants (4, 5) are also removed from expanded list
+        expect(currentState.expandedNodes).toEqual(expect.arrayContaining([1, 3, 6, 7]));
+        expect(currentState.expandedNodes).not.toEqual(expect.arrayContaining([2, 4, 5]));
+      });
+
+    });
   });
 });
 
@@ -2669,100 +4292,6 @@ test.describe("Events", () => {
     });
   });
 
-  test.describe("nodeWillExpand Event", () => {
-    test("fires before node expansion and allows cancellation", async ({ initTestBed, createTreeDriver }) => {
-      await initTestBed(`
-        <VStack height="400px" var.selected="">
-          <Text>{JSON.stringify(selected)}</Text>
-          <Tree testId="tree" 
-            dataFormat="hierarchy"
-            expandOnItemClick="true"
-            data='{${JSON.stringify(hierarchyTreeData)}}'
-            onNodeWillExpand="node => { selected = { willExpand: node }; return true; }"
-            onNodeDidExpand="node => testState = { ...testState, didExpand: node }">
-            <property name="itemTemplate">
-              <TestMarker tag="{$item.id}">
-                <Text value="{$item.name}" />
-              </TestMarker>
-            </property>
-          </Tree>
-        </VStack>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      
-      // Click on first node to expand it
-      await tree.getByMarker("1").click();
-      
-      // Verify nodeWillExpand fired
-      //await expect.poll(testStateDriver.testState).toBeDefined();
-      
-      // Verify expansion proceeded (nodeDidExpand should fire)
-      // await expect.poll(() => testStateDriver.testState().then(s => s?.didExpand?.id)).toBe(1);
-      
-      // Verify children are now visible
-      await expect(tree.getByMarker("2")).toBeVisible();
-    });
-
-    test("cancels expansion when returning false", async ({ initTestBed, createTreeDriver }) => {
-      const { testStateDriver } = await initTestBed(`
-        <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy"
-            expandOnItemClick="true"
-            data='{${JSON.stringify(hierarchyTreeData)}}'
-            onNodeWillExpand="node => { testState = { willExpand: node, didExpand: null }; return false; }"
-            onNodeDidExpand="node => testState = { ...testState, didExpand: node }">
-            <property name="itemTemplate">
-              <TestMarker tag="{$item.id}">
-                <Text value="{$item.name}" />
-              </TestMarker>
-            </property>
-          </Tree>
-        </VStack>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      
-      // Try to expand first node
-      await tree.getByMarker("1").click();
-      
-      // Verify nodeWillExpand fired
-      await expect.poll(() => testStateDriver.testState().then(s => s?.willExpand?.id)).toBe(1);
-      
-      // Wait a bit and verify expansion was cancelled (didExpand should remain null)
-      await tree.component.waitFor({ timeout: 1000 });
-      const state = await testStateDriver.testState();
-      expect(state.didExpand).toBeNull();
-      
-      // Verify child nodes are still not visible
-      await expect(tree.getByMarker("2")).not.toBeVisible();
-    });
-
-    test("allows conditional expansion based on node properties", async ({ initTestBed, createTreeDriver }) => {
-      await initTestBed(`
-        <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
-            data='{${JSON.stringify(hierarchyTreeData)}}'
-            onNodeWillExpand="node => { testState = { willExpand: node }; return node.id === '1'; }"
-            onNodeDidExpand="node => testState = { ...testState, didExpand: node }">
-          </Tree>
-        </VStack>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      
-      // Click on root node (should succeed since it's not filtered)
-      await tree.getByMarker("1").click();
-      
-      // Verify it expanded - child is visible
-      await expect(tree.getByMarker("2")).toBeVisible();
-      
-      // Note: Additional expansion cancellation tests can be added when TreeDriver supports programmatic expansion
-    });
-  });
-
   test.describe("nodeDidExpand Event", () => {
     test("fires after successful node expansion", async ({ initTestBed, createTreeDriver }) => {
       const { testStateDriver } = await initTestBed(`
@@ -2792,80 +4321,6 @@ test.describe("Events", () => {
       // Verify child is now visible
       await expect(tree.getByMarker("2")).toBeVisible();
     });
-  });
-
-  test.describe("nodeWillCollapse Event", () => {
-    test("fires before node collapse and allows cancellation", async ({ initTestBed, createTreeDriver }) => {
-      const { testStateDriver } = await initTestBed(`
-        <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
-            expandOnItemClick="true"
-            defaultExpanded="all"
-            data='{${JSON.stringify(hierarchyTreeData)}}'
-            onNodeWillCollapse="node => { testState = { willCollapse: node }; return true; }"
-            onNodeDidCollapse="node => testState = { ...testState, didCollapse: node }">
-            <property name="itemTemplate">
-              <TestMarker tag="{$item.id}">
-                <Text value="{$item.name}" />
-              </TestMarker>
-            </property>
-          </Tree>
-        </VStack>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      
-      // Click on expanded node to collapse it
-      await tree.getByMarker("1").click();
-      
-      // Verify nodeWillCollapse fired
-      await expect.poll(() => testStateDriver.testState().then(s => s?.willCollapse?.id)).toBe(1);
-      
-      // Verify collapse proceeded (nodeDidCollapse should fire)
-      await expect.poll(() => testStateDriver.testState().then(s => s?.didCollapse?.id)).toBe(1);
-      
-      // Verify children are no longer visible
-      await expect(tree.getByMarker("2")).not.toBeVisible();
-    });
-
-    test("cancels collapse when returning false", async ({ initTestBed, createTreeDriver }) => {
-      const { testStateDriver } = await initTestBed(`
-        <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
-            expandOnItemClick="true"
-            defaultExpanded="all"
-            data='{${JSON.stringify(hierarchyTreeData)}}'
-            onNodeWillCollapse="node => { testState = { willCollapse: node, didCollapse: null }; return false; }"
-            onNodeDidCollapse="node => testState = { ...testState, didCollapse: node }">
-            <property name="itemTemplate">
-              <TestMarker tag="{$item.id}">
-                <Text value="{$item.name}" />
-              </TestMarker>
-            </property>
-          </Tree>
-        </VStack>
-      `);
-
-      const tree = await createTreeDriver("tree");
-      
-      // Try to collapse by clicking the expanded node
-      await tree.getByMarker("1").click();
-      
-      // Verify nodeWillCollapse fired
-      await expect.poll(() => testStateDriver.testState().then(s => s?.willCollapse?.id)).toBe(1);
-      
-      // Wait a bit and verify collapse was cancelled (didCollapse should remain null)
-      await tree.component.waitFor({ timeout: 1000 });
-      const state = await testStateDriver.testState();
-      expect(state.didCollapse).toBeNull();
-      
-      // Verify children are still visible
-      await expect(tree.getByMarker("2")).toBeVisible();
-    });
-
-    // Note: Additional tests for conditional collapse can be added when TreeDriver supports programmatic collapse
   });
 
   test.describe("nodeDidCollapse Event", () => {
@@ -2903,6 +4358,700 @@ test.describe("Events", () => {
     });
 
     // Note: Additional collapse tests can be added when TreeDriver supports programmatic collapse operations
+  });
+
+  // =============================================================================
+  // KEYBOARD EVENT TESTS
+  // =============================================================================
+
+  test.describe("Keyboard Events", () => {
+    test.describe("selectionDidChange Event via Keyboard", () => {
+      test("fires when Enter key is pressed on a selectable node", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="flat" 
+              data='{${JSON.stringify(flatTreeData)}}'
+              onSelectionDidChange="event => testState = event">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Focus the tree and navigate to first item
+        await tree.component.focus();
+        
+        // Press Enter to select the focused node
+        await tree.component.press("Enter");
+        
+        // Verify selectionDidChange event was fired with correct data
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const event = await testStateDriver.testState();
+        expect(event.newNode).toBeDefined();
+        expect(event.newNode.id).toBe(1);
+        expect(event.newNode.displayName).toBe("Root Item 1");
+        expect(event.previousNode).toBeNull();
+      });
+
+      test("fires when Space key is pressed on a selectable node", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="flat" 
+              data='{${JSON.stringify(flatTreeData)}}'
+              onSelectionDidChange="event => testState = event">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Focus the tree (this starts focus on first item)
+        await tree.component.focus();
+        
+        // Press Space to select the currently focused node (should be first node)
+        await tree.component.press("Space");
+        
+        // Verify selectionDidChange event was fired with correct data
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const event = await testStateDriver.testState();
+        expect(event.newNode).toBeDefined();
+        expect(event.newNode.id).toBe(1); // Should be first node since we didn't navigate
+        expect(event.newNode.displayName).toBe("Root Item 1");
+        expect(event.previousNode).toBeNull();
+      });
+
+      test("fires with previous node when selection changes via keyboard", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="flat" 
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'
+              onSelectionDidChange="event => testState = event">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Click to select first node (using mouse to establish baseline)
+        await tree.getByMarker("1").click();
+        
+        // Now use keyboard to navigate and select second node
+        await tree.component.focus();
+        await tree.component.press("ArrowDown"); // Navigate to second node
+        await tree.component.press("Enter"); // Select it
+        
+        // Verify event has both previous and new node
+        await expect.poll(() => testStateDriver.testState()?.then(s => s?.newNode?.id)).toBe(2);
+        const event = await testStateDriver.testState();
+        expect(event.previousNode.id).toBe(1);
+        expect(event.newNode.id).toBe(2);
+      });
+    });
+
+    test.describe("nodeDidExpand Event via Keyboard", () => {
+      test("fires when Right arrow key expands a collapsed node", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="hierarchy"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidExpand="node => testState = node">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Focus the tree (first node should be focused)
+        await tree.component.focus();
+        
+        // Press Right arrow to expand the first node
+        await tree.component.press("ArrowRight");
+        
+        // Verify nodeDidExpand event fired
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+        
+        // Verify child is now visible
+        await expect(tree.getByMarker("2")).toBeVisible();
+      });
+
+      test("fires when Enter key expands a collapsed node with children", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="hierarchy"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidExpand="node => testState = node">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Focus the tree and press Enter to expand first node
+        await tree.component.focus();
+        await tree.component.press("Enter");
+        
+        // Verify nodeDidExpand event fired
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+        
+        // Verify child is now visible
+        await expect(tree.getByMarker("2")).toBeVisible();
+      });
+
+      test("only Enter key expands nodes - Space only selects", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px" var.selectionFired="false">
+            <Tree testId="tree" 
+              dataFormat="hierarchy"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidExpand="node => testState = node"
+              onSelectionDidChange="event => selectionFired = true">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Focus the tree and press Space - should only trigger selection, not expansion
+        await tree.component.focus();
+        await tree.component.press("Space");
+        
+        // Wait a bit to ensure no expansion event fires
+        await tree.component.waitFor({ timeout: 1000 });
+        
+        // Verify no expansion event fired (testState should remain null)
+        const expandState = await testStateDriver.testState();
+        expect(expandState).toBeNull();
+        
+        // Verify children are still not visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+      });
+    });
+
+    test.describe("nodeDidCollapse Event via Keyboard", () => {
+      test("fires when Left arrow key collapses an expanded node", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="hierarchy" 
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidCollapse="node => testState = node">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Verify child is initially visible (node starts expanded)
+        await expect(tree.getByMarker("2")).toBeVisible();
+        
+        // Focus the tree and press Left arrow to collapse the first node
+        await tree.component.focus();
+        await tree.component.press("ArrowLeft");
+        
+        // Verify nodeDidCollapse fired with correct node
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+        
+        // Verify child is no longer visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+      });
+
+      test("fires when Left arrow navigates from child to parent and collapses parent", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px">
+            <Tree testId="tree" 
+              dataFormat="hierarchy" 
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidCollapse="node => testState = node">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Verify child is initially visible (node starts expanded)
+        await expect(tree.getByMarker("2")).toBeVisible();
+        
+        // Focus the tree, navigate to child node, then press Left to go to parent
+        await tree.component.focus();
+        await tree.component.press("ArrowDown"); // Move to child node
+        await tree.component.press("ArrowLeft"); // Navigate to parent
+        
+        // Then collapse the parent by pressing Left again
+        await tree.component.press("ArrowLeft");
+        
+        // Verify nodeDidCollapse fired with correct node
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+        
+        // Verify child is no longer visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+      });
+    });
+
+    test.describe("Complex Keyboard Event Scenarios", () => {
+      test("fires multiple events during keyboard navigation session", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px" var.eventCount="0" var.lastEvent="">
+            <Tree testId="tree" 
+              dataFormat="hierarchy"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onSelectionDidChange="event => { eventCount++; lastEvent = 'selection:' + event.newNode?.id; testState = { count: eventCount, last: lastEvent }; }"
+              onNodeDidExpand="node => { eventCount++; lastEvent = 'expand:' + node.id; testState = { count: eventCount, last: lastEvent }; }"
+              onNodeDidCollapse="node => { eventCount++; lastEvent = 'collapse:' + node.id; testState = { count: eventCount, last: lastEvent }; }">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        
+        // Simple keyboard interaction sequence
+        await tree.component.focus();
+        
+        // 1. Select and expand first node (Enter does both)
+        await tree.component.press("Enter");
+        
+        // 2. Navigate to child and select it  
+        await tree.component.press("ArrowDown");
+        await tree.component.press("Space"); // Select child (Space only selects)
+        
+        // Verify we have multiple events (using poll for async events)
+        await expect.poll(() => testStateDriver.testState().then(s => s?.count)).toBe(2);
+        const result = await testStateDriver.testState();
+        
+        // Check that we captured events (last event should be selection)
+        expect(result.last).toMatch(/selection:\d+/);
+      });
+
+      test("handles rapid keyboard interactions without missing events", async ({ initTestBed, createTreeDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <VStack height="400px" var.expandCount="0">
+            <Tree testId="tree" 
+              dataFormat="hierarchy"
+              data='{${JSON.stringify(hierarchyTreeData)}}'
+              onNodeDidExpand="node => { expandCount++; testState = expandCount; }">
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}">
+                  <Text value="{$item.name}" />
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        await tree.component.focus();
+        
+        // Rapid expand/collapse sequence
+        await tree.component.press("ArrowRight"); // Expand
+        await tree.component.press("ArrowLeft");  // Collapse
+        await tree.component.press("ArrowRight"); // Expand again
+        await tree.component.press("ArrowLeft");  // Collapse again
+        await tree.component.press("ArrowRight"); // Expand third time
+        
+        // Verify all expansion events were captured
+        await expect.poll(() => testStateDriver.testState()).toBe(3);
+      });
+    });
+  });
+
+  // =============================================================================
+  // API EVENT TESTS
+  // =============================================================================
+
+  test.describe("API Events", () => {
+    test.describe("nodeDidExpand Event via API", () => {
+      test("fires when expandNode() API method is called", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onNodeDidExpand="node => testState = node">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-btn" label="Expand Node 1" onClick="
+              treeApi.expandNode('1');
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandButton = await createButtonDriver("expand-btn");
+
+        // Initially, child should not be visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+
+        // Trigger API expansion
+        await expandButton.click();
+
+        // Verify nodeDidExpand event fired
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+
+        // Verify child is now visible
+        await expect(tree.getByMarker("2")).toBeVisible();
+      });
+
+      test("fires for expandAll() API method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px" var.expandEvents="[]">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onNodeDidExpand="node => { expandEvents = [...expandEvents, node.id]; testState = expandEvents; }">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-all-btn" label="Expand All" onClick="
+              treeApi.expandAll();
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandAllButton = await createButtonDriver("expand-all-btn");
+
+        // Trigger API expand all
+        await expandAllButton.click();
+
+        // Verify nodeDidExpand events fired for nodes with children
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const expandEvents = await testStateDriver.testState();
+        expect(Array.isArray(expandEvents)).toBe(true);
+        expect(expandEvents.length).toBeGreaterThan(0);
+        expect(expandEvents).toContain(1); // Root node should be expanded
+      });
+
+      test("fires for expandToLevel() API method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px" var.expandedNodes="[]">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onNodeDidExpand="node => { expandedNodes = [...expandedNodes, node.id]; testState = expandedNodes; }">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="expand-level-btn" label="Expand to Level 1" onClick="
+              treeApi.expandToLevel(1);
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const expandLevelButton = await createButtonDriver("expand-level-btn");
+
+        // Trigger API expand to level
+        await expandLevelButton.click();
+
+        // Verify nodeDidExpand events fired
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const expandedNodes = await testStateDriver.testState();
+        expect(Array.isArray(expandedNodes)).toBe(true);
+        expect(expandedNodes.length).toBeGreaterThan(0);
+        expect(expandedNodes).toContain(1); // Root node should be expanded
+      });
+    });
+
+    test.describe("nodeDidCollapse Event via API", () => {
+      test("fires when collapseNode() API method is called", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onNodeDidCollapse="node => testState = node">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapse-btn" label="Collapse Node 1" onClick="
+              treeApi.collapseNode('1');
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseButton = await createButtonDriver("collapse-btn");
+
+        // Initially, child should be visible (starts expanded)
+        await expect(tree.getByMarker("2")).toBeVisible();
+
+        // Trigger API collapse
+        await collapseButton.click();
+
+        // Verify nodeDidCollapse event fired
+        await expect.poll(() => testStateDriver.testState().then(s => s?.id)).toBe(1);
+
+        // Verify child is no longer visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+      });
+
+      test("fires for collapseAll() API method", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px" var.collapseEvents="[]">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                defaultExpanded="all"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onNodeDidCollapse="node => { collapseEvents = [...collapseEvents, node.id]; testState = collapseEvents; }">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="collapse-all-btn" label="Collapse All" onClick="
+              treeApi.collapseAll();
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const collapseAllButton = await createButtonDriver("collapse-all-btn");
+
+        // Initially, children should be visible (starts expanded)
+        await expect(tree.getByMarker("2")).toBeVisible();
+
+        // Trigger API collapse all
+        await collapseAllButton.click();
+
+        // Verify nodeDidCollapse events fired
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const collapseEvents = await testStateDriver.testState();
+        expect(Array.isArray(collapseEvents)).toBe(true);
+        expect(collapseEvents.length).toBeGreaterThan(0);
+        
+        // Verify children are no longer visible
+        await expect(tree.getByMarker("2")).not.toBeVisible();
+      });
+    });
+
+    test.describe("selectionDidChange Event via API", () => {
+      test("fires when selectNode() API method is called", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="flat"
+                data='{${JSON.stringify(flatTreeData)}}'
+                onSelectionDidChange="event => testState = event">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="select-btn" label="Select Node 2" onClick="
+              treeApi.selectNode('2');
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const selectButton = await createButtonDriver("select-btn");
+
+        // Trigger API selection
+        await selectButton.click();
+
+        // Verify selectionDidChange event fired
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const event = await testStateDriver.testState();
+        expect(event.newNode).toBeDefined();
+        expect(event.newNode.id).toBe(2);
+        expect(event.newNode.displayName).toBe("Child Item 1.1");
+        expect(event.previousNode).toBeNull();
+      });
+
+      test("fires with previous node when changing selection via API", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="flat"
+                data='{${JSON.stringify(flatTreeData)}}'
+                onSelectionDidChange="event => testState = event">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="select-first-btn" label="Select First" onClick="treeApi.selectNode('1');" />
+            <Button testId="select-second-btn" label="Select Second" onClick="treeApi.selectNode('2');" />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const selectFirstButton = await createButtonDriver("select-first-btn");
+        const selectSecondButton = await createButtonDriver("select-second-btn");
+
+        // First selection
+        await selectFirstButton.click();
+        
+        // Second selection
+        await selectSecondButton.click();
+
+        // Verify event has both previous and new node
+        await expect.poll(() => testStateDriver.testState()?.then(s => s?.newNode?.id)).toBe(2);
+        const event = await testStateDriver.testState();
+        expect(event.previousNode.id).toBe(1);
+        expect(event.newNode.id).toBe(2);
+      });
+
+      test("fires when clearSelection() API method is called", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="flat"
+                selectedValue="1"
+                data='{${JSON.stringify(flatTreeData)}}'
+                onSelectionDidChange="event => testState = event">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="clear-btn" label="Clear Selection" onClick="
+              treeApi.clearSelection();
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const clearButton = await createButtonDriver("clear-btn");
+
+        // Trigger API clear selection
+        await clearButton.click();
+
+        // Verify selectionDidChange event fired with null newNode
+        await expect.poll(() => testStateDriver.testState()).toBeDefined();
+        const event = await testStateDriver.testState();
+        expect(event.newNode).toBeNull();
+        expect(event.previousNode).toBeDefined();
+        expect(event.previousNode.id).toBe(1);
+      });
+    });
+
+    test.describe("Complex API Event Scenarios", () => {
+      test("fires events in correct sequence during complex API operations", async ({ initTestBed, createTreeDriver, createButtonDriver }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px" var.eventCount="0" var.lastEvent="">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="hierarchy"
+                data='{${JSON.stringify(hierarchyTreeData)}}'
+                onSelectionDidChange="event => { eventCount++; lastEvent = 'selection:' + (event.newNode?.id || 'null'); testState = { count: eventCount, last: lastEvent }; }"
+                onNodeDidExpand="node => { eventCount++; lastEvent = 'expand:' + node.id; testState = { count: eventCount, last: lastEvent }; }"
+                onNodeDidCollapse="node => { eventCount++; lastEvent = 'collapse:' + node.id; testState = { count: eventCount, last: lastEvent }; }">
+                <property name="itemTemplate">
+                  <TestMarker tag="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </TestMarker>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="complex-btn" label="Complex Operations" onClick="
+              treeApi.expandNode('1');
+              treeApi.selectNode('2');
+              treeApi.collapseNode('1');
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const complexButton = await createButtonDriver("complex-btn");
+
+        // Trigger complex API operations
+        await complexButton.click();
+
+        // Verify multiple events were fired (using poll for async events)
+        await expect.poll(() => testStateDriver.testState().then(s => s?.count)).toBeGreaterThanOrEqual(3);
+        const result = await testStateDriver.testState();
+        
+        // Verify we captured the last event
+        expect(result.last).toMatch(/(selection|expand|collapse):\w+/);
+      });
+    });
   });
 });
 

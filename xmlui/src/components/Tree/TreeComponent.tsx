@@ -78,17 +78,9 @@ export const TreeMd = createMetadata({
       description: `Fired when the tree selection changes.`,
       signature: `(event: TreeSelectionEvent) => void`,
     },
-    nodeWillExpand: {
-      description: `Fired before a tree node is expanded. Return false to cancel expansion.`,
-      signature: `(node: FlatTreeNode) => boolean | void`,
-    },
     nodeDidExpand: {
       description: `Fired when a tree node is expanded.`,
       signature: `(node: FlatTreeNode) => void`,
-    },
-    nodeWillCollapse: {
-      description: `Fired before a tree node is collapsed. Return false to cancel collapse.`,
-      signature: `(node: FlatTreeNode) => boolean | void`,
     },
     nodeDidCollapse: {
       description: `Fired when a tree node is collapsed.`,
@@ -221,9 +213,7 @@ export const treeComponentRenderer = createComponentRenderer(
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
-        onNodeWillExpand={lookupEventHandler("nodeWillExpand")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
-        onNodeWillCollapse={lookupEventHandler("nodeWillCollapse")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
           // ========================================
