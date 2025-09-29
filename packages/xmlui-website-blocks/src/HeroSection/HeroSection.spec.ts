@@ -1,5 +1,4 @@
-import * as testing from "xmlui/testing";
-const { test, expect } = testing;
+import { test, expect } from "xmlui";
 
 test("renders HeroSection", async ({ initTestBed, page }) => {
   const src = `
