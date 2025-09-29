@@ -45,6 +45,20 @@ export interface TreeSelectionEvent {
   previousId?: string;       // Previous selection
 }
 
+export interface TreeExpansionEvent {
+  type: 'expand';
+  nodeId: string;            // Source data ID of the expanded node
+  node: FlatTreeNode;        // The expanded tree node
+  isExpanded: true;          // Always true for expand events
+}
+
+export interface TreeCollapseEvent {
+  type: 'collapse';
+  nodeId: string;            // Source data ID of the collapsed node
+  node: FlatTreeNode;        // The collapsed tree node
+  isExpanded: false;         // Always false for collapse events
+}
+
 export type TreeDataFormat = 'flat' | 'hierarchy';
 
 export type DefaultExpansion = 'none' | 'all' | 'first-level' | string[];

@@ -4,6 +4,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
+import type { TreeSelectionEvent, TreeExpansionEvent, TreeCollapseEvent } from "../../components-core/abstractions/treeAbstractions";
 import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
@@ -76,6 +77,14 @@ export const TreeMd = createMetadata({
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
       signature: `(event: TreeSelectionEvent) => void`,
+    },
+    nodeDidExpand: {
+      description: `Fired when a tree node is expanded.`,
+      signature: `(event: TreeExpansionEvent) => void`,
+    },
+    nodeDidCollapse: {
+      description: `Fired when a tree node is collapsed.`,
+      signature: `(event: TreeCollapseEvent) => void`,
     },
   },
   apis: {
@@ -204,6 +213,8 @@ export const treeComponentRenderer = createComponentRenderer(
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
+        onNodeExpanded={lookupEventHandler("nodeDidExpand")}
+        onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
           // ========================================
           // $item Context Properties for Templates
