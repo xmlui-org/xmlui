@@ -40,21 +40,27 @@ export const CONFIG_SCHEMAS = {
   },
   
   EXTENSIONS: {
-    required: ["packageNames"],
-    optional: ["excludePackages", "includeDevPackages", "customMetadata"],
+    required: [],
+    optional: ["excludeComponentStatuses", "cleanFolder", "includeByName", "excludeByName"],
     properties: {
-      packageNames: {
-        type: "array",
-        itemType: "string"
-      },
-      excludePackages: {
+      excludeComponentStatuses: {
         type: "array",
         itemType: "string",
         default: []
       },
-      includeDevPackages: {
+      cleanFolder: {
         type: "boolean",
         default: false
+      },
+      includeByName: {
+        type: "array",
+        itemType: "string",
+        default: []
+      },
+      excludeByName: {
+        type: "array",
+        itemType: "string",
+        default: []
       }
     }
   },
@@ -231,7 +237,7 @@ export class PathResolver {
     return {
       themes: this.resolvePath("dist/themes", "project"),
       components: this.resolvePath("docs/content/components", "workspace"),
-      extensions: this.resolvePath("docs/content/extensions", "workspace"),
+      extensions: this.resolvePath("docs/content/components", "workspace"),
       pages: this.resolvePath("docs/pages", "workspace"),
       metadata: this.resolvePath("dist/metadata", "project"),
       downloads: this.resolvePath("docs/public/downloads", "workspace")
