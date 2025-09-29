@@ -327,6 +327,19 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       );
     }
 
+    /**
+     * 
+     */
+    const { getBehaviors } = useBehaviors();
+    const behaviors = getBehaviors();
+    if (!isCompoundComponent) {
+      for (const behavior of behaviors) {
+        if (behavior.canAttach(rendererContext.node, descriptor)) {
+          renderedNode = behavior.attach(rendererContext, renderedNode);
+        }
+      }
+    }
+
     // --- The current layout context may suggest to wrap the rendered node.
     if (layoutContextRef.current?.wrapChild) {
       renderedNode = layoutContextRef.current.wrapChild(rendererContext, renderedNode, descriptor);
@@ -384,21 +397,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         : renderedNode;
   }
 
-  const { getBehaviors } = useBehaviors();
-  const applyBehaviors = (node: ReactNode) => {
-    const behaviors = getBehaviors();
-    let wrappedNode = node;
-    if (!isCompoundComponent) {
-      for (const behavior of behaviors) {
-        if (behavior.canAttach(rendererContext.node, descriptor)) {
-          wrappedNode = behavior.attach(rendererContext, wrappedNode);
-        }
-      }
-    }
-    return wrappedNode;
-  };
-
-  return applyBehaviors(nodeToRender);
+  return nodeToRender;
 });
 
 /**
