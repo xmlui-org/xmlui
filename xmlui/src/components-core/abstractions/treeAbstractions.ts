@@ -1,5 +1,5 @@
 export interface TreeNode {
-  uid: string;
+  id: string;
   key: string;
   path: any[];
   displayName?: string;
@@ -10,7 +10,7 @@ export interface TreeNode {
 }
 
 export type TreeItem = {
-  uid: string;
+  id: string;
   children?: Array<TreeItem>;
   [x: string]: any;
 };
@@ -38,25 +38,8 @@ export interface TreeFieldConfig {
 }
 
 export interface TreeSelectionEvent {
-  type: 'selection';
-  selectedId: string;        // Source data ID
-  selectedItem: any;         // Full source item
-  selectedNode: TreeNode;    // Internal tree node
-  previousId?: string;       // Previous selection
-}
-
-export interface TreeExpansionEvent {
-  type: 'expand';
-  nodeId: string;            // Source data ID of the expanded node
-  node: FlatTreeNode;        // The expanded tree node
-  isExpanded: true;          // Always true for expand events
-}
-
-export interface TreeCollapseEvent {
-  type: 'collapse';
-  nodeId: string;            // Source data ID of the collapsed node
-  node: FlatTreeNode;        // The collapsed tree node
-  isExpanded: false;         // Always false for collapse events
+  previousNode: FlatTreeNode | null;
+  newNode: FlatTreeNode | null;
 }
 
 export type TreeDataFormat = 'flat' | 'hierarchy';

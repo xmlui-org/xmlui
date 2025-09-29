@@ -23,8 +23,6 @@ import type {
   UnPackedTreeData,
   TreeFieldConfig,
   TreeSelectionEvent,
-  TreeExpansionEvent,
-  TreeCollapseEvent,
   TreeDataFormat,
   DefaultExpansion,
 } from "../../components-core/abstractions/treeAbstractions";
@@ -42,7 +40,7 @@ type TreeRowProps = {
 interface RowContext {
   nodes: FlatTreeNode[];
   toggleNode: (node: FlatTreeNode) => void;
-  selectedUid: string | undefined;
+  selectedId: string | undefined;
   itemRenderer: (item: any) => ReactNode;
   expandOnItemClick: boolean;
   onItemClick?: (item: FlatTreeNode) => void;
@@ -54,12 +52,12 @@ interface RowContext {
 }
 
 const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
-  const { nodes, toggleNode, selectedUid, itemRenderer, expandOnItemClick, onItemClick, onSelection, focusedIndex, keyboardMode, onKeyDown, treeContainerRef } = data;
+  const { nodes, toggleNode, selectedId, itemRenderer, expandOnItemClick, onItemClick, onSelection, focusedIndex, keyboardMode, onKeyDown, treeContainerRef } = data;
   const treeItem = nodes[index];
   const isFocused = focusedIndex === index && keyboardMode;
   
-  // Use string comparison to handle type mismatches between selectedUid and treeItem.key
-  const isSelected = String(selectedUid) === String(treeItem.key);
+  // Use string comparison to handle type mismatches between selectedId and treeItem.key
+  const isSelected = String(selectedId) === String(treeItem.key);
 
   const onToggleNode = useCallback(
     (e: React.MouseEvent) => {
@@ -169,8 +167,8 @@ export interface TreeRef {
 }
 
 interface TreeComponentProps {
-  registerComponentApi?: RegisterComponentApiFn;
-  data?: UnPackedTreeData | any;
+  registerComponentApi?: (api: any) => void;
+  data?: UnPackedTreeData;
   dataFormat?: TreeDataFormat;
   idField?: string;
   labelField?: string;
@@ -180,15 +178,17 @@ interface TreeComponentProps {
   parentField?: string;
   childrenField?: string;
   selectedValue?: string;
-  selectedUid?: string;
+  selectedId?: string;
   expandedValues?: string[];
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
   expandOnItemClick?: boolean;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
-  onNodeExpanded?: (event: TreeExpansionEvent) => void;
-  onNodeCollapsed?: (event: TreeCollapseEvent) => void;
+  onNodeWillExpand?: (node: FlatTreeNode) => boolean | void;
+  onNodeExpanded?: (node: FlatTreeNode) => void;
+  onNodeWillCollapse?: (node: FlatTreeNode) => boolean | void;
+  onNodeCollapsed?: (node: FlatTreeNode) => void;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
 }
@@ -205,21 +205,23 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   parentField = defaultProps.parentField,
   childrenField = defaultProps.childrenField,
   selectedValue,
-  selectedUid,
+  selectedId,
   expandedValues = defaultProps.expandedValues,
   defaultExpanded = defaultProps.defaultExpanded,
   autoExpandToSelection = defaultProps.autoExpandToSelection,
   expandOnItemClick = defaultProps.expandOnItemClick,
   onItemClick,
   onSelectionChanged,
+  onNodeWillExpand,
   onNodeExpanded,
+  onNodeWillCollapse,
   onNodeCollapsed,
   itemRenderer,
   className,
 }, ref) => {
   // Internal selection state for uncontrolled usage
   // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
-  const [internalSelectedUid, setInternalSelectedUid] = useState<string>(() => {
+  const [internalSelectedId, setInternalSelectedId] = useState<string>(() => {
     return (!onSelectionChanged && selectedValue) ? String(selectedValue) : '';
   });
 
@@ -306,17 +308,17 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
 
   const { treeData, treeItemsById } = transformedData;
 
-  // Bidirectional ID mapping between source IDs and internal UIDs
+  // Bidirectional ID mapping between source IDs and internal IDs
   const idMappings = useMemo(() => {
-    const sourceToUid = new Map<string, string>();
-    const uidToSource = new Map<string, string>();
+    const sourceToId = new Map<string, string>();
+    const idToSource = new Map<string, string>();
     
     const collectMappings = (nodes: TreeNode[]) => {
       nodes.forEach(node => {
-        // For transformed data, map key (source ID) to uid (internal ID)
-        if (node.key !== node.uid) {
-          sourceToUid.set(node.key, node.uid);
-          uidToSource.set(node.uid, node.key);
+        // For transformed data, map key (source ID) to id (internal ID)
+        if (node.key !== node.id) {
+          sourceToId.set(node.key, node.id);
+          idToSource.set(node.id, node.key);
         }
         if (node.children) {
           collectMappings(node.children);
@@ -326,23 +328,23 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     
     collectMappings(treeData);
     
-    return { sourceToUid, uidToSource };
+    return { sourceToId, idToSource };
   }, [treeData]);
   
   // Use selectedValue (source ID) directly since TreeNode.key is the source ID
-  const mappedSelectedUid = useMemo(() => {
+  const mappedSelectedId = useMemo(() => {
     if (selectedValue) {
       // For flat/hierarchy formats, selectedValue is already the source ID (matches TreeNode.key)
       return selectedValue;
     }
-    return selectedUid;
-  }, [selectedValue, selectedUid]);
+    return selectedId;
+  }, [selectedValue, selectedId]);
   
-  // Use mapped selectedValue/selectedUid if provided AND onSelectionChanged exists (controlled mode),
+  // Use mapped selectedValue/selectedId if provided AND onSelectionChanged exists (controlled mode),
   // otherwise use internal state (uncontrolled mode)
-  const effectiveSelectedUid = (mappedSelectedUid !== undefined && onSelectionChanged) 
-    ? mappedSelectedUid 
-    : internalSelectedUid;
+  const effectiveSelectedId = (mappedSelectedId !== undefined && onSelectionChanged) 
+    ? mappedSelectedId 
+    : internalSelectedId;
 
 
   // Initialize expanded IDs based on defaultExpanded prop
@@ -402,9 +404,9 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
   const handleSelection = useCallback((node: FlatTreeNode) => {
     const sourceId = node.key;
     
-    // Update internal state if not controlled by external selectedValue/selectedUid
-    if (selectedUid === undefined || !onSelectionChanged) {
-      setInternalSelectedUid(node.key);
+    // Update internal state if not controlled by external selectedValue/selectedId
+    if (selectedId === undefined || !onSelectionChanged) {
+      setInternalSelectedId(node.key);
     }
     
     // Update focused index to match the selected item
@@ -415,58 +417,66 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     
     // Call external callback if provided
     if (onSelectionChanged) {
+      // Find previous node if there was a previous selection
+      const previousNode = effectiveSelectedId 
+        ? flatTreeData.find(n => String(n.key) === String(effectiveSelectedId)) || null
+        : null;
+      
       onSelectionChanged({
-        type: 'selection',
-        selectedId: sourceId,
-        selectedItem: node,
-        selectedNode: node,
-        previousId: effectiveSelectedUid,
+        previousNode,
+        newNode: node,
       });
     }
-  }, [selectedUid, effectiveSelectedUid, onSelectionChanged, flatTreeData]);
+  }, [selectedId, effectiveSelectedId, onSelectionChanged, flatTreeData]);
 
   /**
    * ensure the selected item's parents are expanded when selection changes
    */
   useEffect(() => {
-    if (autoExpandToSelection && effectiveSelectedUid) {
-      // Find node by key (source ID) since treeItemsById is indexed by uid
-      const treeItem = Object.values(treeItemsById).find(node => node.key === effectiveSelectedUid);
+    if (autoExpandToSelection && effectiveSelectedId) {
+      // Find node by key (source ID) since treeItemsById is indexed by id
+      const treeItem = Object.values(treeItemsById).find(node => node.key === effectiveSelectedId);
       if (treeItem) {
         setExpandedIds((prev) => [...prev, ...treeItem.parentIds]);
       }
     }
-  }, [autoExpandToSelection, effectiveSelectedUid, treeItemsById]);
+  }, [autoExpandToSelection, effectiveSelectedId, treeItemsById]);
 
   const toggleNode = useCallback((node: FlatTreeNode) => {
     if (!node.isExpanded) {
+      // Fire nodeWillExpand event - check for cancellation
+      if (onNodeWillExpand) {
+        const result = onNodeWillExpand({ ...node, isExpanded: false });
+        if (result === false) {
+          return; // Cancel expansion
+        }
+      }
+      
       // Expanding the node
       setExpandedIds((prev) => [...prev, node.key]);
       
       // Fire nodeDidExpand event
       if (onNodeExpanded) {
-        onNodeExpanded({
-          type: 'expand',
-          nodeId: node.key,
-          node: node,
-          isExpanded: true,
-        });
+        onNodeExpanded({ ...node, isExpanded: true });
       }
     } else {
+      // Fire nodeWillCollapse event - check for cancellation
+      if (onNodeWillCollapse) {
+        const result = onNodeWillCollapse({ ...node, isExpanded: true });
+        if (result === false) {
+          return; // Cancel collapse
+        }
+      }
+      
       // Collapsing the node
       setExpandedIds((prev) => prev.filter((id) => id !== node.key));
       
       // Fire nodeDidCollapse event
       if (onNodeCollapsed) {
-        onNodeCollapsed({
-          type: 'collapse',
-          nodeId: node.key,
-          node: node,
-          isExpanded: false,
-        });
+        onNodeCollapsed({ ...node, isExpanded: false });
       }
     }
-  }, [onNodeExpanded, onNodeCollapsed]);
+  }, [onNodeWillExpand, onNodeExpanded, onNodeWillCollapse, onNodeCollapsed]);
 
   // Simplified keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -566,7 +576,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     return {
       nodes: flatTreeData,
       toggleNode,
-      selectedUid: effectiveSelectedUid,
+      selectedId: effectiveSelectedId,
       itemRenderer,
       expandOnItemClick,
       onItemClick,
@@ -576,11 +586,11 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       onKeyDown: handleKeyDown,
       treeContainerRef,
     };
-  }, [flatTreeData, toggleNode, effectiveSelectedUid, itemRenderer, expandOnItemClick, onItemClick, handleSelection, focusedIndex, keyboardMode, handleKeyDown]);
+  }, [flatTreeData, toggleNode, effectiveSelectedId, itemRenderer, expandOnItemClick, onItemClick, handleSelection, focusedIndex, keyboardMode, handleKeyDown]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
     const node = data.nodes[index];
-    return node?.key || node?.uid || `fallback-${index}`;
+    return node?.key || node?.id || `fallback-${index}`;
   }, []);
 
   // Expose imperative API methods via ref
@@ -623,33 +633,48 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       // nodeId is source ID, which matches TreeNode.key
       const wasExpanded = expandedIds.includes(nodeId);
       if (!wasExpanded) {
+        // Find the node to fire the will event
+        const node = flatTreeData.find(n => String(n.key) === String(nodeId));
+        if (node && onNodeWillExpand) {
+          const result = onNodeWillExpand({ ...node, isExpanded: false });
+          if (result === false) {
+            return; // Cancel expansion
+          }
+        }
+        
         setExpandedIds(prev => [...prev, nodeId]);
         
-        // Find the node to fire the event
-        const node = flatTreeData.find(n => String(n.key) === String(nodeId));
+        // Fire nodeDidExpand event
         if (node && onNodeExpanded) {
-          onNodeExpanded({
-            type: 'expand',
-            nodeId: nodeId,
-            node: { ...node, isExpanded: true },
-            isExpanded: true,
-          });
+          onNodeExpanded({ ...node, isExpanded: true });
         }
       }
     },
     
     collapseNode: (nodeId: string) => {
       // nodeId is source ID, which matches TreeNode.key
+      const wasExpanded = expandedIds.includes(nodeId);
+      if (!wasExpanded) return; // Nothing to collapse
+      
+      // Find the node to fire the will event
+      const node = flatTreeData.find(n => String(n.key) === String(nodeId));
+      if (node && onNodeWillCollapse) {
+        const result = onNodeWillCollapse({ ...node, isExpanded: true });
+        if (result === false) {
+          return; // Cancel collapse
+        }
+      }
+      
       // Find the node and collect all its descendants
       const nodeToCollapse = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
       if (nodeToCollapse) {
         const idsToRemove = new Set<string>();
         
         // Recursively collect all descendant IDs
-        const collectDescendants = (node: TreeNode) => {
-          idsToRemove.add(String(node.key));
-          if (node.children) {
-            node.children.forEach(child => collectDescendants(child));
+        const collectDescendants = (treeNode: TreeNode) => {
+          idsToRemove.add(String(treeNode.key));
+          if (treeNode.children) {
+            treeNode.children.forEach(child => collectDescendants(child));
           }
         };
         
@@ -658,18 +683,9 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         // Remove all descendant IDs from expanded list
         setExpandedIds(prev => prev.filter(id => !idsToRemove.has(String(id))));
         
-        // Fire nodeDidCollapse event only if the node was actually expanded
-        const wasExpanded = expandedIds.includes(nodeId);
-        if (wasExpanded) {
-          const node = flatTreeData.find(n => String(n.key) === String(nodeId));
-          if (node && onNodeCollapsed) {
-            onNodeCollapsed({
-              type: 'collapse',
-              nodeId: nodeId,
-              node: { ...node, isExpanded: false },
-              isExpanded: false,
-            });
-          }
+        // Fire nodeDidCollapse event
+        if (node && onNodeCollapsed) {
+          onNodeCollapsed({ ...node, isExpanded: false });
         }
       }
     },
@@ -679,24 +695,36 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
       // Find node by key (source ID) since nodeId is source ID
       const node = Object.values(treeItemsById).find(n => n.key === nodeId);
       if (node && onSelectionChanged) {
+        // Convert TreeNode to FlatTreeNode format
+        const flatNode: FlatTreeNode = {
+          ...node,
+          isExpanded: expandedIds.includes(node.key),
+          depth: node.parentIds.length,
+          hasChildren: !!(node.children && node.children.length > 0),
+        };
+        
+        // Find previous node if there was a previous selection
+        const previousNode = selectedValue 
+          ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
+          : null;
+        
         onSelectionChanged({
-          type: 'selection',
-          selectedId: nodeId,
-          selectedItem: node, // Using the full node as the item
-          selectedNode: node,
-          previousId: selectedValue,
+          previousNode,
+          newNode: flatNode,
         });
       }
     },
     
     clearSelection: () => {
       if (onSelectionChanged) {
+        // Find previous node if there was a previous selection
+        const previousNode = selectedValue 
+          ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
+          : null;
+        
         onSelectionChanged({
-          type: 'selection',
-          selectedId: '',
-          selectedItem: null,
-          selectedNode: null as any,
-          previousId: selectedValue,
+          previousNode,
+          newNode: null,
         });
       }
     },
@@ -713,11 +741,11 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     },
     
     getSelectedNode: () => {
-      if (!effectiveSelectedUid) return null;
-      // Find node by key (source ID) since effectiveSelectedUid contains the source ID
-      return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedUid)) || null;
+      if (!effectiveSelectedId) return null;
+      // Find node by key (source ID) since effectiveSelectedId contains the source ID
+      return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedId)) || null;
     },
-  }), [treeData, treeItemsById, expandedIds, effectiveSelectedUid, onSelectionChanged]);
+  }), [treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged]);
 
   // Register component API methods for external access
   useEffect(() => {
@@ -765,12 +793,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
             // Find the node to fire the event
             const node = flatTreeData.find(n => String(n.key) === String(nodeId));
             if (node && onNodeExpanded) {
-              onNodeExpanded({
-                type: 'expand',
-                nodeId: nodeId,
-                node: { ...node, isExpanded: true },
-                isExpanded: true,
-              });
+              onNodeExpanded({ ...node, isExpanded: true });
             }
           }
         },
@@ -800,12 +823,7 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
             if (wasExpanded) {
               const node = flatTreeData.find(n => String(n.key) === String(nodeId));
               if (node && onNodeCollapsed) {
-                onNodeCollapsed({
-                  type: 'collapse',
-                  nodeId: nodeId,
-                  node: { ...node, isExpanded: false },
-                  isExpanded: false,
-                });
+                onNodeCollapsed({ ...node, isExpanded: false });
               }
             }
           }
@@ -815,24 +833,36 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         selectNode: (nodeId: string) => {
           const node = Object.values(treeItemsById).find(n => n.key === nodeId);
           if (node && onSelectionChanged) {
+            // Convert TreeNode to FlatTreeNode format
+            const flatNode: FlatTreeNode = {
+              ...node,
+              isExpanded: expandedIds.includes(node.key),
+              depth: node.parentIds.length,
+              hasChildren: !!(node.children && node.children.length > 0),
+            };
+            
+            // Find previous node if there was a previous selection
+            const previousNode = selectedValue 
+              ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
+              : null;
+            
             onSelectionChanged({
-              type: 'selection',
-              selectedId: nodeId,
-              selectedItem: node,
-              selectedNode: node,
-              previousId: selectedValue,
+              previousNode,
+              newNode: flatNode,
             });
           }
         },
         
         clearSelection: () => {
           if (onSelectionChanged) {
+            // Find previous node if there was a previous selection
+            const previousNode = selectedValue 
+              ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
+              : null;
+            
             onSelectionChanged({
-              type: 'selection',
-              selectedId: '',
-              selectedItem: null,
-              selectedNode: null as any,
-              previousId: selectedValue,
+              previousNode,
+              newNode: null,
             });
           }
         },
@@ -847,24 +877,24 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
         },
         
         getSelectedNode: () => {
-          if (!effectiveSelectedUid) return null;
-          // Find node by key (source ID) since effectiveSelectedUid contains the source ID
-          return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedUid)) || null;
+          if (!effectiveSelectedId) return null;
+          // Find node by key (source ID) since effectiveSelectedId contains the source ID
+          return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedId)) || null;
         },
       });
     }
-  }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedUid, onSelectionChanged, selectedValue, setExpandedIds, onNodeExpanded, onNodeCollapsed, flatTreeData]);
+  }, [registerComponentApi, treeData, treeItemsById, expandedIds, effectiveSelectedId, onSelectionChanged, selectedValue, setExpandedIds, onNodeWillExpand, onNodeExpanded, onNodeWillCollapse, onNodeCollapsed, flatTreeData]);
 
     // Simplified focus management for the tree container
   const handleTreeFocus = useCallback(() => {
     if (flatTreeData.length > 0 && focusedIndex === -1) {
       // Initialize to selected item or first item on focus
-      const selectedIndex = flatTreeData.findIndex(node => String(node.key) === String(effectiveSelectedUid));
+      const selectedIndex = flatTreeData.findIndex(node => String(node.key) === String(effectiveSelectedId));
       const targetIndex = selectedIndex >= 0 ? selectedIndex : 0;
       setFocusedIndex(targetIndex);
       setKeyboardMode(true);
     }
-  }, [focusedIndex, flatTreeData, effectiveSelectedUid]);
+  }, [focusedIndex, flatTreeData, effectiveSelectedId]);
 
   const handleTreeBlur = useCallback((e: React.FocusEvent) => {
     // Check if focus is moving to another element within the tree

@@ -26,11 +26,11 @@
         selectedValue="{selectedId}"
         defaultExpanded="first-level"
         autoExpandToSelection="true"
-        onSelectionDidChange="{(event) => { 
+        onSelectionDidChange="{(event) => {
           console.log('Selection Event:', event); 
-          console.log('Selected ID:', event.selectedId);
-          console.log('Selected Item:', event.selectedItem);
-          updateState({ selectedId: event.selectedId });
+          console.log('Selected ID:', event.newNode?.id);
+          console.log('Selected Item:', event.newNode);
+          updateState({ selectedId: event.newNode?.id || '' });
         }}"
       >
         <property name="itemTemplate">

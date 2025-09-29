@@ -4,7 +4,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
-import type { TreeSelectionEvent, TreeExpansionEvent, TreeCollapseEvent } from "../../components-core/abstractions/treeAbstractions";
+import type { TreeSelectionEvent, FlatTreeNode } from "../../components-core/abstractions/treeAbstractions";
 import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
@@ -78,13 +78,21 @@ export const TreeMd = createMetadata({
       description: `Fired when the tree selection changes.`,
       signature: `(event: TreeSelectionEvent) => void`,
     },
+    nodeWillExpand: {
+      description: `Fired before a tree node is expanded. Return false to cancel expansion.`,
+      signature: `(node: FlatTreeNode) => boolean | void`,
+    },
     nodeDidExpand: {
       description: `Fired when a tree node is expanded.`,
-      signature: `(event: TreeExpansionEvent) => void`,
+      signature: `(node: FlatTreeNode) => void`,
+    },
+    nodeWillCollapse: {
+      description: `Fired before a tree node is collapsed. Return false to cancel collapse.`,
+      signature: `(node: FlatTreeNode) => boolean | void`,
     },
     nodeDidCollapse: {
       description: `Fired when a tree node is collapsed.`,
-      signature: `(event: TreeCollapseEvent) => void`,
+      signature: `(node: FlatTreeNode) => void`,
     },
   },
   apis: {
@@ -207,13 +215,15 @@ export const treeComponentRenderer = createComponentRenderer(
         parentField={extractValue(node.props.parentField)}
         childrenField={extractValue(node.props.childrenField)}
         selectedValue={extractValue(node.props.selectedValue)}
-        selectedUid={extractValue(node.props.selectedUid)}
+        selectedId={extractValue(node.props.selectedId)}
         expandedValues={extractValue(node.props.expandedValues)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
+        onNodeWillExpand={lookupEventHandler("nodeWillExpand")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
+        onNodeWillCollapse={lookupEventHandler("nodeWillCollapse")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
           // ========================================
@@ -222,7 +232,7 @@ export const treeComponentRenderer = createComponentRenderer(
           // These properties are available in item templates via $item.propertyName
           const itemContext = {
             // Core identification properties
-            id: flatTreeNode.uid,                    // $item.id - Internal unique identifier
+            id: flatTreeNode.id,                     // $item.id - Internal unique identifier
             key: flatTreeNode.key,                   // $item.key - Source data ID
             
             // Display properties
