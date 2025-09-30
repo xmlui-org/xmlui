@@ -50,6 +50,8 @@ $themeVars: t.composePaddingVars($themeVars, $component);
     width: 100%;
     gap: t.$space-1;
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     @include t.paddingVars($themeVars, $component);
     min-height: 2.5rem;
     /* h-12 */
@@ -92,6 +94,14 @@ $themeVars: t.composePaddingVars($themeVars, $component);
     gap: 0.25rem;
   }
 
+  .inputWrapper {
+    display: flex;
+    align-items: center;
+    min-width: fit-content;
+    flex: 1;
+    gap: t.$space-1;
+  }
+
   .badge {
     width: fit-content;
     height: fit-content;
@@ -123,7 +133,7 @@ $themeVars: t.composePaddingVars($themeVars, $component);
   }
 
   .commandInput {
-    flex: 1;
+    width: 100%;
     background-color: transparent;
     outline: none;
 
@@ -144,7 +154,7 @@ $themeVars: t.composePaddingVars($themeVars, $component);
   .actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-shrink: 0;
   }
 
   .action {
@@ -185,7 +195,8 @@ $themeVars: t.composePaddingVars($themeVars, $component);
     transition: background-color 0.2s ease;
     background-color: createThemeVar("backgroundColor-item-#{$component}");
 
-    &[data-selected="true"] {
+    &[aria-selected="true"],
+    &:hover {
       background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
     }
 

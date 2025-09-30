@@ -11,14 +11,7 @@ import {
   useState,
 } from "react";
 import classnames from "classnames";
-import {
-  Command as Cmd,
-  CommandEmpty as CmdEmpty,
-  CommandGroup as CmdGroup,
-  CommandInput as CmdInput,
-  CommandItem as CmdItem,
-  CommandList as CmdList,
-} from "cmdk";
+// Removed cmdk dependency - using pure HTML elements instead
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -31,7 +24,6 @@ import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
 
@@ -124,7 +116,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -137,6 +129,40 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const inputId = id || generatedId;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return Array.from(options);
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    return Array.from(options).filter(option => {
+      const extendedValue = option.value + " " + option.label + " " + (option.keywords || []).join(" ");
+      return extendedValue.toLowerCase().includes(searchLower);
+    });
+  }, [options, searchTerm]);
+
+  // Check if we should show creatable item
+  const shouldShowCreatable = useMemo(() => {
+    if (!creatable || !searchTerm || searchTerm.trim() === "") return false;
+    
+    // Check if the search term already exists as an option
+    const searchTermExists = Array.from(options).some(option => 
+      option.value === searchTerm || option.label === searchTerm
+    );
+    
+    if (searchTermExists) return false;
+    
+    // Check if it's already selected
+    if (Array.isArray(value) && value.includes(searchTerm)) return false;
+    if (value === searchTerm) return false;
+    
+    // Only show creatable if there are no matching filtered options
+    return filteredOptions.length === 0;
+  }, [creatable, searchTerm, options, value, filteredOptions]);
+
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -173,13 +199,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
   const toggleOption = useCallback(
     (selectedItem: string) => {
-      if (multi) {
-        setInputValue("");
-        setSearchTerm("");
-      } else {
-        setOpen(true);
-      }
       if (selectedItem === "") return;
+      
       const newSelectedValue = multi
         ? Array.isArray(value)
           ? value.includes(selectedItem)
@@ -192,6 +213,17 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
+      
+      if (multi) {
+        setInputValue("");
+        setSearchTerm("");
+        // Keep dropdown open for multi-select
+      } else {
+        // Close dropdown for single select
+        setOpen(false);
+        setSearchTerm("");
+      }
+      
       inputRef.current?.focus();
     },
     [multi, value, updateState, onDidChange],
@@ -223,6 +255,68 @@ export const AutoComplete = forwardRef(function AutoComplete(
       return optionsSet;
     });
   }, []);
+
+  // Combined list of all items (creatable + filtered options)
+  const allItems = useMemo(() => {
+    const items = [];
+    if (shouldShowCreatable) {
+      items.push({ type: 'creatable', value: searchTerm, label: `Create "${searchTerm}"` });
+    }
+    filteredOptions.forEach(option => {
+      items.push({ type: 'option', ...option });
+    });
+    return items;
+  }, [shouldShowCreatable, searchTerm, filteredOptions]);
+
+  // Reset selected index when options change
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [allItems]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (!open) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : 0));
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : allItems.length - 1));
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+          const selectedItem = allItems[selectedIndex];
+          if (selectedItem.type === 'creatable') {
+            const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+            onOptionAdd(newOption);
+            onItemCreated(searchTerm);
+            toggleOption(searchTerm);
+          } else {
+            toggleOption(selectedItem.value);
+          }
+        } else if (allItems.length === 1) {
+          // If there's only one item (creatable or regular) and no selection, select it
+          const singleItem = allItems[0];
+          if (singleItem.type === 'creatable') {
+            const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+            onOptionAdd(newOption);
+            onItemCreated(searchTerm);
+            toggleOption(searchTerm);
+          } else {
+            toggleOption(singleItem.value);
+          }
+        }
+        break;
+      case 'Escape':
+        event.preventDefault();
+        setOpen(false);
+        break;
+    }
+  }, [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen]);
 
   // Render the "empty list" message
   const emptyListNode = useMemo(
@@ -267,11 +361,12 @@ export const AutoComplete = forwardRef(function AutoComplete(
       onChange: toggleOption,
       options,
       inputValue,
+      searchTerm,
       open,
       setOpen,
       optionRenderer,
     };
-  }, [inputValue, multi, options, toggleOption, value, open, setOpen, optionRenderer]);
+  }, [inputValue, searchTerm, multi, options, toggleOption, value, open, setOpen, optionRenderer]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
@@ -285,167 +380,161 @@ export const AutoComplete = forwardRef(function AutoComplete(
             }}
             modal={false}
           >
-            <Cmd
+            <div
               ref={dropdownRef}
               className={styles.command}
-              filter={(value, search, keywords) => {
-                if (readOnly) return 1;
-                if (!searchTerm || searchTerm.trim() === "") return 1;
-                const extendedValue = value + " " + keywords.join(" ");
-                if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
-                return 0;
-              }}
             >
-              <ItemWithLabel
-                {...rest}
-                id={inputId}
-                ref={forwardedRef}
-                labelPosition={labelPosition as any}
-                label={label}
-                labelWidth={labelWidth}
-                labelBreak={labelBreak}
-                required={required}
-                enabled={enabled}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                className={className}
-              >
-                <PopoverTrigger asChild>
-                  <div
-                    data-part-id={PART_LIST_WRAPPER}
-                    ref={setReferenceElement}
-                    style={{ width: "100%", ...style }}
-                    className={classnames(
-                      className,
-                      styles.badgeListWrapper,
-                      styles[validationStatus],
-                      {
-                        [styles.disabled]: !enabled,
-                        [styles.focused]: isFocused,
-                      },
-                    )}
-                  >
-                    {Array.isArray(selectedValue) && (
-                      <div className={styles.badgeList}>
-                        {selectedValue.map((v, index) => (
-                          <span key={index} className={styles.badge}>
-                            {v?.label}
-                            {!readOnly && (
-                              <Icon
-                                name="close"
-                                size="sm"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleOption(v.value);
-                                }}
-                              />
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <CmdInput
-                      onFocus={(ev) => {
-                        setIsFocused(true);
-                        onFocus(ev);
-                      }}
-                      onBlur={(ev) => {
-                        if (inputValue === "" && !multi) {
-                          clearValue();
-                        } else {
-                          if (!Array.isArray(selectedValue) && selectedValue) {
-                            setInputValue(selectedValue?.label);
-                          } else {
-                            setInputValue("");
-                          }
-                        }
-                        onBlur(ev);
-                        setIsFocused(false);
-                      }}
-                      onKeyDown={(event) => {
-                        if (readOnly) return;
-                        if (event.key === "ArrowDown") {
-                          setOpen(true);
-                        }
-                        if (event.key === "Enter") {
-                          setOpen((prev) => !prev);
-                        }
-                      }}
-                      id={inputId}
-                      data-part-id={PART_INPUT}
-                      readOnly={readOnly}
-                      autoFocus={autoFocus}
-                      aria-expanded={open}
-                      ref={inputRef}
-                      value={inputValue}
-                      disabled={!enabled}
-                      onValueChange={(value) => {
-                        setOpen(true);
-                        setInputValue(value);
-                        setSearchTerm(value);
-                      }}
-                      placeholder={!readOnly ? placeholder : ""}
-                      className={styles.commandInput}
-                    />
-                    <div className={styles.actions}>
-                      {value?.length > 0 && enabled && !readOnly && (
-                        <span
-                          className={styles.action}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        >
-                          <Icon name="close" />
+              <PopoverTrigger asChild ref={setReferenceElement}>
+                <div
+                  {...rest}
+                  ref={forwardedRef}
+                  data-part-id={PART_LIST_WRAPPER}
+                  style={{ width: "100%", ...style }}
+                  className={classnames(
+                    className,
+                    styles.badgeListWrapper,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.focused]: isFocused,
+                    },
+                  )}
+                  aria-expanded={open}
+                >
+                  {Array.isArray(selectedValue) && selectedValue.length > 0 && (
+                    <div className={styles.badgeList}>
+                      {selectedValue.map((v, index) => (
+                        <span key={index} className={styles.badge}>
+                          {v?.label}
+                          {!readOnly && (
+                            <Icon
+                              name="close"
+                              size="sm"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v.value);
+                              }}
+                            />
+                          )}
                         </span>
-                      )}
+                      ))}
+                    </div>
+                  )}
+                  <div className={styles.inputWrapper}>
+                    <input
+                    role="combobox"
+                    id={inputId}
+                    onFocus={(ev) => {
+                      setIsFocused(true);
+                      onFocus(ev);
+                    }}
+                    onBlur={(ev) => {
+                      if (inputValue === "" && !multi) {
+                        clearValue();
+                      } else {
+                        if (!Array.isArray(selectedValue) && selectedValue) {
+                          setInputValue(selectedValue?.label);
+                        } else {
+                          setInputValue("");
+                        }
+                      }
+                      onBlur(ev);
+                      setIsFocused(false);
+                    }}
+                    onKeyDown={(event) => {
+                      if (readOnly) return;
+                      
+                      // Handle opening dropdown
+                      if (event.key === "ArrowDown" && !open) {
+                        setOpen(true);
+                        return;
+                      }
+                      
+                      // Handle keyboard navigation when dropdown is open
+                      if (open) {
+                        handleKeyDown(event);
+                      } else if (event.key === "Enter") {
+                        setOpen(true);
+                      }
+                    }}
+                    data-part-id={PART_INPUT}
+                    readOnly={readOnly}
+                    autoFocus={autoFocus}
+                    aria-autocomplete="list"
+                    ref={inputRef}
+                    value={inputValue}
+                    disabled={!enabled}
+                    onChange={(event) => {
+                      setOpen(true);
+                      setInputValue(event.target.value);
+                      setSearchTerm(event.target.value);
+                    }}
+                    placeholder={!readOnly ? placeholder : ""}
+                    className={styles.commandInput}
+                  />
+                  <div className={styles.actions}>
+                    {value?.length > 0 && enabled && !readOnly && (
                       <span
                         className={styles.action}
-                        onClick={() => {
-                          if (readOnly) return;
-                          setOpen(!open);
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
                         }}
                       >
-                        <Icon name="chevrondown" />
+                        <Icon name="close" />
                       </span>
-                    </div>
+                    )}
+                    <span
+                      className={styles.action}
+                      onClick={() => {
+                        if (readOnly) return;
+                        setOpen(!open);
+                      }}
+                    >
+                      <Icon name="chevrondown" />
+                    </span>
                   </div>
-                </PopoverTrigger>
-              </ItemWithLabel>
-
+                </div>
+                </div>
+              </PopoverTrigger>
               {open && (
                 <Portal container={root}>
                   <PopoverContent
-                    asChild
                     style={{ width, height: dropdownHeight }}
                     className={styles.popoverContent}
                     align="start"
                     onOpenAutoFocus={(e) => e.preventDefault()}
                   >
-                    <CmdList
+                    <div
                       role="listbox"
                       className={styles.commandList}
                       style={{ height: dropdownHeight }}
                     >
-                      <CmdEmpty>{emptyListNode}</CmdEmpty>
-                      {creatable && <CreatableItem onNewItem={onItemCreated} />}
-                      <CmdGroup>
-                        {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                          <AutoCompleteOption
-                            key={value}
-                            value={value}
-                            label={label}
-                            enabled={enabled}
-                            keywords={keywords}
-                            readOnly={readOnly}
-                          />
-                        ))}
-                      </CmdGroup>
-                    </CmdList>
+                      {filteredOptions.length === 0 && !shouldShowCreatable && (
+                        <div>{emptyListNode}</div>
+                      )}
+                      {shouldShowCreatable && <CreatableItem onNewItem={onItemCreated} isHighlighted={selectedIndex === 0} />}
+                      <div>
+                        {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
+                          const itemIndex = shouldShowCreatable ? index + 1 : index;
+                          return (
+                            <AutoCompleteOption
+                              key={value}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                              readOnly={readOnly}
+                              isHighlighted={selectedIndex === itemIndex}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
                   </PopoverContent>
                 </Portal>
               )}
-            </Cmd>
+            </div>
           </Popover>
           {children}
         </OptionTypeProvider>
@@ -456,72 +545,82 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
 type CreatableItemProps = {
   onNewItem: (item: string) => void;
+  isHighlighted?: boolean;
 };
 
-function CreatableItem({onNewItem}: CreatableItemProps) {
-  const { value, options, inputValue, onChange, setOpen } = useAutoComplete();
+function CreatableItem({onNewItem, isHighlighted = false}: CreatableItemProps) {
+  const { value, options, searchTerm, onChange, setOpen } = useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
-    isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
-    (Array.isArray(value) && value?.find((s) => s === inputValue)) ||
-    inputValue === value
+    isOptionsExist(options, [{ value: searchTerm, label: searchTerm }]) ||
+    (Array.isArray(value) && value?.find((s) => s === searchTerm)) ||
+    searchTerm === value
   ) {
     return <span style={{ display: "none" }} />;
   }
 
+  const handleClick = () => {
+    const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+    onOptionAdd(newOption);
+    onNewItem?.(searchTerm);
+    onChange(searchTerm);
+    setOpen(false);
+  };
+
   const Item = (
-    <CmdItem
-      value={inputValue}
-      className={styles.autoCompleteOption}
+    <div
+      className={classnames(styles.autoCompleteOption, {
+        [styles.highlighted]: isHighlighted,
+      })}
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
       }}
-      onSelect={(value) => {
-        const newOption = { value, label: value, enabled: true };
-        onOptionAdd(newOption);
-        onNewItem?.(value);
-        onChange(value);
-        setOpen(false);
-      }}
+      onClick={handleClick}
+      role="option"
+      aria-selected={isHighlighted}
     >
-      {`Create "${inputValue}"`}
-    </CmdItem>
+      {`Create "${searchTerm}"`}
+    </div>
   );
 
   // For normal creatable
-  if (inputValue.length > 0) {
+  if (searchTerm.length > 0) {
     return Item;
   }
 
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption(option: Option) {
-  const { value, label, enabled = true, keywords, readOnly, children } = option;
+function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
+  const { value, label, enabled = true, keywords, readOnly, children, isHighlighted = false } = option;
   const id = useId();
   const { value: selectedValue, onChange, multi, setOpen, optionRenderer } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
+  const handleClick = () => {
+    if (!readOnly && enabled) {
+      onChange(value);
+      setOpen(false);
+    }
+  };
+
   return (
-    <CmdItem
+    <div
       id={id}
-      key={id}
-      disabled={!enabled}
-      value={`${value}`}
+      role="option"
+      aria-disabled={!enabled}
+      aria-selected={isHighlighted}
       className={classnames(styles.autoCompleteOption, {
         [styles.disabledOption]: !enabled,
+        [styles.highlighted]: isHighlighted,
       })}
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
       }}
-      onSelect={() => {
-        if (!readOnly && enabled) onChange(value);
-        setOpen(false);
-      }}
+      onClick={handleClick}
       data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
-      keywords={keywords}
     >
       {children ? (
         <>
@@ -536,6 +635,6 @@ function AutoCompleteOption(option: Option) {
           {selected && <Icon name="checkmark" />}
         </>
       )}
-    </CmdItem>
+    </div>
   );
 }

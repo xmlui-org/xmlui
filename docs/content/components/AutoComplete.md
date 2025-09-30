@@ -64,31 +64,6 @@ This property determines whether the dropdown list is open when the component is
 
 This property sets the component's initial value.
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` [#labelposition]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
@@ -166,7 +141,7 @@ This event is triggered when a new item is created by the user (if `creatable` i
 
 Add a few new items not in the options list. The following markup will display them:
 
-```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+```xmlui-pg copy display height="300px" name="Example: itemCreated"
 <App var.newItems="{[]}">
   <AutoComplete
     id="autoComplete"

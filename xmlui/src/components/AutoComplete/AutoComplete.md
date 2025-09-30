@@ -71,7 +71,7 @@
 
 Add a few new items not in the options list. The following markup will display them:
 
-```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+```xmlui-pg copy display height="300px" name="Example: itemCreated"
 <App var.newItems="{[]}">
   <AutoComplete
     id="autoComplete"
