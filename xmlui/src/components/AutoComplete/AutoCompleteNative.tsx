@@ -307,10 +307,27 @@ export const AutoComplete = forwardRef(function AutoComplete(
     return -1;
   }, [allItems]);
 
-  // Reset selected index when options change
+  // Reset selected index when options change, but select matching option when dropdown opens
   useEffect(() => {
-    setSelectedIndex(-1);
-  }, [allItems]);
+    if (!open) {
+      setSelectedIndex(-1);
+    } else if (!multi && open && inputValue) {
+      // For single-select, when dropdown opens and there's an input value, try to find and select the matching option
+      const matchingIndex = allItems.findIndex((item) => {
+        if (item.type === "creatable") return false;
+        return item.label?.toLowerCase() === inputValue.toLowerCase() || 
+               item.value?.toLowerCase() === inputValue.toLowerCase();
+      });
+      if (matchingIndex !== -1) {
+        setSelectedIndex(matchingIndex);
+      } else {
+        setSelectedIndex(-1);
+      }
+    } else if (!multi && open && !inputValue) {
+      setSelectedIndex(-1);
+    }
+    // For multi-select, don't reset selectedIndex when dropdown is open - preserve keyboard navigation
+  }, [allItems, multi, open, inputValue]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
