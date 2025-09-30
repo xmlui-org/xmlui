@@ -201,6 +201,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
     (selectedItem: string) => {
       if (selectedItem === "") return;
 
+      // Check if the option is enabled
+      const option = Array.from(options).find((opt) => opt.value === selectedItem);
+      if (option && option.enabled === false) return;
+
       const newSelectedValue = multi
         ? Array.isArray(value)
           ? value.includes(selectedItem)
@@ -226,7 +230,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
       inputRef.current?.focus();
     },
-    [multi, value, updateState, onDidChange],
+    [multi, value, updateState, onDidChange, options],
   );
 
   useEffect(() => {
@@ -296,7 +300,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
               onOptionAdd(newOption);
               onItemCreated(searchTerm);
               toggleOption(searchTerm);
-            } else {
+            } else if (selectedItem.enabled !== false) {
+              // Only toggle if the option is enabled
               toggleOption(selectedItem.value);
             }
           } else if (allItems.length === 1) {
@@ -307,7 +312,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
               onOptionAdd(newOption);
               onItemCreated(searchTerm);
               toggleOption(searchTerm);
-            } else {
+            } else if (singleItem.enabled !== false) {
+              // Only toggle if the option is enabled
               toggleOption(singleItem.value);
             }
           }
