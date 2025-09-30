@@ -37,7 +37,7 @@
           console.log('Previous ID:', event.previousId);
           console.log('New ID:', event.selectedId);
           console.log('Item Name:', event.selectedItem?.name);
-          updateState({ selectedId: event.selectedId });
+          updateState({ selectedId: event.newNode?.id || '' });
         }}"
       >
         <property name="itemTemplate">

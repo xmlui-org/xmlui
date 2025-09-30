@@ -10,7 +10,7 @@ export function flattenNode(
   node: TreeNode,
   depth: number,
   result: FlatTreeNode[],
-  openedIds: string[],
+  openedIds: (string | number)[],
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
@@ -20,7 +20,7 @@ export function flattenNode(
     depth,
     isExpanded,
     // Ensure key is preserved (in case it was overwritten by ...node spread)
-    key: key || node.key || node.uid,
+    key: key || node.key || node.id,
   });
 
   if (isExpanded && children) {
@@ -30,7 +30,7 @@ export function flattenNode(
   }
 }
 
-export function toFlatTree(treeData: TreeNode[], openedIds: string[]) {
+export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[]) {
   const ret: FlatTreeNode[] = [];
   treeData.forEach((node) => {
     flattenNode(node, 0, ret, openedIds);
@@ -56,19 +56,19 @@ export function unPackTree(
 
   items.forEach((item, index) => {
     const path = [...parentPath, index];
-    const uid = item.uid || item.cid;
-    const childTree = unPackTree(item.children, [...parentIds, uid], path);
+    const id = item.id || item.cid;
+    const childTree = unPackTree(item.children, [...parentIds, id], path);
     const treeItem: TreeNode = {
       ...item,
-      uid: uid,
-      key: uid,
+      id: id,
+      key: id,
       parentIds,
       path,
       children: childTree.treeData,
       selectable: item.selectable,
     };
     treeData.push(treeItem);
-    treeItemsById[uid] = treeItem;
+    treeItemsById[id] = treeItem;
     treeItemsById = {
       ...treeItemsById,
       ...childTree.treeItemsById,
@@ -120,15 +120,15 @@ export function flatToNative(
     }
   });
 
-  // Generate unique UIDs for internal tree structure
-  let uidCounter = 1;
-  const sourceIdToUid = new Map<string, string>();
+  // Generate unique IDs for internal tree structure
+  let idCounter = 1;
+  const sourceIdToId = new Map<string, string>();
   
-  const getOrCreateUid = (sourceId: string): string => {
-    if (!sourceIdToUid.has(sourceId)) {
-      sourceIdToUid.set(sourceId, `flat_${uidCounter++}`);
+  const getOrCreateId = (sourceId: string): string => {
+    if (!sourceIdToId.has(sourceId)) {
+      sourceIdToId.set(sourceId, `flat_${idCounter++}`);
     }
-    return sourceIdToUid.get(sourceId)!;
+    return sourceIdToId.get(sourceId)!;
   };
 
   // Recursive function to build TreeNode structure
@@ -138,7 +138,7 @@ export function flatToNative(
     pathSegments: string[] = []
   ): TreeNode => {
     const sourceId = item[fieldConfig.idField];
-    const uid = getOrCreateUid(sourceId);
+    const id = getOrCreateId(sourceId);
     const displayName = item[fieldConfig.labelField] || sourceId;
     const currentPath = [...pathSegments, displayName];
     
@@ -150,7 +150,7 @@ export function flatToNative(
 
     // Build the TreeNode
     const treeNode: TreeNode = {
-      uid,
+      id,
       key: sourceId, // Use source ID as key for expansion state
       path: currentPath,
       displayName,
@@ -179,11 +179,11 @@ export function flatToNative(
     buildTreeNode(rootItem)
   );
 
-  // Build lookup map by UID
+  // Build lookup map by ID
   const treeItemsById: Record<string, TreeNode> = {};
   const collectNodes = (nodes: TreeNode[]) => {
     nodes.forEach(node => {
-      treeItemsById[node.uid] = node;
+      treeItemsById[node.id] = node;
       if (node.children) {
         collectNodes(node.children);
       }
@@ -218,15 +218,15 @@ export function hierarchyToNative(
     return { treeData: [], treeItemsById: {} };
   }
 
-  // Generate unique UIDs for internal tree structure
-  let uidCounter = 1;
-  const sourceIdToUid = new Map<string, string>();
+  // Generate unique IDs for internal tree structure
+  let idCounter = 1;
+  const sourceIdToId = new Map<string, string>();
   
-  const getOrCreateUid = (sourceId: string): string => {
-    if (!sourceIdToUid.has(sourceId)) {
-      sourceIdToUid.set(sourceId, `hierarchy_${uidCounter++}`);
+  const getOrCreateId = (sourceId: string): string => {
+    if (!sourceIdToId.has(sourceId)) {
+      sourceIdToId.set(sourceId, `hierarchy_${idCounter++}`);
     }
-    return sourceIdToUid.get(sourceId)!;
+    return sourceIdToId.get(sourceId)!;
   };
 
   // Set to track visited nodes for circular reference detection
@@ -244,9 +244,9 @@ export function hierarchyToNative(
     // Circular reference detection
     if (visitedIds.has(sourceId)) {
       // Return a simple node without children to break the cycle
-      const uid = getOrCreateUid(sourceId);
+      const id = getOrCreateId(sourceId);
       return {
-        uid,
+        id,
         key: sourceId,
         path: [...pathSegments, displayName],
         displayName,
@@ -263,7 +263,7 @@ export function hierarchyToNative(
     // Mark as visited
     visitedIds.add(sourceId);
 
-    const uid = getOrCreateUid(sourceId);
+    const id = getOrCreateId(sourceId);
     const currentPath = [...pathSegments, displayName];
     
     // Get children from the specified children field
@@ -280,7 +280,7 @@ export function hierarchyToNative(
 
     // Build the TreeNode
     const treeNode: TreeNode = {
-      uid,
+      id,
       path: currentPath,
       displayName,
       parentIds,
@@ -310,11 +310,11 @@ export function hierarchyToNative(
     buildTreeNode(rootItem)
   );
 
-  // Build lookup map by UID
+  // Build lookup map by ID
   const treeItemsById: Record<string, TreeNode> = {};
   const collectNodes = (nodes: TreeNode[]) => {
     nodes.forEach(node => {
-      treeItemsById[node.uid] = node;
+      treeItemsById[node.id] = node;
       if (node.children) {
         collectNodes(node.children);
       }

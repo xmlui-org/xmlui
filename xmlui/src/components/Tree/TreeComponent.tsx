@@ -4,6 +4,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
+import type { TreeSelectionEvent, FlatTreeNode } from "../../components-core/abstractions/treeAbstractions";
 import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
@@ -76,6 +77,14 @@ export const TreeMd = createMetadata({
     selectionDidChange: {
       description: `Fired when the tree selection changes.`,
       signature: `(event: TreeSelectionEvent) => void`,
+    },
+    nodeDidExpand: {
+      description: `Fired when a tree node is expanded.`,
+      signature: `(node: FlatTreeNode) => void`,
+    },
+    nodeDidCollapse: {
+      description: `Fired when a tree node is collapsed.`,
+      signature: `(node: FlatTreeNode) => void`,
     },
   },
   apis: {
@@ -198,12 +207,14 @@ export const treeComponentRenderer = createComponentRenderer(
         parentField={extractValue(node.props.parentField)}
         childrenField={extractValue(node.props.childrenField)}
         selectedValue={extractValue(node.props.selectedValue)}
-        selectedUid={extractValue(node.props.selectedUid)}
+        selectedId={extractValue(node.props.selectedId)}
         expandedValues={extractValue(node.props.expandedValues)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
+        onNodeExpanded={lookupEventHandler("nodeDidExpand")}
+        onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
           // ========================================
           // $item Context Properties for Templates
@@ -211,7 +222,7 @@ export const treeComponentRenderer = createComponentRenderer(
           // These properties are available in item templates via $item.propertyName
           const itemContext = {
             // Core identification properties
-            id: flatTreeNode.uid,                    // $item.id - Internal unique identifier
+            id: flatTreeNode.id,                     // $item.id - Internal unique identifier
             key: flatTreeNode.key,                   // $item.key - Source data ID
             
             // Display properties
