@@ -541,6 +541,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         onClick={() => {
                           if (readOnly) return;
                           setOpen(!open);
+                          // Focus the input after opening dropdown
+                            inputRef.current?.focus();
                         }}
                       >
                         <Icon name="chevrondown" />
