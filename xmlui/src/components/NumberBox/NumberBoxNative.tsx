@@ -531,7 +531,7 @@ export const NumberBox = forwardRef(function NumberBox(
 
     // --- Convert to number and clamp to min/max bounds
     const numericValue = toUsableNumber(finalValue, integersOnly);
-    if (numericValue !== null && numericValue !== undefined) {
+    if (!isEmptyLike(numericValue)) {
       const clampedValue = clamp(numericValue, min, max);
       if (clampedValue !== numericValue) {
         const clampedString = clampedValue.toString();
