@@ -28,6 +28,10 @@ export const OptionMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
+    keywords: d(
+      "An array of keywords that can be used for searching and filtering the option. " +
+      "These keywords are not displayed but help users find the option through search.",
+    ),
   },
 });
 
@@ -49,6 +53,7 @@ export const optionComponentRenderer = createComponentRenderer(
         label={label || textNodeChild}
         value={value !== undefined && value !== "" ? value : label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        keywords={extractValue.asOptionalStringArray(node.props.keywords)}
         className={className}
         optionRenderer={
           node.children?.length > 0
