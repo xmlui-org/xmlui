@@ -4184,14 +4184,6 @@ test.describe("Events", () => {
       const event = await testStateDriver.testState();
       expect(event.previousNode.id).toBe(1);
     });
-
-    test.skip("fires with null newNode when selection is cleared", async ({
-      initTestBed,
-      createTreeDriver,
-    }) => {
-      // TODO: Implement selection clearing mechanism and test
-      // This test requires determining how selection clearing works in the Tree component
-    });
   });
 
   test.describe("nodeDidExpand Event", () => {
@@ -4926,6 +4918,7 @@ test.describe("Events", () => {
                 defaultExpanded="all"
                 data='{${JSON.stringify(flatTreeData)}}'
                 onSelectionDidChange="event => {selectionEvents.push({prev: event.previousNode?.id || null, new: event.newNode?.id || null});}"
+              >
                 <property name="itemTemplate">
                   <TestMarker tag="{$item.id}">
                     <Text value="{$item.name}" />
