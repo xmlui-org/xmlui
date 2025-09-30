@@ -70,7 +70,7 @@ export function AppWithCodeViewNative({
   const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
 
   const safePopOutUrl = withoutTrailingSlash(
-    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
+    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
 
