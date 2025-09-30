@@ -1,126 +1,248 @@
-# Tree Component Implementation Plan
+# Tree Component Simplification Plan# Tree Component Implementation Plan
 
-## Current Status (Sept 27, 2025)
-**Implementation completed through Step 4 + Theme Variables**
 
-### ✅ Completed Features
+
+## Current State Analysis## Current Status (Sept 27, 2025)
+
+- **TreeNative.tsx**: 823 lines - Main implementation**Implementation completed through Step 4 + Theme Variables**
+
+- **TreeComponent.tsx**: 253 lines - Wrapper/metadata layer  
+
+- **Total**: 1,076 lines of code### ✅ Completed Features
+
 1. **Enhanced Metadata & Type Definitions** (Steps 1-2) - Full API specification with flat/hierarchy data formats
-2. **Data Transformation Pipeline** (Steps 3-4) - Complete flat-to-native and hierarchy-to-native conversion
+
+## Simplification Opportunities2. **Data Transformation Pipeline** (Steps 3-4) - Complete flat-to-native and hierarchy-to-native conversion
+
 3. **Selection & Expansion Management** - Working selectedValue/expandedValues props with proper event handling
-4. **Theme Variable Integration** - Complete theme system with selection, hover, focus states (5 passing tests)
-5. **Comprehensive Test Suite** - 37 working tests including defaultExpanded functionality and theme validation
-6. **Field Configuration** - Custom field mapping (idField, labelField, parentField, etc.)
 
-### 🎯 Current Implementation Overview
-The Tree component now supports multiple data formats while maintaining backwards compatibility.
+### 1. Remove Unused Imports and Types4. **Theme Variable Integration** - Complete theme system with selection, hover, focus states (5 passing tests)
 
-## New Component API Specification
+**Priority: High | Impact: Low | Effort: Low**5. **Comprehensive Test Suite** - 37 working tests including defaultExpanded functionality and theme validation
 
-### Data Format Types
+- Remove unused `ScrollIntoViewOptions` type (used in API but not defined locally)6. **Field Configuration** - Custom field mapping (idField, labelField, parentField, etc.)
 
-#### Native Format (Current)
-```typescript
-{
-  treeData: TreeNode[];
+- Remove unused `resolveIcon` function (defined but never called)
+
+- Remove unused `forwardRef` import### 🎯 Current Implementation Overview
+
+- Clean up unused CSSProperties import if not neededThe Tree component now supports multiple data formats while maintaining backwards compatibility.
+
+
+
+### 2. Simplify Data Transformation Pipeline## New Component API Specification
+
+**Priority: High | Impact: Medium | Effort: Medium**
+
+- **Current**: Complex validation logic in `transformedData` useMemo (~80 lines)### Data Format Types
+
+- **Proposed**: 
+
+  - Extract validation to separate utility functions#### Native Format (Current)
+
+  - Simplify error handling (remove try-catch, let utilities handle it)```typescript
+
+  - Reduce branching logic{
+
+- **Estimated savings**: ~30-40 lines  treeData: TreeNode[];
+
   treeItemsById: Record<string, TreeNode>;
-}
-```
 
-#### Flat Format (New)
-```typescript
-Array<{
-  [idField]: string;                // Unique identifier
-  [labelField]: string;             // Display text
+### 3. Consolidate ID Mapping Logic}
+
+**Priority: Medium | Impact: Medium | Effort: Medium**```
+
+- **Current**: Separate `idMappings` useMemo with bidirectional mapping (~25 lines)
+
+- **Current**: Complex `mappedSelectedId` logic (~10 lines)#### Flat Format (New)
+
+- **Proposed**: ```typescript
+
+  - Since we're using `TreeNode.key` as source ID consistently, remove complex mappingArray<{
+
+  - Simplify selection ID resolution  [idField]: string;                // Unique identifier
+
+- **Estimated savings**: ~20-25 lines  [labelField]: string;             // Display text
+
   [iconField]?: string;             // Icon identifier (optional)
-  [iconExpandedField]?: string;     // Expanded state icon (optional)
-  [iconCollapsedField]?: string;    // Collapsed state icon (optional)
-  [parentField]?: string;           // Parent ID (optional, null = root)
-  // ...additional properties for itemTemplate
-}>
-```
 
-#### Hierarchy Format (New)  
-```typescript
-{
+### 4. Simplify Selection State Management  [iconExpandedField]?: string;     // Expanded state icon (optional)
+
+**Priority: High | Impact: Medium | Effort: Medium**  [iconCollapsedField]?: string;    // Collapsed state icon (optional)
+
+- **Current**: Complex controlled/uncontrolled mode logic  [parentField]?: string;           // Parent ID (optional, null = root)
+
+- **Current**: Separate `effectiveSelectedId` calculation  // ...additional properties for itemTemplate
+
+- **Current**: Complex `setSelectedNodeById` with event firing}>
+
+- **Proposed**:```
+
+  - Unify selection state management
+
+  - Simplify controlled vs uncontrolled logic#### Hierarchy Format (New)  
+
+  - Extract selection event firing to separate function```typescript
+
+- **Estimated savings**: ~25-30 lines{
+
   [idField]: string;                // Unique identifier
-  [labelField]: string;             // Display text
-  [iconField]?: string;             // Icon identifier (optional)
-  [iconExpandedField]?: string;     // Expanded state icon (optional)
-  [iconCollapsedField]?: string;    // Collapsed state icon (optional)
-  [childrenField]?: Array<T>;       // Nested children (optional)
+
+### 5. Streamline Expansion State Initialization  [labelField]: string;             // Display text
+
+**Priority: Medium | Impact: Low | Effort: Low**  [iconField]?: string;             // Icon identifier (optional)
+
+- **Current**: Complex `useState` initializer for `expandedIds` (~20 lines)  [iconExpandedField]?: string;     // Expanded state icon (optional)
+
+- **Proposed**: Extract to separate utility function  [iconCollapsedField]?: string;    // Collapsed state icon (optional)
+
+- **Estimated savings**: ~10-15 lines  [childrenField]?: Array<T>;       // Nested children (optional)
+
   // ...additional properties for itemTemplate
-} | Array<T>
-```
 
-### New Properties
+### 6. Simplify API Methods Object} | Array<T>
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `dataFormat` | `"native" \| "flat" \| "hierarchy"` | `"native"` | Input data structure format |
+**Priority: Medium | Impact: High | Effort: High**```
+
+- **Current**: Large `treeApiMethods` useMemo (~150 lines)
+
+- **Proposed**:### New Properties
+
+  - Extract individual API methods to separate functions
+
+  - Reduce inline logic complexity| Property | Type | Default | Description |
+
+  - Combine similar methods (expand/collapse patterns)|----------|------|---------|-------------|
+
+- **Estimated savings**: ~30-40 lines + improved readability| `dataFormat` | `"native" \| "flat" \| "hierarchy"` | `"native"` | Input data structure format |
+
 | `idField` | `string` | `"id"` | Property name for unique identifiers |
-| `labelField` | `string` | `"name"` | Property name for display text |
-| `iconField` | `string` | `"icon"` | Property name for icon identifiers |
-| `iconExpandedField` | `string` | `"iconExpanded"` | Property name for expanded state icons |
-| `iconCollapsedField` | `string` | `"iconCollapsed"` | Property name for collapsed state icons |
-| `parentField` | `string` | `"parentId"` | Property name for parent relationships (flat format) |
+
+### 7. Optimize Event Handlers| `labelField` | `string` | `"name"` | Property name for display text |
+
+**Priority: Low | Impact: Low | Effort: Low**  | `iconField` | `string` | `"icon"` | Property name for icon identifiers |
+
+- **Current**: Multiple useCallback handlers with similar patterns| `iconExpandedField` | `string` | `"iconExpanded"` | Property name for expanded state icons |
+
+- **Proposed**: Consolidate similar event handling patterns| `iconCollapsedField` | `string` | `"iconCollapsed"` | Property name for collapsed state icons |
+
+- **Estimated savings**: ~10-15 lines| `parentField` | `string` | `"parentId"` | Property name for parent relationships (flat format) |
+
 | `childrenField` | `string` | `"children"` | Property name for child arrays (hierarchy format) |
-| `selectedValue` | `string` | `undefined` | Selected item ID in source data format |
-| `expandedValues` | `string[]` | `[]` | Array of expanded item IDs in source data format |
-| `defaultExpanded` | `"none" \| "all" \| "first-level" \| string[]` | `"none"` | Initial expansion state |
-| `autoExpandToSelection` | `boolean` | `true` | Auto-expand path to selected item |
-| `expandOnItemClick` | `boolean` | `false` | Enable expansion/collapse by clicking anywhere on the item |
 
-### Deprecated Properties (Backwards Compatibility)
+### 8. Remove Redundant State| `selectedValue` | `string` | `undefined` | Selected item ID in source data format |
 
-| Property | Replacement | Migration |
-|----------|-------------|-----------|
-| `selectedUid` | `selectedValue` | Maps to internal UID → source ID |
+**Priority: Medium | Impact: Low | Effort: Medium**| `expandedValues` | `string[]` | `[]` | Array of expanded item IDs in source data format |
+
+- **Current**: Separate keyboard mode state tracking| `defaultExpanded` | `"none" \| "all" \| "first-level" \| string[]` | `"none"` | Initial expansion state |
+
+- **Proposed**: Derive keyboard mode from focusedIndex state| `autoExpandToSelection` | `boolean` | `true` | Auto-expand path to selected item |
+
+- **Estimated savings**: ~5-10 lines| `expandOnItemClick` | `boolean` | `false` | Enable expansion/collapse by clicking anywhere on the item |
+
+
+
+### 9. Simplify TreeRow Component Props### Deprecated Properties (Backwards Compatibility)
+
+**Priority: Low | Impact: Low | Effort: Low**
+
+- **Current**: Large RowContext interface with many properties| Property | Replacement | Migration |
+
+- **Proposed**: Group related properties into sub-objects|----------|-------------|-----------|
+
+- **Estimated savings**: ~5-10 lines + improved type safety| `selectedUid` | `selectedValue` | Maps to internal UID → source ID |
+
 | `data` (UnPackedTreeData) | `data` with `dataFormat="native"` | No change required |
 
-### New Events
+### 10. Extract Utility Functions
 
-#### selectionDidChange
-```typescript
+**Priority: Medium | Impact: High | Effort: Medium**### New Events
+
+- **Current**: Inline logic for parent collection, descendant collection
+
+- **Proposed**: Extract to tree utility functions#### selectionDidChange
+
+- **Estimated savings**: ~20-25 lines + reusability```typescript
+
 interface TreeSelectionEvent {
-  type: 'selection';
+
+## Implementation Priority  type: 'selection';
+
   selectedId: string;        // Source data ID
-  selectedItem: any;         // Full source item
-  selectedNode: TreeNode;    // Internal tree node
-  previousId?: string;       // Previous selection
-}
-```
 
-> **Future Consideration**: Multiple selection support will be added in a future iteration with `selectedValues: string[]` and enhanced event structure.
+### Phase 1: Quick Wins (Low Effort, Immediate Impact)  selectedItem: any;         // Full source item
 
-### Enhanced Context Variables
+1. Remove unused imports and functions  selectedNode: TreeNode;    // Internal tree node
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `$item` | `any` | Current tree item (source data) |
+2. Simplify expansion state initialization    previousId?: string;       // Previous selection
+
+3. Extract validation utilities}
+
+4. Remove redundant state```
+
+
+
+**Target**: ~50-70 lines reduction> **Future Consideration**: Multiple selection support will be added in a future iteration with `selectedValues: string[]` and enhanced event structure.
+
+
+
+### Phase 2: Core Simplifications (Medium Effort, High Impact)### Enhanced Context Variables
+
+1. Consolidate ID mapping logic
+
+2. Simplify selection state management| Variable | Type | Description |
+
+3. Extract utility functions|----------|------|-------------|
+
+4. Optimize event handlers| `$item` | `any` | Current tree item (source data) |
+
 | `$node` | `TreeNode` | Internal tree node representation |
-| `$depth` | `number` | Nesting depth (0-based) |
+
+**Target**: ~70-100 lines reduction| `$depth` | `number` | Nesting depth (0-based) |
+
 | `$isExpanded` | `boolean` | Whether item is expanded |
-| `$hasChildren` | `boolean` | Whether item has children |
-| `$isSelected` | `boolean` | Whether item is selected |
-| `$path` | `any[]` | Full path to item (source IDs) |
-| `$icon` | `string` | Current appropriate icon (base/expanded/collapsed) |
 
-### Exposed Methods API
+### Phase 3: Structural Improvements (High Effort, High Quality Impact)| `$hasChildren` | `boolean` | Whether item has children |
 
-Following the pattern from Queue component, Tree exposes these methods for programmatic control:
+1. Simplify API methods object| `$isSelected` | `boolean` | Whether item is selected |
 
-```typescript
-// Node Expansion/Collapse Control
-expandNode(nodeId: string): void                    // Expand a specific node by source ID
-collapseNode(nodeId: string): void                  // Collapse a specific node by source ID
-toggleNode(nodeId: string): void                    // Toggle expansion state of a node
+2. Streamline TreeRow component| `$path` | `any[]` | Full path to item (source IDs) |
+
+3. Refactor data transformation pipeline| `$icon` | `string` | Current appropriate icon (base/expanded/collapsed) |
+
+
+
+**Target**: ~60-80 lines reduction + improved maintainability### Exposed Methods API
+
+
+
+## Expected ResultsFollowing the pattern from Queue component, Tree exposes these methods for programmatic control:
+
+
+
+- **Total line reduction**: 180-250 lines (15-23% reduction)```typescript
+
+- **New total**: ~825-895 lines (from 1,076 lines)// Node Expansion/Collapse Control
+
+- **Improved maintainability**: Cleaner separation of concernsexpandNode(nodeId: string): void                    // Expand a specific node by source ID
+
+- **Better testability**: Extracted utility functionscollapseNode(nodeId: string): void                  // Collapse a specific node by source ID
+
+- **Reduced complexity**: Fewer nested conditions and state interactionstoggleNode(nodeId: string): void                    // Toggle expansion state of a node
+
 expandAll(): void                                   // Expand all nodes in the tree
-collapseAll(): void                                 // Collapse all nodes in the tree
+
+## Implementation NotescollapseAll(): void                                 // Collapse all nodes in the tree
+
 expandToLevel(level: number): void                  // Expand nodes up to specified depth level
 
-// Node Information & State Queries  
-getNodeById(nodeId: string): TreeNodeInfo | null   // Get full node information by source ID
-isNodeExpanded(nodeId: string): boolean             // Check if a node is currently expanded
+- Maintain backward compatibility for all public APIs
+
+- Preserve existing test coverage// Node Information & State Queries  
+
+- Focus on readability improvements alongside line count reductiongetNodeById(nodeId: string): TreeNodeInfo | null   // Get full node information by source ID
+
+- Consider extracting complex logic to separate utility files if it improves overall codebase organizationisNodeExpanded(nodeId: string): boolean             // Check if a node is currently expanded
 hasChildren(nodeId: string): boolean                // Check if a node has children
 getNodeDepth(nodeId: string): number                // Get the depth level of a node
 getNodePath(nodeId: string): string[]               // Get the path from root to node (source IDs)

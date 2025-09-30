@@ -378,6 +378,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const [keyboardMode, setKeyboardMode] = useState<boolean>(false);
   const treeContainerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<FixedSizeList>(null);
   
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds);
@@ -708,6 +709,54 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Find node by key (source ID) since effectiveSelectedId contains the source ID
         return Object.values(treeItemsById).find(node => String(node.key) === String(effectiveSelectedId)) || null;
       },
+      
+      scrollIntoView: (nodeId: string | number, options?: ScrollIntoViewOptions) => {
+        // Find the target node
+        const targetNode = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
+        if (!targetNode) {
+          return; // Node not found
+        }
+        
+        // Collect all parent IDs that need to be expanded
+        const parentsToExpand: (string | number)[] = [];
+        const collectParents = (node: TreeNode) => {
+          if (node.parentIds && node.parentIds.length > 0) {
+            // Add all parent IDs to expansion list
+            parentsToExpand.push(...node.parentIds);
+          }
+        };
+        
+        collectParents(targetNode);
+        
+        // Calculate the new expanded IDs including parents
+        const newExpandedIds = [...new Set([...expandedIds, ...parentsToExpand])];
+        
+        // Expand all parent nodes if they aren't already expanded
+        if (parentsToExpand.length > 0) {
+          setExpandedIds(newExpandedIds);
+        }
+        
+        // Use setTimeout to ensure DOM is updated after expansion state change
+        setTimeout(() => {
+          // Generate the flat tree data with the new expanded state to find the correct index
+          const updatedFlatTreeData = toFlatTree(treeData, newExpandedIds);
+          const nodeIndex = updatedFlatTreeData.findIndex(item => String(item.key) === String(nodeId));
+          
+          if (nodeIndex >= 0 && listRef.current) {
+            // Scroll to the item using the FixedSizeList's scrollToItem method
+            listRef.current.scrollToItem(nodeIndex, 'center');
+          }
+        }, 0);
+      },
+      
+      scrollToItem: (nodeId: string | number) => {
+        // Simple scroll without expanding - just scroll to the item if it's visible
+        const nodeIndex = flatTreeData.findIndex(item => String(item.key) === String(nodeId));
+        
+        if (nodeIndex >= 0 && listRef.current) {
+          listRef.current.scrollToItem(nodeIndex, 'center');
+        }
+      },
     };
   }, [treeData, treeItemsById, expandedIds, effectiveSelectedId, flatTreeData, onNodeExpanded, onNodeCollapsed, setSelectedNodeById]);
 
@@ -757,6 +806,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       <AutoSizer>
         {({ width, height }) => (
           <FixedSizeList
+            ref={listRef}
             height={height}
             itemCount={itemData.nodes.length}
             itemData={itemData}

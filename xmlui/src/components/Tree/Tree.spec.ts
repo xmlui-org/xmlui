@@ -2279,13 +2279,37 @@ test.describe("Basic Functionality", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
+      // Create a larger dataset to ensure scrolling is needed
+      const largeTreeData = [
+        { id: 1, name: "Root Item 1", parentId: null },
+        { id: 2, name: "Child Item 1.1", parentId: 1 },
+        { id: 3, name: "Child Item 1.2", parentId: 1 },
+        { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+        { id: 5, name: "Grandchild Item 1.1.2", parentId: 2 },
+        { id: 6, name: "Root Item 2", parentId: null },
+        { id: 7, name: "Child Item 2.1", parentId: 6 },
+        { id: 8, name: "Child Item 2.2", parentId: 6 },
+        { id: 9, name: "Child Item 2.3", parentId: 6 },
+        { id: 10, name: "Root Item 3", parentId: null },
+        { id: 11, name: "Child Item 3.1", parentId: 10 },
+        { id: 12, name: "Child Item 3.2", parentId: 10 },
+        { id: 13, name: "Root Item 4", parentId: null },
+        { id: 14, name: "Child Item 4.1", parentId: 13 },
+        { id: 15, name: "Child Item 4.2", parentId: 13 },
+        { id: 16, name: "Root Item 5", parentId: null },
+        { id: 17, name: "Child Item 5.1", parentId: 16 },
+        { id: 18, name: "Child Item 5.2", parentId: 16 },
+        { id: 19, name: "Target Item (Bottom)", parentId: 16 }, // This will be at the bottom
+      ];
+
       const { testStateDriver } = await initTestBed(`
         <Fragment>
-          <VStack height="200px">
+          <VStack height="150px">
             <Tree id="treeApi" testId="tree"
               dataFormat="flat"
+              parentField="parentId"
               defaultExpanded="all"
-              data='{${JSON.stringify(flatTreeData)}}'>
+              data='{${JSON.stringify(largeTreeData)}}'>
               <property name="itemTemplate">
                 <TestMarker tag="{$item.id}:scroll">
                   <HStack verticalAlignment="center">
@@ -2295,9 +2319,9 @@ test.describe("Basic Functionality", () => {
               </property>
             </Tree>
           </VStack>
-          <Button id="scrollBtn" testId="scroll-btn" label="Scroll to Item 4" onClick="
-            treeApi.scrollToItem('4');
-            testState = { actionPerformed: 'scrollToItem', itemId: '4' };
+          <Button id="scrollBtn" testId="scroll-btn" label="Scroll to Bottom Item" onClick="
+            treeApi.scrollToItem('19');
+            testState = { actionPerformed: 'scrollToItem', itemId: '19' };
           " />
         </Fragment>
       `);
@@ -2305,19 +2329,26 @@ test.describe("Basic Functionality", () => {
       const tree = await createTreeDriver("tree");
       const scrollButton = await createButtonDriver("scroll-btn");
 
-      // Verify tree is visible
+      // Verify tree is visible and first items are visible
       await expect(tree.getByMarker("1:scroll")).toBeVisible();
+      await expect(tree.getByMarker("2:scroll")).toBeVisible();
+      
+      // Verify the target item at the bottom is initially NOT visible in the small viewport
+      // (Due to the small height of 150px and many items, item 19 should be out of view)
+      await expect(tree.getByMarker("19:scroll")).not.toBeVisible();
 
       // Click scroll to item button
       await scrollButton.click();
 
       // Verify test state confirms action was performed
-      // Note: Testing scrolling behavior in virtualized components is complex in tests
-      // So we mainly verify the API can be called without errors
       await expect.poll(testStateDriver.testState).toEqual({
         actionPerformed: "scrollToItem",
-        itemId: "4",
+        itemId: "19",
       });
+
+      // After scrolling, the target item should now be visible
+      // Note: We can't easily test the exact scroll position in virtualized components,
+      // but we can verify the API was called successfully
     });
 
     test("exposes getSelectedNode method", async ({
@@ -2368,6 +2399,75 @@ test.describe("Basic Functionality", () => {
         selectedNodeKey: 2,
         selectedNodeName: "Child Item 1.1",
       });
+    });
+
+    test("exposes scrollIntoView method", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      // Create a deeper hierarchy to test scrollIntoView with expansion
+      const deepTreeData = [
+        { id: 1, name: "Root Item 1", parentId: null },
+        { id: 2, name: "Child Item 1.1", parentId: 1 },
+        { id: 3, name: "Child Item 1.2", parentId: 1 },
+        { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+        { id: 5, name: "Great-grandchild Item 1.1.1.1", parentId: 4 },
+        { id: 6, name: "Root Item 2", parentId: null },
+        { id: 7, name: "Child Item 2.1", parentId: 6 },
+        { id: 8, name: "Child Item 2.2", parentId: 6 },
+        { id: 9, name: "Grandchild Item 2.1.1", parentId: 7 },
+        { id: 10, name: "Root Item 3", parentId: null },
+        { id: 11, name: "Child Item 3.1", parentId: 10 },
+        { id: 12, name: "Deeply Nested Target", parentId: 11 }, // This requires expansion to be visible
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="100px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              parentField="parentId"
+              data='{${JSON.stringify(deepTreeData)}}'>
+              <property name="itemTemplate">
+                <TestMarker tag="{$item.id}:scrollview">
+                  <HStack verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </TestMarker>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="scrollViewBtn" testId="scroll-view-btn" label="Scroll Into View Deep Target" onClick="
+            treeApi.scrollIntoView('12');
+            testState = { actionPerformed: 'scrollIntoView', itemId: '12' };
+          " />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const scrollViewButton = await createButtonDriver("scroll-view-btn");
+
+      // Initially, tree should be collapsed so the deep target is not visible
+      await expect(tree.getByMarker("1:scrollview")).toBeVisible(); // Root visible
+      await expect(tree.getByMarker("6:scrollview")).toBeVisible(); // Root visible  
+      await expect(tree.getByMarker("10:scrollview")).toBeVisible(); // Root visible
+      await expect(tree.getByMarker("11:scrollview")).not.toBeVisible(); // Child hidden (collapsed)
+      await expect(tree.getByMarker("12:scrollview")).not.toBeVisible(); // Deep target hidden (needs expansion)
+
+      // Click scroll into view button
+      await scrollViewButton.click();
+
+      // Verify test state confirms action was performed
+      await expect.poll(testStateDriver.testState).toEqual({
+        actionPerformed: "scrollIntoView",
+        itemId: "12",
+      });
+
+      // Verify that the node and its parents are now expanded (target should be visible)
+      await expect(tree.getByMarker("10:scrollview")).toBeVisible(); // Root still visible
+      await expect(tree.getByMarker("11:scrollview")).toBeVisible(); // Parent expanded
+      await expect(tree.getByMarker("12:scrollview")).toBeVisible(); // Target node now visible
     });
 
     test("exposes refreshData method", async ({
