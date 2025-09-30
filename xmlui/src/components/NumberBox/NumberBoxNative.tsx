@@ -141,6 +141,8 @@ export const NumberBox = forwardRef(function NumberBox(
   min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
 
   // Step must be an integer since floating point arithmetic needs a deeper dive.
+  // probably some way to integrate with https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
+  // since there are footguns, like 0.1 + 0.2 = 0.0000...04
   const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
 
   const inputRef = useRef<HTMLInputElement>(null);

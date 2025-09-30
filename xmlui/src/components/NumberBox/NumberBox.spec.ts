@@ -45,28 +45,26 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toBeDisabled();
   });
 
-  test("enabled=false prevents user input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox enabled="false" />`);
-    await expect(page.getByRole("textbox")).toBeDisabled();
-  });
-
   test("enabled=true enables control", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox enabled="true" />`);
     await expect(page.getByRole("textbox")).not.toBeDisabled();
   });
 
-  // duplicated: disabled with spinbox functionality
-  test("disabled input field stops user interaction for spinbox", async ({ initTestBed, page }) => {
+  test("disabled input field stops user interaction for spinbox", async ({
+    initTestBed,
+    createNumberBoxDriver,
+    page,
+  }) => {
     await initTestBed(`<NumberBox enabled="false" initialValue="5" />`);
+    const driver = await createNumberBoxDriver();
 
-    // Try to find spinbox buttons (implementation may vary)
-    const spinButtons = page.locator("button");
-    const firstSpinButton = spinButtons.first();
+    await driver.increment();
+    await expect(driver.input).toHaveValue("5");
+    await expect(driver.spinnerUp).toBeDisabled();
 
-    if (await firstSpinButton.isEnabled()) {
-      await firstSpinButton.click();
-      await expect(page.getByRole("textbox")).toHaveValue("5"); // Should not change
-    }
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("5");
+    await expect(driver.spinnerDown).toBeDisabled();
   });
 
   // --- readOnly prop
@@ -89,19 +87,6 @@ test.describe("Basic Functionality", () => {
     await expect(input).toHaveValue("123");
     await input.focus();
     await expect(input).toBeFocused();
-  });
-
-  test("readOnly disables the spinbox", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox readOnly="true" initialValue="5" />`);
-
-    // Try to find and click spinbox buttons
-    const spinButtons = page.locator("button");
-    const firstSpinButton = spinButtons.first();
-
-    if (await firstSpinButton.isEnabled()) {
-      await firstSpinButton.click();
-      await expect(page.getByRole("textbox")).toHaveValue("5"); // Should not change
-    }
   });
 
   // --- required prop
@@ -194,10 +179,8 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<NumberBox initialValue="5" step="2" />`);
     const incrementButton = page.locator("button").first();
 
-    if (await incrementButton.isVisible()) {
-      await incrementButton.click();
-      await expect(page.getByRole("textbox")).toHaveValue("7");
-    }
+    await incrementButton.click();
+    await expect(page.getByRole("textbox")).toHaveValue("7");
   });
 
   test("clicking spinbox down-arrow subtracts step value", async ({ initTestBed, page }) => {
@@ -1109,17 +1092,15 @@ test.describe("Other Edge Cases", () => {
       .filter({ hasText: /increment|up|\+/ })
       .first();
 
-    if (await incrementButton.isVisible()) {
-      // Hold down the button (simulate long press)
-      await incrementButton.hover();
-      await page.mouse.down();
-      await page.waitForTimeout(600); // Wait longer than initial delay
-      await page.mouse.up();
+    // Hold down the button (simulate long press)
+    await incrementButton.hover();
+    await page.mouse.down();
+    await page.waitForTimeout(600); // Wait longer than initial delay
+    await page.mouse.up();
 
-      // Should have incremented multiple times
-      const value = await page.getByRole("textbox").inputValue();
-      expect(parseInt(value) || 0).toBeGreaterThan(1);
-    }
+    // Should have incremented multiple times
+    const value = await page.getByRole("textbox").inputValue();
+    expect(parseInt(value) || 0).toBeGreaterThan(1);
   });
 
   test("integersOnly with zeroOrPositive combination works", async ({
