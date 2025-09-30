@@ -272,6 +272,41 @@ export const AutoComplete = forwardRef(function AutoComplete(
     return items;
   }, [shouldShowCreatable, searchTerm, filteredOptions]);
 
+  // Helper functions to find next/previous enabled option
+  const findNextEnabledIndex = useCallback((currentIndex: number) => {
+    for (let i = currentIndex + 1; i < allItems.length; i++) {
+      const item = allItems[i];
+      if (item.type === "creatable" || item.enabled !== false) {
+        return i;
+      }
+    }
+    // Wrap around to beginning
+    for (let i = 0; i <= currentIndex; i++) {
+      const item = allItems[i];
+      if (item.type === "creatable" || item.enabled !== false) {
+        return i;
+      }
+    }
+    return -1;
+  }, [allItems]);
+
+  const findPreviousEnabledIndex = useCallback((currentIndex: number) => {
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const item = allItems[i];
+      if (item.type === "creatable" || item.enabled !== false) {
+        return i;
+      }
+    }
+    // Wrap around to end
+    for (let i = allItems.length - 1; i >= currentIndex; i--) {
+      const item = allItems[i];
+      if (item.type === "creatable" || item.enabled !== false) {
+        return i;
+      }
+    }
+    return -1;
+  }, [allItems]);
+
   // Reset selected index when options change
   useEffect(() => {
     setSelectedIndex(-1);
@@ -285,11 +320,17 @@ export const AutoComplete = forwardRef(function AutoComplete(
       switch (event.key) {
         case "ArrowDown":
           event.preventDefault();
-          setSelectedIndex((prev) => (prev < allItems.length - 1 ? prev + 1 : 0));
+          setSelectedIndex((prev) => {
+            const nextIndex = findNextEnabledIndex(prev);
+            return nextIndex !== -1 ? nextIndex : prev;
+          });
           break;
         case "ArrowUp":
           event.preventDefault();
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : allItems.length - 1));
+          setSelectedIndex((prev) => {
+            const prevIndex = findPreviousEnabledIndex(prev);
+            return prevIndex !== -1 ? prevIndex : prev;
+          });
           break;
         case "Enter":
           event.preventDefault();
@@ -324,7 +365,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
           break;
       }
     },
-    [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen],
+    [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen, findNextEnabledIndex, findPreviousEnabledIndex],
   );
 
   // Render the "empty list" message
@@ -387,6 +428,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
             onOpenChange={(isOpen) => {
               if (readOnly) return;
               setOpen(isOpen);
+              if (!isOpen) {
+                // Reset highlighted option when dropdown closes
+                setSelectedIndex(-1);
+              }
             }}
             modal={false}
           >
@@ -647,7 +692,7 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
         e.stopPropagation();
       }}
       onMouseEnter={() => {
-        if (itemIndex !== undefined && setSelectedIndex) {
+        if (itemIndex !== undefined && setSelectedIndex && enabled) {
           setSelectedIndex(itemIndex);
         }
       }}
