@@ -1,23 +1,23 @@
 export interface TreeNode {
-  id: string;
-  key: string;
+  id: string | number;
+  key: string | number;
   path: any[];
   displayName?: string;
   children?: TreeNode[];
-  parentIds: string[];
+  parentIds: (string | number)[];
   selectable: boolean;
   [x: string]: any;
 }
 
 export type TreeItem = {
-  id: string;
+  id: string | number;
   children?: Array<TreeItem>;
   [x: string]: any;
 };
 
 export type UnPackedTreeData = {
   treeData: Array<TreeNode>;
-  treeItemsById: Record<string, TreeNode>;
+  treeItemsById: Record<string | number, TreeNode>;
 };
 
 export interface FlatTreeNode extends TreeNode {
@@ -44,18 +44,18 @@ export interface TreeSelectionEvent {
 
 export type TreeDataFormat = 'flat' | 'hierarchy';
 
-export type DefaultExpansion = 'none' | 'all' | 'first-level' | string[];
+export type DefaultExpansion = 'none' | 'all' | 'first-level' | (string | number)[];
 
 export interface TreeNodeInfo {
-  id: string;           // Source data ID
+  id: string | number;           // Source data ID
   item: any;           // Original source item
   depth: number;       // Nesting depth (0-based)
   isExpanded: boolean; // Current expansion state
   hasChildren: boolean;// Whether node has children
   isSelected: boolean; // Whether node is selected
-  path: string[];      // Path from root (source IDs)
-  parentId?: string;   // Parent node ID (if any)
-  childrenIds: string[]; // Direct children IDs
+  path: (string | number)[];      // Path from root (source IDs)
+  parentId?: string | number;   // Parent node ID (if any)
+  childrenIds: (string | number)[]; // Direct children IDs
 }
 
 export interface TreeStats {

@@ -10,7 +10,7 @@ export function flattenNode(
   node: TreeNode,
   depth: number,
   result: FlatTreeNode[],
-  openedIds: string[],
+  openedIds: (string | number)[],
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
@@ -30,7 +30,7 @@ export function flattenNode(
   }
 }
 
-export function toFlatTree(treeData: TreeNode[], openedIds: string[]) {
+export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[]) {
   const ret: FlatTreeNode[] = [];
   treeData.forEach((node) => {
     flattenNode(node, 0, ret, openedIds);

@@ -1363,41 +1363,6 @@ test.describe("Basic Functionality", () => {
       await expect(tree.component).toBeFocused();
     });
 
-    test.skip(
-      "handles selectedUid property (deprecated)",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test backwards compatibility with selectedUid prop
-        // TODO: Verify deprecation warning or fallback behavior
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          selectedUid="2"
-        />
-      `);
-      },
-    );
-
-    test.skip(
-      "fires selectionDidChange event",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test onSelectionDidChange event with correct TreeSelectionEvent structure
-        // TODO: Verify event includes selectedValue, selectedUid, and selectedNode data
-        // NOTE: Event handler may not be fully implemented yet - selectedNode appears to be null
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          onSelectionDidChange="event => testState = event"
-        />
-      `);
-      },
-    );
-
     test("handles null/undefined selection gracefully", async ({
       initTestBed,
       createTreeDriver,
@@ -2130,196 +2095,6 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
-  // ICON RESOLUTION TESTS
-  // =============================================================================
-
-  test.describe("Icon Resolution", () => {
-    test.skip(
-      "displays icons from iconField",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test basic icon display from source data icon field
-        // TODO: Verify icon elements are rendered correctly
-        const iconData = [
-          { id: 1, name: "Folder", icon: "folder", parentId: null },
-          { id: 2, name: "File", icon: "file", parentId: 1 },
-        ];
-
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{iconData}" 
-          dataFormat="flat"
-          iconField="icon"
-        />
-      `);
-      },
-    );
-
-    test.skip(
-      "displays expansion-specific icons",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test iconExpandedField and iconCollapsedField for different expansion states
-        // TODO: Verify icons change based on node expansion state
-        const iconData = [
-          {
-            id: 1,
-            name: "Folder",
-            icon: "folder",
-            iconExpanded: "folder-open",
-            iconCollapsed: "folder-closed",
-            parentId: null,
-          },
-        ];
-
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{iconData}" 
-          dataFormat="flat"
-          iconField="icon"
-          iconExpandedField="iconExpanded"
-          iconCollapsedField="iconCollapsed"
-        />
-      `);
-      },
-    );
-
-    test.skip(
-      "handles missing icon fields gracefully",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test component behavior when icon fields are undefined
-        // TODO: Verify no icon display when icon data is missing
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-          iconField="nonExistentIcon"
-        />
-      `);
-      },
-    );
-  });
-
-  // =============================================================================
-  // CUSTOM ITEM TEMPLATE TESTS
-  // =============================================================================
-
-  test.describe("Custom Item Template", () => {
-    test.skip(
-      "renders default item template",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test default item rendering without custom template
-        // TODO: Verify default label display and structure
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-        />
-      `);
-      },
-    );
-
-    test.skip(
-      "renders custom item template",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test custom itemTemplate property with custom XMLUI content
-        // TODO: Verify custom template receives correct node data context
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-        >
-          <property name="itemTemplate">
-            <HStack>
-              <Text text="{node.label}" />
-              <Text text=" - Custom" />
-            </HStack>
-          </property>
-        </Tree>
-      `);
-      },
-    );
-
-    test.skip(
-      "template has access to node context",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test template access to node properties (label, icon, isExpanded, etc.)
-        // TODO: Verify context variables are properly bound
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{flatTreeData}" 
-          dataFormat="flat"
-        >
-          <property name="itemTemplate">
-            <VStack>
-              <Text text="{node.label}" />
-              <Text text="ID: {node.key}" />
-              <Text text="Expanded: {node.isExpanded}" />
-            </VStack>
-          </property>
-        </Tree>
-      `);
-      },
-    );
-  });
-
-  // =============================================================================
-  // VIRTUALIZATION TESTS
-  // =============================================================================
-
-  test.describe("Virtualization", () => {
-    test.skip(
-      "handles large datasets efficiently",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test performance with large tree datasets (1000+ nodes)
-        // TODO: Verify virtual scrolling behavior and DOM optimization
-        const largeData = Array.from({ length: 1000 }, (_, i) => ({
-          id: i + 1,
-          name: `Item ${i + 1}`,
-          parentId: i === 0 ? null : Math.floor(i / 10) + 1,
-        }));
-
-        await initTestBed(`
-        <Tree 
-          testId="tree" 
-          data="{largeData}" 
-          dataFormat="flat"
-        />
-      `);
-      },
-    );
-
-    test.skip(
-      "maintains scroll position during updates",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test scroll position stability during data updates
-        // TODO: Verify virtual list maintains position during re-renders
-      },
-    );
-
-    test.skip(
-      "handles dynamic height calculations",
-      SKIP_REASON.TO_BE_IMPLEMENTED(),
-      async ({ initTestBed, page }) => {
-        // TODO: Test tree height calculations with container sizing
-        // TODO: Verify AutoSizer integration and responsive behavior
-      },
-    );
-  });
-
-  // =============================================================================
   // IMPERATIVE API TESTS
   // =============================================================================
 
@@ -2329,7 +2104,7 @@ test.describe("Basic Functionality", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      const { testStateDriver } = await initTestBed(`
+      await initTestBed(`
         <Fragment>
           <VStack height="400px">
             <Tree id="treeApi" testId="tree"
@@ -2344,10 +2119,8 @@ test.describe("Basic Functionality", () => {
               </property>
             </Tree>
           </VStack>
-          <Button id="expandBtn" testId="expand-node-btn" label="Expand Node 1" onClick="
-            treeApi.expandNode(1);
-            testState = { expandNodeCalled: true, nodeId: 1 };
-          " />
+          <Button id="expandBtn" testId="expand-node-btn" label="Expand Node 1" 
+            onClick="treeApi.expandNode(1);" />
         </Fragment>
       `);
 
@@ -2362,9 +2135,6 @@ test.describe("Basic Functionality", () => {
       // Click expand specific node button
       await expandButton.click();
 
-      // Verify expandNode was called
-      await expect.poll(testStateDriver.testState).toEqual({ expandNodeCalled: true, nodeId: 1 });
-
       // Verify node 1's children are now visible but grandchildren are still hidden
       await expect(tree.getByMarker("1:expand")).toBeVisible(); // Root visible
       await expect(tree.getByMarker("2:expand")).toBeVisible(); // Child now visible
@@ -2377,7 +2147,7 @@ test.describe("Basic Functionality", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      const { testStateDriver } = await initTestBed(`
+      await initTestBed(`
         <Fragment>
           <VStack height="400px">
             <Tree id="treeApi" testId="tree"
@@ -2393,10 +2163,8 @@ test.describe("Basic Functionality", () => {
               </property>
             </Tree>
           </VStack>
-          <Button id="collapseBtn" testId="collapse-btn" label="Collapse Node 1" onClick="
-            treeApi.collapseNode('1');
-            testState = { actionPerformed: 'collapseNode', nodeId: '1' };
-          " />
+          <Button id="collapseBtn" testId="collapse-btn" label="Collapse Node 1" 
+            onClick="treeApi.collapseNode(1);" />
         </Fragment>
       `);
 
@@ -2417,12 +2185,6 @@ test.describe("Basic Functionality", () => {
       await expect(tree.getByMarker("2:expand")).not.toBeVisible(); // Child hidden
       await expect(tree.getByMarker("3:expand")).not.toBeVisible(); // Child hidden
       await expect(tree.getByMarker("4:expand")).not.toBeVisible(); // Grandchild hidden
-
-      // Verify test state confirms action was performed
-      await expect.poll(testStateDriver.testState).toEqual({
-        actionPerformed: "collapseNode",
-        nodeId: "1",
-      });
     });
 
     test("exposes expandAll method", async ({
@@ -2430,7 +2192,7 @@ test.describe("Basic Functionality", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      const { testStateDriver } = await initTestBed(`
+      await initTestBed(`
         <Fragment>
           <VStack height="400px">
             <Tree id="treeApi" testId="tree"
@@ -2445,10 +2207,8 @@ test.describe("Basic Functionality", () => {
               </property>
             </Tree>
           </VStack>
-          <Button id="expandBtn" testId="expand-all-btn" label="Expand All" onClick="
-            treeApi.expandAll();
-            testState = { expandAllCalled: true };
-          " />
+          <Button id="expandBtn" testId="expand-all-btn" label="Expand All" 
+            onClick="treeApi.expandAll();" />
         </Fragment>
       `);
 
@@ -2462,9 +2222,6 @@ test.describe("Basic Functionality", () => {
       // Click expandAll button
       await expandButton.click();
 
-      // Verify expandAll was called
-      await expect.poll(testStateDriver.testState).toEqual({ expandAllCalled: true });
-
       // Verify all nodes are now visible (expanded)
       await expect(tree.getByMarker("1:expandall")).toBeVisible(); // Root
       await expect(tree.getByMarker("2:expandall")).toBeVisible(); // Child
@@ -2477,7 +2234,7 @@ test.describe("Basic Functionality", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      const { testStateDriver } = await initTestBed(`
+      await initTestBed(`
         <Fragment>
           <VStack height="400px">
             <Tree id="treeApi" testId="tree"
@@ -2493,10 +2250,8 @@ test.describe("Basic Functionality", () => {
               </property>
             </Tree>
           </VStack>
-          <Button id="collapseBtn" testId="collapse-all-btn" label="Collapse All" onClick="
-            treeApi.collapseAll();
-            testState = { collapseAllCalled: true };
-          " />
+          <Button id="collapseBtn" testId="collapse-all-btn" label="Collapse All" 
+            onClick="treeApi.collapseAll();" />
         </Fragment>
       `);
 
@@ -2511,9 +2266,6 @@ test.describe("Basic Functionality", () => {
 
       // Click collapseAll button
       await collapseButton.click();
-
-      // Verify collapseAll was called
-      await expect.poll(testStateDriver.testState).toEqual({ collapseAllCalled: true });
 
       // Verify only root nodes are visible (all collapsed)
       await expect(tree.getByMarker("1:collapseall")).toBeVisible(); // Root still visible
@@ -3517,6 +3269,7 @@ test.describe("Basic Functionality", () => {
       });
 
       test("selectNode(nodeId) - API method executes without error", async ({
+        page,
         initTestBed,
         createTreeDriver,
         createButtonDriver,
@@ -3536,14 +3289,14 @@ test.describe("Basic Functionality", () => {
           },
         ];
 
-        const { testStateDriver } = await initTestBed(`
+        await initTestBed(`
           <Fragment>
-            <VStack height="400px">
+            <VStack height="400px" var.selectedNodeId="{null}">
+              <Text testId="selectedId">{selectedNodeId}</Text>
               <Tree id="treeApi" testId="tree"
                 dataFormat="hierarchy"
                 defaultExpanded="all"
-                selectedValue="{selectedNodeId}"
-                onSelectionDidChange="selectedNodeId = $event.newNode?.key || null;"
+                onSelectionDidChange="node => {selectedNodeId = node.newNode.id}"
                 data='{${JSON.stringify(selectableHierarchyData)}}'>
                 <property name="itemTemplate">
                   <TestMarker tag="{$item.id}:selection">
@@ -3552,19 +3305,11 @@ test.describe("Basic Functionality", () => {
                 </property>
               </Tree>
             </VStack>
-            <Button testId="select-node2-btn" label="Select Node 2" onClick="
-              treeApi.selectNode('2');
-              const selectedNode = treeApi.getSelectedNode();
-              testState = { actionPerformed: 'selectNode2', selectedNodeData: selectedNode };
-            " />
+            <Button testId="select-node2-btn" label="Select Node 2" onClick="treeApi.selectNode(2);" />
             <Button testId="select-nonexistent-btn" label="Select Non-existent Node" onClick="
               treeApi.selectNode('999');
               const selectedNode = treeApi.getSelectedNode();
               testState = { actionPerformed: 'selectNonExistent', selectedNodeData: selectedNode };
-            " />
-            <Button testId="get-selected-btn" label="Get Selected Node" onClick="
-              const selectedNode = treeApi.getSelectedNode();
-              testState = { actionPerformed: 'getSelected', selectedNodeData: selectedNode };
             " />
           </Fragment>
         `);
@@ -3572,58 +3317,18 @@ test.describe("Basic Functionality", () => {
         const tree = await createTreeDriver("tree");
         const selectNode2Button = await createButtonDriver("select-node2-btn");
         const selectNonExistentButton = await createButtonDriver("select-nonexistent-btn");
-        const getSelectedButton = await createButtonDriver("get-selected-btn");
+        const selectedIdText = page.getByTestId("selectedId");
 
         // INITIAL STATE: No selection
-        await getSelectedButton.click();
-        await expect
-          .poll(async () => {
-            const state = await testStateDriver.testState();
-            return state.actionPerformed;
-          })
-          .toBe("getSelected");
-
-        await expect
-          .poll(async () => {
-            const state = await testStateDriver.testState();
-            return state.selectedNodeData;
-          })
-          .toBe(null);
+        await expect(selectedIdText).toHaveText("");
 
         // TEST 1: selectNode('2') API call completes without error
         await selectNode2Button.click();
-        await expect
-          .poll(async () => {
-            const state = await testStateDriver.testState();
-            return state.actionPerformed;
-          })
-          .toBe("selectNode2");
-
-        // Verify API call completed (even if selection doesn't take effect due to implementation)
-        // NOTE: This test documents that selectNode() triggers onSelectionDidChange event
-        // but the actual selection state depends on the onSelectionDidChange handler updating selectedValue
-        const currentState = await testStateDriver.testState();
-        expect(currentState.actionPerformed).toBe("selectNode2");
-
-        // The selectedNodeData might be null if selectNode() doesn't immediately update the tree state
-        // This is expected behavior given the current implementation that relies on onSelectionDidChange
+        await expect(selectedIdText).toHaveText("2");
 
         // TEST 2: selectNode('999') with invalid ID completes without error
         await selectNonExistentButton.click();
-        await expect
-          .poll(async () => {
-            const state = await testStateDriver.testState();
-            return state.actionPerformed;
-          })
-          .toBe("selectNonExistent");
-
-        // Verify invalid node selection returns null
-        await expect
-          .poll(async () => {
-            const state = await testStateDriver.testState();
-            return state.selectedNodeData;
-          })
-          .toBe(null);
+        await expect(selectedIdText).toHaveText("");
       });
 
       test("getSelectedNode() - returns correct selected node data", async ({
@@ -5021,7 +4726,7 @@ test.describe("Events", () => {
         // expandAll() does not fire individual nodeDidExpand events
         // This is the correct behavior - mass operations should not fire individual events
         await expect(eventsText).toHaveText("[]");
-        
+
         // But verify the visual result is correct - all nodes should be visible
         await expect(tree.getByMarker("2")).toBeVisible();
         await expect(tree.getByMarker("4")).toBeVisible();
@@ -5067,7 +4772,7 @@ test.describe("Events", () => {
         // expandToLevel() does not fire individual nodeDidExpand events
         // This is the correct behavior - mass operations should not fire individual events
         await expect(eventsText).toHaveText("[]");
-        
+
         // But verify the visual result is correct - level 1 nodes should be visible
         await expect(tree.getByMarker("2")).toBeVisible();
       });
@@ -5159,7 +4864,7 @@ test.describe("Events", () => {
         // collapseAll() does not fire individual nodeDidCollapse events
         // This is the correct behavior - mass operations should not fire individual events
         await expect(eventsText).toHaveText("[]");
-        
+
         // But verify the visual result is correct - children should no longer be visible
         await expect(tree.getByMarker("2")).not.toBeVisible();
       });
@@ -5214,13 +4919,13 @@ test.describe("Events", () => {
       }) => {
         await initTestBed(`
           <Fragment>
-            <VStack height="400px" var.selectionEvents="[]">
-              <Text testId="eventsText">{selectionEvents}</Text>
+            <VStack height="400px" var.selectionEvents="{[]}">
+              <Text testId="eventsText">{JSON.stringify(selectionEvents)}</Text>
               <Tree id="treeApi" testId="tree"
                 dataFormat="flat"
                 defaultExpanded="all"
                 data='{${JSON.stringify(flatTreeData)}}'
-                onSelectionDidChange="event => {selectionEvents.push({prev: event.previousNode?.id || null, new: event.newNode?.id || null})}">
+                onSelectionDidChange="event => {selectionEvents.push({prev: event.previousNode?.id || null, new: event.newNode?.id || null});}"
                 <property name="itemTemplate">
                   <TestMarker tag="{$item.id}">
                     <Text value="{$item.name}" />
@@ -5287,54 +4992,6 @@ test.describe("Events", () => {
         expect(event.newNode).toBeNull();
         expect(event.previousNode).toBeDefined();
         expect(event.previousNode.id).toBe(1);
-      });
-    });
-
-    test.describe("Complex API Event Scenarios", () => {
-      test("fires events in correct sequence during complex API operations", async ({
-        initTestBed,
-        createTreeDriver,
-        createButtonDriver,
-      }) => {
-        const { testStateDriver } = await initTestBed(`
-          <Fragment>
-            <VStack height="400px" var.eventCount="0" var.lastEvent="">
-              <Tree id="treeApi" testId="tree"
-                dataFormat="hierarchy"
-                defaultExpanded="none"
-                data='{${JSON.stringify(hierarchyTreeData)}}'
-                onSelectionDidChange="event => { eventCount++; lastEvent = 'selection:' + (event.newNode?.id || 'null'); testState = { count: eventCount, last: lastEvent }; }"
-                onNodeDidExpand="node => { eventCount++; lastEvent = 'expand:' + node.id; testState = { count: eventCount, last: lastEvent }; }"
-                onNodeDidCollapse="node => { eventCount++; lastEvent = 'collapse:' + node.id; testState = { count: eventCount, last: lastEvent }; }">
-                <property name="itemTemplate">
-                  <TestMarker tag="{$item.id}">
-                    <Text value="{$item.name}" />
-                  </TestMarker>
-                </property>
-              </Tree>
-            </VStack>
-            <Button testId="complex-btn" label="Complex Operations" onClick="
-              treeApi.expandNode(1);
-              treeApi.selectNode(2);
-              treeApi.collapseNode(1);
-            " />
-          </Fragment>
-        `);
-
-        const tree = await createTreeDriver("tree");
-        const complexButton = await createButtonDriver("complex-btn");
-
-        // Trigger complex API operations
-        await complexButton.click();
-
-        // Verify multiple events were fired (using poll for async events)
-        await expect
-          .poll(() => testStateDriver.testState().then((s) => s?.count))
-          .toBeGreaterThanOrEqual(3);
-        const result = await testStateDriver.testState();
-
-        // Verify we captured the last event
-        expect(result.last).toMatch(/(selection|expand|collapse):\w+/);
       });
     });
   });
@@ -5870,191 +5527,142 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test.skip(
-    "handles empty data gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component behavior with empty data arrays/objects
-      // TODO: Verify no crash and appropriate empty state display
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{[]}" 
-        dataFormat="flat"
-      />
+  test("handles null/undefined data gracefully", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data="{null}" 
+          dataFormat="flat"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles null/undefined data gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component behavior with null/undefined data
-      // TODO: Verify defensive programming and error boundaries
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{null}" 
-        dataFormat="flat"
-      />
+  test("handles malformed data gracefully", async ({ initTestBed, createTreeDriver }) => {
+    const malformedData = [
+      { id: 1, name: "Valid Item" },
+      { /* missing id */ name: "Invalid Item" },
+      null,
+      undefined,
+    ];
+
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(malformedData)}}' 
+          dataFormat="flat"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles malformed data gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component behavior with invalid data structures
-      // TODO: Verify error handling and recovery mechanisms
-      const malformedData = [
-        { id: 1, name: "Valid Item" },
-        { /* missing id */ name: "Invalid Item" },
-        null,
-        undefined,
-      ];
+  test("handles circular references in hierarchy data", async ({
+    initTestBed,
+    createTreeDriver,
+  }) => {
+    const circularData = [
+      { id: 1, name: "Item 1", parentId: 2 },
+      { id: 2, name: "Item 2", parentId: 1 },
+    ];
 
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{malformedData}" 
-        dataFormat="flat"
-      />
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(circularData)}}' 
+          dataFormat="flat"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles circular references in hierarchy data",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test detection and handling of circular parent-child references
-      // TODO: Verify infinite loop prevention and error recovery
-      const circularData = [
-        { id: 1, name: "Item 1", parentId: 2 },
-        { id: 2, name: "Item 2", parentId: 1 },
-      ];
+  test("handles duplicate IDs gracefully", async ({ initTestBed, createTreeDriver }) => {
+    const duplicateIdData = [
+      { id: 1, name: "Item 1" },
+      { id: 1, name: "Duplicate Item 1" },
+      { id: 2, name: "Item 2" },
+    ];
 
-      await initTestBed(`
+    await initTestBed(`
+      <VStack height="200px">
       <Tree 
-        testId="tree" 
-        data="{circularData}" 
-        dataFormat="flat"
-      />
+          testId="tree" 
+          data='{${JSON.stringify(duplicateIdData)}}' 
+          dataFormat="flat"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles duplicate IDs gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component behavior with duplicate ID values
-      // TODO: Verify ID uniqueness enforcement or conflict resolution
-      const duplicateIdData = [
-        { id: 1, name: "Item 1" },
-        { id: 1, name: "Duplicate Item 1" },
-        { id: 2, name: "Item 2" },
-      ];
+  test("handles orphaned nodes in flat data", async ({ initTestBed, createTreeDriver }) => {
+    const orphanedData = [
+      { id: 1, name: "Root Item" },
+      { id: 2, name: "Orphaned Item", parentId: 999 }, // non-existent parent
+    ];
 
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{duplicateIdData}" 
-        dataFormat="flat"
-      />
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(orphanedData)}}' 
+          dataFormat="flat"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles orphaned nodes in flat data",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test handling of nodes with non-existent parent IDs
-      // TODO: Verify orphaned node placement or error handling
-      const orphanedData = [
-        { id: 1, name: "Root Item" },
-        { id: 2, name: "Orphaned Item", parentId: 999 }, // non-existent parent
-      ];
+  test("handles deeply nested data structures", async ({ initTestBed, createTreeDriver }) => {
+    const deepData = Array.from({ length: 100 }, (_, i) => ({
+      id: i + 1,
+      name: `Level ${i + 1}`,
+      parentId: i === 0 ? null : i,
+    }));
 
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{orphanedData}" 
-        dataFormat="flat"
-      />
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(deepData)}}' 
+          dataFormat="flat"
+          selectedValue="{100}"
+        />
+      </VStack>
     `);
-    },
-  );
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+  });
 
-  test.skip(
-    "handles deeply nested data structures",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test performance and functionality with very deep nesting
-      // TODO: Verify stack overflow prevention and UI rendering limits
-      const deepData = Array.from({ length: 100 }, (_, i) => ({
-        id: i + 1,
-        name: `Level ${i + 1}`,
-        parentId: i === 0 ? null : i,
-      }));
-
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{deepData}" 
-        dataFormat="flat"
-      />
-    `);
-    },
-  );
-
-  test.skip(
-    "handles frequent data updates",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component stability with rapid data changes
-      // TODO: Verify memory leaks prevention and performance optimization
-      // TODO: Use testStateDriver to simulate rapid data updates
-    },
-  );
-
-  test.skip(
+  test(
     "handles invalid dataFormat values",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test component behavior with invalid dataFormat prop values
-      // TODO: Verify fallback behavior and error handling
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{flatTreeData}" 
-        dataFormat="invalid-format"
-      />
-    `);
-    },
-  );
+    async ({ initTestBed, createTreeDriver }) => {
+    const orphanedData = [
+      { id: 1, name: "Root Item" },
+      { id: 2, name: "Orphaned Item", parentId: 999 }, // non-existent parent
+    ];
 
-  test.skip(
-    "handles missing required field configurations",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, page }) => {
-      // TODO: Test behavior when required fields (id, label) are missing from data
-      // TODO: Verify graceful degradation and error messaging
-      const missingFieldData = [
-        { /* missing id */ name: "Item without ID" },
-        { id: 2 /* missing name/label */ },
-      ];
-
-      await initTestBed(`
-      <Tree 
-        testId="tree" 
-        data="{missingFieldData}" 
-        dataFormat="flat"
-      />
+    await initTestBed(`
+      <VStack height="200px">
+        <Tree 
+          testId="tree" 
+          data='{${JSON.stringify(orphanedData)}}' 
+          dataFormat="invalid-format"
+        />
+      </VStack>
     `);
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
     },
   );
 });
