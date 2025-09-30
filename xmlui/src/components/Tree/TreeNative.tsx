@@ -217,8 +217,8 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
 }, ref) => {
   // Internal selection state for uncontrolled usage
   // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
-  const [internalSelectedId, setInternalSelectedId] = useState<string>(() => {
-    return (!onSelectionChanged && selectedValue) ? String(selectedValue) : '';
+  const [internalSelectedId, setInternalSelectedId] = useState<string | undefined>(() => {
+    return (!onSelectionChanged && selectedValue) ? String(selectedValue) : undefined;
   });
 
   // Steps 3a & 3b: Transform data based on format
@@ -663,33 +663,44 @@ export const TreeComponent = forwardRef<TreeRef, TreeComponentProps>(({
     // Selection methods
     selectNode: (nodeId: string) => {
       // Find node by key (source ID) since nodeId is source ID
-      const node = Object.values(treeItemsById).find(n => n.key === nodeId);
-      if (node && onSelectionChanged) {
-        // Convert TreeNode to FlatTreeNode format
-        const flatNode: FlatTreeNode = {
-          ...node,
-          isExpanded: expandedIds.includes(node.key),
-          depth: node.parentIds.length,
-          hasChildren: !!(node.children && node.children.length > 0),
-        };
+      // Use String() comparison to handle type mismatches between nodeId and node.key
+      const node = Object.values(treeItemsById).find(n => String(n.key) === String(nodeId));
+      if (node) {
+        // Update internal state first (this makes the visual selection work)
+        setInternalSelectedId(node.key);
         
-        // Find previous node if there was a previous selection
-        const previousNode = selectedValue 
-          ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
-          : null;
-        
-        onSelectionChanged({
-          previousNode,
-          newNode: flatNode,
-        });
+        // Also call the external callback if provided
+        if (onSelectionChanged) {
+          // Convert TreeNode to FlatTreeNode format
+          const flatNode: FlatTreeNode = {
+            ...node,
+            isExpanded: expandedIds.includes(node.key),
+            depth: node.parentIds.length,
+            hasChildren: !!(node.children && node.children.length > 0),
+          };
+          
+          // Find previous node if there was a previous selection
+          const previousNode = effectiveSelectedId 
+            ? flatTreeData.find(n => String(n.key) === String(effectiveSelectedId)) || null
+            : null;
+          
+          onSelectionChanged({
+            previousNode,
+            newNode: flatNode,
+          });
+        }
       }
     },
     
     clearSelection: () => {
+      // Update internal state first (this makes the visual deselection work)
+      setInternalSelectedId(undefined);
+      
+      // Also call the external callback if provided
       if (onSelectionChanged) {
         // Find previous node if there was a previous selection
-        const previousNode = selectedValue 
-          ? flatTreeData.find(n => String(n.key) === String(selectedValue)) || null
+        const previousNode = effectiveSelectedId 
+          ? flatTreeData.find(n => String(n.key) === String(effectiveSelectedId)) || null
           : null;
         
         onSelectionChanged({
