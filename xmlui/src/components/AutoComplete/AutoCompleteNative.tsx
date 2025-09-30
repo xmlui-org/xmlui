@@ -11,7 +11,6 @@ import {
   useState,
 } from "react";
 import classnames from "classnames";
-// Removed cmdk dependency - using pure HTML elements instead
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
