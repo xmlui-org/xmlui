@@ -11,7 +11,7 @@ export function HiddenOption(option: Option) {
     return {
       ...option,
       label: label ?? node?.textContent ?? "",
-      keywords: [label ?? node?.textContent ?? ""],
+      keywords: option.keywords || [label ?? node?.textContent ?? ""],
       // Store the rendered ReactNode for dropdown display
     };
   }, [option, node, label]);

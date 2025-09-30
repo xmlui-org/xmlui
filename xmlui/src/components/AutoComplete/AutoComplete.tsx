@@ -19,10 +19,6 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
-  dLabel,
-  dLabelPosition,
-  dLabelWidth,
-  dLabelBreak,
   createMetadata,
   d,
 } from "../metadata-helpers";
@@ -73,13 +69,6 @@ export const AutoCompleteMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    label: dLabel(),
-    labelPosition: {
-      ...dLabelPosition(),
-      defaultValue: defaultProps.labelPosition,
-    },
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     multi: {
       ...dMulti(),
@@ -98,7 +87,7 @@ export const AutoCompleteMd = createMetadata({
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
     itemCreated: {
-      description: "This event is triggered when a new item is created by the user " + 
+      description: "This event is triggered when a new item is created by the user " +
       "(if `creatable` is enabled).",
     }
   },
@@ -176,10 +165,6 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         creatable={extractValue.asOptionalBoolean(node.props.creatable)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
