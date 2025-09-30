@@ -263,38 +263,51 @@ test.describe("Basic Functionality", () => {
 
   // --- Range validation (min/max)
 
-  test("minValue prevents values below minimum", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox minValue="10" initialValue="15" />`);
-    const decrementButton = page
-      .locator("button")
-      .filter({ hasText: /decrement|down|\-/ })
-      .first();
+  test("minValue prevents values below minimum spinner button", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox minValue="10" initialValue="11" />`);
+    const decrementButton = page.getByRole("spinbutton").nth(1);
 
-    if (await decrementButton.isVisible()) {
-      // Click multiple times to try to go below minimum
-      for (let i = 0; i < 10; i++) {
-        await decrementButton.click();
-      }
-      const value = await page.getByRole("textbox").inputValue();
-      expect(parseInt(value) || 0).toBeGreaterThanOrEqual(10);
-    }
+    const textbox = page.getByRole("textbox");
+
+    await decrementButton.click();
+    await expect(textbox).toHaveValue("10");
+
+    await decrementButton.click();
+    await expect(textbox).toHaveValue("10");
   });
 
-  test("maxValue prevents values above maximum", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox maxValue="20" initialValue="15" />`);
-    const incrementButton = page
-      .locator("button")
-      .filter({ hasText: /increment|up|\+/ })
-      .first();
+  test("minValue prevents typing values below minimum", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox minValue="10" initialValue="11" />`);
+    const decrementButton = page.getByRole("spinbutton").nth(1);
 
-    if (await incrementButton.isVisible()) {
-      // Click multiple times to try to go above maximum
-      for (let i = 0; i < 10; i++) {
-        await incrementButton.click();
-      }
-      const value = await page.getByRole("textbox").inputValue();
-      expect(parseInt(value) || 0).toBeLessThanOrEqual(20);
-    }
+    const textbox = page.getByRole("textbox");
+
+    await textbox.fill("2");
+    await textbox.blur();
+    await expect(textbox).toHaveValue("10");
+  });
+
+  test("maxValue prevents values above maximum spinner button", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox maxValue="11" initialValue="10" />`);
+    const incrementButton = page.getByRole("spinbutton").nth(0);
+
+    const textbox = page.getByRole("textbox");
+
+    await incrementButton.click();
+    await expect(textbox).toHaveValue("11");
+
+    await incrementButton.click();
+    await expect(textbox).toHaveValue("11");
+  });
+
+  test("maxValue prevents typing values above maximum", async ({ initTestBed, page }) => {
+    await initTestBed(`<NumberBox maxValue="11" initialValue="10" />`);
+
+    const textbox = page.getByRole("textbox");
+
+    await textbox.fill("200");
+    await textbox.blur();
+    await expect(textbox).toHaveValue("11");
   });
 });
 

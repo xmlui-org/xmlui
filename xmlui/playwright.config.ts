@@ -14,8 +14,6 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = 3211;
 export default defineConfig({
-  /* We're using the root directory since both src/components and tests-e2e folders are included */
-  //testDir: "./src/components",
   /* Run tests in files in parallel */
   fullyParallel: true,
   testMatch: "*.spec.ts",
@@ -39,11 +37,11 @@ export default defineConfig({
     trace: "on-first-retry",
     serviceWorkers: "allow",
     /* Grants specified permissions to the browser context. */
-    permissions: ['clipboard-read', 'clipboard-write'],
+    permissions: ["clipboard-read", "clipboard-write"],
   },
 
   /* Global timeout settings */
-  timeout: 20000, // 20 seconds for entire test
+  timeout: process.env.CI ? 10000 : 5000,
   expect: {
     timeout: 5000, // 5 seconds for expect assertions
   },
@@ -53,7 +51,7 @@ export default defineConfig({
   projects: [
     {
       name: "non-smoke",
-      grepInvert: /@smoke/
+      grepInvert: /@smoke/,
     },
     {
       name: "smoke",

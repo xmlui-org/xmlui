@@ -414,7 +414,13 @@ export const NumberBox = forwardRef(function NumberBox(
     }
 
     // --- Single character processing
-    const result = processCharacterInput(event.data, currentValue, currentPos, expectedNewValue, false);
+    const result = processCharacterInput(
+      event.data,
+      currentValue,
+      currentPos,
+      expectedNewValue,
+      false,
+    );
 
     if (result.shouldPreventDefault) {
       event.preventDefault();
@@ -447,7 +453,6 @@ export const NumberBox = forwardRef(function NumberBox(
         currentValue.substring(0, selectionStart) +
         pastedText +
         currentValue.substring(selectionEnd);
-
 
       // --- Start with the value before the selection
       let resultValue = currentValue.substring(0, selectionStart);
@@ -514,25 +519,39 @@ export const NumberBox = forwardRef(function NumberBox(
   const handleOnBlur = useCallback(() => {
     // --- Get the current input value
     const currentInputValue = inputRef.current?.value ?? "";
-    
+
     // --- Check if we need to add a trailing zero
     let finalValue = currentInputValue;
     if (!integersOnly && currentInputValue.endsWith(DECIMAL_SEPARATOR)) {
       // --- Add trailing zero if the value ends with decimal separator
       finalValue = currentInputValue + "0";
-      
-      // --- Update the input and state with the new value
-      if (inputRef.current) {
-        inputRef.current.value = finalValue;
+    }
+
+    // --- Convert to number and clamp to min/max bounds
+    const numericValue = toUsableNumber(finalValue, integersOnly);
+    if (numericValue !== null && numericValue !== undefined) {
+      const clampedValue = clamp(numericValue, min, max);
+      if (clampedValue !== numericValue) {
+        const clampedString = clampedValue.toString();
+        finalValue = clampedString;
+
+        // --- Update the input field immediately
+        if (inputRef.current) {
+          inputRef.current.value = clampedString;
+        }
       }
+    }
+
+    // --- Update the state if the final value is different from current input
+    if (finalValue !== currentInputValue) {
       updateValue(finalValue, finalValue);
     } else {
       // --- Use the standard representation mapping
       setValueStrRep(mapToRepresentation(value));
     }
-    
+
     onBlur?.();
-  }, [value, onBlur, integersOnly, updateValue]);
+  }, [value, onBlur, integersOnly, updateValue, min, max]);
 
   const focus = useCallback(() => {
     inputRef.current?.focus();
