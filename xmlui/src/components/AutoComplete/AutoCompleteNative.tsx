@@ -373,9 +373,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
       searchTerm,
       open,
       setOpen,
+      setSelectedIndex,
       optionRenderer,
     };
-  }, [inputValue, searchTerm, multi, options, toggleOption, value, open, setOpen, optionRenderer]);
+  }, [inputValue, searchTerm, multi, options, toggleOption, value, open, setOpen, setSelectedIndex, optionRenderer]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
@@ -537,6 +538,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                               keywords={keywords}
                               readOnly={readOnly}
                               isHighlighted={selectedIndex === itemIndex}
+                              itemIndex={itemIndex}
                             />
                           );
                         })}
@@ -560,7 +562,7 @@ type CreatableItemProps = {
 };
 
 function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps) {
-  const { value, options, searchTerm, onChange, setOpen } = useAutoComplete();
+  const { value, options, searchTerm, onChange, setOpen, setSelectedIndex } = useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
     isOptionsExist(options, [{ value: searchTerm, label: searchTerm }]) ||
@@ -587,6 +589,11 @@ function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps)
         e.preventDefault();
         e.stopPropagation();
       }}
+      onMouseEnter={() => {
+        if (setSelectedIndex) {
+          setSelectedIndex(0); // CreatableItem is always at index 0
+        }
+      }}
       onClick={handleClick}
       role="option"
       aria-selected={isHighlighted}
@@ -603,7 +610,7 @@ function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps)
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
+function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {
   const {
     value,
     label,
@@ -612,9 +619,10 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
     readOnly,
     children,
     isHighlighted = false,
+    itemIndex,
   } = option;
   const id = useId();
-  const { value: selectedValue, onChange, multi, setOpen, optionRenderer } = useAutoComplete();
+  const { value: selectedValue, onChange, multi, setOpen, setSelectedIndex, optionRenderer } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   const handleClick = () => {
@@ -637,6 +645,11 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
+      }}
+      onMouseEnter={() => {
+        if (itemIndex !== undefined && setSelectedIndex) {
+          setSelectedIndex(itemIndex);
+        }
       }}
       onClick={handleClick}
     >
