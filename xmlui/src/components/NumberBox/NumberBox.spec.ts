@@ -246,19 +246,15 @@ test.describe("Basic Functionality", () => {
   // --- zeroOrPositive prop
 
   test("zeroOrPositive=true prevents negative values", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="5" />`);
+    await initTestBed(`<NumberBox zeroOrPositive="true" initialValue="1" />`);
     const input = page.getByRole("textbox");
     const decrementButton = page.locator("button").nth(1);
 
-    if (await decrementButton.isVisible()) {
-      // Click multiple times to try to go negative
-      for (let i = 0; i < 10; i++) {
-        await decrementButton.click();
-      }
-      // Should not go below 0
-      const value = await input.inputValue();
-      expect(parseInt(value) || 0).toBeGreaterThanOrEqual(0);
-    }
+    await decrementButton.click();
+    expect(input).toHaveValue("0");
+
+    await decrementButton.click();
+    expect(input).toHaveValue("0");
   });
 
   // --- Range validation (min/max)
@@ -318,11 +314,8 @@ test.describe("Basic Functionality", () => {
 test.describe("Accessibility", () => {
   test("has correct role", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" hasSpinBox="true" />`);
-    const spinButtons = page.getByTestId("input").locator("button");
-    for (let i = 0; i < (await spinButtons.count()); i++) {
-      const button = spinButtons.nth(i);
-      await expect(button).toHaveAttribute("role", "spinbutton");
-    }
+    await expect(page.getByRole("spinbutton")).toHaveCount(2);
+    await expect(page.getByRole("textbox")).toBeVisible();
   });
 
   test("component supports keyboard navigation", async ({ initTestBed, page }) => {
@@ -334,16 +327,6 @@ test.describe("Accessibility", () => {
   test("required has proper ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox required="true" label="Required field" />`);
     await expect(page.getByRole("textbox")).toHaveAttribute("required");
-  });
-
-  test("spinbox buttons are accessible when present", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox />`);
-    const spinButtons = page.locator("button");
-
-    for (let i = 0; i < (await spinButtons.count()); i++) {
-      const button = spinButtons.nth(i);
-      await expect(button).toHaveAttribute("role", "spinbutton");
-    }
   });
 });
 
@@ -1139,26 +1122,23 @@ test.describe("Other Edge Cases", () => {
     }
   });
 
-  test("integersOnly with zeroOrPositive combination works", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox integersOnly="true" zeroOrPositive="true" initialValue="5" />`);
-    const input = page.getByRole("textbox");
+  test("integersOnly with zeroOrPositive combination works", async ({
+    initTestBed,
+    createNumberBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox integersOnly="true" zeroOrPositive="true" initialValue="1" />`);
 
-    // Try to go negative
-    const decrementButton = page
-      .locator("button")
-      .filter({ hasText: /decrement|down|\-/ })
-      .first();
-    if (await decrementButton.isVisible()) {
-      for (let i = 0; i < 10; i++) {
-        await decrementButton.click();
-      }
-      await expect(input).toHaveValue("0"); // Should stop at 0
-    }
+    const driver = await createNumberBoxDriver();
 
-    // Try to add decimal
-    await input.focus();
-    await page.keyboard.type(".5");
-    await expect(input).not.toHaveValue("0.5"); // Should not allow decimal
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("0");
+
+    await driver.decrement();
+    await expect(driver.input).toHaveValue("0");
+
+    await driver.input.type(".5");
+    await expect(driver.input).toHaveValue("5");
   });
 
   // Special numeric formats
