@@ -200,7 +200,8 @@ $themeVars: t.composePaddingVars($themeVars, $component);
       background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
     }
 
-    &[data-disabled="true"] {
+    &[aria-disabled="true"],
+    &.disabledOption {
       pointer-events: none;
       cursor: not-allowed;
       color: createThemeVar("textColor-item-#{$component}--disabled");

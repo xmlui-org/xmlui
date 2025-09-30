@@ -138,8 +138,9 @@ export const AutoComplete = forwardRef(function AutoComplete(
     }
 
     const searchLower = searchTerm.toLowerCase();
-    return Array.from(options).filter(option => {
-      const extendedValue = option.value + " " + option.label + " " + (option.keywords || []).join(" ");
+    return Array.from(options).filter((option) => {
+      const extendedValue =
+        option.value + " " + option.label + " " + (option.keywords || []).join(" ");
       return extendedValue.toLowerCase().includes(searchLower);
     });
   }, [options, searchTerm]);
@@ -147,22 +148,21 @@ export const AutoComplete = forwardRef(function AutoComplete(
   // Check if we should show creatable item
   const shouldShowCreatable = useMemo(() => {
     if (!creatable || !searchTerm || searchTerm.trim() === "") return false;
-    
+
     // Check if the search term already exists as an option
-    const searchTermExists = Array.from(options).some(option => 
-      option.value === searchTerm || option.label === searchTerm
+    const searchTermExists = Array.from(options).some(
+      (option) => option.value === searchTerm || option.label === searchTerm,
     );
-    
+
     if (searchTermExists) return false;
-    
+
     // Check if it's already selected
     if (Array.isArray(value) && value.includes(searchTerm)) return false;
     if (value === searchTerm) return false;
-    
+
     // Only show creatable if there are no matching filtered options
     return filteredOptions.length === 0;
   }, [creatable, searchTerm, options, value, filteredOptions]);
-
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -200,7 +200,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const toggleOption = useCallback(
     (selectedItem: string) => {
       if (selectedItem === "") return;
-      
+
       const newSelectedValue = multi
         ? Array.isArray(value)
           ? value.includes(selectedItem)
@@ -213,7 +213,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
-      
+
       if (multi) {
         setInputValue("");
         setSearchTerm("");
@@ -223,7 +223,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
         setOpen(false);
         setSearchTerm("");
       }
-      
+
       inputRef.current?.focus();
     },
     [multi, value, updateState, onDidChange],
@@ -260,10 +260,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const allItems = useMemo(() => {
     const items = [];
     if (shouldShowCreatable) {
-      items.push({ type: 'creatable', value: searchTerm, label: `Create "${searchTerm}"` });
+      items.push({ type: "creatable", value: searchTerm, label: `Create "${searchTerm}"` });
     }
-    filteredOptions.forEach(option => {
-      items.push({ type: 'option', ...option });
+    filteredOptions.forEach((option) => {
+      items.push({ type: "option", ...option });
     });
     return items;
   }, [shouldShowCreatable, searchTerm, filteredOptions]);
@@ -274,49 +274,52 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }, [allItems]);
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (!open) return;
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!open) return;
 
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : 0));
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        setSelectedIndex(prev => (prev > 0 ? prev - 1 : allItems.length - 1));
-        break;
-      case 'Enter':
-        event.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < allItems.length) {
-          const selectedItem = allItems[selectedIndex];
-          if (selectedItem.type === 'creatable') {
-            const newOption = { value: searchTerm, label: searchTerm, enabled: true };
-            onOptionAdd(newOption);
-            onItemCreated(searchTerm);
-            toggleOption(searchTerm);
-          } else {
-            toggleOption(selectedItem.value);
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) => (prev < allItems.length - 1 ? prev + 1 : 0));
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : allItems.length - 1));
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+            const selectedItem = allItems[selectedIndex];
+            if (selectedItem.type === "creatable") {
+              const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+              onOptionAdd(newOption);
+              onItemCreated(searchTerm);
+              toggleOption(searchTerm);
+            } else {
+              toggleOption(selectedItem.value);
+            }
+          } else if (allItems.length === 1) {
+            // If there's only one item (creatable or regular) and no selection, select it
+            const singleItem = allItems[0];
+            if (singleItem.type === "creatable") {
+              const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+              onOptionAdd(newOption);
+              onItemCreated(searchTerm);
+              toggleOption(searchTerm);
+            } else {
+              toggleOption(singleItem.value);
+            }
           }
-        } else if (allItems.length === 1) {
-          // If there's only one item (creatable or regular) and no selection, select it
-          const singleItem = allItems[0];
-          if (singleItem.type === 'creatable') {
-            const newOption = { value: searchTerm, label: searchTerm, enabled: true };
-            onOptionAdd(newOption);
-            onItemCreated(searchTerm);
-            toggleOption(searchTerm);
-          } else {
-            toggleOption(singleItem.value);
-          }
-        }
-        break;
-      case 'Escape':
-        event.preventDefault();
-        setOpen(false);
-        break;
-    }
-  }, [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen]);
+          break;
+        case "Escape":
+          event.preventDefault();
+          setOpen(false);
+          break;
+      }
+    },
+    [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen],
+  );
 
   // Render the "empty list" message
   const emptyListNode = useMemo(
@@ -380,10 +383,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
             }}
             modal={false}
           >
-            <div
-              ref={dropdownRef}
-              className={styles.command}
-            >
+            <div ref={dropdownRef} className={styles.command}>
               <PopoverTrigger asChild ref={setReferenceElement}>
                 <div
                   {...rest}
@@ -422,79 +422,79 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   )}
                   <div className={styles.inputWrapper}>
                     <input
-                    role="combobox"
-                    id={inputId}
-                    onFocus={(ev) => {
-                      setIsFocused(true);
-                      onFocus(ev);
-                    }}
-                    onBlur={(ev) => {
-                      if (inputValue === "" && !multi) {
-                        clearValue();
-                      } else {
-                        if (!Array.isArray(selectedValue) && selectedValue) {
-                          setInputValue(selectedValue?.label);
+                      role="combobox"
+                      id={inputId}
+                      onFocus={(ev) => {
+                        setIsFocused(true);
+                        onFocus(ev);
+                      }}
+                      onBlur={(ev) => {
+                        if (inputValue === "" && !multi) {
+                          clearValue();
                         } else {
-                          setInputValue("");
+                          if (!Array.isArray(selectedValue) && selectedValue) {
+                            setInputValue(selectedValue?.label);
+                          } else {
+                            setInputValue("");
+                          }
                         }
-                      }
-                      onBlur(ev);
-                      setIsFocused(false);
-                    }}
-                    onKeyDown={(event) => {
-                      if (readOnly) return;
-                      
-                      // Handle opening dropdown
-                      if (event.key === "ArrowDown" && !open) {
+                        onBlur(ev);
+                        setIsFocused(false);
+                      }}
+                      onKeyDown={(event) => {
+                        if (readOnly) return;
+
+                        // Handle opening dropdown
+                        if (event.key === "ArrowDown" && !open) {
+                          setOpen(true);
+                          return;
+                        }
+
+                        // Handle keyboard navigation when dropdown is open
+                        if (open) {
+                          handleKeyDown(event);
+                        } else if (event.key === "Enter") {
+                          setOpen(true);
+                        }
+                      }}
+                      data-part-id={PART_INPUT}
+                      readOnly={readOnly}
+                      autoFocus={autoFocus}
+                      aria-autocomplete="list"
+                      ref={inputRef}
+                      value={inputValue}
+                      disabled={!enabled}
+                      onChange={(event) => {
                         setOpen(true);
-                        return;
-                      }
-                      
-                      // Handle keyboard navigation when dropdown is open
-                      if (open) {
-                        handleKeyDown(event);
-                      } else if (event.key === "Enter") {
-                        setOpen(true);
-                      }
-                    }}
-                    data-part-id={PART_INPUT}
-                    readOnly={readOnly}
-                    autoFocus={autoFocus}
-                    aria-autocomplete="list"
-                    ref={inputRef}
-                    value={inputValue}
-                    disabled={!enabled}
-                    onChange={(event) => {
-                      setOpen(true);
-                      setInputValue(event.target.value);
-                      setSearchTerm(event.target.value);
-                    }}
-                    placeholder={!readOnly ? placeholder : ""}
-                    className={styles.commandInput}
-                  />
-                  <div className={styles.actions}>
-                    {value?.length > 0 && enabled && !readOnly && (
+                        setInputValue(event.target.value);
+                        setSearchTerm(event.target.value);
+                      }}
+                      placeholder={!readOnly ? placeholder : ""}
+                      className={styles.commandInput}
+                    />
+                    <div className={styles.actions}>
+                      {value?.length > 0 && enabled && !readOnly && (
+                        <span
+                          className={styles.action}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
+                        >
+                          <Icon name="close" />
+                        </span>
+                      )}
                       <span
                         className={styles.action}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
+                        onClick={() => {
+                          if (readOnly) return;
+                          setOpen(!open);
                         }}
                       >
-                        <Icon name="close" />
+                        <Icon name="chevrondown" />
                       </span>
-                    )}
-                    <span
-                      className={styles.action}
-                      onClick={() => {
-                        if (readOnly) return;
-                        setOpen(!open);
-                      }}
-                    >
-                      <Icon name="chevrondown" />
-                    </span>
+                    </div>
                   </div>
-                </div>
                 </div>
               </PopoverTrigger>
               {open && (
@@ -513,7 +513,12 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       {filteredOptions.length === 0 && !shouldShowCreatable && (
                         <div>{emptyListNode}</div>
                       )}
-                      {shouldShowCreatable && <CreatableItem onNewItem={onItemCreated} isHighlighted={selectedIndex === 0} />}
+                      {shouldShowCreatable && (
+                        <CreatableItem
+                          onNewItem={onItemCreated}
+                          isHighlighted={selectedIndex === 0}
+                        />
+                      )}
                       <div>
                         {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
                           const itemIndex = shouldShowCreatable ? index + 1 : index;
@@ -548,7 +553,7 @@ type CreatableItemProps = {
   isHighlighted?: boolean;
 };
 
-function CreatableItem({onNewItem, isHighlighted = false}: CreatableItemProps) {
+function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps) {
   const { value, options, searchTerm, onChange, setOpen } = useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
@@ -593,7 +598,15 @@ function CreatableItem({onNewItem, isHighlighted = false}: CreatableItemProps) {
 }
 
 function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
-  const { value, label, enabled = true, keywords, readOnly, children, isHighlighted = false } = option;
+  const {
+    value,
+    label,
+    enabled = true,
+    keywords,
+    readOnly,
+    children,
+    isHighlighted = false,
+  } = option;
   const id = useId();
   const { value: selectedValue, onChange, multi, setOpen, optionRenderer } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
@@ -620,7 +633,6 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean }) {
         e.stopPropagation();
       }}
       onClick={handleClick}
-      data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
     >
       {children ? (
         <>
