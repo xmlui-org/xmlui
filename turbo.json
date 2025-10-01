@@ -25,6 +25,13 @@
       "dependsOn": ["^build:extension"],
       "outputs": ["dist/**"]
     },
+    "build:meta": {
+      "outputs": ["dist/**"]
+    },
+    "build:extension-metadata": {
+      "dependsOn": ["^build:meta"],
+      "outputs": ["../packages/xmlui-*/dist/**"]
+    },
     "xmlui-vscode#build:vsix": {
       "dependsOn": ["xmlui-vscode#build"],
       "outputs": ["xmlui-vscode-*.vsix"]
@@ -52,8 +59,8 @@
     },
     "generate-docs": {
       "outputs": ["scripts/generate-docs/metadata/**", "$TURBO_ROOT$/docs/content/**"],
-      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**"],
-      "dependsOn": ["build:xmlui-metadata"]
+      "inputs": ["$TURBO_DEFAULT$", "dist/metadata/**", "../packages/xmlui-*/dist/**"],
+      "dependsOn": ["build:xmlui-metadata", "build:extension-metadata"]
     },
     "generate-docs-summaries": {
       "outputs": ["$TURBO_ROOT$/docs/content/**"],

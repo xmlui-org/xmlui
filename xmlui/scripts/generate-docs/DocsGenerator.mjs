@@ -42,7 +42,17 @@ export class DocsGenerator {
       })
       .map(([compName, compData]) => {
         const displayName = compName;
-        const componentFolder = compData.specializedFrom || compData.docFolder || compName;
+
+        let componentFolder = "";
+        if (compData.specializedFrom) {
+          const parentName = Object.keys(this.metadata).find((name) => name === compData.specializedFrom);
+          if (parentName) {
+            componentFolder = this.metadata[parentName].docFolder || compData.specializedFrom;
+          }
+        } else {
+          componentFolder = compData.docFolder || compName;
+        }
+
         const descriptionRef = join(componentFolder, `${displayName}.md`);
         const extendedComponentData = {
           ...compData,

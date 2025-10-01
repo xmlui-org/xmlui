@@ -246,6 +246,10 @@
                 <NavLink label="VStack" to="/components/VStack" />
                 <!-- END GENERATED CONTENT/Component references links -->
             </NavGroup>
+            <NavGroup label="Extensions">
+                <!-- GENERATED CONTENT/Extension references links -->
+                <!-- END GENERATED CONTENT/Extension references links -->
+            </NavGroup>
             <NavGroup label="Themes">
                 <NavLink
                     label="Layout Properties"
@@ -527,9 +531,17 @@
         </Page>
         <Page url="/components/*">
             <script>
-                  var contentKey = 'components/' + $routeParams['*'];
-                  var content = appGlobals.content[contentKey];
-                </script>
+                var contentKey = 'components/' + $routeParams['*'];
+                var content = appGlobals.content[contentKey];
+            </script>
+            <DocumentPage when="{content}" content="{content}" />
+            <Redirect when="{!content}" to="/404" />
+        </Page>
+        <Page url="/extensions/*">
+            <script>
+                var contentKey = 'extensions/' + $routeParams['*'];
+                var content = appGlobals.content[contentKey];
+            </script>
             <DocumentPage when="{content}" content="{content}" />
             <Redirect when="{!content}" to="/404" />
         </Page>
