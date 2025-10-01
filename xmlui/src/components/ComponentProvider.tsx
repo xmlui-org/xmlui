@@ -128,7 +128,6 @@ import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
-import { testMarkerComponentRenderer } from "./TestMarker/TestMarker";
 import { createPropHolderComponent } from "../components-core/renderers";
 import { breakoutComponentRenderer } from "./Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
@@ -367,10 +366,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerCoreComponent(spaceFillerComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_TestMarker !== "false") {
-      this.registerCoreComponent(testMarkerComponentRenderer);
-    }
-
     if (process.env.VITE_USED_COMPONENTS_Textarea !== "false") {
       this.registerCoreComponent(textAreaComponentRenderer);
     }

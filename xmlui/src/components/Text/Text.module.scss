@@ -181,6 +181,10 @@ $component: "Text";
       @include textVariant("small");
     }
 
+    &.code {
+      @include textVariant("code");
+    }
+
     &.caption {
       letter-spacing: createThemeVar("letterSpacing-#{$component}-caption");
     }

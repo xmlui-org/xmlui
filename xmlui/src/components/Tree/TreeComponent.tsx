@@ -24,9 +24,9 @@ export const TreeMd = createMetadata({
       description: `The property name in source data for unique identifiers.`,
       default: defaultProps.idField,
     },
-    labelField: {
+    nameField: {
       description: `The property name in source data for display text.`,
-      default: defaultProps.labelField,
+      default: defaultProps.nameField,
     },
     iconField: {
       description: `The property name in source data for icon identifiers.`,
@@ -40,19 +40,20 @@ export const TreeMd = createMetadata({
       description: `The property name in source data for collapsed state icons.`,
       default: defaultProps.iconCollapsedField,
     },
-    parentField: {
+    parentIdField: {
       description: `The property name in source data for parent relationships (used in flat format).`,
-      default: defaultProps.parentField,
+      default: defaultProps.parentIdField,
     },
     childrenField: {
       description: `The property name in source data for child arrays (used in hierarchy format).`,
       default: defaultProps.childrenField,
     },
+    selectableField: {
+      description: `The property name in source data for selectable state (default: "selectable").`,
+      default: defaultProps.selectableField,
+    },
     selectedValue: {
       description: `The selected item ID in source data format.`,
-    },
-    selectedUid: {
-      description: `[DEPRECATED] Use selectedValue instead. The ID of the selected tree row (internal format).`,
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
@@ -219,12 +220,13 @@ export const treeComponentRenderer = createComponentRenderer(
         data={extractValue(node.props.data)}
         dataFormat={extractValue(node.props.dataFormat)}
         idField={extractValue(node.props.idField)}
-        labelField={extractValue(node.props.labelField)}
+        nameField={extractValue(node.props.nameField)}
         iconField={extractValue(node.props.iconField)}
         iconExpandedField={extractValue(node.props.iconExpandedField)}
         iconCollapsedField={extractValue(node.props.iconCollapsedField)}
-        parentField={extractValue(node.props.parentField)}
+        parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
+        selectableField={extractValue(node.props.selectableField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
@@ -240,25 +242,12 @@ export const treeComponentRenderer = createComponentRenderer(
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
-          // ========================================
-          // $item Context Properties for Templates
-          // ========================================
-          // These properties are available in item templates via $item.propertyName
           const itemContext = {
-            // Core identification properties
             id: flatTreeNode.id,                     // $item.id - Internal unique identifier
-            key: flatTreeNode.key,                   // $item.key - Source data ID
-            
-            // Display properties
             name: flatTreeNode.displayName,          // $item.name - Primary display text
-            displayName: flatTreeNode.displayName,   // $item.displayName - Alternative access
-            
-            // State properties  
             depth: flatTreeNode.depth,               // $item.depth - Nesting level (0-based)
             isExpanded: flatTreeNode.isExpanded,     // $item.isExpanded - Expansion state
             hasChildren: flatTreeNode.hasChildren,   // $item.hasChildren - Children indicator
-            
-            // All other TreeNode properties including:
             // - icon, iconExpanded, iconCollapsed (from icon fields)
             // - uid, path, parentIds, selectable, children (TreeNode internals)
             // - All original source data properties (custom fields)

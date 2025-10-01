@@ -1,5 +1,9 @@
 {
   "_overview": "Components Overview",
+  "_xmlui-animations": "Xmlui Animations Package",
+  "_xmlui-pdf": "Xmlui Pdf Package",
+  "_xmlui-spreadsheet": "Xmlui Spreadsheet Package",
+  "_xmlui-website-blocks": "Xmlui Website Blocks Package",
   "APICall": "APICall",
   "App": "App",
   "AppHeader": "AppHeader",
@@ -99,6 +103,7 @@
   "ToneChangerButton": "ToneChangerButton",
   "ToneSwitch": "ToneSwitch",
   "Tooltip": "Tooltip",
+  "Tree": "Tree",
   "VSplitter": "VSplitter",
   "VStack": "VStack"
 }

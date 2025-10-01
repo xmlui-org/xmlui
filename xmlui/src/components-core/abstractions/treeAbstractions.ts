@@ -35,6 +35,7 @@ export interface TreeFieldConfig {
   iconCollapsedField?: string;
   parentField?: string;
   childrenField?: string;
+  selectableField?: string;
 }
 
 export interface TreeSelectionEvent {

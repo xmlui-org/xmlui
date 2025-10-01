@@ -146,16 +146,57 @@ const emptyTreeData: UnPackedTreeData = {
   treeItemsById: {},
 };
 
+/**
+ * Find all parent node IDs for a given node ID by traversing up the tree structure
+ * @param nodeId The target node ID to find parents for
+ * @param treeItemsById Map of all tree nodes by their ID
+ * @returns Array of parent node IDs from immediate parent to root
+ */
+const findAllParentIds = (nodeId: string | number, treeItemsById: Record<string, TreeNode>): (string | number)[] => {
+  const parentIds: (string | number)[] = [];
+  const targetNode = treeItemsById[String(nodeId)];
+  
+  if (!targetNode) {
+    return parentIds;
+  }
+  
+  // Walk up the tree using parentIds property which contains the path from root to parent
+  if (targetNode.parentIds && targetNode.parentIds.length > 0) {
+    parentIds.push(...targetNode.parentIds);
+  }
+  
+  return parentIds;
+};
+
+/**
+ * Expand all parent paths for an array of node IDs to ensure they are visible
+ * @param nodeIds Array of node IDs that should be expanded
+ * @param treeItemsById Map of all tree nodes by their ID
+ * @returns Array containing original node IDs plus all necessary parent IDs
+ */
+const expandParentPaths = (nodeIds: (string | number)[], treeItemsById: Record<string, TreeNode>): (string | number)[] => {
+  const allExpandedIds = new Set<string | number>(nodeIds);
+  
+  // For each target node, find and add all its parent IDs
+  nodeIds.forEach(nodeId => {
+    const parentIds = findAllParentIds(nodeId, treeItemsById);
+    parentIds.forEach(parentId => allExpandedIds.add(parentId));
+  });
+  
+  return Array.from(allExpandedIds);
+};
+
 // Default props following XMLUI conventions
 export const defaultProps = {
   dataFormat: "flat" as const,
   idField: "id",
-  labelField: "name",
+  nameField: "name",
   iconField: "icon",
   iconExpandedField: "iconExpanded",
   iconCollapsedField: "iconCollapsed",
-  parentField: "parentId",
+  parentIdField: "parentId",
   childrenField: "children",
+  selectableField: "selectable",
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
   expandOnItemClick: false,
@@ -172,12 +213,13 @@ interface TreeComponentProps {
   data?: UnPackedTreeData;
   dataFormat?: TreeDataFormat;
   idField?: string;
-  labelField?: string;
+  nameField?: string;
   iconField?: string;
   iconExpandedField?: string;
   iconCollapsedField?: string;
-  parentField?: string;
+  parentIdField?: string;
   childrenField?: string;
+  selectableField?: string;
   selectedValue?: string | number;
   selectedId?: string | number;
   defaultExpanded?: DefaultExpansion;
@@ -203,12 +245,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     data = emptyTreeData,
     dataFormat = defaultProps.dataFormat,
     idField = defaultProps.idField,
-    labelField = defaultProps.labelField,
+    nameField = defaultProps.nameField,
     iconField = defaultProps.iconField,
     iconExpandedField = defaultProps.iconExpandedField,
     iconCollapsedField = defaultProps.iconCollapsedField,
-    parentField = defaultProps.parentField,
+    parentIdField = defaultProps.parentIdField,
     childrenField = defaultProps.childrenField,
+    selectableField = defaultProps.selectableField,
     selectedValue,
     selectedId,
     defaultExpanded = defaultProps.defaultExpanded,
@@ -244,12 +287,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     // Build field configuration with validation
     const fieldConfig: TreeFieldConfig = {
       idField: idField || "id",
-      labelField: labelField || "name",
+      labelField: nameField || "name",
       iconField,
       iconExpandedField,
       iconCollapsedField,
-      parentField,
+      parentField: parentIdField,
       childrenField,
+      selectableField,
     };
 
     try {
@@ -327,12 +371,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     data,
     dataFormat,
     idField,
-    labelField,
+    nameField,
     iconField,
     iconExpandedField,
     iconCollapsedField,
-    parentField,
+    parentIdField,
     childrenField,
+    selectableField,
   ]);
 
   const { treeData, treeItemsById } = transformedData;
@@ -371,7 +416,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       collectIds(treeData);
       return allIds;
     } else if (Array.isArray(defaultExpanded)) {
-      return defaultExpanded;
+      // Expand full paths to specified nodes by including all parent nodes
+      return expandParentPaths(defaultExpanded, treeItemsById);
     }
     return [];
   });
