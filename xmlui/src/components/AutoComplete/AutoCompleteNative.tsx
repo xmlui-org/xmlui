@@ -49,10 +49,6 @@ type AutoCompleteProps = {
   autoFocus?: boolean;
   dropdownHeight?: CSSProperties["height"];
   multi?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   readOnly?: boolean;
   creatable?: boolean;
@@ -103,10 +99,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     autoFocus = defaultProps.autoFocus,
     dropdownHeight,
     multi = defaultProps.multi,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
     required = defaultProps.required,
     creatable = defaultProps.creatable,
     optionRenderer,
@@ -314,8 +306,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
       // For single-select, when dropdown opens and there's an input value, try to find and select the matching option
       const matchingIndex = allItems.findIndex((item) => {
         if (item.type === "creatable") return false;
-        return item.label?.toLowerCase() === inputValue.toLowerCase() || 
-               item.value?.toLowerCase() === inputValue.toLowerCase();
+        return item.label?.toLowerCase() === inputValue.toLowerCase() ||
+          item.value?.toLowerCase() === inputValue.toLowerCase();
       });
       if (matchingIndex !== -1) {
         setSelectedIndex(matchingIndex);
@@ -558,7 +550,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                           if (readOnly) return;
                           setOpen(!open);
                           // Focus the input after opening dropdown
-                            inputRef.current?.focus();
+                          inputRef.current?.focus();
                         }}
                       >
                         <Icon name="chevrondown" />
