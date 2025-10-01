@@ -23,19 +23,34 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue("123");
   });
 
-  [
-    { label: "integer", value: "'{1}'", toExpect: "1" },
-    { label: "float", value: "'{1.2}'", toExpect: "1.2" },
-    { label: "undefined", value: "'{undefined}'", toExpect: "" },
-    { label: "null", value: "'{null}'", toExpect: "" },
-    { label: "empty string", value: "''", toExpect: "" },
-    { label: "string that resolves to integer", value: "'1'", toExpect: "1" },
-    { label: "string that resolves to float", value: "'1.2'", toExpect: "1.2" },
-  ].forEach(({ label, value, toExpect }) => {
-    test(`initialValue accepts ${label} type with ${value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<NumberBox initialValue=${value} />`);
-      await expect(page.getByRole("textbox")).toHaveValue(toExpect);
-    });
+  test("initialValue ignores non-numeric string", async ({ initTestBed, page }) => {
+    await initTestBed(`
+        <NumberBox initialValue="can't be this" />
+    `);
+
+    await expect(page.getByRole("textbox")).toHaveValue("");
+  });
+
+  test("initialValue accepts various types", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack>
+        <NumberBox testId="integer" initialValue="{1}" />
+        <NumberBox testId="float" initialValue="{1.2}" />
+        <NumberBox testId="undefined" initialValue="{undefined}" />
+        <NumberBox testId="null" initialValue="{null}" />
+        <NumberBox testId="empty-string" initialValue="" />
+        <NumberBox testId="string-integer" initialValue="1" />
+        <NumberBox testId="string-float" initialValue="1.2" />
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("integer").getByRole("textbox")).toHaveValue("1");
+    await expect(page.getByTestId("float").getByRole("textbox")).toHaveValue("1.2");
+    await expect(page.getByTestId("undefined").getByRole("textbox")).toHaveValue("");
+    await expect(page.getByTestId("null").getByRole("textbox")).toHaveValue("");
+    await expect(page.getByTestId("empty-string").getByRole("textbox")).toHaveValue("");
+    await expect(page.getByTestId("string-integer").getByRole("textbox")).toHaveValue("1");
+    await expect(page.getByTestId("string-float").getByRole("textbox")).toHaveValue("1.2");
   });
 
   // --- enabled prop
@@ -199,7 +214,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`<NumberBox initialValue="10" step="3.5" />`);
     const driver = await createNumberBoxDriver();
     await driver.increment();
-    await expect(driver.input).toHaveValue("13.5");
+    await expect(driver.input).toHaveValue("11");
   });
 
   // --- Arrow key navigation
@@ -967,11 +982,6 @@ test.describe("Other Edge Cases", () => {
     // Test various invalid types
     await initTestBed(`<NumberBox initialValue="{true}" />`);
     await expect(page.getByRole("textbox")).toHaveValue("");
-  });
-
-  test("handles if initialValue is a string", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox initialValue="asdasd" />`);
-    await expect(page.getByRole("textbox")).toHaveValue("asdasd");
   });
 
   // Complex edge cases

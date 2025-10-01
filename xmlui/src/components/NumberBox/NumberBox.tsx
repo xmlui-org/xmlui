@@ -157,11 +157,10 @@ export const numberBoxComponentRenderer = createComponentRenderer(
     className,
     registerComponentApi,
   }) => {
-    // --- Handle initial value as a number
-    let extractedInitialValue = extractValue(node.props.initialValue);
-    if (typeof extractedInitialValue === "string" && !isNaN(parseFloat(extractedInitialValue))) {
-      extractedInitialValue = Number(extractedInitialValue);
-    }
+    let extractedInitialValue;
+    try {
+      extractedInitialValue = extractValue.asOptionalNumber(node.props.initialValue);
+    } catch {}
     return (
       <NumberBox
         className={className}
