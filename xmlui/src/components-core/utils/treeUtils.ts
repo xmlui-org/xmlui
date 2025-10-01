@@ -155,7 +155,7 @@ export function flatToNative(
       path: currentPath,
       displayName,
       parentIds,
-      selectable: true,
+      selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
       children,
       // Preserve original item properties
       ...item,
@@ -251,7 +251,7 @@ export function hierarchyToNative(
         path: [...pathSegments, displayName],
         displayName,
         parentIds,
-        selectable: true,
+        selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
         children: [],
         ...item,
         ...(fieldConfig.iconField && item[fieldConfig.iconField] && {
@@ -284,7 +284,7 @@ export function hierarchyToNative(
       path: currentPath,
       displayName,
       parentIds,
-      selectable: true,
+      selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
       // Preserve original item properties (excluding children to avoid overwriting)
       ...item,
       // Add icon properties if configured

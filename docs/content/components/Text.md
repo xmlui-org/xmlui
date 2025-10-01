@@ -538,13 +538,17 @@ Returns true when the displayed text overflows its container boundaries.
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-codefence | 1.5 | 1.5 |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
@@ -566,6 +570,7 @@ Returns true when the displayed text overflows its container boundaries.
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |

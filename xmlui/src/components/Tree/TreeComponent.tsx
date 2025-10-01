@@ -4,13 +4,12 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
-import type { TreeSelectionEvent, FlatTreeNode } from "../../components-core/abstractions/treeAbstractions";
 import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
 
 export const TreeMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
   props: {
     data: {
@@ -25,9 +24,9 @@ export const TreeMd = createMetadata({
       description: `The property name in source data for unique identifiers.`,
       default: defaultProps.idField,
     },
-    labelField: {
+    nameField: {
       description: `The property name in source data for display text.`,
-      default: defaultProps.labelField,
+      default: defaultProps.nameField,
     },
     iconField: {
       description: `The property name in source data for icon identifiers.`,
@@ -41,23 +40,20 @@ export const TreeMd = createMetadata({
       description: `The property name in source data for collapsed state icons.`,
       default: defaultProps.iconCollapsedField,
     },
-    parentField: {
+    parentIdField: {
       description: `The property name in source data for parent relationships (used in flat format).`,
-      default: defaultProps.parentField,
+      default: defaultProps.parentIdField,
     },
     childrenField: {
       description: `The property name in source data for child arrays (used in hierarchy format).`,
       default: defaultProps.childrenField,
     },
+    selectableField: {
+      description: `The property name in source data for selectable state (default: "selectable").`,
+      default: defaultProps.selectableField,
+    },
     selectedValue: {
       description: `The selected item ID in source data format.`,
-    },
-    selectedUid: {
-      description: `[DEPRECATED] Use selectedValue instead. The ID of the selected tree row (internal format).`,
-    },
-    expandedValues: {
-      description: `Array of expanded item IDs in source data format.`,
-      default: defaultProps.expandedValues,
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
@@ -70,6 +66,30 @@ export const TreeMd = createMetadata({
     expandOnItemClick: {
       description: `Enable expansion/collapse by clicking anywhere on the item (not just the chevron).`,
       default: defaultProps.expandOnItemClick,
+    },
+    iconCollapsed: {
+      description: `The icon name to use for collapsed nodes (default: "chevronright").`,
+      default: defaultProps.iconCollapsed,
+    },
+    iconExpanded: {
+      description: `The icon name to use for expanded nodes (default: "chevrondown").`,
+      default: defaultProps.iconExpanded,
+    },
+    iconSize: {
+      description: `The size of the expand/collapse icons (default: "16").`,
+      default: defaultProps.iconSize,
+    },
+    itemHeight: {
+      description: `The height of each tree row in pixels (default: 35).`,
+      default: defaultProps.itemHeight,
+    },
+    animateExpand: {
+      description: `When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).`,
+      default: defaultProps.animateExpand,
+    },
+    expandRotation: {
+      description: `The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).`,
+      default: defaultProps.expandRotation,
     },
     itemTemplate: dComponent("The template for each item in the tree."),
   },
@@ -200,41 +220,34 @@ export const treeComponentRenderer = createComponentRenderer(
         data={extractValue(node.props.data)}
         dataFormat={extractValue(node.props.dataFormat)}
         idField={extractValue(node.props.idField)}
-        labelField={extractValue(node.props.labelField)}
+        nameField={extractValue(node.props.nameField)}
         iconField={extractValue(node.props.iconField)}
         iconExpandedField={extractValue(node.props.iconExpandedField)}
         iconCollapsedField={extractValue(node.props.iconCollapsedField)}
-        parentField={extractValue(node.props.parentField)}
+        parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
+        selectableField={extractValue(node.props.selectableField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
-        expandedValues={extractValue(node.props.expandedValues)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
+        iconCollapsed={extractValue(node.props.iconCollapsed)}
+        iconExpanded={extractValue(node.props.iconExpanded)}
+        iconSize={extractValue(node.props.iconSize)}
+        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
+        animateExpand={extractValue.asOptionalBoolean(node.props.animateExpand, defaultProps.animateExpand)}
+        expandRotation={extractValue.asOptionalNumber(node.props.expandRotation, defaultProps.expandRotation)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
         itemRenderer={(flatTreeNode: any) => {
-          // ========================================
-          // $item Context Properties for Templates
-          // ========================================
-          // These properties are available in item templates via $item.propertyName
           const itemContext = {
-            // Core identification properties
             id: flatTreeNode.id,                     // $item.id - Internal unique identifier
-            key: flatTreeNode.key,                   // $item.key - Source data ID
-            
-            // Display properties
             name: flatTreeNode.displayName,          // $item.name - Primary display text
-            displayName: flatTreeNode.displayName,   // $item.displayName - Alternative access
-            
-            // State properties  
             depth: flatTreeNode.depth,               // $item.depth - Nesting level (0-based)
             isExpanded: flatTreeNode.isExpanded,     // $item.isExpanded - Expansion state
             hasChildren: flatTreeNode.hasChildren,   // $item.hasChildren - Children indicator
-            
-            // All other TreeNode properties including:
             // - icon, iconExpanded, iconCollapsed (from icon fields)
             // - uid, path, parentIds, selectable, children (TreeNode internals)
             // - All original source data properties (custom fields)
