@@ -4,7 +4,6 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
-import type { TreeSelectionEvent, FlatTreeNode } from "../../components-core/abstractions/treeAbstractions";
 import styles from "./TreeComponent.module.scss";
 
 const COMP = "Tree";
@@ -54,10 +53,6 @@ export const TreeMd = createMetadata({
     },
     selectedUid: {
       description: `[DEPRECATED] Use selectedValue instead. The ID of the selected tree row (internal format).`,
-    },
-    expandedValues: {
-      description: `Array of expanded item IDs in source data format.`,
-      default: defaultProps.expandedValues,
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
@@ -208,7 +203,6 @@ export const treeComponentRenderer = createComponentRenderer(
         childrenField={extractValue(node.props.childrenField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
-        expandedValues={extractValue(node.props.expandedValues)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
