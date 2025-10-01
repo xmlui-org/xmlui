@@ -9,7 +9,7 @@ import styles from "./TreeComponent.module.scss";
 const COMP = "Tree";
 
 export const TreeMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.`,
   props: {
     data: {
@@ -65,6 +65,30 @@ export const TreeMd = createMetadata({
     expandOnItemClick: {
       description: `Enable expansion/collapse by clicking anywhere on the item (not just the chevron).`,
       default: defaultProps.expandOnItemClick,
+    },
+    iconCollapsed: {
+      description: `The icon name to use for collapsed nodes (default: "chevronright").`,
+      default: defaultProps.iconCollapsed,
+    },
+    iconExpanded: {
+      description: `The icon name to use for expanded nodes (default: "chevrondown").`,
+      default: defaultProps.iconExpanded,
+    },
+    iconSize: {
+      description: `The size of the expand/collapse icons (default: "16").`,
+      default: defaultProps.iconSize,
+    },
+    itemHeight: {
+      description: `The height of each tree row in pixels (default: 35).`,
+      default: defaultProps.itemHeight,
+    },
+    animateExpand: {
+      description: `When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).`,
+      default: defaultProps.animateExpand,
+    },
+    expandRotation: {
+      description: `The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).`,
+      default: defaultProps.expandRotation,
     },
     itemTemplate: dComponent("The template for each item in the tree."),
   },
@@ -206,6 +230,12 @@ export const treeComponentRenderer = createComponentRenderer(
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
         expandOnItemClick={extractValue(node.props.expandOnItemClick)}
+        iconCollapsed={extractValue(node.props.iconCollapsed)}
+        iconExpanded={extractValue(node.props.iconExpanded)}
+        iconSize={extractValue(node.props.iconSize)}
+        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
+        animateExpand={extractValue.asOptionalBoolean(node.props.animateExpand, defaultProps.animateExpand)}
+        expandRotation={extractValue.asOptionalNumber(node.props.expandRotation, defaultProps.expandRotation)}
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}

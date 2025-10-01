@@ -2,6 +2,7 @@ import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import classnames from "classnames";
+import Icon from "../Icon/IconNative";
 
 import styles from "./TreeComponent.module.scss";
 
@@ -30,6 +31,11 @@ interface RowContext {
   focusedIndex: number;
   onKeyDown: (e: React.KeyboardEvent) => void;
   treeContainerRef: React.RefObject<HTMLDivElement>;
+  iconCollapsed: string;
+  iconExpanded: string;
+  iconSize: string;
+  animateExpand: boolean;
+  expandRotation: number;
 }
 
 const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
@@ -43,6 +49,11 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
     onSelection,
     focusedIndex,
     treeContainerRef,
+    iconCollapsed,
+    iconExpanded,
+    iconSize,
+    animateExpand,
+    expandRotation,
   } = data;
   const treeItem = nodes[index];
   const isFocused = focusedIndex === index && focusedIndex >= 0;
@@ -103,7 +114,20 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
               [styles.expanded]: treeItem.isExpanded,
               [styles.hidden]: !treeItem.hasChildren,
             })}
-          />
+          >
+            {treeItem.hasChildren && (
+              <Icon
+                name={animateExpand ? iconCollapsed : (treeItem.isExpanded ? iconExpanded : iconCollapsed)}
+                size={iconSize}
+                className={classnames(styles.toggleIcon, {
+                  [styles.rotated]: animateExpand && treeItem.isExpanded,
+                })}
+                style={animateExpand && treeItem.isExpanded ? {
+                  transform: `rotate(${expandRotation}deg)`
+                } : undefined}
+              />
+            )}
+          </div>
         </div>
         <div
           className={styles.labelWrapper}
@@ -135,6 +159,12 @@ export const defaultProps = {
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
   expandOnItemClick: false,
+  iconCollapsed: "chevronright",
+  iconExpanded: "chevrondown",
+  iconSize: "16",
+  itemHeight: 35,
+  animateExpand: false,
+  expandRotation: 90,
 };
 
 interface TreeComponentProps {
@@ -153,6 +183,12 @@ interface TreeComponentProps {
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
   expandOnItemClick?: boolean;
+  iconCollapsed?: string;
+  iconExpanded?: string;
+  iconSize?: string;
+  itemHeight?: number;
+  animateExpand?: boolean;
+  expandRotation?: number;
   onItemClick?: (node: FlatTreeNode) => void;
   onSelectionChanged?: (event: TreeSelectionEvent) => void;
   onNodeExpanded?: (node: FlatTreeNode) => void;
@@ -178,6 +214,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     expandOnItemClick = defaultProps.expandOnItemClick,
+    iconCollapsed = defaultProps.iconCollapsed,
+    iconExpanded = defaultProps.iconExpanded,
+    iconSize = defaultProps.iconSize,
+    itemHeight = defaultProps.itemHeight,
+    animateExpand = defaultProps.animateExpand,
+    expandRotation = defaultProps.expandRotation,
     onItemClick,
     onSelectionChanged,
     onNodeExpanded,
@@ -603,6 +645,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       focusedIndex,
       onKeyDown: handleKeyDown,
       treeContainerRef,
+      iconCollapsed,
+      iconExpanded,
+      iconSize,
+      animateExpand,
+      expandRotation,
     };
   }, [
     flatTreeData,
@@ -614,6 +661,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     setSelectedNodeById,
     focusedIndex,
     handleKeyDown,
+    iconCollapsed,
+    iconExpanded,
+    iconSize,
+    animateExpand,
+    expandRotation,
   ]);
 
   const getItemKey = useCallback((index: number, data: RowContext) => {
@@ -840,7 +892,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             height={height}
             itemCount={itemData.nodes.length}
             itemData={itemData}
-            itemSize={35}
+            itemSize={itemHeight}
             itemKey={getItemKey}
             width={width}
           >

@@ -5759,3 +5759,212 @@ test.describe("Edge Cases", () => {
     },
   );
 });
+
+test.describe("icon props", () => {
+  test.skip("default icons appear (chevronright and chevrondown)", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(flatTreeData)}'
+      />
+    `);
+    
+    const tree = await page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+    
+    // Expand the first node to see both collapsed and expanded icons
+    const firstToggle = tree.locator('[data-testid*="toggle-button"]').first();
+    await firstToggle.click();
+    
+    // Check that the default chevron icons are present in the DOM
+    // Note: We can't easily test the specific icon names without more specific selectors
+    await expect(tree.locator('[data-testid*="toggle-button"]')).toHaveCount(2);
+  });
+
+  test.skip("custom iconCollapsed appears", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(flatTreeData)}'
+        iconCollapsed="bell"
+      />
+    `);
+    
+    await expect(testIcons.bellIcon).toBeVisible();
+  });
+
+  test.skip("custom iconExpanded appears", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(flatTreeData)}'
+        iconExpanded="eye"
+      />
+    `);
+    
+    const tree = await page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+    
+    // Icon should not be visible initially (node is collapsed)
+    await expect(testIcons.eyeIcon).not.toBeVisible();
+    
+    // Expand the first node
+    const firstToggle = tree.locator('[data-testid*="toggle-button"]').first();
+    await firstToggle.click();
+    
+    // Now the expanded icon should be visible
+    await expect(testIcons.eyeIcon).toBeVisible();
+  });
+
+  test.skip("both custom icons work together", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(flatTreeData)}'
+        iconCollapsed="box"
+        iconExpanded="sun"
+      />
+    `);
+    
+    const tree = await page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+    
+    // Initially should show collapsed icon
+    await expect(testIcons.boxIcon).toBeVisible();
+    await expect(testIcons.sunIcon).not.toBeVisible();
+    
+    // Expand the first node
+    const firstToggle = tree.locator('[data-testid*="toggle-button"]').first();
+    await firstToggle.click();
+    
+    // Should now show expanded icon and hide collapsed icon
+    await expect(testIcons.sunIcon).toBeVisible();
+    await expect(testIcons.boxIcon).not.toBeVisible();
+    
+    // Collapse again
+    await firstToggle.click();
+    
+    // Should show collapsed icon again
+    await expect(testIcons.boxIcon).toBeVisible();
+    await expect(testIcons.sunIcon).not.toBeVisible();
+  });
+
+  test.skip("iconSize property affects icon display", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(flatTreeData)}'
+        iconCollapsed="doc"
+        iconSize="large"
+      />
+    `);
+    
+    await expect(testIcons.docIcon).toBeVisible();
+    
+    // Check that the icon has the appropriate size class
+    const iconElement = testIcons.docIcon;
+    await expect(iconElement).toHaveClass(/large/);
+  });
+
+  test.skip("different iconSize values work", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    // Test small size
+    const { testIcons: smallIcons } = await initTestBed(`
+      <Tree 
+        testId="tree-small"
+        data='${JSON.stringify(flatTreeData)}'
+        iconCollapsed="txt"
+        iconSize="small"
+      />
+    `);
+    
+    await expect(smallIcons.txtIcon).toBeVisible();
+    await expect(smallIcons.txtIcon).toHaveClass(/small/);
+  });
+
+  test.skip("icons work with hierarchy data format", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(hierarchyTreeData)}'
+        dataFormat="hierarchy"
+        iconCollapsed="bell"
+        iconExpanded="eye"
+      />
+    `);
+    
+    const tree = await page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+    
+    // Initially should show collapsed icon
+    await expect(testIcons.bellIcon).toBeVisible();
+    await expect(testIcons.eyeIcon).not.toBeVisible();
+    
+    // Expand the root node
+    const firstToggle = tree.locator('[data-testid*="toggle-button"]').first();
+    await firstToggle.click();
+    
+    // Should now show expanded icon
+    await expect(testIcons.eyeIcon).toBeVisible();
+    
+    // Should have nested toggle buttons for child nodes
+    await expect(tree.locator('[data-testid*="toggle-button"]')).toHaveCount(2);
+  });
+
+  test.skip("icon properties work with virtual scrolling", async ({ 
+    initTestBed, 
+    page 
+  }) => {
+    // Create larger dataset to trigger virtualization
+    const largeDataset = [];
+    for (let i = 1; i <= 100; i++) {
+      largeDataset.push({ id: i, name: `Item ${i}`, parentId: null });
+      if (i <= 50) {
+        largeDataset.push({ id: i + 100, name: `Child ${i}`, parentId: i });
+      }
+    }
+
+    const { testIcons } = await initTestBed(`
+      <Tree 
+        testId="tree"
+        data='${JSON.stringify(largeDataset)}'
+        iconCollapsed="box"
+        iconExpanded="sun"
+        height="200"
+      />
+    `);
+    
+    const tree = await page.getByTestId("tree");
+    await expect(tree).toBeVisible();
+    
+    // Should show collapsed icons for expandable nodes
+    await expect(testIcons.boxIcon).toBeVisible();
+    
+    // Expand first node
+    const firstToggle = tree.locator('[data-testid*="toggle-button"]').first();
+    await firstToggle.click();
+    
+    // Should show expanded icon
+    await expect(testIcons.sunIcon).toBeVisible();
+  });
+});
