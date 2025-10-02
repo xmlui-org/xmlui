@@ -96,7 +96,6 @@ export const labelBehavior: Behavior = {
 
     return (
       <ItemWithLabel
-        id={componentNode.uid}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -106,7 +105,6 @@ export const labelBehavior: Behavior = {
         style={style}
         className={className}
         shrinkToLabel={shrinkToLabel}
-        testId={componentNode.testId}
       >
         {node}
       </ItemWithLabel>
