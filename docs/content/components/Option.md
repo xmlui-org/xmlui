@@ -43,6 +43,10 @@
 
 This boolean property indicates whether the option is enabled or disabled.
 
+### `keywords` [#keywords]
+
+An array of keywords that can be used for searching and filtering the option. These keywords are not displayed but help users find the option through search.
+
 ### `label` [#label]
 
 This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.

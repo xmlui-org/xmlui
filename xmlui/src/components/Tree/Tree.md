@@ -163,4 +163,57 @@ The following option demonstrates the last two options:
 </App>
 ```
 
+## Item templates
+
+You can override the default template used to display a tree item with the `itemTemplate` property. The template definition can use the `$item` context variable to access the item's attributes for display. `$item` provides these properties:
+- `id`: The unique node ID
+- `name`: The name of the node
+- `depth`: The depth level in the tree
+- `isExpanded`: Indicates if the tree node is expanded
+- `hasChildren`: Indicates if the tree node has children
+- `children`: The children of the tree node
+- `selectable`: Indicates if the node can be selected
+- `parentId`: The ID of the node's parent
+- `parentIds`: A list of parent IDs from the root node to the direct parent of the node
+- `path`: An array with the node names following the path from the root node to the displayed node.
+
+This example demonstrates these concepts:
+
+```xmlui-pg display copy {20-30} height="400px" /$item.id/ /$item.name/ /$item.hasChildren/ name="Example: itemTemplate"
+<App>
+  <Tree
+    testId="tree"
+    id="tree"
+    defaultExpanded="all"
+    data='{[
+        { id: "root", name: "My Files", parentId: null },
+        { id: "doc-root", name: "Documents", parentId: "root" },
+        { id: "doc-reports", name: "Reports", parentId: "doc-root" },
+        { id: "doc-q1-report", name: "Q1 Report.pdf", parentId: "doc-reports" },
+        { id: "doc-q2-report", name: "Q2 Report.pdf", parentId: "doc-reports" },
+        { id: "proj-root", name: "Projects", parentId: "root" },
+        { id: "proj-web", name: "Web Apps", parentId: "proj-root" },
+        { id: "proj-ecommerce", name: "E-commerce Site", parentId: "proj-web" },
+        { id: "proj-dashboard", name: "Admin Dashboard", parentId: "proj-web" },
+        { id: "media-root", name: "Media", parentId: "root" },
+        { id: "media-images", name: "Images", parentId: "media-root" },
+        { id: "media-videos", name: "Videos", parentId: "media-root" },
+      ]}'>
+    <property name="itemTemplate">
+      <HStack testId="{$item.id}" verticalAlignment="center" gap="$space-1">
+        <Icon name="{$item.hasChildren ? 'folder' : 'code'}" />
+        <Text>
+          ({$item.id}):
+        </Text>
+        <Text variant="strong">
+          {$item.name}
+        </Text>
+      </HStack>
+    </property>
+  </Tree>
+</App>
+```
+
+
+
 %-DESC-END

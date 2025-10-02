@@ -42,6 +42,18 @@ export class ComponentDriver {
     return this.component.locator(`[data-part-id="${part}"]`).first();
   }
 
+  getIcons(): Locator {
+    return this.component.locator('[data-icon-name="*"]');
+  }
+
+  getIconsByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`);
+  }
+  
+  getIconByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`).first();
+  }
+
   /**
    * Gets the html tag name of the final rendered component
    */

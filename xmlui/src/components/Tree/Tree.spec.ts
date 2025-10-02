@@ -5851,46 +5851,74 @@ test.describe("Edge Cases", () => {
 });
 
 test.describe("icon props", () => {
-  test("custom iconCollapsed appears", async ({ initTestBed }) => {
-    const { testIcons } = await initTestBed(`
+  test("default collapsed icon appears", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree testId="tree" data='{${JSON.stringify(flatTreeData)}}' />
+      </VStack>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    await expect(tree.getIconByName("chevronright")).toBeVisible();
+  });
+
+  test("custom iconCollapsed appears", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
       <VStack height="400px">
         <Tree 
           testId="tree"
           data='{${JSON.stringify(flatTreeData)}}'
-          iconCollapsed="bell"
-          iconExpanded="sun"
+          iconCollapsed="phone"
+          iconExpanded="email"
         />
       </VStack>
     `);
 
-    await expect(testIcons.bellIcon).toBeVisible();
+    const tree = await createTreeDriver("tree");
+    await expect(tree.getIconByName("phone")).toBeVisible();
   });
 
-  test("custom iconExpanded appears", async ({ initTestBed, page }) => {
-    const { testIcons } = await initTestBed(`
+  test("default expanded icon appears", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
       <VStack height="400px">
         <Tree 
           testId="tree"
           defaultExpanded="all"
           data='{${JSON.stringify(flatTreeData)}}'
-          iconCollapsed="bell"
-          iconExpanded="sun"
         />
       </VStack>
     `);
 
-    await expect(testIcons.bellIcon).not.toBeVisible();
-    await expect(testIcons.sunIcon).toHaveCount(2);
+    const tree = await createTreeDriver("tree");
+    await expect(tree.getIconByName("chevrondown")).toBeVisible();
+  });
+
+  test("custom iconExpanded appears", async ({ initTestBed, createTreeDriver }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tree 
+          testId="tree"
+          defaultExpanded="all"
+          data='{${JSON.stringify(flatTreeData)}}'
+          iconCollapsed="phone"
+          iconExpanded="email"
+        />
+      </VStack>
+    `);
+
+    const tree = await createTreeDriver("tree");
+    await expect(tree.getIconByName("phone")).not.toBeVisible();
+    await expect(tree.getIconsByName("email")).toHaveCount(2);
   });
 
   test("both custom icons work together", async ({ initTestBed, createTreeDriver, page }) => {
-    const { testIcons } = await initTestBed(`
+    await initTestBed(`
       <VStack height="400px">
         <Tree 
           id="tree"
           data='{${JSON.stringify(flatTreeData)}}'
-          iconCollapsed="box"
-          iconExpanded="sun"
+          iconCollapsed="phone"
+          iconExpanded="email"
         >
           <property name="itemTemplate">
             <HStack testId="{$item.id}" verticalAlignment="center">
@@ -5909,21 +5937,21 @@ test.describe("icon props", () => {
     await expect(tree.component).toBeVisible();
 
     // Initially should show collapsed icon
-    await expect(testIcons.boxIcon).toBeVisible();
-    await expect(testIcons.sunIcon).not.toBeVisible();
+    await expect(tree.getIconsByName("phone")).toBeVisible();
+    await expect(tree.getIconsByName("email")).not.toBeVisible();
 
     // Expand the first node
     await page.getByTestId("expand1").click();
 
     // Should now show expanded icon and hide collapsed icon
-    await expect(testIcons.sunIcon).toBeVisible();
-    await expect(testIcons.boxIcon).toBeVisible();
+    await expect(tree.getIconsByName("email")).toBeVisible();
+    await expect(tree.getIconsByName("phone")).toBeVisible();
 
     // Collapse again
     await page.getByTestId("expand2").click();
 
     // Should show collapsed icon again
-    await expect(testIcons.boxIcon).toBeVisible();
-    await expect(testIcons.sunIcon).not.toBeVisible();
+    await expect(tree.getIconsByName("phone")).toBeVisible();
+    await expect(tree.getIconsByName("email")).not.toBeVisible();
   });
 });
