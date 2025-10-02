@@ -1398,22 +1398,36 @@ export class SliderDriver extends ComponentDriver {
   }
 
   async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber: number = 0) {
-    const sliderOffsetWidth = await this.page.locator("[data-track]").evaluate((el) => {
-      return el.getBoundingClientRect().width;
-    });
+    const track = this.page.locator("[data-track]");
+    await track.waitFor({ state: "visible" });
+
     const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.waitFor({ state: "visible" });
+
+    // Get the thumb's current position for relative movement
+    const thumbBox = await activeThumb.boundingBox();
+    if (!thumbBox) {
+      throw new Error("Could not get thumb bounding box");
+    }
+    const trackBox = await track.boundingBox();
+    if (!trackBox) {
+      throw new Error("Could not get track bounding box");
+    }
+    
+    // Calculate target position relative to track
+    let targetX: number;
+    if (location === "start") {
+      targetX = trackBox.x;
+    } else if (location === "end") {
+      targetX = trackBox.x + trackBox.width;
+    } else { // middle
+      targetX = trackBox.x + trackBox.width / 2;
+    }
+    const targetY = trackBox.y + trackBox.height / 2;
 
     await activeThumb.hover();
     await this.page.mouse.down({ button: "left" });
-
-    if (location === "start") {
-      await this.page.mouse.move(0, 0);
-    } else if (location === "end") {
-      await this.page.mouse.move(sliderOffsetWidth, 0);
-    } else { // middle
-      await this.page.mouse.move(sliderOffsetWidth / 2, 0);
-    }
-
+    await this.page.mouse.move(targetX, targetY);
     await this.page.mouse.up();
   }
 
