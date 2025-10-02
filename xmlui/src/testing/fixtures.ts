@@ -56,6 +56,7 @@ import {
   LabelDriver,
   BackdropDriver,
   SpinnerDriver,
+  SliderDriver,
 } from "./ComponentDrivers";
 import { parseComponentIfNecessary } from "./component-test-helpers";
 import { TimeInputDriver } from "./drivers/TimeInputDriver";
@@ -64,7 +65,6 @@ import { DateInputDriver } from "./drivers/DateInputDriver";
 import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
-import { SliderDriver } from "./drivers/SliderDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
 
 export { expect } from "./assertions";
