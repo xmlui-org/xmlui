@@ -69,9 +69,9 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
     [toggleNode, treeItem],
   );
 
-  const onItemClickHandler = useCallback(
+  const onItemMouseDownHandler = useCallback(
     (e: React.MouseEvent) => {
-      // Handle selection for selectable items
+      // Handle selection immediately on mouse down for immediate visual feedback
       if (treeItem.selectable) {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
@@ -79,7 +79,14 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
           treeContainerRef.current?.focus();
         }, 0);
       }
+    },
+    [onSelection, treeItem, treeContainerRef],
+  );
 
+  const onItemClickHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Selection is already handled in onMouseDown, so we skip it here
+      
       // Call optional onItemClick callback
       if (onItemClick) {
         onItemClick(treeItem);
@@ -90,7 +97,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         toggleNode(treeItem);
       }
     },
-    [onSelection, onItemClick, itemClickExpands, treeItem, toggleNode, treeContainerRef],
+    [onItemClick, itemClickExpands, treeItem, toggleNode],
   );
 
   return (
@@ -131,6 +138,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         </div>
         <div
           className={styles.labelWrapper}
+          onMouseDown={onItemMouseDownHandler}
           onClick={onItemClickHandler}
           style={{ cursor: "pointer" }}
         >
