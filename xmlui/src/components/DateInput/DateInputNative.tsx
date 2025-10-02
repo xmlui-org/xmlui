@@ -18,7 +18,6 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
 // Component part names
@@ -93,10 +92,6 @@ type Props = {
   endText?: string;
   endIcon?: string;
   gap?: string;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
@@ -152,10 +147,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     endText,
     endIcon,
     gap,
-    label,
-    labelPosition = defaultProps.labelPosition,
-    labelWidth,
-    labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
@@ -323,12 +314,12 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
         // Update invalid state immediately for visual feedback
         const isInvalid = validateFn(newValue);
         setInvalid(isInvalid);
-        
+
         // Clear day invalid state when any field changes, as the date combination might become valid
         if (!isInvalid) {
           setIsDayCurrentlyInvalid(false);
         }
-        
+
         // Fire invalid event if the value is invalid
         if (isInvalid) {
           onInvalidChange?.();
@@ -361,7 +352,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          
+
           if (dateString !== null) {
             // Valid complete date - update normally
             handleChange(dateString);
@@ -390,7 +381,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           const dateValues = { day, month, year };
           dateValues[field] = normalizedValue;
           const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
-          
+
           if (dateString !== null) {
             // Valid complete date - update normally
             handleChange(dateString);
@@ -591,7 +582,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       const year4 = yearNum.toString().padStart(4, "0");
       const month2 = monthNum.toString().padStart(2, "0");
       const day2 = dayNum.toString().padStart(2, "0");
-      
+
       return `${year4}-${month2}-${day2}`;
     } catch (error) {
       return null;
@@ -664,6 +655,8 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
 
     return dateOrder.map((field, index) => {
       const nextRef = index < inputRefs.length - 1 ? inputRefs[index + 1] : undefined;
+      // Pass id to the first input field only
+      const inputId = index === 0 ? id : undefined;
 
       const getSeparator = () => {
         if (index === dateOrder.length - 1) return null;
@@ -679,6 +672,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           return (
             <React.Fragment key="day">
               <DayInput
+                id={inputId}
                 autoFocus={autoFocus && index === 0}
                 disabled={!enabled}
                 inputRef={dayInputRef}
@@ -703,6 +697,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           return (
             <React.Fragment key="month">
               <MonthInput
+                id={inputId}
                 autoFocus={autoFocus && index === 0}
                 disabled={!enabled}
                 inputRef={monthInputRef}
@@ -725,6 +720,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           return (
             <React.Fragment key="year">
               <YearInput
+                id={inputId}
                 autoFocus={autoFocus && index === 0}
                 disabled={!enabled}
                 inputRef={yearInputRef}
@@ -750,7 +746,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     });
   };
 
-  const dateInputComponent = (
+  return (
     <div
       ref={dateInputRef}
       className={classnames(
@@ -773,7 +769,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       {startAdornment}
       <div className={styles.wrapper}>
         <div className={styles.inputGroup}>{createDateInputs()}</div>
-
         {clearable && (
           <button
             data-part-id={PART_CLEAR_BUTTON}
@@ -793,27 +788,11 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       {endAdornment}
     </div>
   );
-
-  // Wrap with label if needed
-  if (label) {
-    return (
-      <ItemWithLabel
-        label={label}
-        labelPosition={labelPosition as any}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-      >
-        {dateInputComponent}
-      </ItemWithLabel>
-    );
-  }
-
-  return dateInputComponent;
 });
 
 // Input component types
 type InputProps = {
+  id?: string;
   ariaLabel?: string;
   autoFocus?: boolean;
   className?: string;
@@ -840,6 +819,7 @@ type InputProps = {
 
 // Input component
 function Input({
+  id,
   ariaLabel,
   autoFocus,
   className,
@@ -899,6 +879,7 @@ function Input({
   return (
     <>
       <input
+        id={id}
         aria-label={ariaLabel}
         autoComplete="off"
         // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
@@ -977,6 +958,7 @@ function DayInput({
   return (
     <PartialInput
       data-part-id={PART_DAY}
+      id={otherProps.id}
       value={value}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
@@ -1031,6 +1013,7 @@ function MonthInput({
   return (
     <PartialInput
       data-part-id={PART_MONTH}
+      id={otherProps.id}
       max={12}
       min={1}
       name="month"
@@ -1096,6 +1079,7 @@ function YearInput({
   return (
     <PartialInput
       data-part-id={PART_YEAR}
+      id={otherProps.id}
       max={max}
       min={min}
       name="year"

@@ -2,7 +2,6 @@ import type { CSSProperties, ForwardedRef } from "react";
 import { useEffect, useId, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { noop } from "../../components-core/constants";
 import type { ValidationStatus } from "../abstractions";
 import { useEvent } from "../../components-core/utils/misc";
