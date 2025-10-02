@@ -292,7 +292,6 @@ test("labelBreak prop defaults to false", async ({ initTestBed, page, createSele
   await initTestBed(`
     <Select
       label="Dignissimos esse quasi esse cupiditate qui qui. Ut provident ad voluptatem tenetur sit consequuntur. Aliquam nisi fugit ut temporibus itaque ducimus rerum. Dolorem reprehenderit qui adipisci. Ullam harum atque ipsa."
-
       >
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>

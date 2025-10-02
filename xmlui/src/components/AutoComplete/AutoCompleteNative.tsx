@@ -116,8 +116,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const { root } = useTheme();
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
-  const generatedId = useId();
-  const inputId = id || generatedId;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -483,7 +481,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   <div className={styles.inputWrapper}>
                     <input
                       role="combobox"
-                      id={inputId}
+                      id={id}
                       onFocus={(ev) => {
                         setIsFocused(true);
                         onFocus(ev);
