@@ -109,6 +109,11 @@ export const TreeMd = createMetadata({
       valueType: "number",
       defaultValue: defaultProps.expandRotation,
     },
+    dynamicField: {
+      description: `The property name in source data for dynamic loading state (default: "dynamic").`,
+      valueType: "string",
+      defaultValue: defaultProps.dynamicField,
+    },
     itemTemplate: {
       description: "The template for each item in the tree.",
       valueType: "ComponentDef",
@@ -184,6 +189,14 @@ export const TreeMd = createMetadata({
       description: `Get the currently selected tree node.`,
       signature: "getSelectedNode(): TreeNode | null",
     },
+    appendNode: {
+      description: `Add a new node to the tree as a child of the specified parent node.`,
+      signature: "appendNode(parentNodeId: string | number | null, nodeData: any): void",
+      parameters: {
+        parentNodeId: "The ID of the parent node, or null/undefined to add to root level",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -248,6 +261,7 @@ export const treeComponentRenderer = createComponentRenderer(
         parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
         selectableField={extractValue(node.props.selectableField)}
+        dynamicField={extractValue(node.props.dynamicField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}

@@ -208,6 +208,7 @@ export const defaultProps = {
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
   itemClickExpands: false,
+  dynamicField: "dynamic",
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
   iconSize: "16",
@@ -233,6 +234,7 @@ interface TreeComponentProps {
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
+  dynamicField?: string;
   iconCollapsed?: string;
   iconExpanded?: string;
   iconSize?: string;
@@ -265,6 +267,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
+    dynamicField = defaultProps.dynamicField,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
     iconSize = defaultProps.iconSize,
@@ -284,38 +287,55 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     return !onSelectionChanged && selectedValue ? selectedValue : undefined;
   });
 
+  // Internal data state for API methods that modify the tree structure
+  const [internalData, setInternalData] = useState<any>(undefined);
+  
+  // Use internal data if available, otherwise use props data
+  const effectiveData = internalData ?? data;
+
+  // Build field configuration
+  const fieldConfig = useMemo<TreeFieldConfig>(() => ({
+    idField: idField || "id",
+    labelField: nameField || "name",
+    iconField,
+    iconExpandedField,
+    iconCollapsedField,
+    parentField: parentIdField,
+    childrenField,
+    selectableField,
+    dynamicField,
+  }), [
+    idField,
+    nameField,
+    iconField,
+    iconExpandedField,
+    iconCollapsedField,
+    parentIdField,
+    childrenField,
+    selectableField,
+    dynamicField,
+  ]);
+
   // Steps 3a & 3b: Transform data based on format
   // Enhanced data transformation pipeline with validation and error handling
   const transformedData = useMemo(() => {
     // Return empty data if no data provided
-    if (!data) {
+    if (!effectiveData) {
       return emptyTreeData;
     }
-
-    // Build field configuration with validation
-    const fieldConfig: TreeFieldConfig = {
-      idField: idField || "id",
-      labelField: nameField || "name",
-      iconField,
-      iconExpandedField,
-      iconCollapsedField,
-      parentField: parentIdField,
-      childrenField,
-      selectableField,
-    };
 
     try {
       if (dataFormat === "flat") {
         // Validation: Flat format requires array
-        if (!Array.isArray(data)) {
+        if (!Array.isArray(effectiveData)) {
           throw new Error(
-            `TreeComponent: dataFormat='flat' requires array data, received: ${typeof data}`,
+            `TreeComponent: dataFormat='flat' requires array data, received: ${typeof effectiveData}`,
           );
         }
 
         // Validation: Check for required fields in sample data
-        if (data.length > 0) {
-          const sampleItem = data[0];
+        if (effectiveData.length > 0) {
+          const sampleItem = effectiveData[0];
           if (typeof sampleItem !== "object" || sampleItem === null) {
             throw new Error("TreeComponent: Flat data items must be objects");
           }
@@ -331,12 +351,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           }
         }
 
-        return flatToNative(data, fieldConfig);
+        return flatToNative(effectiveData, fieldConfig);
       } else if (dataFormat === "hierarchy") {
         // Validation: Hierarchy format requires object or array
-        if (!data || typeof data !== "object") {
+        if (!effectiveData || typeof effectiveData !== "object") {
           throw new Error(
-            `TreeComponent: dataFormat='hierarchy' requires object or array data, received: ${typeof data}`,
+            `TreeComponent: dataFormat='hierarchy' requires object or array data, received: ${typeof effectiveData}`,
           );
         }
 
@@ -357,15 +377,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           }
         };
 
-        if (Array.isArray(data)) {
-          if (data.length > 0) {
-            checkHierarchyData(data[0]);
+        if (Array.isArray(effectiveData)) {
+          if (effectiveData.length > 0) {
+            checkHierarchyData(effectiveData[0]);
           }
         } else {
-          checkHierarchyData(data);
+          checkHierarchyData(effectiveData);
         }
 
-        return hierarchyToNative(data, fieldConfig);
+        return hierarchyToNative(effectiveData, fieldConfig);
       } else {
         throw new Error(
           `TreeComponent: Unsupported dataFormat '${dataFormat}'. Use 'flat' or 'hierarchy'.`,
@@ -376,16 +396,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       return emptyTreeData;
     }
   }, [
-    data,
+    effectiveData,
     dataFormat,
-    idField,
-    nameField,
-    iconField,
-    iconExpandedField,
-    iconCollapsedField,
-    parentIdField,
-    childrenField,
-    selectableField,
+    fieldConfig,
   ]);
 
   const { treeData, treeItemsById } = transformedData;
@@ -436,8 +449,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const listRef = useRef<FixedSizeList>(null);
 
   const flatTreeData = useMemo(() => {
-    return toFlatTree(treeData, expandedIds);
-  }, [expandedIds, treeData]);
+    return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField);
+  }, [expandedIds, treeData, fieldConfig.dynamicField]);
 
   // Tree node utilities for consistent ID mapping
   const findNodeById = useCallback(
@@ -867,7 +880,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Use setTimeout to ensure DOM is updated after expansion state change
         setTimeout(() => {
           // Generate the flat tree data with the new expanded state to find the correct index
-          const updatedFlatTreeData = toFlatTree(treeData, newExpandedIds);
+          const updatedFlatTreeData = toFlatTree(treeData, newExpandedIds, fieldConfig.dynamicField);
           const nodeIndex = updatedFlatTreeData.findIndex(
             (item) => String(item.key) === String(nodeId),
           );
@@ -887,6 +900,72 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           listRef.current.scrollToItem(nodeIndex, "center");
         }
       },
+
+      appendNode: (parentNodeId: string | number | undefined | null, nodeData: any) => {
+        // Generate a new ID if not provided
+        const nodeId = nodeData[fieldConfig.idField] || Date.now();
+        
+        // Create the new node with proper field mapping
+        const newNode = {
+          ...nodeData,
+          [fieldConfig.idField]: nodeId,
+        };
+
+        // For flat data format, set the parent ID field
+        if (dataFormat === "flat") {
+          newNode[fieldConfig.parentField || "parentId"] = parentNodeId || null;
+        }
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+          
+          if (dataFormat === "flat") {
+            // For flat format, just append to the array
+            return Array.isArray(currentData) ? [...currentData, newNode] : [newNode];
+          } else if (dataFormat === "hierarchy") {
+            // For hierarchy format, we need to find the parent and add to its children
+            const addToHierarchy = (nodes: any[]): any[] => {
+              if (!parentNodeId) {
+                // Add to root level
+                return [...nodes, { ...newNode, [fieldConfig.childrenField || "children"]: [] }];
+              }
+              
+              return nodes.map((node) => {
+                if (node[fieldConfig.idField] === parentNodeId) {
+                  const children = node[fieldConfig.childrenField || "children"] || [];
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: [
+                      ...children,
+                      { ...newNode, [fieldConfig.childrenField || "children"]: [] }
+                    ]
+                  };
+                }
+                
+                // Recursively check children
+                const childrenField = fieldConfig.childrenField || "children";
+                if (node[childrenField] && Array.isArray(node[childrenField])) {
+                  return {
+                    ...node,
+                    [childrenField]: addToHierarchy(node[childrenField])
+                  };
+                }
+                
+                return node;
+              });
+            };
+            
+            if (Array.isArray(currentData)) {
+              return addToHierarchy(currentData);
+            } else {
+              return currentData;
+            }
+          }
+          
+          return currentData;
+        });
+      },
     };
   }, [
     treeData,
@@ -898,6 +977,10 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     onNodeCollapsed,
     setSelectedNodeById,
     nodeExists,
+    fieldConfig,
+    dataFormat,
+    data,
+    setInternalData,
   ]);
 
   // Register component API methods for external access

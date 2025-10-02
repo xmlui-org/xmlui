@@ -11,12 +11,18 @@ export function flattenNode(
   depth: number,
   result: FlatTreeNode[],
   openedIds: (string | number)[],
+  dynamicField?: string,
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
+  // Check if node has actual children OR is a dynamic node that can load children
+  const hasActualChildren = !!children && children.length > 0;
+  const isDynamic = dynamicField && node[dynamicField];
+  const hasChildren = hasActualChildren || isDynamic;
+  
   result.push({
     ...node,
-    hasChildren: !!children && children.length > 0,
+    hasChildren,
     depth,
     isExpanded,
     // Ensure key is preserved (in case it was overwritten by ...node spread)
@@ -25,15 +31,15 @@ export function flattenNode(
 
   if (isExpanded && children) {
     for (let child of children) {
-      flattenNode(child, depth + 1, result, openedIds);
+      flattenNode(child, depth + 1, result, openedIds, dynamicField);
     }
   }
 }
 
-export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[]) {
+export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[], dynamicField?: string) {
   const ret: FlatTreeNode[] = [];
   treeData.forEach((node) => {
-    flattenNode(node, 0, ret, openedIds);
+    flattenNode(node, 0, ret, openedIds, dynamicField);
   });
 
   return ret;
