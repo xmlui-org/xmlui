@@ -25,7 +25,7 @@ interface RowContext {
   toggleNode: (node: FlatTreeNode) => void;
   selectedId: string | number | undefined;
   itemRenderer: (item: any) => ReactNode;
-  expandOnItemClick: boolean;
+  itemClickExpands: boolean;
   onItemClick?: (item: FlatTreeNode) => void;
   onSelection: (node: FlatTreeNode) => void;
   focusedIndex: number;
@@ -44,7 +44,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
     toggleNode,
     selectedId,
     itemRenderer,
-    expandOnItemClick,
+    itemClickExpands,
     onItemClick,
     onSelection,
     focusedIndex,
@@ -85,12 +85,12 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         onItemClick(treeItem);
       }
 
-      // If expandOnItemClick is enabled and item has children, also toggle
-      if (expandOnItemClick && treeItem.hasChildren) {
+      // If itemClickExpands is enabled and item has children, also toggle
+      if (itemClickExpands && treeItem.hasChildren) {
         toggleNode(treeItem);
       }
     },
-    [onSelection, onItemClick, expandOnItemClick, treeItem, toggleNode, treeContainerRef],
+    [onSelection, onItemClick, itemClickExpands, treeItem, toggleNode, treeContainerRef],
   );
 
   return (
@@ -199,7 +199,7 @@ export const defaultProps = {
   selectableField: "selectable",
   defaultExpanded: "none" as const,
   autoExpandToSelection: true,
-  expandOnItemClick: false,
+  itemClickExpands: false,
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
   iconSize: "16",
@@ -224,7 +224,7 @@ interface TreeComponentProps {
   selectedId?: string | number;
   defaultExpanded?: DefaultExpansion;
   autoExpandToSelection?: boolean;
-  expandOnItemClick?: boolean;
+  itemClickExpands?: boolean;
   iconCollapsed?: string;
   iconExpanded?: string;
   iconSize?: string;
@@ -256,7 +256,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     selectedId,
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
-    expandOnItemClick = defaultProps.expandOnItemClick,
+    itemClickExpands = defaultProps.itemClickExpands,
     iconCollapsed = defaultProps.iconCollapsed,
     iconExpanded = defaultProps.iconExpanded,
     iconSize = defaultProps.iconSize,
@@ -685,7 +685,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       toggleNode,
       selectedId: effectiveSelectedId,
       itemRenderer,
-      expandOnItemClick,
+      itemClickExpands,
       onItemClick,
       onSelection: (node: FlatTreeNode) => setSelectedNodeById(node.key),
       focusedIndex,
@@ -702,7 +702,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     toggleNode,
     effectiveSelectedId,
     itemRenderer,
-    expandOnItemClick,
+    itemClickExpands,
     onItemClick,
     setSelectedNodeById,
     focusedIndex,

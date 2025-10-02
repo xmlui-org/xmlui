@@ -2219,14 +2219,14 @@ test.describe("Basic Functionality", () => {
       "supports expansion toggle by item click when enabled",
       SKIP_REASON.TO_BE_IMPLEMENTED(),
       async ({ initTestBed, page }) => {
-        // TODO: Test expandOnItemClick prop enables expansion on full item click
+        // TODO: Test itemClickExpands prop enables expansion on full item click
         // TODO: Verify clicking anywhere on item (not just chevron) toggles expansion
         await initTestBed(`
         <Tree 
           testId="tree" 
           data="{flatTreeData}" 
           dataFormat="flat"
-          expandOnItemClick="true"
+          itemClickExpands="true"
         />
       `);
       },
@@ -4433,7 +4433,7 @@ test.describe("Events", () => {
         <VStack height="400px">
           <Tree testId="tree" 
             dataFormat="hierarchy"
-            expandOnItemClick="true"
+            itemClickExpands="true"
             data='{${JSON.stringify(hierarchyTreeData)}}'
             onNodeDidExpand="node => testState = node">
             <property name="itemTemplate">
@@ -4464,7 +4464,7 @@ test.describe("Events", () => {
         <VStack height="400px">
           <Tree testId="tree" 
             dataFormat="hierarchy" 
-            expandOnItemClick="true"
+            itemClickExpands="true"
             defaultExpanded="all"
             data='{${JSON.stringify(hierarchyTreeData)}}'
             onNodeDidCollapse="node => testState = node">
@@ -5341,12 +5341,12 @@ test.describe("Accessibility", () => {
     await expect(tree.getByTestId("1:keyboard")).toBeVisible();
   });
 
-  test("supports expandOnItemClick behavior", async ({ initTestBed, createTreeDriver }) => {
+  test("supports itemClickExpands behavior", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="400px">
         <Tree testId="tree" 
           dataFormat="flat" 
-          expandOnItemClick="true"
+          itemClickExpands="true"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
             <HStack testId="{$item.id}:expand-click" verticalAlignment="center">
@@ -5860,6 +5860,7 @@ test.describe("icon props", () => {
 
     const tree = await createTreeDriver("tree");
     await expect(tree.getIconByName("chevronright")).toBeVisible();
+    await expect(tree.getIconByName("chevrondown")).not.toBeVisible();
   });
 
   test("custom iconCollapsed appears", async ({ initTestBed, createTreeDriver }) => {
@@ -5876,6 +5877,7 @@ test.describe("icon props", () => {
 
     const tree = await createTreeDriver("tree");
     await expect(tree.getIconByName("phone")).toBeVisible();
+    await expect(tree.getIconByName("email")).not.toBeVisible();
   });
 
   test("default expanded icon appears", async ({ initTestBed, createTreeDriver }) => {

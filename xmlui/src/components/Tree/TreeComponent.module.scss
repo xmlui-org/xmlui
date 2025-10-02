@@ -127,6 +127,7 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
     height: 100%;
     flex-shrink: 0;
     min-width: fit-content;
+    user-select: none;
   }
 
   .addButton {

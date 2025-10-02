@@ -97,11 +97,12 @@ The following example uses the `idField`, `nameField`, and `parentIdField` mappi
 
 ## Expanding and collapsing tree nodes
 
+By default, when you click a tree node outside of its expand/collapse icon,  the specified item is selected. With the `expandOnItemClick` property (using the `true` value), you can change this behavior to expand or collapse the item when clicking its surface anywhere.
+
 You can use the `defaultExpanded` property to specify what nodes you want to see expanded initially. You can set this property to a list of node IDs or a string. When you specify IDs, the component expands the hierarchy to reveal the specified nodes. When the value is a string, you can use these options:
 - `none`: all nodes are collapsed (default)
 - `first-level`: all first-level nodes are expanded
 - `all`: all nodes are expanded
-## Expanding and collapsing tree nodes
 
 The following example demonstrates the use of `defaultExpanded` with tree node IDs:
 
@@ -162,6 +163,13 @@ The following option demonstrates the last two options:
   </Tree>
 </App>
 ```
+
+## Selection
+
+Each tree node is selectable by default, unless the node item's data does not have a `selectable` property (or the one specified in `selectedField`).
+A selectable item can be selected by clicking the mouse or pressing the Enter or Space keys when it has focus.
+
+You can set the `selectedValue` property to define the selected tree item, ot use the `selectNode` exposed method for imperative selection.
 
 ## Item templates
 
