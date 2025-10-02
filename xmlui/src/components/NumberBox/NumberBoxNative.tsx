@@ -87,6 +87,7 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
+  direction?: "ltr" | "rtl";
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -121,6 +122,7 @@ export const NumberBox = forwardRef(function NumberBox(
     autoFocus,
     readOnly,
     required,
+    direction,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -543,6 +545,7 @@ export const NumberBox = forwardRef(function NumberBox(
 
   return (
       <div
+        {...rest}
         className={classnames(styles.inputRoot,{
           [styles.readOnly]: readOnly,
           [styles.disabled]: !enabled,
@@ -550,6 +553,7 @@ export const NumberBox = forwardRef(function NumberBox(
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
+          [styles.rtl]: direction === "rtl",
         })}
         id={id}
         ref={forwardedRef}

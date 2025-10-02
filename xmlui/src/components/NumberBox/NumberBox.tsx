@@ -154,6 +154,7 @@ export const numberBoxComponentRenderer = createComponentRenderer(
     if (typeof extractedInitialValue === "string" && !isNaN(parseFloat(extractedInitialValue))) {
       extractedInitialValue = Number(extractedInitialValue);
     }
+
     return (
       <NumberBox
         className={className}
@@ -184,6 +185,7 @@ export const numberBoxComponentRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         maxLength={extractValue(node.props.maxLength)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        direction={extractValue(node.props.direction)}
       />
     );
   },
