@@ -36,6 +36,7 @@ export interface TreeFieldConfig {
   parentField?: string;
   childrenField?: string;
   selectableField?: string;
+  dynamicField?: string;
 }
 
 export interface TreeSelectionEvent {
@@ -46,6 +47,14 @@ export interface TreeSelectionEvent {
 export type TreeDataFormat = 'flat' | 'hierarchy';
 
 export type DefaultExpansion = 'none' | 'all' | 'first-level' | (string | number)[];
+
+// Node loading states for dynamic node handling
+export type NodeLoadingState = 'unloaded' | 'loading' | 'loaded';
+
+// Extended FlatTreeNode with loading state information
+export interface FlatTreeNodeWithState extends FlatTreeNode {
+  loadingState: NodeLoadingState;
+}
 
 export interface TreeNodeInfo {
   id: string | number;           // Source data ID

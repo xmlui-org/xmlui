@@ -2,7 +2,7 @@ import { ComponentDef } from "../..";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, dComponent } from "../metadata-helpers";
+import { createMetadata } from "../metadata-helpers";
 import { TreeComponent, defaultProps } from "./TreeNative";
 import styles from "./TreeComponent.module.scss";
 
@@ -14,84 +14,110 @@ export const TreeMd = createMetadata({
   props: {
     data: {
       description: `The data source of the tree. Format depends on the dataFormat property.`,
-      required: true,
+      isRequired: true,
     },
     dataFormat: {
       description: `The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).`,
-      default: defaultProps.dataFormat,
+      valueType: "string",
+      defaultValue: defaultProps.dataFormat,
     },
     idField: {
       description: `The property name in source data for unique identifiers.`,
-      default: defaultProps.idField,
+      valueType: "string",
+      defaultValue: defaultProps.idField,
     },
     nameField: {
       description: `The property name in source data for display text.`,
-      default: defaultProps.nameField,
+      valueType: "string",
+      defaultValue: defaultProps.nameField,
     },
     iconField: {
       description: `The property name in source data for icon identifiers.`,
-      default: defaultProps.iconField,
+      valueType: "string",
+      defaultValue: defaultProps.iconField,
     },
     iconExpandedField: {
       description: `The property name in source data for expanded state icons.`,
-      default: defaultProps.iconExpandedField,
+      valueType: "string",
+      defaultValue: defaultProps.iconExpandedField,
     },
     iconCollapsedField: {
       description: `The property name in source data for collapsed state icons.`,
-      default: defaultProps.iconCollapsedField,
+      valueType: "string",
+      defaultValue: defaultProps.iconCollapsedField,
     },
     parentIdField: {
       description: `The property name in source data for parent relationships (used in flat format).`,
-      default: defaultProps.parentIdField,
+      valueType: "string",
+      defaultValue: defaultProps.parentIdField,
     },
     childrenField: {
       description: `The property name in source data for child arrays (used in hierarchy format).`,
-      default: defaultProps.childrenField,
+      valueType: "string",
+      defaultValue: defaultProps.childrenField,
     },
     selectableField: {
       description: `The property name in source data for selectable state (default: "selectable").`,
-      default: defaultProps.selectableField,
+      valueType: "string",
+      defaultValue: defaultProps.selectableField,
     },
     selectedValue: {
       description: `The selected item ID in source data format.`,
     },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
-      default: defaultProps.defaultExpanded,
+      valueType: "string",
+      defaultValue: defaultProps.defaultExpanded,
     },
     autoExpandToSelection: {
       description: `Automatically expand the path to the selected item.`,
-      default: defaultProps.autoExpandToSelection,
+      valueType: "boolean",
+      defaultValue: defaultProps.autoExpandToSelection,
     },
-    expandOnItemClick: {
-      description: `Enable expansion/collapse by clicking anywhere on the item (not just the chevron).`,
-      default: defaultProps.expandOnItemClick,
+    itemClickExpands: {
+      description: "Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.",
+      valueType: "boolean",
+      defaultValue: defaultProps.itemClickExpands,
     },
     iconCollapsed: {
       description: `The icon name to use for collapsed nodes (default: "chevronright").`,
-      default: defaultProps.iconCollapsed,
+      valueType: "string",
+      defaultValue: defaultProps.iconCollapsed,
     },
     iconExpanded: {
       description: `The icon name to use for expanded nodes (default: "chevrondown").`,
-      default: defaultProps.iconExpanded,
+      valueType: "string",
+      defaultValue: defaultProps.iconExpanded,
     },
     iconSize: {
       description: `The size of the expand/collapse icons (default: "16").`,
-      default: defaultProps.iconSize,
+      valueType: "string",
+      defaultValue: defaultProps.iconSize,
     },
     itemHeight: {
       description: `The height of each tree row in pixels (default: 35).`,
-      default: defaultProps.itemHeight,
+      valueType: "number",
+      defaultValue: defaultProps.itemHeight,
     },
     animateExpand: {
       description: `When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).`,
-      default: defaultProps.animateExpand,
+      valueType: "boolean",
+      defaultValue: defaultProps.animateExpand,
     },
     expandRotation: {
       description: `The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).`,
-      default: defaultProps.expandRotation,
+      valueType: "number",
+      defaultValue: defaultProps.expandRotation,
     },
-    itemTemplate: dComponent("The template for each item in the tree."),
+    dynamicField: {
+      description: `The property name in source data for dynamic loading state (default: "dynamic").`,
+      valueType: "string",
+      defaultValue: defaultProps.dynamicField,
+    },
+    itemTemplate: {
+      description: "The template for each item in the tree.",
+      valueType: "ComponentDef",
+    },
   },
   events: {
     selectionDidChange: {
@@ -105,6 +131,10 @@ export const TreeMd = createMetadata({
     nodeDidCollapse: {
       description: `Fired when a tree node is collapsed.`,
       signature: `(node: FlatTreeNode) => void`,
+    },
+    loadChildren: {
+      description: `Fired when a tree node needs to load children dynamically. Should return a Promise that resolves to an array of child data.`,
+      signature: `(node: FlatTreeNode) => Promise<any[]>`,
     },
   },
   apis: {
@@ -162,6 +192,44 @@ export const TreeMd = createMetadata({
     getSelectedNode: {
       description: `Get the currently selected tree node.`,
       signature: "getSelectedNode(): TreeNode | null",
+    },
+    appendNode: {
+      description: `Add a new node to the tree as a child of the specified parent node.`,
+      signature: "appendNode(parentNodeId: string | number | null, nodeData: any): void",
+      parameters: {
+        parentNodeId: "The ID of the parent node, or null/undefined to add to root level",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
+    },
+    removeNode: {
+      description: `Remove a node and all its descendants from the tree.`,
+      signature: "removeNode(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the node to remove (along with all its descendants)",
+      },
+    },
+    removeChildren: {
+      description: `Remove all children (descendants) of a node while keeping the node itself.`,
+      signature: "removeChildren(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the parent node whose children should be removed",
+      },
+    },
+    insertNodeBefore: {
+      description: `Insert a new node before an existing node at the same level.`,
+      signature: "insertNodeBefore(beforeNodeId: string | number, nodeData: any): void",
+      parameters: {
+        beforeNodeId: "The ID of the existing node before which the new node should be inserted",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
+    },
+    insertNodeAfter: {
+      description: `Insert a new node after an existing node at the same level.`,
+      signature: "insertNodeAfter(afterNodeId: string | number, nodeData: any): void",
+      parameters: {
+        afterNodeId: "The ID of the existing node after which the new node should be inserted",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -227,11 +295,12 @@ export const treeComponentRenderer = createComponentRenderer(
         parentIdField={extractValue(node.props.parentIdField)}
         childrenField={extractValue(node.props.childrenField)}
         selectableField={extractValue(node.props.selectableField)}
+        dynamicField={extractValue(node.props.dynamicField)}
         selectedValue={extractValue(node.props.selectedValue)}
         selectedId={extractValue(node.props.selectedId)}
         defaultExpanded={extractValue(node.props.defaultExpanded)}
         autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
-        expandOnItemClick={extractValue(node.props.expandOnItemClick)}
+        itemClickExpands={extractValue. asOptionalBoolean(node.props.itemClickExpands)}
         iconCollapsed={extractValue(node.props.iconCollapsed)}
         iconExpanded={extractValue(node.props.iconExpanded)}
         iconSize={extractValue(node.props.iconSize)}
@@ -241,6 +310,7 @@ export const treeComponentRenderer = createComponentRenderer(
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
+        loadChildren={lookupEventHandler("loadChildren")}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
             id: flatTreeNode.id,                     // $item.id - Internal unique identifier

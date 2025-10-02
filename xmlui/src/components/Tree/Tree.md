@@ -97,11 +97,12 @@ The following example uses the `idField`, `nameField`, and `parentIdField` mappi
 
 ## Expanding and collapsing tree nodes
 
+By default, when you click a tree node outside of its expand/collapse icon,  the specified item is selected. With the `expandOnItemClick` property (using the `true` value), you can change this behavior to expand or collapse the item when clicking its surface anywhere.
+
 You can use the `defaultExpanded` property to specify what nodes you want to see expanded initially. You can set this property to a list of node IDs or a string. When you specify IDs, the component expands the hierarchy to reveal the specified nodes. When the value is a string, you can use these options:
 - `none`: all nodes are collapsed (default)
 - `first-level`: all first-level nodes are expanded
 - `all`: all nodes are expanded
-## Expanding and collapsing tree nodes
 
 The following example demonstrates the use of `defaultExpanded` with tree node IDs:
 
@@ -162,5 +163,65 @@ The following option demonstrates the last two options:
   </Tree>
 </App>
 ```
+
+## Selection
+
+Each tree node is selectable by default, unless the node item's data does not have a `selectable` property (or the one specified in `selectedField`).
+A selectable item can be selected by clicking the mouse or pressing the Enter or Space keys when it has focus.
+
+You can set the `selectedValue` property to define the selected tree item, ot use the `selectNode` exposed method for imperative selection.
+
+## Item templates
+
+You can override the default template used to display a tree item with the `itemTemplate` property. The template definition can use the `$item` context variable to access the item's attributes for display. `$item` provides these properties:
+- `id`: The unique node ID
+- `name`: The name of the node
+- `depth`: The depth level in the tree
+- `isExpanded`: Indicates if the tree node is expanded
+- `hasChildren`: Indicates if the tree node has children
+- `children`: The children of the tree node
+- `selectable`: Indicates if the node can be selected
+- `parentId`: The ID of the node's parent
+- `parentIds`: A list of parent IDs from the root node to the direct parent of the node
+- `path`: An array with the node names following the path from the root node to the displayed node.
+
+This example demonstrates these concepts:
+
+```xmlui-pg display copy {20-30} height="400px" /$item.id/ /$item.name/ /$item.hasChildren/ name="Example: itemTemplate"
+<App>
+  <Tree
+    testId="tree"
+    id="tree"
+    defaultExpanded="all"
+    data='{[
+        { id: "root", name: "My Files", parentId: null },
+        { id: "doc-root", name: "Documents", parentId: "root" },
+        { id: "doc-reports", name: "Reports", parentId: "doc-root" },
+        { id: "doc-q1-report", name: "Q1 Report.pdf", parentId: "doc-reports" },
+        { id: "doc-q2-report", name: "Q2 Report.pdf", parentId: "doc-reports" },
+        { id: "proj-root", name: "Projects", parentId: "root" },
+        { id: "proj-web", name: "Web Apps", parentId: "proj-root" },
+        { id: "proj-ecommerce", name: "E-commerce Site", parentId: "proj-web" },
+        { id: "proj-dashboard", name: "Admin Dashboard", parentId: "proj-web" },
+        { id: "media-root", name: "Media", parentId: "root" },
+        { id: "media-images", name: "Images", parentId: "media-root" },
+        { id: "media-videos", name: "Videos", parentId: "media-root" },
+      ]}'>
+    <property name="itemTemplate">
+      <HStack testId="{$item.id}" verticalAlignment="center" gap="$space-1">
+        <Icon name="{$item.hasChildren ? 'folder' : 'code'}" />
+        <Text>
+          ({$item.id}):
+        </Text>
+        <Text variant="strong">
+          {$item.name}
+        </Text>
+      </HStack>
+    </property>
+  </Tree>
+</App>
+```
+
+
 
 %-DESC-END
