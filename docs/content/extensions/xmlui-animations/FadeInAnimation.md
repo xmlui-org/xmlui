@@ -1,6 +1,6 @@
 # FadeInAnimation [#fadeinanimation]
 
-The `FadeInAnimation` component represents an animation that fades in the content. kakaaaaaa
+The `FadeInAnimation` component represents an animation that fades in the content.
 
 ## Properties
 
