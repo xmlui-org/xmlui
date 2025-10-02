@@ -213,7 +213,7 @@ test.describe("Basic Functionality", () => {
         <Text testId="slider-value" value="{mySlider.value}" />
       </Fragment>`);
     const driver = await createSliderDriver("mySlider");
-    driver.dragThumbByMouse("end");
+    await driver.dragThumbByMouse("end");
     await expect(page.getByTestId("slider-value")).toHaveText("0"); // Value should remain unchanged
   });
 
