@@ -132,6 +132,10 @@ export const TreeMd = createMetadata({
       description: `Fired when a tree node is collapsed.`,
       signature: `(node: FlatTreeNode) => void`,
     },
+    loadChildren: {
+      description: `Fired when a tree node needs to load children dynamically. Should return a Promise that resolves to an array of child data.`,
+      signature: `(node: FlatTreeNode) => Promise<any[]>`,
+    },
   },
   apis: {
     expandAll: {
@@ -194,6 +198,36 @@ export const TreeMd = createMetadata({
       signature: "appendNode(parentNodeId: string | number | null, nodeData: any): void",
       parameters: {
         parentNodeId: "The ID of the parent node, or null/undefined to add to root level",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
+    },
+    removeNode: {
+      description: `Remove a node and all its descendants from the tree.`,
+      signature: "removeNode(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the node to remove (along with all its descendants)",
+      },
+    },
+    removeChildren: {
+      description: `Remove all children (descendants) of a node while keeping the node itself.`,
+      signature: "removeChildren(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the parent node whose children should be removed",
+      },
+    },
+    insertNodeBefore: {
+      description: `Insert a new node before an existing node at the same level.`,
+      signature: "insertNodeBefore(beforeNodeId: string | number, nodeData: any): void",
+      parameters: {
+        beforeNodeId: "The ID of the existing node before which the new node should be inserted",
+        nodeData: "The node data object using the format specified in dataFormat and field properties",
+      },
+    },
+    insertNodeAfter: {
+      description: `Insert a new node after an existing node at the same level.`,
+      signature: "insertNodeAfter(afterNodeId: string | number, nodeData: any): void",
+      parameters: {
+        afterNodeId: "The ID of the existing node after which the new node should be inserted",
         nodeData: "The node data object using the format specified in dataFormat and field properties",
       },
     },
@@ -276,6 +310,7 @@ export const treeComponentRenderer = createComponentRenderer(
         onSelectionChanged={lookupEventHandler("selectionDidChange")}
         onNodeExpanded={lookupEventHandler("nodeDidExpand")}
         onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
+        loadChildren={lookupEventHandler("loadChildren")}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
             id: flatTreeNode.id,                     // $item.id - Internal unique identifier

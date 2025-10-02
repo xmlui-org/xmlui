@@ -4,6 +4,8 @@ import {
   TreeNode,
   UnPackedTreeData,
   TreeFieldConfig,
+  NodeLoadingState,
+  FlatTreeNodeWithState,
 } from "../abstractions/treeAbstractions";
 
 export function flattenNode(
@@ -12,6 +14,7 @@ export function flattenNode(
   result: FlatTreeNode[],
   openedIds: (string | number)[],
   dynamicField?: string,
+  nodeStates?: Map<string | number, NodeLoadingState>,
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
@@ -20,26 +23,37 @@ export function flattenNode(
   const isDynamic = dynamicField && node[dynamicField];
   const hasChildren = hasActualChildren || isDynamic;
   
-  result.push({
+  // Get loading state for this node
+  const loadingState = nodeStates?.get(key) || 'unloaded';
+  
+  const flatNode: FlatTreeNodeWithState = {
     ...node,
     hasChildren,
     depth,
     isExpanded,
+    loadingState,
     // Ensure key is preserved (in case it was overwritten by ...node spread)
     key: key || node.key || node.id,
-  });
+  };
+  
+  result.push(flatNode);
 
   if (isExpanded && children) {
     for (let child of children) {
-      flattenNode(child, depth + 1, result, openedIds, dynamicField);
+      flattenNode(child, depth + 1, result, openedIds, dynamicField, nodeStates);
     }
   }
 }
 
-export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[], dynamicField?: string) {
-  const ret: FlatTreeNode[] = [];
+export function toFlatTree(
+  treeData: TreeNode[], 
+  openedIds: (string | number)[], 
+  dynamicField?: string,
+  nodeStates?: Map<string | number, NodeLoadingState>
+): FlatTreeNodeWithState[] {
+  const ret: FlatTreeNodeWithState[] = [];
   treeData.forEach((node) => {
-    flattenNode(node, 0, ret, openedIds, dynamicField);
+    flattenNode(node, 0, ret, openedIds, dynamicField, nodeStates);
   });
 
   return ret;

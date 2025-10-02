@@ -492,6 +492,1090 @@ test.describe("Imperative API", () => {
     await expect(tree.getByTestId("5")).toBeVisible(); // New root node
   });
 
+  test("exposes removeNode method with flat data format #1 - remove leaf node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Leaf Node 4" 
+            onClick="treeApi.removeNode(4);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove leaf node using API
+    await removeButton.click();
+
+    // Verify original nodes are still visible except removed node
+    await expect(tree.getByTestId("1")).toBeVisible(); // Original root
+    await expect(tree.getByTestId("2")).toBeVisible(); // Original child  
+    await expect(tree.getByTestId("3")).toBeVisible(); // Original child
+
+    // Verify removed node is no longer visible
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed leaf node
+  });
+
+  test("exposes removeNode method with flat data format #2 - remove parent with children", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Node 2 and its children" 
+            onClick="treeApi.removeNode(2);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove parent node and its children using API
+    await removeButton.click();
+
+    // Verify remaining nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Original root
+    await expect(tree.getByTestId("3")).toBeVisible(); // Original child (not removed)
+
+    // Verify removed nodes are no longer visible
+    await expect(tree.getByTestId("2")).not.toBeVisible(); // Removed parent
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed child (descendant of node 2)
+  });
+
+  test("exposes removeNode method with flat data format #3 - remove root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Root Node 1 and all descendants" 
+            onClick="treeApi.removeNode(1);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove root node and all descendants using API
+    await removeButton.click();
+
+    // Verify all nodes are removed since they were all descendants of node 1
+    await expect(tree.getByTestId("1")).not.toBeVisible(); // Removed root
+    await expect(tree.getByTestId("2")).not.toBeVisible(); // Removed descendant
+    await expect(tree.getByTestId("3")).not.toBeVisible(); // Removed descendant  
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed descendant
+  });
+
+  test("exposes removeChildren method with flat data format #1 - remove children of parent node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Node 1" 
+            onClick="treeApi.removeChildren(1);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of node 1 using API
+    await removeChildrenButton.click();
+
+    // Verify parent node 1 is still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Parent node kept
+
+    // Verify all children and descendants are removed
+    await expect(tree.getByTestId("2")).not.toBeVisible(); // Removed child
+    await expect(tree.getByTestId("3")).not.toBeVisible(); // Removed child
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed descendant
+  });
+
+  test("exposes removeChildren method with flat data format #2 - remove children of node with one child", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Node 2" 
+            onClick="treeApi.removeChildren(2);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of node 2 using API
+    await removeChildrenButton.click();
+
+    // Verify nodes 1, 2, and 3 are still visible (not affected)
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Parent node kept
+    await expect(tree.getByTestId("3")).toBeVisible(); // Sibling not affected
+
+    // Verify only node 4 (child of node 2) is removed
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed child
+  });
+
+  test("exposes removeChildren method with flat data format #3 - remove children of leaf node (no effect)", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Leaf Node 4" 
+            onClick="treeApi.removeChildren(4);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of leaf node 4 using API (should have no effect)
+    await removeChildrenButton.click();
+
+    // Verify all nodes are still visible (no changes since node 4 has no children)
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Leaf node still visible
+  });
+
+  test("exposes removeNode method with hierarchy data format #1 - remove leaf node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Leaf Node 4" 
+            onClick="treeApi.removeNode(4);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove leaf node using API
+    await removeButton.click();
+
+    // Verify original nodes are still visible except removed node
+    await expect(tree.getByTestId("1")).toBeVisible(); // Original root
+    await expect(tree.getByTestId("2")).toBeVisible(); // Original child  
+    await expect(tree.getByTestId("3")).toBeVisible(); // Original child
+
+    // Verify removed node is no longer visible
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed leaf node
+  });
+
+  test("exposes removeNode method with hierarchy data format #2 - remove parent with children", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Node 3 and its children" 
+            onClick="treeApi.removeNode(3);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove parent node and its children using API
+    await removeButton.click();
+
+    // Verify remaining nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Original root
+    await expect(tree.getByTestId("2")).toBeVisible(); // Original child (not removed)
+
+    // Verify removed nodes are no longer visible
+    await expect(tree.getByTestId("3")).not.toBeVisible(); // Removed parent
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed child (descendant of node 3)
+  });
+
+  test("exposes removeNode method with hierarchy data format #3 - remove root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeBtn" testId="remove-btn" label="Remove Root Node 1 and all descendants" 
+            onClick="treeApi.removeNode(1);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeButton = await createButtonDriver("remove-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove root node and all descendants using API
+    await removeButton.click();
+
+    // Verify all nodes are removed since they were all descendants of node 1
+    await expect(tree.getByTestId("1")).not.toBeVisible(); // Removed root
+    await expect(tree.getByTestId("2")).not.toBeVisible(); // Removed descendant
+    await expect(tree.getByTestId("3")).not.toBeVisible(); // Removed descendant  
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed descendant
+  });
+
+  test("exposes removeChildren method with hierarchy data format #1 - remove children of parent node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Node 1" 
+            onClick="treeApi.removeChildren(1);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of node 1 using API
+    await removeChildrenButton.click();
+
+    // Verify parent node 1 is still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Parent node kept
+
+    // Verify all children and descendants are removed
+    await expect(tree.getByTestId("2")).not.toBeVisible(); // Removed child
+    await expect(tree.getByTestId("3")).not.toBeVisible(); // Removed child
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed descendant
+  });
+
+  test("exposes removeChildren method with hierarchy data format #2 - remove children of node with children", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Node 3" 
+            onClick="treeApi.removeChildren(3);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of node 3 using API
+    await removeChildrenButton.click();
+
+    // Verify nodes 1, 2, and 3 are still visible (not affected)
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Sibling not affected
+    await expect(tree.getByTestId("3")).toBeVisible(); // Parent node kept
+
+    // Verify only node 4 (child of node 3) is removed
+    await expect(tree.getByTestId("4")).not.toBeVisible(); // Removed child
+  });
+
+  test("exposes removeChildren method with hierarchy data format #3 - remove children of leaf node (no effect)", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="removeChildrenBtn" testId="remove-children-btn" label="Remove children of Leaf Node 2" 
+            onClick="treeApi.removeChildren(2);" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const removeChildrenButton = await createButtonDriver("remove-children-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Remove children of leaf node 2 using API (should have no effect)
+    await removeChildrenButton.click();
+
+    // Verify all nodes are still visible (no changes since node 2 has no children in hierarchy data)
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Leaf node still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Sibling still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Child of sibling still visible
+  });
+
+  test("exposes insertNodeBefore method with flat data format #1 - insert before sibling node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Node 3" 
+            onClick="treeApi.insertNodeBefore(3, { id: 5, name: 'New Node Before 3' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before node 3 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as sibling of node 3)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeBefore method with flat data format #2 - insert before first child", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Node 2" 
+            onClick="treeApi.insertNodeBefore(2, { id: 5, name: 'New First Child' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before node 2 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as first child of node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeBefore method with flat data format #3 - insert before root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Root Node 1" 
+            onClick="treeApi.insertNodeBefore(1, { id: 5, name: 'New Root Before 1' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before root node 1 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as new root before node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeBefore method with hierarchy data format #1 - insert before sibling node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Node 3" 
+            onClick="treeApi.insertNodeBefore(3, { id: 5, name: 'New Node Before 3' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before node 3 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as sibling of node 3)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeBefore method with hierarchy data format #2 - insert before first child", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Node 2" 
+            onClick="treeApi.insertNodeBefore(2, { id: 5, name: 'New First Child' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before node 2 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as first child of node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeBefore method with hierarchy data format #3 - insert before root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert before Root Node 1" 
+            onClick="treeApi.insertNodeBefore(1, { id: 5, name: 'New Root Before 1' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node before root node 1 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as new root before node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with flat data format #1 - insert after sibling node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Node 2" 
+            onClick="treeApi.insertNodeAfter(2, { id: 5, name: 'New Node After 2' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after node 2 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as sibling after node 2)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with flat data format #2 - insert after last child", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Node 3" 
+            onClick="treeApi.insertNodeAfter(3, { id: 5, name: 'New Last Child' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after node 3 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as last child of node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with flat data format #3 - insert after root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Root Node 1" 
+            onClick="treeApi.insertNodeAfter(1, { id: 5, name: 'New Root After 1' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after root node 1 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as new root after node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with hierarchy data format #1 - insert after sibling node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Node 2" 
+            onClick="treeApi.insertNodeAfter(2, { id: 5, name: 'New Node After 2' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after node 2 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as sibling after node 2)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with hierarchy data format #2 - insert after last child", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Node 3" 
+            onClick="treeApi.insertNodeAfter(3, { id: 5, name: 'New Last Child' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after node 3 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as last child of node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
+  test("exposes insertNodeAfter method with hierarchy data format #3 - insert after root node", async ({
+    initTestBed,
+    createTreeDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree id="treeApi" testId="tree"
+              dataFormat="hierarchy"
+              defaultExpanded="all"
+              data='{${JSON.stringify(hierarchyTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}" verticalAlignment="center">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button id="insertBtn" testId="insert-btn" label="Insert after Root Node 1" 
+            onClick="treeApi.insertNodeAfter(1, { id: 5, name: 'New Root After 1' });" />
+        </Fragment>
+      `);
+
+    const tree = await createTreeDriver("tree");
+    const insertButton = await createButtonDriver("insert-btn");
+
+    // Check initial tree structure - all nodes visible due to defaultExpanded="all"
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child visible (expanded)
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild visible (expanded)
+
+    // Insert new node after root node 1 using API
+    await insertButton.click();
+
+    // Verify all original nodes are still visible
+    await expect(tree.getByTestId("1")).toBeVisible(); // Root still visible
+    await expect(tree.getByTestId("2")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("3")).toBeVisible(); // Child still visible
+    await expect(tree.getByTestId("4")).toBeVisible(); // Grandchild still visible
+
+    // Verify new node is visible (inserted as new root after node 1)
+    await expect(tree.getByTestId("5")).toBeVisible(); // New node inserted
+  });
+
   test("exposes scrollIntoView method", async ({
     initTestBed,
     createTreeDriver,
