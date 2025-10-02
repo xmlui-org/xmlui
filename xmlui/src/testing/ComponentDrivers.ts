@@ -1366,3 +1366,50 @@ export class DropdownMenuDriver extends ComponentDriver {
     await this.getMenuContent().waitFor({ state: "hidden" });
   }
 }
+
+// --- Slider
+
+export class SliderDriver extends ComponentDriver {
+
+  private async getActiveThumb(thumbNumber: number = 0) {
+    const thumbs = this.page.getByRole("slider");
+    const thumbCount = await thumbs.count();
+    if (thumbCount === 0) {
+      throw new Error("No slider thumb found to drag");
+    }
+    if (thumbNumber < 0) {
+      thumbNumber = 0;
+    } else if (thumbNumber >= thumbCount) {
+      thumbNumber = thumbCount - 1;
+    }
+    return thumbs.nth(thumbNumber);
+  }
+
+  async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber: number = 0) {
+    const sliderOffsetWidth = await this.page.locator("[data-track]").evaluate((el) => {
+      return el.getBoundingClientRect().width;
+    });
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+
+    await activeThumb.hover();
+    await this.page.mouse.down({ button: "left" });
+
+    if (location === "start") {
+      await this.page.mouse.move(0, 0);
+    } else if (location === "end") {
+      await this.page.mouse.move(sliderOffsetWidth, 0);
+    } else { // middle
+      await this.page.mouse.move(sliderOffsetWidth / 2, 0);
+    }
+
+    await this.page.mouse.up();
+  }
+
+  async stepThumbByKeyboard(key: "ArrowLeft" | "ArrowRight" | "Home" | "End", thumbNumber: number = 0, repeat: number = 1) {
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.focus();
+    for (let i = 0; i < repeat; i++) {
+      await this.page.keyboard.press(key);
+    }
+  }
+}

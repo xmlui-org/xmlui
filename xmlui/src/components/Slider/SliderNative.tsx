@@ -144,7 +144,7 @@ export const Slider = forwardRef(
     id = id || _id;
     const inputRef = useRef(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const thumbRef = useRef(null);
+    const thumbsRef = useRef<(HTMLSpanElement | null)[]>([]);
     min = parseValue(min, defaultProps.min);
     max = parseValue(max, defaultProps.max);
 
@@ -236,21 +236,26 @@ export const Slider = forwardRef(
     // Component APIs
     const handleOnFocus = useCallback(
       (ev: React.FocusEvent<HTMLInputElement>) => {
-        thumbRef.current?.focus();
+        onShowTooltip();
         onFocus?.(ev);
       },
-      [onFocus],
+      [onFocus, onShowTooltip],
     );
     const handleOnBlur = useCallback(
       (ev: React.FocusEvent<HTMLInputElement>) => {
-        thumbRef.current?.focus();
         onBlur?.(ev);
       },
       [onBlur],
     );
 
     const focus = useCallback(() => {
-      inputRef.current?.focus();
+      // Focus the first available thumb
+      const firstThumb = thumbsRef.current.find(thumb => thumb !== null);
+      if (firstThumb) {
+        firstThumb.focus();
+      } else {
+        inputRef.current?.focus();
+      }
     }, []);
 
     const setValue = useEvent((newValue) => {
@@ -271,6 +276,12 @@ export const Slider = forwardRef(
 
     // Ensure we always have at least one thumb
     const displayValue = localValue.length > 0 ? localValue : formatValue(undefined, min, min, max);
+
+    // Clean up thumbs ref array when number of thumbs changes
+    useEffect(() => {
+      thumbsRef.current = thumbsRef.current.slice(0, displayValue.length);
+    }, [displayValue.length]);
+
       return (
         <ItemWithLabel
           {...rest}
@@ -341,13 +352,15 @@ export const Slider = forwardRef(
                 <Thumb
                   id={id}
                   aria-required={required}
-                  ref={index === 0 ? thumbRef : null}
+                  ref={(el) => {
+                    thumbsRef.current[index] = el;
+                  }}
                   className={classnames(styles.sliderThumb, {
                     [styles.disabled]: !enabled,
                   })}
                   style={thumbStyle ? { ...thumbStyle } : undefined}
                   data-thumb-index={index}
-                  autoFocus={autoFocus}
+                  autoFocus={autoFocus && index === 0}
                 />
               </Tooltip>
             ))}

@@ -148,36 +148,72 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("slider-value")).toHaveText("0.1");
   });
 
-  test.fixme(
-    "minStepsBetweenThumbs maintains thumb separation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test actual thumb separation logic"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider initialValue="{[2, 7]}" minStepsBetweenThumbs="5" />`);
-      // Test that thumbs maintain minimum separation
-      await expect(page.getByRole("slider")).toBeVisible();
-    },
-  );
+  test("component handles multiple thumbs", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider initialValue="{[2, 4]}" />`);
+    const thumbs = page.getByRole("slider");
+    await expect(thumbs).toHaveCount(2);
+  });
+
+  test("all thumbs are interactable via mouse", async ({
+    initTestBed,
+    createSliderDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />
+        <Text testId="sliderValue0">{slider.value[0]}</Text>
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.dragThumbByMouse("start", 0);
+    await driver.dragThumbByMouse("end", 1);
+
+    await expect(page.getByTestId("sliderValue0")).toHaveText("0");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("10");
+  });
+
+  test("all thumbs are interactable via keyboard", async ({ initTestBed, createSliderDriver, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />
+        <Text testId="sliderValue0">{slider.value[0]}</Text>
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.stepThumbByKeyboard("ArrowLeft", 0);
+    await driver.stepThumbByKeyboard("ArrowRight", 1);
+    await expect(page.getByTestId("sliderValue0")).toHaveText("1");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("5");
+  });
+
+  test("minStepsBetweenThumbs maintains thumb separation", async ({ initTestBed, createSliderDriver, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[0, 5]}" minStepsBetweenThumbs="3" minValue="0" maxValue="10" />
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.stepThumbByKeyboard("ArrowLeft", 1, 3); // Try to move left by 3 steps
+    await expect(page.getByTestId("sliderValue1")).toHaveText("3");
+  });
 
   test("enabled=false disables control", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider enabled="false" />`);
     await expect(page.getByRole("slider")).toBeDisabled();
   });
 
-  test("readOnly prevents interaction", async ({ initTestBed, page }) => {
+  test("readOnly prevents interaction", async ({ initTestBed, page, createSliderDriver }) => {
     await initTestBed(`
       <Fragment>
         <Slider id="mySlider" readOnly="true" />
         <Text testId="slider-value" value="{mySlider.value}" />
       </Fragment>`);
-    const slider = page.getByRole("slider");
-    const sliderOffsetWidth = await page.locator("[data-track]").evaluate((el) => {
-      return el.getBoundingClientRect().width;
-    });
-
-    await slider.hover();
-    await page.mouse.down({ button: "left" });
-    await page.mouse.move(sliderOffsetWidth, 0); // Attempt to drag to end
-    await page.mouse.up();
+    const driver = await createSliderDriver("mySlider");
+    driver.dragThumbByMouse("end");
     await expect(page.getByTestId("slider-value")).toHaveText("0"); // Value should remain unchanged
   });
 
