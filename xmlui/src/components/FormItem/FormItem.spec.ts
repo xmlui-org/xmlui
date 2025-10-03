@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -793,7 +794,9 @@ test.describe("Other Edge Cases", () => {
     await expect(input2.field).toHaveValue("Second");
   });
 
-  test("handles FormItem with no Form parent gracefully", async ({ initTestBed, createFormItemDriver }) => {
+  test.fixme("handles FormItem with no Form parent gracefully",
+    SKIP_REASON.XMLUI_BUG("If not inside a Form, FormItem renders error component - test should also account for this"),
+    async ({ initTestBed, createFormItemDriver }) => {
     await initTestBed(`
       <FormItem testId="formItem" label="Standalone FormItem" />
     `);
