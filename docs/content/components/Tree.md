@@ -226,67 +226,71 @@ This example demonstrates these concepts:
 
 ## Properties [#properties]
 
-### `animateExpand` [#animateexpand]
+### `animateExpand` (default: false) [#animateexpand-default-false]
 
 When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).
 
-### `autoExpandToSelection` [#autoexpandtoselection]
+### `autoExpandToSelection` (default: true) [#autoexpandtoselection-default-true]
 
 Automatically expand the path to the selected item.
 
-### `childrenField` [#childrenfield]
+### `childrenField` (default: "children") [#childrenfield-default-children]
 
 The property name in source data for child arrays (used in hierarchy format).
 
-### `data` [#data]
+### `data` (required) [#data-required]
 
 The data source of the tree. Format depends on the dataFormat property.
 
-### `dataFormat` [#dataformat]
+### `dataFormat` (default: "flat") [#dataformat-default-flat]
 
 The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).
 
-### `defaultExpanded` [#defaultexpanded]
+### `defaultExpanded` (default: "none") [#defaultexpanded-default-none]
 
 Initial expansion state: "none", "all", "first-level", or array of specific IDs.
 
-### `expandOnItemClick` [#expandonitemclick]
+### `dynamicField` (default: "dynamic") [#dynamicfield-default-dynamic]
 
-Enable expansion/collapse by clicking anywhere on the item (not just the chevron).
+The property name in source data for dynamic loading state (default: "dynamic").
 
-### `expandRotation` [#expandrotation]
+### `expandRotation` (default: 90) [#expandrotation-default-90]
 
 The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).
 
-### `iconCollapsed` [#iconcollapsed]
+### `iconCollapsed` (default: "chevronright") [#iconcollapsed-default-chevronright]
 
 The icon name to use for collapsed nodes (default: "chevronright").
 
-### `iconCollapsedField` [#iconcollapsedfield]
+### `iconCollapsedField` (default: "iconCollapsed") [#iconcollapsedfield-default-iconcollapsed]
 
 The property name in source data for collapsed state icons.
 
-### `iconExpanded` [#iconexpanded]
+### `iconExpanded` (default: "chevrondown") [#iconexpanded-default-chevrondown]
 
 The icon name to use for expanded nodes (default: "chevrondown").
 
-### `iconExpandedField` [#iconexpandedfield]
+### `iconExpandedField` (default: "iconExpanded") [#iconexpandedfield-default-iconexpanded]
 
 The property name in source data for expanded state icons.
 
-### `iconField` [#iconfield]
+### `iconField` (default: "icon") [#iconfield-default-icon]
 
 The property name in source data for icon identifiers.
 
-### `iconSize` [#iconsize]
+### `iconSize` (default: "16") [#iconsize-default-16]
 
 The size of the expand/collapse icons (default: "16").
 
-### `idField` [#idfield]
+### `idField` (default: "id") [#idfield-default-id]
 
 The property name in source data for unique identifiers.
 
-### `itemHeight` [#itemheight]
+### `itemClickExpands` (default: false) [#itemclickexpands-default-false]
+
+Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.
+
+### `itemHeight` (default: 35) [#itemheight-default-35]
 
 The height of each tree row in pixels (default: 35).
 
@@ -294,15 +298,15 @@ The height of each tree row in pixels (default: 35).
 
 The template for each item in the tree.
 
-### `nameField` [#namefield]
+### `nameField` (default: "name") [#namefield-default-name]
 
 The property name in source data for display text.
 
-### `parentIdField` [#parentidfield]
+### `parentIdField` (default: "parentId") [#parentidfield-default-parentid]
 
 The property name in source data for parent relationships (used in flat format).
 
-### `selectableField` [#selectablefield]
+### `selectableField` (default: "selectable") [#selectablefield-default-selectable]
 
 The property name in source data for selectable state (default: "selectable").
 
@@ -311,6 +315,10 @@ The property name in source data for selectable state (default: "selectable").
 The selected item ID in source data format.
 
 ## Events [#events]
+
+### `loadChildren` [#loadchildren]
+
+Fired when a tree node needs to load children dynamically. Should return a Promise that resolves to an array of child data.
 
 ### `nodeDidCollapse` [#nodedidcollapse]
 
@@ -325,6 +333,15 @@ Fired when a tree node is expanded.
 Fired when the tree selection changes.
 
 ## Exposed Methods [#exposed-methods]
+
+### `appendNode` [#appendnode]
+
+Add a new node to the tree as a child of the specified parent node.
+
+**Signature**: `appendNode(parentNodeId: string | number | null, nodeData: any): void`
+
+- `parentNodeId`: The ID of the parent node, or null/undefined to add to root level
+- `nodeData`: The node data object using the format specified in dataFormat and field properties
 
 ### `clearSelection` [#clearselection]
 
@@ -387,6 +404,40 @@ Get a tree node by its source data ID.
 Get the currently selected tree node.
 
 **Signature**: `getSelectedNode(): TreeNode | null`
+
+### `insertNodeAfter` [#insertnodeafter]
+
+Insert a new node after an existing node at the same level.
+
+**Signature**: `insertNodeAfter(afterNodeId: string | number, nodeData: any): void`
+
+- `afterNodeId`: The ID of the existing node after which the new node should be inserted
+- `nodeData`: The node data object using the format specified in dataFormat and field properties
+
+### `insertNodeBefore` [#insertnodebefore]
+
+Insert a new node before an existing node at the same level.
+
+**Signature**: `insertNodeBefore(beforeNodeId: string | number, nodeData: any): void`
+
+- `beforeNodeId`: The ID of the existing node before which the new node should be inserted
+- `nodeData`: The node data object using the format specified in dataFormat and field properties
+
+### `removeChildren` [#removechildren]
+
+Remove all children (descendants) of a node while keeping the node itself.
+
+**Signature**: `removeChildren(nodeId: string | number): void`
+
+- `nodeId`: The ID of the parent node whose children should be removed
+
+### `removeNode` [#removenode]
+
+Remove a node and all its descendants from the tree.
+
+**Signature**: `removeNode(nodeId: string | number): void`
+
+- `nodeId`: The ID of the node to remove (along with all its descendants)
 
 ### `selectNode` [#selectnode]
 
