@@ -5,7 +5,7 @@ import codeBehind from "./Hello.xmlui.xs";
 const COMP = "Hello";
 
 export const HelloMd = createMetadata({
-  status: "experimental",
+  status: "internal",
   description:
     "A sample component",
   props: {},
