@@ -41,7 +41,7 @@ export default defineConfig({
   },
 
   /* Global timeout settings */
-  timeout: process.env.CI ? 10000 : 5000,
+  timeout: process.env.CI ? 5000 : 10000,
   expect: {
     timeout: 5000, // 5 seconds for expect assertions
   },
