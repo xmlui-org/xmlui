@@ -13,7 +13,7 @@ import { useToast } from "../hooks/useToast";
 import { ErrorBoundary, Spinner, useThemes } from "xmlui";
 import { Header } from "./Header";
 import { PlaygroundContent } from "./PlaygroundContent";
-import { HelloWorldTheme } from "../themes/hello-world-theme";
+import { Theme } from "../themes/theme";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
@@ -64,14 +64,14 @@ export const StandalonePlayground = () => {
           description: "",
           appGlobals: {},
           resources: {},
-          themes: [HelloWorldTheme],
+          themes: [Theme],
         },
         components: [],
         app: "<App>Hello World!</App>",
       }));
       dispatch(
         optionsInitialized({
-          activeTheme: "hello-world-theme",
+          activeTheme: "theme",
           activeTone: "light",
           content: "app",
           orientation: "horizontal",

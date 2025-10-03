@@ -24,14 +24,14 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
     setShow(true);
   }, []);
 
-  const openStandaloneApp = useCallback(
-    async (previewMode = true) => {
+  const createAppUrl = useCallback(
+    async (previewMode: boolean) => {
       const data = {
         standalone: appDescription,
         options: {
           fixedTheme: options.fixedTheme,
           swapped: options.swapped,
-          previewMode: previewMode,
+          previewMode,
           orientation: options.orientation,
           activeTheme: options.activeTheme,
           activeTone: options.activeTone,
@@ -39,7 +39,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         },
       };
       const appQueryString = await createQueryString(JSON.stringify(data));
-      window.open(`/#/playground#${appQueryString}`, "_blank");
+      return `${window.location.origin}/#/playground#${appQueryString}`;
     },
     [
       appDescription,
@@ -52,31 +52,18 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
     ],
   );
 
+  const openStandaloneApp = useCallback(
+    async (previewMode = true) => {
+      const url = await createAppUrl(previewMode);
+      window.open(url, "_blank");
+    },
+    [createAppUrl],
+  );
+
   const share = useCallback(async () => {
-    const data = {
-      standalone: appDescription,
-      options: {
-        fixedTheme: options.fixedTheme,
-        swapped: options.swapped,
-        previewMode: false,
-        orientation: options.orientation,
-        activeTheme: options.activeTheme,
-        activeTone: options.activeTone,
-        content: options.content,
-      },
-    };
-    const appQueryString = await createQueryString(JSON.stringify(data));
-    const fullUrl = `${window.location.origin}/#/playground#${appQueryString}`;
-    navigator.clipboard.writeText(fullUrl);
-  }, [
-    appDescription,
-    options.fixedTheme,
-    options.swapped,
-    options.activeTone,
-    options.orientation,
-    options.activeTheme,
-    options.content
-  ]);
+    const url = await createAppUrl(false);
+    navigator.clipboard.writeText(url);
+  }, [createAppUrl]);
 
   const download = useCallback(() => {
     handleDownloadZip(appDescription);
