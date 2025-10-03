@@ -186,6 +186,7 @@ You can override the default template used to display a tree item with the `item
 - `parentId`: The ID of the node's parent
 - `parentIds`: A list of parent IDs from the root node to the direct parent of the node
 - `path`: An array with the node names following the path from the root node to the displayed node.
+- `loadingState`: The current state of a dynamic node ("unloaded", "loading", or "loaded")
 
 This example demonstrates these concepts:
 
@@ -221,6 +222,54 @@ This example demonstrates these concepts:
       </HStack>
     </property>
   </Tree>
+</App>
+```
+
+## Dynamic tree nodes [#dynamic-tree-nodes]
+
+When initializing the tree with its `data` property, you can set the `dynamic` property of the node to `true` (you can use a field name alias with the `dynamicField` property). When you extend a dynamic node, the tree fires the `loadChildren` event, and the nodes returned by the event handler will be the actual nodes.
+
+By default, nodes are not dynamic.
+
+While the child nodes are being queried, the tree node displays a spinner to indicate the loading state.
+
+You can use the `markNodeUnloaded` exposed method to reset the state of an already loaded dynamic tree node. The next time the user expands the node, its content will be loaded again.
+
+The following sample demonstrates this feature. Click the "Child Item 1.2" node to check how it loads its children. Click the Unload button to reload the items when the node is expanded the next time.
+
+```xmlui-pg display copy {16-19} height="340px" /dynamic: true/ /onLoadChildren/ name="Example: dynamic nodes"
+<App var.loadCount="{0}">
+  <Tree
+    testId="tree"
+    defaultExpanded="all"
+    id="tree"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Root Item 1", parentId: null },
+      { id: 2, name: "Child Item 1.1", parentId: 1 },
+      { id: 3, name: "Child Item 1.2", parentId: 1, dynamic: true },
+      { id: 4, name: "Child Item 1.3", parentId: 1 },
+    ]}'
+    onLoadChildren="(node) => {
+      loadCount++;
+      delay(1000); 
+      return ([
+        { id: 5, name: `Dynamic Item 1.2.1 (${loadCount})` },
+        { id: 6, name: `Dynamic Item 2.2.2 (${loadCount})` },
+      ])
+    }"
+    >
+    <property name="itemTemplate">
+      <HStack testId="{$item.id}" verticalAlignment="center" gap="$space-1">
+        <Icon name="{$item.hasChildren 
+          ? ($item.loadingState === 'loaded' ? 'folder' : 'folder-outline' ) 
+          : 'code'}" 
+        />
+        <Text>{$item.name}</Text>
+      </HStack>
+    </property>
+  </Tree>
+  <Button onClick="tree.markNodeUnloaded(3)">Unload</Button>
 </App>
 ```
 
@@ -318,7 +367,7 @@ The selected item ID in source data format.
 
 ### `loadChildren` [#loadchildren]
 
-Fired when a tree node needs to load children dynamically. Should return a Promise that resolves to an array of child data.
+Fired when a tree node needs to load children dynamically. Should return an array of child data.
 
 ### `nodeDidCollapse` [#nodedidcollapse]
 
@@ -359,7 +408,7 @@ Collapse all nodes in the tree.
 
 Collapse a specific node by its source data ID.
 
-**Signature**: `collapseNode(nodeId: string): void`
+**Signature**: `collapseNode(nodeId: string | number): void`
 
 - `nodeId`: The ID of the node to collapse (source data format)
 
@@ -373,7 +422,7 @@ Expand all nodes in the tree.
 
 Expand a specific node by its source data ID.
 
-**Signature**: `expandNode(nodeId: string): void`
+**Signature**: `expandNode(nodeId: string | number): void`
 
 - `nodeId`: The ID of the node to expand (source data format)
 
@@ -389,15 +438,23 @@ Expand nodes up to the specified depth level (0-based).
 
 Get an array of currently expanded node IDs in source data format.
 
-**Signature**: `getExpandedNodes(): string[]`
+**Signature**: `getExpandedNodes(): (string | number)[]`
 
 ### `getNodeById` [#getnodebyid]
 
 Get a tree node by its source data ID.
 
-**Signature**: `getNodeById(nodeId: string): TreeNode | null`
+**Signature**: `getNodeById(nodeId: string | number): TreeNode | null`
 
 - `nodeId`: The ID of the node to retrieve (source data format)
+
+### `getNodeLoadingState` [#getnodeloadingstate]
+
+Get the loading state of a dynamic node.
+
+**Signature**: `getNodeLoadingState(nodeId: string | number): NodeLoadingState`
+
+- `nodeId`: The ID of the node to check loading state for
 
 ### `getSelectedNode` [#getselectednode]
 
@@ -423,6 +480,22 @@ Insert a new node before an existing node at the same level.
 - `beforeNodeId`: The ID of the existing node before which the new node should be inserted
 - `nodeData`: The node data object using the format specified in dataFormat and field properties
 
+### `markNodeLoaded` [#marknodeloaded]
+
+Mark a dynamic node as loaded.
+
+**Signature**: `markNodeLoaded(nodeId: string | number): void`
+
+- `nodeId`: The ID of the node to mark as loaded
+
+### `markNodeUnloaded` [#marknodeunloaded]
+
+Mark a dynamic node as unloaded and collapse it.
+
+**Signature**: `markNodeUnloaded(nodeId: string | number): void`
+
+- `nodeId`: The ID of the node to mark as unloaded
+
 ### `removeChildren` [#removechildren]
 
 Remove all children (descendants) of a node while keeping the node itself.
@@ -439,11 +512,28 @@ Remove a node and all its descendants from the tree.
 
 - `nodeId`: The ID of the node to remove (along with all its descendants)
 
+### `scrollIntoView` [#scrollintoview]
+
+Scroll to a specific node and expand parent nodes as needed to make it visible.
+
+**Signature**: `scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void`
+
+- `nodeId`: The ID of the node to scroll to (source data format)
+- `options`: Optional scroll options
+
+### `scrollToItem` [#scrolltoitem]
+
+Scroll to a specific node if it's currently visible in the tree.
+
+**Signature**: `scrollToItem(nodeId: string | number): void`
+
+- `nodeId`: The ID of the node to scroll to (source data format)
+
 ### `selectNode` [#selectnode]
 
 Programmatically select a node by its source data ID.
 
-**Signature**: `selectNode(nodeId: string): void`
+**Signature**: `selectNode(nodeId: string | number): void`
 
 - `nodeId`: The ID of the node to select (source data format)
 

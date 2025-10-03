@@ -13,8 +13,8 @@ The "flat" and "hierarchy" data structures both use these fields for a particula
 - `id`: Unique ID of tree node
 - `name`: The field to be used as the display label
 - `icon`: An optional icon identifier. If specified, this icon is displayed with the tree item.
-- `iconExpanded`. An optional icon identifier. This icon is displayed when the field is expanded.
-- `iconCollapsed`. An optional icon identifier. This icon is displayed when the field is collapsed.
+- `iconExpanded`: An optional icon identifier. This icon is displayed when the field is expanded.
+- `iconCollapsed`: An optional icon identifier. This icon is displayed when the field is collapsed.
 - `selectable`: Indicates if the node can be selected.
 
 The "flat" structure refers to its direct parent node via the `parentId` property, which contains the ID of the node it is referring to.
@@ -184,6 +184,7 @@ You can override the default template used to display a tree item with the `item
 - `parentId`: The ID of the node's parent
 - `parentIds`: A list of parent IDs from the root node to the direct parent of the node
 - `path`: An array with the node names following the path from the root node to the displayed node.
+- `loadingState`: The current state of a dynamic node ("unloaded", "loading", or "loaded")
 
 This example demonstrates these concepts:
 
@@ -222,6 +223,52 @@ This example demonstrates these concepts:
 </App>
 ```
 
+## Dynamic tree nodes
 
+When initializing the tree with its `data` property, you can set the `dynamic` property of the node to `true` (you can use a field name alias with the `dynamicField` property). When you extend a dynamic node, the tree fires the `loadChildren` event, and the nodes returned by the event handler will be the actual nodes.
+
+By default, nodes are not dynamic.
+
+While the child nodes are being queried, the tree node displays a spinner to indicate the loading state.
+
+You can use the `markNodeUnloaded` exposed method to reset the state of an already loaded dynamic tree node. The next time the user expands the node, its content will be loaded again.
+
+The following sample demonstrates this feature. Click the "Child Item 1.2" node to check how it loads its children. Click the Unload button to reload the items when the node is expanded the next time.
+
+```xmlui-pg display copy {16-19} height="340px" /dynamic: true/ /onLoadChildren/ name="Example: dynamic nodes"
+<App var.loadCount="{0}">
+  <Tree
+    testId="tree"
+    defaultExpanded="all"
+    id="tree"
+    itemClickExpands
+    data='{[
+      { id: 1, name: "Root Item 1", parentId: null },
+      { id: 2, name: "Child Item 1.1", parentId: 1 },
+      { id: 3, name: "Child Item 1.2", parentId: 1, dynamic: true },
+      { id: 4, name: "Child Item 1.3", parentId: 1 },
+    ]}'
+    onLoadChildren="(node) => {
+      loadCount++;
+      delay(1000); 
+      return ([
+        { id: 5, name: `Dynamic Item 1.2.1 (${loadCount})` },
+        { id: 6, name: `Dynamic Item 2.2.2 (${loadCount})` },
+      ])
+    }"
+    >
+    <property name="itemTemplate">
+      <HStack testId="{$item.id}" verticalAlignment="center" gap="$space-1">
+        <Icon name="{$item.hasChildren 
+          ? ($item.loadingState === 'loaded' ? 'folder' : 'folder-outline' ) 
+          : 'code'}" 
+        />
+        <Text>{$item.name}</Text>
+      </HStack>
+    </property>
+  </Tree>
+  <Button onClick="tree.markNodeUnloaded(3)">Unload</Button>
+</App>
+```
 
 %-DESC-END

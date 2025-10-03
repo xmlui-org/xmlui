@@ -24,7 +24,7 @@ export function flattenNode(
   const hasChildren = hasActualChildren || isDynamic;
   
   // Get loading state for this node
-  const loadingState = nodeStates?.get(key) || 'unloaded';
+  const loadingState = nodeStates?.get(key) || (isDynamic ? 'unloaded' : 'loaded');
   
   const flatNode: FlatTreeNodeWithState = {
     ...node,
@@ -129,11 +129,13 @@ export function flatToNative(
     itemsById.set(id, item);
     
     if (parentId && parentId !== '') {
+      // Convert parentId to string for consistent type in childrenMap
+      const parentKey = String(parentId);
       // Has parent - add to children map
-      if (!childrenMap.has(parentId)) {
-        childrenMap.set(parentId, []);
+      if (!childrenMap.has(parentKey)) {
+        childrenMap.set(parentKey, []);
       }
-      childrenMap.get(parentId)!.push(item);
+      childrenMap.get(parentKey)!.push(item);
     } else {
       // Root item
       rootItems.push(item);
@@ -163,7 +165,8 @@ export function flatToNative(
     const currentPath = [...pathSegments, displayName];
     
     // Get children for this item
-    const childItems = childrenMap.get(sourceId) || [];
+    const sourceKey = String(sourceId);
+    const childItems = childrenMap.get(sourceKey) || [];
     const children: TreeNode[] = childItems.map(childItem => 
       buildTreeNode(childItem, [...parentIds, sourceId], currentPath)
     );
