@@ -14,10 +14,12 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
 import { Button, Text, Logo } from "xmlui";
 import { ToneSwitcher } from "./ToneSwitcher";
+import { useToast } from "../hooks/useToast";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { appDescription, options, dispatch } = usePlayground();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { showToast } = useToast();
 
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -63,6 +65,11 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const share = useCallback(async () => {
     const url = await createAppUrl(false);
     navigator.clipboard.writeText(url);
+    showToast({
+      title: "URL copied to clipboard",
+      description: "",
+      type: "info",
+    });
   }, [createAppUrl]);
 
   const download = useCallback(() => {
