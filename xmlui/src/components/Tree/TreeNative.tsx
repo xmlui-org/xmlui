@@ -69,7 +69,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
       e.stopPropagation();
       // Prevent toggling if node is in loading state
       const nodeWithState = treeItem as FlatTreeNodeWithState;
-      if (nodeWithState.loadingState === 'loading') {
+      if (nodeWithState.loadingState === "loading") {
         return;
       }
       toggleNode(treeItem);
@@ -94,7 +94,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
   const onItemClickHandler = useCallback(
     (e: React.MouseEvent) => {
       // Selection is already handled in onMouseDown, so we skip it here
-      
+
       // Call optional onItemClick callback
       if (onItemClick) {
         onItemClick(treeItem);
@@ -103,7 +103,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
       // If itemClickExpands is enabled and item has children, also toggle
       // But prevent toggling if node is in loading state
       const nodeWithState = treeItem as FlatTreeNodeWithState;
-      if (itemClickExpands && treeItem.hasChildren && nodeWithState.loadingState !== 'loading') {
+      if (itemClickExpands && treeItem.hasChildren && nodeWithState.loadingState !== "loading") {
         toggleNode(treeItem);
       }
     },
@@ -112,7 +112,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
 
   // Get loading state for styling and interaction
   const nodeWithState = treeItem as FlatTreeNodeWithState;
-  const isLoading = nodeWithState.loadingState === 'loading';
+  const isLoading = nodeWithState.loadingState === "loading";
 
   return (
     <div style={{ ...style, width: "auto", minWidth: "100%", display: "flex" }}>
@@ -129,10 +129,10 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
         aria-busy={isLoading}
         tabIndex={isFocused ? 0 : -1}
       >
-        <div 
-          onClick={onToggleNode} 
+        <div
+          onClick={onToggleNode}
           className={styles.gutter}
-          style={{ cursor: isLoading ? 'default' : 'pointer' }}
+          style={{ cursor: isLoading ? "default" : "pointer" }}
         >
           <div style={{ width: treeItem.depth * 10 }} className={styles.depthPlaceholder} />
           <div
@@ -144,18 +144,28 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
             {treeItem.hasChildren && (
               <>
                 {/* Show loading spinner when node is loading */}
-                {(treeItem as FlatTreeNodeWithState).loadingState === 'loading' ? (
-                  <Spinner delay={0} />
+                {(treeItem as FlatTreeNodeWithState).loadingState === "loading" ? (
+                  <Spinner delay={0} style={{ width: 24, height: 24 }} />
                 ) : (
                   <Icon
-                    name={animateExpand ? iconCollapsed : (treeItem.isExpanded ? iconExpanded : iconCollapsed)}
+                    name={
+                      animateExpand
+                        ? treeItem.iconCollapsed || iconCollapsed
+                        : treeItem.isExpanded
+                          ? treeItem.iconExpanded || iconExpanded
+                          : treeItem.iconCollapsed || iconCollapsed
+                    }
                     size={iconSize}
                     className={classnames(styles.toggleIcon, {
                       [styles.rotated]: animateExpand && treeItem.isExpanded,
                     })}
-                    style={animateExpand && treeItem.isExpanded ? {
-                      transform: `rotate(${expandRotation}deg)`
-                    } : undefined}
+                    style={
+                      animateExpand && treeItem.isExpanded
+                        ? {
+                            transform: `rotate(${expandRotation}deg)`,
+                          }
+                        : undefined
+                    }
                   />
                 )}
               </>
@@ -186,19 +196,22 @@ const emptyTreeData: UnPackedTreeData = {
  * @param treeItemsById Map of all tree nodes by their ID
  * @returns Array of parent node IDs from immediate parent to root
  */
-const findAllParentIds = (nodeId: string | number, treeItemsById: Record<string, TreeNode>): (string | number)[] => {
+const findAllParentIds = (
+  nodeId: string | number,
+  treeItemsById: Record<string, TreeNode>,
+): (string | number)[] => {
   const parentIds: (string | number)[] = [];
   const targetNode = treeItemsById[String(nodeId)];
-  
+
   if (!targetNode) {
     return parentIds;
   }
-  
+
   // Walk up the tree using parentIds property which contains the path from root to parent
   if (targetNode.parentIds && targetNode.parentIds.length > 0) {
     parentIds.push(...targetNode.parentIds);
   }
-  
+
   return parentIds;
 };
 
@@ -208,15 +221,18 @@ const findAllParentIds = (nodeId: string | number, treeItemsById: Record<string,
  * @param treeItemsById Map of all tree nodes by their ID
  * @returns Array containing original node IDs plus all necessary parent IDs
  */
-const expandParentPaths = (nodeIds: (string | number)[], treeItemsById: Record<string, TreeNode>): (string | number)[] => {
+const expandParentPaths = (
+  nodeIds: (string | number)[],
+  treeItemsById: Record<string, TreeNode>,
+): (string | number)[] => {
   const allExpandedIds = new Set<string | number>(nodeIds);
-  
+
   // For each target node, find and add all its parent IDs
-  nodeIds.forEach(nodeId => {
+  nodeIds.forEach((nodeId) => {
     const parentIds = findAllParentIds(nodeId, treeItemsById);
-    parentIds.forEach(parentId => allExpandedIds.add(parentId));
+    parentIds.forEach((parentId) => allExpandedIds.add(parentId));
   });
-  
+
   return Array.from(allExpandedIds);
 };
 
@@ -238,14 +254,14 @@ export const defaultProps = {
   iconCollapsed: "chevronright",
   iconExpanded: "chevrondown",
   iconSize: "16",
-  itemHeight: 35,
+  itemHeight: 32,
   animateExpand: false,
   expandRotation: 90,
 };
 
 interface TreeComponentProps {
   registerComponentApi?: (api: any) => void;
-  data?: UnPackedTreeData;
+  data?: any; // Raw data in flat array or hierarchy format
   dataFormat?: TreeDataFormat;
   idField?: string;
   nameField?: string;
@@ -317,32 +333,42 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Internal data state for API methods that modify the tree structure
   const [internalData, setInternalData] = useState<any>(undefined);
-  
+  const [dataRevision, setDataRevision] = useState(0);
+
   // Use internal data if available, otherwise use props data
   const effectiveData = internalData ?? data;
 
+  // Helper function to update internal data and force re-render
+  const updateInternalData = useCallback((updater: (prevData: any) => any) => {
+    setInternalData(updater);
+    setDataRevision(prev => prev + 1);
+  }, []);
+
   // Build field configuration
-  const fieldConfig = useMemo<TreeFieldConfig>(() => ({
-    idField: idField || "id",
-    labelField: nameField || "name",
-    iconField,
-    iconExpandedField,
-    iconCollapsedField,
-    parentField: parentIdField,
-    childrenField,
-    selectableField,
-    dynamicField,
-  }), [
-    idField,
-    nameField,
-    iconField,
-    iconExpandedField,
-    iconCollapsedField,
-    parentIdField,
-    childrenField,
-    selectableField,
-    dynamicField,
-  ]);
+  const fieldConfig = useMemo<TreeFieldConfig>(
+    () => ({
+      idField: idField || "id",
+      labelField: nameField || "name",
+      iconField,
+      iconExpandedField,
+      iconCollapsedField,
+      parentField: parentIdField,
+      childrenField,
+      selectableField,
+      dynamicField,
+    }),
+    [
+      idField,
+      nameField,
+      iconField,
+      iconExpandedField,
+      iconCollapsedField,
+      parentIdField,
+      childrenField,
+      selectableField,
+      dynamicField,
+    ],
+  );
 
   // Steps 3a & 3b: Transform data based on format
   // Enhanced data transformation pipeline with validation and error handling
@@ -423,11 +449,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Return empty data on error to prevent crashes
       return emptyTreeData;
     }
-  }, [
-    effectiveData,
-    dataFormat,
-    fieldConfig,
-  ]);
+  }, [effectiveData, dataFormat, fieldConfig, dataRevision]);
 
   const { treeData, treeItemsById } = transformedData;
 
@@ -450,13 +472,22 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Initialize expanded IDs based on defaultExpanded prop
   const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() => {
+    // Helper function to check if a node is dynamic (should not be auto-expanded)
+    const isDynamic = (node: TreeNode): boolean => {
+      return !!(fieldConfig.dynamicField && node[fieldConfig.dynamicField]);
+    };
+
     if (defaultExpanded === "first-level") {
-      return treeData.map((node) => node.key);
+      return treeData
+        .filter(node => !isDynamic(node))
+        .map((node) => node.key);
     } else if (defaultExpanded === "all") {
       const allIds: (string | number)[] = [];
       const collectIds = (nodes: TreeNode[]) => {
         nodes.forEach((node) => {
-          allIds.push(node.key);
+          if (!isDynamic(node)) {
+            allIds.push(node.key);
+          }
           if (node.children) {
             collectIds(node.children);
           }
@@ -466,7 +497,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       return allIds;
     } else if (Array.isArray(defaultExpanded)) {
       // Expand full paths to specified nodes by including all parent nodes
-      return expandParentPaths(defaultExpanded, treeItemsById);
+      // But exclude dynamic nodes from the expansion
+      const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
+      return expandedPaths.filter(nodeId => {
+        const node = treeItemsById[String(nodeId)];
+        return !node || !isDynamic(node);
+      });
     }
     return [];
   });
@@ -475,28 +511,19 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [nodeStates, setNodeStates] = useState<Map<string | number, NodeLoadingState>>(new Map());
 
   // Helper functions for managing node loading states
-  const getNodeState = useCallback((nodeId: string | number): NodeLoadingState => {
-    return nodeStates.get(nodeId) || 'unloaded';
-  }, [nodeStates]);
+  const getNodeState = useCallback(
+    (nodeId: string | number): NodeLoadingState => {
+      return nodeStates.get(nodeId) || "loaded";
+    },
+    [nodeStates],
+  );
 
   const setNodeState = useCallback((nodeId: string | number, state: NodeLoadingState) => {
-    setNodeStates(prev => {
+    setNodeStates((prev) => {
       const newStates = new Map(prev);
       newStates.set(nodeId, state);
       return newStates;
     });
-  }, []);
-
-  const clearNodeState = useCallback((nodeId: string | number) => {
-    setNodeStates(prev => {
-      const newStates = new Map(prev);
-      newStates.delete(nodeId);
-      return newStates;
-    });
-  }, []);
-
-  const clearAllNodeStates = useCallback(() => {
-    setNodeStates(new Map());
   }, []);
 
   // Simplified focus management
@@ -643,44 +670,87 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         if (onNodeExpanded) {
           onNodeExpanded({ ...node, isExpanded: true });
         }
-        
+
         // Check if we need to load children dynamically
-        if (loadChildren) {
+        const nodeWithState = node as FlatTreeNodeWithState;
+        if (nodeWithState.loadingState === "unloaded" && loadChildren) {
           // Set loading state
-          setNodeStates(prev => new Map(prev).set(node.key, 'loading'));
-          
+          setNodeStates((prev) => new Map(prev).set(node.key, "loading"));
+
+          // Immediately remove existing children so node appears empty while loading
+          updateInternalData((prevData) => {
+            const currentData = prevData ?? data;
+
+            if (dataFormat === "flat" && Array.isArray(currentData)) {
+              // Remove existing children of this node
+              return currentData.filter(
+                item => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key)
+              );
+            } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+              // For hierarchy format, clear children array
+              const clearChildren = (nodes: any[]): any[] => {
+                return nodes.map((n) => {
+                  if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: [],
+                    };
+                  } else if (n[fieldConfig.childrenField || "children"]) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: clearChildren(
+                        n[fieldConfig.childrenField || "children"],
+                      ),
+                    };
+                  }
+                  return n;
+                });
+              };
+              return clearChildren(currentData);
+            }
+
+            return currentData;
+          });
+
           try {
             // Load the children data
             const loadedData = await loadChildren({ ...node, isExpanded: true });
-            
+
             // Update the tree data with loaded children
             if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
-              setInternalData((prevData) => {
+              updateInternalData((prevData) => {
                 const currentData = prevData ?? data;
-                
+
                 if (dataFormat === "flat" && Array.isArray(currentData)) {
-                  // Add loaded data as children of the expanded node
-                  const newItems = loadedData.map(item => ({
+                  // Replace existing children with newly loaded data
+                  
+                  // Remove existing children of this node
+                  const filteredData = currentData.filter(
+                    item => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key)
+                  );
+                  
+                  // Add new children
+                  const newItems = loadedData.map((item) => ({
                     ...item,
-                    [fieldConfig.parentField || 'parentId']: String(node.key)
+                    [fieldConfig.parentField || "parentId"]: String(node.key),
                   }));
-                  return [...currentData, ...newItems];
+
+                  return [...filteredData, ...newItems];
                 } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
                   // For hierarchy format, we need to find the node and add children
                   const updateHierarchy = (nodes: any[]): any[] => {
-                    return nodes.map(n => {
-                      if (String(n[fieldConfig.idField || 'id']) === String(node.key)) {
+                    return nodes.map((n) => {
+                      if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
                         return {
                           ...n,
-                          [fieldConfig.childrenField || 'children']: [
-                            ...(n[fieldConfig.childrenField || 'children'] || []),
-                            ...loadedData
-                          ]
+                          [fieldConfig.childrenField || "children"]: loadedData,
                         };
-                      } else if (n[fieldConfig.childrenField || 'children']) {
+                      } else if (n[fieldConfig.childrenField || "children"]) {
                         return {
                           ...n,
-                          [fieldConfig.childrenField || 'children']: updateHierarchy(n[fieldConfig.childrenField || 'children'])
+                          [fieldConfig.childrenField || "children"]: updateHierarchy(
+                            n[fieldConfig.childrenField || "children"],
+                          ),
                         };
                       }
                       return n;
@@ -688,17 +758,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                   };
                   return updateHierarchy(currentData);
                 }
-                
+
                 return currentData;
               });
             }
-            
+
             // Set loaded state
-            setNodeStates(prev => new Map(prev).set(node.key, 'loaded'));
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
           } catch (error) {
-            console.error('Error loading tree node data:', error);
+            console.error("Error loading tree node data:", error);
             // Set back to unloaded state on error
-            setNodeStates(prev => {
+            setNodeStates((prev) => {
               const newMap = new Map(prev);
               newMap.delete(node.key);
               return newMap;
@@ -904,48 +974,70 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           setExpandedIds((prev) => [...prev, nodeId]);
 
           // Always fire nodeDidExpand event
-          const node = findNodeById(nodeId);
+          const node = getNodeById(nodeId);
           if (node && onNodeExpanded) {
-            onNodeExpanded({ ...node, isExpanded: true });
+            // Convert TreeNode to FlatTreeNode format for the event
+            const flatNode: FlatTreeNode = {
+              ...node,
+              isExpanded: true,
+              depth: node.parentIds.length,
+              hasChildren: !!(node.children && node.children.length > 0),
+            };
+            onNodeExpanded(flatNode);
           }
-          
+
           // Check if we need to load children dynamically
           if (node && loadChildren) {
             // Set loading state
-            setNodeStates(prev => new Map(prev).set(nodeId, 'loading'));
-            
+            setNodeStates((prev) => new Map(prev).set(nodeId, "loading"));
+
             try {
-              // Load the children data
-              const loadedData = await loadChildren({ ...node, isExpanded: true });
+              // Convert TreeNode to FlatTreeNode format for loadChildren
+              const flatNode: FlatTreeNode = {
+                ...node,
+                isExpanded: true,
+                depth: node.parentIds.length,
+                hasChildren: !!(node.children && node.children.length > 0),
+              };
               
+              // Load the children data
+              const loadedData = await loadChildren(flatNode);
+
               // Update the tree data with loaded children
               if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
-                setInternalData((prevData) => {
+                updateInternalData((prevData) => {
                   const currentData = prevData ?? data;
-                  
+
                   if (dataFormat === "flat" && Array.isArray(currentData)) {
-                    // Add loaded data as children of the expanded node
-                    const newItems = loadedData.map(item => ({
+                    // Replace existing children with newly loaded data
+                    
+                    // Remove existing children of this node
+                    const filteredData = currentData.filter(
+                      item => String(item[fieldConfig.parentField || "parentId"]) !== String(nodeId)
+                    );
+                    
+                    // Add new children
+                    const newItems = loadedData.map((item) => ({
                       ...item,
-                      [fieldConfig.parentField || 'parentId']: String(nodeId)
+                      [fieldConfig.parentField || "parentId"]: String(nodeId),
                     }));
-                    return [...currentData, ...newItems];
+
+                    return [...filteredData, ...newItems];
                   } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
                     // For hierarchy format, we need to find the node and add children
                     const updateHierarchy = (nodes: any[]): any[] => {
-                      return nodes.map(n => {
-                        if (String(n[fieldConfig.idField || 'id']) === String(nodeId)) {
+                      return nodes.map((n) => {
+                        if (String(n[fieldConfig.idField || "id"]) === String(nodeId)) {
                           return {
                             ...n,
-                            [fieldConfig.childrenField || 'children']: [
-                              ...(n[fieldConfig.childrenField || 'children'] || []),
-                              ...loadedData
-                            ]
+                            [fieldConfig.childrenField || "children"]: loadedData,
                           };
-                        } else if (n[fieldConfig.childrenField || 'children']) {
+                        } else if (n[fieldConfig.childrenField || "children"]) {
                           return {
                             ...n,
-                            [fieldConfig.childrenField || 'children']: updateHierarchy(n[fieldConfig.childrenField || 'children'])
+                            [fieldConfig.childrenField || "children"]: updateHierarchy(
+                              n[fieldConfig.childrenField || "children"],
+                            ),
                           };
                         }
                         return n;
@@ -953,17 +1045,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                     };
                     return updateHierarchy(currentData);
                   }
-                  
+
                   return currentData;
                 });
               }
-              
+
               // Set loaded state
-              setNodeStates(prev => new Map(prev).set(nodeId, 'loaded'));
+              setNodeStates((prev) => new Map(prev).set(nodeId, "loaded"));
             } catch (error) {
-              console.error('Error loading tree node data:', error);
+              console.error("Error loading tree node data:", error);
               // Set back to unloaded state on error
-              setNodeStates(prev => {
+              setNodeStates((prev) => {
                 const newMap = new Map(prev);
                 newMap.delete(nodeId);
                 return newMap;
@@ -1064,7 +1156,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Use setTimeout to ensure DOM is updated after expansion state change
         setTimeout(() => {
           // Generate the flat tree data with the new expanded state to find the correct index
-          const updatedFlatTreeData = toFlatTree(treeData, newExpandedIds, fieldConfig.dynamicField, nodeStates);
+          const updatedFlatTreeData = toFlatTree(
+            treeData,
+            newExpandedIds,
+            fieldConfig.dynamicField,
+            nodeStates,
+          );
           const nodeIndex = updatedFlatTreeData.findIndex(
             (item) => String(item.key) === String(nodeId),
           );
@@ -1088,7 +1185,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       appendNode: (parentNodeId: string | number | undefined | null, nodeData: any) => {
         // Generate a new ID if not provided
         const nodeId = nodeData[fieldConfig.idField] || Date.now();
-        
+
         // Create the new node with proper field mapping
         const newNode = {
           ...nodeData,
@@ -1101,9 +1198,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         }
 
         // Update the internal data state
-        setInternalData((prevData) => {
+        updateInternalData((prevData) => {
           const currentData = prevData ?? data;
-          
+
           if (dataFormat === "flat") {
             // For flat format, just append to the array
             return Array.isArray(currentData) ? [...currentData, newNode] : [newNode];
@@ -1114,7 +1211,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                 // Add to root level
                 return [...nodes, { ...newNode, [fieldConfig.childrenField || "children"]: [] }];
               }
-              
+
               return nodes.map((node) => {
                 if (node[fieldConfig.idField] === parentNodeId) {
                   const children = node[fieldConfig.childrenField || "children"] || [];
@@ -1122,31 +1219,31 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                     ...node,
                     [fieldConfig.childrenField || "children"]: [
                       ...children,
-                      { ...newNode, [fieldConfig.childrenField || "children"]: [] }
-                    ]
+                      { ...newNode, [fieldConfig.childrenField || "children"]: [] },
+                    ],
                   };
                 }
-                
+
                 // Recursively check children
                 const childrenField = fieldConfig.childrenField || "children";
                 if (node[childrenField] && Array.isArray(node[childrenField])) {
                   return {
                     ...node,
-                    [childrenField]: addToHierarchy(node[childrenField])
+                    [childrenField]: addToHierarchy(node[childrenField]),
                   };
                 }
-                
+
                 return node;
               });
             };
-            
+
             if (Array.isArray(currentData)) {
               return addToHierarchy(currentData);
             } else {
               return currentData;
             }
           }
-          
+
           return currentData;
         });
       },
@@ -1157,7 +1254,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const nodeIdToRemove = String(nodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldParent = fieldConfig.parentField || "parentId";
-          
+
           // First, collect all descendant IDs recursively
           const getDescendantIds = (parentId: string): string[] => {
             const descendants: string[] = [];
@@ -1170,35 +1267,35 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             }
             return descendants;
           };
-          
+
           // Get all IDs to remove (node itself + all descendants)
           const idsToRemove = new Set([nodeIdToRemove, ...getDescendantIds(nodeIdToRemove)]);
-          
+
           // Filter out all nodes with IDs in the removal set
-          return data.filter(item => !idsToRemove.has(String(item[fieldId])));
+          return data.filter((item) => !idsToRemove.has(String(item[fieldId])));
         };
 
         const removeFromHierarchy = (nodes: any[]): any[] => {
           const fieldId = fieldConfig.idField || "id";
           const fieldChildren = fieldConfig.childrenField || "children";
-          
+
           return nodes.reduce((acc: any[], node: any) => {
             // If this is the node to remove, don't include it (and its descendants)
             if (String(node[fieldId]) === String(nodeId)) {
               return acc;
             }
-            
+
             // Otherwise, include the node but recursively process its children
             const children = node[fieldChildren];
             if (children && Array.isArray(children)) {
               acc.push({
                 ...node,
-                [fieldChildren]: removeFromHierarchy(children)
+                [fieldChildren]: removeFromHierarchy(children),
               });
             } else {
               acc.push(node);
             }
-            
+
             return acc;
           }, []);
         };
@@ -1206,13 +1303,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Update the internal data state
         setInternalData((prevData) => {
           const currentData = prevData ?? data;
-          
+
           if (dataFormat === "flat" && Array.isArray(currentData)) {
             return removeFromFlat(currentData);
           } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
             return removeFromHierarchy(currentData);
           }
-          
+
           return currentData;
         });
       },
@@ -1223,7 +1320,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const parentNodeId = String(nodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldParent = fieldConfig.parentField || "parentId";
-          
+
           // First, collect all descendant IDs recursively (but not the parent node itself)
           const getDescendantIds = (parentId: string): string[] => {
             const descendants: string[] = [];
@@ -1236,36 +1333,36 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             }
             return descendants;
           };
-          
+
           // Get all descendant IDs to remove (children and their descendants)
           const idsToRemove = new Set(getDescendantIds(parentNodeId));
-          
+
           // Filter out all descendant nodes but keep the parent node
-          return data.filter(item => !idsToRemove.has(String(item[fieldId])));
+          return data.filter((item) => !idsToRemove.has(String(item[fieldId])));
         };
 
         const removeChildrenFromHierarchy = (nodes: any[]): any[] => {
           const fieldId = fieldConfig.idField || "id";
           const fieldChildren = fieldConfig.childrenField || "children";
-          
+
           return nodes.map((node: any) => {
             // If this is the target node, remove all its children
             if (String(node[fieldId]) === String(nodeId)) {
               return {
                 ...node,
-                [fieldChildren]: []
+                [fieldChildren]: [],
               };
             }
-            
+
             // Otherwise, recursively process children
             const children = node[fieldChildren];
             if (children && Array.isArray(children)) {
               return {
                 ...node,
-                [fieldChildren]: removeChildrenFromHierarchy(children)
+                [fieldChildren]: removeChildrenFromHierarchy(children),
               };
             }
-            
+
             return node;
           });
         };
@@ -1273,13 +1370,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Update the internal data state
         setInternalData((prevData) => {
           const currentData = prevData ?? data;
-          
+
           if (dataFormat === "flat" && Array.isArray(currentData)) {
             return removeChildrenFromFlat(currentData);
           } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
             return removeChildrenFromHierarchy(currentData);
           }
-          
+
           return currentData;
         });
       },
@@ -1287,7 +1384,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       insertNodeBefore: (beforeNodeId: string | number, nodeData: any) => {
         // Generate a new ID if not provided
         const nodeId = nodeData[fieldConfig.idField] || Date.now();
-        
+
         // Create the new node with proper field mapping
         const newNode = {
           ...nodeData,
@@ -1299,20 +1396,20 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const beforeNodeIdStr = String(beforeNodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldParent = fieldConfig.parentField || "parentId";
-          
+
           // Find the target node to get its parent
-          const targetNode = data.find(item => String(item[fieldId]) === beforeNodeIdStr);
+          const targetNode = data.find((item) => String(item[fieldId]) === beforeNodeIdStr);
           if (!targetNode) {
             // If target node not found, just append to root level
             return [...data, { ...newNode, [fieldParent]: null }];
           }
-          
+
           // Set the same parent as the target node
           const parentId = targetNode[fieldParent];
           newNode[fieldParent] = parentId;
-          
+
           // Find the index of the target node and insert before it
-          const targetIndex = data.findIndex(item => String(item[fieldId]) === beforeNodeIdStr);
+          const targetIndex = data.findIndex((item) => String(item[fieldId]) === beforeNodeIdStr);
           const result = [...data];
           result.splice(targetIndex, 0, newNode);
           return result;
@@ -1322,9 +1419,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const beforeNodeIdStr = String(beforeNodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldChildren = fieldConfig.childrenField || "children";
-          
+
           // Check if the target node is at this level
-          const targetIndex = nodes.findIndex(node => String(node[fieldId]) === beforeNodeIdStr);
+          const targetIndex = nodes.findIndex((node) => String(node[fieldId]) === beforeNodeIdStr);
           if (targetIndex >= 0) {
             // Insert before the target node at this level
             const result = [...nodes];
@@ -1332,7 +1429,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             result.splice(targetIndex, 0, nodeWithChildren);
             return result;
           }
-          
+
           // Otherwise, recursively search in children
           return nodes.map((node: any) => {
             const children = node[fieldChildren];
@@ -1341,7 +1438,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
               if (updatedChildren !== children) {
                 return {
                   ...node,
-                  [fieldChildren]: updatedChildren
+                  [fieldChildren]: updatedChildren,
                 };
               }
             }
@@ -1352,13 +1449,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Update the internal data state
         setInternalData((prevData) => {
           const currentData = prevData ?? data;
-          
+
           if (dataFormat === "flat" && Array.isArray(currentData)) {
             return insertBeforeInFlat(currentData);
           } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
             return insertBeforeInHierarchy(currentData);
           }
-          
+
           return currentData;
         });
       },
@@ -1366,7 +1463,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       insertNodeAfter: (afterNodeId: string | number, nodeData: any) => {
         // Generate a new ID if not provided
         const nodeId = nodeData[fieldConfig.idField] || Date.now();
-        
+
         // Create the new node with proper field mapping
         const newNode = {
           ...nodeData,
@@ -1378,20 +1475,20 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const afterNodeIdStr = String(afterNodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldParent = fieldConfig.parentField || "parentId";
-          
+
           // Find the target node to get its parent
-          const targetNode = data.find(item => String(item[fieldId]) === afterNodeIdStr);
+          const targetNode = data.find((item) => String(item[fieldId]) === afterNodeIdStr);
           if (!targetNode) {
             // If target node not found, just append to root level
             return [...data, { ...newNode, [fieldParent]: null }];
           }
-          
+
           // Set the same parent as the target node
           const parentId = targetNode[fieldParent];
           newNode[fieldParent] = parentId;
-          
+
           // Find the index of the target node and insert after it
-          const targetIndex = data.findIndex(item => String(item[fieldId]) === afterNodeIdStr);
+          const targetIndex = data.findIndex((item) => String(item[fieldId]) === afterNodeIdStr);
           const result = [...data];
           result.splice(targetIndex + 1, 0, newNode);
           return result;
@@ -1401,9 +1498,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const afterNodeIdStr = String(afterNodeId);
           const fieldId = fieldConfig.idField || "id";
           const fieldChildren = fieldConfig.childrenField || "children";
-          
+
           // Check if the target node is at this level
-          const targetIndex = nodes.findIndex(node => String(node[fieldId]) === afterNodeIdStr);
+          const targetIndex = nodes.findIndex((node) => String(node[fieldId]) === afterNodeIdStr);
           if (targetIndex >= 0) {
             // Insert after the target node at this level
             const result = [...nodes];
@@ -1411,7 +1508,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             result.splice(targetIndex + 1, 0, nodeWithChildren);
             return result;
           }
-          
+
           // Otherwise, recursively search in children
           return nodes.map((node: any) => {
             const children = node[fieldChildren];
@@ -1420,7 +1517,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
               if (updatedChildren !== children) {
                 return {
                   ...node,
-                  [fieldChildren]: updatedChildren
+                  [fieldChildren]: updatedChildren,
                 };
               }
             }
@@ -1431,22 +1528,31 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         // Update the internal data state
         setInternalData((prevData) => {
           const currentData = prevData ?? data;
-          
+
           if (dataFormat === "flat" && Array.isArray(currentData)) {
             return insertAfterInFlat(currentData);
           } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
             return insertAfterInHierarchy(currentData);
           }
-          
+
           return currentData;
         });
       },
-      
+
       // Node state management methods
-      getNodeState,
-      setNodeState,
-      clearNodeState,
-      clearAllNodeStates,
+
+      getNodeLoadingState: (nodeId: string | number) => {
+        return getNodeState(nodeId);
+      },
+
+      markNodeLoaded: (nodeId: string | number) => {
+        setNodeState(nodeId, "loaded");
+      },
+
+      markNodeUnloaded: (nodeId: string | number) => {
+        setNodeState(nodeId, "unloaded");
+        treeApiMethods.collapseNode(nodeId);
+      },
     };
   }, [
     treeData,
@@ -1462,10 +1568,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     dataFormat,
     data,
     setInternalData,
-    getNodeState,
-    setNodeState,
-    clearNodeState,
-    clearAllNodeStates,
   ]);
 
   // Register component API methods for external access

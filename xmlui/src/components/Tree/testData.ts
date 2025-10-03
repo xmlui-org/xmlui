@@ -288,3 +288,31 @@ export const dynamicFlatData = [
     parentId: null,
   },
 ];
+
+export const flatTreeDataWithIcons1 = [
+  { id: 1, name: "Root Item 1", iconExpanded: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconExpanded: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIconsAndAlias1 = [
+  { id: 1, name: "Root Item 1", iconExp: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconExp: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIcons2 = [
+  { id: 1, name: "Root Item 1", iconCollapsed: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconCollapsed: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIconsAndAlias2 = [
+  { id: 1, name: "Root Item 1", iconColl: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconColl: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];

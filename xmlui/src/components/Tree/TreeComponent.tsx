@@ -133,8 +133,8 @@ export const TreeMd = createMetadata({
       signature: `(node: FlatTreeNode) => void`,
     },
     loadChildren: {
-      description: `Fired when a tree node needs to load children dynamically. Should return a Promise that resolves to an array of child data.`,
-      signature: `(node: FlatTreeNode) => Promise<any[]>`,
+      description: `Fired when a tree node needs to load children dynamically. Should return an array of child data.`,
+      signature: `(node: FlatTreeNode) => any[]`,
     },
   },
   apis: {
@@ -155,21 +155,21 @@ export const TreeMd = createMetadata({
     },
     expandNode: {
       description: `Expand a specific node by its source data ID.`,
-      signature: "expandNode(nodeId: string): void",
+      signature: "expandNode(nodeId: string | number): void",
       parameters: {
         nodeId: "The ID of the node to expand (source data format)",
       },
     },
     collapseNode: {
       description: `Collapse a specific node by its source data ID.`,
-      signature: "collapseNode(nodeId: string): void", 
+      signature: "collapseNode(nodeId: string | number): void", 
       parameters: {
         nodeId: "The ID of the node to collapse (source data format)",
       },
     },
     selectNode: {
       description: `Programmatically select a node by its source data ID.`,
-      signature: "selectNode(nodeId: string): void",
+      signature: "selectNode(nodeId: string | number): void",
       parameters: {
         nodeId: "The ID of the node to select (source data format)",
       },
@@ -180,18 +180,33 @@ export const TreeMd = createMetadata({
     },
     getNodeById: {
       description: `Get a tree node by its source data ID.`,
-      signature: "getNodeById(nodeId: string): TreeNode | null",
+      signature: "getNodeById(nodeId: string | number): TreeNode | null",
       parameters: {
         nodeId: "The ID of the node to retrieve (source data format)",
       },
     },
     getExpandedNodes: {
       description: `Get an array of currently expanded node IDs in source data format.`,
-      signature: "getExpandedNodes(): string[]",
+      signature: "getExpandedNodes(): (string | number)[]",
     },
     getSelectedNode: {
       description: `Get the currently selected tree node.`,
       signature: "getSelectedNode(): TreeNode | null",
+    },
+    scrollIntoView: {
+      description: `Scroll to a specific node and expand parent nodes as needed to make it visible.`,
+      signature: "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
+      parameters: {
+        nodeId: "The ID of the node to scroll to (source data format)",
+        options: "Optional scroll options",
+      },
+    },
+    scrollToItem: {
+      description: `Scroll to a specific node if it's currently visible in the tree.`,
+      signature: "scrollToItem(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the node to scroll to (source data format)",
+      },
     },
     appendNode: {
       description: `Add a new node to the tree as a child of the specified parent node.`,
@@ -231,6 +246,27 @@ export const TreeMd = createMetadata({
         nodeData: "The node data object using the format specified in dataFormat and field properties",
       },
     },
+    getNodeLoadingState: {
+      description: `Get the loading state of a dynamic node.`,
+      signature: "getNodeLoadingState(nodeId: string | number): NodeLoadingState",
+      parameters: {
+        nodeId: "The ID of the node to check loading state for",
+      },
+    },
+    markNodeLoaded: {
+      description: `Mark a dynamic node as loaded.`,
+      signature: "markNodeLoaded(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the node to mark as loaded",
+      },
+    },
+    markNodeUnloaded: {
+      description: `Mark a dynamic node as unloaded and collapse it.`,
+      signature: "markNodeUnloaded(nodeId: string | number): void",
+      parameters: {
+        nodeId: "The ID of the node to mark as unloaded",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -264,6 +300,7 @@ export const treeComponentRenderer = createComponentRenderer(
       type: "HStack",
       props: {
         verticalAlignment: "center",
+        gap: "$space-4"
       },
       children: [
         {
