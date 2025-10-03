@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import classnames from "classnames";
-import { RxOpenInNewWindow, RxDownload } from "react-icons/rx";
+import { RxOpenInNewWindow, RxDownload, RxShare2 } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
 import { usePlayground } from "../hooks/usePlayground";
 import { resetApp } from "../state/store";
@@ -51,6 +51,32 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       options.content,
     ],
   );
+
+  const share = useCallback(async () => {
+    const data = {
+      standalone: appDescription,
+      options: {
+        fixedTheme: options.fixedTheme,
+        swapped: options.swapped,
+        previewMode: false,
+        orientation: options.orientation,
+        activeTheme: options.activeTheme,
+        activeTone: options.activeTone,
+        content: options.content,
+      },
+    };
+    const appQueryString = await createQueryString(JSON.stringify(data));
+    const fullUrl = `${window.location.origin}/#/playground#${appQueryString}`;
+    navigator.clipboard.writeText(fullUrl);
+  }, [
+    appDescription,
+    options.fixedTheme,
+    options.swapped,
+    options.activeTone,
+    options.orientation,
+    options.activeTheme,
+    options.content
+  ]);
 
   const download = useCallback(() => {
     handleDownloadZip(appDescription);
@@ -144,6 +170,11 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           )}
           {standalone && (
             <>
+              <Tooltip label="Share this app">
+                <Button variant="ghost" onClick={() => share()}>
+                  <RxShare2 />
+                </Button>
+              </Tooltip>
               <Tooltip label="Preview in fullscreen">
                 <Button variant="ghost" onClick={() => openStandaloneApp()}>
                   <RxOpenInNewWindow height={24} width={24} />
