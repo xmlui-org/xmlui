@@ -360,6 +360,7 @@ export function useValidationDisplay(
     useFormContextPart((value) => value.interactionFlags[bindTo]) || EMPTY_OBJECT;
   const forceShowValidationResult = interactionFlags.forceShowValidationResult;
   const focused = interactionFlags.focused;
+  const afterFirstDirtyBlur = interactionFlags.afterFirstDirtyBlur;
   const isValidLostFocus = interactionFlags.isValidLostFocus;
   const isValidOnFocus = interactionFlags.isValidOnFocus;
   const invalidToValid = interactionFlags.invalidToValid;
@@ -386,15 +387,30 @@ export function useValidationDisplay(
 
   let isHelperTextShown = false;
   switch (validationMode) {
+    // This validation model was inspired by https://medium.com/wdstack/inline-validation-in-forms-designing-the-experience-123fb34088ce
+    // The idea is to show validation errors as late as possible (on blur)
     case "errorLate":
-      isHelperTextShown =
-        isDirty && (focused ? !invalidToValid && !isValidOnFocus : !isValidLostFocus);
+      // --- Don't fire if not dirty
+      if (!isDirty) {
+        isHelperTextShown = false;
+        break;
+      }
+      // --- Show if losing focus and invalid
+      if (!focused && !isValidLostFocus) {
+        isHelperTextShown = true;
+        break;
+      }
+      // --- Show if focused, after first meaningful blur, was not valid on last focus and not changed to valid while typing
+      if (focused && afterFirstDirtyBlur && !isValidOnFocus && !invalidToValid) {
+        isHelperTextShown = true;
+        break;
+      }
       break;
     case "onChanged":
       isHelperTextShown = isDirty;
       break;
     case "onLostFocus":
-      isHelperTextShown = isDirty && ((!focused && !isValid) || (!isValidLostFocus && !isValid));
+      isHelperTextShown = isDirty && !isValid && (!focused || !isValidLostFocus);
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;
 

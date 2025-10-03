@@ -12,6 +12,7 @@ export type InteractionFlags = {
   isValidOnFocus: boolean;
   isValidLostFocus: boolean;
   focused: boolean;
+  afterFirstDirtyBlur: boolean;
   forceShowValidationResult: boolean;
 };
 
