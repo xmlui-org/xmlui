@@ -208,6 +208,7 @@ export const Toggle = forwardRef(function Toggle(
     handleOnBlur,
     handleOnFocus,
     onInputChange,
+    onClick,
     readOnly,
     required,
     validationStatus,
