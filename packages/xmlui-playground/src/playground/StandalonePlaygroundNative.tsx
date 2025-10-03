@@ -7,7 +7,7 @@ import {
   playgroundReducer,
 } from "../state/store";
 import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
-import { ToastProvider } from "@radix-ui/react-toast";
+import { ToastProvider } from "../providers/ToastProvider";
 import styles from "./StandalonePlaygroundNative.module.scss";
 import { useToast } from "../hooks/useToast";
 import { ErrorBoundary, Spinner, useThemes } from "xmlui";

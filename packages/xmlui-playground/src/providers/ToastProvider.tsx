@@ -30,7 +30,6 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
   const [open, setOpen] = useState(false);
 
   const showToast = (toastMessage: ToastMessage) => {
-    console.log("showToast", toastMessage.description);
     setToastMessage(toastMessage);
     setOpen(true);
   };
