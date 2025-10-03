@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.10.17
+
+### Patch Changes
+
+- 07dae0b: fix: AccordionItem produces the right error outside of Accordion component
+
 ## 0.10.16
 
 ### Patch Changes

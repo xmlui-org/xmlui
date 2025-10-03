@@ -1,5 +1,11 @@
 # xmlui-playground
 
+## 0.1.9
+
+### Patch Changes
+
+- b390690: improve: xmlui-playground - toast message on share
+
 ## 0.1.8
 
 ### Patch Changes
