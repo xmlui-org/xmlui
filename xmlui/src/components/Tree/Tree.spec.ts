@@ -1510,7 +1510,7 @@ test.describe("Basic Functionality", () => {
 
       // Focus the tree and navigate to an item
       await tree.component.focus();
-      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("ArrowDown", {delay: 100});
 
       // Test focused item has all custom theme variables applied
       const focusedItem = tree.getNodeWrapperByTestId("2");
