@@ -1,14 +1,22 @@
 import { editorStatusChanged, textChanged } from "../state/store";
-import { useCallback, useEffect } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import { Editor as XMLUIEditor } from "xmlui-devtools";
 
 export const Editor = () => {
   const { text, dispatch, options } = usePlayground();
+  const [value, setValue] = useState(text);
+
+  useEffect(() => {
+    setValue(text);
+  }, [text]);
 
   const updateValue = useCallback(
     (value: string) => {
-      dispatch(textChanged(value));
+      setValue(value);
+      startTransition(() => {
+        dispatch(textChanged(value));
+      });
     },
     [dispatch],
   );
@@ -28,7 +36,7 @@ export const Editor = () => {
       onMount={() => {
         dispatch(editorStatusChanged("loaded"));
       }}
-      value={text} // Directly use global state
+      value={value}
     />
   );
 };
