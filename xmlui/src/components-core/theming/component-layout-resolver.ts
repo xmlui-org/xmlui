@@ -1,5 +1,5 @@
-import { CSSProperties } from "react";
-import { LayoutContext } from "../../abstractions/RendererDefs";
+import type { CSSProperties } from "react";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
 import { parseLayoutProperty } from "./parse-layout-props";
 

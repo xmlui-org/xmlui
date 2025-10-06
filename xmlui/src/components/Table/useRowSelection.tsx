@@ -1,4 +1,5 @@
-import { KeyboardEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEventHandler} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { union, uniq } from "lodash-es";
 
 import { useEvent } from "../../components-core/utils/misc";

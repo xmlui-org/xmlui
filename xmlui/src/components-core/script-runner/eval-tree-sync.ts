@@ -1,6 +1,8 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import {
+import type {
   Identifier,
+  TemplateLiteralExpression} from "./ScriptingSourceTree";
+import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
   T_ASSIGNMENT_EXPRESSION,
@@ -24,7 +26,6 @@ import {
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
   T_VAR_DECLARATION,
-  TemplateLiteralExpression,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,

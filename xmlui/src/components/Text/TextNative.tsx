@@ -13,7 +13,7 @@ import {
   type TextVariant,
   TextVariantElement,
 } from "../abstractions";
-import { RegisterComponentApiFn } from "../..";
+import type { RegisterComponentApiFn } from "../..";
 
 type TextProps = {
   uid?: string;

@@ -5,7 +5,7 @@ import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContex
 import classnames from "classnames";
 import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
-import { IconRegistryEntry } from "../IconProvider";
+import type { IconRegistryEntry } from "../IconProvider";
 
 export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   children?: React.ReactNode;

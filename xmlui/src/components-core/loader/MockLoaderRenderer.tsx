@@ -5,7 +5,7 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import { asyncWait } from "../utils/misc";
 import { extractParam } from "../utils/extractParam";

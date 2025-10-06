@@ -13,9 +13,10 @@ import {
 import type { TryScope } from "../../abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";
-import {
+import type {
   StatementQueueItem,
-  StatementWithInfo,
+  StatementWithInfo} from "./statement-queue";
+import {
   mapStatementsToQueueItems,
 } from "./statement-queue";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";

@@ -1,9 +1,10 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, ForwardedRef, forwardRef, useEffect, useId, useMemo, useState } from "react";
+import type { ForwardedRef} from "react";
+import React, { Children, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { useCallback } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import { RegisterComponentApiFn } from "../..";
+import type { RegisterComponentApiFn } from "../..";
 import { isPlainObject } from "lodash-es";
 
 export type AnimationProps = {

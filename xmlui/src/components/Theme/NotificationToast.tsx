@@ -1,4 +1,5 @@
-import { CSSProperties, useEffect, useState } from "react";
+import type { CSSProperties} from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
 import { useTheme } from "../../components-core/theming/ThemeContext";

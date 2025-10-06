@@ -1,5 +1,7 @@
 import { isPlainObject } from "lodash-es";
 
+import type {
+  TemplateLiteralExpression} from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -24,7 +26,6 @@ import {
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_UNARY_EXPRESSION,
   T_VAR_DECLARATION,
-  TemplateLiteralExpression,
   type ArrayLiteral,
   type ArrowExpression,
   type AssignmentExpression,

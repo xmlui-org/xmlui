@@ -5,7 +5,7 @@ import styles from "./Splitter.module.scss";
 
 import { noop } from "../../components-core/constants";
 import { parseSize, toPercentage } from "../Splitter/utils";
-import { OrientationOptions } from "../abstractions";
+import type { OrientationOptions } from "../abstractions";
 
 export const defaultProps = {
   initialPrimarySize: "50%",

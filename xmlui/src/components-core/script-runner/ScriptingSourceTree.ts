@@ -1,6 +1,6 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
 import type { TokenType } from "../../parsers/scripting/TokenType";
-import { ScriptParserErrorMessage } from "../../abstractions/scripting/ScriptParserError";
+import type { ScriptParserErrorMessage } from "../../abstractions/scripting/ScriptParserError";
 
 // --- All binding expression tree node types
 type ScriptNode = Statement | Expression;

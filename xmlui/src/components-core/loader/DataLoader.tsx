@@ -9,7 +9,7 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { LoaderDirections } from "../loader/PageableLoader";
 import { createLoaderRenderer } from "../renderers";

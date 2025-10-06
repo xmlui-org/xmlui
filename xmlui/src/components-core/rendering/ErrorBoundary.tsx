@@ -37,8 +37,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
    * This method implements the Error Boundaries for the React application.
    * It is invoked if errors occur during the rendering phase of any lifecycle
    * methods or children components.
-   * 
-   * DO NOT DELETE this method! Though it is not referenced directly from the code, 
+   *
+   * DO NOT DELETE this method! Though it is not referenced directly from the code,
    * it is a required part of the React component lifecycle.
    */
   static getDerivedStateFromError(error: Error): State {

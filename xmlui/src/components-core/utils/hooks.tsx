@@ -1,5 +1,6 @@
+import type {
+  MutableRefObject} from "react";
 import React, {
-  MutableRefObject,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -9,7 +10,7 @@ import React, {
 import { isEqual } from "lodash-es";
 
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
-import { ColorDef } from "./css-utils";
+import type { ColorDef } from "./css-utils";
 
 import { shallowCompare, useEvent } from "../utils/misc";
 import { useTheme } from "../theming/ThemeContext";

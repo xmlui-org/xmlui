@@ -1,8 +1,8 @@
 export function deepFreeze (o: any) {
   Object.freeze(o);
 
-  var oIsFunction = typeof o === "function";
-  var hasOwnProp = Object.prototype.hasOwnProperty;
+  let oIsFunction = typeof o === "function";
+  let hasOwnProp = Object.prototype.hasOwnProperty;
 
   Object.getOwnPropertyNames(o).forEach(function (prop) {
     if (hasOwnProp.call(o, prop)

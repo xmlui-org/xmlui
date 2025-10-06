@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
+import type React from "react";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import toast from "react-hot-toast";
 import produce from "immer";
 import { isEqual } from "lodash-es";
@@ -8,6 +9,8 @@ import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { generatedId, useEvent } from "../../components-core/utils/misc";
 import { useAppContext } from "../../components-core/AppContext";
+import type {
+  QueueAction} from "../Queue/queueActions";
 import {
   actionItemCompleted,
   actionItemError,
@@ -15,7 +18,6 @@ import {
   actionItemStarted,
   actionQueueInitialized,
   clearCompletedActionItems,
-  QueueAction,
   QueueActionKind,
   removeActionItem,
 } from "../Queue/queueActions";

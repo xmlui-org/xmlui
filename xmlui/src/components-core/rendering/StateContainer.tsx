@@ -1,9 +1,10 @@
+import type {
+  MutableRefObject,
+  ReactNode,
+  RefObject} from "react";
 import {
   forwardRef,
   memo,
-  MutableRefObject,
-  ReactNode,
-  RefObject,
   useCallback,
   useMemo,
   useReducer,
@@ -20,9 +21,10 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./containers";
-import {
+import type {
   CodeDeclaration,
-  ModuleErrors,
+  ModuleErrors} from "../script-runner/ScriptingSourceTree";
+import {
   T_ARROW_EXPRESSION,
 } from "../script-runner/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
@@ -39,7 +41,7 @@ import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
-import {
+import type {
   ComponentApi,
   ContainerWrapperDef,
   RegisterComponentApiFnInner,
