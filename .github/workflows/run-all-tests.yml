@@ -20,6 +20,13 @@ jobs:
       - id: check
         name: Determine if the commit has been tested already
         run: |
+          # Always run tests if triggered by workflow_dispatch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Workflow dispatch triggered, always run tests"
+            echo "should_test=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           current_time_epoch=$(date +%s)
           last_commit_time_epoch=$(git log -1 --format=%ct)
           one_day_epoch=$((60 * 60 * 24))
