@@ -54,44 +54,79 @@ export const Playground = ({
 }: PlaygroundProps) => {
   const id = useId();
 
+  const initializationProps = useMemo(
+    () => ({
+      name,
+      description,
+      app,
+      themes,
+      defaultTheme,
+      defaultTone,
+      resources,
+      previewOnly,
+      components,
+      initialEditorHeight,
+      swapped,
+      horizontal,
+      allowStandalone,
+      api,
+      fixedTheme,
+    }),
+    [
+      name,
+      description,
+      app,
+      themes,
+      defaultTheme,
+      defaultTone,
+      resources,
+      previewOnly,
+      components,
+      initialEditorHeight,
+      swapped,
+      horizontal,
+      allowStandalone,
+      api,
+      fixedTheme,
+    ],
+  );
+
   useEffect(() => {
-    if (app) {
+    if (initializationProps.app) {
       dispatch(
         appDescriptionInitialized({
           config: {
-            name,
-            description,
+            name: initializationProps.name,
+            description: initializationProps.description,
             logo: null,
             appGlobals: {},
-            resources,
-            themes,
-            defaultTone,
-            defaultTheme,
+            resources: initializationProps.resources,
+            themes: initializationProps.themes,
+            defaultTone: initializationProps.defaultTone,
+            defaultTheme: initializationProps.defaultTheme,
           },
-          components: components.map((c) => preprocessCode(c)),
-          app: preprocessCode(app),
-          api,
+          components: initializationProps.components.map((c) => preprocessCode(c)),
+          app: preprocessCode(initializationProps.app),
+          api: initializationProps.api,
         }),
       );
 
       dispatch(
         optionsInitialized({
-          orientation: horizontal ? "horizontal" : "vertical",
-          swapped,
-          activeTheme: defaultTheme,
-          activeTone: defaultTone,
+          orientation: initializationProps.horizontal ? "horizontal" : "vertical",
+          swapped: initializationProps.swapped,
+          activeTheme: initializationProps.defaultTheme,
+          activeTone: initializationProps.defaultTone,
           content: "app",
-          previewMode: previewOnly,
-          allowStandalone,
+          previewMode: initializationProps.previewOnly,
+          allowStandalone: initializationProps.allowStandalone,
           id: 0,
           language: "xmlui",
-          fixedTheme,
+          fixedTheme: initializationProps.fixedTheme,
         }),
       );
     }
-
-    //TODO illesg, review (dep array?)!!!
-  }, []);
+  }, [initializationProps]);
 
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
 
@@ -104,6 +139,7 @@ export const Playground = ({
       originalAppDescription: playgroundState.originalAppDescription,
       appDescription: playgroundState.appDescription,
       dispatch,
+      error: playgroundState.error,
     };
   }, [
     id,
@@ -112,6 +148,7 @@ export const Playground = ({
     playgroundState.text,
     playgroundState.originalAppDescription,
     playgroundState.appDescription,
+    playgroundState.error,
   ]);
 
   return (

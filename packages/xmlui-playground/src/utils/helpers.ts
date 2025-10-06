@@ -91,12 +91,13 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
     components: [],
     app: "",
   },
+  error: null,
 };
 
 function removeWhitespace(obj: any) {
   if (typeof obj === "string") {
     return obj.replace(/\s+/g, " ").trim(); // Remove extra whitespaces and newlines
-  } else if (typeof obj === "object" && obj !== null) {
+  } else if (obj !== null && typeof obj === "object") {
     const newObj: any = Array.isArray(obj) ? [] : {};
     for (const key in obj) {
       newObj[key] = removeWhitespace(obj[key]);

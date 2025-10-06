@@ -13,7 +13,6 @@ export const Editor = () => {
 
   const updateValue = useCallback(
     (value: string) => {
-      setValue(value);
       startTransition(() => {
         dispatch(textChanged(value));
       });

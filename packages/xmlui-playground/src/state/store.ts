@@ -50,6 +50,7 @@ export interface IPlaygroundContext {
   text: string;
   options: Options;
   playgroundId: string;
+  error: string | null;
 }
 
 export const PlaygroundContext = createContext<IPlaygroundContext>(
@@ -68,6 +69,7 @@ enum PlaygroundActionKind {
   OPTIONS_INITIALIZED = "PlaygroundActionKind:OPTIONS_INITIALIZED",
   ACTIVE_THEME_CHANGED = "PlaygroundActionKind:ACTIVE_THEME_CHANGED",
   TONE_CHANGED = "PlaygroundActionKind:TONE_CHANGED",
+  ERROR_CLEARED = "PlaygroundActionKind:ERROR_CLEARED",
 }
 
 type PlaygroundAction = {
@@ -82,6 +84,7 @@ type PlaygroundAction = {
     themes?: ThemeDefinition[];
     previewMode?: boolean;
     editorStatus?: "loading" | "loaded";
+    error?: string | null;
   };
 };
 
@@ -92,6 +95,7 @@ export interface PlaygroundState {
   appDescription: AppDescription;
   originalAppDescription: AppDescription;
   options: Options;
+  error: string | null;
 }
 
 export function toneChanged(activeTone: ThemeTone) {
@@ -184,6 +188,13 @@ export function editorStatusChanged(editorStatus: "loading" | "loaded") {
     payload: {
       editorStatus,
     },
+  };
+}
+
+export function clearError() {
+  return {
+    type: PlaygroundActionKind.ERROR_CLEARED,
+    payload: {},
   };
 }
 
@@ -311,17 +322,23 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       }
       break;
     }
+    case PlaygroundActionKind.ERROR_CLEARED: {
+      state.error = null;
+      break;
+    }
     case PlaygroundActionKind.TEXT_CHANGED:
       state.options.id = state.options.id + 1;
       {
+        console.log("abababababa");
         state.text = action.payload.text || "";
+        state.error = null;
         if (state.options.content === "app") {
           state.appDescription.app = state.text;
         } else if (state.options.content === "config") {
           try {
             state.appDescription.config = JSON.parse(state.text || "");
-          } catch (e) {
-            console.log(e);
+          } catch (e: any) {
+            state.error = e.message;
           }
         } else if (
           state.appDescription.components?.some(
@@ -353,8 +370,8 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
                 return theme;
               },
             );
-          } catch (e) {
-            console.log(e);
+          } catch (e: any) {
+            state.error = e.message;
           }
         }
       }

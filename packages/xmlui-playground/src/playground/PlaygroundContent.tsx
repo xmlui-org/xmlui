@@ -9,7 +9,6 @@ type PlaygroundContentProps = {
   height?: number | string;
   initialPrimarySize?: string;
   standalone?: boolean;
-  loading?: boolean;
 };
 
 export const PlaygroundContent = ({

@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useReducer, useState } from "react";
+import { useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
 import {
   appDescriptionInitialized,
   contentChanged,
@@ -21,6 +21,7 @@ export const StandalonePlayground = () => {
   const [loading, setLoading] = useState(true);
   const { setActiveThemeTone } = useThemes();
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
+  const initialized = useRef(false);
 
   const queryParams = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -34,7 +35,6 @@ export const StandalonePlayground = () => {
       try {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         setLoading(false);
-        console.log("cica", data.options);
         dispatch(appDescriptionInitialized(data.standalone));
         dispatch(
           optionsInitialized({
@@ -53,38 +53,45 @@ export const StandalonePlayground = () => {
           description: "The app could not be loaded",
         });
       }
+      initialized.current = true;
     };
 
-    if (queryParams.app !== "undefined") {
-      getApp();
+    if (initialized.current) {
+      return;
     } else {
-      setLoading(false);
-      dispatch(
-        appDescriptionInitialized({
-          config: {
-            name: "Hello World",
-            description: "",
-            appGlobals: {},
-            resources: {},
-            themes: [Theme],
-          },
-          components: [],
-          app: "<App>Hello World!</App>",
-        }),
-      );
-      dispatch(
-        optionsInitialized({
-          activeTheme: "theme",
-          activeTone: "light",
-          content: "app",
-          orientation: "horizontal",
-          id: 0,
-          allowStandalone: true,
-          language: "xmlui",
-          emulatedApi: undefined,
-          fixedTheme: false,
-        }),
-      );
+      if (queryParams.app !== "undefined") {
+        getApp();
+      } else {
+        setLoading(false);
+        dispatch(
+          appDescriptionInitialized({
+            config: {
+              name: "Hello World",
+              description: "",
+              appGlobals: {},
+              resources: {},
+              themes: [Theme],
+            },
+            components: [],
+            app: "<App>Hello World!</App>",
+          }),
+        );
+        dispatch(
+          optionsInitialized({
+            activeTheme: "theme",
+            activeTone: "light",
+            content: "app",
+            orientation: "horizontal",
+            id: 0,
+            allowStandalone: true,
+            language: "xmlui",
+            emulatedApi: undefined,
+            fixedTheme: false,
+          }),
+        );
+
+        initialized.current = true;
+      }
     }
   }, [queryParams.app, showToast, setActiveThemeTone, playgroundState.options]);
 
@@ -98,6 +105,7 @@ export const StandalonePlayground = () => {
       appDescription: playgroundState.appDescription,
       dispatch,
       playgroundId: id,
+      error: playgroundState.error,
     };
   }, [
     playgroundState.editorStatus,
@@ -107,6 +115,7 @@ export const StandalonePlayground = () => {
     playgroundState.originalAppDescription,
     playgroundState.appDescription,
     id,
+    playgroundState.error,
   ]);
 
   return (

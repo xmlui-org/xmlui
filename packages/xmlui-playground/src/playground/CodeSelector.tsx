@@ -39,7 +39,7 @@ export const CodeSelector = () => {
       content = `${options.content}.xmlui`;
     }
     return content;
-  }, [options.content]);
+  }, [appDescription.components, appDescription.config?.themes, options.content]);
 
   return (
     <RadixSelect.Root
