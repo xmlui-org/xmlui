@@ -1,8 +1,5 @@
 import { nodeToComponentDef } from "../../../src/parsers/xmlui-parser/transform";
-import type {
-  ComponentDef,
-  CompoundComponentDef,
-} from "../../../src/abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { createXmlUiParser, ParseResult } from "../../../src/parsers/xmlui-parser/parser";
 import type { GetText } from "../../../src/parsers/xmlui-parser/parser";
 import { toDbgString } from "../../../src/parsers/xmlui-parser/utils";
@@ -11,15 +8,13 @@ export function transformSource(
   source: string,
   fileId?: number,
   printRes: boolean = false,
-): ComponentDef | CompoundComponentDef | null {
+): ComponentDef | CompoundComponentDef | undefined {
   const { getText, parse } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (printRes) {
     console.log(toDbgString(node, getText));
     console.log(
-      "errors: \n[\n" +
-        errors.map((e) => e.message + ` @${e.pos}`).join(";\n") +
-        "\n]\n",
+      "errors: \n[\n" + errors.map((e) => e.message + ` @${e.pos}`).join(";\n") + "\n]\n",
     );
   }
   if (errors.length > 0) {
@@ -39,9 +34,7 @@ export function parseSource(
   if (printRes) {
     console.log(toDbgString(parseRes.node, parser.getText));
     console.log(
-      "errors: \n[\n" +
-        parseRes.errors.map((e) => e.message + ` @${e.pos}`).join(";\n") +
-        "\n]\n",
+      "errors: \n[\n" + parseRes.errors.map((e) => e.message + ` @${e.pos}`).join(";\n") + "\n]\n",
     );
   }
   return { ...parseRes, getText: parser.getText };
