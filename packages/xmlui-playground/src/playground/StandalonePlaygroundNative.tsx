@@ -10,7 +10,7 @@ import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
 import { ToastProvider } from "../providers/ToastProvider";
 import styles from "./StandalonePlaygroundNative.module.scss";
 import { useToast } from "../hooks/useToast";
-import { ErrorBoundary, Spinner, useThemes } from "xmlui";
+import { ErrorBoundary, useThemes } from "xmlui";
 import { Header } from "./Header";
 import { PlaygroundContent } from "./PlaygroundContent";
 import { Theme } from "../themes/theme";
@@ -45,7 +45,6 @@ export const StandalonePlayground = () => {
         );
         setActiveThemeTone(data.options.activeTone || "light");
         dispatch(contentChanged(data.options.content));
-        setLoading(false);
       } catch (e) {
         showToast({
           type: "error",
@@ -53,6 +52,7 @@ export const StandalonePlayground = () => {
           description: "The app could not be loaded",
         });
       }
+      setLoading(false);
       initialized.current = true;
     };
 
@@ -62,7 +62,6 @@ export const StandalonePlayground = () => {
       if (queryParams.app && queryParams.app !== "undefined") {
         getApp();
       } else {
-        setLoading(false);
         dispatch(
           appDescriptionInitialized({
             config: {
@@ -89,7 +88,7 @@ export const StandalonePlayground = () => {
             fixedTheme: false,
           }),
         );
-
+        setLoading(false);
         initialized.current = true;
       }
     }
