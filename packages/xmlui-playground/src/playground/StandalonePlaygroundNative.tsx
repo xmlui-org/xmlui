@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
+import { useEffect, useId, useMemo, useReducer, useState } from "react";
 import {
   appDescriptionInitialized,
   contentChanged,
@@ -20,6 +20,7 @@ export const StandalonePlayground = () => {
   const id = useId();
   const [loading, setLoading] = useState(true);
   const { setActiveThemeTone } = useThemes();
+  const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
 
   const queryParams = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -28,47 +29,49 @@ export const StandalonePlayground = () => {
     return {};
   }, []);
 
-  const getApp = async () => {
-    try {
-      const data = JSON.parse(await decompressData(queryParams.app as string));
-      setLoading(false);
-      console.log("cica", data.options);
-      dispatch(appDescriptionInitialized(data.standalone));
-      dispatch(
-        optionsInitialized({
-          ...playgroundState.options,
-          ...data.options,
-          content: "app",
-          orientation: "horizontal",
-        }),
-      );
-      setActiveThemeTone(data.options.activeTone || "light");
-      dispatch(contentChanged(data.options.content));
-    } catch (e) {
-      showToast({
-        type: "error",
-        title: "Error",
-        description: "The app could not be loaded",
-      });
-    }
-  };
-
   useEffect(() => {
+    const getApp = async () => {
+      try {
+        const data = JSON.parse(await decompressData(queryParams.app as string));
+        setLoading(false);
+        console.log("cica", data.options);
+        dispatch(appDescriptionInitialized(data.standalone));
+        dispatch(
+          optionsInitialized({
+            ...playgroundState.options,
+            ...data.options,
+            content: "app",
+            orientation: "horizontal",
+          }),
+        );
+        setActiveThemeTone(data.options.activeTone || "light");
+        dispatch(contentChanged(data.options.content));
+      } catch (e) {
+        showToast({
+          type: "error",
+          title: "Error",
+          description: "The app could not be loaded",
+        });
+      }
+    };
+
     if (queryParams.app !== "undefined") {
       getApp();
     } else {
       setLoading(false);
-      dispatch(appDescriptionInitialized({
-        config: {
-          name: "Hello World",
-          description: "",
-          appGlobals: {},
-          resources: {},
-          themes: [Theme],
-        },
-        components: [],
-        app: "<App>Hello World!</App>",
-      }));
+      dispatch(
+        appDescriptionInitialized({
+          config: {
+            name: "Hello World",
+            description: "",
+            appGlobals: {},
+            resources: {},
+            themes: [Theme],
+          },
+          components: [],
+          app: "<App>Hello World!</App>",
+        }),
+      );
       dispatch(
         optionsInitialized({
           activeTheme: "theme",
@@ -83,9 +86,7 @@ export const StandalonePlayground = () => {
         }),
       );
     }
-  }, [queryParams.app]);
-
-  const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
+  }, [queryParams.app, showToast, setActiveThemeTone, playgroundState.options]);
 
   const playgroundContextValue = useMemo(() => {
     return {
@@ -102,7 +103,6 @@ export const StandalonePlayground = () => {
     playgroundState.editorStatus,
     playgroundState.status,
     playgroundState.options,
-    playgroundState.options.activeTone,
     playgroundState.text,
     playgroundState.originalAppDescription,
     playgroundState.appDescription,

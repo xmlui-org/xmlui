@@ -1,5 +1,5 @@
 import { Provider, Root, Portal, Trigger, Content } from "@radix-ui/react-tooltip";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useTheme } from "xmlui";
 import styles from "./Tooltip.module.scss";
 
@@ -9,9 +9,7 @@ export const Tooltip = ({ children, label }: { children: ReactNode; label: strin
     <Provider>
       <Root>
         <Trigger asChild>
-          <div>
-            {children}
-          </div>
+          <div>{children}</div>
         </Trigger>
         <Portal container={root}>
           <Content className={styles.TooltipContent} sideOffset={5}>

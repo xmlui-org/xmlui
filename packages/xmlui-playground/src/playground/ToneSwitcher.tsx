@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { ThemeTone, ToneChangerButton } from "xmlui";
+import { type ThemeTone, ToneChangerButton } from "xmlui";
 import { toneChanged } from "../state/store";
 import { usePlayground } from "../hooks/usePlayground";
 

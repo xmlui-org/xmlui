@@ -20,6 +20,7 @@
     "xmlui-devtools": "*"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "xmlui": "*"
   },
   "main": "./dist/xmlui-playground.js",

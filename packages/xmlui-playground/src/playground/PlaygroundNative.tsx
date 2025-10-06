@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useReducer } from "react";
+import { useEffect, useId, useMemo, useReducer } from "react";
 import {
   appDescriptionInitialized,
   optionsInitialized,

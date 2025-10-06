@@ -1,25 +1,24 @@
-import React, { useMemo } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
 import selectStyles from "./Select.module.scss";
 import { usePlayground } from "../hooks/usePlayground";
 import { contentChanged } from "../state/store";
-import { HiChevronDown, HiChevronUp } from "react-icons/hi";
-import { Button, CompoundComponentDef, Icon, ThemeDefinition, useTheme } from "xmlui";
+import { useTheme, Button, type CompoundComponentDef, Icon, type ThemeDefinition } from "xmlui";
 
-export const SelectItem = React.forwardRef(
-  ({ children, className, ...props }: any, forwardedRef) => {
-    return (
-      <RadixSelect.Item className={selectStyles.RadixMenuItem} {...props} ref={forwardedRef}>
-        <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
-      </RadixSelect.Item>
-    );
-  },
-);
+export const SelectItem = forwardRef(({ children, className, ...props }: any, forwardedRef) => {
+  return (
+    <RadixSelect.Item className={selectStyles.RadixMenuItem} {...props} ref={forwardedRef}>
+      <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
+    </RadixSelect.Item>
+  );
+});
+
+SelectItem.displayName = "SelectItem";
 
 export const CodeSelector = () => {
   const { appDescription, options, dispatch } = usePlayground();
-  const [open, setOpen] = React.useState(false);
-  const {root} = useTheme();
+  const [open, setOpen] = useState(false);
+  const { root } = useTheme();
 
   const selectedValue = useMemo(() => {
     let content = "";
