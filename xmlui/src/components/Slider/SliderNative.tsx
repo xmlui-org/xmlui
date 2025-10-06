@@ -6,7 +6,6 @@ import styles from "./Slider.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 import { Tooltip } from "../Tooltip/TooltipNative";

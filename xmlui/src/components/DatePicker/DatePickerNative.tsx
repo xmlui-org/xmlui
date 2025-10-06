@@ -12,7 +12,6 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import Icon from "../Icon/IconNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -21,35 +20,35 @@ export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
 
 // Extended matcher types that support string dates in addition to Date objects
-type StringDateRange = { 
-  from: string | Date; 
-  to?: string | Date; 
+type StringDateRange = {
+  from: string | Date;
+  to?: string | Date;
 };
 
-type StringDateBefore = { 
-  before: string | Date; 
+type StringDateBefore = {
+  before: string | Date;
 };
 
-type StringDateAfter = { 
-  after: string | Date; 
+type StringDateAfter = {
+  after: string | Date;
 };
 
-type StringDateInterval = { 
-  before: string | Date; 
-  after: string | Date; 
+type StringDateInterval = {
+  before: string | Date;
+  after: string | Date;
 };
 
-type DayOfWeekMatcher = { 
-  dayOfWeek: number | number[]; 
+type DayOfWeekMatcher = {
+  dayOfWeek: number | number[];
 };
 
-type ExtendedMatcher = 
+type ExtendedMatcher =
   | boolean
   | string
   | Date
   | (string | Date)[]
   | StringDateRange
-  | StringDateBefore  
+  | StringDateBefore
   | StringDateAfter
   | StringDateInterval
   | DayOfWeekMatcher
@@ -275,7 +274,7 @@ export const DatePicker = forwardRef(function DatePicker(
       // Handle array of mixed matchers (combines multiple disable patterns)
       if (Array.isArray(matcher)) {
         const convertedMatchers: any[] = [];
-        
+
         for (const item of matcher) {
           if (typeof item === 'object' && item !== null && !Array.isArray(item) && !(item instanceof Date)) {
             // Handle nested matcher objects in array (e.g., {dayOfWeek: [0,6]}, {from: date, to: date})
@@ -291,7 +290,7 @@ export const DatePicker = forwardRef(function DatePicker(
             }
           }
         }
-        
+
         // Return array of all matchers to combine their effects
         return convertedMatchers.length > 0 ? convertedMatchers as Matcher : undefined;
       }
@@ -426,7 +425,7 @@ export const DatePicker = forwardRef(function DatePicker(
     },
     [onDidChange, updateState, mode, dateFormat, readOnly],
   );
-  
+
   return inline ? (
     <div ref={ref} {...rest} style={style} className={classnames(styles.inlinePickerMenu, className)} tabIndex={0}>
       <DayPicker
