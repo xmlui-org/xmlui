@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import classnames from "classnames";
-import { RxOpenInNewWindow, RxDownload } from "react-icons/rx";
+import { RxOpenInNewWindow, RxDownload, RxShare2 } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
 import { usePlayground } from "../hooks/usePlayground";
 import { resetApp } from "../state/store";
@@ -14,24 +14,26 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
 import { Button, Text, Logo } from "xmlui";
 import { ToneSwitcher } from "./ToneSwitcher";
+import { useToast } from "../hooks/useToast";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { appDescription, options, dispatch } = usePlayground();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { showToast } = useToast();
 
   const [show, setShow] = useState(false);
   useEffect(() => {
     setShow(true);
   }, []);
 
-  const openStandaloneApp = useCallback(
-    async (previewMode = true) => {
+  const createAppUrl = useCallback(
+    async (previewMode: boolean) => {
       const data = {
         standalone: appDescription,
         options: {
           fixedTheme: options.fixedTheme,
           swapped: options.swapped,
-          previewMode: previewMode,
+          previewMode,
           orientation: options.orientation,
           activeTheme: options.activeTheme,
           activeTone: options.activeTone,
@@ -39,7 +41,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         },
       };
       const appQueryString = await createQueryString(JSON.stringify(data));
-      window.open(`/#/playground#${appQueryString}`, "_blank");
+      return `${window.location.origin}/#/playground#${appQueryString}`;
     },
     [
       appDescription,
@@ -51,6 +53,24 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       options.content,
     ],
   );
+
+  const openStandaloneApp = useCallback(
+    async (previewMode = true) => {
+      const url = await createAppUrl(previewMode);
+      window.open(url, "_blank");
+    },
+    [createAppUrl],
+  );
+
+  const share = useCallback(async () => {
+    const url = await createAppUrl(false);
+    navigator.clipboard.writeText(url);
+    showToast({
+      title: "URL copied to clipboard",
+      description: "",
+      type: "info",
+    });
+  }, [createAppUrl]);
 
   const download = useCallback(() => {
     handleDownloadZip(appDescription);
@@ -144,6 +164,11 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           )}
           {standalone && (
             <>
+              <Tooltip label="Share this app">
+                <Button variant="ghost" onClick={() => share()}>
+                  <RxShare2 />
+                </Button>
+              </Tooltip>
               <Tooltip label="Preview in fullscreen">
                 <Button variant="ghost" onClick={() => openStandaloneApp()}>
                   <RxOpenInNewWindow height={24} width={24} />

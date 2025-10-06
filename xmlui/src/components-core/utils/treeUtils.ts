@@ -4,6 +4,8 @@ import {
   TreeNode,
   UnPackedTreeData,
   TreeFieldConfig,
+  NodeLoadingState,
+  FlatTreeNodeWithState,
 } from "../abstractions/treeAbstractions";
 
 export function flattenNode(
@@ -11,29 +13,47 @@ export function flattenNode(
   depth: number,
   result: FlatTreeNode[],
   openedIds: (string | number)[],
+  dynamicField?: string,
+  nodeStates?: Map<string | number, NodeLoadingState>,
 ) {
   const { children, key } = node;
   const isExpanded = openedIds.includes(key);
-  result.push({
+  // Check if node has actual children OR is a dynamic node that can load children
+  const hasActualChildren = !!children && children.length > 0;
+  const isDynamic = dynamicField && node[dynamicField];
+  const hasChildren = hasActualChildren || isDynamic;
+  
+  // Get loading state for this node
+  const loadingState = nodeStates?.get(key) || (isDynamic ? 'unloaded' : 'loaded');
+  
+  const flatNode: FlatTreeNodeWithState = {
     ...node,
-    hasChildren: !!children && children.length > 0,
+    hasChildren,
     depth,
     isExpanded,
+    loadingState,
     // Ensure key is preserved (in case it was overwritten by ...node spread)
     key: key || node.key || node.id,
-  });
+  };
+  
+  result.push(flatNode);
 
   if (isExpanded && children) {
     for (let child of children) {
-      flattenNode(child, depth + 1, result, openedIds);
+      flattenNode(child, depth + 1, result, openedIds, dynamicField, nodeStates);
     }
   }
 }
 
-export function toFlatTree(treeData: TreeNode[], openedIds: (string | number)[]) {
-  const ret: FlatTreeNode[] = [];
+export function toFlatTree(
+  treeData: TreeNode[], 
+  openedIds: (string | number)[], 
+  dynamicField?: string,
+  nodeStates?: Map<string | number, NodeLoadingState>
+): FlatTreeNodeWithState[] {
+  const ret: FlatTreeNodeWithState[] = [];
   treeData.forEach((node) => {
-    flattenNode(node, 0, ret, openedIds);
+    flattenNode(node, 0, ret, openedIds, dynamicField, nodeStates);
   });
 
   return ret;
@@ -109,11 +129,13 @@ export function flatToNative(
     itemsById.set(id, item);
     
     if (parentId && parentId !== '') {
+      // Convert parentId to string for consistent type in childrenMap
+      const parentKey = String(parentId);
       // Has parent - add to children map
-      if (!childrenMap.has(parentId)) {
-        childrenMap.set(parentId, []);
+      if (!childrenMap.has(parentKey)) {
+        childrenMap.set(parentKey, []);
       }
-      childrenMap.get(parentId)!.push(item);
+      childrenMap.get(parentKey)!.push(item);
     } else {
       // Root item
       rootItems.push(item);
@@ -143,7 +165,8 @@ export function flatToNative(
     const currentPath = [...pathSegments, displayName];
     
     // Get children for this item
-    const childItems = childrenMap.get(sourceId) || [];
+    const sourceKey = String(sourceId);
+    const childItems = childrenMap.get(sourceKey) || [];
     const children: TreeNode[] = childItems.map(childItem => 
       buildTreeNode(childItem, [...parentIds, sourceId], currentPath)
     );
@@ -155,7 +178,7 @@ export function flatToNative(
       path: currentPath,
       displayName,
       parentIds,
-      selectable: true,
+      selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
       children,
       // Preserve original item properties
       ...item,
@@ -251,7 +274,7 @@ export function hierarchyToNative(
         path: [...pathSegments, displayName],
         displayName,
         parentIds,
-        selectable: true,
+        selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
         children: [],
         ...item,
         ...(fieldConfig.iconField && item[fieldConfig.iconField] && {
@@ -284,7 +307,7 @@ export function hierarchyToNative(
       path: currentPath,
       displayName,
       parentIds,
-      selectable: true,
+      selectable: fieldConfig.selectableField ? (item[fieldConfig.selectableField] ?? true) : true,
       // Preserve original item properties (excluding children to avoid overwriting)
       ...item,
       // Add icon properties if configured

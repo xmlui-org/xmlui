@@ -1,5 +1,17 @@
 # xmlui-playground
 
+## 0.1.9
+
+### Patch Changes
+
+- b390690: improve: xmlui-playground - toast message on share
+
+## 0.1.8
+
+### Patch Changes
+
+- 8f03ada: feat: show a helloworld app in the playground if no other content loads; add share button to the header
+
 ## 0.1.7
 
 ### Patch Changes

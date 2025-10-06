@@ -26,10 +26,10 @@ export class NumberBoxDriver extends InputComponentDriver {
   }
 
   async increment() {
-    await this.spinnerUp.click();
+    await this.spinnerUp.click({ force: true });
   }
 
   async decrement() {
-    await this.spinnerDown.click();
+    await this.spinnerDown.click({ force: true });
   }
 }

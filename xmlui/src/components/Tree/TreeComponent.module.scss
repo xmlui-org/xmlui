@@ -104,20 +104,14 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
       visibility: hidden;
       pointer-events: none;
     }
+  }
 
-    &:before {
-      transition: transform .2s;
-      content: "›";
-      font-size: 24px;
-      line-height: 0;
-      height: 8px;
-    }
-
-    &.expanded {
-      &:before {
-        transform: rotate(90deg);
-      }
-    }
+  .toggleIcon {
+    transition: transform 0.2s ease-in-out;
+    color: currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .depthPlaceholder {
@@ -129,9 +123,11 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
     flex: 1;
     display: flex;
     flex-direction: row;
+    align-items: center;
     height: 100%;
     flex-shrink: 0;
     min-width: fit-content;
+    user-select: none;
   }
 
   .addButton {

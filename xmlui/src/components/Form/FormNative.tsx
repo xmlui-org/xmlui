@@ -67,6 +67,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       isValidOnFocus: false,
       isValidLostFocus: false,
       focused: false,
+      afterFirstDirtyBlur: false,
       forceShowValidationResult: false,
     };
   }
@@ -114,8 +115,10 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       } else {
         state.validationResults[uid] = action.payload.validationResult;
       }
-      state.interactionFlags[uid].invalidToValid =
-        !prevValid && state.validationResults[uid].isValid;
+      const currentIsInvalidToValid = !prevValid && state.validationResults[uid].isValid;
+      if (currentIsInvalidToValid) {
+        state.interactionFlags[uid].invalidToValid = true;
+      }
       break;
     }
     case FormActionKind.FIELD_FOCUSED: {
@@ -126,6 +129,8 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     case FormActionKind.FIELD_LOST_FOCUS: {
       state.interactionFlags[uid].isValidLostFocus = !!state.validationResults[uid]?.isValid;
       state.interactionFlags[uid].focused = false;
+      state.interactionFlags[uid].afterFirstDirtyBlur = state.interactionFlags[uid].isDirty;
+      state.interactionFlags[uid].invalidToValid = false;
       break;
     }
     case FormActionKind.TRIED_TO_SUBMIT: {
@@ -350,14 +355,14 @@ const Form = forwardRef(function (
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
-    console.log(`🚀 Form submit started`);
+    /* console.log(`🚀 Form submit started`);
     console.log(`🔍 Initial values:`, {
       initialValue,
       EMPTY_OBJECT,
       isEqual: initialValue === EMPTY_OBJECT,
       initialValueType: typeof initialValue,
       emptyObjectType: typeof EMPTY_OBJECT
-    });
+    }); */
     event?.preventDefault();
     if (!isEnabled) {
       return;
@@ -660,3 +665,4 @@ export const FormWithContextVar = forwardRef(function({
     </Slot>
   );
 });
+FormWithContextVar.displayName = "FormWithContextVar";

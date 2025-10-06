@@ -71,7 +71,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     register,
     unRegister,
   } = useAccordionContext();
-  const expanded = useMemo(() => expandedItems.includes(itemId), [itemId, expandedItems]);
+  const expanded = useMemo(() => (expandedItems ?? []).includes(itemId), [itemId, expandedItems]);
   const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {

@@ -7,12 +7,13 @@ import {
   playgroundReducer,
 } from "../state/store";
 import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
-import { ToastProvider } from "@radix-ui/react-toast";
+import { ToastProvider } from "../providers/ToastProvider";
 import styles from "./StandalonePlaygroundNative.module.scss";
 import { useToast } from "../hooks/useToast";
 import { ErrorBoundary, Spinner, useThemes } from "xmlui";
 import { Header } from "./Header";
 import { PlaygroundContent } from "./PlaygroundContent";
+import { Theme } from "../themes/theme";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
@@ -27,32 +28,60 @@ export const StandalonePlayground = () => {
     return {};
   }, []);
 
+  const getApp = async () => {
+    try {
+      const data = JSON.parse(await decompressData(queryParams.app as string));
+      setLoading(false);
+      console.log("cica", data.options);
+      dispatch(appDescriptionInitialized(data.standalone));
+      dispatch(
+        optionsInitialized({
+          ...playgroundState.options,
+          ...data.options,
+          content: "app",
+          orientation: "horizontal",
+        }),
+      );
+      setActiveThemeTone(data.options.activeTone || "light");
+      dispatch(contentChanged(data.options.content));
+    } catch (e) {
+      showToast({
+        type: "error",
+        title: "Error",
+        description: "The app could not be loaded",
+      });
+    }
+  };
+
   useEffect(() => {
-    const getApp = async () => {
-      try {
-        const data = JSON.parse(await decompressData(queryParams.app as string));
-        setLoading(false);
-        dispatch(appDescriptionInitialized(data.standalone));
-        dispatch(
-          optionsInitialized({
-            ...playgroundState.options,
-            ...data.options,
-            content: "app",
-            orientation: "horizontal",
-          }),
-        );
-        setActiveThemeTone(data.options.activeTone || "light");
-        dispatch(contentChanged(data.options.content));
-      } catch (e) {
-        showToast({
-          type: "error",
-          title: "Error",
-          description: "The app could not be loaded",
-        });
-      }
-    };
-    if (queryParams.app) {
+    if (queryParams.app !== "undefined") {
       getApp();
+    } else {
+      setLoading(false);
+      dispatch(appDescriptionInitialized({
+        config: {
+          name: "Hello World",
+          description: "",
+          appGlobals: {},
+          resources: {},
+          themes: [Theme],
+        },
+        components: [],
+        app: "<App>Hello World!</App>",
+      }));
+      dispatch(
+        optionsInitialized({
+          activeTheme: "theme",
+          activeTone: "light",
+          content: "app",
+          orientation: "horizontal",
+          id: 0,
+          allowStandalone: true,
+          language: "xmlui",
+          emulatedApi: undefined,
+          fixedTheme: false,
+        }),
+      );
     }
   }, [queryParams.app]);
 

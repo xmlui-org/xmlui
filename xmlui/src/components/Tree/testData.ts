@@ -1,284 +1,318 @@
-/**
- * Test Data for Step 3a: Flat to Native Transformation
- * This file contains test data structures for validating the flat data format
- * conversion to UnPackedTreeData format.
- */
-
-// Test Case 1: Simple 2-level hierarchy
-export const simpleFlatData = [
-  { id: '1', name: 'Documents', icon: 'folder' },
-  { id: '2', name: 'File.txt', icon: 'file', parentId: '1' },
-  { id: '3', name: 'Photo.jpg', icon: 'image', parentId: '1' }
+export const flatTreeData = [
+  { id: 1, name: "Root Item 1", parentId: null },
+  { id: 2, name: "Child Item 1.1", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
 ];
 
-// Test Case 2: Multi-level hierarchy with mixed icons
-export const multiLevelFlatData = [
-  { id: 'root', name: 'Project', icon: 'folder' },
-  { id: 'src', name: 'Source Code', icon: 'folder', parentId: 'root' },
-  { id: 'docs', name: 'Documentation', icon: 'folder', parentId: 'root' },
-  { id: 'app', name: 'App.tsx', icon: 'code', parentId: 'src' },
-  { id: 'utils', name: 'Utils.ts', icon: 'code', parentId: 'src' },
-  { id: 'readme', name: 'README.md', icon: 'markdown', parentId: 'docs' },
-  { id: 'api', name: 'API.md', icon: 'markdown', parentId: 'docs' }
-];
-
-// Test Case 3: Deep nesting (4 levels)
-export const deepFlatData = [
-  { id: '1', name: 'Level 1', icon: 'folder' },
-  { id: '2', name: 'Level 2', icon: 'folder', parentId: '1' },
-  { id: '3', name: 'Level 3', icon: 'folder', parentId: '2' },
-  { id: '4', name: 'Level 4 File', icon: 'file', parentId: '3' }
-];
-
-// Test Case 4: Multiple root nodes
-export const multipleRootFlatData = [
-  { id: 'root1', name: 'Root One', icon: 'folder' },
-  { id: 'root2', name: 'Root Two', icon: 'folder' },
-  { id: 'child1', name: 'Child of Root 1', icon: 'file', parentId: 'root1' },
-  { id: 'child2', name: 'Child of Root 2', icon: 'file', parentId: 'root2' }
-];
-
-// Test Case 5: Custom field mapping
-export const customFieldFlatData = [
-  { uuid: 'A', title: 'Custom Root', type: 'directory' },
-  { uuid: 'B', title: 'Custom Child', type: 'document', parent: 'A' }
-];
-
-// Test Case 6: Edge case - orphaned nodes (parentId references missing parent)
-export const orphanedFlatData = [
-  { id: '1', name: 'Valid Root', icon: 'folder' },
-  { id: '2', name: 'Valid Child', icon: 'file', parentId: '1' },
-  { id: '3', name: 'Orphaned Node', icon: 'file', parentId: 'missing-parent' }
-];
-
-// Test Case 7: Icon state properties (expanded/collapsed icons)
-export const iconStateFlatData = [
-  { 
-    id: '1', 
-    name: 'Expandable Folder', 
-    icon: 'folder',
-    iconExpanded: 'folder-open',
-    iconCollapsed: 'folder-closed'
-  },
-  { 
-    id: '2', 
-    name: 'Nested Folder', 
-    icon: 'folder',
-    iconExpanded: 'folder-open',
-    iconCollapsed: 'folder-closed',
-    parentId: '1'
-  },
-  { id: '3', name: 'File in nested', icon: 'file', parentId: '2' }
-];
-
-// === Step 3b: Hierarchy Data Format Test Cases ===
-
-// Test Case 1: Simple hierarchy structure 
-export const simpleHierarchyData = {
-  id: 'root',
-  name: 'Project Root',
-  icon: 'folder',
-  children: [
-    { id: 'file1', name: 'README.md', icon: 'code' },
-    { id: 'file2', name: 'package.json', icon: 'code' }
-  ]
-};
-
-// Test Case 2: Multi-level hierarchy
-export const multiLevelHierarchyData = {
-  id: 'workspace',
-  name: 'Workspace',
-  icon: 'folder',
-  children: [
-    {
-      id: 'frontend',
-      name: 'Frontend',
-      icon: 'folder',
-      children: [
-        {
-          id: 'src',
-          name: 'src',
-          icon: 'folder',
-          children: [
-            { id: 'app', name: 'App.tsx', icon: 'code' },
-            { id: 'index', name: 'index.ts', icon: 'code' }
-          ]
-        },
-        { id: 'package', name: 'package.json', icon: 'code' }
-      ]
-    },
-    {
-      id: 'backend',
-      name: 'Backend', 
-      icon: 'folder',
-      children: [
-        { id: 'server', name: 'server.js', icon: 'code' }
-      ]
-    }
-  ]
-};
-
-// Test Case 3: Array of hierarchy objects (multiple roots)
-export const multiRootHierarchyData = [
+export const hierarchyTreeData = [
   {
-    id: 'proj1',
-    name: 'Project Alpha',
-    icon: 'folder',
+    id: 1,
+    name: "Root Item 1",
     children: [
-      { id: 'alpha1', name: 'alpha.js', icon: 'code' }
-    ]
+      { id: 2, name: "Child Item 1.1", children: [] },
+      {
+        id: 3,
+        name: "Child Item 1.2",
+        children: [{ id: 4, name: "Grandchild Item 1.2.1", children: [] }],
+      },
+    ],
   },
-  {
-    id: 'proj2',
-    name: 'Project Beta',
-    icon: 'folder',
-    children: [
-      { id: 'beta1', name: 'beta.js', icon: 'code' }
-    ]
-  }
 ];
 
-// Test Case 4: Custom field names in hierarchy
-export const customHierarchyData = {
-  uuid: 'root',
-  title: 'Custom Hierarchy',
-  type: 'folder',
-  items: [
-    { 
-      uuid: 'child1', 
-      title: 'Child Item', 
-      type: 'code',
-      items: [
-        { uuid: 'grandchild', title: 'Grandchild', type: 'email' }
-      ]
-    }
-  ]
-};
+// Test data with custom field names for field mapping validation
+export const customFieldsData1 = [
+  { nodeId: "A1", title: "Root Item 1", parent: null },
+  { nodeId: "A2", title: "Child Item 1.1", parent: "A1" },
+  { nodeId: "A3", title: "Child Item 1.2", parent: "A1" },
+  { nodeId: "A4", title: "Grandchild Item 1.1.1", parent: "A2" },
+];
 
-// Expected output structure for validation
-export const expectedSimpleOutput = {
-  treeData: [
-    {
-      uid: 'flat_1',
-      key: '1',
-      path: ['Documents'],
-      displayName: 'Documents',
-      parentIds: [],
-      selectable: true,
-      icon: 'folder',
-      children: [
-        {
-          uid: 'flat_2',
-          key: '2',
-          path: ['Documents', 'File.txt'],
-          displayName: 'File.txt',
-          parentIds: ['1'],
-          selectable: true,
-          icon: 'file',
-          children: []
-        },
-        {
-          uid: 'flat_3',
-          key: '3',
-          path: ['Documents', 'Photo.jpg'],
-          displayName: 'Photo.jpg',
-          parentIds: ['1'],
-          selectable: true,
-          icon: 'image',
-          children: []
-        }
-      ]
-    }
-  ]
-};
+export const customFieldsData2 = [
+  { id: 100, displayName: "Root Item 1", parentId: null },
+  { id: 101, displayName: "Child Item 1.1", parentId: 100 },
+  { id: 102, displayName: "Child Item 1.2", parentId: 100 },
+  { id: 103, displayName: "Grandchild Item 1.1.1", parentId: 101 },
+];
 
-// Field configurations for testing
-export const standardFieldConfig = {
-  idField: 'id',
-  labelField: 'name',
-  iconField: 'icon',
-  parentField: 'parentId'
-};
+export const databaseStyleData = [
+  { pk: "root-1", label: "Root Item 1", parent_id: null },
+  { pk: "child-1", label: "Child Item 1.1", parent_id: "root-1" },
+  { pk: "child-2", label: "Child Item 1.2", parent_id: "root-1" },
+  { pk: "grandchild-1", label: "Grandchild Item 1.1.1", parent_id: "child-1" },
+];
 
-export const customFieldConfig = {
-  idField: 'uuid',
-  labelField: 'title',
-  iconField: 'type',
-  parentField: 'parent'
-};
+export const apiStyleData = [
+  { key: "item1", text: "Root Item 1", parentKey: undefined },
+  { key: "item2", text: "Child Item 1.1", parentKey: "item1" },
+  { key: "item3", text: "Child Item 1.2", parentKey: "item1" },
+  { key: "item4", text: "Grandchild Item 1.1.1", parentKey: "item2" },
+];
 
-export const iconStateFieldConfig = {
-  idField: 'id',
-  labelField: 'name',
-  iconField: 'icon',
-  iconExpandedField: 'iconExpanded',
-  iconCollapsedField: 'iconCollapsed',
-  parentField: 'parentId'
-};
+// Test data with multiple independent branches for comprehensive defaultExpanded testing
+export const multiBranchTreeData = [
+  // Branch A: Documents
+  { id: "doc-root", name: "Documents", parentId: null },
+  { id: "doc-reports", name: "Reports", parentId: "doc-root" },
+  { id: "doc-invoices", name: "Invoices", parentId: "doc-root" },
+  { id: "doc-q1-report", name: "Q1 Report.pdf", parentId: "doc-reports" },
+  { id: "doc-q2-report", name: "Q2 Report.pdf", parentId: "doc-reports" },
+  { id: "doc-inv-001", name: "Invoice-001.pdf", parentId: "doc-invoices" },
 
-// Field configurations for hierarchy data
-export const hierarchyFieldConfig = {
-  idField: 'id',
-  labelField: 'name',
-  iconField: 'icon',
-  childrenField: 'children'
-};
+  // Branch B: Projects
+  { id: "proj-root", name: "Projects", parentId: null },
+  { id: "proj-web", name: "Web Apps", parentId: "proj-root" },
+  { id: "proj-mobile", name: "Mobile Apps", parentId: "proj-root" },
+  { id: "proj-ecommerce", name: "E-commerce Site", parentId: "proj-web" },
+  { id: "proj-dashboard", name: "Admin Dashboard", parentId: "proj-web" },
+  { id: "proj-ios-app", name: "iOS Shopping App", parentId: "proj-mobile" },
 
-export const customHierarchyFieldConfig = {
-  idField: 'uuid',
-  labelField: 'title',
-  iconField: 'type',
-  childrenField: 'items'
-};
+  // Branch C: Media
+  { id: "media-root", name: "Media", parentId: null },
+  { id: "media-images", name: "Images", parentId: "media-root" },
+  { id: "media-videos", name: "Videos", parentId: "media-root" },
+  { id: "media-profile-pic", name: "profile.jpg", parentId: "media-images" },
+  { id: "media-banner", name: "banner.png", parentId: "media-images" },
+];
 
-// Test scenarios for manual validation
-export const testScenarios = [
+// Test data with icon fields for icon mapping validation
+export const flatDataWithIcons = [
+  { id: 1, name: "Documents", icon: "folder", parentId: null },
+  { id: 2, name: "Report.pdf", icon: "file-pdf", parentId: 1 },
+  { id: 3, name: "Images", icon: "folder", parentId: null },
+  { id: 4, name: "Photo.jpg", icon: "file-image", parentId: 3 },
+];
+
+export const customIconFieldData = [
+  { nodeId: "A1", title: "Project", iconType: "project-folder", parent: null },
+  { nodeId: "A2", title: "Source", iconType: "code-folder", parent: "A1" },
+  { nodeId: "A3", title: "App.tsx", iconType: "typescript-file", parent: "A2" },
+  { nodeId: "A4", title: "Utils.ts", iconType: "typescript-file", parent: "A2" },
+];
+
+export const dataWithStateIcons = [
   {
-    name: 'Simple 2-level hierarchy',
-    data: simpleFlatData,
-    fieldConfig: standardFieldConfig,
-    expectedNodes: 3,
-    expectedRoots: 1,
-    expectedMaxDepth: 2
+    id: 1,
+    name: "Shared Folder",
+    icon: "folder",
+    iconExpanded: "folder-open",
+    iconCollapsed: "folder-closed",
+    parentId: null,
   },
   {
-    name: 'Multi-level with 3 depths',
-    data: multiLevelFlatData,
-    fieldConfig: standardFieldConfig,
-    expectedNodes: 7,
-    expectedRoots: 1,
-    expectedMaxDepth: 3
+    id: 2,
+    name: "Subfolder",
+    icon: "folder",
+    iconExpanded: "folder-open",
+    iconCollapsed: "folder-closed",
+    parentId: 1,
+  },
+  { id: 3, name: "Document.txt", icon: "file-text", parentId: 2 },
+];
+
+// Hierarchical test data with custom field names for field mapping validation
+export const customFieldsHierarchy1 = [
+  {
+    nodeId: "A1",
+    title: "Root Item 1",
+    items: [
+      {
+        nodeId: "A2",
+        title: "Child Item 1.1",
+        items: [{ nodeId: "A4", title: "Grandchild Item 1.1.1", items: [] }],
+      },
+      { nodeId: "A3", title: "Child Item 1.2", items: [] },
+    ],
+  },
+];
+
+export const customFieldsHierarchy2 = [
+  {
+    id: 100,
+    displayName: "Root Item 1",
+    subNodes: [
+      {
+        id: 101,
+        displayName: "Child Item 1.1",
+        subNodes: [{ id: 103, displayName: "Grandchild Item 1.1.1", subNodes: [] }],
+      },
+      { id: 102, displayName: "Child Item 1.2", subNodes: [] },
+    ],
+  },
+];
+
+export const databaseStyleHierarchy = [
+  {
+    pk: "root-1",
+    label: "Root Item 1",
+    nested_items: [
+      {
+        pk: "child-1",
+        label: "Child Item 1.1",
+        nested_items: [{ pk: "grandchild-1", label: "Grandchild Item 1.1.1", nested_items: [] }],
+      },
+      { pk: "child-2", label: "Child Item 1.2", nested_items: [] },
+    ],
+  },
+];
+
+export const apiStyleHierarchy = [
+  {
+    key: "item1",
+    text: "Root Item 1",
+    nodes: [
+      {
+        key: "item2",
+        text: "Child Item 1.1",
+        nodes: [{ key: "item4", text: "Grandchild Item 1.1.1", nodes: [] }],
+      },
+      { key: "item3", text: "Child Item 1.2", nodes: [] },
+    ],
+  },
+];
+
+// Hierarchical test data with icon fields
+export const hierarchyDataWithIcons = [
+  {
+    id: 1,
+    name: "Documents",
+    icon: "folder",
+    children: [
+      { id: 2, name: "Report.pdf", icon: "file-pdf", children: [] },
+      {
+        id: 3,
+        name: "Images",
+        icon: "folder",
+        children: [{ id: 4, name: "Photo.jpg", icon: "file-image", children: [] }],
+      },
+    ],
+  },
+];
+
+export const customIconFieldHierarchy = [
+  {
+    nodeId: "A1",
+    title: "Project",
+    iconType: "project-folder",
+    items: [
+      {
+        nodeId: "A2",
+        title: "Source",
+        iconType: "code-folder",
+        items: [
+          { nodeId: "A3", title: "App.tsx", iconType: "typescript-file", items: [] },
+          { nodeId: "A4", title: "Utils.ts", iconType: "typescript-file", items: [] },
+        ],
+      },
+    ],
+  },
+];
+
+export const hierarchyWithStateIcons = [
+  {
+    id: 1,
+    name: "Shared Folder",
+    icon: "folder",
+    iconExpanded: "folder-open",
+    iconCollapsed: "folder-closed",
+    children: [
+      {
+        id: 2,
+        name: "Subfolder",
+        icon: "folder",
+        iconExpanded: "folder-open",
+        iconCollapsed: "folder-closed",
+        children: [{ id: 3, name: "Document.txt", icon: "file-text", children: [] }],
+      },
+    ],
+  },
+];
+
+export const dynamicTreeData = [
+  {
+    id: 1,
+    name: "Normal Node",
+    children: [{ id: 2, name: "Child Node", children: [] }],
   },
   {
-    name: 'Deep nesting (4 levels)',
-    data: deepFlatData,
-    fieldConfig: standardFieldConfig,
-    expectedNodes: 4,
-    expectedRoots: 1,
-    expectedMaxDepth: 4
+    id: 3,
+    name: "Dynamic Node (no children)",
+    dynamic: true,
+    children: [],
   },
   {
-    name: 'Multiple root nodes',
-    data: multipleRootFlatData,
-    fieldConfig: standardFieldConfig,
-    expectedNodes: 4,
-    expectedRoots: 2,
-    expectedMaxDepth: 2
+    id: 4,
+    name: "Regular Leaf Node",
+    children: [],
+  },
+];
+
+export const customDynamicTreeData = [
+  {
+    id: 1,
+    name: "Normal Node",
+    children: [{ id: 2, name: "Child Node", children: [] }],
   },
   {
-    name: 'Custom field mapping',
-    data: customFieldFlatData,
-    fieldConfig: customFieldConfig,
-    expectedNodes: 2,
-    expectedRoots: 1,
-    expectedMaxDepth: 2
+    id: 3,
+    name: "Dynamic Node (no children)",
+    canLoadMore: true,
+    children: [],
   },
   {
-    name: 'Icon state properties',
-    data: iconStateFlatData,
-    fieldConfig: iconStateFieldConfig,
-    expectedNodes: 3,
-    expectedRoots: 1,
-    expectedMaxDepth: 3
-  }
+    id: 4,
+    name: "Regular Leaf Node",
+    children: [],
+  },
+];
+
+export const dynamicFlatData = [
+  {
+    id: 1,
+    name: "Normal Node",
+    parentId: null,
+  },
+  {
+    id: 2,
+    name: "Child Node",
+    parentId: 1,
+  },
+  {
+    id: 3,
+    name: "Dynamic Node (no children)",
+    dynamic: true,
+  },
+  {
+    id: 4,
+    name: "Regular Leaf Node",
+    parentId: null,
+  },
+];
+
+export const flatTreeDataWithIcons1 = [
+  { id: 1, name: "Root Item 1", iconExpanded: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconExpanded: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIconsAndAlias1 = [
+  { id: 1, name: "Root Item 1", iconExp: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconExp: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIcons2 = [
+  { id: 1, name: "Root Item 1", iconCollapsed: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconCollapsed: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
+];
+
+export const flatTreeDataWithIconsAndAlias2 = [
+  { id: 1, name: "Root Item 1", iconColl: "phone", parentId: null },
+  { id: 2, name: "Child Item 1.1", iconColl: "email", parentId: 1 },
+  { id: 3, name: "Child Item 1.2", parentId: 1 },
+  { id: 4, name: "Grandchild Item 1.1.1", parentId: 2 },
 ];

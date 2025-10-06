@@ -34,12 +34,24 @@ export class ComponentDriver {
     return this.locator;
   }
 
-  getByMarker(tag: string): Locator {
-    return this.component.locator(`[data-test="${tag}"]`).first();
+  getByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).first();
   }
 
   getByPartName(part: string): Locator {
     return this.component.locator(`[data-part-id="${part}"]`).first();
+  }
+
+  getIcons(): Locator {
+    return this.component.locator('[data-icon-name="*"]');
+  }
+
+  getIconsByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`);
+  }
+  
+  getIconByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`).first();
   }
 
   /**
@@ -460,34 +472,34 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   async triggerDrop(files: string[] = ["test.txt"]) {
     // Simulate file drop event by creating File objects and using setInputFiles
     const hiddenInput = this.getHiddenInput();
-    
+
     // Create temporary files for testing
     const fileObjects = files.map((name) => {
       return {
         name,
         mimeType: "text/plain",
-        buffer: Buffer.from("test content")
+        buffer: Buffer.from("test content"),
       };
     });
-    
+
     // Set files on the hidden input
     await hiddenInput.setInputFiles(fileObjects);
-    
+
     // Trigger the drop event with a proper structure
     await this.component.evaluate((element, fileNames) => {
       // Create a proper drop event
       const event = new DragEvent("drop", {
         bubbles: true,
         cancelable: true,
-        dataTransfer: new DataTransfer()
+        dataTransfer: new DataTransfer(),
       });
-      
+
       // Add files to dataTransfer if needed for component logic
       fileNames.forEach((fileName: string) => {
         const file = new File(["test content"], fileName, { type: "text/plain" });
         event.dataTransfer?.items.add(file);
       });
-      
+
       element.dispatchEvent(event);
     }, files);
   }
@@ -775,8 +787,7 @@ export class RadioGroupDriver extends ComponentDriver {}
 
 // --- TextArea
 
-export class TextAreaDriver extends InputComponentDriver {
-}
+export class TextAreaDriver extends InputComponentDriver {}
 
 // --- ProgressBar
 
@@ -1365,5 +1376,66 @@ export class DropdownMenuDriver extends ComponentDriver {
    */
   async waitForClose() {
     await this.getMenuContent().waitFor({ state: "hidden" });
+  }
+}
+
+// --- Slider
+
+export class SliderDriver extends ComponentDriver {
+
+  private async getActiveThumb(thumbNumber: number = 0) {
+    const thumbs = this.page.getByRole("slider");
+    const thumbCount = await thumbs.count();
+    if (thumbCount === 0) {
+      throw new Error("No slider thumb found to drag");
+    }
+    if (thumbNumber < 0) {
+      thumbNumber = 0;
+    } else if (thumbNumber >= thumbCount) {
+      thumbNumber = thumbCount - 1;
+    }
+    return thumbs.nth(thumbNumber);
+  }
+
+  async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber: number = 0) {
+    const track = this.page.locator("[data-track]");
+    await track.waitFor({ state: "visible" });
+
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.waitFor({ state: "visible" });
+
+    // Get the thumb's current position for relative movement
+    const thumbBox = await activeThumb.boundingBox();
+    if (!thumbBox) {
+      throw new Error("Could not get thumb bounding box");
+    }
+    const trackBox = await track.boundingBox();
+    if (!trackBox) {
+      throw new Error("Could not get track bounding box");
+    }
+    
+    // Calculate target position relative to track
+    let targetX: number;
+    if (location === "start") {
+      targetX = trackBox.x;
+    } else if (location === "end") {
+      targetX = trackBox.x + trackBox.width;
+    } else { // middle
+      targetX = trackBox.x + trackBox.width / 2;
+    }
+    const targetY = trackBox.y + trackBox.height / 2;
+
+    await activeThumb.hover();
+    await this.page.mouse.down({ button: "left" });
+    await this.page.mouse.move(targetX, targetY);
+    await this.page.mouse.up();
+  }
+
+  async stepThumbByKeyboard(key: "ArrowLeft" | "ArrowRight" | "Home" | "End", thumbNumber: number = 0, repeat: number = 1) {
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.focus();
+    for (let i = 0; i < repeat; i++) {
+      await this.page.keyboard.press(key);
+    }
   }
 }

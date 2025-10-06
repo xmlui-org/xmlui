@@ -1,5 +1,77 @@
 [
   {
+    "tag_name": "xmlui@0.10.16",
+    "published_at": "2025-10-03T09:59:22Z",
+    "changes": [
+      {
+        "description": "Undust and improve the Tree component",
+        "commit_sha": "0ba6612"
+      },
+      {
+        "description": "Fixed Slider ranged version where only the first thumb is interactable.",
+        "commit_sha": "7b78052"
+      },
+      {
+        "description": "improve: remove cmdk from autocomple, add keywords prop to option",
+        "commit_sha": "314b429"
+      },
+      {
+        "description": "fix: NumberBox initialValue ignores non-convertible string values, minValue and maxValue now applies to typed-in input as well as to increments / decrements with spinner buttons.",
+        "commit_sha": "a1dea8f"
+      },
+      {
+        "description": "refactor: move behavior application earlier in ComponentAdapter render flow",
+        "commit_sha": "cff754c"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.16.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.16/xmlui-0.10.16.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.15",
+    "published_at": "2025-09-26T11:41:22Z",
+    "changes": [
+      {
+        "description": "Add the data property to the Pdf component",
+        "commit_sha": "3c8ad14"
+      },
+      {
+        "description": "Add the \"transform\" layout property",
+        "commit_sha": "5502fea"
+      },
+      {
+        "description": "Add syncWithAppState and initiallySelected properties to Table",
+        "commit_sha": "e08f0ba"
+      },
+      {
+        "description": "Fix MenuSeparator and SubMenuitem (forwardRef)",
+        "commit_sha": "5502fea"
+      },
+      {
+        "description": "fix: NavGroup componenet's iconVertical{Expanded,Collapsed} properties now apply based on it's 'open' state. Only the Expanded one was present before the fix.",
+        "commit_sha": "db618b5"
+      },
+      {
+        "description": "Allow event handlers to use nested action components recursively",
+        "commit_sha": "a795b3d"
+      },
+      {
+        "description": "feat: introducing behaviors - tooltip, animation, label",
+        "commit_sha": "5851c02"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.15.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.15/xmlui-0.10.15.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.14",
     "published_at": "2025-09-23T12:57:26Z",
     "changes": [
@@ -204,102 +276,6 @@
       {
         "name": "xmlui-0.10.8.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.8/xmlui-0.10.8.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.7",
-    "published_at": "2025-09-03T10:53:53Z",
-    "changes": [
-      {
-        "description": "Fixed BarChart hideTickY property to not remove the Y axis when set to true.",
-        "commit_sha": "664ea4f"
-      },
-      {
-        "description": "Fixed Checkbox and Switch visual issue. Fixed Line- and BarChart visual glitch in Table.",
-        "commit_sha": "a739a26"
-      },
-      {
-        "description": "Small fixes for tiny bugs found during MyWorkDrive update",
-        "commit_sha": "bdb54dd"
-      },
-      {
-        "description": "Fixed BarChart tick labels not appearing.",
-        "commit_sha": "81724c6"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.7.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.7/xmlui-0.10.7.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.6",
-    "published_at": "2025-09-02T08:34:14Z",
-    "changes": [
-      {
-        "description": "fix ssr",
-        "commit_sha": "6464ec8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.6.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.6/xmlui-0.10.6.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.5",
-    "published_at": "2025-09-02T07:46:45Z",
-    "changes": [
-      {
-        "description": "fix missing dependency",
-        "commit_sha": "d38351d"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.5.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.5/xmlui-0.10.5.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.4",
-    "published_at": "2025-09-01T15:53:19Z",
-    "changes": [
-      {
-        "description": "small fixes: Avatar, FileUploadDropzone, auto xsrf token handling",
-        "commit_sha": "43fd8c5"
-      },
-      {
-        "description": "Autocomplete: initiallyOpen prop",
-        "commit_sha": "1df8e5d"
-      },
-      {
-        "description": "Reworked Pagination layout strategy. Provided props to better control layout: pageSizeSelectorPosition, pageInfoPosition, buttonRowPosition. These props are available in Table pagination as well.",
-        "commit_sha": "0d5d9d1"
-      },
-      {
-        "description": "DropdownMenu doesn't cooperate with Fragment triggerTemplate",
-        "commit_sha": "3def673"
-      },
-      {
-        "description": "include themes.scss file in lib dist",
-        "commit_sha": "428ebea"
-      },
-      {
-        "description": "FileUploadDropZone fixes (dropPlaceholder disappeared)",
-        "commit_sha": "a12ce66"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.4.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.4/xmlui-0.10.4.js"
       }
     ]
   }

@@ -1,5 +1,21 @@
 # xmlui
 
+## 0.10.17
+
+### Patch Changes
+
+- 07dae0b: fix: AccordionItem produces the right error outside of Accordion component
+
+## 0.10.16
+
+### Patch Changes
+
+- 0ba6612: Undust and improve the Tree component
+- 7b78052: Fixed Slider ranged version where only the first thumb is interactable.
+- 314b429: improve: remove cmdk from autocomple, add keywords prop to option
+- a1dea8f: fix: NumberBox initialValue ignores non-convertible string values, minValue and maxValue now applies to typed-in input as well as to increments / decrements with spinner buttons.
+- cff754c: refactor: move behavior application earlier in ComponentAdapter render flow
+
 ## 0.10.15
 
 ### Patch Changes
