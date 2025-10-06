@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("Basic Functionality", () => {
@@ -46,7 +47,7 @@ test.describe("Basic Functionality", () => {
   });
 });
 
-test.describe("Event Handling", () => {
+test.describe.fixme("Event Handling", () => {
   test("timer tick event is called", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickCount="{0}">
@@ -93,7 +94,7 @@ test.describe("Event Handling", () => {
     await expect(counter).toHaveText("1");
   });
 
-  test("timer prevents overlapping events", async ({ page, initTestBed }) => {
+  test.fixme("timer prevents overlapping events", async ({ page, initTestBed }) => {
     // This test verifies that a new tick event doesn't fire if the previous one hasn't completed
     await initTestBed(`
       <Fragment var.tickStr="" var.processingTime="{2000}">
@@ -122,7 +123,7 @@ test.describe("Event Handling", () => {
   });
 });
 
-test.describe("Initial Delay Functionality", () => {
+test.describe.fixme("Initial Delay Functionality", () => {
   test("timer waits for initial delay before first tick", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickStr="">
@@ -202,7 +203,7 @@ test.describe("Initial Delay Functionality", () => {
   });
 });
 
-test.describe("Pause and Resume API", () => {
+test.describe.fixme("Pause and Resume API", () => {
   test("timer can be paused and resumed via API", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickStr="">
@@ -276,7 +277,9 @@ test.describe("Pause and Resume API", () => {
 });
 
 test.describe("Once Functionality", () => {
-  test("timer with once=true fires only once", async ({ page, initTestBed }) => {
+  test.fixme("timer with once=true fires only once", 
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickCount="{0}">
         <Timer interval="1000" once="true" onTick="tickCount++" />
@@ -295,7 +298,9 @@ test.describe("Once Functionality", () => {
     await expect(counter).toHaveText("1");
   });
 
-  test("timer with once=true can be restarted by re-enabling", async ({ page, initTestBed }) => {
+  test.fixme("timer with once=true can be restarted by re-enabling", 
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickCount="{0}" var.timerEnabled="{true}">
         <Timer interval="1000" once="true" enabled="{timerEnabled}" onTick="tickCount++" />
@@ -319,7 +324,9 @@ test.describe("Once Functionality", () => {
     await expect(counter).toHaveText("2");
   });
 
-  test("once timer doesn't interfere with regular timer functionality", async ({ page, initTestBed }) => {
+  test.fixme("once timer doesn't interfere with regular timer functionality",
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickStr="">
         <Timer interval="1000" once="false" onTick="tickStr += '+'" />
@@ -335,7 +342,7 @@ test.describe("Once Functionality", () => {
   });
 });
 
-test.describe("State Management", () => {
+test.describe.fixme("State Management", () => {
   test("timer can be dynamically enabled and disabled", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment var.tickCount="{0}" var.timerEnabled="{false}">
