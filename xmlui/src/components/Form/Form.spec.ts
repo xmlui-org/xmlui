@@ -1479,22 +1479,25 @@ test("field-related errors disappear if user updates FormItems", async ({ initTe
 
   const fieldDriver = await createFormItemDriver("testField");
   const fieldDriver2 = await createFormItemDriver("testField2");
+  
   await fieldDriver.component.focus();
   await fieldDriver.textBox.fill("a");
-  await fieldDriver.textBox.fill("", { timeout: 500 }); // trigger 'required' error
+  await fieldDriver.textBox.fill("");
+  await fieldDriver.textBox.blur();
 
+  // Should show required error now
+  await expect(fieldDriver.textBox).toHaveValue("");
   await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "error",
   );
 
-  //await fieldDriver.component.focus();
   await fieldDriver.textBox.fill("a");
   await fieldDriver.textBox.blur();
 
+  await fieldDriver2.textBox.focus();
 
-  await fieldDriver2.component.focus();
-  await page.waitForTimeout(200);
+  await expect(fieldDriver2.textBox).toBeFocused();
 
   await fieldDriver2.textBox.fill("b");
   expect(await fieldDriver.getValidationStatusIndicator()).not.toBeVisible();
