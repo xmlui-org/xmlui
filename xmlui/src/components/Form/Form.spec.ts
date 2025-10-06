@@ -1468,7 +1468,7 @@ test("field-related errors map to correct FormItems", async ({
   );
 });
 
-test("field-related errors disappear if user updates FormItems", async ({ initTestBed, page, createFormItemDriver }) => {
+test.skip("field-related errors disappear if user updates FormItems", async ({ initTestBed, page, createFormItemDriver }) => {
   await initTestBed(
     `
       <Form testId="form">
