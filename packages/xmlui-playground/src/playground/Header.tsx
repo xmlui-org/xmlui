@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import classnames from "classnames";
 import { RxOpenInNewWindow, RxDownload, RxShare2 } from "react-icons/rx";
@@ -70,7 +70,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       description: "",
       type: "info",
     });
-  }, [createAppUrl]);
+  }, [createAppUrl, showToast]);
 
   const download = useCallback(() => {
     handleDownloadZip(appDescription);
@@ -136,30 +136,6 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                   <LiaUndoAltSolid height={24} width={24} />
                 </Button>
               </Tooltip>
-              {/*            {standalone && (
-              <>
-                <Tooltip
-                  trigger={
-                    <button className={styles.button} onClick={() => dispatch(swapApp())}>
-                      {options.orientation === "horizontal" ? <MdSwapHoriz /> : <MdSwapVert />}
-                    </button>
-                  }
-                  label="Swap editor and preview"
-                />
-                <Tooltip
-                  trigger={
-                    <button className={styles.button} onClick={() => dispatch(changeOrientation())}>
-                      {options.orientation === "vertical" ? (
-                        <PiSquareSplitHorizontalLight />
-                      ) : (
-                        <PiSquareSplitVerticalLight />
-                      )}
-                    </button>
-                  }
-                  label="Toggle orientation"
-                />
-              </>
-            )}*/}
             </>
           )}
           {standalone && (

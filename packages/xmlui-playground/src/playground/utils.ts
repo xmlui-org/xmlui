@@ -4,25 +4,23 @@
  * @param {string} str
  * @returns {Promise<Uint8Array>}
  */
-async function compress(str: string) {
-    // Convert the string to a byte stream.
-    const stream = new Blob([str]).stream();
+async function compress(str: string): Promise<Uint8Array> {
+  // Convert the string to a byte stream.
+  const stream = new Blob([str]).stream();
 
-    // Create a compressed stream.
-    const compressedStream = stream.pipeThrough(
-        new CompressionStream("gzip")
-    );
+  // Create a compressed stream.
+  const compressedStream = stream.pipeThrough(new CompressionStream("gzip"));
 
-    // Convert the string to a byte stream.
-    const reader = compressedStream.getReader();
-    const chunks = [];
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-    }
+  // Convert the string to a byte stream.
+  const reader = compressedStream.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
 
-    return await concatUint8Arrays(chunks);
+  return await concatUint8Arrays(chunks);
 }
 
 /**
@@ -31,28 +29,26 @@ async function compress(str: string) {
  * @param {Uint8Array} compressedBytes
  * @returns {Promise<string>}
  */
-async function decompress(compressedBytes: Uint8Array) {
-    // Convert the bytes to a stream.
-    const stream = new Blob([compressedBytes]).stream();
+async function decompress(compressedBytes: Uint8Array): Promise<string> {
+  // Convert the bytes to a stream.
+  const stream = new Blob([compressedBytes]).stream();
 
-    // Create a decompressed stream.
-    const decompressedStream = stream.pipeThrough(
-        new DecompressionStream("gzip")
-    );
+  // Create a decompressed stream.
+  const decompressedStream = stream.pipeThrough(new DecompressionStream("gzip"));
 
-    // Convert the string to a byte stream.
-    const reader = decompressedStream.getReader();
-    const chunks = [];
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-    }
+  // Convert the string to a byte stream.
+  const reader = decompressedStream.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
 
-    const stringBytes = await concatUint8Arrays(chunks);
+  const stringBytes = await concatUint8Arrays(chunks);
 
-    // Convert the bytes to a string.
-    return new TextDecoder().decode(stringBytes);
+  // Convert the bytes to a string.
+  return new TextDecoder().decode(stringBytes);
 }
 
 /**
@@ -61,20 +57,20 @@ async function decompress(compressedBytes: Uint8Array) {
  * @param {ReadonlyArray<Uint8Array>} uint8arrays
  * @returns {Promise<Uint8Array>}
  */
-async function concatUint8Arrays(uint8arrays: Uint8Array[]) {
-    const blob = new Blob(uint8arrays);
-    const buffer = await blob.arrayBuffer();
-    return new Uint8Array(buffer);
+async function concatUint8Arrays(uint8arrays: Uint8Array[]): Promise<Uint8Array> {
+  const blob = new Blob(uint8arrays);
+  const buffer = await blob.arrayBuffer();
+  return new Uint8Array(buffer);
 }
 
-async function createQueryString(target: any) {
-    // Convert the Uint8Array to a Base64 string.
+async function createQueryString(target: any): Promise<string> {
+  // Convert the Uint8Array to a Base64 string.
 
-    const compressed = await compress(target);
-    const base64 = btoa(String.fromCharCode(...compressed));
+  const compressed = await compress(target);
+  const base64 = btoa(String.fromCharCode(...compressed));
 
-    // Create a query string.
-    return encodeURIComponent(base64);
+  // Create a query string.
+  return encodeURIComponent(base64);
 }
 
 export { compress, decompress, createQueryString };
