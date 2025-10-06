@@ -1056,7 +1056,7 @@ export class FormItemDriver extends ComponentDriver {
     return "data-validation-status";
   }
 
-  async getValidationStatusIndicator() {
+  get validationStatusIndicator() {
     return this.component.locator(`[${this.validationStatusTag}]`);
   }
 }
