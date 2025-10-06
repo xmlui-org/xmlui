@@ -1406,3 +1406,43 @@ test.describe("Layout", () => {
     expect(Math.abs(hourToMinuteGap - minuteToSecondGap)).toBeLessThan(5); // Allow small differences
   });
 });
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+
+test("input has correct width", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <TimeInput width="200px" testId="test"/>
+  `);
+  const { width } = await page.getByTestId("test").boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <TimeInput width="200px" label="test" testId="test"/>
+  `);
+  const { width } = await page.getByTestId("test").boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TimeInput width="50%" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TimeInput width="50%" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+

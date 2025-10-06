@@ -32,7 +32,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
-import { useBehaviors } from "../behaviors/BehaviorContext";
+import { getCoreBehaviors } from "../behaviors/CoreBehaviors";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -256,6 +256,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
   let renderingError = null;
+
   try {
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
@@ -273,11 +274,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderedNode = renderer(rendererContext);
     }
 
-     /**
-     * 
+    /**
+     * Apply any core behaviors to the component.
      */
-    const { getBehaviors } = useBehaviors();
-    const behaviors = getBehaviors();
+    const behaviors = getCoreBehaviors();
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
         if (behavior.canAttach(rendererContext.node, descriptor)) {

@@ -9,10 +9,7 @@ import {
   parseTooltipOptions,
   Tooltip
 } from "../../components/Tooltip/TooltipNative";
-import type { Behavior } from "./BehaviorContext";
-import { MetadataProvider } from "../../language-server/services/common/metadata-utils";
-import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
-import { ComponentMetadata } from "../..";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying tooltips to components.
@@ -93,6 +90,7 @@ export const labelBehavior: Behavior = {
     const enabled = extractValue.asOptionalBoolean(componentNode.props.enabled, true);
     const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
     const style = extractValue(componentNode.props.style);
+    const readOnly = extractValue.asOptionalBoolean(componentNode.props.readOnly);
 
     return (
       <ItemWithLabel
@@ -105,9 +103,16 @@ export const labelBehavior: Behavior = {
         style={style}
         className={className}
         shrinkToLabel={shrinkToLabel}
+        labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
+        isInputTemplateUsed={!!componentNode.props?.inputTemplate}
       >
         {node}
       </ItemWithLabel>
     );
   },
+};
+
+
+export const getCoreBehaviors = () => {
+  return [tooltipBehavior, animationBehavior, labelBehavior];
 };

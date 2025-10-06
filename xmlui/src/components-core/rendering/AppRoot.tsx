@@ -11,7 +11,6 @@ import type { AppWrapperProps } from "./AppWrapper";
 import { AppWrapper } from "./AppWrapper";
 import type { ComponentCompilation } from "../../abstractions/scripting/Compilation";
 import { StyleProvider } from "../theming/StyleContext";
-import { BehaviorsProvider } from "../behaviors/BehaviorContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -102,7 +101,6 @@ export function AppRoot({
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <StyleProvider>
-        <BehaviorsProvider>
           <DebugViewProvider debugConfig={globalProps?.debug}>
             <AppWrapper
               projectCompilation={projectCompilation}
@@ -126,7 +124,6 @@ export function AppRoot({
               {children}
             </AppWrapper>
           </DebugViewProvider>
-        </BehaviorsProvider>
       </StyleProvider>
     </ComponentProvider>
   );

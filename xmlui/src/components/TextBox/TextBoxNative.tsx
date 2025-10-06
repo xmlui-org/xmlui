@@ -202,62 +202,62 @@ export const TextBox = forwardRef(function TextBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-      <div
-        {...rest}
-        ref={ref}
-        className={classnames(styles.inputRoot, {
-          [styles.disabled]: !enabled,
+    <div
+      {...rest}
+      ref={ref}
+      className={classnames(className, styles.inputRoot, {
+        [styles.disabled]: !enabled,
+        [styles.readOnly]: readOnly,
+        [styles.error]: validationStatus === "error",
+        [styles.warning]: validationStatus === "warning",
+        [styles.valid]: validationStatus === "valid",
+      })}
+      tabIndex={-1}
+      onFocus={focus}
+      style={{ ...style, gap }}
+    >
+      <Adornment
+        data-part-id={PART_START_ADORNMENT}
+        text={startText}
+        iconName={startIcon}
+        className={classnames(styles.adornment)}
+      />
+      <input
+        id={id}
+        ref={inputRef}
+        data-part-id={PART_INPUT}
+        type={actualType}
+        className={classnames(styles.input, {
           [styles.readOnly]: readOnly,
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
         })}
-        tabIndex={-1}
-        onFocus={focus}
-        style={{ gap }}
-      >
+        disabled={!enabled}
+        value={localValue}
+        maxLength={maxLength}
+        placeholder={placeholder}
+        onChange={onInputChange}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        onKeyDown={onKeyDown}
+        readOnly={readOnly}
+        autoFocus={autoFocus}
+        tabIndex={enabled ? tabIndex : -1}
+        required={required}
+      />
+      {type === "password" && showPasswordToggle ? (
         <Adornment
-          data-part-id={PART_START_ADORNMENT}
-          text={startText}
-          iconName={startIcon}
-          className={classnames(styles.adornment)}
+          data-part-id={PART_END_ADORNMENT}
+          iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+          className={classnames(styles.adornment, styles.passwordToggle)}
+          onClick={togglePasswordVisibility}
         />
-        <input
-          id={id}
-          ref={inputRef}
-          data-part-id={PART_INPUT}
-          type={actualType}
-          className={classnames(styles.input, {
-            [styles.readOnly]: readOnly,
-          })}
-          disabled={!enabled}
-          value={localValue}
-          maxLength={maxLength}
-          placeholder={placeholder}
-          onChange={onInputChange}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-          onKeyDown={onKeyDown}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          tabIndex={enabled ? tabIndex : -1}
-          required={required}
+      ) : (
+        <Adornment
+          data-part-id={PART_END_ADORNMENT}
+          text={endText}
+          iconName={endIcon}
+          className={styles.adornment}
         />
-        {type === "password" && showPasswordToggle ? (
-          <Adornment
-            data-part-id={PART_END_ADORNMENT}
-            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
-            className={classnames(styles.adornment, styles.passwordToggle)}
-            onClick={togglePasswordVisibility}
-          />
-        ) : (
-          <Adornment
-            data-part-id={PART_END_ADORNMENT}
-            text={endText}
-            iconName={endIcon}
-            className={styles.adornment}
-          />
-        )}
-      </div>
+      )}
+    </div>
   );
 });

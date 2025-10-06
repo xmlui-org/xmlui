@@ -128,7 +128,7 @@ export const ColorPicker = forwardRef(
       <input
         {...rest}
         id={id}
-        className={classnames(styles.colorInput, className, {
+        className={classnames(className,styles.colorInput, {
           [styles.disabled]: !enabled,
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",

@@ -1,5 +1,5 @@
-import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef, useId } from "react";
+import type { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
+import { cloneElement, forwardRef, useId } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -8,6 +8,7 @@ import styles from "./FormItem.module.scss";
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
+import { EMPTY_OBJECT } from "../../components-core/constants";
 
 // Component part names
 
@@ -30,6 +31,7 @@ type ItemWithLabelProps = {
   isInputTemplateUsed?: boolean;
   onLabelClick?: () => void;
   validationResult?: ReactNode;
+  layoutContext?: any;
   testId?: string;
 };
 export const defaultProps: Pick<ItemWithLabelProps, "labelBreak"> = {
@@ -58,17 +60,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     validationResult,
     isInputTemplateUsed = false,
     onLabelClick,
+    layoutContext,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  // --- HACK: the "rest" may contain a "layoutContext" property that React doesn't recognize
-  // --- as a valid DOM attribute, which would issue a warning in React.
-  if ((rest as any).layoutContext !== undefined) {
-    delete (rest as any).layoutContext;
-  }
-  // --- END HACK
-
   const generatedId = useId();
   const inputId = id || generatedId;
   if (label === undefined && !validationResult) {
@@ -84,14 +80,6 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         {children}
       </Slot>
     );
-    // return cloneElement(children as ReactElement, {
-    //   ...mergeProps((children as ReactElement).props, {
-    //     style,
-    //     id: inputId,
-    //     onFocus: onFocus,
-    //     onBlur: onBlur
-    //   }),
-    // });
   }
   return (
     <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
@@ -128,9 +116,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined}>
-          {children}
-        </Slot>
+        {cloneElement(children as ReactElement, { 
+          id: !isInputTemplateUsed ? inputId : undefined,
+          style: undefined,
+          className: undefined,
+          "data-part-id": PART_LABELED_ITEM,
+         })}
       </div>
       {validationResult}
     </div>

@@ -274,17 +274,16 @@ export const Slider = forwardRef(
     }, [displayValue.length]);
 
       return (
-          <div className={styles.sliderContainer} data-slider-container>
+          <div {...rest} ref={ref} style={style} className={classnames(styles.sliderContainer, className)} data-slider-container>
             <Root
+              ref={inputRef}
               minStepsBetweenThumbs={minStepsBetweenThumbs}
-              ref={ref}
               tabIndex={tabIndex}
               aria-readonly={readOnly}
-              className={classnames(className, styles.sliderRoot, {
+              className={classnames(styles.sliderRoot, {
                 [styles.disabled]: !enabled,
                 [styles.readOnly]: readOnly,
               })}
-              style={style}
               max={max}
               min={min}
               inverted={inverted}
