@@ -90,6 +90,7 @@ export const labelBehavior: Behavior = {
     const enabled = extractValue.asOptionalBoolean(componentNode.props.enabled, true);
     const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
     const style = extractValue(componentNode.props.style);
+    const readOnly = extractValue.asOptionalBoolean(componentNode.props.readOnly);
 
     return (
       <ItemWithLabel
@@ -102,6 +103,8 @@ export const labelBehavior: Behavior = {
         style={style}
         className={className}
         shrinkToLabel={shrinkToLabel}
+        labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
+        isInputTemplateUsed={!!componentNode.props?.inputTemplate}
       >
         {node}
       </ItemWithLabel>

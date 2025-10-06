@@ -10,10 +10,6 @@ import {
   dGotFocus,
   dInitialValue,
   dInternal,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
   dRequired,
@@ -58,10 +54,6 @@ export const RadioGroupMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
         `options within the radio group.`,
     ),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -117,10 +109,6 @@ export const radioGroupRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
-        label={extractValue.asOptionalString(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       >

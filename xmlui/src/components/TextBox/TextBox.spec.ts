@@ -252,30 +252,6 @@ test.describe("Label", () => {
     expect(labelTop).toBeGreaterThan(textboxBottom);
   });
 
-  test("labelWidth applies custom label width", async ({ initTestBed, createTextBoxDriver }) => {
-    const expected = 200;
-    await initTestBed(`<TextBox testId="test" label="test test" labelWidth="${expected}px" />`);
-    const driver = await createTextBoxDriver("test");
-    const { width } = await getBounds(driver.label);
-    expect(width).toEqual(expected);
-  });
-
-  test("input has correct width", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <TextBox width="200px" testId="test"/>
-    `);
-    const { width } = await page.getByTestId("test").boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input with label has correct width", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <TextBox width="200px" label="test" testId="test"/>
-    `);
-    const { width } = await page.getByTestId("test").boundingBox();
-    expect(width).toBe(200);
-  });
-
   test("labelBreak enables label line breaks", async ({ initTestBed, createTextBoxDriver }) => {
     const labelText = "Very long label text that should break";
     const commonProps = `label="${labelText}" labelWidth="100px"`;
@@ -827,4 +803,52 @@ test.describe("Integration", () => {
     await page.getByTestId("toggleBtn").click();
     await expect(driver.label).not.toBeVisible();
   });
+});
+
+
+test("labelWidth applies custom label width", async ({ initTestBed, createTextBoxDriver }) => {
+  const expected = 200;
+  await initTestBed(`<TextBox testId="test" label="test test" labelWidth="${expected}px" />`);
+  const driver = await createTextBoxDriver("test");
+  const { width } = await getBounds(driver.label);
+  expect(width).toEqual(expected);
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+
+test("input has correct width", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <TextBox width="200px" testId="test"/>
+  `);
+  const { width } = await page.getByTestId("test").boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <TextBox width="200px" label="test" testId="test"/>
+  `);
+  const { width } = await page.getByTestId("test").boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TextBox width="50%" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TextBox width="50%" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
 });

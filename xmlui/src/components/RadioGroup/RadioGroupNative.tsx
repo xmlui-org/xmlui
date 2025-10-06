@@ -19,7 +19,6 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
 import { convertOptionValue } from "../Option/OptionNative";
@@ -185,39 +184,25 @@ export const RadioGroup = forwardRef(function RadioGroup(
   return (
     <OptionTypeProvider Component={RadioGroupOption}>
       <RadioGroupStatusContext.Provider value={contextValue}>
-        <ItemWithLabel
+        <InnerRadioGroup.Root
           {...rest}
-          ref={forwardedRef}
-          labelPosition={labelPosition as any}
-          label={label}
-          labelWidth={labelWidth}
-          labelBreak={labelBreak}
-          required={required}
-          enabled={enabled}
-          onFocus={onFocus}
-          onBlur={onBlur}
           style={style}
-          className={className}
-          onLabelClick={focusActiveOption}
+          ref={radioGroupRef}
+          id={id}
+          onBlur={handleOnBlur}
+          onFocus={handleOnFocus}
+          onValueChange={onInputChange}
+          value={value}
+          disabled={!enabled}
+          required={required}
+          aria-readonly={readOnly}
+          className={classnames(className, styles.radioGroupContainer, {
+            [styles.focused]: focused,
+            [styles.disabled]: !enabled,
+          })}
         >
-          <InnerRadioGroup.Root
-            ref={radioGroupRef}
-            id={id}
-            onBlur={handleOnBlur}
-            onFocus={handleOnFocus}
-            onValueChange={onInputChange}
-            value={value}
-            disabled={!enabled}
-            required={required}
-            aria-readonly={readOnly}
-            className={classnames(styles.radioGroupContainer, {
-              [styles.focused]: focused,
-              [styles.disabled]: !enabled,
-            })}
-          >
-            {children}
-          </InnerRadioGroup.Root>
-        </ItemWithLabel>
+          {children}
+        </InnerRadioGroup.Root>
       </RadioGroupStatusContext.Provider>
     </OptionTypeProvider>
   );

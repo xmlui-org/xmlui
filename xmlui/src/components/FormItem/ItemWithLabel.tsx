@@ -117,9 +117,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           </label>
         )}
         {cloneElement(children as ReactElement, { 
-          id: inputId,
-          style: EMPTY_OBJECT,
-          className: "",
+          id: !isInputTemplateUsed ? inputId : undefined,
+          style: undefined,
+          className: undefined,
           "data-part-id": PART_LABELED_ITEM,
          })}
       </div>
