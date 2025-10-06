@@ -13,10 +13,6 @@ import {
   dIndeterminate,
   dInitialValue,
   dInternal,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
   dRequired,
@@ -48,10 +44,6 @@ export const CheckboxMd = createMetadata({
   },
   props: {
     indeterminate: dIndeterminate(toggleDefaultProps.indeterminate),
-    label: dLabel(),
-    labelPosition: dLabelPosition(defaultProps.labelPosition),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     required: dRequired(),
     initialValue: dInitialValue(toggleDefaultProps.initialValue),
     autoFocus: dAutoFocus(),
@@ -143,10 +135,6 @@ export const checkboxComponentRenderer = createComponentRenderer(
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         indeterminate={extractValue.asOptionalBoolean(node.props.indeterminate)}
         registerComponentApi={registerComponentApi}

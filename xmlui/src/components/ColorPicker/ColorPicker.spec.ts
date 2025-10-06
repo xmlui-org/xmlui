@@ -98,41 +98,6 @@ test("component has correct accessibility attributes", async ({ page, initTestBe
   await expect(label).toHaveAttribute("for", inputId);
 });
 
-test("input has correct width in px", async ({ page, initTestBed }) => {
-  await initTestBed(`<ColorPicker width="200px" testId="test"/>`, {});
-  
-  const colorInput = page.getByTestId("test");
-  const { width } = await colorInput.boundingBox();
-  expect(width).toBe(200);
-});
-
-test("input with label has correct width in px", async ({ page, initTestBed }) => {
-  await initTestBed(`<ColorPicker width="200px" label="test" testId="test"/>`, {});
-  
-  const colorInput = page.getByTestId("test");
-  const { width } = await colorInput.boundingBox();
-  expect(width).toBe(200);
-});
-
-test("input has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
-  await initTestBed(`<ColorPicker width="50%" testId="test"/>`, {});
-  
-  const colorInput = page.getByTestId("test");
-  const { width } = await colorInput.boundingBox();
-  expect(width).toBe(200);
-});
-
-test("input with label has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
-  await initTestBed(`<ColorPicker width="50%" label="test" testId="test"/>`, {});
-  
-  const colorInput = page.getByTestId("test");
-  const { width } = await colorInput.boundingBox();
-  expect(width).toBe(200);
-});
-
-
 test("component is keyboard accessible", async ({ page, initTestBed }) => {
   const { testStateDriver } = await initTestBed(`
     <ColorPicker initialValue="#FF0000" onGotFocus="testState = 'focused'" />
@@ -359,4 +324,42 @@ test("component focus API works", async ({ page, initTestBed }) => {
   await expect(page.locator("input[type='color']")).toBeFocused();
   // Verify the focus event fired
   await expect.poll(testStateDriver.testState).toEqual("focused");
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("input has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker width="200px" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<ColorPicker width="200px" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<ColorPicker width="50%" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<ColorPicker width="50%" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
 });

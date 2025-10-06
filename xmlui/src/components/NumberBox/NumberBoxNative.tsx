@@ -30,9 +30,7 @@ import { type ValidationStatus } from "../abstractions";
 import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
-import { current } from "immer";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
@@ -567,7 +565,7 @@ export const NumberBox = forwardRef(function NumberBox(
   return (
       <div
         {...rest}
-        className={classnames(styles.inputRoot,{
+        className={classnames(className, styles.inputRoot,{
           [styles.readOnly]: readOnly,
           [styles.disabled]: !enabled,
           [styles.noSpinBox]: !hasSpinBox,
@@ -582,7 +580,7 @@ export const NumberBox = forwardRef(function NumberBox(
         onFocus={() => {
           inputRef.current?.focus();
         }}
-        style={{ gap }}
+        style={{ ...style, gap }}
       >
         <Adornment
           data-part-id={PART_START_ADORNMENT}
