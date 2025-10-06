@@ -34,7 +34,6 @@ export const StandalonePlayground = () => {
     const getApp = async () => {
       try {
         const data = JSON.parse(await decompressData(queryParams.app as string));
-        setLoading(false);
         dispatch(appDescriptionInitialized(data.standalone));
         dispatch(
           optionsInitialized({
@@ -46,6 +45,7 @@ export const StandalonePlayground = () => {
         );
         setActiveThemeTone(data.options.activeTone || "light");
         dispatch(contentChanged(data.options.content));
+        setLoading(false);
       } catch (e) {
         showToast({
           type: "error",
@@ -59,7 +59,7 @@ export const StandalonePlayground = () => {
     if (initialized.current) {
       return;
     } else {
-      if (queryParams.app !== "undefined") {
+      if (queryParams.app && queryParams.app !== "undefined") {
         getApp();
       } else {
         setLoading(false);
