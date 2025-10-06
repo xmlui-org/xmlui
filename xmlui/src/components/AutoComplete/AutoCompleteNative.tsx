@@ -107,10 +107,9 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const [options, setOptions] = useState(new Set<Option>());
   const [inputValue, setInputValue] = useState("");
   const { root } = useTheme();
@@ -262,39 +261,45 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }, [shouldShowCreatable, searchTerm, filteredOptions]);
 
   // Helper functions to find next/previous enabled option
-  const findNextEnabledIndex = useCallback((currentIndex: number) => {
-    for (let i = currentIndex + 1; i < allItems.length; i++) {
-      const item = allItems[i];
-      if (item.type === "creatable" || item.enabled !== false) {
-        return i;
+  const findNextEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex + 1; i < allItems.length; i++) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
       }
-    }
-    // Wrap around to beginning
-    for (let i = 0; i <= currentIndex; i++) {
-      const item = allItems[i];
-      if (item.type === "creatable" || item.enabled !== false) {
-        return i;
+      // Wrap around to beginning
+      for (let i = 0; i <= currentIndex; i++) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
       }
-    }
-    return -1;
-  }, [allItems]);
+      return -1;
+    },
+    [allItems],
+  );
 
-  const findPreviousEnabledIndex = useCallback((currentIndex: number) => {
-    for (let i = currentIndex - 1; i >= 0; i--) {
-      const item = allItems[i];
-      if (item.type === "creatable" || item.enabled !== false) {
-        return i;
+  const findPreviousEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
       }
-    }
-    // Wrap around to end
-    for (let i = allItems.length - 1; i >= currentIndex; i--) {
-      const item = allItems[i];
-      if (item.type === "creatable" || item.enabled !== false) {
-        return i;
+      // Wrap around to end
+      for (let i = allItems.length - 1; i >= currentIndex; i--) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
       }
-    }
-    return -1;
-  }, [allItems]);
+      return -1;
+    },
+    [allItems],
+  );
 
   // Reset selected index when options change, but select matching option when dropdown opens
   useEffect(() => {
@@ -304,8 +309,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
       // For single-select, when dropdown opens and there's an input value, try to find and select the matching option
       const matchingIndex = allItems.findIndex((item) => {
         if (item.type === "creatable") return false;
-        return item.label?.toLowerCase() === inputValue.toLowerCase() ||
-          item.value?.toLowerCase() === inputValue.toLowerCase();
+        return (
+          item.label?.toLowerCase() === inputValue.toLowerCase() ||
+          item.value?.toLowerCase() === inputValue.toLowerCase()
+        );
       });
       if (matchingIndex !== -1) {
         setSelectedIndex(matchingIndex);
@@ -371,7 +378,18 @@ export const AutoComplete = forwardRef(function AutoComplete(
           break;
       }
     },
-    [open, selectedIndex, allItems, searchTerm, onOptionAdd, onItemCreated, toggleOption, setOpen, findNextEnabledIndex, findPreviousEnabledIndex],
+    [
+      open,
+      selectedIndex,
+      allItems,
+      searchTerm,
+      onOptionAdd,
+      onItemCreated,
+      toggleOption,
+      setOpen,
+      findNextEnabledIndex,
+      findPreviousEnabledIndex,
+    ],
   );
 
   // Render the "empty list" message
@@ -423,7 +441,18 @@ export const AutoComplete = forwardRef(function AutoComplete(
       setSelectedIndex,
       optionRenderer,
     };
-  }, [inputValue, searchTerm, multi, options, toggleOption, value, open, setOpen, setSelectedIndex, optionRenderer]);
+  }, [
+    inputValue,
+    searchTerm,
+    multi,
+    options,
+    toggleOption,
+    value,
+    open,
+    setOpen,
+    setSelectedIndex,
+    optionRenderer,
+  ]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
@@ -441,166 +470,158 @@ export const AutoComplete = forwardRef(function AutoComplete(
             }}
             modal={false}
           >
-            <div ref={dropdownRef} className={styles.command}>
-              <PopoverTrigger asChild ref={setReferenceElement}>
-                <div
-                  {...rest}
-                  ref={forwardedRef}
-                  data-part-id={PART_LIST_WRAPPER}
-                  style={{ width: "100%", ...style }}
-                  className={classnames(
-                    className,
-                    styles.badgeListWrapper,
-                    styles[validationStatus],
-                    {
-                      [styles.disabled]: !enabled,
-                      [styles.focused]: isFocused,
-                    },
-                  )}
-                  aria-expanded={open}
-                >
-                  {Array.isArray(selectedValue) && selectedValue.length > 0 && (
-                    <div className={styles.badgeList}>
-                      {selectedValue.map((v, index) => (
-                        <span key={index} className={styles.badge}>
-                          {v?.label}
-                          {!readOnly && (
-                            <Icon
-                              name="close"
-                              size="sm"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleOption(v.value);
-                              }}
-                            />
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className={styles.inputWrapper}>
-                    <input
-                      role="combobox"
-                      id={id}
-                      onFocus={(ev) => {
-                        setIsFocused(true);
-                        onFocus(ev);
-                      }}
-                      onBlur={(ev) => {
-                        if (inputValue === "" && !multi) {
-                          clearValue();
+            <PopoverTrigger asChild ref={setReferenceElement}>
+              <div
+                style={style}
+                data-part-id={PART_LIST_WRAPPER}
+                className={classnames(className, styles.badgeListWrapper, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                  [styles.focused]: isFocused,
+                })}
+                aria-expanded={open}
+              >
+                {Array.isArray(selectedValue) && selectedValue.length > 0 && (
+                  <div className={styles.badgeList}>
+                    {selectedValue.map((v, index) => (
+                      <span key={index} className={styles.badge}>
+                        {v?.label}
+                        {!readOnly && (
+                          <Icon
+                            name="close"
+                            size="sm"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              toggleOption(v.value);
+                            }}
+                          />
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className={styles.inputWrapper}>
+                  <input
+                    {...rest}
+                    role="combobox"
+                    id={id}
+                    ref={inputRef}
+                    onFocus={(ev) => {
+                      setIsFocused(true);
+                      onFocus(ev);
+                    }}
+                    onBlur={(ev) => {
+                      if (inputValue === "" && !multi) {
+                        clearValue();
+                      } else {
+                        if (!Array.isArray(selectedValue) && selectedValue) {
+                          setInputValue(selectedValue?.label);
                         } else {
-                          if (!Array.isArray(selectedValue) && selectedValue) {
-                            setInputValue(selectedValue?.label);
-                          } else {
-                            setInputValue("");
-                          }
+                          setInputValue("");
                         }
-                        onBlur(ev);
-                        setIsFocused(false);
-                      }}
-                      onKeyDown={(event) => {
-                        if (readOnly) return;
+                      }
+                      onBlur(ev);
+                      setIsFocused(false);
+                    }}
+                    onKeyDown={(event) => {
+                      if (readOnly) return;
 
-                        // Handle opening dropdown
-                        if (event.key === "ArrowDown" && !open) {
-                          setOpen(true);
-                          return;
-                        }
-
-                        // Handle keyboard navigation when dropdown is open
-                        if (open) {
-                          handleKeyDown(event);
-                        } else if (event.key === "Enter") {
-                          setOpen(true);
-                        }
-                      }}
-                      data-part-id={PART_INPUT}
-                      readOnly={readOnly}
-                      autoFocus={autoFocus}
-                      aria-autocomplete="list"
-                      ref={inputRef}
-                      value={inputValue}
-                      disabled={!enabled}
-                      onChange={(event) => {
+                      // Handle opening dropdown
+                      if (event.key === "ArrowDown" && !open) {
                         setOpen(true);
-                        setInputValue(event.target.value);
-                        setSearchTerm(event.target.value);
-                      }}
-                      placeholder={!readOnly ? placeholder : ""}
-                      className={styles.commandInput}
-                    />
-                    <div className={styles.actions}>
-                      {value?.length > 0 && enabled && !readOnly && (
-                        <span
-                          className={styles.action}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        >
-                          <Icon name="close" />
-                        </span>
-                      )}
+                        return;
+                      }
+
+                      // Handle keyboard navigation when dropdown is open
+                      if (open) {
+                        handleKeyDown(event);
+                      } else if (event.key === "Enter") {
+                        setOpen(true);
+                      }
+                    }}
+                    data-part-id={PART_INPUT}
+                    readOnly={readOnly}
+                    autoFocus={autoFocus}
+                    aria-autocomplete="list"
+                    value={inputValue}
+                    disabled={!enabled}
+                    onChange={(event) => {
+                      setOpen(true);
+                      setInputValue(event.target.value);
+                      setSearchTerm(event.target.value);
+                    }}
+                    placeholder={!readOnly ? placeholder : ""}
+                    className={styles.commandInput}
+                  />
+                  <div className={styles.actions}>
+                    {value?.length > 0 && enabled && !readOnly && (
                       <span
                         className={styles.action}
-                        onClick={() => {
-                          if (readOnly) return;
-                          setOpen(!open);
-                          // Focus the input after opening dropdown
-                          inputRef.current?.focus();
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
                         }}
                       >
-                        <Icon name="chevrondown" />
+                        <Icon name="close" />
                       </span>
-                    </div>
+                    )}
+                    <span
+                      className={styles.action}
+                      onClick={() => {
+                        if (readOnly) return;
+                        setOpen(!open);
+                        // Focus the input after opening dropdown
+                        inputRef.current?.focus();
+                      }}
+                    >
+                      <Icon name="chevrondown" />
+                    </span>
                   </div>
                 </div>
-              </PopoverTrigger>
-              {open && (
-                <Portal container={root}>
-                  <PopoverContent
-                    style={{ width, height: dropdownHeight }}
-                    className={styles.popoverContent}
-                    align="start"
-                    onOpenAutoFocus={(e) => e.preventDefault()}
+              </div>
+            </PopoverTrigger>
+            {open && (
+              <Portal container={root}>
+                <PopoverContent
+                  style={{ width, height: dropdownHeight }}
+                  className={styles.popoverContent}
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div
+                    role="listbox"
+                    className={styles.commandList}
+                    style={{ height: dropdownHeight }}
                   >
-                    <div
-                      role="listbox"
-                      className={styles.commandList}
-                      style={{ height: dropdownHeight }}
-                    >
-                      {filteredOptions.length === 0 && !shouldShowCreatable && (
-                        <div>{emptyListNode}</div>
-                      )}
-                      {shouldShowCreatable && (
-                        <CreatableItem
-                          onNewItem={onItemCreated}
-                          isHighlighted={selectedIndex === 0}
-                        />
-                      )}
-                      <div>
-                        {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
-                          const itemIndex = shouldShowCreatable ? index + 1 : index;
-                          return (
-                            <AutoCompleteOption
-                              key={value}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                              readOnly={readOnly}
-                              isHighlighted={selectedIndex === itemIndex}
-                              itemIndex={itemIndex}
-                            />
-                          );
-                        })}
-                      </div>
+                    {filteredOptions.length === 0 && !shouldShowCreatable && (
+                      <div>{emptyListNode}</div>
+                    )}
+                    {shouldShowCreatable && (
+                      <CreatableItem
+                        onNewItem={onItemCreated}
+                        isHighlighted={selectedIndex === 0}
+                      />
+                    )}
+                    <div>
+                      {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
+                        const itemIndex = shouldShowCreatable ? index + 1 : index;
+                        return (
+                          <AutoCompleteOption
+                            key={value}
+                            value={value}
+                            label={label}
+                            enabled={enabled}
+                            keywords={keywords}
+                            readOnly={readOnly}
+                            isHighlighted={selectedIndex === itemIndex}
+                            itemIndex={itemIndex}
+                          />
+                        );
+                      })}
                     </div>
-                  </PopoverContent>
-                </Portal>
-              )}
-            </div>
+                  </div>
+                </PopoverContent>
+              </Portal>
+            )}
           </Popover>
           {children}
         </OptionTypeProvider>
@@ -675,7 +696,14 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
     itemIndex,
   } = option;
   const id = useId();
-  const { value: selectedValue, onChange, multi, setOpen, setSelectedIndex, optionRenderer } = useAutoComplete();
+  const {
+    value: selectedValue,
+    onChange,
+    multi,
+    setOpen,
+    setSelectedIndex,
+    optionRenderer,
+  } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   const handleClick = () => {
