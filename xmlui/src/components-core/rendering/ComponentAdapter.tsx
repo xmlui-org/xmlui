@@ -32,7 +32,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
-import { useBehaviors } from "../behaviors/BehaviorContext";
+import { getCoreBehaviors } from "../behaviors/CoreBehaviors";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -274,10 +274,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     }
 
      /**
-     * 
+     *
      */
-    const { getBehaviors } = useBehaviors();
-    const behaviors = getBehaviors();
+    const behaviors = getCoreBehaviors();
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
         if (behavior.canAttach(rendererContext.node, descriptor)) {

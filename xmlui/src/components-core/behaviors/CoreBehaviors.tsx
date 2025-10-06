@@ -9,10 +9,7 @@ import {
   parseTooltipOptions,
   Tooltip
 } from "../../components/Tooltip/TooltipNative";
-import type { Behavior } from "./BehaviorContext";
-import { MetadataProvider } from "../../language-server/services/common/metadata-utils";
-import { collectedComponentMetadata } from "../../components/collectedComponentMetadata";
-import { ComponentMetadata } from "../..";
+import type { Behavior } from "./Behavior";
 
 /**
  * Behavior for applying tooltips to components.
@@ -110,4 +107,9 @@ export const labelBehavior: Behavior = {
       </ItemWithLabel>
     );
   },
+};
+
+
+export const getCoreBehaviors = () => {
+  return [tooltipBehavior, animationBehavior, labelBehavior];
 };
