@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.10.18
+
+### Patch Changes
+
+- 202f2b2: refactor: use labelBehavior instead of ItemWithLabel
+- 6650ee8: Add back removed RadioItem
+- da98994: Fixed FormItem validation indicators to use a relaxed validation indication strategy.
+- 8394663: fix: labelBehavior, input components - styling issue
+
 ## 0.10.17
 
 ### Patch Changes
