@@ -41,7 +41,6 @@ const numberRegex = /^[0-9]+$/;
 export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
-    testId,
     labelPosition = "top",
     style = {},
     className,
@@ -95,7 +94,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div {...rest} data-testid={testId} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
+    <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
@@ -129,7 +128,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined} data-testid={undefined}>
+        <Slot data-part-id={PART_LABELED_ITEM} id={!isInputTemplateUsed ? inputId : undefined}>
           {children}
         </Slot>
       </div>

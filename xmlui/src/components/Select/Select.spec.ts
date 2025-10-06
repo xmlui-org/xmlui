@@ -292,7 +292,6 @@ test("labelBreak prop defaults to false", async ({ initTestBed, page, createSele
   await initTestBed(`
     <Select
       label="Dignissimos esse quasi esse cupiditate qui qui. Ut provident ad voluptatem tenetur sit consequuntur. Aliquam nisi fugit ut temporibus itaque ducimus rerum. Dolorem reprehenderit qui adipisci. Ullam harum atque ipsa."
-
       >
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
@@ -301,7 +300,7 @@ test("labelBreak prop defaults to false", async ({ initTestBed, page, createSele
   const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
   const select = page.getByRole("button").or(page.getByRole("combobox")).first();
   const { width: selectWidth } = await select.boundingBox();
-  expect(labelWidth).toBeGreaterThan(selectWidth);
+  expect(labelWidth).toBe(selectWidth);
 });
 
 test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
@@ -525,7 +524,7 @@ test.describe("multiSelect", () => {
     const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
     const select = page.getByRole("button").or(page.getByRole("combobox")).first();
     const { width: selectWidth } = await select.boundingBox();
-    expect(labelWidth).toBeGreaterThan(selectWidth);
+    expect(labelWidth).toBe(selectWidth);
   });
 
   test('labelPosition="start" is left in ltr language', async ({

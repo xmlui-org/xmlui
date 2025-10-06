@@ -4,7 +4,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -12,13 +11,8 @@ import {
   dEndText,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -59,10 +53,6 @@ export const DateInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     mode: {
       description: "The mode of the date input (single or range)",
       valueType: "string",
@@ -258,10 +248,6 @@ export const dateInputComponentRenderer = createComponentRenderer(
         startIcon={extractValue.asOptionalString(node.props.startIcon)}
         endText={extractValue.asOptionalString(node.props.endText)}
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        label={extractValue.asOptionalString(node.props.label)}
-        labelPosition={extractValue.asOptionalString(node.props.labelPosition)}
-        labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         required={extractValue.asOptionalBoolean(node.props.required)}

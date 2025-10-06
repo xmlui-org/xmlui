@@ -6,11 +6,11 @@ import styles from "./Slider.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 import { Tooltip } from "../Tooltip/TooltipNative";
 import { isNaN } from "lodash-es";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export type Props = {
   id?: string;
@@ -32,10 +32,6 @@ export type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   enabled?: boolean;
   rangeStyle?: CSSProperties;
@@ -124,10 +120,6 @@ export const Slider = forwardRef(
       autoFocus,
       readOnly,
       tabIndex = defaultProps.tabIndex,
-      label,
-      labelPosition,
-      labelWidth,
-      labelBreak,
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue,
@@ -140,9 +132,8 @@ export const Slider = forwardRef(
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
-    const _id = useId();
-    id = id || _id;
     const inputRef = useRef(null);
+    const ref = forwardedRef ? composeRefs(inputRef, forwardedRef) : inputRef;
     const tooltipRef = useRef<HTMLDivElement>(null);
     const thumbsRef = useRef<(HTMLSpanElement | null)[]>([]);
     min = parseValue(min, defaultProps.min);
@@ -283,26 +274,10 @@ export const Slider = forwardRef(
     }, [displayValue.length]);
 
       return (
-        <ItemWithLabel
-          {...rest}
-          labelPosition={labelPosition as any}
-          label={label}
-          labelWidth={labelWidth}
-          labelBreak={labelBreak}
-          required={required}
-          enabled={enabled}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          style={style}
-          className={className}
-          ref={forwardedRef}
-          id={id}
-          isInputTemplateUsed={true}
-        >
           <div className={styles.sliderContainer} data-slider-container>
             <Root
               minStepsBetweenThumbs={minStepsBetweenThumbs}
-              ref={inputRef}
+              ref={ref}
               tabIndex={tabIndex}
               aria-readonly={readOnly}
               className={classnames(className, styles.sliderRoot, {
@@ -366,7 +341,6 @@ export const Slider = forwardRef(
             ))}
           </Root>
         </div>
-      </ItemWithLabel>
     );
   },
 );

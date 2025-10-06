@@ -87,10 +87,7 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
+  direction?: "ltr" | "rtl";
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -125,10 +122,7 @@ export const NumberBox = forwardRef(function NumberBox(
     autoFocus,
     readOnly,
     required,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
+    direction,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -571,32 +565,19 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <ItemWithLabel
-      {...rest}
-      id={id}
-      ref={forwardedRef}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
-      isInputTemplateUsed={true}
-    >
       <div
-        className={classnames(styles.inputRoot, {
+        {...rest}
+        className={classnames(styles.inputRoot,{
           [styles.readOnly]: readOnly,
           [styles.disabled]: !enabled,
           [styles.noSpinBox]: !hasSpinBox,
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
+          [styles.rtl]: direction === "rtl",
         })}
+        id={id}
+        ref={forwardedRef}
         tabIndex={-1}
         onFocus={() => {
           inputRef.current?.focus();
@@ -676,7 +657,6 @@ export const NumberBox = forwardRef(function NumberBox(
           </div>
         )}
       </div>
-    </ItemWithLabel>
   );
 });
 

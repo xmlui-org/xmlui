@@ -4,7 +4,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -12,14 +11,9 @@ import {
   dEndText,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -48,10 +42,6 @@ export const DatePickerMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     mode: {
       description: "The mode of the datepicker (single or range)",
       valueType: "string",
@@ -180,7 +170,6 @@ export const datePickerComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <DatePicker
-        id={node.uid}
         className={className}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
@@ -206,10 +195,6 @@ export const datePickerComponentRenderer = createComponentRenderer(
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       />
     );
   },

@@ -5,19 +5,12 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
-  dFocus,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi,
   dValidationStatus,
-  dValue,
 } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ColorPicker.module.scss";
@@ -30,10 +23,6 @@ export const ColorPickerMd = createMetadata({
     "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
   props: {
     initialValue: dInitialValue(),
-    label: dLabel(),
-    labelPosition: dLabelPosition(),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -94,10 +83,6 @@ export const colorPickerComponentRenderer = createComponentRenderer(
         enabled={enabled && !readOnly}
         readOnly={readOnly}
         autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}
-        label={extractValue(node.props?.label)}
-        labelPosition={extractValue(node.props?.labelPosition)}
-        labelBreak={extractValue(node.props?.labelBreak)}
-        labelWidth={extractValue(node.props?.labelWidth)}
       />
     );
   },

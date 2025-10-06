@@ -1,15 +1,17 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { useEffect, useTransition } from "react";
+import { useEffect, useId, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { noop } from "../../components-core/constants";
 import type { ValidationStatus } from "../abstractions";
 import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+import { PART_INPUT } from "../../components-core/parts";
 
 type Props = {
+  id?: string;
   value?: string;
   initialValue?: string;
   style?: CSSProperties;
@@ -21,10 +23,6 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
   autoFocus?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   readOnly?: boolean;
   enabled?: boolean;
@@ -44,6 +42,7 @@ export const defaultProps: Pick<
 export const ColorPicker = forwardRef(
   (
     {
+      id,
       style,
       className,
       updateState,
@@ -56,19 +55,16 @@ export const ColorPicker = forwardRef(
       value = defaultProps.value,
       autoFocus,
       tabIndex = 0,
-      label,
-      labelPosition,
-      labelWidth,
-      labelBreak,
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue = defaultProps.initialValue,
       ...rest
     }: Props,
-    forwardedRef: ForwardedRef<HTMLDivElement>,
+    forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
-    const inputRef = useRef(null);
     const [isPending, startTransition] = useTransition();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const composedRef = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
     const updateValue = useCallback(
       (value: string) => {
@@ -77,6 +73,7 @@ export const ColorPicker = forwardRef(
       },
       [onDidChange, updateState],
     );
+
 
     const updateValueWithTransition = useCallback(
       (value: string, immediate = false) => {
@@ -126,43 +123,32 @@ export const ColorPicker = forwardRef(
       });
     }, [focus, registerComponentApi, setValue]);
 
+    {/* Produces a 7 character RGB color output in hex as a string type */ }
     return (
-      <ItemWithLabel
+      <input
         {...rest}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
+        id={id}
+        className={classnames(styles.colorInput, className, {
+          [styles.disabled]: !enabled,
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        data-part-id={PART_INPUT}
         style={style}
-        className={className}
-        ref={forwardedRef}
-      >
-        {/* Produces a 7 character RGB color output in hex as a string type */}
-        <input
-          className={classnames(styles.colorInput, {
-            [styles.disabled]: !enabled,
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          })}
-          disabled={!enabled}
-          onFocus={handleOnFocus}
-          onChange={onInputChange}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          tabIndex={tabIndex}
-          onBlur={handleOnBlur}
-          required={required}
-          type="color"
-          inputMode="text"
-          ref={inputRef}
-          value={value}
-        />
-      </ItemWithLabel>
+        disabled={!enabled}
+        onFocus={handleOnFocus}
+        onChange={onInputChange}
+        readOnly={readOnly}
+        autoFocus={autoFocus}
+        tabIndex={tabIndex}
+        onBlur={handleOnBlur}
+        required={required}
+        type="color"
+        inputMode="text"
+        ref={composedRef}
+        value={value}
+      />
     );
   },
 );

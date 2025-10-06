@@ -273,6 +273,19 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderedNode = renderer(rendererContext);
     }
 
+     /**
+     * 
+     */
+    const { getBehaviors } = useBehaviors();
+    const behaviors = getBehaviors();
+    if (!isCompoundComponent) {
+      for (const behavior of behaviors) {
+        if (behavior.canAttach(rendererContext.node, descriptor)) {
+          renderedNode = behavior.attach(rendererContext, renderedNode);
+        }
+      }
+    }
+
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.
     if (
@@ -325,19 +338,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           parentRendererContext={parentRenderContext}
         />
       );
-    }
-
-    /**
-     * 
-     */
-    const { getBehaviors } = useBehaviors();
-    const behaviors = getBehaviors();
-    if (!isCompoundComponent) {
-      for (const behavior of behaviors) {
-        if (behavior.canAttach(rendererContext.node, descriptor)) {
-          renderedNode = behavior.attach(rendererContext, renderedNode);
-        }
-      }
     }
 
     // --- The current layout context may suggest to wrap the rendered node.

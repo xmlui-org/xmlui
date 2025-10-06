@@ -93,12 +93,9 @@ export const labelBehavior: Behavior = {
     const enabled = extractValue.asOptionalBoolean(componentNode.props.enabled, true);
     const shrinkToLabel = extractValue.asOptionalBoolean(componentNode.props.shrinkToLabel);
     const style = extractValue(componentNode.props.style);
-    const generatedId = useId();
 
-    console.log("HERE!!!");
     return (
       <ItemWithLabel
-        id={componentNode.uid || generatedId}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -108,7 +105,6 @@ export const labelBehavior: Behavior = {
         style={style}
         className={className}
         shrinkToLabel={shrinkToLabel}
-        testId={componentNode.testId}
       >
         {node}
       </ItemWithLabel>

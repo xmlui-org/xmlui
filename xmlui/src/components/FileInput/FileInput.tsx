@@ -8,13 +8,8 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
-  dFocus,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dPlaceholder,
   dReadonly,
@@ -43,10 +38,6 @@ export const FileInputMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     buttonVariant: d("The button variant to use", buttonVariantNames),
     buttonLabel: d(`This property is an optional string to set a label for the button part.`),
     buttonIcon: d(
@@ -153,10 +144,6 @@ export const fileInputRenderer = createComponentRenderer(
         buttonPosition={extractValue.asOptionalString(node.props.buttonPosition)}
         initialValue={extractValue(node.props.initialValue)}
         acceptsFileType={extractValue(node.props.acceptsFileType)}
-        label={extractValue.asOptionalString(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         className={className}
       />

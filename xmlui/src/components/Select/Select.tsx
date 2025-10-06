@@ -13,14 +13,7 @@ import {
   dDidChange,
   dGotFocus,
   dLostFocus,
-  dFocus,
-  dSetValueApi,
   dMulti,
-  dLabel,
-  dLabelPosition,
-  dLabelWidth,
-  dLabelBreak,
-  dValue,
   dComponent,
   createMetadata,
   d,
@@ -67,13 +60,6 @@ export const SelectMd = createMetadata({
     validationStatus: {
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
-    },
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: {
-      ...dLabelBreak(COMP),
-      defaultValue: defaultProps.labelBreak,
     },
     optionLabelTemplate: dComponent(
       `This property allows replacing the default template to display an option in the dropdown list.`,
@@ -210,10 +196,6 @@ export const selectComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         valueRenderer={
           node.props.valueTemplate

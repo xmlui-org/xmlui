@@ -36,7 +36,6 @@ import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "./HiddenOption";
 import { useIsInsideForm } from "../Form/FormContext";
 
@@ -95,12 +94,6 @@ interface SelectProps {
   inProgress?: boolean;
   inProgressNotificationMessage?: string;
 
-  // Label configuration
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
-
   // Internal
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
@@ -152,9 +145,8 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       ...rest
     } = props;
 
-    // Compose refs for proper forwarding
-    const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
-    const { options } = useSelect();
+    const { options } = useSelect();  
+    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;  
 
     // Convert value to string for Radix UI compatibility
     const stringValue = useMemo(() => {
@@ -181,6 +173,7 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         <SelectTrigger
           {...rest}
           id={id}
+          ref={composedRef}
           aria-haspopup="listbox"
           style={style}
           onFocus={onFocus}
@@ -196,7 +189,6 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
             event.stopPropagation();
           }}
-          ref={ref}
           autoFocus={autoFocus}
         >
           <div
@@ -272,12 +264,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     inProgress = defaultProps.inProgress,
     inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
 
-    // Label configuration
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak = defaultProps.labelBreak,
-
     // Internal
     updateState = noop,
     registerComponentApi,
@@ -285,7 +271,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
     ...rest
   },
-  ref,
+  forwardedRef,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -293,8 +279,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState(new Set<Option>());
-  const generatedId = useId();
-  const inputId = id || generatedId;
   const isInForm = useIsInsideForm();
 
   // Set initial state based on the initialValue prop
@@ -423,27 +407,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         {searchable || multiSelect ? (
           <OptionTypeProvider Component={HiddenOption}>
             <Popover open={open} onOpenChange={setOpen} modal={false}>
-              <ItemWithLabel
-                {...rest}
-                ref={ref}
-                id={inputId}
-                labelPosition={labelPosition as any}
-                label={label}
-                labelWidth={labelWidth}
-                labelBreak={labelBreak}
-                required={required}
-                enabled={enabled}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                className={className}
-                style={style}
-              >
                 <PopoverTrigger
                   {...rest}
-                  id={inputId}
+                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  id={id}
                   aria-haspopup="listbox"
                   style={style}
-                  ref={setReferenceElement}
                   onFocus={onFocus}
                   onBlur={onBlur}
                   disabled={!enabled}
@@ -520,7 +489,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     </div>
                   </>
                 </PopoverTrigger>
-              </ItemWithLabel>
               {open && (
                 <Portal container={root}>
                   <FocusScope asChild loop trapped>
@@ -577,29 +545,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           </OptionTypeProvider>
         ) : (
           <OptionTypeProvider Component={SelectOption}>
-            <ItemWithLabel
-              {...rest}
-              ref={ref}
-              id={inputId}
-              labelPosition={labelPosition as any}
-              label={label}
-              labelWidth={labelWidth}
-              labelBreak={labelBreak}
-              required={required}
-              enabled={enabled}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              className={className}
-              style={style}
-            >
               <SimpleSelect
                 {...rest}
                 readOnly={!!readOnly}
-                ref={ref}
+                ref={forwardedRef}
                 key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
                 value={value as SingleValueType}
                 onValueChange={toggleOption}
-                id={inputId}
+                id={id}
                 style={style}
                 className={className}
                 onFocus={onFocus}
@@ -615,7 +568,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               >
                 {children}
               </SimpleSelect>
-            </ItemWithLabel>
           </OptionTypeProvider>
         )}
       </OptionContext.Provider>

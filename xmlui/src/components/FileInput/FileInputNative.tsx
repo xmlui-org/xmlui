@@ -14,7 +14,6 @@ import type { ValidationStatus } from "../abstractions";
 import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { TextBox } from "../TextBox/TextBoxNative";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -49,10 +48,6 @@ type Props = {
   acceptsFileType?: string | string[];
   multiple?: boolean;
   directory?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   placeholder?: string;
   buttonPosition?: "start" | "end";
@@ -109,10 +104,6 @@ export const FileInput = ({
   acceptsFileType,
   multiple = defaultProps.multiple,
   directory = defaultProps.directory,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
   required,
   ...rest
 }: Props) => {
@@ -191,27 +182,16 @@ export const FileInput = ({
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
-    <ItemWithLabel
-      {...rest}
-      id={id}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      style={style}
-      className={className}
-      isInputTemplateUsed={true}
-    >
       <div
-        className={classnames(styles.container, {
+        className={classnames(styles.container, className, {
           [styles.buttonStart]: buttonPosition === "start",
           [styles.buttonEnd]: buttonPosition === "end",
         })}
+        style={style}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         tabIndex={-1}
+        {...rest}
       >
         <button
           id={id}
@@ -257,7 +237,6 @@ export const FileInput = ({
           {buttonLabel}
         </Button>
       </div>
-    </ItemWithLabel>
   );
 };
 

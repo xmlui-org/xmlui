@@ -1,4 +1,4 @@
-import { type CSSProperties, useId } from "react";
+import { type CSSProperties, ForwardedRef, useId, useRef } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
@@ -12,43 +12,43 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import Icon from "../Icon/IconNative";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
 
 // Extended matcher types that support string dates in addition to Date objects
-type StringDateRange = { 
-  from: string | Date; 
-  to?: string | Date; 
+type StringDateRange = {
+  from: string | Date;
+  to?: string | Date;
 };
 
-type StringDateBefore = { 
-  before: string | Date; 
+type StringDateBefore = {
+  before: string | Date;
 };
 
-type StringDateAfter = { 
-  after: string | Date; 
+type StringDateAfter = {
+  after: string | Date;
 };
 
-type StringDateInterval = { 
-  before: string | Date; 
-  after: string | Date; 
+type StringDateInterval = {
+  before: string | Date;
+  after: string | Date;
 };
 
-type DayOfWeekMatcher = { 
-  dayOfWeek: number | number[]; 
+type DayOfWeekMatcher = {
+  dayOfWeek: number | number[];
 };
 
-type ExtendedMatcher = 
+type ExtendedMatcher =
   | boolean
   | string
   | Date
   | (string | Date)[]
   | StringDateRange
-  | StringDateBefore  
+  | StringDateBefore
   | StringDateAfter
   | StringDateInterval
   | DayOfWeekMatcher
@@ -184,14 +184,14 @@ export const DatePicker = forwardRef(function DatePicker(
     autoFocus = false,
     ...rest
   }: Props,
-  ref: React.Ref<HTMLDivElement>,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
-  const generatedId = useId();
-  const inputId = id || generatedId;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
   const selected: any = useMemo(() => {
     if (mode === "single" && typeof value === "string") {
@@ -214,7 +214,6 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [dateFormat]);
 
   const startDate = useMemo(() => {
-    console.log(minValue, parse(minValue, dateFormat, new Date()));
     return minValue ? parse(minValue, dateFormat, new Date()) : undefined;
   }, [minValue, dateFormat]);
 
@@ -275,7 +274,7 @@ export const DatePicker = forwardRef(function DatePicker(
       // Handle array of mixed matchers (combines multiple disable patterns)
       if (Array.isArray(matcher)) {
         const convertedMatchers: any[] = [];
-        
+
         for (const item of matcher) {
           if (typeof item === 'object' && item !== null && !Array.isArray(item) && !(item instanceof Date)) {
             // Handle nested matcher objects in array (e.g., {dayOfWeek: [0,6]}, {from: date, to: date})
@@ -291,7 +290,7 @@ export const DatePicker = forwardRef(function DatePicker(
             }
           }
         }
-        
+
         // Return array of all matchers to combine their effects
         return convertedMatchers.length > 0 ? convertedMatchers as Matcher : undefined;
       }
@@ -428,71 +427,42 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   return inline ? (
-    <ItemWithLabel
-      id={inputId}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-      ref={ref}
-    >
-      <div {...rest} className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>
-        <DayPicker
-          id={inputId}
-          required={undefined}
-          captionLayout="dropdown"
-          fixedWeeks
-          startMonth={startDate}
-          endMonth={endDate}
-          month={inlineMonth}
-          onMonthChange={setInlineMonth}
-          disabled={disabled}
-          weekStartsOn={_weekStartsOn}
-          showWeekNumber={showWeekNumber}
-          showOutsideDays
-          classNames={styles}
-          mode={mode === "single" ? "single" : "range"}
-          selected={selected}
-          onSelect={handleSelect}
-          autoFocus={autoFocus}
-          numberOfMonths={mode === "range" ? 2 : 1}
-          components={{
-            Chevron,
-          }}
-        />
-      </div>
-    </ItemWithLabel>
+    <div ref={ref} {...rest} style={style} className={classnames(styles.inlinePickerMenu, className)} tabIndex={0}>
+      <DayPicker
+        id={id}
+        required={undefined}
+        captionLayout="dropdown"
+        fixedWeeks
+        startMonth={startDate}
+        endMonth={endDate}
+        month={inlineMonth}
+        onMonthChange={setInlineMonth}
+        disabled={disabled}
+        weekStartsOn={_weekStartsOn}
+        showWeekNumber={showWeekNumber}
+        showOutsideDays
+        classNames={styles}
+        mode={mode === "single" ? "single" : "range"}
+        selected={selected}
+        onSelect={handleSelect}
+        autoFocus={autoFocus}
+        numberOfMonths={mode === "range" ? 2 : 1}
+        components={{
+          Chevron,
+        }}
+      />
+    </div>
   ) : (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <ItemWithLabel
-        {...rest}
-        id={inputId}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-        className={className}
-        ref={ref}
-      >
         <PopoverTrigger
-          ref={setReferenceElement}
-          id={inputId}
+          id={id}
+          ref={composeRefs(setReferenceElement, ref)}
           aria-haspopup={true}
           disabled={!enabled}
           style={style}
           aria-expanded={open}
           className={classnames(
+            className,
             styles.datePicker,
             {
               [styles.disabled]: !enabled,
@@ -528,7 +498,6 @@ export const DatePicker = forwardRef(function DatePicker(
           </div>
           <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
         </PopoverTrigger>
-      </ItemWithLabel>
       <PopoverPortal container={root}>
         <PopoverContent
           role="menu"
