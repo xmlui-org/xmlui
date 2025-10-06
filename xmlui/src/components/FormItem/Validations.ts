@@ -389,7 +389,7 @@ export function useValidationDisplay(
   switch (validationMode) {
     // This validation model was inspired by https://medium.com/wdstack/inline-validation-in-forms-designing-the-experience-123fb34088ce
     // The idea is to show validation errors as late as possible (on blur)
-    case "errorLate":
+    case "errorLate": {
       // --- Don't fire if not dirty
       if (!isDirty) {
         isHelperTextShown = false;
@@ -406,11 +406,14 @@ export function useValidationDisplay(
         break;
       }
       break;
-    case "onChanged":
+    }
+    case "onChanged": {
       isHelperTextShown = isDirty;
       break;
-    case "onLostFocus":
-      isHelperTextShown = isDirty && !isValid && (!focused || !isValidLostFocus);
+    }
+    case "onLostFocus": {
+      isHelperTextShown = isDirty && !focused && !isValidLostFocus;
+    }
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;
 

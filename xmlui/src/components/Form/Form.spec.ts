@@ -1437,7 +1437,7 @@ test("field-related errors are rendered at FormItems", async ({
   const fieldDriver = await createFormItemDriver("testField");
 
   await formDriver.submitForm();
-  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "warning",
   );
@@ -1462,7 +1462,7 @@ test("field-related errors map to correct FormItems", async ({
   const fieldDriver = await createFormItemDriver("testField");
 
   await formDriver.submitForm();
-  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "warning",
   );
@@ -1487,7 +1487,7 @@ test.skip("field-related errors disappear if user updates FormItems", async ({ i
 
   // Should show required error now
   await expect(fieldDriver.textBox).toHaveValue("");
-  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "error",
   );
@@ -1500,7 +1500,7 @@ test.skip("field-related errors disappear if user updates FormItems", async ({ i
   await expect(fieldDriver2.textBox).toBeFocused();
 
   await fieldDriver2.textBox.fill("b");
-  expect(await fieldDriver.getValidationStatusIndicator()).not.toBeVisible();
+  await expect(fieldDriver.validationStatusIndicator).not.toBeVisible();
 });
 
 const smartCrudInterceptor: ApiInterceptorDefinition = {
