@@ -78,6 +78,7 @@ import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
 import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
+import { radioItemComponentRenderer} from "./RadioGroup/RadioItem";
 import { SlotHolder } from "./Slot/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
@@ -550,6 +551,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(numberBoxComponentRenderer);
       this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
+      this.registerCoreComponent(radioItemComponentRenderer);
       this.registerCoreComponent(fileInputRenderer);
       this.registerCoreComponent(spinnerComponentRenderer);
       this.registerCoreComponent(selectComponentRenderer);
