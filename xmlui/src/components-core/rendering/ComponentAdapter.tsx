@@ -256,6 +256,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
   let renderingError = null;
+
   try {
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
@@ -273,8 +274,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderedNode = renderer(rendererContext);
     }
 
-     /**
-     *
+    /**
+     * Apply any core behaviors to the component.
      */
     const behaviors = getCoreBehaviors();
     if (!isCompoundComponent) {
