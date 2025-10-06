@@ -260,6 +260,22 @@ test.describe("Label", () => {
     expect(width).toEqual(expected);
   });
 
+  test("input has correct width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TextBox width="200px" testId="test"/>
+    `);
+    const { width } = await page.getByTestId("test").boundingBox();
+    expect(width).toBe(200);
+  });
+
+  test("input with label has correct width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TextBox width="200px" label="test" testId="test"/>
+    `);
+    const { width } = await page.getByTestId("test").boundingBox();
+    expect(width).toBe(200);
+  });
+
   test("labelBreak enables label line breaks", async ({ initTestBed, createTextBoxDriver }) => {
     const labelText = "Very long label text that should break";
     const commonProps = `label="${labelText}" labelWidth="100px"`;
