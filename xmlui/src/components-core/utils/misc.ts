@@ -112,10 +112,13 @@ export const useEvent: UseEventOverload = (callback) => {
     callbackRef.current = callback;
   }, [callback]);
 
-  return useCallback((...args: any) => {
-    const latestFn = callbackRef.current
-    return latestFn?.(...args);
-  }, [callbackRef]);
+  return useCallback(
+    (...args: any) => {
+      const latestFn = callbackRef.current;
+      return latestFn?.(...args);
+    },
+    [callbackRef],
+  );
 };
 
 /**

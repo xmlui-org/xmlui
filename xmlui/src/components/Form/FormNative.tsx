@@ -351,7 +351,7 @@ const Form = forwardRef(function (
 
   const doCancel = useEvent(() => {
     onCancel?.();
-    requestModalFormClose();
+    void requestModalFormClose();
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
@@ -391,7 +391,7 @@ const Form = forwardRef(function (
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
-        requestModalFormClose();
+        void requestModalFormClose();
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
