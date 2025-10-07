@@ -20,7 +20,7 @@ import type {
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { useFormContextPart } from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
@@ -199,24 +199,24 @@ export const FormItem = memo(function FormItem({
     }
   }, [bindTo, defaultId, itemIndex, parentFormItemId]);
 
-  const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
+  const labelWidthValue = useFormContextPart((value) => labelWidth || value?.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
-    labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
+    labelBreak !== undefined ? labelBreak : value?.itemLabelBreak,
   );
   const labelPositionValue = useFormContextPart<any>(
-    (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
+    (value) => labelPosition || value?.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
   const initialValueFromSubject = useFormContextPart<any>((value) =>
-    getByPath(value.originalSubject, formItemId),
+    getByPath(value?.originalSubject, formItemId),
   );
   const initialValue =
     initialValueFromSubject === undefined ? initialValueFromProps : initialValueFromSubject;
 
-  const value = useFormContextPart<any>((value) => getByPath(value.subject, formItemId));
+  const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
 
-  const validationResult = useFormContextPart((value) => value.validationResults[formItemId]);
-  const dispatch = useFormContextPart((value) => value.dispatch);
-  const formEnabled = useFormContextPart((value) => value.enabled);
+  const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
+  const dispatch = useFormContextPart((value) => value?.dispatch);
+  const formEnabled = useFormContextPart((value) => value?.enabled);
 
   const isEnabled = enabled && formEnabled;
 
@@ -492,6 +492,10 @@ export const FormItem = memo(function FormItem({
 
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
+  const isInsideForm = useIsInsideForm();
+  if (!isInsideForm) {
+    throw new Error("FormItem must be used inside a Form");
+  }
   return (
     <ItemWithLabel
       labelPosition={labelPositionValue}

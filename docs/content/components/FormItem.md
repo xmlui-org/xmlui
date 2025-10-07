@@ -2,6 +2,8 @@
 
 `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
 
+> **Note:** `FormItem` must be used inside a `Form` component.
+
 **Key features:**
 - **Data binding**: Automatically syncs control values with form data using the `bindTo` property
 - **Validation**: Displays validation states and error messages for the associated input

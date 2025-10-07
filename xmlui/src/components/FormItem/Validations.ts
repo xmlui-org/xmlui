@@ -357,7 +357,7 @@ export function useValidationDisplay(
   validationStatus: ValidationSeverity;
 } {
   const interactionFlags: any =
-    useFormContextPart((value) => value.interactionFlags[bindTo]) || EMPTY_OBJECT;
+    useFormContextPart((value) => value?.interactionFlags[bindTo]) || EMPTY_OBJECT;
   const forceShowValidationResult = interactionFlags.forceShowValidationResult;
   const focused = interactionFlags.focused;
   const afterFirstDirtyBlur = interactionFlags.afterFirstDirtyBlur;

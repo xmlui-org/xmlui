@@ -1,4 +1,4 @@
-import React, { ErrorInfo, ReactNode } from "react";
+import React, { type ErrorInfo, type ReactNode } from "react";
 
 import styles from "./ErrorBoundary.module.scss";
 
@@ -75,7 +75,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
    */
   render() {
     return this.state.hasError ? (
-      <div className={styles.errorOverlay}>
+      <div data-error-boundary className={styles.errorOverlay}>
         <div className={styles.title}>There was an error!</div>
         <div className={styles.errorItem}>{this.state.error?.message}</div>
       </div>
