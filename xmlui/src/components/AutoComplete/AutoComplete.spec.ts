@@ -340,6 +340,37 @@ test("gotFocus and lostFocus events work correctly", async ({
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 });
 
+test("gotFocus and lostFocus events by clicking on label work correctly", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
+    <App var.isFocused="false">
+      <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
+      <AutoComplete
+        id="autoComplete"
+        label="Select a hero"
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false"
+      >
+        <Option value="1" label="Bruce Wayne" />
+      </AutoComplete>
+    </App>
+  `);
+
+  // Initial state
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
+
+  // Focus the autocomplete
+  await page.getByText("Select a hero").click();
+
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
+
+  // Blur the autocomplete
+  await page.keyboard.press("Tab");
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
+});
+
 test("setValue API works correctly", async ({ initTestBed, page }) => {
   await initTestBed(`
     <App>
@@ -436,10 +467,8 @@ test("creates new option when typing non-existing value", async ({
 // ACCESSIBILITY TESTS
 // =============================================================================
 
-test("has appropriate ARIA attributes", // SKIP_REASON.XMLUI_BUG(
-//   "There's a weird issue where the aria-expanded attribute is not set correctly on the input but it is on the wrapping div.",
-// ),
-async ({ initTestBed, page }) => {
+test("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
+  // ), //   "There's a weird issue where the aria-expanded attribute is not set correctly on the input but it is on the wrapping div.", // SKIP_REASON.XMLUI_BUG(
   // TODO: review these Copilot-created tests
   await initTestBed(`
     <AutoComplete label="Select a hero" placeholder="Search heroes">
@@ -500,7 +529,7 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
 
 test("input has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<AutoComplete width="200px" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
@@ -508,25 +537,25 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<AutoComplete width="200px" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<AutoComplete width="50%" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input with label has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<AutoComplete width="50%" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);

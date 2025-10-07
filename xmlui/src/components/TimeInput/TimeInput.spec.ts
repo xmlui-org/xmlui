@@ -75,9 +75,7 @@ test.describe("Basic Functionality", () => {
     });
 
     test("handles time with seconds", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(
-        `<TimeInput testId="timeInput" initialValue="14:30:45" seconds="true" />`,
-      );
+      await initTestBed(`<TimeInput testId="timeInput" initialValue="14:30:45" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
       await expect(driver.hourInput).toHaveValue("14");
@@ -87,7 +85,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("falls back to ISO time format when standard parsing fails", async ({ initTestBed, createTimeInputDriver }) => {
+    test("falls back to ISO time format when standard parsing fails", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="15:30:00" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -98,7 +99,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("falls back to ISO time format with seconds", async ({ initTestBed, createTimeInputDriver }) => {
+    test("falls back to ISO time format with seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="09:15:30" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -109,7 +113,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles boolean initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles boolean initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{true}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -120,7 +127,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles numeric initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles numeric initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{123}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -131,7 +141,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles array initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles array initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{['14', '30']}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -142,8 +155,13 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles object initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" initialValue="{{ hour: 14, minute: 30 }}" />`);
+    test("handles object initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(
+        `<TimeInput testId="timeInput" initialValue="{{ hour: 14, minute: 30 }}" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
       await expect(driver.hourInput).toHaveValue("");
@@ -153,7 +171,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles function initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles function initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{() => '14:30'}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -164,7 +185,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles Date object initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles Date object initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{getDate()}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -175,7 +199,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles Symbol initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles Symbol initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{Symbol('time')}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -186,7 +213,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles BigInt initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles BigInt initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{BigInt(1430)}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -197,7 +227,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles zero numeric initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles zero numeric initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{0}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -208,7 +241,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles negative numeric initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles negative numeric initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="{-1}" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -219,7 +255,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles empty string initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles empty string initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -230,7 +269,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("handles whitespace-only initialValue gracefully", async ({ initTestBed, createTimeInputDriver }) => {
+    test("handles whitespace-only initialValue gracefully", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" initialValue="   " />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
@@ -243,8 +285,13 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("hour24 and seconds properties", () => {
-    test("displays 24-hour format without seconds", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="false" initialValue="14:30" />`);
+    test("displays 24-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(
+        `<TimeInput testId="timeInput" hour24="true" seconds="false" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
       await expect(driver.hourInput).toHaveValue("14");
@@ -267,8 +314,13 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("displays 12-hour format without seconds", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="false" initialValue="14:30" />`);
+    test("displays 12-hour format without seconds", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(
+        `<TimeInput testId="timeInput" hour24="false" seconds="false" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.hourInput).toHaveValue("02");
       await expect(driver.minuteInput).toHaveValue("30");
@@ -277,7 +329,9 @@ test.describe("Basic Functionality", () => {
     });
 
     test("displays 12-hour format with seconds", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="true" initialValue="14:30:15" />`);
+      await initTestBed(
+        `<TimeInput testId="timeInput" hour24="false" seconds="true" initialValue="14:30:15" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.hourInput).toHaveValue("02");
       await expect(driver.minuteInput).toHaveValue("30");
@@ -348,7 +402,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("clearable property", () => {
-    test("shows clear button when clearable is true", async ({ initTestBed, createTimeInputDriver }) => {
+    test("shows clear button when clearable is true", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" clearable="true" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.clearButton).toBeVisible();
@@ -363,7 +420,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).not.toBeVisible();
     });
 
-    test("clears value when clear button is clicked (clearToInitialValue is true)", async ({ initTestBed, createTimeInputDriver }) => {
+    test("clears value when clear button is clicked (clearToInitialValue is true)", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" clearable="true" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
       driver.hourInput.fill("05");
@@ -372,7 +432,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.minuteInput).toHaveValue("30");
     });
 
-    test("clears value when clear button is clicked (clearToInitialValue is false)", async ({ initTestBed, createTimeInputDriver }) => {
+    test("clears value when clear button is clicked (clearToInitialValue is false)", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`
           <TimeInput testId="timeInput" clearable="true" 
             clearToInitialValue="false" initialValue="14:30" />
@@ -387,7 +450,9 @@ test.describe("Basic Functionality", () => {
 
   test.describe("clearIcon property", () => {
     test("displays custom clear icon", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" clearable="true" clearIcon="trash" initialValue="14:30" />`);
+      await initTestBed(
+        `<TimeInput testId="timeInput" clearable="true" clearIcon="trash" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.clearButton).toBeVisible();
       // Icon presence would be tested via the icon's specific attributes
@@ -410,19 +475,25 @@ test.describe("Basic Functionality", () => {
 
   test.describe("validationStatus property", () => {
     test("displays valid status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" validationStatus="valid" initialValue="14:30" />`);
+      await initTestBed(
+        `<TimeInput testId="timeInput" validationStatus="valid" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
     });
 
     test("displays warning status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" validationStatus="warning" initialValue="14:30" />`);
+      await initTestBed(
+        `<TimeInput testId="timeInput" validationStatus="warning" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
     });
 
     test("displays error status", async ({ initTestBed, createTimeInputDriver }) => {
-      await initTestBed(`<TimeInput testId="timeInput" validationStatus="error" initialValue="14:30" />`);
+      await initTestBed(
+        `<TimeInput testId="timeInput" validationStatus="error" initialValue="14:30" />`,
+      );
       const driver = await createTimeInputDriver("timeInput");
       await expect(driver.component).toBeVisible();
     });
@@ -489,7 +560,10 @@ test.describe("Basic Functionality", () => {
       await expect(driver.component.getByRole("img")).toBeVisible();
     });
 
-    test("displays multiple adornments together", async ({ initTestBed, createTimeInputDriver }) => {
+    test("displays multiple adornments together", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(
         `<TimeInput testId="timeInput" startText="Start" endText="End" startIcon="phone" endIcon="email" />`,
       );
@@ -820,71 +894,85 @@ test.describe("Basic Functionality", () => {
       await expect(driver.amPmInput).toHaveText("PM");
     });
 
-    test("auto-tabs from hour to minute after typing two digits", async ({ initTestBed, page, createTimeInputDriver }) => {
+    test("auto-tabs from hour to minute after typing two digits", async ({
+      initTestBed,
+      page,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" />`);
       const driver = await createTimeInputDriver("timeInput");
-      
+
       // Focus on hour input and clear it
       await driver.hourInput.focus();
       await driver.hourInput.selectText();
-      
+
       // Type two digits - should auto-tab to minute
       await page.keyboard.type("14");
-      
+
       // Verify hour input has the value and minute input is now focused
       await expect(driver.hourInput).toHaveValue("14");
       await expect(driver.minuteInput).toBeFocused();
     });
 
-    test("auto-tabs from minute to second after typing two digits", async ({ initTestBed, page, createTimeInputDriver }) => {
+    test("auto-tabs from minute to second after typing two digits", async ({
+      initTestBed,
+      page,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
-      
+
       // Focus on minute input and clear it
       await driver.minuteInput.focus();
       await driver.minuteInput.selectText();
-      
+
       // Type two digits - should auto-tab to second
       await page.keyboard.type("30");
-      
+
       // Verify minute input has the value and second input is now focused
       await expect(driver.minuteInput).toHaveValue("30");
       await expect(driver.secondInput).toBeFocused();
     });
 
-    test("auto-tabs from second to AM/PM after typing two digits in 12-hour format", async ({ initTestBed, page, createTimeInputDriver }) => {
+    test("auto-tabs from second to AM/PM after typing two digits in 12-hour format", async ({
+      initTestBed,
+      page,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" hour24="false" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
-      
+
       // Focus on second input and clear it
       await driver.secondInput.focus();
       await driver.secondInput.selectText();
-      
+
       // Type two digits - should auto-tab to AM/PM
       await page.keyboard.type("45");
-      
+
       // Verify second input has the value and AM/PM input is now focused
       await expect(driver.secondInput).toHaveValue("45");
       await expect(driver.amPmInput).toBeFocused();
     });
 
-    test("does not auto-tab from second input in 24-hour format", async ({ initTestBed, page, createTimeInputDriver }) => {
+    test("does not auto-tab from second input in 24-hour format", async ({
+      initTestBed,
+      page,
+      createTimeInputDriver,
+    }) => {
       await initTestBed(`<TimeInput testId="timeInput" hour24="true" seconds="true" />`);
       const driver = await createTimeInputDriver("timeInput");
-      
+
       // Focus on second input and clear it
       await driver.secondInput.focus();
       await driver.secondInput.selectText();
-      
+
       // Type two digits - should stay on second input since there's no AM/PM
       await page.keyboard.type("45");
-      
+
       // Verify second input has the value and is still focused
       await expect(driver.secondInput).toHaveValue("45");
       await expect(driver.secondInput).toBeFocused();
     });
-
-    
   });
 
   test.describe("API", () => {
@@ -912,7 +1000,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toBe("14:30:00");
     });
 
-    test("isoValue returns ISO format for 24-hour time with seconds", async ({ initTestBed, page }) => {
+    test("isoValue returns ISO format for 24-hour time with seconds", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <TimeInput id="timeInput" initialValue="14:30:45" hour24="true" seconds="true" />
@@ -972,7 +1063,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toBe("12:00:00");
     });
 
-    test("isoValue includes seconds when available in 12-hour format", async ({ initTestBed, page }) => {
+    test("isoValue includes seconds when available in 12-hour format", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <TimeInput id="timeInput" initialValue="02:30:15 PM" hour24="false" seconds="true" />
@@ -984,7 +1078,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toBe("14:30:15");
     });
 
-    test("isoValue updates when time is changed programmatically", async ({ initTestBed, page }) => {
+    test("isoValue updates when time is changed programmatically", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <TimeInput id="timeInput" initialValue="14:30" hour24="true" />
@@ -995,13 +1092,17 @@ test.describe("Basic Functionality", () => {
 
       // Change the time programmatically
       await page.getByTestId("setTimeBtn").click();
-      
+
       // Get the ISO value
       await page.getByTestId("getIsoBtn").click();
       await expect.poll(testStateDriver.testState).toBe("09:15:00");
     });
 
-    test("isoValue returns null when only hour is set", async ({ initTestBed, page, createTimeInputDriver }) => {
+    test("isoValue returns null when only hour is set", async ({
+      initTestBed,
+      page,
+      createTimeInputDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <TimeInput id="timeInput" testId="timeInput" />
@@ -1010,10 +1111,10 @@ test.describe("Basic Functionality", () => {
       `);
 
       const driver = await createTimeInputDriver("timeInput");
-      
+
       // Set only hour, leave minute empty
       await driver.hourInput.fill("14");
-      
+
       await page.getByTestId("getIsoBtn").click();
       await expect.poll(testStateDriver.testState).toBe(null);
     });
@@ -1031,7 +1132,10 @@ test.describe("Accessibility", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("has correct accessibility attributes for inputs", async ({ initTestBed, createTimeInputDriver }) => {
+  test("has correct accessibility attributes for inputs", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="timeInput" label="Select time" />`);
     const driver = await createTimeInputDriver("timeInput");
     await expect(driver.hourInput).toHaveAttribute("type", "text");
@@ -1060,21 +1164,32 @@ test.describe("Accessibility", () => {
     await expect(driver.secondInput).toBeFocused();
   });
 
-  test("supports required attribute for accessibility", async ({ initTestBed, createTimeInputDriver }) => {
+  test("supports required attribute for accessibility", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="timeInput" required="true" label="Required time" />`);
     const driver = await createTimeInputDriver("timeInput");
     await expect(driver.hourInput).toHaveAttribute("required");
   });
 
-  test("has proper ARIA attributes for disabled state", async ({ initTestBed, createTimeInputDriver }) => {
+  test("has proper ARIA attributes for disabled state", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="timeInput" enabled="false" label="Disabled time" />`);
     const driver = await createTimeInputDriver("timeInput");
     await expect(driver.hourInput).toBeDisabled();
     await expect(driver.minuteInput).toBeDisabled();
   });
 
-  test("has proper ARIA attributes for readonly state", async ({ initTestBed, createTimeInputDriver }) => {
-    await initTestBed(`<TimeInput testId="timeInput" readOnly="true" label="Readonly time" initialValue="14:30" />`);
+  test("has proper ARIA attributes for readonly state", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
+    await initTestBed(
+      `<TimeInput testId="timeInput" readOnly="true" label="Readonly time" initialValue="14:30" />`,
+    );
     const driver = await createTimeInputDriver("timeInput");
     await expect(driver.hourInput).toHaveAttribute("readonly");
     await expect(driver.minuteInput).toHaveAttribute("readonly");
@@ -1098,7 +1213,10 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies Input borderRadius theme variable", async ({ initTestBed, createTimeInputDriver }) => {
+  test("applies Input borderRadius theme variable", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
       testThemeVars: { "borderRadius-TimeInput-default": "10px" },
     });
@@ -1106,7 +1224,10 @@ test.describe("Theme Variables", () => {
     await expect(driver.component).toHaveCSS("border-radius", "10px");
   });
 
-  test("applies Input borderColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
+  test("applies Input borderColor theme variable", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
       testThemeVars: { "borderColor-TimeInput-default": "rgb(255, 0, 0)" },
     });
@@ -1170,7 +1291,10 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("handles very large numbers in time inputs", async ({ initTestBed, createTimeInputDriver }) => {
+  test("handles very large numbers in time inputs", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`<TimeInput testId="timeInput" />`);
     const driver = await createTimeInputDriver("timeInput");
     await driver.hourInput.click();
@@ -1180,7 +1304,10 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("handles multiple rapid clear button clicks", async ({ initTestBed, createTimeInputDriver }) => {
+  test("handles multiple rapid clear button clicks", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     await initTestBed(`
       <TimeInput testId="timeInput" clearable="true" clearToInitialValue="false" initialValue="14:30" />
     `);
@@ -1201,7 +1328,10 @@ test.describe("Other Edge Cases", () => {
 // =============================================================================
 
 test.describe("Events", () => {
-  test("didChange event fires when value changes", async ({ initTestBed, createTimeInputDriver }) => {
+  test("didChange event fires when value changes", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <TimeInput testId="timeInput" initialValue="03:28"
         onDidChange="arg => {testState = arg; console.log('arg', arg)}" />
@@ -1243,6 +1373,15 @@ test.describe("Events", () => {
     const driver = await createTimeInputDriver("timeInput");
 
     await driver.hourInput.focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TimeInput testId="timeInput" label="Time" onGotFocus="testState = 'focused'" />
+    `);
+
+    await page.getByText("Time").click();
     await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
@@ -1411,7 +1550,6 @@ test.describe("Layout", () => {
 // VISUAL STATE TESTS
 // =============================================================================
 
-
 test("input has correct width", async ({ initTestBed, page }) => {
   await initTestBed(`
     <TimeInput width="200px" testId="test"/>
@@ -1429,20 +1567,19 @@ test("input with label has correct width", async ({ initTestBed, page }) => {
 });
 
 test("input has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<TimeInput width="50%" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input with label has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<TimeInput width="50%" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
-

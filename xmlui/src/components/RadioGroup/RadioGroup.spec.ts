@@ -341,6 +341,16 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toBe("focused");
   });
 
+  test("gotFocus event fires on label focus", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <RadioGroup initialValue="1" onGotFocus="() => testState = 'focused'" label="test">
+        <Option value="1">Option 1</Option>
+      </RadioGroup>
+    `);
+    await page.getByText("test").click();
+    await expect.poll(testStateDriver.testState).toBe("focused");
+  });
+
   test("lostFocus event fires on blurring the field", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <RadioGroup initialValue="1" onLostFocus="() => testState = 'blurred'">

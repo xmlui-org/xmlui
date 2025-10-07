@@ -285,6 +285,14 @@ test("gotFocus event fires on focus", async ({ initTestBed, page, createFileInpu
   await expect.poll(testStateDriver.testState).toEqual("focused");
 });
 
+test("gotFocus event fires on label focus", async ({ initTestBed, page }) => {
+  const { testStateDriver } = await initTestBed(`
+    <FileInput testId="fileInput" onGotFocus="testState = 'focused'" label="test" />
+  `);
+  await page.getByText("test").click();
+  await expect.poll(testStateDriver.testState).toEqual("focused");
+});
+
 test("lostFocus event fires on blue", async ({ initTestBed, page, createFileInputDriver }) => {
   const { testStateDriver } = await initTestBed(`
       <FileInput testId="fileInput" onLostFocus="testState = 'blurred'" />
@@ -295,7 +303,6 @@ test("lostFocus event fires on blue", async ({ initTestBed, page, createFileInpu
   await driver.getTextBox().blur();
   await expect.poll(testStateDriver.testState).toEqual("blurred");
 });
-
 
 test("component supports custom button templates", async ({
   initTestBed,
@@ -334,7 +341,7 @@ test("component handles label positioning correctly", async ({
 
 test("input has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<FileInput width="200px" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
@@ -342,25 +349,25 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<FileInput width="200px" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<FileInput width="50%" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input with label has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<FileInput width="50%" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
