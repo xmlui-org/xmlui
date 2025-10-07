@@ -36,7 +36,7 @@ export const IconMd = createMetadata({
 
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`size-${COMP}`]: "1.25em",
+    [`size-${COMP}`]: "1.2em",
   },
 });
 
