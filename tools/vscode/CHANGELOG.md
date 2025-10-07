@@ -1,5 +1,14 @@
 # xmlui-vscode
 
+## 0.10.19
+
+### Patch Changes
+
+- Updated dependencies [facb257]
+- Updated dependencies [6084c14]
+- Updated dependencies [e1fa9d7]
+  - xmlui@0.10.19
+
 ## 0.10.18
 
 ### Patch Changes
