@@ -1,4 +1,4 @@
-import { type CSSProperties, ForwardedRef, useId, useRef } from "react";
+import { type CSSProperties, type ForwardedRef, useRef } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
@@ -66,15 +66,15 @@ type Props = {
   style?: CSSProperties;
   className?: string;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
-  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
-  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
   dateFormat?: DateFormat;
   showWeekNumber?: boolean;
   weekStartsOn?: WeekDays;
-  minValue?: string;
-  maxValue?: string;
+  startDate?: string;
+  endDate?: string;
   disabledDates?: ExtendedMatcher;
   inline?: boolean;
   startText?: string;
@@ -164,8 +164,8 @@ export const DatePicker = forwardRef(function DatePicker(
     dateFormat = defaultProps.dateFormat,
     showWeekNumber = defaultProps.showWeekNumber,
     weekStartsOn = defaultProps.weekStartsOn,
-    minValue,
-    maxValue,
+    startDate,
+    endDate,
     disabledDates = defaultProps.disabledDates,
     style,
     className,
@@ -213,13 +213,13 @@ export const DatePicker = forwardRef(function DatePicker(
     }
   }, [dateFormat]);
 
-  const startDate = useMemo(() => {
-    return minValue ? parse(minValue, dateFormat, new Date()) : undefined;
-  }, [minValue, dateFormat]);
+  const _startDate = useMemo(() => {
+    return startDate ? parse(startDate, dateFormat, new Date()) : undefined;
+  }, [startDate, dateFormat]);
 
-  const endDate = useMemo(() => {
-    return maxValue ? parse(maxValue, dateFormat, new Date()) : undefined;
-  }, [maxValue, dateFormat]);
+  const _endDate = useMemo(() => {
+    return endDate ? parse(endDate, dateFormat, new Date()) : undefined;
+  }, [endDate, dateFormat]);
 
   const defaultMonth = useMemo(() => {
     if (mode === "single" && selected) {
@@ -239,7 +239,7 @@ export const DatePicker = forwardRef(function DatePicker(
       if (dateValue instanceof Date) {
         return dateValue;
       }
-      if (typeof dateValue === 'string') {
+      if (typeof dateValue === "string") {
         // Try to parse as ISO date first
         const isoDate = parseISODate(dateValue);
         if (isoDate) {
@@ -256,17 +256,17 @@ export const DatePicker = forwardRef(function DatePicker(
 
     const convertMatcher = (matcher: ExtendedMatcher): Matcher | undefined => {
       // Handle boolean - disable all dates
-      if (typeof matcher === 'boolean') {
+      if (typeof matcher === "boolean") {
         return matcher;
       }
 
       // Handle function matcher - pass through as is
-      if (typeof matcher === 'function') {
+      if (typeof matcher === "function") {
         return matcher;
       }
 
       // Handle single Date or string
-      if (matcher instanceof Date || typeof matcher === 'string') {
+      if (matcher instanceof Date || typeof matcher === "string") {
         const convertedDate = convertStringToDate(matcher);
         return convertedDate || undefined;
       }
@@ -276,13 +276,18 @@ export const DatePicker = forwardRef(function DatePicker(
         const convertedMatchers: any[] = [];
 
         for (const item of matcher) {
-          if (typeof item === 'object' && item !== null && !Array.isArray(item) && !(item instanceof Date)) {
+          if (
+            typeof item === "object" &&
+            item !== null &&
+            !Array.isArray(item) &&
+            !(item instanceof Date)
+          ) {
             // Handle nested matcher objects in array (e.g., {dayOfWeek: [0,6]}, {from: date, to: date})
             const nestedResult = convertMatcher(item);
             if (nestedResult) {
               convertedMatchers.push(nestedResult);
             }
-          } else if (item instanceof Date || typeof item === 'string') {
+          } else if (item instanceof Date || typeof item === "string") {
             // Handle individual dates in the array
             const convertedDate = convertStringToDate(item);
             if (convertedDate) {
@@ -292,13 +297,13 @@ export const DatePicker = forwardRef(function DatePicker(
         }
 
         // Return array of all matchers to combine their effects
-        return convertedMatchers.length > 0 ? convertedMatchers as Matcher : undefined;
+        return convertedMatchers.length > 0 ? (convertedMatchers as Matcher) : undefined;
       }
 
       // Handle object matchers (DateRange, DateBefore, DateAfter, DateInterval, DayOfWeek)
-      if (typeof matcher === 'object' && matcher !== null) {
+      if (typeof matcher === "object" && matcher !== null) {
         // Handle DateRange: { from: Date, to?: Date }
-        if ('from' in matcher) {
+        if ("from" in matcher) {
           const fromDate = convertStringToDate(matcher.from);
           const toDate = matcher.to ? convertStringToDate(matcher.to) : undefined;
           if (fromDate) {
@@ -307,7 +312,7 @@ export const DatePicker = forwardRef(function DatePicker(
         }
 
         // Handle DateBefore: { before: Date }
-        if ('before' in matcher && !('after' in matcher)) {
+        if ("before" in matcher && !("after" in matcher)) {
           const beforeDate = convertStringToDate(matcher.before);
           if (beforeDate) {
             return { before: beforeDate };
@@ -315,7 +320,7 @@ export const DatePicker = forwardRef(function DatePicker(
         }
 
         // Handle DateAfter: { after: Date }
-        if ('after' in matcher && !('before' in matcher)) {
+        if ("after" in matcher && !("before" in matcher)) {
           const afterDate = convertStringToDate(matcher.after);
           if (afterDate) {
             return { after: afterDate };
@@ -323,7 +328,7 @@ export const DatePicker = forwardRef(function DatePicker(
         }
 
         // Handle DateInterval: { before: Date, after: Date }
-        if ('before' in matcher && 'after' in matcher) {
+        if ("before" in matcher && "after" in matcher) {
           const beforeDate = convertStringToDate(matcher.before);
           const afterDate = convertStringToDate(matcher.after);
           if (beforeDate && afterDate) {
@@ -332,7 +337,7 @@ export const DatePicker = forwardRef(function DatePicker(
         }
 
         // Handle DayOfWeek: { dayOfWeek: number | number[] }
-        if ('dayOfWeek' in matcher) {
+        if ("dayOfWeek" in matcher) {
           return { dayOfWeek: matcher.dayOfWeek };
         }
       }
@@ -427,14 +432,20 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   return inline ? (
-    <div ref={ref} {...rest} style={style} className={classnames(styles.inlinePickerMenu, className)} tabIndex={0}>
+    <div
+      ref={ref}
+      {...rest}
+      style={style}
+      className={classnames(styles.inlinePickerMenu, className)}
+      tabIndex={0}
+    >
       <DayPicker
         id={id}
         required={undefined}
         captionLayout="dropdown"
         fixedWeeks
-        startMonth={startDate}
-        endMonth={endDate}
+        startMonth={_startDate}
+        endMonth={_endDate}
         month={inlineMonth}
         onMonthChange={setInlineMonth}
         disabled={disabled}
@@ -454,50 +465,50 @@ export const DatePicker = forwardRef(function DatePicker(
     </div>
   ) : (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger
-          id={id}
-          ref={composeRefs(setReferenceElement, ref)}
-          aria-haspopup={true}
-          disabled={!enabled}
-          style={style}
-          aria-expanded={open}
-          className={classnames(
-            className,
-            styles.datePicker,
-            {
-              [styles.disabled]: !enabled,
-              [styles.error]: validationStatus === "error",
-              [styles.warning]: validationStatus === "warning",
-              [styles.valid]: validationStatus === "valid",
-            },
-            className,
-          )}
-          autoFocus={autoFocus}
-          onFocus={onFocus as any}
-          onBlur={onBlur as any}
-        >
-          <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-          <div className={styles.datePickerValue}>
-            {mode === "single" && selected ? (
-              <>{format(selected, dateFormat)}</>
-            ) : mode === "range" && typeof selected === "object" && selected.from ? (
-              selected.to ? (
-                <>
-                  {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
-                </>
-              ) : (
-                <>{format(selected.from, dateFormat)}</>
-              )
-            ) : placeholder ? (
-              <span className={styles.placeholder} placeholder={placeholder}>
-                {placeholder}
-              </span>
+      <PopoverTrigger
+        id={id}
+        ref={composeRefs(setReferenceElement, ref)}
+        aria-haspopup={true}
+        disabled={!enabled}
+        style={style}
+        aria-expanded={open}
+        className={classnames(
+          className,
+          styles.datePicker,
+          {
+            [styles.disabled]: !enabled,
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          },
+          className,
+        )}
+        autoFocus={autoFocus}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <div className={styles.datePickerValue}>
+          {mode === "single" && selected ? (
+            <>{format(selected, dateFormat)}</>
+          ) : mode === "range" && typeof selected === "object" && selected.from ? (
+            selected.to ? (
+              <>
+                {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
+              </>
             ) : (
-              <span>&nbsp;</span>
-            )}
-          </div>
-          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-        </PopoverTrigger>
+              <>{format(selected.from, dateFormat)}</>
+            )
+          ) : placeholder ? (
+            <span className={styles.placeholder} placeholder={placeholder}>
+              {placeholder}
+            </span>
+          ) : (
+            <span>&nbsp;</span>
+          )}
+        </div>
+        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+      </PopoverTrigger>
       <PopoverPortal container={root}>
         <PopoverContent
           role="menu"
@@ -515,8 +526,8 @@ export const DatePicker = forwardRef(function DatePicker(
             autoFocus={autoFocus}
             classNames={styles}
             captionLayout="dropdown"
-            startMonth={startDate}
-            endMonth={endDate}
+            startMonth={_startDate}
+            endMonth={_endDate}
             defaultMonth={defaultMonth}
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
