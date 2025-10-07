@@ -72,7 +72,7 @@ class PollClient {
     this.tries = 0;
     this.abortController = new AbortController();
     // console.log("poll client: start polling", this.handlers);
-    this.poll(this.abortController.signal);
+    void this.poll(this.abortController.signal);
   }
 
   private stopPoll() {

@@ -378,7 +378,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
       !isFetchingPrevPage.current
     ) {
       isFetchingPrevPage.current = true;
-      (async function doFetch() {
+      void (async function doFetch() {
         try {
           await requestFetchPrevPage();
         } finally {
@@ -399,7 +399,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
       !isFetchingNextPage.current
     ) {
       isFetchingNextPage.current = true;
-      (async function doFetch() {
+      void (async function doFetch() {
         try {
           await requestFetchNextPage();
         } finally {

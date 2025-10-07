@@ -25,13 +25,13 @@ asyncProxies.set(Array.prototype.flatMap, asyncFlatMap);
 asyncProxies.set(Array.prototype.some, asyncSome);
 
 // The async implementation of Array.prototype.some
-async function asyncSome(arr: any[], predicate: (...args: any[]) => boolean){
+async function asyncSome(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.some((_v, index) => results[index]);
 }
 
 // The async implementation of Array.prototype.filter
-async function asyncFilter(arr: any[], predicate: (...args: any[]) => boolean){
+async function asyncFilter(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.filter((_v, index) => results[index]);
 }
@@ -59,19 +59,19 @@ async function asyncEvery(arr: any[], callback: (...args: any[]) => any) {
 }
 
 // The async implementation of Array.prototype.asyncFind
-async function asyncFind(arr: any[], predicate: (...args: any[]) => boolean){
+async function asyncFind(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.find((_v, index) => results[index]);
 }
 
 // The async implementation of Array.prototype.asyncFindIndex
-async function asyncFindIndex(arr: any[], predicate: (...args: any[]) => boolean){
+async function asyncFindIndex(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.findIndex((_v, index) => results[index]);
 }
 
 // The async implementation of Array.prototype.asyncFlatMap
-async function asyncFlatMap(arr: any[], predicate: (...args: any[]) => boolean){
+async function asyncFlatMap(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.flatMap((_v, index) => results[index]);
 }

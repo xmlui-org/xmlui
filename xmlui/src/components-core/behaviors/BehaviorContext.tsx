@@ -61,9 +61,7 @@ export interface BehaviorContextType {
 }
 
 // --- Create the context with a default value
-const BehaviorContext = createContext<BehaviorContextType | undefined>(
-  undefined
-);
+const BehaviorContext = createContext<BehaviorContextType | undefined>(undefined);
 
 /**
  * A provider component that makes the behavior management system available to

@@ -978,7 +978,9 @@ export class Lexer {
       if (useResolver) {
         tokenType =
           resolverHash.get(text) ??
-          (isIdStart(text[0]) && text[text.length - 1] !== "'" ? TokenType.Identifier : TokenType.Unknown);
+          (isIdStart(text[0]) && text[text.length - 1] !== "'"
+            ? TokenType.Identifier
+            : TokenType.Unknown);
       }
       return {
         text,
@@ -1159,7 +1161,13 @@ function isIdStart(ch: string): boolean {
  * @param ch Character to test
  */
 function isIdContinuation(ch: string): boolean {
-  return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || ch === "_" || ch === "$";
+  return (
+    (ch >= "a" && ch <= "z") ||
+    (ch >= "A" && ch <= "Z") ||
+    (ch >= "0" && ch <= "9") ||
+    ch === "_" ||
+    ch === "$"
+  );
 }
 
 /**

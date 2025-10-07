@@ -426,7 +426,7 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`<TimeInput testId="timeInput" clearable="true" initialValue="14:30" />`);
       const driver = await createTimeInputDriver("timeInput");
-      driver.hourInput.fill("05");
+      await driver.hourInput.fill("05");
       await driver.clearButton.click();
       await expect(driver.hourInput).toHaveValue("14");
       await expect(driver.minuteInput).toHaveValue("30");
@@ -437,11 +437,11 @@ test.describe("Basic Functionality", () => {
       createTimeInputDriver,
     }) => {
       await initTestBed(`
-          <TimeInput testId="timeInput" clearable="true" 
+          <TimeInput testId="timeInput" clearable="true"
             clearToInitialValue="false" initialValue="14:30" />
       `);
       const driver = await createTimeInputDriver("timeInput");
-      driver.hourInput.fill("05");
+      await driver.hourInput.fill("05");
       await driver.clearButton.click();
       await expect(driver.hourInput).toHaveValue("");
       await expect(driver.minuteInput).toHaveValue("");

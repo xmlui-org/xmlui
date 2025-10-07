@@ -1,7 +1,6 @@
 import { isPlainObject } from "lodash-es";
 
-import type {
-  TemplateLiteralExpression} from "./ScriptingSourceTree";
+import type { TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -257,7 +256,7 @@ async function evalCalculatedMemberAccessAsync(
   return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
-async function evalSequenceAsync(
+function evalSequenceAsync(
   evaluator: EvaluatorAsyncFunction,
   thisStack: any[],
   expr: SequenceExpression,
@@ -426,7 +425,7 @@ async function evalAssignmentAsync(
   const rootScope = getRootIdScope(leftValue, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
   }
   await evaluator(thisStack, leftValue, evalContext, thread);
   thisStack.pop();
@@ -436,7 +435,7 @@ async function evalAssignmentAsync(
   await completeExprValue(expr.expr, thread);
   const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
   }
   return value;
 }
@@ -451,14 +450,14 @@ async function evalPreOrPostAsync(
   const rootScope = getRootIdScope(expr.expr, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
   }
   await evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
   await completeExprValue(expr.expr, thread);
   const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
   }
   return value;
 }
@@ -523,7 +522,7 @@ async function evalFunctionInvocationAsync(
       } else {
         if (arg.type === T_ARROW_EXPRESSION) {
           const funcArg = await createArrowFunctionAsync(evaluator, arg);
-          const wrappedFunc = async (...args: any[]) => {
+          const wrappedFunc = (...args: any[]) => {
             return funcArg(arg.args, evalContext, thread, ...args);
           };
           functionArgs.push(wrappedFunc);
@@ -573,7 +572,7 @@ async function evalFunctionInvocationAsync(
   const rootScope = getRootIdScope(expr.obj, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
   }
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
@@ -581,7 +580,7 @@ async function evalFunctionInvocationAsync(
 
   let returnValue = await completePromise(value);
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
   }
 
   // --- Done.
@@ -590,7 +589,7 @@ async function evalFunctionInvocationAsync(
   return returnValue;
 }
 
-async function createArrowFunctionAsync(
+function createArrowFunctionAsync(
   evaluator: EvaluatorAsyncFunction,
   expr: ArrowExpression,
 ): Promise<Function> {
@@ -749,7 +748,7 @@ async function createArrowFunctionAsync(
 }
 
 // --- Completes all promises within the input
-async function completePromise(input: any): Promise<any> {
+function completePromise(input: any): Promise<any> {
   const visited = new Map<any, any>();
 
   return completePromiseInternal(input);

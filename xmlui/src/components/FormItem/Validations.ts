@@ -330,7 +330,7 @@ export function useValidation(
       if (!ignore) {
         dispatch(fieldValidated(bindTo, partialResult));
         if (partialResult.partial) {
-          (async () => {
+          void (async () => {
             const result = await throttledAsyncValidate(validations, onValidate, deferredValue);
             if (!ignore) {
               // console.log(`async validation result for ${bindTo}`, result);

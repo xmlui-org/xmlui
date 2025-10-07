@@ -54,11 +54,11 @@ export function Loader({
   loaderIsRefetchingChanged,
   loaderError,
   transformResult,
-  structuralSharing = true
+  structuralSharing = true,
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
-  const {initialized} = useApiInterceptorContext();
+  const { initialized } = useApiInterceptorContext();
 
   // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
   // --- its data source.
@@ -122,7 +122,7 @@ export function Loader({
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {
       intervalId = setInterval(() => {
-        refetch();
+        void refetch();
       }, pollIntervalInSeconds * 1000);
     }
     return () => {
@@ -175,8 +175,8 @@ export function Loader({
 
   useEffect(() => {
     registerComponentApi?.({
-      refetch: async (options) => {
-        refetch(options);
+      refetch: (options) => {
+        void refetch(options);
       },
       update: async (updater) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as any[];
@@ -196,7 +196,7 @@ export function Loader({
 
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
-      addItem: async (element: any, indexToInsert?: number) => {
+      addItem: (element: any, indexToInsert?: number) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as any[];
         const draft = createDraft(oldData);
         if (indexToInsert === undefined) {
@@ -207,10 +207,10 @@ export function Loader({
         const newData = finishDraft(draft);
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
-      getItems: async () => {
+      getItems: () => {
         return data;
       },
-      deleteItem: async (element: any) => {
+      deleteItem: (element: any) => {
         throw new Error("not implemented");
       },
     });

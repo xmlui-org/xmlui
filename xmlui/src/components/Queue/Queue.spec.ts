@@ -5,7 +5,10 @@ import { expect, test } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("component initializes and provides API methods", async ({ initTestBed, createButtonDriver }) => {
+  test("component initializes and provides API methods", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Queue id="testQueue" />
@@ -20,7 +23,7 @@ test.describe("Basic Functionality", () => {
     `);
 
     const buttonDriver = createButtonDriver("checkApi");
-    (await buttonDriver).component.click();
+    await (await buttonDriver).component.click();
     await expect.poll(testStateDriver.testState).toEqual({
       hasEnqueueItem: true,
       hasEnqueueItems: true,
@@ -35,7 +38,10 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("enqueueItem API", () => {
-    test("enqueueItem adds item to queue and returns ID", async ({ initTestBed, createButtonDriver }) => {
+    test("enqueueItem adds item to queue and returns ID", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -51,14 +57,17 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         itemId: expect.any(String),
         hasValidId: true,
       });
     });
 
-    test("enqueueItem handles different data types", async ({ initTestBed, createButtonDriver }) => {
+    test("enqueueItem handles different data types", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -77,7 +86,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe(6);
     });
 
@@ -99,7 +108,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       const result = await testStateDriver.testState();
       expect(result.allDifferent).toBe(true);
       expect(result.ids).toHaveLength(3);
@@ -111,7 +120,10 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("enqueueItems API", () => {
-    test("enqueueItems adds multiple items and returns array of IDs", async ({ initTestBed, createButtonDriver }) => {
+    test("enqueueItems adds multiple items and returns array of IDs", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -128,7 +140,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         itemIds: expect.any(Array),
         isArray: true,
@@ -153,7 +165,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         itemIds: [],
         queueLength: 0,
@@ -167,7 +179,10 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("getQueueLength API", () => {
-    test("getQueueLength returns 0 for empty queue", async ({ initTestBed, createButtonDriver }) => {
+    test("getQueueLength returns 0 for empty queue", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -177,11 +192,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("checkBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe(0);
     });
 
-    test("getQueueLength updates after adding items", async ({ initTestBed, createButtonDriver }) => {
+    test("getQueueLength updates after adding items", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -191,9 +209,9 @@ test.describe("Basic Functionality", () => {
             const afterOne = testQueue.getQueueLength();
             const ids = testQueue.enqueueItems(['item2', 'item3']);
             const afterThree = testQueue.getQueueLength();
-            testState = { 
-              initial, 
-              afterOne, 
+            testState = {
+              initial,
+              afterOne,
               afterThree,
               hasId1: !!id1,
               hasIds: ids.length === 2
@@ -204,13 +222,13 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("testBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         initial: 0,
         afterOne: 0,
         afterThree: 0,
         hasId1: true,
-        hasIds: true
+        hasIds: true,
       });
     });
   });
@@ -220,7 +238,10 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("getQueuedItems API", () => {
-    test("getQueuedItems returns empty array for empty queue", async ({ initTestBed, createButtonDriver }) => {
+    test("getQueuedItems returns empty array for empty queue", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -230,11 +251,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("checkBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual([]);
     });
 
-    test("getQueuedItems returns items with correct structure", async ({ initTestBed, createButtonDriver }) => {
+    test("getQueuedItems returns items with correct structure", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" />
@@ -252,11 +276,11 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("testBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         hasItemId: true,
         itemsLength: 0,
-        isArray: true
+        isArray: true,
       });
     });
   });
@@ -288,12 +312,12 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("testBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         lengthBefore: 0,
         lengthAfter: 0,
         hasItemId: true,
-        hasKeepId: true
+        hasKeepId: true,
       });
     });
 
@@ -306,8 +330,8 @@ test.describe("Basic Functionality", () => {
             const lengthBefore = testQueue.getQueueLength();
             testQueue.remove('invalid-id');
             const lengthAfter = testQueue.getQueueLength();
-            testState = { 
-              lengthBefore, 
+            testState = {
+              lengthBefore,
               lengthAfter,
               hasItemId: !!itemId
             };
@@ -317,11 +341,11 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("testBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toEqual({
         lengthBefore: 0,
         lengthAfter: 0,
-        hasItemId: true
+        hasItemId: true,
       });
     });
   });
@@ -341,14 +365,17 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("processed");
     });
 
-    test("clearAfterFinish=true removes completed items", async ({ initTestBed, createButtonDriver }) => {
+    test("clearAfterFinish=true removes completed items", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
-          <Queue id="testQueue" clearAfterFinish="true" 
+          <Queue id="testQueue" clearAfterFinish="true"
                  onProcess="processing => {}"
                  onComplete="() => testState = testQueue.getQueuedItems().length" />
           <Button id="enqueueBtn" label="Enqueue" onClick="testQueue.enqueueItem('test');" />
@@ -357,7 +384,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe(0);
     });
   });
@@ -377,14 +404,17 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("test-data");
     });
 
-    test("onWillProcess event can skip items by returning false", async ({ initTestBed, createButtonDriver }) => {
+    test("onWillProcess event can skip items by returning false", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
-          <Queue id="testQueue" 
+          <Queue id="testQueue"
                  onWillProcess="processing => processing.item !== 'skip' ? true : (testState = 'skipped', false)"
                  onProcess="processing => testState = 'processed'" />
           <Button id="enqueueBtn" label="Enqueue" onClick="
@@ -396,15 +426,18 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("processed");
     });
 
-    test("onDidProcess event fires after processing", async ({ initTestBed, createButtonDriver }) => {
+    test("onDidProcess event fires after processing", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue"
-                 onProcess="processing => {}" 
+                 onProcess="processing => {}"
                  onDidProcess="processing => testState = 'did-process-' + processing.item" />
           <Button id="enqueueBtn" label="Enqueue" onClick="testQueue.enqueueItem('test');" />
         </Fragment>
@@ -412,11 +445,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("did-process-test");
     });
 
-    test("onProcessError event fires when processing throws", async ({ initTestBed, createButtonDriver }) => {
+    test("onProcessError event fires when processing throws", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue"
@@ -428,11 +464,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("error-test");
     });
 
-    test("onComplete event fires when queue becomes empty", async ({ initTestBed, createButtonDriver }) => {
+    test("onComplete event fires when queue becomes empty", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" clearAfterFinish="true"
@@ -444,7 +483,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("complete");
     });
   });
@@ -454,7 +493,11 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("Template Properties", () => {
-    test("progressFeedback renders during processing", async ({ initTestBed, page, createButtonDriver }) => {
+    test("progressFeedback renders during processing", async ({
+      initTestBed,
+      page,
+      createButtonDriver,
+    }) => {
       await initTestBed(`
         <Fragment>
           <Queue id="testQueue" onProcess="processing => { processing.reportProgress('50%'); }">
@@ -468,11 +511,15 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect(page.getByText("Progress: 0 of 1")).toBeVisible();
     });
 
-    test("resultFeedback renders when queue completes", async ({ initTestBed, page, createButtonDriver }) => {
+    test("resultFeedback renders when queue completes", async ({
+      initTestBed,
+      page,
+      createButtonDriver,
+    }) => {
       await initTestBed(`
         <Fragment>
           <Queue id="testQueue" clearAfterFinish="true" onProcess="processing => {}">
@@ -486,11 +533,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect(page.getByText("All 1 items processed")).toBeVisible();
     });
 
-    test("progressFeedback handles null gracefully", async ({ initTestBed, createButtonDriver }) => {
+    test("progressFeedback handles null gracefully", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <Queue id="testQueue" progressFeedback="{null}" onProcess="processing => testState = 'processed'" />
@@ -500,14 +550,14 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("processed");
     });
 
     test("resultFeedback handles null gracefully", async ({ initTestBed, createButtonDriver }) => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
-          <Queue id="testQueue" resultFeedback="{null}" clearAfterFinish="true" 
+          <Queue id="testQueue" resultFeedback="{null}" clearAfterFinish="true"
                  onProcess="processing => {}"
                  onComplete="() => testState = 'complete'" />
           <Button id="enqueueBtn" label="Enqueue" onClick="testQueue.enqueueItem('test');" />
@@ -516,7 +566,7 @@ test.describe("Basic Functionality", () => {
 
       const buttonDriver = await createButtonDriver("enqueueBtn");
       await buttonDriver.component.click();
-      
+
       await expect.poll(testStateDriver.testState).toBe("complete");
     });
   });
@@ -536,12 +586,12 @@ test.describe("Other Edge Cases", () => {
           const id1 = testQueue.enqueueItem('item1');
           const id2 = testQueue.enqueueItem('item2');
           const ids = testQueue.enqueueItems(['item3', 'item4', 'item5']);
-          
+
           // Mix operations
           testQueue.remove(id1);
           const finalLength = testQueue.getQueueLength();
           const items = testQueue.getQueuedItems();
-          
+
           testState = {
             finalLength,
             itemCount: items.length,
@@ -555,17 +605,20 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("callBtn");
     await buttonDriver.component.click();
-    
+
     await expect.poll(testStateDriver.testState).toEqual({
       finalLength: 0,
       itemCount: 0,
       hasId1: true,
       hasId2: true,
-      idsLength: 3
+      idsLength: 3,
     });
   });
 
-  test("handles processing with errors and recovery", async ({ initTestBed, createButtonDriver }) => {
+  test("handles processing with errors and recovery", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Queue id="testQueue"
@@ -584,12 +637,10 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("enqueueBtn");
     await buttonDriver.component.click();
-    
-    await expect.poll(testStateDriver.testState).toEqual([
-      "processed-good1", 
-      "error-error", 
-      "processed-good2"
-    ]);
+
+    await expect
+      .poll(testStateDriver.testState)
+      .toEqual(["processed-good1", "error-error", "processed-good2"]);
   });
 
   test("handles very large queue operations", async ({ initTestBed, createButtonDriver }) => {
@@ -602,7 +653,7 @@ test.describe("Other Edge Cases", () => {
           for (let i = 0; i < 100; i++) {
             largeArray.push('item-' + i);
           }
-          
+
           const itemIds = testQueue.enqueueItems(largeArray);
           // Check uniqueness without Set
           const uniqueCheck = {};
@@ -625,7 +676,7 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("largeBtn");
     await buttonDriver.component.click();
-    
+
     await expect.poll(testStateDriver.testState).toEqual({
       enqueuedCount: 100,
       queueLength: expect.any(Number), // Queue length will vary based on processing timing
@@ -633,7 +684,10 @@ test.describe("Other Edge Cases", () => {
     });
   });
 
-  test("handles nested object and complex data types", async ({ initTestBed, createButtonDriver }) => {
+  test("handles nested object and complex data types", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Queue id="testQueue" onProcess="processing => testState = processing.item" />
@@ -651,13 +705,16 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("complexBtn");
     await buttonDriver.component.click();
-    
+
     const result = await testStateDriver.testState();
     expect(result.nested.deep.value).toBe("test");
     expect(result.array).toEqual([1, 2, { key: "value" }]);
   });
 
-  test("handles rapid state changes during processing", async ({ initTestBed, createButtonDriver }) => {
+  test("handles rapid state changes during processing", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Queue id="testQueue"
@@ -673,16 +730,19 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("rapidBtn");
     await buttonDriver.component.click();
-    
+
     await expect.poll(testStateDriver.testState).toBe(5);
   });
 
-  test("handles context variables in templates correctly", async ({ initTestBed, createButtonDriver }) => {
+  test("handles context variables in templates correctly", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Queue id="testQueue" clearAfterFinish="false"
-               onProcess="processing => { 
-                 processing.reportProgress(processing.item); 
+               onProcess="processing => {
+                 processing.reportProgress(processing.item);
                  testState = {
                    queuedItems: testQueue.getQueuedItems().length,
                    item: processing.item
@@ -701,11 +761,11 @@ test.describe("Other Edge Cases", () => {
 
     const buttonDriver = await createButtonDriver("templateBtn");
     await buttonDriver.component.click();
-    
+
     // Verify that the queue processing works with template properties defined
     await expect.poll(testStateDriver.testState).toEqual({
       queuedItems: expect.any(Number),
-      item: expect.any(String)
+      item: expect.any(String),
     });
   });
 });

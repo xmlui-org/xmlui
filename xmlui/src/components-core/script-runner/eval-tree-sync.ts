@@ -1,7 +1,5 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import type {
-  Identifier,
-  TemplateLiteralExpression} from "./ScriptingSourceTree";
+import type { Identifier, TemplateLiteralExpression } from "./ScriptingSourceTree";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -453,7 +451,7 @@ function evalAssignment(
   const rootScope = getRootIdScope(leftValue, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
   }
   evaluator(thisStack, leftValue, evalContext, thread);
   thisStack.pop();
@@ -461,7 +459,7 @@ function evalAssignment(
   thisStack.pop();
   const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
   }
   return value;
 }
@@ -476,13 +474,13 @@ function evalPreOrPost(
   const rootScope = getRootIdScope(expr.expr, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
   }
   evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
   const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
   }
   return value;
 }
@@ -587,7 +585,7 @@ function evalFunctionInvocation(
   const rootScope = getRootIdScope(expr.obj, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
   if (updatesState && evalContext.onWillUpdate) {
-    evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
+    void evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
   }
 
   const value = evalContext.options?.defaultToOptionalMemberAccess
@@ -595,7 +593,7 @@ function evalFunctionInvocation(
     : (functionObj as Function).call(currentContext, ...functionArgs);
 
   if (updatesState && evalContext.onDidUpdate) {
-    evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
+    void evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
   }
 
   setExprValue(expr, { value }, thread);

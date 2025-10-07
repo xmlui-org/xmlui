@@ -255,10 +255,10 @@ test.describe("Basic Functionality", () => {
     const driver = await createNumberBoxDriver();
 
     await driver.decrement();
-    expect(driver.input).toHaveValue("0");
+    await expect(driver.input).toHaveValue("0");
 
     await driver.decrement();
-    expect(driver.input).toHaveValue("0");
+    await expect(driver.input).toHaveValue("0");
   });
 
   // --- Range validation (min/max)

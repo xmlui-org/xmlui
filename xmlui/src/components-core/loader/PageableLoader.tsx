@@ -152,7 +152,7 @@ export function PageableLoader({
   useEffect(() => {
     const queryKey = thizRef.current;
     return () => {
-      appContext.queryClient?.cancelQueries(queryKey);
+      void appContext.queryClient?.cancelQueries(queryKey);
       appContext.queryClient?.setQueryData(queryKey, (old) => {
         if (!old) {
           return old;
@@ -209,6 +209,7 @@ export function PageableLoader({
   }, [
     data,
     error,
+    isRefetching,
     loaderError,
     loaderLoaded,
     onLoaded,
@@ -223,7 +224,7 @@ export function PageableLoader({
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {
       intervalId = setInterval(() => {
-        refetch();
+        void refetch();
       }, pollIntervalInSeconds * 1000);
     }
     return () => {
@@ -245,8 +246,8 @@ export function PageableLoader({
     registerComponentApi({
       fetchPrevPage,
       fetchNextPage: stableFetchNextPage,
-      refetch: async (options) => {
-        refetch(options);
+      refetch: (options) => {
+        void refetch(options);
       },
       update: async (updater) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
@@ -277,7 +278,7 @@ export function PageableLoader({
 
         // console.log("AFTER: ", appContext.queryClient?.getQueryData(queryId!));
       },
-      addItem: async (element: any, indexToInsert?: number) => {
+      addItem: (element: any, indexToInsert?: number) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
         const draft = createDraft(oldData);
 
@@ -307,7 +308,7 @@ export function PageableLoader({
       getItems: () => {
         return data;
       },
-      deleteItem: async (element: any) => {
+      deleteItem: (element: any) => {
         throw new Error("not implemented");
       },
     });

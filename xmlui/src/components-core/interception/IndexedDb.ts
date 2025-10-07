@@ -111,7 +111,7 @@ export class IndexedDb implements IDatabase {
   };
 
   public getItemById = async (resourceId: string, id: any) => {
-    return await this.getItem(resourceId, async (item) => {
+    return await this.getItem(resourceId, (item) => {
       return item.id + "" === id + "";
     });
   };
@@ -147,7 +147,7 @@ async function createTableWrapper(table: Table): Promise<any> {
   // --- Helper method to filter the table data
   const filteredData = async (predicate?: (item: any) => Promise<boolean>) => {
     const dataSnapshot = await table.toArray();
-    const results = await Promise.all(dataSnapshot.map(predicate ?? (async () => true)));
+    const results = await Promise.all(dataSnapshot.map(predicate ?? (() => Promise.resolve(true))));
     return dataSnapshot.filter((_v, index) => results[index]);
   };
 

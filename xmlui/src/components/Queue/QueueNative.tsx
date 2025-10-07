@@ -9,8 +9,7 @@ import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { generatedId, useEvent } from "../../components-core/utils/misc";
 import { useAppContext } from "../../components-core/AppContext";
-import type {
-  QueueAction} from "../Queue/queueActions";
+import type { QueueAction } from "../Queue/queueActions";
 import {
   actionItemCompleted,
   actionItemError,
@@ -320,7 +319,7 @@ export function Queue({
       return;
     }
     let queueItem = queue[0];
-    (async () => {
+    void (async () => {
       await doSingle(queueItem);
     })();
   }, [doComplete, doSingle, prevQueue, queue]);

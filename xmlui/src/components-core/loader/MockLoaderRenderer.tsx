@@ -31,14 +31,16 @@ function MockLoader({
   loaderError,
   loaderLoaded,
   state,
-  structuralSharing
+  structuralSharing,
 }: MockLoaderProps) {
   const appContext = useAppContext();
   const waitTime: number = extractParam(state, loader.props.waitTime, appContext);
   const responseObj: Record<string, any>[] = extractParam(state, loader.props.data, appContext);
 
   const doLoad = useCallback(async () => {
-    waitTime && (await asyncWait(waitTime));
+    if (waitTime) {
+      await asyncWait(waitTime);
+    }
     return responseObj;
   }, [responseObj, waitTime]);
 

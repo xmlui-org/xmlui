@@ -45,11 +45,11 @@ export function randomUUID() {
 
 export function readCookie(name) {
   const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i=0;i < ca.length;i++) {
+  const ca = document.cookie.split(";");
+  for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
-    while (c.charAt(0)===' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
+    while (c.charAt(0) === " ") c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
   }
   return null;
 }
@@ -95,7 +95,6 @@ export interface UseEventOverload {
 
   <TF extends callbackType>(callback: TF): any;
 }
-
 
 // from here: https://github.com/bluesky-social/social-app/blob/587c0c625752964d8ce64faf1d329dce3c834a5c/src/lib/hooks/useNonReactiveCallback.ts
 // This should be used sparingly. It erases reactivity, i.e. when the inputs
@@ -200,7 +199,11 @@ export function ensureLeadingSlashForUrl(url?: string): string | undefined {
   return `/${url}`;
 }
 
-export function humanReadableDateTimeTillNow(dateTime: number | string | Date, nowLabel?: string, time?: string) {
+export function humanReadableDateTimeTillNow(
+  dateTime: number | string | Date,
+  nowLabel?: string,
+  time?: string,
+) {
   // WARNING: does not handle locales, consider doing Date arithmetic instead of parsing human-readable date time
   const dateTimeStr = formatDistanceToNow(new Date(dateTime), {
     includeSeconds: true /* TODO: , locale  */,
@@ -318,7 +321,7 @@ export function normalizePath(url?: string): string | undefined {
   }
   // @ts-ignore
   const prefix = window.__PUBLIC_PATH || "";
-  if(!prefix){
+  if (!prefix) {
     return url;
   }
   const prefixWithoutTrailingSlash = prefix.endsWith("/") ? prefix.slice(0, -1) : prefix;
@@ -509,8 +512,8 @@ export function toHashObject(arr: any[], keyProp: string, valueProp: string): an
   }, {});
 }
 
-export function findByField(arr: any[], field: string, value: any): any{
-  return (arr ?? []).find(item => item[field || ""] === value);
+export function findByField(arr: any[], field: string, value: any): any {
+  return (arr ?? []).find((item) => item[field || ""] === value);
 }
 
 export function distinct<T>(arr: T[]): T[] {
@@ -536,7 +539,7 @@ export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
 ) {
   const throttled = throttle(
     (resolve, reject, args: Parameters<F>) => {
-      func(...args)
+      void func(...args)
         .then(resolve)
         .catch(reject);
     },
