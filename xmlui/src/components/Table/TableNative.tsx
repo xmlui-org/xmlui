@@ -776,7 +776,78 @@ export const Table = forwardRef(
                       if (target.tagName.toLowerCase() === "input") {
                         return;
                       }
+                      
+                      // Check if click is within 8 pixels of the checkbox boundary
+                      // Find the checkbox in this row directly
+                      const currentRow = event.currentTarget as HTMLElement;
+                      const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                      
+                      if (checkbox) {
+                        const checkboxRect = checkbox.getBoundingClientRect();
+                        const clickX = event.clientX;
+                        const clickY = event.clientY;
+                        
+                        // Calculate distance from click point to checkbox boundaries
+                        const distanceToLeft = Math.abs(clickX - checkboxRect.left);
+                        const distanceToRight = Math.abs(clickX - checkboxRect.right);
+                        const distanceToTop = Math.abs(clickY - checkboxRect.top);
+                        const distanceToBottom = Math.abs(clickY - checkboxRect.bottom);
+                        
+                        // Check if click is within the checkbox bounds or within 8px of any boundary
+                        const withinHorizontalBounds = clickX >= checkboxRect.left && clickX <= checkboxRect.right;
+                        const withinVerticalBounds = clickY >= checkboxRect.top && clickY <= checkboxRect.bottom;
+                        const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
+                        
+                        const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= 8 || distanceToRight <= 8));
+                        const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= 8 || distanceToBottom <= 8));
+                        
+                        if (withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary) {
+                          // Toggle the checkbox when clicking within the 8-pixel boundary
+                          toggleRow(row.original, { metaKey: true });
+                          return;
+                        }
+                      }
+                      
                       toggleRow(row.original, event);
+                    }}
+                    onMouseMove={(event) => {
+                      // Change cursor when within 8 pixels of the checkbox boundary
+                      const currentRow = event.currentTarget as HTMLElement;
+                      const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                      
+                      if (checkbox) {
+                        const checkboxRect = checkbox.getBoundingClientRect();
+                        const mouseX = event.clientX;
+                        const mouseY = event.clientY;
+                        
+                        // Calculate distance from mouse to checkbox boundaries
+                        const distanceToLeft = Math.abs(mouseX - checkboxRect.left);
+                        const distanceToRight = Math.abs(mouseX - checkboxRect.right);
+                        const distanceToTop = Math.abs(mouseY - checkboxRect.top);
+                        const distanceToBottom = Math.abs(mouseY - checkboxRect.bottom);
+                        
+                        // Check if mouse is within the checkbox bounds or within 8px of any boundary
+                        const withinHorizontalBounds = mouseX >= checkboxRect.left && mouseX <= checkboxRect.right;
+                        const withinVerticalBounds = mouseY >= checkboxRect.top && mouseY <= checkboxRect.bottom;
+                        const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
+                        
+                        const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= 8 || distanceToRight <= 8));
+                        const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= 8 || distanceToBottom <= 8));
+                        
+                        const shouldShowPointer = withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
+                        
+                        // Change cursor based on proximity to checkbox
+                        if (shouldShowPointer) {
+                          currentRow.style.cursor = 'pointer';
+                        } else {
+                          currentRow.style.cursor = '';
+                        }
+                      }
+                    }}
+                    onMouseLeave={(event) => {
+                      // Reset cursor when leaving the row
+                      const currentRow = event.currentTarget as HTMLElement;
+                      currentRow.style.cursor = '';
                     }}
                   >
                     {row.getVisibleCells().map((cell, i) => {
