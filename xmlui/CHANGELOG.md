@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.10.19
+
+### Patch Changes
+
+- facb257: Add checkboxTolerance property to Table
+- 6084c14: test: review onFocus, onBlur e2e tests
+- e1fa9d7: Renamed the following properties in DatePicker: minValue -> startDate, maxValue -> endDate. Also updated component documentation.
+
 ## 0.10.18
 
 ### Patch Changes
