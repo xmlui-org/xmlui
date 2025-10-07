@@ -53,8 +53,6 @@ $themeVars: t.composePaddingVars($themeVars, $component);
     flex-direction: row;
     flex-wrap: wrap;
     @include t.paddingVars($themeVars, $component);
-    min-height: 2.5rem;
-    /* h-12 */
 
     @include variant("default");
 

@@ -48,43 +48,15 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 }
 
-@mixin valueVariant($variantName) {
-  &>span {
-    font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
-
-    &>div {
-      color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-      font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-    }
-  }
-}
-
 @layer components {
-  .selectValue {
-    @include valueVariant("default");
-
-    &.error {
-      @include valueVariant("error");
-    }
-
-    &.warning {
-      @include valueVariant("warning");
-    }
-
-    &.valid {
-      @include valueVariant("success");
-    }
-  }
-
   .selectTrigger {
-    display: flex;
-    @include t.paddingVars($themeVars, $componentName);
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
     outline: none;
-    overflow: hidden;
+    width: 100%;
+    gap: t.$space-1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    @include t.paddingVars($themeVars, $componentName);
 
     @include variant("default");
 
@@ -100,12 +72,19 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       @include variant("success");
     }
 
-    &:disabled {
+    &.disabled {
       cursor: not-allowed;
-      opacity: createThemeVar("opacity-#{$componentName}--disabled");
+      opacity: 0.5;
       background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
       color: createThemeVar("Input:textColor-#{$componentName}--disabled");
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
+
+    &.focused {
+      outline-width: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+      outline-color: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+      outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+      outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
     }
   }
 
@@ -125,10 +104,19 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .badgeList {
-    gap: 4px;
+    position: relative;
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .inputWrapper {
+    display: flex;
     align-items: center;
+    min-width: fit-content;
+    flex: 1;
+    gap: t.$space-1;
   }
 
   .badge {
@@ -162,7 +150,11 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   .actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .action {
+    cursor: pointer;
   }
 
   .placeholder {
@@ -199,13 +191,10 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .command {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
     width: 100%;
-    overflow: auto;
-    border-radius: 6px;
-    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    height: auto;
+    overflow: visible;
+    background-color: transparent;
   }
 
   .commandInputContainer {
@@ -216,22 +205,21 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .commandInput {
-    flex: 1;
+    width: 100%;
     background-color: transparent;
-    padding: 0.5rem;
-    font-size: 14px;
     outline: none;
-    border: none;
-
-    &:focus {
-      outline: none;
-      box-shadow: none;
-      border: 0;
-    }
 
     &:disabled {
       cursor: not-allowed;
-      opacity: createThemeVar("opacity-#{$componentName}--disabled");
+      opacity: 0.5;
+    }
+
+    &::placeholder {
+      color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+    }
+
+    &:focus-within {
+      outline: none;
     }
   }
 

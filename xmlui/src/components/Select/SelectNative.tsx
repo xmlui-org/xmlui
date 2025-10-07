@@ -192,7 +192,6 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           >
             {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
           </div>
-
           <SelectIcon asChild>
             <Icon name="chevrondown" />
           </SelectIcon>
@@ -580,16 +579,23 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                     </span>
                   )}
                   <div className={styles.actions}>
-                    {multiSelect && Array.isArray(value) && value.length > 0 && (
-                      <Icon
-                        name="close"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
-                        }}
-                      />
-                    )}
-                    <Icon name="chevrondown" />
+                    {((multiSelect && Array.isArray(value) && value.length > 0) ||
+                      (!multiSelect && value !== undefined && value !== null && value !== "")) &&
+                      enabled &&
+                      !readOnly && (
+                        <span
+                          className={styles.action}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
+                        >
+                          <Icon name="close" />
+                        </span>
+                      )}
+                    <span className={styles.action}>
+                      <Icon name="chevrondown" />
+                    </span>
                   </div>
                 </>
               </PopoverTrigger>
