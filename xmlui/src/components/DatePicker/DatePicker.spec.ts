@@ -1,4 +1,3 @@
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { format } from "date-fns";
 
@@ -354,60 +353,54 @@ test("component handles readOnly mode correctly", async ({ page, initTestBed }) 
   await expect(page.getByTestId("datePicker")).toHaveText(initialDate);
 });
 
-test.fixme(
-  "component handles minValue restrictions",
-  SKIP_REASON.XMLUI_BUG("Prop does not work"),
+test(
+  "component handles startDate restrictions",
   async ({ page, initTestBed }) => {
     await initTestBed(
       `<DatePicker
         testId="datePicker"
         mode="range"
-        minValue="05/25/2024"
+        startDate="05/01/2024"
         dateFormat="MM/dd/yyyy"
         initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
       />`,
     );
     await page.getByTestId("datePicker").click();
-    await page.getByRole("grid", { name: "May" }).getByLabel("May 24th").click();
-    await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 24th")).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Go to the Previous Month' })).toBeDisabled();
   },
 );
 
-test.fixme(
-  "component handles maxValue restrictions",
-  SKIP_REASON.XMLUI_BUG("Prop does not work"),
+test(
+  "component handles endDate restrictions",
   async ({ page, initTestBed }) => {
     await initTestBed(
       `<DatePicker
         testId="datePicker"
         mode="range"
-        minValue="05/25/2024"
+        endDate="06/01/2024"
         initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
         dateFormat="MM/dd/yyyy"
       />`,
     );
     await page.getByTestId("datePicker").click();
-    await page.getByRole("grid", { name: "May" }).getByLabel("May 24th").click();
-    await expect(page.getByRole("grid", { name: "May" }).getByLabel("May 24th")).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Go to the Next Month' })).toBeDisabled();
   },
 );
 
-test.fixme("component handles disabledDates correctly", async ({ page, initTestBed }) => {
+test("component handles disabledDates correctly", async ({ page, initTestBed }) => {
+  const testDay = 15;
   const today = new Date();
   const testDayFormatted = format(
-    new Date(today.getFullYear(), today.getMonth(), 15),
+    new Date(today.getFullYear(), today.getMonth(), testDay),
     "MM/dd/yyyy",
   );
+  const testMonthName = format(today, "LLLL");
 
-  await initTestBed(`<DatePicker disabledDates={['${testDayFormatted}']} />`, {});
+  await initTestBed(`<DatePicker testId="datePicker" disabledDates="{['${testDayFormatted}']}" />`, {});
+  await page.getByTestId("datePicker").click();
 
-  // Open the calendar
-  await page.locator("button").click();
-
-  // The 15th day should be disabled
-  const testDay = "15";
-  const testDayCell = page.locator(".rdp-day").filter({ hasText: testDay }).first();
-  await expect(testDayCell).toHaveClass(/disabled/);
+  const testDayCell = page.getByRole("grid", { name: testMonthName }).getByLabel(testDay.toString());
+  await expect(testDayCell).toBeDisabled();
 });
 
 // =============================================================================

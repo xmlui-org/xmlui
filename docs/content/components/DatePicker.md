@@ -47,7 +47,7 @@ The table below shows the available date formats:
 
 ### `disabledDates` [#disableddates]
 
-An optional array of dates that are disabled
+An optional array of dates that are to be disabled.
 
 The `disabledDates` prop supports multiple patterns for disabling specific dates in the calendar. You can use Date objects, strings (parsed using the `dateFormat`), or complex matcher objects.
 
@@ -136,6 +136,10 @@ This boolean property value indicates whether the component responds to user eve
 </App>  
 ```
 
+### `endDate` [#enddate]
+
+The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`.Example: '2023-12-31' ensures the last month to select a date from is December 2023.
+
 ### `endIcon` [#endicon]
 
 This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
@@ -156,27 +160,7 @@ This property sets the component's initial value.
 
 ### `inline` (default: false) [#inline-default-false]
 
-Whether to display the datepicker inline
-
-### `maxValue` [#maxvalue]
-
-The optional end date of the selectable date range. If not defined, the range allows any future dates.
-
-```xmlui-pg copy display name="Example: maxValue" height="440px"
-<App>
-  <DatePicker inline maxValue="05/26/2024" />
-</App>
-```
-
-### `minValue` [#minvalue]
-
-The optional start date of the selectable date range. If not defined, the range allows any dates in the past.
-
-```xmlui-pg copy display name="Example: minValue" height="440px"
-<App>
-  <DatePicker inline minValue="05/24/2024" />
-</App>
-```
+If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.
 
 ### `mode` (default: "single") [#mode-default-single]
 
@@ -214,6 +198,10 @@ Whether to show the week number in the calendar
   <DatePicker showWeekNumber="true" />
 </App>
 ```
+
+### `startDate` [#startdate]
+
+The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`.Example: '2023-01-01' ensures the first month to select a date from is January 2023.
 
 ### `startIcon` [#starticon]
 
