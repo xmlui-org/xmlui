@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { AppThemes, ThemeScope } from "../../abstractions/ThemingDefs";
+import type { AppThemes, ThemeScope } from "../../abstractions/ThemingDefs";
 
 export const ThemeContext = React.createContext<ThemeScope | undefined>(undefined);
 export const ThemesContext = React.createContext<AppThemes | undefined>(undefined);

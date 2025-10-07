@@ -704,7 +704,7 @@ test.describe("User Interactions", () => {
     await expect(driver.monthInput).toHaveValue("05");
     await expect(driver.dayInput).toHaveValue("25");
     await expect(driver.yearInput).toHaveValue("2024");
-    driver.dayInput.fill("18");
+    await driver.dayInput.fill("18");
 
     await driver.clearButton.click();
 
@@ -724,7 +724,7 @@ test.describe("User Interactions", () => {
     await expect(driver.monthInput).toHaveValue("05");
     await expect(driver.dayInput).toHaveValue("25");
     await expect(driver.yearInput).toHaveValue("2024");
-    driver.dayInput.fill("18");
+    await driver.dayInput.fill("18");
 
     await driver.clearButton.click();
 
@@ -1182,8 +1182,8 @@ test.describe("Accessibility", () => {
 test.describe("Theme Variables", () => {
   test("component renders with theme variables", async ({ initTestBed, createDateInputDriver }) => {
     await initTestBed(`
-      <DateInput 
-        testId="dateInput" 
+      <DateInput
+        testId="dateInput"
         style="--color-divider: red; --width-input: 100px; --backgroundColor-input-invalid: rgb(255, 200, 200);"
       />
     `);
@@ -1199,8 +1199,8 @@ test.describe("Theme Variables", () => {
     createDateInputDriver,
   }) => {
     await initTestBed(`
-      <DateInput 
-        testId="dateInput" 
+      <DateInput
+        testId="dateInput"
         clearable="{true}"
         style="--padding-button: 15px; --outlineColor-button--focused: green;"
       />

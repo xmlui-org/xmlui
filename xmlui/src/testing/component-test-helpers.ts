@@ -25,7 +25,7 @@ export function mapObject<K extends (val: any) => any, V extends (val: string) =
   return newObject;
 }
 
-export async function getComponentTagName(locator: Locator) {
+export function getComponentTagName(locator: Locator) {
   return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
@@ -56,11 +56,11 @@ export function scaleByPercent(scalarOf100Percent: number, percentage: string) {
   return (scalarOf100Percent / 100) * parsed.value;
 }
 
-export async function getBoundingRect(locator: Locator) {
+export function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
 }
 
-export async function getElementStyle(specifier: Locator, style: string) {
+export function getElementStyle(specifier: Locator, style: string) {
   return specifier.evaluate(
     (element, style) => window.getComputedStyle(element).getPropertyValue(style),
     style,
@@ -71,7 +71,7 @@ export async function getElementStyle(specifier: Locator, style: string) {
  * Retreives all the provided style properties from the locator
  * @returns an object with the keys being the elements of the styles argument
  */
-export async function getElementStyles(locator: Locator, styles: string[] = []) {
+export function getElementStyles(locator: Locator, styles: string[] = []) {
   return locator.evaluate(
     (element, styles) =>
       Object.fromEntries(
@@ -84,7 +84,7 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   );
 }
 
-export async function isIndeterminate(specifier: ComponentDriver | Locator) {
+export function isIndeterminate(specifier: ComponentDriver | Locator) {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
   return specifier.evaluate((el: HTMLInputElement) => el.indeterminate);
 }
@@ -105,7 +105,7 @@ export async function overflows(locator: Locator, direction: "x" | "y" | "both" 
 // ComponentDriver style helpers
 // ----------------------------------
 
-export async function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
+export function getStyles(specifier: ComponentDriver | Locator, style: string | string[]) {
   if (specifier instanceof ComponentDriver) specifier = specifier.component;
   style = Array.isArray(style) ? style : [style];
   return specifier.evaluate(
@@ -124,7 +124,7 @@ export async function getStyles(specifier: ComponentDriver | Locator, style: str
   );
 }
 
-export async function getPseudoStyles(
+export function getPseudoStyles(
   specifier: ComponentDriver | Locator,
   pseudoElement: string,
   style: string | string[],
@@ -188,7 +188,7 @@ export async function getBorders(specifier: ComponentDriver | Locator) {
   };
 }
 
-export async function getMargins(specifier: ComponentDriver | Locator) {
+export function getMargins(specifier: ComponentDriver | Locator) {
   return getStyles(specifier, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
 }
 

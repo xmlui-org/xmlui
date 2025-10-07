@@ -1,9 +1,11 @@
-import { forwardRef, memo, ReactNode, RefObject, useMemo, useRef } from "react";
+import type { ReactNode, RefObject} from "react";
+import { forwardRef, memo, useMemo, useRef } from "react";
 
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { extractParam } from "../utils/extractParam";
-import { ChildRendererContext } from "./renderChild";
-import { ContainerWrapper, ContainerWrapperDef, isContainerLike } from "./ContainerWrapper";
+import type { ChildRendererContext } from "./renderChild";
+import type { ContainerWrapperDef} from "./ContainerWrapper";
+import { ContainerWrapper, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { EMPTY_ARRAY } from "../constants";

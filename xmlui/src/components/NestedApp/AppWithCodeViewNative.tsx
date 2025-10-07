@@ -73,7 +73,6 @@ export function AppWithCodeViewNative({
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
-
     const data = {
       standalone: {
         app,
@@ -141,7 +140,7 @@ export function AppWithCodeViewNative({
                       <button
                         className={styles.headerButton}
                         onClick={() => {
-                          openPlayground();
+                          void openPlayground();
                         }}
                       >
                         <RxOpenInNewWindow />

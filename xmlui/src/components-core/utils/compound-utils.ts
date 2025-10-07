@@ -1,4 +1,4 @@
-import { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../xmlui-parser";
 
 export function compoundComponentDefFromSource(name: string, componentSource: string): CompoundComponentDef {

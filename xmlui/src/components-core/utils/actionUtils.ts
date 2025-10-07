@@ -15,13 +15,13 @@ export async function invalidateQueries(
       arrayToInvalidate = invalidates;
     }
     arrayToInvalidate.forEach((invalidate) => {
-      appContext.queryClient?.invalidateQueries(
+      void appContext.queryClient?.invalidateQueries(
         new DataLoaderQueryKeyGenerator(
           extractParam(state, invalidate, appContext),
           undefined,
           appContext?.appGlobals.apiUrl,
           undefined,
-          undefined
+          undefined,
         ).asPredicate(),
       );
     });

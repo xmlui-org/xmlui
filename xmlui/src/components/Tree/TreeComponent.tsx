@@ -1,4 +1,4 @@
-import { ComponentDef } from "../..";
+import type { ComponentDef } from "../..";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";

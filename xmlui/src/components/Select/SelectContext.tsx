@@ -1,7 +1,8 @@
-import { createContext, ReactNode, useContext } from "react";
+import type { ReactNode} from "react";
+import { createContext, useContext } from "react";
 
 import type { SingleValueType, ValueType } from "./SelectNative";
-import { Option } from "../abstractions";
+import type { Option } from "../abstractions";
 
 type SelectContextValue = {
   multiSelect?: boolean;

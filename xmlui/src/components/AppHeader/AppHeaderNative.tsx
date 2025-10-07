@@ -1,4 +1,5 @@
-import { ReactNode, useLayoutEffect, useRef } from "react";
+import type { ReactNode} from "react";
+import { useLayoutEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";

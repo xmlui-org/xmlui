@@ -64,7 +64,7 @@ export function CodeBlock({
               icon={<Icon name={"copy"} aria-hidden />}
               onClick={() => {
                 if (!textToCopy) return;
-                navigator.clipboard.writeText(textToCopy);
+                void navigator.clipboard.writeText(textToCopy);
                 toast.success("Code copied!");
               }}
             ></Button>

@@ -46,7 +46,7 @@ test.describe("Basic Functionality", () => {
 
     const buttonDriver = await createButtonDriver("toggleLayout");
     await expect(page.getByTestId("app")).toHaveClass(/vertical/);
-    buttonDriver.click();
+    await buttonDriver.click();
     await expect(page.getByTestId("app")).toHaveClass(/horizontal/);
   });
 
@@ -139,8 +139,8 @@ test.describe("Event Handling", () => {
     initTestBed,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
-        onReady="() => testState = 'app-ready'" 
+      <App
+        onReady="() => testState = 'app-ready'"
         testId="app"
       />
     `);
@@ -151,8 +151,8 @@ test.describe("Event Handling", () => {
 
   test("ready event is triggered for App with complex content", async ({ initTestBed }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
-        onReady="() => testState = 'complex-app-ready'" 
+      <App
+        onReady="() => testState = 'complex-app-ready'"
         layout="horizontal"
         testId="app"
       >
@@ -178,15 +178,15 @@ test.describe("Event Handling", () => {
 
   test("ready event fires only once during component lifecycle", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         var.counter="{0}"
-        onReady="() => { counter = counter + 1; testState = counter; }" 
+        onReady="() => { counter = counter + 1; testState = counter; }"
         testId="app"
       >
-        <Button 
-          testId="trigger-rerender" 
-          label="Re-render" 
-          onClick="counter = counter" 
+        <Button
+          testId="trigger-rerender"
+          label="Re-render"
+          onClick="counter = counter"
         />
       </App>
     `);
@@ -206,8 +206,8 @@ test.describe("Event Handling", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
-        onMessageReceived="(msg, ev) => testState = msg" 
+      <App
+        onMessageReceived="(msg, ev) => testState = msg"
         testId="app"
       />
     `);
@@ -226,8 +226,8 @@ test.describe("Event Handling", () => {
     page,
   }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
-        onMessageReceived="(msg, ev) => testState = { message: msg, eventType: ev.type, origin: ev.origin }" 
+      <App
+        onMessageReceived="(msg, ev) => testState = { message: msg, eventType: ev.type, origin: ev.origin }"
         testId="app"
       />
     `);
@@ -247,8 +247,8 @@ test.describe("Event Handling", () => {
 
   test("messageReceived event handles complex data objects", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
-        onMessageReceived="(msg, ev) => testState = msg" 
+      <App
+        onMessageReceived="(msg, ev) => testState = msg"
         testId="app"
       />
     `);

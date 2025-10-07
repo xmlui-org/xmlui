@@ -316,9 +316,9 @@ const Form = forwardRef(function (
   const requestModalFormClose = useModalFormClose();
 
   const isEnabled = enabled && !formState.submitInProgress;
-  const isDirty = useMemo(()=>{
-    return Object.entries(formState.interactionFlags).some(([key, flags])=>{
-      if(flags.isDirty){
+  const isDirty = useMemo(() => {
+    return Object.entries(formState.interactionFlags).some(([key, flags]) => {
+      if (flags.isDirty) {
         return true;
       }
       return false;
@@ -351,7 +351,7 @@ const Form = forwardRef(function (
 
   const doCancel = useEvent(() => {
     onCancel?.();
-    requestModalFormClose();
+    void requestModalFormClose();
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
@@ -391,7 +391,7 @@ const Form = forwardRef(function (
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
-        requestModalFormClose();
+        void requestModalFormClose();
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
@@ -492,12 +492,16 @@ const Form = forwardRef(function (
     });
   }, [doReset, updateData, registerComponentApi]);
 
-  let safeButtonRow = <>{buttonRow || (
-    <div className={styles.buttonRow}>
-      {swapCancelAndSave && [submitButton, cancelButton]}
-      {!swapCancelAndSave && [cancelButton, submitButton]}
-    </div>
-  )}</>;
+  let safeButtonRow = (
+    <>
+      {buttonRow || (
+        <div className={styles.buttonRow}>
+          {swapCancelAndSave && [submitButton, cancelButton]}
+          {!swapCancelAndSave && [cancelButton, submitButton]}
+        </div>
+      )}
+    </>
+  );
   return (
     <>
       <form
@@ -551,23 +555,26 @@ Form.displayName = "Form";
 
 type FormComponentDef = ComponentDef<typeof FormMd>;
 
-export const FormWithContextVar = forwardRef(function({
-  node,
-  renderChild,
-  extractValue,
-  style,
-  className,
-  lookupEventHandler,
-  registerComponentApi,
-}: {
-  node: FormComponentDef;
-  renderChild: RenderChildFn;
-  extractValue: ValueExtractor;
-  style?: CSSProperties;
-  className?: string;
-  lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
-  registerComponentApi: RegisterComponentApiFn;
-}, ref: ForwardedRef<HTMLDivElement>) {
+export const FormWithContextVar = forwardRef(function (
+  {
+    node,
+    renderChild,
+    extractValue,
+    style,
+    className,
+    lookupEventHandler,
+    registerComponentApi,
+  }: {
+    node: FormComponentDef;
+    renderChild: RenderChildFn;
+    extractValue: ValueExtractor;
+    style?: CSSProperties;
+    className?: string;
+    lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
+    registerComponentApi: RegisterComponentApiFn;
+  },
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const $data = useMemo(() => {

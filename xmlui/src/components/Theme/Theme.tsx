@@ -1,4 +1,4 @@
-import { ThemeTone } from "../../abstractions/ThemingDefs";
+import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
 import { Theme, defaultProps } from "./ThemeNative";

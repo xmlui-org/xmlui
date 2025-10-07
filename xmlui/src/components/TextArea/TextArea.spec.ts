@@ -112,7 +112,7 @@ test.describe("Basic Functionality", () => {
     const textarea = page.getByRole("textbox");
     await textarea.fill("Some content");
     await expect(textarea).toHaveValue("Some content");
-    expect(textarea).toHaveAttribute("placeholder", "Enter comments");
+    await expect(textarea).toHaveAttribute("placeholder", "Enter comments");
   });
 
   test("maxLength limits input length", async ({ initTestBed, page }) => {
@@ -150,7 +150,7 @@ test.describe("Basic Functionality", () => {
         <Button onClick="rows = 5">Set Rows to 5</Button>
       </Fragment>`);
     const textarea = page.getByRole("textbox");
-    
+
     await expect(textarea).toHaveAttribute("rows", "3");
     await page.getByRole("button", { name: "Set Rows to 5" }).click();
     await expect(textarea).toHaveAttribute("rows", "5");
@@ -342,7 +342,7 @@ test.describe("Accessibility", () => {
 
   test("component is keyboard accessible when interactive", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <TextArea 
+      <TextArea
         label="Comments"
         onGotFocus="testState = 'keyboard-focused'"
       />
@@ -386,7 +386,10 @@ test.describe("Accessibility", () => {
 
   test("placeholder provides accessible description", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea placeholder="Describe your feedback in detail" />`);
-    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "Describe your feedback in detail");
+    await expect(page.getByRole("textbox")).toHaveAttribute(
+      "placeholder",
+      "Describe your feedback in detail",
+    );
   });
 
   test("component supports multiple textareas with keyboard navigation", async ({
@@ -505,7 +508,7 @@ test.describe("Visual States", () => {
       testThemeVars: {
         "backgroundColor-TextArea--disabled": "rgb(255, 0, 0)",
         "textColor-TextArea--disabled": "rgb(0, 255, 0)",
-        "borderColor-TextArea--disabled": "rgb(0, 0, 255)"
+        "borderColor-TextArea--disabled": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");
@@ -630,17 +633,26 @@ test.describe("Edge Cases", () => {
     await expect(textarea).toHaveValue(longValue);
   });
 
-  test("component handles invalid maxRows/minRows combinations with autoSize", async ({ initTestBed, page }) => {
+  test("component handles invalid maxRows/minRows combinations with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="2" minRows="5" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("component handles zero maxRows/minRows values with autoSize", async ({ initTestBed, page }) => {
+  test("component handles zero maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="0" minRows="0" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("component handles negative maxRows/minRows values with autoSize", async ({ initTestBed, page }) => {
+  test("component handles negative maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="{-1}" minRows="{-1}" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
@@ -653,7 +665,7 @@ test.describe("Edge Cases", () => {
 test.describe("Performance", () => {
   test("component memoization prevents unnecessary re-renders", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <TextArea 
+      <TextArea
         label="Performance Test"
         onDidChange="testState = ++testState || 1"
       />
@@ -768,7 +780,7 @@ test.describe("Integration", () => {
   test("component works with event handling chain", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <TextArea 
+        <TextArea
           onGotFocus="testState = 'focused'"
           onLostFocus="testState = 'blurred'"
           onDidChange="(value) => testState = 'changed: ' + value"

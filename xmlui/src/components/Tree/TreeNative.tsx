@@ -341,7 +341,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   // Helper function to update internal data and force re-render
   const updateInternalData = useCallback((updater: (prevData: any) => any) => {
     setInternalData(updater);
-    setDataRevision(prev => prev + 1);
+    setDataRevision((prev) => prev + 1);
   }, []);
 
   // Build field configuration
@@ -478,9 +478,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     };
 
     if (defaultExpanded === "first-level") {
-      return treeData
-        .filter(node => !isDynamic(node))
-        .map((node) => node.key);
+      return treeData.filter((node) => !isDynamic(node)).map((node) => node.key);
     } else if (defaultExpanded === "all") {
       const allIds: (string | number)[] = [];
       const collectIds = (nodes: TreeNode[]) => {
@@ -499,7 +497,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Expand full paths to specified nodes by including all parent nodes
       // But exclude dynamic nodes from the expansion
       const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
-      return expandedPaths.filter(nodeId => {
+      return expandedPaths.filter((nodeId) => {
         const node = treeItemsById[String(nodeId)];
         return !node || !isDynamic(node);
       });
@@ -684,7 +682,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             if (dataFormat === "flat" && Array.isArray(currentData)) {
               // Remove existing children of this node
               return currentData.filter(
-                item => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key)
+                (item) => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
               );
             } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
               // For hierarchy format, clear children array
@@ -723,12 +721,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
                 if (dataFormat === "flat" && Array.isArray(currentData)) {
                   // Replace existing children with newly loaded data
-                  
+
                   // Remove existing children of this node
                   const filteredData = currentData.filter(
-                    item => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key)
+                    (item) =>
+                      String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
                   );
-                  
+
                   // Add new children
                   const newItems = loadedData.map((item) => ({
                     ...item,
@@ -818,7 +817,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             const currentNode = flatTreeData[currentIndex];
             if (currentNode.hasChildren && !currentNode.isExpanded) {
               // Expand node
-              toggleNode(currentNode);
+              void toggleNode(currentNode);
             } else if (
               currentNode.hasChildren &&
               currentNode.isExpanded &&
@@ -837,7 +836,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             const currentNode = flatTreeData[currentIndex];
             if (currentNode.hasChildren && currentNode.isExpanded) {
               // Collapse node
-              toggleNode(currentNode);
+              void toggleNode(currentNode);
             } else if (currentNode.depth > 0) {
               // Move to parent - find previous node with smaller depth
               for (let i = currentIndex - 1; i >= 0; i--) {
@@ -876,7 +875,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             }
             // Handle expansion for Enter key
             if (e.key === "Enter" && currentNode.hasChildren) {
-              toggleNode(currentNode);
+              void toggleNode(currentNode);
             }
           }
           handled = true;
@@ -999,7 +998,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                 depth: node.parentIds.length,
                 hasChildren: !!(node.children && node.children.length > 0),
               };
-              
+
               // Load the children data
               const loadedData = await loadChildren(flatNode);
 
@@ -1010,12 +1009,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
                   if (dataFormat === "flat" && Array.isArray(currentData)) {
                     // Replace existing children with newly loaded data
-                    
+
                     // Remove existing children of this node
                     const filteredData = currentData.filter(
-                      item => String(item[fieldConfig.parentField || "parentId"]) !== String(nodeId)
+                      (item) =>
+                        String(item[fieldConfig.parentField || "parentId"]) !== String(nodeId),
                     );
-                    
+
                     // Add new children
                     const newItems = loadedData.map((item) => ({
                       ...item,

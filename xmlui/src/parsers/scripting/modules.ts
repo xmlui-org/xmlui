@@ -1,5 +1,6 @@
+import type {
+  ScriptModule} from "../../components-core/script-runner/ScriptingSourceTree";
 import {
-  ScriptModule,
   T_FUNCTION_DECLARATION,
   type FunctionDeclaration,
   type Statement,

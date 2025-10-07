@@ -98,14 +98,15 @@ class Clipboard {
 
   init() {
     return () => {
-      window.navigator.clipboard.readText = async () => this.content;
-      window.navigator.clipboard.read = async () => {
+      window.navigator.clipboard.readText = () => Promise.resolve(this.content);
+      window.navigator.clipboard.read = () => {
         throw new Error("Clipboard read not implemented in mocked environment");
       };
-      window.navigator.clipboard.writeText = async (text) => {
+      window.navigator.clipboard.writeText = (text) => {
         this.content = text;
+        return Promise.resolve(undefined);
       };
-      window.navigator.clipboard.write = async (items) => {
+      window.navigator.clipboard.write = (items) => {
         throw new Error("Clipboard write not implemented in mocked environment");
       };
     };
@@ -321,267 +322,267 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
 
   createButtonDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ButtonDriver, testIdOrLocator);
     });
   },
   createBackdropDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(BackdropDriver, testIdOrLocator);
     });
   },
   createContentSeparatorDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ContentSeparatorDriver, testIdOrLocator);
     });
   },
   createAvatarDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(AvatarDriver, testIdOrLocator);
     });
   },
   createFormDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(FormDriver, testIdOrLocator);
     });
   },
   createFormItemDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(FormItemDriver, testIdOrLocator);
     });
   },
   createValidationSummaryDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ValidationSummaryDriver, testIdOrLocator);
     });
   },
   createValidationDisplayDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ValidationDisplayDriver, testIdOrLocator);
     });
   },
   createSplitterDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(SplitterDriver, testIdOrLocator);
     });
   },
   createMarkdownDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(MarkdownDriver, testIdOrLocator);
     });
   },
   createItemsDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ItemsDriver, testIdOrLocator);
     });
   },
   createRangeDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(RangeDriver, testIdOrLocator);
     });
   },
   createDatePickerDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(DatePickerDriver, testIdOrLocator);
     });
   },
   createExpandableItemDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ExpandableItemDriver, testIdOrLocator);
     });
   },
   createFileInputDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(FileInputDriver, testIdOrLocator);
     });
   },
   createFileUploadDropZoneDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(FileUploadDropZoneDriver, testIdOrLocator);
     });
   },
   createAutoCompleteDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(AutoCompleteDriver, testIdOrLocator);
     });
   },
   createSelectDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(SelectDriver, testIdOrLocator);
     });
   },
   createRadioGroupDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(RadioGroupDriver, testIdOrLocator);
     });
   },
   createNumberBoxDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(NumberBoxDriver, testIdOrLocator);
     });
   },
   createTextBoxDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TextBoxDriver, testIdOrLocator);
     });
   },
   createSliderDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(SliderDriver, testIdOrLocator);
     });
   },
   createTextAreaDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TextAreaDriver, testIdOrLocator);
     });
   },
   createProgressBarDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ProgressBarDriver, testIdOrLocator);
     });
   },
   createListDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ListDriver, testIdOrLocator);
     });
   },
   createTextDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TextDriver, testIdOrLocator);
     });
   },
   createHeadingDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(HeadingDriver, testIdOrLocator);
     });
   },
   createIconDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(IconDriver, testIdOrLocator);
     });
   },
   createStackDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(StackDriver, testIdOrLocator);
     });
   },
   createHStackDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(HStackDriver, testIdOrLocator);
     });
   },
   createVStackDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(VStackDriver, testIdOrLocator);
     });
   },
   createLinkDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(LinkDriver, testIdOrLocator);
     });
   },
   createNavLinkDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(NavLinkDriver, testIdOrLocator);
     });
   },
   createNavGroupDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(NavGroupDriver, testIdOrLocator);
     });
   },
   createNavPanelDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(NavPanelDriver, testIdOrLocator);
     });
   },
   createCardDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(CardDriver, testIdOrLocator);
     });
   },
   createAccordionDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(AccordionDriver, testIdOrLocator);
     });
   },
   createAppHeaderDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(AppHeaderDriver, testIdOrLocator);
     });
   },
   createAppFooterDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(AppFooterDriver, testIdOrLocator);
     });
   },
   createBadgeDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(BadgeDriver, testIdOrLocator);
     });
   },
   createNoResultDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(NoResultDriver, testIdOrLocator);
     });
   },
   createOptionDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(OptionDriver, testIdOrLocator);
     });
   },
   createHtmlTagDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(HtmlTagDriver, testIdOrLocator);
     });
   },
   createCodeBlockDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(CodeBlockDriver, testIdOrLocator);
     });
   },
   createCheckboxDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(CheckboxDriver, testIdOrLocator);
     });
   },
   createLabelDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(LabelDriver, testIdOrLocator);
     });
   },
   createSpinnerDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(SpinnerDriver, testIdOrLocator);
     });
   },
   createDropdownMenuDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(DropdownMenuDriver, testIdOrLocator);
     });
   },
   createTimeInputDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TimeInputDriver, testIdOrLocator);
     });
   },
   createTimerDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TimerDriver, testIdOrLocator);
     });
   },
   createDateInputDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(DateInputDriver, testIdOrLocator);
     });
   },
   createModalDialogDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ModalDialogDriver, testIdOrLocator);
     });
   },
   createTreeDriver: async ({ createDriver }, use) => {
-    await use(async (testIdOrLocator?: string | Locator) => {
+    await use((testIdOrLocator?: string | Locator) => {
       return createDriver(TreeDriver, testIdOrLocator);
     });
   },

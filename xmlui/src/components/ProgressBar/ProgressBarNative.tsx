@@ -1,4 +1,5 @@
-import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import type { CSSProperties, ForwardedRef} from "react";
+import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./ProgressBar.module.scss";

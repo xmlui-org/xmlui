@@ -1,4 +1,5 @@
-import { KeyboardEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEventHandler } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { union, uniq } from "lodash-es";
 
 import { useEvent } from "../../components-core/utils/misc";
@@ -200,14 +201,16 @@ export default function useRowSelection({
   const prevAppStateSelection = usePrevious(appStateSelection);
 
   // --- State machine for sync direction control
-  const [syncState, setSyncState] = useState<'idle' | 'updating_to_appstate' | 'updating_from_appstate'>('idle');
-  
+  const [syncState, setSyncState] = useState<
+    "idle" | "updating_to_appstate" | "updating_from_appstate"
+  >("idle");
+
   // --- Use refs to track the last known selections to prevent update loops
   const lastAppStateSelectionRef = useRef<any[]>();
   const lastTableSelectionRef = useRef<any[]>();
-  
+
   // --- Track the source of the last update to prevent echoing
-  const lastUpdateSourceRef = useRef<'table' | 'appstate' | null>(null);
+  const lastUpdateSourceRef = useRef<"table" | "appstate" | null>(null);
 
   // --- Sync from AppState to table selection (when AppState changes externally)
   useEffect(() => {
@@ -216,7 +219,7 @@ export default function useRowSelection({
       !rowsSelectable ||
       !syncWithAppState ||
       !appStateSelection ||
-      syncState === 'updating_to_appstate'
+      syncState === "updating_to_appstate"
     ) {
       return;
     }
@@ -226,12 +229,12 @@ export default function useRowSelection({
     const isDifferentFromLastKnown =
       JSON.stringify([...(appStateSelection || [])].sort()) !==
       JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
-    const wasNotOurUpdate = lastUpdateSourceRef.current !== 'table';
+    const wasNotOurUpdate = lastUpdateSourceRef.current !== "table";
 
     if (appStateChanged && isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
       // Set state machine to indicate we're updating from AppState
-      setSyncState('updating_from_appstate');
-      
+      setSyncState("updating_from_appstate");
+
       const validIds = appStateSelection.filter((id: string) =>
         items.some((item) => item[idKey] === id),
       );
@@ -241,7 +244,7 @@ export default function useRowSelection({
       // Track what we're setting to prevent loop
       lastAppStateSelectionRef.current = [...appStateSelection];
       lastTableSelectionRef.current = [...idsToSelect];
-      lastUpdateSourceRef.current = 'appstate';
+      lastUpdateSourceRef.current = "appstate";
 
       setSelectedRowIds(idsToSelect);
       setInitialSelectionApplied(true);
@@ -261,11 +264,7 @@ export default function useRowSelection({
   // --- Sync from table selection to AppState (when user interacts with table)
   useEffect(() => {
     // Skip if not selectable, no sync, or currently updating from AppState
-    if (
-      !rowsSelectable ||
-      !syncWithAppState ||
-      syncState === 'updating_from_appstate'
-    ) {
+    if (!rowsSelectable || !syncWithAppState || syncState === "updating_from_appstate") {
       return;
     }
 
@@ -279,48 +278,41 @@ export default function useRowSelection({
     const isDifferentFromAppState =
       JSON.stringify([...currentSelectionIds].sort()) !==
       JSON.stringify([...appStateSelectionIds].sort());
-    const wasNotAppStateUpdate = lastUpdateSourceRef.current !== 'appstate';
+    const wasNotAppStateUpdate = lastUpdateSourceRef.current !== "appstate";
 
     if (tableChanged && isDifferentFromAppState && wasNotAppStateUpdate) {
       // Set state machine to indicate we're updating to AppState
-      setSyncState('updating_to_appstate');
-      
+      setSyncState("updating_to_appstate");
+
       // Track what we're updating to prevent loop
       lastTableSelectionRef.current = [...currentSelectionIds];
       lastAppStateSelectionRef.current = [...currentSelectionIds];
-      lastUpdateSourceRef.current = 'table';
+      lastUpdateSourceRef.current = "table";
 
       syncWithAppState.update?.({ selectedIds: currentSelectionIds });
     }
-  }, [
-    selectedItems,
-    syncWithAppState,
-    appStateSelection,
-    idKey,
-    rowsSelectable,
-    syncState,
-  ]);
+  }, [selectedItems, syncWithAppState, appStateSelection, idKey, rowsSelectable, syncState]);
 
   // --- Reset sync state machine to idle when updates are complete
   useEffect(() => {
-    if (syncState !== 'idle') {
+    if (syncState !== "idle") {
       // Reset to idle state in the next tick to allow the current update to complete
       const resetTimer = requestAnimationFrame(() => {
-        setSyncState('idle');
+        setSyncState("idle");
       });
-      
+
       return () => cancelAnimationFrame(resetTimer);
     }
   }, [syncState, appStateSelection, selectedItems]);
 
   // --- Clear update source when sync state becomes idle
   useEffect(() => {
-    if (syncState === 'idle') {
+    if (syncState === "idle") {
       // Use a separate frame to clear the source after the sync state is reset
       const clearTimer = requestAnimationFrame(() => {
         lastUpdateSourceRef.current = null;
       });
-      
+
       return () => cancelAnimationFrame(clearTimer);
     }
   }, [syncState]);
@@ -539,7 +531,7 @@ export default function useRowSelection({
 
   useEffect(() => {
     // console.log("selection DID CHANGE?");
-    onSelectionDidChange?.(selectedItems);
+    void onSelectionDidChange?.(selectedItems);
   }, [selectedItems, onSelectionDidChange]);
 
   /**

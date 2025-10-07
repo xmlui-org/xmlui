@@ -1,5 +1,5 @@
 import type { StyleToken } from "./tokens";
-import { StyleInputStream } from "./StyleInputStream";
+import type { StyleInputStream } from "./StyleInputStream";
 import { StyleTokenType } from "./tokens";
 
 // States of the lexer's state machine
@@ -102,7 +102,6 @@ export class StyleLexer {
    */
   private fetch(): StyleToken {
     // --- Captured constants used in nested functions
-    const lexer = this;
     const input = this.input;
     const startPos = this._prefetchedPos || input.position;
     this._lastFetchPosition = this.input.position;
@@ -114,6 +113,27 @@ export class StyleLexer {
     let ch: string | null = null;
     let useResolver = false;
     let stringWrapper = "";
+
+    /**
+     * Appends the last character to the token, and manages positions
+     */
+    const appendTokenChar = (): void => {
+      text += ch;
+      this._prefetched = null;
+      this._prefetchedPos = null;
+      lastEndPos = input.position;
+    };
+
+    /**
+     * Fetches the next character from the input stream
+     */
+    const fetchNextChar = (): string | null => {
+      if (!this._prefetched) {
+        this._prefetchedPos = input.position;
+        this._prefetched = input.get();
+      }
+      return this._prefetched;
+    };
 
     // --- Start from the beginning
     let phase: LexerPhase = LexerPhase.Start;
@@ -275,32 +295,13 @@ export class StyleLexer {
     }
 
     /**
-     * Appends the last character to the token, and manages positions
-     */
-    function appendTokenChar(): void {
-      text += ch;
-      lexer._prefetched = null;
-      lexer._prefetchedPos = null;
-      lastEndPos = input.position;
-    }
-
-    /**
-     * Fetches the next character from the input stream
-     */
-    function fetchNextChar(): string | null {
-      if (!lexer._prefetched) {
-        lexer._prefetchedPos = input.position;
-        lexer._prefetched = input.get();
-      }
-      return lexer._prefetched;
-    }
-
-    /**
      * Packs the specified type of token to send back
      */
     function makeToken(): StyleToken {
       if (useResolver) {
-        tokenType = styleKeywords[text] ?? (isIdStart(text[0]) ? StyleTokenType.Identifier : StyleTokenType.Unknown);
+        tokenType =
+          styleKeywords[text] ??
+          (isIdStart(text[0]) ? StyleTokenType.Identifier : StyleTokenType.Unknown);
       }
       return {
         text,
@@ -346,7 +347,9 @@ function isWs(t: StyleToken): boolean {
  * @param ch Character to test
  */
 function isIdStart(ch: string): boolean {
-  return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "-" || ch === "_" || ch === "$";
+  return (
+    (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "-" || ch === "_" || ch === "$"
+  );
 }
 
 /**
