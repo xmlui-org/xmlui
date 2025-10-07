@@ -39,6 +39,7 @@ type ToggleProps = {
   autoFocus?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
+  forceHover?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -73,6 +74,7 @@ export const Toggle = forwardRef(function Toggle(
     autoFocus,
     registerComponentApi,
     inputRenderer,
+    forceHover = false,
     ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
@@ -191,6 +193,7 @@ export const Toggle = forwardRef(function Toggle(
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
+          [styles.forceHover]: forceHover,
         })}
       />
     );
@@ -212,6 +215,7 @@ export const Toggle = forwardRef(function Toggle(
     variant,
     indeterminate,
     autoFocus,
+    forceHover,
   ]);
 
   return (

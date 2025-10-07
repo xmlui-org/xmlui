@@ -339,6 +339,11 @@ $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
     &:hover {
       opacity: 1;
     }
+
+    // Force hover state for extended interaction zone
+    &.forceHoverWrapper {
+      opacity: 1;
+    }
   }
 
   .resizer {

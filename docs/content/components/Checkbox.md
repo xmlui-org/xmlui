@@ -101,47 +101,6 @@ This property sets the component's initial value.
 
 This property is used to define a custom checkbox input template
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-```xmlui-pg copy display name="Example: label"
-<App>
-  <Checkbox label="Example label" initialValue="true" />
-  <Checkbox label="Another label" intialValue="false" />
-</App>
-```
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `Checkbox` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "end") [#labelposition-default-end]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) **(default)** |
-| `top` | The top of the input |
-| `bottom` | The bottom of the input |
-
-```xmlui-pg copy display name="Example: labelPosition"
-<App>
-  <Checkbox label="Top label" labelPosition="top" initialValue="true" />
-  <Checkbox label="End label" labelPosition="end" initialValue="true" />
-  <Checkbox label="Bottom label" labelPosition="bottom" initialValue="true" />
-  <Checkbox label="Start label" labelPosition="start" initialValue="true" />
-</App>
-```
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `readOnly` (default: false) [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
