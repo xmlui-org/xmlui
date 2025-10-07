@@ -203,7 +203,6 @@ export class Lexer {
    */
   private fetch(): Token {
     // --- Captured constants used in nested functions
-    const lexer = this;
     const input = this.input;
     const startPos = this._prefetchedPos || input.position;
     const line = input.line;
@@ -218,6 +217,18 @@ export class Lexer {
     let lastEndColumn = input.column;
     let ch: string | null = null;
     let useResolver = false;
+
+    /**
+     * Appends the last character to the token, and manages positions
+     */
+    const appendTokenChar = (): void => {
+      text += ch;
+      this._prefetched = null;
+      this._prefetchedPos = null;
+      this._prefetchedColumn = null;
+      lastEndPos = input.position;
+      lastEndColumn = input.position;
+    };
 
     // --- Start from the beginning
     let phase: LexerPhase = this.getStartingPhaseThenReset();
@@ -671,7 +682,10 @@ export class Lexer {
         case LexerPhase.DecimalOrReal:
           if (isDecimalDigit(ch) || ch === "_") {
             break;
-          } else if (ch === "." && (this.input.peek() === null || isDecimalDigit(this.input.peek()!))) {
+          } else if (
+            ch === "." &&
+            (this.input.peek() === null || isDecimalDigit(this.input.peek()!))
+          ) {
             phase = LexerPhase.RealFractionalFirst;
             tokenType = TokenType.Unknown;
           } else if (ch === "e" || ch === "E") {
@@ -960,18 +974,6 @@ export class Lexer {
     }
 
     /**
-     * Appends the last character to the token, and manages positions
-     */
-    function appendTokenChar(): void {
-      text += ch;
-      lexer._prefetched = null;
-      lexer._prefetchedPos = null;
-      lexer._prefetchedColumn = null;
-      lastEndPos = input.position;
-      lastEndColumn = input.position;
-    }
-
-    /**
      * Packs the specified type of token to send back
      */
     function makeToken(): Token {
@@ -1022,7 +1024,8 @@ export class Lexer {
    */
   private fetchRegEx(): RegExpLexerResult {
     // --- Get the tail
-    const tailPosition = this._ahead.length > 0 ? this._ahead[0].startPosition : this._lastFetchPosition;
+    const tailPosition =
+      this._ahead.length > 0 ? this._ahead[0].startPosition : this._lastFetchPosition;
     const tail = this.input.getTail(tailPosition);
 
     // --- Parse the tail. If no error, the entire tail is the RegExp
