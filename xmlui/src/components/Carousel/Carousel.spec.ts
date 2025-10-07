@@ -1,4 +1,3 @@
-import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -224,6 +223,28 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Visual States", () => {
+  test("component width", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel width="500px">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`
+    );
+    const carousel = page.getByRole("region");
+    await expect(carousel).toHaveCSS("width", "500px");
+  });
+
+  test("component height", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel height="500px">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`
+    );
+    const carousel = page.getByRole("region");
+    await expect(carousel).toHaveCSS("height", "500px");
+  });
+
   test("component control background color", async ({ page, initTestBed }) => {
     await initTestBed(
       `<Carousel controls="true">
@@ -270,6 +291,268 @@ test.describe("Visual States", () => {
     );
     const indicator = page.getByRole("tab", { name: "Go to slide 1" });
     await expect(indicator).toHaveCSS("width", "20px");
+  });
+
+  test("component control height", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "height-control-Carousel": "50px",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("height", "50px");
+  });
+
+  test("component control width", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "width-control-Carousel": "50px",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("width", "50px");
+  });
+
+  test("component control border radius", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "borderRadius-control-Carousel": "10px",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("border-radius", "10px");
+  });
+
+  test("component control hover background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-control-hover-Carousel": "rgb(255, 165, 0)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await control.hover();
+    await expect(control).toHaveCSS("background-color", "rgb(255, 165, 0)");
+  });
+
+  test("component control hover text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-control-hover-Carousel": "rgb(255, 255, 255)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await control.hover();
+    await expect(control).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
+
+  test("component control active background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-control-active-Carousel": "rgb(0, 128, 0)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await control.hover();
+    await page.mouse.down();
+    await expect(control).toHaveCSS("background-color", "rgb(0, 128, 0)");
+  });
+
+  test("component control active text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-control-active-Carousel": "rgb(255, 255, 0)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await control.hover();
+    await page.mouse.down();
+    await expect(control).toHaveCSS("color", "rgb(255, 255, 0)");
+  });
+
+  test("component control disabled background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true" loop="false">
+        <CarouselItem>Slide 1</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-control-disabled-Carousel": "rgb(200, 200, 200)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("background-color", "rgb(200, 200, 200)");
+  });
+
+  test("component control disabled text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel controls="true" loop="false">
+        <CarouselItem>Slide 1</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-control-disabled-Carousel": "rgb(150, 150, 150)",
+        },
+      },
+    );
+    const control = page.getByRole("button", { name: "Next Slide" });
+    await expect(control).toHaveCSS("color", "rgb(150, 150, 150)");
+  });
+
+  test("component indicator height", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "height-indicator-Carousel": "15px",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 1" });
+    await expect(indicator).toHaveCSS("height", "15px");
+  });
+
+  test("component indicator background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-indicator-Carousel": "rgb(100, 100, 100)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 2" });
+    await expect(indicator).toHaveCSS("background-color", "rgb(100, 100, 100)");
+  });
+
+  test("component indicator text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-indicator-Carousel": "rgb(50, 50, 50)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 2" });
+    await expect(indicator).toHaveCSS("color", "rgb(50, 50, 50)");
+  });
+
+  test("component indicator hover background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-indicator-hover-Carousel": "rgb(150, 150, 255)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 2" });
+    await indicator.hover();
+    await expect(indicator).toHaveCSS("background-color", "rgb(150, 150, 255)");
+  });
+
+  test("component indicator hover text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-indicator-hover-Carousel": "rgb(255, 100, 100)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 2" });
+    await indicator.hover();
+    await expect(indicator).toHaveCSS("color", "rgb(255, 100, 100)");
+  });
+
+  test("component indicator active background color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "backgroundColor-indicator-active-Carousel": "rgb(0, 0, 255)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 1" });
+    await expect(indicator).toHaveCSS("background-color", "rgb(0, 0, 255)");
+  });
+
+  test("component indicator active text color", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<Carousel indicators="true">
+        <CarouselItem>Slide 1</CarouselItem>
+        <CarouselItem>Slide 2</CarouselItem>
+      </Carousel>`,
+      {
+        testThemeVars: {
+          "textColor-indicator-active-Carousel": "rgb(255, 255, 255)",
+        },
+      },
+    );
+    const indicator = page.getByRole("tab", { name: "Go to slide 1" });
+    await expect(indicator).toHaveCSS("color", "rgb(255, 255, 255)");
   });
 });
 
