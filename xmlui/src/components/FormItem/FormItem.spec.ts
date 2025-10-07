@@ -1135,24 +1135,11 @@ test.describe("Other Edge Cases", () => {
     await expect(driver.validationStatusIndicator).toBeVisible();
   });
 
-  test.fixme(
-    "handles FormItem with no Form parent gracefully",
-    SKIP_REASON.XMLUI_BUG(
-      "If not inside a Form, FormItem renders error component - test should also account for this",
-    ),
-    async ({ initTestBed, createFormItemDriver }) => {
-      await initTestBed(`
-      <FormItem testId="formItem" label="Standalone FormItem" />
-    `);
+  test("handles FormItem with no Form parent gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<FormItem label="Standalone FormItem" type="text" />`);
 
-      const driver = await createFormItemDriver("formItem");
-      // Component should either render with fallback behavior or be gracefully hidden
-      const isVisible = await driver.component.isVisible();
-      if (isVisible) {
-        await expect(driver.component).toBeVisible();
-      } else {
-        expect(isVisible).toBe(false);
-      }
-    },
-  );
+    const field = page.getByRole("textbox");
+    await expect(field).not.toBeVisible();
+    await expect(page.locator("[data-error-boundary]")).toBeVisible();
+  });
 });

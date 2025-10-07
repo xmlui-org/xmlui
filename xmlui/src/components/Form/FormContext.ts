@@ -98,7 +98,7 @@ export const validationModeMd: PropertyValueDescription[] = [
 
 export const FormContext = createContext<IFormContext>(undefined as unknown as IFormContext);
 
-export function useFormContextPart<T = unknown>(selector: (value: IFormContext) => T) {
+export function useFormContextPart<T = unknown>(selector: (value?: IFormContext) => T) {
   return useContextSelector(FormContext, selector);
 }
 
