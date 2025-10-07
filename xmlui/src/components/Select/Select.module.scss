@@ -78,7 +78,6 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .selectTrigger {
-    min-height: 2.6rem;
     display: flex;
     @include t.paddingVars($themeVars, $componentName);
     width: 100%;
