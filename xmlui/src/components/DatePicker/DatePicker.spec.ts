@@ -229,6 +229,14 @@ test("component fires proper focus event on gotFocus", async ({ page, initTestBe
   await expect.poll(testStateDriver.testState).toBe("focused");
 });
 
+test("component fires proper focus event on label focus", async ({ page, initTestBed }) => {
+  const { testStateDriver } = await initTestBed(`
+    <DatePicker testId="datePicker" onGotFocus="testState = 'focused'" label="test" />
+  `);
+  await page.getByText("test").click();
+  await expect.poll(testStateDriver.testState).toBe("focused");
+});
+
 test("component fires proper blur event on lostFocus", async ({ page, initTestBed }) => {
   const { testStateDriver } = await initTestBed(`
     <DatePicker testId="datePicker" onLostFocus="testState = 'blurred'" />
@@ -462,7 +470,7 @@ test("component works correctly within a form", async ({ page, initTestBed }) =>
 
 test("input has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<DatePicker width="200px" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
@@ -470,25 +478,25 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<DatePicker width="200px" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<DatePicker width="50%" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
 test("input with label has correct width in %", async ({ page, initTestBed }) => {
-  await page.setViewportSize({ width: 400, height: 300});
+  await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<DatePicker width="50%" label="test" testId="test"/>`, {});
-  
+
   const input = page.getByTestId("test");
   const { width } = await input.boundingBox();
   expect(width).toBe(200);

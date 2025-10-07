@@ -412,6 +412,64 @@ test.describe("Accessibility", () => {
 });
 
 // =============================================================================
+// EVENT HANDLING TESTS
+// =============================================================================
+
+test.describe("Event Handling", () => {
+  test("didChange event fires on input change", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="testState = 'changed'" />
+    `);
+    await page.getByRole("textbox").fill("test");
+    await expect.poll(testStateDriver.testState).toEqual("changed");
+  });
+
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="arg => testState = arg" />
+    `);
+    await page.getByRole("textbox").fill("test value");
+    await expect.poll(testStateDriver.testState).toEqual("test value");
+  });
+
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByRole("textbox").focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea label="Comments" onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByText("Comments").click();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("lostFocus event fires on blur", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onLostFocus="testState = 'blurred'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.blur();
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
+  });
+
+  test("events do not fire when component is disabled", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea enabled="false" onDidChange="testState = 'changed'" onGotFocus="testState = 'focused'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.fill("test", { force: true });
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+});
+
+// =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================
 

@@ -60,17 +60,17 @@ export interface PartialInputProps {
 
 /**
  * PartialInput is a specialized input component designed for multi-field input scenarios.
- * 
+ *
  * Key features:
  * - Auto-advance: Automatically moves to the next input when max length is reached
  * - Enhanced blur detection: Provides direction information (next/previous/external)
  * - Consistent styling: Common base styles with component-specific overrides via className
  * - Accessibility: Proper ARIA labels and keyboard navigation support
  * - Validation integration: Works with validation functions and provides feedback
- * 
+ *
  * This component encapsulates common patterns found in multi-field input components,
  * reducing code duplication and ensuring consistent behavior.
- * 
+ *
  * @param props - PartialInputProps configuration
  * @returns A configured input element with enhanced multi-field input behavior
  */
@@ -103,7 +103,6 @@ export function PartialInput({
   isInvalid = false,
   ...restProps
 }: PartialInputProps) {
-
   /**
    * Process emptyCharacter according to requirements.
    * Handles null/empty values, multi-character strings, and unicode characters.

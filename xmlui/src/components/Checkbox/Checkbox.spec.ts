@@ -612,6 +612,14 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Checkbox onGotFocus="testState = 'focused'" label="test" />`,
+    );
+    await page.getByText("test").click();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
   test("component lostFocus event fires on blur", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<Checkbox onLostFocus="testState = 'blurred'" />`,

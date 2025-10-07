@@ -91,7 +91,10 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("switch")).not.toBeChecked();
     });
 
-    test("initialValue handles string 'FALSE' as false (case insensitive)", async ({ initTestBed, page }) => {
+    test("initialValue handles string 'FALSE' as false (case insensitive)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`<Switch initialValue="FALSE" />`);
       await expect(page.getByRole("switch")).not.toBeChecked();
     });
@@ -106,7 +109,10 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("switch")).toBeChecked();
     });
 
-    test("initialValue handles string with content and 'false' as true", async ({ initTestBed, page }) => {
+    test("initialValue handles string with content and 'false' as true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`<Switch initialValue="not false" />`);
       await expect(page.getByRole("switch")).toBeChecked();
     });
@@ -138,7 +144,10 @@ test.describe("Basic Functionality", () => {
       }
     });
 
-    test("initialValue handles array with single element as true", async ({ initTestBed, page }) => {
+    test("initialValue handles array with single element as true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`<Switch initialValue="{['item']}" />`);
       // Arrays may cause component to not render in some contexts
       const switchElement = page.getByRole("switch");
@@ -213,12 +222,12 @@ test.describe("Basic Functionality", () => {
           <Button testId="setFalse" onClick="mySwitch.setValue(false)">Set False</Button>
         </Fragment>
       `);
-      
+
       const switchElement = page.getByRole("switch");
-      
+
       await page.getByTestId("setTrue").click();
       await expect(switchElement).toBeChecked();
-      
+
       await page.getByTestId("setFalse").click();
       await expect(switchElement).not.toBeChecked();
     });
@@ -232,15 +241,15 @@ test.describe("Basic Functionality", () => {
           <Button testId="setNegative" onClick="mySwitch.setValue(-5)">Set -5</Button>
         </Fragment>
       `);
-      
+
       const switchElement = page.getByRole("switch");
-      
+
       await page.getByTestId("setZero").click();
       await expect(switchElement).not.toBeChecked();
-      
+
       await page.getByTestId("setOne").click();
       await expect(switchElement).toBeChecked();
-      
+
       await page.getByTestId("setNegative").click();
       await expect(switchElement).toBeChecked();
     });
@@ -255,18 +264,18 @@ test.describe("Basic Functionality", () => {
           <Button testId="setYes" onClick="mySwitch.setValue('yes')">Set 'yes'</Button>
         </Fragment>
       `);
-      
+
       const switchElement = page.getByRole("switch");
-      
+
       await page.getByTestId("setEmpty").click();
       await expect(switchElement).not.toBeChecked();
-      
+
       await page.getByTestId("setFalseStr").click();
       await expect(switchElement).not.toBeChecked();
-      
+
       await page.getByTestId("setTrueStr").click();
       await expect(switchElement).toBeChecked();
-      
+
       await page.getByTestId("setYes").click();
       await expect(switchElement).toBeChecked();
     });
@@ -280,10 +289,10 @@ test.describe("Basic Functionality", () => {
           <Text testId="currentValue">{mySwitch.value}</Text>
         </Fragment>
       `);
-      
+
       const switchElement = page.getByRole("switch");
       const valueDisplay = page.getByTestId("currentValue");
-      
+
       // Complex types should eventually resolve through transformToLegitValue
       await page.getByTestId("testComplexTypes").click();
       // After setValue operations, switch should reflect the final transformed value
@@ -367,7 +376,8 @@ test.describe("Basic Functionality", () => {
   });
 
   test("component handles very long label text", async ({ initTestBed, page }) => {
-    const longLabel = "This is a very long label that might cause layout issues or text wrapping problems in the component rendering";
+    const longLabel =
+      "This is a very long label that might cause layout issues or text wrapping problems in the component rendering";
     await initTestBed(`<Switch label="${longLabel}" />`);
     await expect(page.getByLabel(longLabel)).toBeVisible();
   });
@@ -375,12 +385,12 @@ test.describe("Basic Functionality", () => {
   test("component handles rapid state changes", async ({ initTestBed, page }) => {
     await initTestBed(`<Switch />`);
     const switchElement = page.getByRole("switch");
-    
+
     // Perform rapid clicks
     for (let i = 0; i < 5; i++) {
       await switchElement.click();
     }
-    
+
     // Should end up checked (odd number of clicks)
     await expect(switchElement).toBeChecked();
   });
@@ -401,13 +411,13 @@ test.describe("Accessibility", () => {
   test("pressing Space after focus toggles the control", async ({ initTestBed, page }) => {
     await initTestBed(`<Switch />`);
     const switchElement = page.getByRole("switch");
-    
+
     await switchElement.focus();
     await expect(switchElement).not.toBeChecked();
-    
+
     await switchElement.press("Space", { delay: 100 });
     await expect(switchElement).toBeChecked();
-    
+
     await switchElement.press("Space", { delay: 100 });
     await expect(switchElement).not.toBeChecked();
   });
@@ -419,13 +429,13 @@ test.describe("Accessibility", () => {
         <Switch label="Second switch" />
       </Fragment>
     `);
-    
+
     const firstSwitch = page.getByLabel("First switch");
     const secondSwitch = page.getByLabel("Second switch");
-    
+
     await firstSwitch.focus();
     await expect(firstSwitch).toBeFocused();
-    
+
     await page.keyboard.press("Tab", { delay: 100 });
     await expect(secondSwitch).toBeFocused();
   });
@@ -454,7 +464,7 @@ test.describe("Accessibility", () => {
   }) => {
     await initTestBed(`<Switch required="true" label="Required switch" />`);
     const driver = await createCheckboxDriver();
-    
+
     // Check for required indicator (usually asterisk or similar)
     await expect(driver.component).toContainText("*");
   });
@@ -508,7 +518,9 @@ test.describe("Label", () => {
   });
 
   test("labelBreak enables label line breaks", async ({ initTestBed, page }) => {
-    await initTestBed(`<Switch label="Very long label that should break into multiple lines" labelBreak="true" />`);
+    await initTestBed(
+      `<Switch label="Very long label that should break into multiple lines" labelBreak="true" />`,
+    );
     const switchElement = page.getByRole("switch");
     await expect(switchElement).toBeVisible();
   });
@@ -529,21 +541,21 @@ test.describe("Event Handling", () => {
     const { testStateDriver } = await initTestBed(`
       <Switch onDidChange="testState = 'changed'" />
     `);
-    
+
     const switchElement = page.getByRole("switch");
     await switchElement.click();
-    
-    await expect.poll(testStateDriver.testState).toEqual('changed');
+
+    await expect.poll(testStateDriver.testState).toEqual("changed");
   });
 
   test("didChange event passes new value", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Switch onDidChange="arg => testState = arg" />
     `);
-    
+
     const switchElement = page.getByRole("switch");
     await switchElement.click();
-    
+
     await expect.poll(testStateDriver.testState).toEqual(true);
   });
 
@@ -551,23 +563,33 @@ test.describe("Event Handling", () => {
     const { testStateDriver } = await initTestBed(`
       <Switch onGotFocus="testState = 'focused'" />
     `);
-    
+
     const switchElement = page.getByRole("switch");
     await switchElement.focus();
-    
-    await expect.poll(testStateDriver.testState).toEqual('focused');
+
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Switch label="Enable" onGotFocus="testState = 'focused'" />
+    `);
+
+    await page.getByText("Enable").click();
+
+    await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
   test("component lostFocus event fires on blur", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Switch onLostFocus="testState = 'blurred'" />
     `);
-    
+
     const switchElement = page.getByRole("switch");
     await switchElement.focus();
     await switchElement.blur();
-    
-    await expect.poll(testStateDriver.testState).toEqual('blurred');
+
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
   });
 });
 
@@ -583,7 +605,7 @@ test.describe("Api", () => {
         <Text testId="value">{mySwitch.value}</Text>
       </Fragment>
     `);
-    
+
     await expect(page.getByTestId("value")).toHaveText("true");
   });
 
@@ -594,9 +616,9 @@ test.describe("Api", () => {
         <Text testId="value">{mySwitch.value}</Text>
       </Fragment>
     `);
-    
+
     await expect(page.getByTestId("value")).toHaveText("false");
-    
+
     await page.getByRole("switch").click();
     await expect(page.getByTestId("value")).toHaveText("true");
   });
@@ -609,9 +631,9 @@ test.describe("Api", () => {
         <Text testId="value">{mySwitch.value}</Text>
       </Fragment>
     `);
-    
+
     await expect(page.getByTestId("value")).toHaveText("false");
-    
+
     await page.getByTestId("setBtn").click();
     await expect(page.getByTestId("value")).toHaveText("true");
     await expect(page.getByRole("switch")).toBeChecked();
@@ -624,9 +646,9 @@ test.describe("Api", () => {
         <Button testId="setBtn" onClick="mySwitch.setValue(true)">Set True</Button>
       </Fragment>
     `);
-    
+
     await page.getByTestId("setBtn").click();
-    await expect.poll(testStateDriver.testState).toEqual('api-changed');
+    await expect.poll(testStateDriver.testState).toEqual("api-changed");
   });
 
   // =============================================================================
@@ -634,7 +656,10 @@ test.describe("Api", () => {
   // =============================================================================
 
   test.describe("value property with transformToLegitValue", () => {
-    test("switch reflects state changes with different value types", async ({ initTestBed, page }) => {
+    test("switch reflects state changes with different value types", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Fragment>
           <Switch id="mySwitch" initialValue="false" />
@@ -642,11 +667,11 @@ test.describe("Api", () => {
           <Text testId="currentValue">{mySwitch.value}</Text>
         </Fragment>
       `);
-      
+
       // Initially false
       await expect(page.getByTestId("currentValue")).toContainText("false");
       await expect(page.getByRole("switch")).not.toBeChecked();
-      
+
       // Update to truthy string value
       await page.getByTestId("updateValue").click();
       await expect(page.getByTestId("currentValue")).toContainText("true");
@@ -662,15 +687,15 @@ test.describe("Api", () => {
           <Text testId="currentValue">Current: {mySwitch.value}</Text>
         </Fragment>
       `);
-      
+
       const currentValue = page.getByTestId("currentValue");
       const switchElement = page.getByRole("switch");
-      
+
       // Set to 0 (falsy number)
       await page.getByTestId("setZero").click();
       await expect(currentValue).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // Set to positive number (truthy)
       await page.getByTestId("setPositive").click();
       await expect(currentValue).toContainText("true");
@@ -687,20 +712,20 @@ test.describe("Api", () => {
           <Text testId="valueDisplay">Value: {mySwitch.value}</Text>
         </Fragment>
       `);
-      
+
       const valueDisplay = page.getByTestId("valueDisplay");
       const switchElement = page.getByRole("switch");
-      
+
       // Non-empty string should be true
       await page.getByTestId("setString").click();
       await expect(valueDisplay).toContainText("true");
       await expect(switchElement).toBeChecked();
-      
+
       // Empty string should be false
       await page.getByTestId("setEmptyString").click();
       await expect(valueDisplay).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // String 'false' should be false
       await page.getByTestId("setFalseString").click();
       await expect(valueDisplay).toContainText("false");
@@ -719,30 +744,30 @@ test.describe("Api", () => {
           <Text testId="status">Status: {mySwitch.value}</Text>
         </Fragment>
       `);
-      
+
       const status = page.getByTestId("status");
       const switchElement = page.getByRole("switch");
-      
+
       // String 'false' should be false
       await page.getByTestId("setFalseString").click();
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // String 'FALSE' should be false (case insensitive)
       await page.getByTestId("setFalseUpper").click();
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // Empty string should be false
       await page.getByTestId("setEmptyString").click();
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // Whitespace-only string should be false
       await page.getByTestId("setWhitespace").click();
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
-      
+
       // Any other string should be true
       await page.getByTestId("setTruthyString").click();
       await expect(status).toContainText("true");
@@ -756,10 +781,13 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Visual States", () => {
-  test("component applies switch-specific styling", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component applies switch-specific styling", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch />`);
     const driver = await createCheckboxDriver();
-    
+
     // Switch should have different visual styling than checkbox
     await expect(driver.component).toHaveClass(/switch/);
   });
@@ -869,25 +897,37 @@ test.describe("Theme Vars", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  test("validationStatus=error correctly displayed", async ({ initTestBed, createCheckboxDriver }) => {
+  test("validationStatus=error correctly displayed", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch validationStatus="error" />`);
     const driver = await createCheckboxDriver();
     await expect(driver.component).toHaveClass(/error/);
   });
 
-  test("validationStatus=warning correctly displayed", async ({ initTestBed, createCheckboxDriver }) => {
+  test("validationStatus=warning correctly displayed", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch validationStatus="warning" />`);
     const driver = await createCheckboxDriver();
     await expect(driver.component).toHaveClass(/warning/);
   });
 
-  test("validationStatus=valid correctly displayed", async ({ initTestBed, createCheckboxDriver }) => {
+  test("validationStatus=valid correctly displayed", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch validationStatus="valid" />`);
     const driver = await createCheckboxDriver();
     await expect(driver.component).toHaveClass(/valid/);
   });
 
-  test("handles invalid validationStatus gracefully", async ({ initTestBed, createCheckboxDriver }) => {
+  test("handles invalid validationStatus gracefully", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch validationStatus="invalid-status" />`);
     const driver = await createCheckboxDriver();
     await expect(driver.component).toBeVisible();
@@ -899,27 +939,36 @@ test.describe("Validation", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test("component handles null and undefined props gracefully", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component handles null and undefined props gracefully", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch/>`, {});
     const driver1 = await createCheckboxDriver();
     await expect(driver1.component).toBeVisible();
-    
+
     await initTestBed(`<Switch label=""/>`, {});
     const driver2 = await createCheckboxDriver();
     await expect(driver2.component).toBeVisible();
   });
 
-  test("component handles special characters correctly", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component handles special characters correctly", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch label="Test with !@#$%^&*()"/>`, {});
     const driver = await createCheckboxDriver();
     await expect(driver.component).toBeVisible();
   });
 
-  test("component handles concurrent prop updates correctly", async ({ initTestBed, createCheckboxDriver }) => {
+  test("component handles concurrent prop updates correctly", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
     await initTestBed(`<Switch initialValue="false" />`, {});
     const driver1 = await createCheckboxDriver();
     await expect(driver1.component).not.toBeChecked();
-    
+
     await initTestBed(`<Switch initialValue="true" />`, {});
     const driver2 = await createCheckboxDriver();
     await expect(driver2.component).toBeChecked();
@@ -931,19 +980,25 @@ test.describe("Edge Cases", () => {
 // =============================================================================
 
 test.describe("Integration", () => {
-  test("component works correctly in different layout contexts", async ({ initTestBed, createCheckboxDriver }) => {
-    await initTestBed(`
+  test("component works correctly in different layout contexts", async ({
+    initTestBed,
+    createCheckboxDriver,
+  }) => {
+    await initTestBed(
+      `
       <VStack>
         <Switch label="First switch" />
         <Switch label="Second switch" />
       </VStack>
-    `, {});
-    
+    `,
+      {},
+    );
+
     const driver = await createCheckboxDriver();
-    
+
     // Test basic layout integration
     await expect(driver.component).toBeVisible();
-    
+
     // Test bounding box and dimensions
     const boundingBox = await driver.component.boundingBox();
     expect(boundingBox).not.toBeNull();
@@ -958,10 +1013,10 @@ test.describe("Integration", () => {
         <Button type="submit">Submit</Button>
       </Form>
     `);
-    
+
     const switchElement = page.getByRole("switch");
     const submitButton = page.getByRole("button", { name: "Submit" });
-    
+
     await expect(switchElement).toBeVisible();
     await expect(submitButton).toBeVisible();
   });
@@ -975,9 +1030,9 @@ test.describe("Integration", () => {
         <Button testId="toggleBtn" onClick="showSwitch = !showSwitch">Toggle</Button>
       </Fragment>
     `);
-    
+
     await expect(page.getByLabel("Conditional switch")).toBeVisible();
-    
+
     await page.getByTestId("toggleBtn").click();
     await expect(page.getByLabel("Conditional switch")).not.toBeVisible();
   });

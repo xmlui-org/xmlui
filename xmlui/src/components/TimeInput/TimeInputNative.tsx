@@ -346,7 +346,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange],
+    [hour, minute, second, formatTimeValue, amPm, is12HourFormat, handleChange],
   );
 
   // Handle changes from individual inputs
@@ -417,7 +417,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     // Always call handleChange to update the time value
     const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
     handleChange(timeString);
-  }, [amPm, hour, minute, second, is12HourFormat, handleChange]);
+  }, [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange]);
 
   const handleAmPmSet = useCallback(
     (targetAmPm: AmPmType) => {
@@ -429,7 +429,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       const timeString = formatTimeValue(hour, minute, second, targetAmPm, is12HourFormat);
       handleChange(timeString);
     },
-    [amPm, hour, minute, second, is12HourFormat, handleChange],
+    [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange],
   );
 
   // Focus method
@@ -556,21 +556,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     setTimeout(() => {
       focus();
     }, 0);
-  }, [
-    stableInitialValue,
-    handleChange,
-    localValue,
-    controlledValue,
-    hour,
-    minute,
-    second,
-    amPm,
-    setHour,
-    setMinute,
-    setSecond,
-    setAmPm,
-    focus,
-  ]);
+  }, [clearToInitialValue, stableInitialValue, handleChange, is12HourFormat, focus]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
@@ -900,6 +886,7 @@ type HourInputProps = {
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
+  id,
   amPm,
   maxTime,
   minTime,
@@ -963,6 +950,7 @@ function HourInput({
 
   return (
     <PartialInput
+      id={id}
       data-part-id={PART_HOUR}
       value={displayValue}
       emptyCharacter={emptyCharacter}
