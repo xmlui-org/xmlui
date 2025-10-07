@@ -104,6 +104,7 @@ class Clipboard {
       };
       window.navigator.clipboard.writeText = (text) => {
         this.content = text;
+        return Promise.resolve(undefined);
       };
       window.navigator.clipboard.write = (items) => {
         throw new Error("Clipboard write not implemented in mocked environment");

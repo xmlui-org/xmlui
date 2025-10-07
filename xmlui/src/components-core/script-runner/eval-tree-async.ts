@@ -521,7 +521,7 @@ async function evalFunctionInvocationAsync(
         functionArgs.push(...funcArg);
       } else {
         if (arg.type === T_ARROW_EXPRESSION) {
-          const funcArg = await createArrowFunctionAsync(evaluator, arg);
+          const funcArg = createArrowFunctionAsync(evaluator, arg);
           const wrappedFunc = (...args: any[]) => {
             return funcArg(arg.args, evalContext, thread, ...args);
           };
@@ -530,7 +530,7 @@ async function evalFunctionInvocationAsync(
           await evaluator([], arg, evalContext, thread);
           const funcArg = await completeExprValue(arg, thread);
           if (funcArg?._ARROW_EXPR_) {
-            const wrappedFuncArg = await createArrowFunctionAsync(evaluator, funcArg);
+            const wrappedFuncArg = createArrowFunctionAsync(evaluator, funcArg);
             const wrappedFunc = (...args: any[]) =>
               wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
             functionArgs.push(wrappedFunc);
@@ -592,7 +592,7 @@ async function evalFunctionInvocationAsync(
 function createArrowFunctionAsync(
   evaluator: EvaluatorAsyncFunction,
   expr: ArrowExpression,
-): Promise<Function> {
+): Function {
   // --- Use this function, it evaluates the arrow function
   return async (...args: any[]) => {
     // --- Prepare the variables to pass

@@ -112,7 +112,7 @@ export class IndexedDb implements IDatabase {
 
   public getItemById = async (resourceId: string, id: any) => {
     return await this.getItem(resourceId, (item) => {
-      return item.id + "" === id + "";
+      return Promise.resolve(item.id + "" === id + "");
     });
   };
 
