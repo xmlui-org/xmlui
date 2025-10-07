@@ -293,20 +293,38 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .multiComboboxOption {
+    padding: 0.5rem 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+
     .multiComboboxOptionContent {
       width: 100%;
       gap: 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}");
-      @include t.paddingVars($themeVars, "item-#{$componentName}");
+    }
+
+    &[aria-selected="true"],
+    &:hover {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
     }
 
     &[data-selected=true] {
       background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    &[aria-disabled="true"],
+    &.disabledOption {
+      pointer-events: none;
+      cursor: not-allowed;
+      color: createThemeVar("textColor-item-#{$componentName}--disabled");
+      font-style: italic;
     }
 
     &[data-disabled=true] {

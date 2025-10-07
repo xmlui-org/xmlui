@@ -15,13 +15,6 @@ import {
   Trigger as SelectTrigger,
 } from "@radix-ui/react-select";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import {
-  Command as Cmd,
-  CommandEmpty as CmdEmpty,
-  CommandInput as CmdInput,
-  CommandItem as CmdItem,
-  CommandList as CmdList,
-} from "cmdk";
 import classnames from "classnames";
 import { FocusScope } from "@radix-ui/react-focus-scope";
 
@@ -145,8 +138,8 @@ const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       ...rest
     } = props;
 
-    const { options } = useSelect();  
-    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;  
+    const { options } = useSelect();
+    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
     // Convert value to string for Radix UI compatibility
     const stringValue = useMemo(() => {
@@ -280,6 +273,30 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const { root } = useTheme();
   const [options, setOptions] = useState(new Set<Option>());
   const isInForm = useIsInsideForm();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return Array.from(options);
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    return Array.from(options).filter((option) => {
+      const extendedValue =
+        option.value + " " + option.label + " " + (option.keywords || []).join(" ");
+      return extendedValue.toLowerCase().includes(searchLower);
+    });
+  }, [options, searchTerm]);
+
+  // Reset selected index when options change or dropdown closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedIndex(-1);
+      setSearchTerm("");
+    }
+  }, [open]);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -330,6 +347,92 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     updateState({ value: newValue });
     onDidChange(newValue);
   }, [multiSelect, updateState, onDidChange]);
+
+  // Helper functions to find next/previous enabled option
+  const findNextEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex + 1; i < filteredOptions.length; i++) {
+        const item = filteredOptions[i];
+        if (item.enabled !== false) {
+          return i;
+        }
+      }
+      // Wrap around to beginning
+      for (let i = 0; i <= currentIndex; i++) {
+        const item = filteredOptions[i];
+        if (item.enabled !== false) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    [filteredOptions],
+  );
+
+  const findPreviousEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        const item = filteredOptions[i];
+        if (item.enabled !== false) {
+          return i;
+        }
+      }
+      // Wrap around to end
+      for (let i = filteredOptions.length - 1; i >= currentIndex; i--) {
+        const item = filteredOptions[i];
+        if (item.enabled !== false) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    [filteredOptions],
+  );
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!open) return;
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const nextIndex = findNextEnabledIndex(prev);
+            return nextIndex !== -1 ? nextIndex : prev;
+          });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const prevIndex = findPreviousEnabledIndex(prev);
+            return prevIndex !== -1 ? prevIndex : prev;
+          });
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
+            const selectedItem = filteredOptions[selectedIndex];
+            if (selectedItem.enabled !== false) {
+              toggleOption(selectedItem.value);
+            }
+          }
+          break;
+        case "Escape":
+          event.preventDefault();
+          setOpen(false);
+          break;
+      }
+    },
+    [
+      open,
+      selectedIndex,
+      filteredOptions,
+      toggleOption,
+      findNextEnabledIndex,
+      findPreviousEnabledIndex,
+    ],
+  );
 
   // Register component API for external interactions
   const focus = useCallback(() => {
@@ -395,10 +498,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       value,
       onChange: toggleOption,
       setOpen,
+      setSelectedIndex,
       options,
       optionRenderer,
     }),
-    [multiSelect, toggleOption, value, options],
+    [multiSelect, toggleOption, value, options, optionRenderer],
   );
 
   return (
@@ -407,123 +511,117 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         {searchable || multiSelect ? (
           <OptionTypeProvider Component={HiddenOption}>
             <Popover open={open} onOpenChange={setOpen} modal={false}>
-                <PopoverTrigger
-                  {...rest}
-                  ref={composeRefs(setReferenceElement, forwardedRef)}
-                  id={id}
-                  aria-haspopup="listbox"
-                  style={style}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                  disabled={!enabled}
-                  aria-expanded={open}
-                  onClick={(event) => {
-                    // Prevent event propagation to parent elements (e.g., DropdownMenu)
-                    // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
-                    event.stopPropagation();
-                    setOpen((prev) => !prev);
-                  }}
-                  className={classnames(
-                    styles.selectTrigger,
-                    styles[validationStatus],
-                    {
-                      [styles.disabled]: !enabled,
-                      [styles.multi]: multiSelect,
-                    },
-                    className,
-                  )}
-                  autoFocus={autoFocus}
-                >
-                  <>
-                    {multiSelect ? (
-                      Array.isArray(value) && value.length > 0 ? (
-                        <div className={styles.badgeListContainer}>
-                          <div className={styles.badgeList}>
-                            {value.map((v) =>
-                              valueRenderer ? (
-                                valueRenderer(
-                                  Array.from(options).find((o) => o.value === `${v}`),
-                                  () => {
+              <PopoverTrigger
+                {...rest}
+                ref={composeRefs(setReferenceElement, forwardedRef)}
+                id={id}
+                aria-haspopup="listbox"
+                style={style}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                disabled={!enabled}
+                aria-expanded={open}
+                onClick={(event) => {
+                  // Prevent event propagation to parent elements (e.g., DropdownMenu)
+                  // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+                  event.stopPropagation();
+                  setOpen((prev) => !prev);
+                }}
+                className={classnames(
+                  styles.selectTrigger,
+                  styles[validationStatus],
+                  {
+                    [styles.disabled]: !enabled,
+                    [styles.multi]: multiSelect,
+                  },
+                  className,
+                )}
+                autoFocus={autoFocus}
+              >
+                <>
+                  {multiSelect ? (
+                    Array.isArray(value) && value.length > 0 ? (
+                      <div className={styles.badgeListContainer}>
+                        <div className={styles.badgeList}>
+                          {value.map((v) =>
+                            valueRenderer ? (
+                              valueRenderer(
+                                Array.from(options).find((o) => o.value === `${v}`),
+                                () => {
+                                  toggleOption(v);
+                                },
+                              )
+                            ) : (
+                              <span key={v} className={styles.badge}>
+                                {Array.from(options).find((o) => o.value === `${v}`)?.label}
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
                                     toggleOption(v);
-                                  },
-                                )
-                              ) : (
-                                <span key={v} className={styles.badge}>
-                                  {Array.from(options).find((o) => o.value === `${v}`)?.label}
-                                  <Icon
-                                    name="close"
-                                    size="sm"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      toggleOption(v);
-                                    }}
-                                  />
-                                </span>
-                              ),
-                            )}
-                          </div>
+                                  }}
+                                />
+                              </span>
+                            ),
+                          )}
                         </div>
-                      ) : (
-                        <span placeholder={placeholder} className={styles.placeholder}>
-                          {placeholder}
-                        </span>
-                      )
-                    ) : value !== undefined && value !== null ? (
-                      <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
+                      </div>
                     ) : (
-                      <span aria-placeholder={placeholder} className={styles.placeholder}>
-                        {placeholder || ""}
+                      <span placeholder={placeholder} className={styles.placeholder}>
+                        {placeholder}
                       </span>
+                    )
+                  ) : value !== undefined && value !== null ? (
+                    <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
+                  ) : (
+                    <span aria-placeholder={placeholder} className={styles.placeholder}>
+                      {placeholder || ""}
+                    </span>
+                  )}
+                  <div className={styles.actions}>
+                    {multiSelect && Array.isArray(value) && value.length > 0 && (
+                      <Icon
+                        name="close"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      />
                     )}
-                    <div className={styles.actions}>
-                      {multiSelect && Array.isArray(value) && value.length > 0 && (
-                        <Icon
-                          name="close"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        />
-                      )}
-                      <Icon name="chevrondown" />
-                    </div>
-                  </>
-                </PopoverTrigger>
+                    <Icon name="chevrondown" />
+                  </div>
+                </>
+              </PopoverTrigger>
               {open && (
                 <Portal container={root}>
                   <FocusScope asChild loop trapped>
                     <PopoverContent
                       style={{ minWidth: width, height: dropdownHeight }}
                       className={styles.selectContent}
+                      onKeyDown={handleKeyDown}
                     >
-                      <Cmd
-                        className={styles.command}
-                        shouldFilter={searchable}
-                        filter={(_, search, keywords) => {
-                          const lowSearch = search.toLowerCase();
-                          for (const kw of keywords) {
-                            if (kw.toLowerCase().includes(lowSearch)) return 1;
-                          }
-                          return 0;
-                        }}
-                      >
+                      <div className={styles.command}>
                         {searchable ? (
                           <div className={styles.commandInputContainer}>
                             <Icon name="search" />
-                            <CmdInput
+                            <input
+                              role="combobox"
                               className={classnames(styles.commandInput)}
                               placeholder="Search..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              autoFocus
                             />
                           </div>
                         ) : (
-                          // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
                           <button autoFocus aria-hidden="true" className={styles.srOnly} />
                         )}
-                        <CmdList className={styles.commandList}>
+                        <div role="listbox" className={styles.commandList}>
                           {inProgress && (
                             <div className={styles.loading}>{inProgressNotificationMessage}</div>
                           )}
-                          {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                          {filteredOptions.map(({ value, label, enabled, keywords }, index) => (
                             <ComboboxOption
                               key={value}
                               readOnly={readOnly}
@@ -531,11 +629,15 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                               label={label}
                               enabled={enabled}
                               keywords={keywords}
+                              isHighlighted={selectedIndex === index}
+                              itemIndex={index}
                             />
                           ))}
-                          {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
-                        </CmdList>
-                      </Cmd>
+                          {!inProgress && filteredOptions.length === 0 && (
+                            <div>{emptyListNode}</div>
+                          )}
+                        </div>
+                      </div>
                     </PopoverContent>
                   </FocusScope>
                 </Portal>
@@ -545,29 +647,29 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           </OptionTypeProvider>
         ) : (
           <OptionTypeProvider Component={SelectOption}>
-              <SimpleSelect
-                {...rest}
-                readOnly={!!readOnly}
-                ref={forwardedRef}
-                key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
-                value={value as SingleValueType}
-                onValueChange={toggleOption}
-                id={id}
-                style={style}
-                className={className}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                enabled={enabled}
-                validationStatus={validationStatus}
-                triggerRef={setReferenceElement}
-                autoFocus={autoFocus}
-                placeholder={placeholder}
-                height={dropdownHeight}
-                width={width}
-                emptyListNode={emptyListNode}
-              >
-                {children}
-              </SimpleSelect>
+            <SimpleSelect
+              {...rest}
+              readOnly={!!readOnly}
+              ref={forwardedRef}
+              key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
+              value={value as SingleValueType}
+              onValueChange={toggleOption}
+              id={id}
+              style={style}
+              className={className}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              enabled={enabled}
+              validationStatus={validationStatus}
+              triggerRef={setReferenceElement}
+              autoFocus={autoFocus}
+              placeholder={placeholder}
+              height={dropdownHeight}
+              width={width}
+              emptyListNode={emptyListNode}
+            >
+              {children}
+            </SimpleSelect>
           </OptionTypeProvider>
         )}
       </OptionContext.Provider>
@@ -576,38 +678,66 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 });
 
 export const ComboboxOption = forwardRef(function Combobox(
-  option: Option,
+  option: Option & { isHighlighted?: boolean; itemIndex?: number },
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
-  const { label, value, enabled = true, keywords, readOnly, children } = option;
-  const { value: selectedValue, onChange, multiSelect, setOpen, optionRenderer } = useSelect();
+  const {
+    label,
+    value,
+    enabled = true,
+    keywords,
+    readOnly,
+    children,
+    isHighlighted = false,
+    itemIndex,
+  } = option;
+  const {
+    value: selectedValue,
+    onChange,
+    multiSelect,
+    setOpen,
+    setSelectedIndex,
+    optionRenderer,
+  } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.map((v) => String(v)).includes(value)
       : String(selectedValue) === String(value);
   }, [selectedValue, value, multiSelect]);
 
+  const handleClick = () => {
+    if (readOnly) {
+      setOpen(false);
+      return;
+    }
+    if (enabled) {
+      onChange(value);
+    }
+  };
+
   return (
-    <CmdItem
+    <div
       id={id}
       ref={forwardedRef}
-      key={id}
-      disabled={!enabled}
-      value={value}
-      className={styles.multiComboboxOption}
-      onSelect={() => {
-        if (readOnly) {
-          setOpen(false);
-          return;
+      role="option"
+      aria-disabled={!enabled}
+      aria-selected={isHighlighted}
+      className={classnames(styles.multiComboboxOption, {
+        [styles.disabledOption]: !enabled,
+        [styles.highlighted]: isHighlighted,
+      })}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseEnter={() => {
+        if (itemIndex !== undefined && setSelectedIndex && enabled) {
+          setSelectedIndex(itemIndex);
         }
-        onChange(value);
       }}
-      onClick={(event) => {
-        event.stopPropagation();
-      }}
+      onClick={handleClick}
       data-state={selected ? "checked" : undefined}
-      keywords={[...keywords, label]}
     >
       <div className={styles.multiComboboxOptionContent}>
         {optionRenderer ? (
@@ -619,7 +749,7 @@ export const ComboboxOption = forwardRef(function Combobox(
           </>
         )}
       </div>
-    </CmdItem>
+    </div>
   );
 });
 
@@ -633,11 +763,10 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     const opt: Option = useMemo(() => {
       return {
         ...option,
-        label: label ?? visibleContentRef.current?.textContent ?? "",
-        keywords: [label ?? visibleContentRef.current?.textContent ?? ""],
-        // Store the rendered ReactNode for dropdown display
+        label: label ?? "",
+        keywords: [label ?? ""],
       };
-    }, [option, label, visibleContentRef.current]);
+    }, [option, label]);
 
     useEffect(() => {
       onOptionAdd(opt);
@@ -649,20 +778,10 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         ref={ref}
         className={classnames(styles.selectItem, className)}
         value={value}
-        textValue={label || visibleContentRef.current?.textContent}
+        textValue={label}
         disabled={!enabled}
         onClick={(event) => {
           event.stopPropagation();
-        }}
-        onMouseEnter={(event) => {
-          // Ensure hover state is applied even in DropdownMenu context
-          const target = event.currentTarget;
-          target.setAttribute("data-highlighted", "");
-        }}
-        onMouseLeave={(event) => {
-          // Remove hover state when mouse leaves
-          const target = event.currentTarget;
-          target.removeAttribute("data-highlighted");
         }}
         data-state={selectedValue === value && "checked"}
       >

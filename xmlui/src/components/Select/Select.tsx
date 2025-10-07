@@ -39,7 +39,7 @@ export const SelectMd = createMetadata({
     initialValue: dInitialValue(),
     value: {
       description: "This property sets the current value of the component.",
-      isInternal: true  //TODO illesg temp
+      isInternal: true, //TODO illesg temp
     },
     autoFocus: {
       ...dAutoFocus(),
@@ -216,24 +216,24 @@ export const selectComponentRenderer = createComponentRenderer(
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
-              return (
-                <MemoizedItem
-                  node={node.props.optionTemplate}
-                  item={item}
-                  contextVars={{
-                    $selectedValue: val,
-                    $inTrigger: inTrigger,
-                  }}
-                  renderChild={(...args) =>
-                    multiSelect || searchable ? (
-                      renderChild(...args)
-                    ) : (
-                      <SelectItemText>{renderChild(...args)}</SelectItemText>
-                    )
-                  }
-                />
-              );
-            }
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    contextVars={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
+                    renderChild={(...args) =>
+                      multiSelect || searchable ? (
+                        renderChild(...args)
+                      ) : (
+                        <SelectItemText>{renderChild(...args)}</SelectItemText>
+                      )
+                    }
+                  />
+                );
+              }
             : undefined
         }
       >
