@@ -217,6 +217,19 @@ $themeVars: ();
       border-color: createThemeVar("Input:borderColor-Switch-success");
     }
   }
+
+  // --------------- Force Hover State ---------------
+  // Apply the same hover styles as the :hover pseudo-class
+  
+  .resetAppearance.checkbox.forceHover {
+    border-color: createThemeVar("Input:borderColor-Checkbox-default--hover");
+    // Don't override background-color - let the existing background rules apply
+  }
+
+  .resetAppearance.switch.forceHover {
+    border-color: createThemeVar("Input:borderColor-Switch-default--hover");
+    // Don't override background-color - let the existing background rules apply
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

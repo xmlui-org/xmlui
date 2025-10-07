@@ -272,6 +272,9 @@ export const Table = forwardRef(
     // --- Keep track of visible table rows
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
+    // --- Track which row should show forced hover for checkbox
+    const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
+
     // --- Get the operations to manage selected rows in a table
     const {
       toggleRow,
@@ -449,9 +452,12 @@ export const Table = forwardRef(
         cell: ({ row }: CellContext<any, unknown>) => (
           <Toggle
             {...{
-              className: styles.checkBoxWrapper,
+              className: classnames(styles.checkBoxWrapper, {
+                [styles.forceHoverWrapper]: hoveredRowId === row.id,
+              }),
               value: row.getIsSelected(),
               indeterminate: row.getIsSomeSelected(),
+              forceHover: hoveredRowId === row.id,
               onDidChange: () => {
                 toggleRow(row.original, { metaKey: true });
               },
@@ -468,6 +474,7 @@ export const Table = forwardRef(
       checkAllRows,
       toggleRow,
       rowDisabledPredicate,
+      hoveredRowId,
     ]);
 
     // --- Set up page information (using the first page size option)
@@ -828,7 +835,7 @@ export const Table = forwardRef(
                       toggleRow(row.original, event);
                     }}
                     onMouseMove={(event) => {
-                      // Change cursor when within checkbox boundary
+                      // Change cursor and hover state when within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
                       const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
                       
@@ -837,20 +844,23 @@ export const Table = forwardRef(
                         const mouseX = event.clientX;
                         const mouseY = event.clientY;
                         
-                        const shouldShowPointer = isWithinCheckboxBoundary(mouseX, mouseY, checkboxRect);
+                        const shouldShowHover = isWithinCheckboxBoundary(mouseX, mouseY, checkboxRect);
                         
-                        // Change cursor based on proximity to checkbox
-                        if (shouldShowPointer) {
+                        // Update hover state and cursor based on proximity to checkbox
+                        if (shouldShowHover) {
+                          setHoveredRowId(row.id);
                           currentRow.style.cursor = 'pointer';
                         } else {
+                          setHoveredRowId(null);
                           currentRow.style.cursor = '';
                         }
                       }
                     }}
                     onMouseLeave={(event) => {
-                      // Reset cursor when leaving the row
+                      // Reset cursor and hover state when leaving the row
                       const currentRow = event.currentTarget as HTMLElement;
                       currentRow.style.cursor = '';
+                      setHoveredRowId(null);
                     }}
                   >
                     {row.getVisibleCells().map((cell, i) => {
