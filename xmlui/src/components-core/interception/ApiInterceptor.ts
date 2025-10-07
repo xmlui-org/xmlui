@@ -189,10 +189,7 @@ export class ApiInterceptor {
         // Properly encode filename for Content-Disposition header
         // Use percent-encoding for non-ASCII characters in filename*
         const encodedFilename = encodeURIComponent(ret.name);
-        headers.append(
-          "Content-Disposition",
-          `attachment; filename*=UTF-8''${encodedFilename}`,
-        );
+        headers.append("Content-Disposition", `attachment; filename*=UTF-8''${encodedFilename}`);
         return HttpResponse.arrayBuffer(await ret.arrayBuffer(), {
           headers: headers,
           status: successStatusCode,

@@ -84,7 +84,7 @@ export class Backend {
       return helper;
     });
     if (definition.initialize) {
-      this.runFn(definition.initialize);
+      void this.runFn(definition.initialize);
     }
   }
 

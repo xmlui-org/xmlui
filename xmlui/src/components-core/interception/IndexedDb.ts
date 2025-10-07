@@ -140,7 +140,7 @@ export class IndexedDb implements IDatabase {
 }
 
 // Wraps an indexDb Table into an object that provides helpful methods
-async function createTableWrapper(table: Table): Promise<any> {
+function createTableWrapper(table: Table): any {
   // --- Function to retrieve the current table data
   const getDataFn = () => table.db.table(table.name);
 
@@ -177,7 +177,7 @@ async function createTableWrapper(table: Table): Promise<any> {
         //it's an auto incremented id, must be a number
         safeId = Number(id);
       }
-      return table.get(safeId);
+      return await table.get(safeId);
     },
     toArray: async () => await table.toArray(),
     single: async (predicate: (item: any) => Promise<boolean>) =>

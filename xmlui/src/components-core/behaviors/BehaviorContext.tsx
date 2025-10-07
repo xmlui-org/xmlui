@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { animationBehavior, tooltipBehavior, labelBehavior } from "./CoreBehaviors";
@@ -70,17 +70,12 @@ const BehaviorContext = createContext<BehaviorContextType | undefined>(undefined
 export const BehaviorsProvider = ({ children }: { children: ReactNode }) => {
   const behaviors = useMemo(() => new Map<string, Behavior>(), []);
 
-  const getBehaviors = () => {
-    return Array.from(behaviors.values());
-  };
-
-  const registerBehavior = (behavior: Behavior) => {
-    behaviors.set(behavior.name, behavior);
-  };
-
-  const unregisterBehavior = (name: string) => {
-    behaviors.delete(name);
-  };
+  const registerBehavior = useCallback(
+    (behavior: Behavior) => {
+      behaviors.set(behavior.name, behavior);
+    },
+    [behaviors],
+  );
 
   useMemo(() => {
     if (process.env.VITE_USED_BEHAVIORS_Animation !== "false") {
@@ -92,23 +87,21 @@ export const BehaviorsProvider = ({ children }: { children: ReactNode }) => {
     if (process.env.VITE_USED_BEHAVIORS_Label !== "false") {
       registerBehavior(labelBehavior);
     }
-  }, []);
+  }, [registerBehavior]);
 
   const contextValue = useMemo<BehaviorContextType>(
     () => ({
       behaviors,
       registerBehavior,
-      unregisterBehavior,
-      getBehaviors,
+      unregisterBehavior: (name: string) => behaviors.delete(name),
+      getBehaviors: () => {
+        return Array.from(behaviors.values());
+      },
     }),
-    [behaviors]
+    [behaviors, registerBehavior],
   );
 
-  return (
-    <BehaviorContext.Provider value={contextValue}>
-      {children}
-    </BehaviorContext.Provider>
-  );
+  return <BehaviorContext.Provider value={contextValue}>{children}</BehaviorContext.Provider>;
 };
 
 /**

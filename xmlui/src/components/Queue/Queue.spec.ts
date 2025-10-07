@@ -22,8 +22,8 @@ test.describe("Basic Functionality", () => {
       </Fragment>
     `);
 
-    const buttonDriver = createButtonDriver("checkApi");
-    await (await buttonDriver).component.click();
+    const buttonDriver = await createButtonDriver("checkApi");
+    await buttonDriver.component.click();
     await expect.poll(testStateDriver.testState).toEqual({
       hasEnqueueItem: true,
       hasEnqueueItems: true,
