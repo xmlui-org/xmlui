@@ -144,6 +144,38 @@ const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
 
+// Checkbox interaction boundary constant
+const CHECKBOX_BOUNDARY_PIXELS = 8;
+
+/**
+ * Helper function to check if a point is within the checkbox boundary
+ * @param pointX - X coordinate of the point to check
+ * @param pointY - Y coordinate of the point to check
+ * @param checkboxRect - Bounding rectangle of the checkbox
+ * @returns true if the point is within the checkbox or within CHECKBOX_BOUNDARY_PIXELS of its boundary
+ */
+const isWithinCheckboxBoundary = (
+  pointX: number,
+  pointY: number,
+  checkboxRect: DOMRect
+): boolean => {
+  // Calculate distance from point to checkbox boundaries
+  const distanceToLeft = Math.abs(pointX - checkboxRect.left);
+  const distanceToRight = Math.abs(pointX - checkboxRect.right);
+  const distanceToTop = Math.abs(pointY - checkboxRect.top);
+  const distanceToBottom = Math.abs(pointY - checkboxRect.bottom);
+  
+  // Check if point is within the checkbox bounds or within boundary pixels of any edge
+  const withinHorizontalBounds = pointX >= checkboxRect.left && pointX <= checkboxRect.right;
+  const withinVerticalBounds = pointY >= checkboxRect.top && pointY <= checkboxRect.bottom;
+  const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
+  
+  const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= CHECKBOX_BOUNDARY_PIXELS || distanceToRight <= CHECKBOX_BOUNDARY_PIXELS));
+  const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= CHECKBOX_BOUNDARY_PIXELS || distanceToBottom <= CHECKBOX_BOUNDARY_PIXELS));
+  
+  return withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
+};
+
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
 //View the index.css file for more needed styles such as border-collapse: separate
@@ -777,8 +809,7 @@ export const Table = forwardRef(
                         return;
                       }
                       
-                      // Check if click is within 8 pixels of the checkbox boundary
-                      // Find the checkbox in this row directly
+                      // Check if click is within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
                       const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
                       
@@ -787,22 +818,8 @@ export const Table = forwardRef(
                         const clickX = event.clientX;
                         const clickY = event.clientY;
                         
-                        // Calculate distance from click point to checkbox boundaries
-                        const distanceToLeft = Math.abs(clickX - checkboxRect.left);
-                        const distanceToRight = Math.abs(clickX - checkboxRect.right);
-                        const distanceToTop = Math.abs(clickY - checkboxRect.top);
-                        const distanceToBottom = Math.abs(clickY - checkboxRect.bottom);
-                        
-                        // Check if click is within the checkbox bounds or within 8px of any boundary
-                        const withinHorizontalBounds = clickX >= checkboxRect.left && clickX <= checkboxRect.right;
-                        const withinVerticalBounds = clickY >= checkboxRect.top && clickY <= checkboxRect.bottom;
-                        const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
-                        
-                        const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= 8 || distanceToRight <= 8));
-                        const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= 8 || distanceToBottom <= 8));
-                        
-                        if (withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary) {
-                          // Toggle the checkbox when clicking within the 8-pixel boundary
+                        if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect)) {
+                          // Toggle the checkbox when clicking within the boundary
                           toggleRow(row.original, { metaKey: true });
                           return;
                         }
@@ -811,7 +828,7 @@ export const Table = forwardRef(
                       toggleRow(row.original, event);
                     }}
                     onMouseMove={(event) => {
-                      // Change cursor when within 8 pixels of the checkbox boundary
+                      // Change cursor when within checkbox boundary
                       const currentRow = event.currentTarget as HTMLElement;
                       const checkbox = currentRow.querySelector('input[type="checkbox"]') as HTMLInputElement;
                       
@@ -820,21 +837,7 @@ export const Table = forwardRef(
                         const mouseX = event.clientX;
                         const mouseY = event.clientY;
                         
-                        // Calculate distance from mouse to checkbox boundaries
-                        const distanceToLeft = Math.abs(mouseX - checkboxRect.left);
-                        const distanceToRight = Math.abs(mouseX - checkboxRect.right);
-                        const distanceToTop = Math.abs(mouseY - checkboxRect.top);
-                        const distanceToBottom = Math.abs(mouseY - checkboxRect.bottom);
-                        
-                        // Check if mouse is within the checkbox bounds or within 8px of any boundary
-                        const withinHorizontalBounds = mouseX >= checkboxRect.left && mouseX <= checkboxRect.right;
-                        const withinVerticalBounds = mouseY >= checkboxRect.top && mouseY <= checkboxRect.bottom;
-                        const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
-                        
-                        const nearHorizontalBoundary = (withinVerticalBounds && (distanceToLeft <= 8 || distanceToRight <= 8));
-                        const nearVerticalBoundary = (withinHorizontalBounds && (distanceToTop <= 8 || distanceToBottom <= 8));
-                        
-                        const shouldShowPointer = withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
+                        const shouldShowPointer = isWithinCheckboxBoundary(mouseX, mouseY, checkboxRect);
                         
                         // Change cursor based on proximity to checkbox
                         if (shouldShowPointer) {
