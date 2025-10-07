@@ -1,5 +1,57 @@
 [
   {
+    "tag_name": "xmlui@0.10.19",
+    "published_at": "2025-10-07T09:22:39Z",
+    "changes": [
+      {
+        "description": "Add checkboxTolerance property to Table",
+        "commit_sha": "facb257"
+      },
+      {
+        "description": "test: review onFocus, onBlur e2e tests",
+        "commit_sha": "6084c14"
+      },
+      {
+        "description": "Renamed the following properties in DatePicker: minValue -> startDate, maxValue -> endDate. Also updated component documentation.",
+        "commit_sha": "e1fa9d7"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.19.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.19/xmlui-0.10.19.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.18",
+    "published_at": "2025-10-06T12:52:25Z",
+    "changes": [
+      {
+        "description": "refactor: use labelBehavior instead of ItemWithLabel",
+        "commit_sha": "202f2b2"
+      },
+      {
+        "description": "Add back removed RadioItem",
+        "commit_sha": "6650ee8"
+      },
+      {
+        "description": "Fixed FormItem validation indicators to use a relaxed validation indication strategy.",
+        "commit_sha": "da98994"
+      },
+      {
+        "description": "fix: labelBehavior, input components - styling issue",
+        "commit_sha": "8394663"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.18.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.18/xmlui-0.10.18.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.16",
     "published_at": "2025-10-03T09:59:22Z",
     "changes": [
@@ -240,42 +292,6 @@
       {
         "name": "xmlui-0.10.11.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.11/xmlui-0.10.11.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.10",
-    "published_at": "2025-09-09T12:43:31Z",
-    "changes": [
-      {
-        "description": "Bump package version",
-        "commit_sha": "fff80c5"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.10.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.10/xmlui-0.10.10.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.8",
-    "published_at": "2025-09-04T13:13:38Z",
-    "changes": [
-      {
-        "description": "Add experimental Timer component",
-        "commit_sha": "a4d62c4"
-      },
-      {
-        "description": "Add the appendBlob function to the ApiInterceptor backend",
-        "commit_sha": "7ed2918"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.8.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.8/xmlui-0.10.8.js"
       }
     ]
   }
