@@ -14,7 +14,7 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
-import { Table, TablePaginationControlsLocationValues, defaultProps } from "./TableNative";
+import { Table, TablePaginationControlsLocationValues, CheckboxToleranceValues, defaultProps } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 import { PositionValues } from "../Pagination/PaginationNative";
 
@@ -179,6 +179,17 @@ export const TableMd = createMetadata({
       valueType: "string",
       availableValues: ["top", "center", "bottom"],
       defaultValue: "center",
+    },
+    checkboxTolerance: {
+      description:
+        `This property controls the tolerance area around checkboxes for easier interaction. ` +
+        `This property only has an effect when the rowsSelectable property is set to \`true\`. ` +
+        `\`none\` provides no tolerance (0px), \`compact\` provides minimal tolerance (8px), ` +
+        `\`comfortable\` provides medium tolerance (12px), and \`spacious\` provides generous tolerance (16px) ` +
+        `for improved accessibility.`,
+      valueType: "string",
+      availableValues: CheckboxToleranceValues,
+      defaultValue: defaultProps.checkboxTolerance,
     },
   },
   events: {
@@ -402,6 +413,7 @@ const TableWithColumns = memo(forwardRef(
           showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
           showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
           showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
+          checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
           initiallySelected={extractValue(node.props.initiallySelected)}
           syncWithAppState={extractValue(node.props.syncWithAppState)}
         />

@@ -13,11 +13,11 @@ $themeVars: ();
   border-color: createThemeVar("Input:borderColor-Checkbox-#{$variantName}");
   background-color: createThemeVar("Input:backgroundColor-Checkbox-#{$variantName}");
 
-  &:focus-visible{
-    outline-width: createThemeVar('Input:outlineWidth-Checkbox-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-Checkbox-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-Checkbox-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-Checkbox-#{$variantName}--focus');
+  &:focus-visible {
+    outline-width: createThemeVar("Input:outlineWidth-Checkbox-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-Checkbox-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-Checkbox-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-Checkbox-#{$variantName}--focus");
   }
 }
 
@@ -92,12 +92,17 @@ $themeVars: ();
     height: 1em;
     border: 2px solid transparent;
 
-    &:not([readonly]){
+    &:not([readonly]) {
       cursor: pointer;
     }
 
     @include checkboxVariant("default");
     @include hoverAndDisabledState("Checkbox");
+
+    .forceHover {
+      border-color: createThemeVar("Input:borderColor-Checkbox-default--hover");
+      // Don't override background-color - let the existing background rules apply
+    }
 
     &.error {
       @include checkboxVariant("error");
@@ -132,7 +137,7 @@ $themeVars: ();
       background-color: createThemeVar("Input:backgroundColor-checked-Checkbox");
       border-color: createThemeVar("Input:borderColor-checked-Checkbox");
 
-      &[readonly]{
+      &[readonly] {
         pointer-events: none;
       }
     }
@@ -141,7 +146,7 @@ $themeVars: ();
       border-color: createThemeVar("Input:borderColor-Checkbox--disabled");
     }
     &:indeterminate::before {
-      clip-path: circle(30.0% at 50% 50%);
+      clip-path: circle(30% at 50% 50%);
       transform: scale(1);
     }
   }
@@ -185,18 +190,25 @@ $themeVars: ();
 
       &::before {
         background: createThemeVar("backgroundColor-indicator-checked-Switch");
-        --thumb-position: calc(var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 2px);
+        --thumb-position: calc(
+          var(--track-size) - var(--thumb-size) - 2 * var(--padding-size) - 2px
+        );
       }
     }
 
     @include hoverAndDisabledState("Switch");
     @include checkedState("Switch");
 
-    &:focus-visible{
-      outline-width: createThemeVar('Input:outlineWidth-Switch--focus');
-      outline-color: createThemeVar('Input:outlineColor-Switch--focus');
-      outline-style: createThemeVar('Input:outlineStyle-Switch--focus');
-      outline-offset: createThemeVar('Input:outlineOffset-Switch--focus');
+    .forceHover {
+      border-color: createThemeVar("Input:borderColor-Switch-default--hover");
+      // Don't override background-color - let the existing background rules apply
+    }
+
+    &:focus-visible {
+      outline-width: createThemeVar("Input:outlineWidth-Switch--focus");
+      outline-color: createThemeVar("Input:outlineColor-Switch--focus");
+      outline-style: createThemeVar("Input:outlineStyle-Switch--focus");
+      outline-offset: createThemeVar("Input:outlineOffset-Switch--focus");
     }
 
     &:disabled {
@@ -216,19 +228,6 @@ $themeVars: ();
     &.valid {
       border-color: createThemeVar("Input:borderColor-Switch-success");
     }
-  }
-
-  // --------------- Force Hover State ---------------
-  // Apply the same hover styles as the :hover pseudo-class
-  
-  .resetAppearance.checkbox.forceHover {
-    border-color: createThemeVar("Input:borderColor-Checkbox-default--hover");
-    // Don't override background-color - let the existing background rules apply
-  }
-
-  .resetAppearance.switch.forceHover {
-    border-color: createThemeVar("Input:borderColor-Switch-default--hover");
-    // Don't override background-color - let the existing background rules apply
   }
 }
 

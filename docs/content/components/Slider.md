@@ -27,31 +27,6 @@ This property sets the component's initial value.
 <Slider initialValue="5" />
 ```
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `Slider` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "top") [#labelposition-default-top]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `maxValue` (default: 10) [#maxvalue-default-10]
 
 This property specifies the maximum value of the allowed input range.

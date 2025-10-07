@@ -248,6 +248,352 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("checkboxTolerance property", () => {
+    test("allows checkbox interaction within compact tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               checkboxTolerance="compact"
+               onSelectionDidChange="testState = 'selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get first row checkbox - checkboxes exist but are hidden via CSS
+      const firstRowCheckbox = page.locator("input[type='checkbox']").nth(1); // Skip header checkbox
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(firstRowCheckbox).toBeAttached();
+      
+      // Get the first table row to interact with
+      const firstDataRow = page.locator("tbody tr").first();
+      await expect(firstDataRow).toBeVisible();
+      
+      // Get row bounds for calculation
+      const rowBounds = await firstDataRow.boundingBox();
+      
+      // Click near the left edge of the row (where checkbox would be with tolerance)
+      // This simulates clicking within the 8px compact tolerance of the checkbox
+      const clickX = rowBounds.x + 15; // Slightly to the right of where checkbox would be
+      const clickY = rowBounds.y + rowBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger selection due to checkboxTolerance="compact"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify checkbox is now checked (using force since it's hidden)
+      await expect(firstRowCheckbox).toBeChecked();
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('selection changed');
+    });
+
+    test("allows header checkbox interaction within compact tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               enableMultiRowSelection="true"
+               checkboxTolerance="compact"
+               onSelectionDidChange="testState = 'header selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get header checkbox (select all checkbox)
+      const headerCheckbox = page.locator("input[type='checkbox']").first(); // Header checkbox is first
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(headerCheckbox).toBeAttached();
+      
+      // Get the header row to interact with
+      const headerRow = page.locator("thead tr").first();
+      await expect(headerRow).toBeVisible();
+      
+      // Get header row bounds for calculation
+      const headerBounds = await headerRow.boundingBox();
+      
+      // Click near the left edge of the header row (where checkbox would be with tolerance)
+      // This simulates clicking within the 8px compact tolerance of the header checkbox
+      const clickX = headerBounds.x + 15; // Slightly to the right of where checkbox would be
+      const clickY = headerBounds.y + headerBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="compact"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify header checkbox is now checked (select all)
+      await expect(headerCheckbox).toBeChecked();
+      
+      // Verify all row checkboxes are also checked (select all behavior)
+      const allCheckboxes = page.locator("input[type='checkbox']");
+      const checkboxCount = await allCheckboxes.count();
+      for (let i = 0; i < checkboxCount; i++) {
+        await expect(allCheckboxes.nth(i)).toBeChecked();
+      }
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('header selection changed');
+    });
+
+    test("allows checkbox interaction within none tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               checkboxTolerance="none"
+               onSelectionDidChange="testState = 'none selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get first row checkbox - checkboxes exist but are hidden via CSS
+      const firstRowCheckbox = page.locator("input[type='checkbox']").nth(1); // Skip header checkbox
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(firstRowCheckbox).toBeAttached();
+      
+      // Get the first table row to interact with
+      const firstDataRow = page.locator("tbody tr").first();
+      await expect(firstDataRow).toBeVisible();
+      
+      // Get row bounds for calculation
+      const rowBounds = await firstDataRow.boundingBox();
+      
+      // For "none" tolerance, we need to click precisely on the checkbox
+      // Since checkboxes are hidden, click on their expected position
+      await firstRowCheckbox.click({ force: true });
+      
+      // Verify checkbox is now checked
+      await expect(firstRowCheckbox).toBeChecked();
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('none selection changed');
+    });
+
+    test("allows header checkbox interaction within none tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               enableMultiRowSelection="true"
+               checkboxTolerance="none"
+               onSelectionDidChange="testState = 'header none selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get header checkbox (select all checkbox)
+      const headerCheckbox = page.locator("input[type='checkbox']").first(); // Header checkbox is first
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(headerCheckbox).toBeAttached();
+      
+      // Get the header row to interact with
+      const headerRow = page.locator("thead tr").first();
+      await expect(headerRow).toBeVisible();
+      
+      // Get header row bounds for calculation
+      const headerBounds = await headerRow.boundingBox();
+      
+      // For "none" tolerance, we need to click precisely on the checkbox
+      // Since checkboxes are hidden, click on their expected position
+      await headerCheckbox.click({ force: true });
+      
+      // Verify header checkbox is now checked (select all)
+      await expect(headerCheckbox).toBeChecked();
+      
+      // Verify all row checkboxes are also checked (select all behavior)
+      const allCheckboxes = page.locator("input[type='checkbox']");
+      const checkboxCount = await allCheckboxes.count();
+      for (let i = 0; i < checkboxCount; i++) {
+        await expect(allCheckboxes.nth(i)).toBeChecked();
+      }
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('header none selection changed');
+    });
+
+    test("allows checkbox interaction within comfortable tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               checkboxTolerance="comfortable"
+               onSelectionDidChange="testState = 'comfortable selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get first row checkbox - checkboxes exist but are hidden via CSS
+      const firstRowCheckbox = page.locator("input[type='checkbox']").nth(1); // Skip header checkbox
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(firstRowCheckbox).toBeAttached();
+      
+      // Get the first table row to interact with
+      const firstDataRow = page.locator("tbody tr").first();
+      await expect(firstDataRow).toBeVisible();
+      
+      // Get row bounds for calculation
+      const rowBounds = await firstDataRow.boundingBox();
+      
+      // Click near the left edge of the row (where checkbox would be with tolerance)
+      // This simulates clicking within the 12px comfortable tolerance of the checkbox
+      const clickX = rowBounds.x + 20; // Further right to test 12px tolerance
+      const clickY = rowBounds.y + rowBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger selection due to checkboxTolerance="comfortable"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify checkbox is now checked
+      await expect(firstRowCheckbox).toBeChecked();
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('comfortable selection changed');
+    });
+
+    test("allows header checkbox interaction within comfortable tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               enableMultiRowSelection="true"
+               checkboxTolerance="comfortable"
+               onSelectionDidChange="testState = 'header comfortable selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get header checkbox (select all checkbox)
+      const headerCheckbox = page.locator("input[type='checkbox']").first(); // Header checkbox is first
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(headerCheckbox).toBeAttached();
+      
+      // Get the header row to interact with
+      const headerRow = page.locator("thead tr").first();
+      await expect(headerRow).toBeVisible();
+      
+      // Get header row bounds for calculation
+      const headerBounds = await headerRow.boundingBox();
+      
+      // Click near the left edge of the header row (where checkbox would be with tolerance)
+      // This simulates clicking within the 12px comfortable tolerance of the header checkbox
+      const clickX = headerBounds.x + 20; // Further right to test 12px tolerance
+      const clickY = headerBounds.y + headerBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="comfortable"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify header checkbox is now checked (select all)
+      await expect(headerCheckbox).toBeChecked();
+      
+      // Verify all row checkboxes are also checked (select all behavior)
+      const allCheckboxes = page.locator("input[type='checkbox']");
+      const checkboxCount = await allCheckboxes.count();
+      for (let i = 0; i < checkboxCount; i++) {
+        await expect(allCheckboxes.nth(i)).toBeChecked();
+      }
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('header comfortable selection changed');
+    });
+
+    test("allows checkbox interaction within spacious tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               checkboxTolerance="spacious"
+               onSelectionDidChange="testState = 'spacious selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get first row checkbox - checkboxes exist but are hidden via CSS
+      const firstRowCheckbox = page.locator("input[type='checkbox']").nth(1); // Skip header checkbox
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(firstRowCheckbox).toBeAttached();
+      
+      // Get the first table row to interact with
+      const firstDataRow = page.locator("tbody tr").first();
+      await expect(firstDataRow).toBeVisible();
+      
+      // Get row bounds for calculation
+      const rowBounds = await firstDataRow.boundingBox();
+      
+      // Click near the left edge of the row (where checkbox would be with tolerance)
+      // This simulates clicking within the 16px spacious tolerance of the checkbox
+      const clickX = rowBounds.x + 24; // Even further right to test 16px tolerance
+      const clickY = rowBounds.y + rowBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger selection due to checkboxTolerance="spacious"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify checkbox is now checked
+      await expect(firstRowCheckbox).toBeChecked();
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('spacious selection changed');
+    });
+
+    test("allows header checkbox interaction within spacious tolerance boundary", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' 
+               rowsSelectable="true" 
+               enableMultiRowSelection="true"
+               checkboxTolerance="spacious"
+               onSelectionDidChange="testState = 'header spacious selection changed'"
+               testId="table">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `);
+      
+      // Get header checkbox (select all checkbox)
+      const headerCheckbox = page.locator("input[type='checkbox']").first(); // Header checkbox is first
+      
+      // Verify checkbox exists (even if hidden)
+      await expect(headerCheckbox).toBeAttached();
+      
+      // Get the header row to interact with
+      const headerRow = page.locator("thead tr").first();
+      await expect(headerRow).toBeVisible();
+      
+      // Get header row bounds for calculation
+      const headerBounds = await headerRow.boundingBox();
+      
+      // Click near the left edge of the header row (where checkbox would be with tolerance)
+      // This simulates clicking within the 16px spacious tolerance of the header checkbox
+      const clickX = headerBounds.x + 24; // Even further right to test 16px tolerance
+      const clickY = headerBounds.y + headerBounds.height / 2;
+      
+      // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="spacious"
+      await page.mouse.click(clickX, clickY);
+      
+      // Verify header checkbox is now checked (select all)
+      await expect(headerCheckbox).toBeChecked();
+      
+      // Verify all row checkboxes are also checked (select all behavior)
+      const allCheckboxes = page.locator("input[type='checkbox']");
+      const checkboxCount = await allCheckboxes.count();
+      for (let i = 0; i < checkboxCount; i++) {
+        await expect(allCheckboxes.nth(i)).toBeChecked();
+      }
+      
+      // Verify selection event was fired
+      await expect.poll(testStateDriver.testState).toEqual('header spacious selection changed');
+    });
+  });
+
   test.describe("noDataTemplate property", () => {
     test("shows custom no data template when data is empty", async ({ initTestBed, page }) => {
       await initTestBed(`

@@ -15,8 +15,8 @@ The "flat" and "hierarchy" data structures both use these fields for a particula
 - `id`: Unique ID of tree node
 - `name`: The field to be used as the display label
 - `icon`: An optional icon identifier. If specified, this icon is displayed with the tree item.
-- `iconExpanded`. An optional icon identifier. This icon is displayed when the field is expanded.
-- `iconCollapsed`. An optional icon identifier. This icon is displayed when the field is collapsed.
+- `iconExpanded`: An optional icon identifier. This icon is displayed when the field is expanded.
+- `iconCollapsed`: An optional icon identifier. This icon is displayed when the field is collapsed.
 - `selectable`: Indicates if the node can be selected.
 
 The "flat" structure refers to its direct parent node via the `parentId` property, which contains the ID of the node it is referring to.
@@ -339,7 +339,7 @@ The property name in source data for unique identifiers.
 
 Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.
 
-### `itemHeight` (default: 35) [#itemheight-default-35]
+### `itemHeight` (default: 32) [#itemheight-default-32]
 
 The height of each tree row in pixels (default: 35).
 

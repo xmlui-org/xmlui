@@ -8,10 +8,6 @@ HeroSection
 
 The template for the background of the hero section
 
-### `className`
-
-Additional CSS class names to apply to the hero section
-
 ### `contentAlignment` (default: "center")
 
 Horizontal alignment of the content within its area
@@ -19,10 +15,6 @@ Horizontal alignment of the content within its area
 ### `contentPlacement` (default: "bottom")
 
 Position of the content area relative to the header
-
-### `contentTone` (default: "dark")
-
-The tone for the content section, affecting text colors
 
 ### `contentWidth` (default: "$maxWidth-content")
 
@@ -51,10 +43,6 @@ Gap between header and content sections
 ### `headerAlignment` (default: "center")
 
 Alignment of the header content
-
-### `headerTone` (default: "dark")
-
-The tone for the header section, affecting text colors
 
 ### `headerWidth` (default: "50%")
 

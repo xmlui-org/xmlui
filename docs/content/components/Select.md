@@ -126,31 +126,6 @@ This property indicates whether the component is in progress. It can be used to 
 
 This property indicates the message to display when the component is in progress.
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: false) [#labelbreak-default-false]
-
-This boolean value indicates whether the `Select` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "top") [#labelposition-default-top]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `multiSelect` (default: false) [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
