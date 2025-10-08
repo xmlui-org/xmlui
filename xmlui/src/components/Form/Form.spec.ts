@@ -1,7 +1,7 @@
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 import { labelPositionValues } from "../abstractions";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import { getElementStyle } from "../../testing/component-test-helpers";
 
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
@@ -205,6 +205,22 @@ test.describe("Basic Functionality", () => {
       await initTestBed(`<Form itemLabelWidth="invalid" testId="form"/>`);
       const driver = await createFormDriver("form");
       await expect(driver.component).toBeVisible();
+    });
+
+    test("handles theme variable", async ({ initTestBed, createFormItemDriver }) => {
+      const spaceBase = 0.25; //rem
+      const labelSize = 10;
+      const widthInPx = labelSize * spaceBase * 16; //px
+      await initTestBed(`
+        <Theme space-base="${spaceBase}rem">
+          <Form itemLabelWidth="$space-${labelSize}">
+            <FormItem label="Test Label" bindTo="test" testId="testField" />
+          </Form>
+        </Theme>
+      `);
+      const driver = await createFormItemDriver("testField");
+      const labelWidth = await getElementStyle(driver.label, "width");
+      expect(labelWidth).toBe(`${widthInPx}px`);
     });
   });
 

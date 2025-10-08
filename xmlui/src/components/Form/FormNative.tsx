@@ -50,6 +50,7 @@ import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
+import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -620,13 +621,16 @@ export const FormWithContextVar = forwardRef(function (
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
 
+  const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth });
+
   return (
     <Slot ref={ref} style={style}>
       <Form
         keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}
         itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
-        itemLabelWidth={extractValue.asOptionalString(node.props.itemLabelWidth)}
+        itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         formState={formState}
         dispatch={dispatch}
