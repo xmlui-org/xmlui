@@ -882,6 +882,12 @@ test.describe("Accessibility", () => {
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Page 2" })).toBeFocused();
   });
+
+  test("page size selector is focused when label is clicked", async ({ initTestBed, page }) => {
+    await initTestBed(`<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}"/>`);
+    await page.getByText("Items per page").click();
+    await expect(page.locator("select")).toBeFocused();
+  });
 });
 
 // =============================================================================
