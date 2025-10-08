@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState, useCallback, useMemo } from "react";
+import { forwardRef, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import classnames from "classnames";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -10,6 +10,8 @@ import { Icon } from "../Icon/IconNative";
 import type { OrientationOptions } from "../abstractions";
 import type { ComponentApi } from "../../components-core/rendering/ContainerWrapper";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { Select } from "../Select/SelectNative";
+import { OptionNative } from "../Option/OptionNative";
 
 export const PageNumberValues = [1, 3, 5] as const;
 export type PageNumber = (typeof PageNumberValues)[number];
@@ -412,8 +414,6 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           style={style}
           className={className}
           labelPosition={orientation === "vertical" ? "top" : "start"}
-          // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
-          isInputTemplateUsed={true}
         >
           <select
             id={`${id}-page-size-selector`}
