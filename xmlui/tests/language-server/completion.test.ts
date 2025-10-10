@@ -71,6 +71,24 @@ describe("Completion", () => {
     expect(docs).toContain(mockMetadata.Button.props.label.description);
   });
 
+  it("resolves closing component name", () => {
+    const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+    console.log(resolvedItem);
+
+    // Here the focus is on the data.metadataAccessInfo.componentName, the label is not so important
+    const expected: Partial<CompletionItem> = {
+      kind: CompletionItemKind.Constructor,
+      data: { metadataAccessInfo: { componentName: "Button" } },
+    };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(mockMetadata.Button.description);
+    expect(docs).toContain(mockMetadata.Button.events.click.description);
+    expect(docs).toContain(mockMetadata.Button.props.label.description);
+  });
+
   it("resolves prop", () => {
     const item = completeAtPoundSign("<Button labe#l />").find(({ label }) => label === "label");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
@@ -157,10 +175,10 @@ function completeAtPoundSign(source: string) {
   }
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
-
-
   const parseResult = parser.parse();
+
   //console.log(toDbgString(parseResult.node, parser.getText));
+
   return handleCompletion(
     { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
     position,
