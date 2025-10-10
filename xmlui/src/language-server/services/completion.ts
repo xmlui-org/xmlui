@@ -106,7 +106,7 @@ export function handleCompletion(
         const compName = getNameFromElement(matchingNode, getText);
         if (!compName) return defaultCompNames;
 
-        const compNameSuggestion = componentCompletionItem("/" + compName, 0);
+        const compNameSuggestion = closingComponentCompletionItem(compName, 0);
         return [compNameSuggestion, ...defaultCompNames.map((c) => ({ ...c, sortText: "1" }))];
       }
       return defaultCompNames;
@@ -296,6 +296,36 @@ function componentCompletionItem(
     label: componentName,
     kind: CompletionItemKind.Constructor,
     sortText,
+    data: {
+      metadataAccessInfo: {
+        componentName,
+      },
+    },
+  };
+}
+
+function closingComponentCompletionItem(
+  componentName: string,
+  sortingOrder?: number,
+): XmluiCompletionItem {
+  const sortText =
+    sortingOrder !== undefined &&
+    sortingOrder !== 0 &&
+    sortingOrder !== null &&
+    !isNaN(sortingOrder)
+      ? sortingOrder.toString()
+      : "";
+
+  // TODO
+  const updatedText = /* globals.clientSupports.insertReplaceEdit ? Handle this case : */ {
+    newText: `/${componentName}>`,
+    range: null,
+  };
+  return {
+    label: `/${componentName}`,
+    kind: CompletionItemKind.Constructor,
+    sortText,
+    textEdit: updatedText,
     data: {
       metadataAccessInfo: {
         componentName,

@@ -47,7 +47,7 @@ export function start(connection: Connection) {
   let hasDiagnosticRelatedInformationCapability = false;
 
   connection.onInitialize((params: InitializeParams) => {
-    connection.console.log("initing!");
+    connection.console.log("Initializing!");
     const capabilities = params.capabilities;
 
     // Does the client support the `workspace/configuration` request?
