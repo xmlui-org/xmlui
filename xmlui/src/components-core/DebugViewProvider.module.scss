@@ -1,0 +1,14 @@
+.wrapper{
+  display: flex;
+    flex-direction: column;
+}
+
+.content{
+  flex: 1;
+  overflow: auto;
+}
+
+.debugger{
+  overflow: auto;
+  min-height: 0;
+}

@@ -96,7 +96,7 @@ export const StateContainer = memo(
     // --- This reducer allow collecting state changes for debugging purposes. The `debugView`
     // --- contains the debug configuration; it may enable (or disable) logging.
     const debugView = useDebugView();
-    const containerReducer = createContainerReducer(debugView);
+    const containerReducer = createContainerReducer(debugView, node.uid);
     const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
 
     // --- The exposed APIs of components are also the part of the state.

@@ -13,7 +13,7 @@ const MAX_STATE_TRANSITION_LENGTH = 100;
  * log the state transitions.
  * @param debugView This debug view determines if the state transitions should be logged.
  */
-export function createContainerReducer(debugView: IDebugViewContext) {
+export function createContainerReducer(debugView: IDebugViewContext, containerUid?: any) {
   const allowLogging = debugView.collectStateTransitions;
   let prevState: any = undefined;
   let nextState: any = undefined;
@@ -55,7 +55,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         const { data, pageInfo } = action.payload;
         state[uid] = {
           value: data,
-          byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
+          // byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
           inProgress: false,
           loaded: data !== undefined,
           pageInfo,
@@ -133,9 +133,10 @@ export function createContainerReducer(debugView: IDebugViewContext) {
     }
 
     // --- Log the transition
-    if (allowLogging) {
+    // if (allowLogging) {
       const loggedTransition = {
         action: action.type,
+        containerUid: containerUid,
         uid,
         prevState,
         nextState,
@@ -144,13 +145,14 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       // TODO: Logging to the console is a temporary solution. We should use a proper
       // logging mechanism. Nonetheless, this works only with state transition logging
       // enabled (which is disabled by default).
-      if (debugView.stateTransitions) {
-        if (debugView.stateTransitions.length >= MAX_STATE_TRANSITION_LENGTH) {
-          debugView.stateTransitions.shift();
-        }
-        debugView.stateTransitions.push(loggedTransition);
-      }
-    }
+      // if (debugView.stateTransitions) {
+        // if (debugView.stateTransitions.length >= MAX_STATE_TRANSITION_LENGTH) {
+        //   debugView.stateTransitions.shift();
+        // }
+        // debugView.stateTransitions.push(loggedTransition);
+        debugView.log(loggedTransition);
+      // }
+    // }
 
     function storeNextValue(nextValue: any) {
       if (allowLogging) {
