@@ -34,6 +34,8 @@ export const ContentSeparatorMd = createMetadata({
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-200",
     [`size-${COMP}`]: "1px",
+    [`marginVertical-${COMP}`]: "0",
+    [`marginHorizontal-${COMP}`]: "0",
     light: {
       // --- No light-specific theme vars
     },

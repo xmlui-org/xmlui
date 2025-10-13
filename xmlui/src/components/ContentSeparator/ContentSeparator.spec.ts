@@ -179,6 +179,230 @@ test.describe("Visual States & Themes", () => {
 });
 
 // =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("applies basic theme variables", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "backgroundColor-ContentSeparator": "rgb(255, 0, 0)",
+        "size-ContentSeparator": "5px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    const height = await driver.getComputedHeight();
+    expect(height).toBe('5px');
+  });
+
+  test("applies vertical margin theme variables", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "10px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("margin-top", "10px");
+    await expect(driver.separator).toHaveCSS("margin-bottom", "10px");
+  });
+
+  test("applies horizontal margin theme variables", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginHorizontal-ContentSeparator": "15px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("margin-left", "15px");
+    await expect(driver.separator).toHaveCSS("margin-right", "15px");
+  });
+
+  test("specific margin-top overrides vertical margin", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "10px",
+        "marginTop-ContentSeparator": "20px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Specific margin-top should override vertical margin
+    await expect(driver.separator).toHaveCSS("margin-top", "20px");
+    // Bottom should still use vertical margin
+    await expect(driver.separator).toHaveCSS("margin-bottom", "10px");
+  });
+
+  test("specific margin-bottom overrides vertical margin", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "10px",
+        "marginBottom-ContentSeparator": "25px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Top should use vertical margin
+    await expect(driver.separator).toHaveCSS("margin-top", "10px");
+    // Specific margin-bottom should override vertical margin
+    await expect(driver.separator).toHaveCSS("margin-bottom", "25px");
+  });
+
+  test("specific margin-left overrides horizontal margin", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginHorizontal-ContentSeparator": "15px",
+        "marginLeft-ContentSeparator": "30px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Specific margin-left should override horizontal margin
+    await expect(driver.separator).toHaveCSS("margin-left", "30px");
+    // Right should still use horizontal margin
+    await expect(driver.separator).toHaveCSS("margin-right", "15px");
+  });
+
+  test("specific margin-right overrides horizontal margin", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginHorizontal-ContentSeparator": "15px",
+        "marginRight-ContentSeparator": "35px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Left should use horizontal margin
+    await expect(driver.separator).toHaveCSS("margin-left", "15px");
+    // Specific margin-right should override horizontal margin
+    await expect(driver.separator).toHaveCSS("margin-right", "35px");
+  });
+
+  test("all specific margins override general margins", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "10px",
+        "marginHorizontal-ContentSeparator": "15px",
+        "marginTop-ContentSeparator": "5px",
+        "marginBottom-ContentSeparator": "8px",
+        "marginLeft-ContentSeparator": "12px",
+        "marginRight-ContentSeparator": "18px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // All specific margins should be used instead of general ones
+    await expect(driver.separator).toHaveCSS("margin-top", "5px");
+    await expect(driver.separator).toHaveCSS("margin-bottom", "8px");
+    await expect(driver.separator).toHaveCSS("margin-left", "12px");
+    await expect(driver.separator).toHaveCSS("margin-right", "18px");
+  });
+
+  test("fallback to vertical margin when specific margins not defined", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "20px",
+        // No specific marginTop or marginBottom defined
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Should fall back to vertical margin values
+    await expect(driver.separator).toHaveCSS("margin-top", "20px");
+    await expect(driver.separator).toHaveCSS("margin-bottom", "20px");
+  });
+
+  test("fallback to horizontal margin when specific margins not defined", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginHorizontal-ContentSeparator": "25px",
+        // No specific marginLeft or marginRight defined
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Should fall back to horizontal margin values
+    await expect(driver.separator).toHaveCSS("margin-left", "25px");
+    await expect(driver.separator).toHaveCSS("margin-right", "25px");
+  });
+
+  test("handles zero margin values", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginTop-ContentSeparator": "0px",
+        "marginBottom-ContentSeparator": "0px",
+        "marginLeft-ContentSeparator": "0px",
+        "marginRight-ContentSeparator": "0px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("margin-top", "0px");
+    await expect(driver.separator).toHaveCSS("margin-bottom", "0px");
+    await expect(driver.separator).toHaveCSS("margin-left", "0px");
+    await expect(driver.separator).toHaveCSS("margin-right", "0px");
+  });
+
+  test("handles negative margin values", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginTop-ContentSeparator": "-5px",
+        "marginLeft-ContentSeparator": "-10px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("margin-top", "-5px");
+    await expect(driver.separator).toHaveCSS("margin-left", "-10px");
+  });
+
+  test("handles different unit types for margins", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginTop-ContentSeparator": "1rem",
+        "marginBottom-ContentSeparator": "2em",
+        "marginLeft-ContentSeparator": "10px",
+        "marginRight-ContentSeparator": "10px",
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    // Browser computes rem/em to px values, so we check that margins are applied (not zero)
+    const marginTop = await driver.separator.evaluate((el) => window.getComputedStyle(el).marginTop);
+    const marginBottom = await driver.separator.evaluate((el) => window.getComputedStyle(el).marginBottom);
+    
+    // rem and em should resolve to non-zero pixel values
+    expect(parseFloat(marginTop)).toBeGreaterThan(0);
+    expect(parseFloat(marginBottom)).toBeGreaterThan(0);
+    
+    // px values should be exact
+    await expect(driver.separator).toHaveCSS("margin-left", "10px");
+    await expect(driver.separator).toHaveCSS("margin-right", "10px");
+  });
+
+  test("mixed general and specific margins work correctly", async ({ initTestBed, createContentSeparatorDriver }) => {
+    await initTestBed(`<ContentSeparator />`, {
+      testThemeVars: {
+        "marginVertical-ContentSeparator": "8px",
+        "marginHorizontal-ContentSeparator": "12px",
+        "marginTop-ContentSeparator": "16px", // Override top
+        "marginRight-ContentSeparator": "20px", // Override right
+        // marginBottom and marginLeft should use general values
+      },
+    });
+    const driver = await createContentSeparatorDriver();
+
+    await expect(driver.separator).toHaveCSS("margin-top", "16px"); // Specific
+    await expect(driver.separator).toHaveCSS("margin-bottom", "8px"); // Fallback to vertical
+    await expect(driver.separator).toHaveCSS("margin-left", "12px"); // Fallback to horizontal
+    await expect(driver.separator).toHaveCSS("margin-right", "20px"); // Specific
+  });
+});
+
+// =============================================================================
 // EDGE CASE TESTS
 // =============================================================================
 
