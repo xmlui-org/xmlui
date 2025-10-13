@@ -30,6 +30,20 @@ test("initializes with initial state value", async ({ initTestBed, page }) => {
   await expect(page.getByTestId("stateValue")).toHaveText("|true|");
 });
 
+test("initializes with multiple initial state value", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <AppState id="appState" initialValue="{{ mode: true }}"/>
+      <AppState id="appState2" initialValue="{{ otherMode: 123 }}"/>
+      <Text testId="stateValue">|{appState.value.mode}|{appState2.value.otherMode}|</Text>
+    </Fragment>
+  `);
+
+  // AppState should initialize with default bucket and display the correct value
+  await expect(page.getByTestId("stateValue")).toBeVisible();
+  await expect(page.getByTestId("stateValue")).toHaveText("|true|123|");
+});
+
 test("initializes with provided bucket name and no initial value", async ({
   initTestBed,
   page,
@@ -57,6 +71,23 @@ test("initializes with bucket name and initial state value", async ({ initTestBe
   // AppState should initialize with default bucket and display the correct value
   await expect(page.getByTestId("stateValue")).toBeVisible();
   await expect(page.getByTestId("stateValue")).toHaveText("|true|");
+});
+
+test("initializes with bucket name and multiple initial state value", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <AppState id="appState" bucket="settings" initialValue="{{ mode: true }}"/>
+      <AppState id="appState2" bucket="settings" initialValue="{{ otherMode: 123 }}"/>
+      <Text testId="stateValue">|{appState.value.mode}|{appState.value.otherMode}|</Text>
+    </Fragment>
+  `);
+
+  // AppState should initialize with default bucket and display the correct value
+  await expect(page.getByTestId("stateValue")).toBeVisible();
+  await expect(page.getByTestId("stateValue")).toHaveText("|true|123|");
 });
 
 test("updates state using the update API", async ({ initTestBed, page }) => {
@@ -268,10 +299,7 @@ test("handles multiple rapid state updates efficiently", async ({ initTestBed, p
 // INTEGRATION TESTS
 // =============================================================================
 
-test("integrates with other components that consume app state", async ({
-  initTestBed,
-  page,
-}) => {
+test("integrates with other components that consume app state", async ({ initTestBed, page }) => {
   // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment>
@@ -292,10 +320,7 @@ test("integrates with other components that consume app state", async ({
   await expect(page.getByTestId("themeValue")).toHaveText("light");
 });
 
-test("works correctly when wrapped in conditional rendering", async ({
-  initTestBed,
-  page,
-}) => {
+test("works correctly when wrapped in conditional rendering", async ({ initTestBed, page }) => {
   // TODO: review these Copilot-created tests
   await initTestBed(`
     <Fragment var.showState="{false}">

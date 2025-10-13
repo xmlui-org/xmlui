@@ -1,7 +1,6 @@
 import { createContext, useContextSelector } from "use-context-selector";
 
 export interface IAppStateContext {
-  registerAppState: (id: string, initialValue: Record<string, any>) => void;
   appState: Record<string, any>;
   update: (id: string, patch: any)=> void;
 }

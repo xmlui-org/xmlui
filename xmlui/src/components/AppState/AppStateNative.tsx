@@ -7,28 +7,30 @@ export const defaultProps: Pick<{ bucket?: string }, "bucket"> = {
   bucket: "default",
 };
 
+type Props = {
+  bucket?: string;
+  initialValue: Record<string, any>;
+  updateState: UpdateStateFn;
+  registerComponentApi: RegisterComponentApiFn;
+  onDidUpdate?: AsyncFunction;
+};
+
 export function AppState({
   bucket = defaultProps.bucket,
   updateState,
   initialValue,
   registerComponentApi,
   onDidUpdate,
-}: {
-  bucket?: string;
-  initialValue: Record<string, any>;
-  updateState: UpdateStateFn;
-  registerComponentApi: RegisterComponentApiFn;
-  onDidUpdate?: AsyncFunction;
-}) {
-  const registerAppState = useAppStateContextPart((value) => value.registerAppState);
+}: Props) {
   const update = useAppStateContextPart((value) => value.update);
+  const value = useAppStateContextPart((value) => value?.appState?.[bucket]);
+
   useIsomorphicLayoutEffect(() => {
     if (initialValue !== undefined) {
-      registerAppState(bucket, initialValue);
+      update(bucket, initialValue);
     }
-  }, [bucket, initialValue, registerAppState]);
+  }, [bucket, initialValue]);
 
-  const value = useAppStateContextPart((value) => value.appState[bucket]);
   useIsomorphicLayoutEffect(() => {
     updateState({ value });
     
