@@ -472,12 +472,18 @@ export const AutoComplete = forwardRef(function AutoComplete(
           >
             <PopoverTrigger asChild ref={setReferenceElement}>
               <div
+                ref={forwardedRef}
                 style={style}
                 data-part-id={PART_LIST_WRAPPER}
-                className={classnames(className, styles.badgeListWrapper, styles[validationStatus], {
-                  [styles.disabled]: !enabled,
-                  [styles.focused]: isFocused,
-                })}
+                className={classnames(
+                  className,
+                  styles.badgeListWrapper,
+                  styles[validationStatus],
+                  {
+                    [styles.disabled]: !enabled,
+                    [styles.focused]: isFocused,
+                  },
+                )}
                 aria-expanded={open}
               >
                 {Array.isArray(selectedValue) && selectedValue.length > 0 && (
