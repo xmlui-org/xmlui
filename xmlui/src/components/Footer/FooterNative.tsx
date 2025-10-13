@@ -1,4 +1,6 @@
-import React, { ForwardedRef, forwardRef, ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
+import type React from "react";
+import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Footer.module.scss";

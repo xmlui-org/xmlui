@@ -15,7 +15,7 @@ import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ContainerActionKind } from "./rendering/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
 import { useReferenceTrackedApi } from "./utils/hooks";
-import { AppContextObject } from "../abstractions/AppContextDefs";
+import type { AppContextObject } from "../abstractions/AppContextDefs";
 
 interface LoaderRendererContext {
   node: ComponentDef;

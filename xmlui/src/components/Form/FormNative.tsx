@@ -50,6 +50,7 @@ import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
+import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -316,9 +317,9 @@ const Form = forwardRef(function (
   const requestModalFormClose = useModalFormClose();
 
   const isEnabled = enabled && !formState.submitInProgress;
-  const isDirty = useMemo(()=>{
-    return Object.entries(formState.interactionFlags).some(([key, flags])=>{
-      if(flags.isDirty){
+  const isDirty = useMemo(() => {
+    return Object.entries(formState.interactionFlags).some(([key, flags]) => {
+      if (flags.isDirty) {
         return true;
       }
       return false;
@@ -351,7 +352,7 @@ const Form = forwardRef(function (
 
   const doCancel = useEvent(() => {
     onCancel?.();
-    requestModalFormClose();
+    void requestModalFormClose();
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
@@ -391,7 +392,7 @@ const Form = forwardRef(function (
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
-        requestModalFormClose();
+        void requestModalFormClose();
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
@@ -492,12 +493,16 @@ const Form = forwardRef(function (
     });
   }, [doReset, updateData, registerComponentApi]);
 
-  let safeButtonRow = <>{buttonRow || (
-    <div className={styles.buttonRow}>
-      {swapCancelAndSave && [submitButton, cancelButton]}
-      {!swapCancelAndSave && [cancelButton, submitButton]}
-    </div>
-  )}</>;
+  let safeButtonRow = (
+    <>
+      {buttonRow || (
+        <div className={styles.buttonRow}>
+          {swapCancelAndSave && [submitButton, cancelButton]}
+          {!swapCancelAndSave && [cancelButton, submitButton]}
+        </div>
+      )}
+    </>
+  );
   return (
     <>
       <form
@@ -551,23 +556,26 @@ Form.displayName = "Form";
 
 type FormComponentDef = ComponentDef<typeof FormMd>;
 
-export const FormWithContextVar = forwardRef(function({
-  node,
-  renderChild,
-  extractValue,
-  style,
-  className,
-  lookupEventHandler,
-  registerComponentApi,
-}: {
-  node: FormComponentDef;
-  renderChild: RenderChildFn;
-  extractValue: ValueExtractor;
-  style?: CSSProperties;
-  className?: string;
-  lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
-  registerComponentApi: RegisterComponentApiFn;
-}, ref: ForwardedRef<HTMLDivElement>) {
+export const FormWithContextVar = forwardRef(function (
+  {
+    node,
+    renderChild,
+    extractValue,
+    style,
+    className,
+    lookupEventHandler,
+    registerComponentApi,
+  }: {
+    node: FormComponentDef;
+    renderChild: RenderChildFn;
+    extractValue: ValueExtractor;
+    style?: CSSProperties;
+    className?: string;
+    lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
+    registerComponentApi: RegisterComponentApiFn;
+  },
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const $data = useMemo(() => {
@@ -613,13 +621,16 @@ export const FormWithContextVar = forwardRef(function({
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
 
+  const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth });
+
   return (
     <Slot ref={ref} style={style}>
       <Form
         keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}
         itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
         itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
-        itemLabelWidth={extractValue.asOptionalString(node.props.itemLabelWidth)}
+        itemLabelWidth={itemLabelWidthCssProps.width as string}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         formState={formState}
         dispatch={dispatch}

@@ -1,4 +1,5 @@
-import React, { type CSSProperties, forwardRef, memo, useEffect, useImperativeHandle, useRef } from "react";
+import type React from "react";
+import { type CSSProperties, forwardRef, memo, useEffect, useImperativeHandle, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./IFrame.module.scss";

@@ -1,7 +1,7 @@
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 import { labelPositionValues } from "../abstractions";
-import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import { getElementStyle } from "../../testing/component-test-helpers";
 
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
@@ -206,6 +206,22 @@ test.describe("Basic Functionality", () => {
       const driver = await createFormDriver("form");
       await expect(driver.component).toBeVisible();
     });
+
+    test("handles theme variable", async ({ initTestBed, createFormItemDriver }) => {
+      const spaceBase = 0.25; //rem
+      const labelSize = 10;
+      const widthInPx = labelSize * spaceBase * 16; //px
+      await initTestBed(`
+        <Theme space-base="${spaceBase}rem">
+          <Form itemLabelWidth="$space-${labelSize}">
+            <FormItem label="Test Label" bindTo="test" testId="testField" />
+          </Form>
+        </Theme>
+      `);
+      const driver = await createFormItemDriver("testField");
+      const labelWidth = await getElementStyle(driver.label, "width");
+      expect(labelWidth).toBe(`${widthInPx}px`);
+    });
   });
 
   // =============================================================================
@@ -328,7 +344,7 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(
         `
-        <Form 
+        <Form
           testId="form"
           submitUrl="/test-success"
           onSuccess="testState = 'success'; console.log('Submitted successfully')"
@@ -356,7 +372,7 @@ test.describe("Basic Functionality", () => {
 
     test("onReset event fires when form is reset", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           id="testForm"
           onReset="testState = 'reset'"
           data="{{ name: 'Test' }}">
@@ -383,7 +399,7 @@ test.describe("Basic Functionality", () => {
       createTextBoxDriver,
     }) => {
       await initTestBed(`
-        <Form 
+        <Form
           id="testForm"
           data="{{ name: 'Original', age: 25 }}">
           <FormItem label="Name" bindTo="name" testId="nameField" />
@@ -413,7 +429,7 @@ test.describe("Basic Functionality", () => {
       createTextBoxDriver,
     }) => {
       await initTestBed(`
-        <Form 
+        <Form
           id="testForm"
           data="{{ name: 'Initial' }}">
           <FormItem label="Name" bindTo="name" testId="nameField" />
@@ -780,7 +796,7 @@ test.describe("Edge Cases", () => {
 
   test("handles form with empty string properties", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Form 
+      <Form
         cancelLabel=""
         saveLabel=""
         data="{{ name: '' }}">
@@ -1080,8 +1096,8 @@ test("buttonRowTemplate replaces built-in buttons", async ({ initTestBed, create
     </Form>`);
 
   const driver = await createFormDriver("form");
-  expect(driver.submitButton).not.toBeVisible();
-  expect(driver.cancelButton).not.toBeVisible();
+  await expect(driver.submitButton).not.toBeVisible();
+  await expect(driver.cancelButton).not.toBeVisible();
 });
 
 test("setting buttonRowTemplate without buttons still runs submit on Enter", async ({
@@ -1468,7 +1484,11 @@ test("field-related errors map to correct FormItems", async ({
   );
 });
 
-test.skip("field-related errors disappear if user updates FormItems", async ({ initTestBed, page, createFormItemDriver }) => {
+test.skip("field-related errors disappear if user updates FormItems", async ({
+  initTestBed,
+  page,
+  createFormItemDriver,
+}) => {
   await initTestBed(
     `
       <Form testId="form">
@@ -1479,7 +1499,7 @@ test.skip("field-related errors disappear if user updates FormItems", async ({ i
 
   const fieldDriver = await createFormItemDriver("testField");
   const fieldDriver2 = await createFormItemDriver("testField2");
-  
+
   await fieldDriver.component.focus();
   await fieldDriver.textBox.fill("a");
   await fieldDriver.textBox.fill("");
@@ -1594,7 +1614,7 @@ test("regression: data url through modal context", async ({
   const inputElement = (await createFormItemDriver("nameInput")).input;
   const inputDriver = await createTextBoxDriver(inputElement);
 
-  (await createButtonDriver("openModalButton")).click();
+  await (await createButtonDriver("openModalButton")).click();
 
   await expect(inputDriver.field).toHaveValue("Smith");
 

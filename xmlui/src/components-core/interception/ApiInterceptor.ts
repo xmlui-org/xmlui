@@ -90,8 +90,7 @@ export class ApiInterceptor {
   private backend: Backend | null = null;
   // public id = crypto.randomUUID();
 
-  constructor(private readonly apiDef: ApiInterceptorDefinition) {
-  }
+  constructor(private readonly apiDef: ApiInterceptorDefinition) {}
 
   public async initialize() {
     // --- Transfer the handlers of API operations to the backend implementation
@@ -190,10 +189,7 @@ export class ApiInterceptor {
         // Properly encode filename for Content-Disposition header
         // Use percent-encoding for non-ASCII characters in filename*
         const encodedFilename = encodeURIComponent(ret.name);
-        headers.append(
-          "Content-Disposition",
-          `attachment; filename*=UTF-8''${encodedFilename}`,
-        );
+        headers.append("Content-Disposition", `attachment; filename*=UTF-8''${encodedFilename}`);
         return HttpResponse.arrayBuffer(await ret.arrayBuffer(), {
           headers: headers,
           status: successStatusCode,
@@ -247,7 +243,11 @@ export class ApiInterceptor {
   private getMockForRequest(url: string, options: RequestInit) {
     return Object.entries(this.getOperations()).find(([operationId, operationDef]) => {
       if (
-        matchRequestUrl(new URL(url, window.location.href), `${this.getApiUrl()}${operationDef.url}`, `${window.location.href}`).matches &&
+        matchRequestUrl(
+          new URL(url, window.location.href),
+          `${this.getApiUrl()}${operationDef.url}`,
+          `${window.location.href}`,
+        ).matches &&
         (options.method || "get").toLowerCase() === operationDef.method.toLowerCase()
       ) {
         return true;
@@ -256,14 +256,23 @@ export class ApiInterceptor {
     });
   }
 
-  async executeMockedFetch(url: string, options: RequestInit) {
+  executeMockedFetch(url: string, options: RequestInit) {
     const mockForRequest = this.getMockForRequest(url, options);
-    if(!mockForRequest) {
+    if (!mockForRequest) {
       throw new Error(`No mock found for request: ${url} with options: ${JSON.stringify(options)}`);
     }
     const [operationId, operationDef] = mockForRequest;
-    const match = matchRequestUrl(new URL(url, window.location.href), `${this.getApiUrl()}${operationDef.url}`, `${window.location.href}`);
-    return this.executeOperation(operationId, new Request(url, options), getCookiesAsObject(), match.params as PathParams);
+    const match = matchRequestUrl(
+      new URL(url, window.location.href),
+      `${this.getApiUrl()}${operationDef.url}`,
+      `${window.location.href}`,
+    );
+    return this.executeOperation(
+      operationId,
+      new Request(url, options),
+      getCookiesAsObject(),
+      match.params as PathParams,
+    );
   }
 }
 
@@ -277,11 +286,11 @@ function getCookiesAsObject() {
   }
 
   // 3. Split into individual "key=value" pairs
-  const cookiePairs = cookieString.split('; ');
+  const cookiePairs = cookieString.split("; ");
 
   // 4. Use reduce to build the final object
   const cookieObject = cookiePairs.reduce((acc, currentPair) => {
-    const [key, value] = currentPair.split('=');
+    const [key, value] = currentPair.split("=");
     // Decode the key and value to handle special characters
     acc[decodeURIComponent(key)] = decodeURIComponent(value);
     return acc;

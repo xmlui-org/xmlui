@@ -1,15 +1,9 @@
-import React, {
-  MutableRefObject,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import type { MutableRefObject } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { isEqual } from "lodash-es";
 
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
-import { ColorDef } from "./css-utils";
+import type { ColorDef } from "./css-utils";
 
 import { shallowCompare, useEvent } from "../utils/misc";
 import { useTheme } from "../theming/ThemeContext";
@@ -326,10 +320,7 @@ export const useRealBackground = (element: HTMLElement) => {
   useEffect(() => {
     return setCounter((prev) => prev + 1);
   }, [activeThemeTone, activeThemeId]);
-  return useMemo(
-    () => (element ? realBackgroundColor(element) : "transparent"),
-    [element, counter],
-  );
+  return useMemo(() => (element ? realBackgroundColor(element) : "transparent"), [element]);
 };
 
 // export const useIsInViewport = (ref, observerOptions) => {

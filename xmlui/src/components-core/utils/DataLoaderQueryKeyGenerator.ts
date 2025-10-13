@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { Query, QueryKey } from "@tanstack/react-query";
+import type { Query, QueryKey } from "@tanstack/react-query";
 
 // base on this: https://tkdodo.eu/blog/effective-react-query-keys
 

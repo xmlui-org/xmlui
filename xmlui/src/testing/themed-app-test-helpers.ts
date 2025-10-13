@@ -83,7 +83,7 @@ export function scalePercentBy(scalarOf100Percent: number, percentage: string) {
   return (scalarOf100Percent / 100) * percentageNum;
 }
 
-export async function getBoundingRect(locator: Locator) {
+export function getBoundingRect(locator: Locator) {
   return locator.evaluate((element) => element.getBoundingClientRect());
 }
 
@@ -126,7 +126,7 @@ export function pixelStrToNum(pixelStr: string) {
   return Number(pixelStr.replace("px", ""));
 }
 
-export async function getElementStyle(locator: Locator, style: string) {
+export function getElementStyle(locator: Locator, style: string) {
   return locator.evaluate(
     (element, style) => window.getComputedStyle(element).getPropertyValue(style),
     style,
@@ -137,7 +137,7 @@ export async function getElementStyle(locator: Locator, style: string) {
  * Retreives all the provided style properties from the locator
  * @returns an object with the keys being the elements of the styles argument
  */
-export async function getElementStyles(locator: Locator, styles: string[] = []) {
+export function getElementStyles(locator: Locator, styles: string[] = []) {
   return locator.evaluate(
     (element, styles) =>
       Object.fromEntries(

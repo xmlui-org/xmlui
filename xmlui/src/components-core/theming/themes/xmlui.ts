@@ -1,4 +1,4 @@
-import { ThemeDefinition } from "../../../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 import {
   cyanThemeColors,
   grayThemeColors,

@@ -44,6 +44,7 @@ type ModalProps = {
   fullScreen?: boolean;
   title?: string;
   closeButtonVisible?: boolean;
+  externalAnimation?: boolean;
 };
 
 type ModalDialogFrameProps = {
@@ -136,6 +137,7 @@ export const ModalDialog = React.forwardRef(
       className,
       onOpen,
       onClose,
+      externalAnimation = true,
       ...rest
     }: ModalProps,
     ref,
@@ -199,11 +201,18 @@ export const ModalDialog = React.forwardRef(
       <Dialog.Content
         {...rest}
         data-part-id={PART_CONTENT}
-        className={classnames(styles.content, className)}
+        className={classnames(
+          {
+            [styles.contentAnimation]: !externalAnimation,
+          },
+          styles.content,
+          className,
+        )}
         onPointerDownOutside={(event) => {
           if (
             event.target instanceof Element &&
-            (event.target.closest("._debug-inspect-button") !== null || event.target.localName === "com-1password-button")
+            (event.target.closest("._debug-inspect-button") !== null ||
+              event.target.localName === "com-1password-button")
           ) {
             //we prevent the auto modal close on clicking the inspect button
             event.preventDefault();

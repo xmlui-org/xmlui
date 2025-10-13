@@ -1,4 +1,4 @@
-import { Position, Range } from "vscode-languageserver";
+import type { Position, Range } from "vscode-languageserver";
 
 type OffsetRange = { pos: number, end: number };
 

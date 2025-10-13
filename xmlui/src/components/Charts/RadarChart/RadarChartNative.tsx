@@ -9,7 +9,8 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import { ReactNode, useEffect, useRef, useState, useCallback } from "react";
+import type { ReactNode} from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";

@@ -78,10 +78,13 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
     min-width: $minWidth-ModalDialog;
     isolation: isolate;
     position: relative;
-    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     gap: t.$space-4;
+  }
+
+  .contentAnimation {
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .content:focus {

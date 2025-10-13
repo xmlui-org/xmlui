@@ -1,5 +1,5 @@
-import { Diagnostic, Position } from "vscode-languageserver";
-import { Error, ParseResult } from "../../parsers/xmlui-parser";
+import type { Diagnostic, Position } from "vscode-languageserver";
+import type { Error, ParseResult } from "../../parsers/xmlui-parser";
 import { offsetToPosRange } from "./common/lsp-utils";
 
 export type DiagnosticsContext = {

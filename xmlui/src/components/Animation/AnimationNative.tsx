@@ -1,9 +1,10 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, ForwardedRef, forwardRef, useEffect, useId, useMemo, useState } from "react";
+import type { ForwardedRef } from "react";
+import React, { Children, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { useCallback } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import { RegisterComponentApiFn } from "../..";
+import type { RegisterComponentApiFn } from "../..";
 import { isPlainObject } from "lodash-es";
 
 export type AnimationProps = {
@@ -31,68 +32,71 @@ const AnimatedComponent = animated(
   }),
 );
 
-export const defaultProps: Pick<AnimationProps, "delay" | "animateWhenInView" |"reverse" | "loop" | "once"> = {
+export const defaultProps: Pick<
+  AnimationProps,
+  "delay" | "animateWhenInView" | "reverse" | "loop" | "once"
+> = {
   delay: 0,
   animateWhenInView: false,
   reverse: false,
   loop: false,
-  once: false
+  once: false,
 };
 
 export const parseAnimation = (animation: string | object): object => {
-  if (typeof animation === 'object') {
+  if (typeof animation === "object") {
     return animation;
   }
 
   const presetAnimations: Record<string, object> = {
     fadein: {
       from: { opacity: 0 },
-      to: { opacity: 1 }
+      to: { opacity: 1 },
     },
     fadeout: {
       from: { opacity: 1 },
-      to: { opacity: 0 }
+      to: { opacity: 0 },
     },
     slidein: {
-      from: { transform: 'translateX(-100%)' },
-      to: { transform: 'translateX(0%)' }
+      from: { transform: "translateX(-100%)" },
+      to: { transform: "translateX(0%)" },
     },
     slideout: {
-      from: { transform: 'translateX(0%)' },
-      to: { transform: 'translateX(100%)' }
+      from: { transform: "translateX(0%)" },
+      to: { transform: "translateX(100%)" },
     },
     popin: {
-      from: { transform: 'scale(0.8)', opacity: 0 },
-      to: { transform: 'scale(1)', opacity: 1 }
+      from: { transform: "scale(0.8)", opacity: 0 },
+      to: { transform: "scale(1)", opacity: 1 },
     },
     popout: {
-      from: { transform: 'scale(1)', opacity: 1 },
-      to: { transform: 'scale(0.8)', opacity: 0 }
+      from: { transform: "scale(1)", opacity: 1 },
+      to: { transform: "scale(0.8)", opacity: 0 },
     },
     flipin: {
-      from: { transform: 'rotateY(90deg)', opacity: 0 },
-      to: { transform: 'rotateY(0deg)', opacity: 1 }
+      from: { transform: "rotateY(90deg)", opacity: 0 },
+      to: { transform: "rotateY(0deg)", opacity: 1 },
     },
     flipout: {
-      from: { transform: 'rotateY(0deg)', opacity: 1 },
-      to: { transform: 'rotateY(90deg)', opacity: 0 }
+      from: { transform: "rotateY(0deg)", opacity: 1 },
+      to: { transform: "rotateY(90deg)", opacity: 0 },
     },
     rotatein: {
-      from: { transform: 'rotate(-180deg)', opacity: 0 },
-      to: { transform: 'rotate(0deg)', opacity: 1 }
+      from: { transform: "rotate(-180deg)", opacity: 0 },
+      to: { transform: "rotate(0deg)", opacity: 1 },
     },
     rotateout: {
-      from: { transform: 'rotate(0deg)', opacity: 1 },
-      to: { transform: 'rotate(180deg)', opacity: 0 }
+      from: { transform: "rotate(0deg)", opacity: 1 },
+      to: { transform: "rotate(180deg)", opacity: 0 },
     },
     zoomin: {
-      from: { transform: 'scale(0)', opacity: 0 },
-      to: { transform: 'scale(1)', opacity: 1 }
+      from: { transform: "scale(0)", opacity: 0 },
+      to: { transform: "scale(1)", opacity: 1 },
     },
     zoomout: {
-      from: { transform: 'scale(1)', opacity: 1 },
-      to: { transform: 'scale(0)', opacity: 0 }
-    }
+      from: { transform: "scale(1)", opacity: 1 },
+      to: { transform: "scale(0)", opacity: 0 },
+    },
   };
 
   return presetAnimations[animation] || { from: {}, to: {} };
@@ -187,7 +191,7 @@ export const Animation = forwardRef(function Animation(
   const [count, setCount] = useState(0);
   const times = 1;
   const animationId = useId();
-  
+
   const animationSettings = useMemo<any>(
     () => ({
       from: _animation.from,
@@ -230,9 +234,9 @@ export const Animation = forwardRef(function Animation(
       onStart,
       onStop,
       reset,
+      once,
       reverse,
       toggle,
-      animationId,
     ],
   );
 
@@ -249,7 +253,7 @@ export const Animation = forwardRef(function Animation(
   const composedRef = ref ? composeRefs(ref, forwardedRef) : forwardedRef;
 
   const startAnimation = useCallback(() => {
-    api.start(_animation);
+    void api.start(_animation);
     return () => {
       api.stop();
     };
@@ -278,7 +282,7 @@ export const Animation = forwardRef(function Animation(
         </AnimatedComponent>
       ),
     );
-  }, [animateWhenInView, animationStyles, children, springs, rest]);
+  }, [animateWhenInView, animationStyles, children, springs, rest, composedRef, forwardedRef]);
 
   return content;
 });

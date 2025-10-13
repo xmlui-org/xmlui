@@ -6,11 +6,11 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-} from "./ScriptingSourceTree";
+
+  Identifier} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { getIdentifierScope } from "./eval-tree-common";
 import {
-  Identifier,
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
   T_ARROW_EXPRESSION_STATEMENT,

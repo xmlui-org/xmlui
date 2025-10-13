@@ -1,4 +1,4 @@
-import { DelayMode } from "msw";
+import type { DelayMode } from "msw";
 
 export type AuthDefinition = {
   defaultLoggedInUser?: any

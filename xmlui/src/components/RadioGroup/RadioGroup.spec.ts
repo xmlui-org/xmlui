@@ -478,7 +478,7 @@ test("labelPosition=start positions label before input with ltr", async ({ initT
   `);
 
   const labels = page.locator("label");
-  expect(labels).toHaveCount(3);
+  await expect(labels).toHaveCount(3);
   const { left: optionLeft } = await getBounds(labels.nth(1));
   const { right: labelRight } = await getBounds(labels.nth(0));
 
@@ -494,7 +494,7 @@ test("labelPosition=start positions label after input with rtl", async ({ initTe
   `);
 
   const labels = page.locator("label");
-  expect(labels).toHaveCount(3);
+  await expect(labels).toHaveCount(3);
   const { left: optionLeft } = await getBounds(labels.nth(0));
   const { right: labelRight } = await getBounds(labels.nth(2));
 
@@ -510,7 +510,7 @@ test("labelPosition=end positions label after input with ltr", async ({ initTest
   `);
 
   const labels = page.locator("label");
-  expect(labels).toHaveCount(3);
+  await expect(labels).toHaveCount(3);
   const { left: optionLeft } = await getBounds(labels.nth(0));
   const { right: labelRight } = await getBounds(labels.nth(1));
 
@@ -526,8 +526,8 @@ test("labelPosition=end positions label after input with rtl", async ({ initTest
   `);
 
   const labels = page.locator("label");
-  expect(labels).toHaveCount(3);
-  expect(labels.nth(2)).toHaveText("Option 2");
+  await expect(labels).toHaveCount(3);
+  await expect(labels.nth(2)).toHaveText("Option 2");
   const { left: optionLeft } = await getBounds(labels.nth(0));
   const { right: labelRight } = await getBounds(labels.nth(2));
 

@@ -472,6 +472,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
           >
             <PopoverTrigger asChild ref={setReferenceElement}>
               <div
+                ref={forwardedRef}
                 style={style}
                 data-part-id={PART_LIST_WRAPPER}
                 className={classnames(

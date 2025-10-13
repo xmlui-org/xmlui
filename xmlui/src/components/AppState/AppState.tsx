@@ -31,8 +31,9 @@ export const AppStateMd = createMetadata({
         `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
         `component instances for the same bucket with their \`initialValue\` set, it may result ` +
         `in faulty app logic. When xmlui instantiates an \`${COMP}\` with an explicit initial ` +
-        `value, that value is immediately set. Multiple initial values may result in ` +
-        `undesired initialization. By default, the bucked's initial state is undefined.`,
+        `value, that value is immediately merged with the existing state. ` +
+        `The issue may come from the behavior that \`initialValue\` is set (merged) only when a component mounts. ` +
+        `By default, the bucket's initial state is undefined.`,
     },
   },
   apis: {

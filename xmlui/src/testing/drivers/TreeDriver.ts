@@ -1,4 +1,4 @@
-import { Locator } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import { ComponentDriver } from "../ComponentDrivers";
 
 export class TreeDriver extends ComponentDriver {

@@ -186,6 +186,6 @@ test.describe("Edge Cases", { tag: "@smoke" }, () => {
 
     await page.getByRole("button").click({ force: true });
 
-    expect.poll(testStateDriver.testState).not.toEqual("clicked");
+    await expect.poll(testStateDriver.testState).not.toEqual("clicked");
   });
 });

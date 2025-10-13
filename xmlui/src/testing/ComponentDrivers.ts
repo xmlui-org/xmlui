@@ -49,7 +49,7 @@ export class ComponentDriver {
   getIconsByName(name: string): Locator {
     return this.component.locator(`[data-icon-name="${name}"]`);
   }
-  
+
   getIconByName(name: string): Locator {
     return this.component.locator(`[data-icon-name="${name}"]`).first();
   }
@@ -57,7 +57,7 @@ export class ComponentDriver {
   /**
    * Gets the html tag name of the final rendered component
    */
-  async getComponentTagName() {
+  getComponentTagName() {
     return this.component.evaluate((el) => el.tagName.toLowerCase());
   }
 
@@ -303,14 +303,14 @@ export class SplitterDriver extends ComponentDriver {
   /**
    * Gets the primary panel element
    */
-  async getPrimaryPanel() {
+  getPrimaryPanel() {
     return this.locator.locator('[class*="primaryPanel"]').first();
   }
 
   /**
    * Gets the secondary panel element
    */
-  async getSecondaryPanel() {
+  getSecondaryPanel() {
     return this.locator.locator('[class*="secondaryPanel"]').first();
   }
 }
@@ -600,7 +600,7 @@ export class FormDriver extends ComponentDriver {
     return requestPromise;
   }
 
-  async getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+  getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes(endpoint) && response.status() === responseStatus,
       { timeout },
@@ -612,7 +612,7 @@ export class FormDriver extends ComponentDriver {
    * Gets the validation summary component inside the Form.
    * Uses the 'data-validation-summary' attribute to find the component
    */
-  async getValidationSummary() {
+  getValidationSummary() {
     return this.component.locator("[data-validation-summary='true']");
   }
 
@@ -621,13 +621,13 @@ export class FormDriver extends ComponentDriver {
    * Uses the 'data-validation-display-severity' attribute to find the components.
    * The attribute contains the severity of the validation.
    */
-  async getValidationDisplays() {
+  getValidationDisplays() {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator("[data-validation-display-severity]");
   }
 
-  async getValidationDisplaysBySeverity(severity: string) {
+  getValidationDisplaysBySeverity(severity: string) {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator(`[data-validation-display-severity="${severity}"]`);
@@ -655,7 +655,7 @@ export class ValidationSummaryDriver extends ComponentDriver {
    * Uses the 'data-validation-display-severity' attribute to find the components.
    * The attribute contains the severity of the validation.
    */
-  async getValidationDisplays() {
+  getValidationDisplays() {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator("[data-validation-display-severity]");
@@ -665,11 +665,11 @@ export class ValidationSummaryDriver extends ComponentDriver {
 // --- ValidationDisplay
 
 export class ValidationDisplayDriver extends ComponentDriver {
-  async getSeverity() {
+  getSeverity() {
     return this.component.getAttribute("data-validation-display-severity");
   }
 
-  async getText() {
+  getText() {
     return this.component.locator("li").textContent();
   }
 }
@@ -1382,7 +1382,6 @@ export class DropdownMenuDriver extends ComponentDriver {
 // --- Slider
 
 export class SliderDriver extends ComponentDriver {
-
   private async getActiveThumb(thumbNumber: number = 0) {
     const thumbs = this.page.getByRole("slider");
     const thumbCount = await thumbs.count();
@@ -1413,14 +1412,15 @@ export class SliderDriver extends ComponentDriver {
     if (!trackBox) {
       throw new Error("Could not get track bounding box");
     }
-    
+
     // Calculate target position relative to track
     let targetX: number;
     if (location === "start") {
       targetX = trackBox.x;
     } else if (location === "end") {
       targetX = trackBox.x + trackBox.width;
-    } else { // middle
+    } else {
+      // middle
       targetX = trackBox.x + trackBox.width / 2;
     }
     const targetY = trackBox.y + trackBox.height / 2;
@@ -1431,7 +1431,11 @@ export class SliderDriver extends ComponentDriver {
     await this.page.mouse.up();
   }
 
-  async stepThumbByKeyboard(key: "ArrowLeft" | "ArrowRight" | "Home" | "End", thumbNumber: number = 0, repeat: number = 1) {
+  async stepThumbByKeyboard(
+    key: "ArrowLeft" | "ArrowRight" | "Home" | "End",
+    thumbNumber: number = 0,
+    repeat: number = 1,
+  ) {
     const activeThumb = await this.getActiveThumb(thumbNumber);
     await activeThumb.focus();
     for (let i = 0; i < repeat; i++) {

@@ -1,4 +1,4 @@
-import {
+import type {
   ArrowExpression,
   BlockStatement,
   Expression,
@@ -12,7 +12,8 @@ import {
   ObjectDestructure,
   UnaryExpression,
   ObjectLiteral,
-  BinaryExpression,
+  BinaryExpression} from "./ScriptingSourceTree";
+import {
   T_UNARY_EXPRESSION,
   T_BINARY_EXPRESSION,
   T_SEQUENCE_EXPRESSION,
