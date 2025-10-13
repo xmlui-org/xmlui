@@ -104,6 +104,43 @@ Otherwise, the `Theme` component will just provide the theme context to its chil
 
 %-PROP-END
 
+%-PROP-START applyIf
+
+The `applyIf` property controls whether the theme is conditionally applied to its children. When set to `false`, the children are rendered without the theme wrapper, effectively bypassing the theme styling.
+
+```xmlui-pg copy {2,9,16} display name="Example: applyIf"
+<App var.apply="{false}">
+  <Theme backgroundColor-Button="rgb(255, 100, 100)" applyIf="true">
+    <VStack>
+      <H3>Theme Applied (applyIf="true"):</H3>
+      <Button>Themed Button</Button>
+    </VStack>
+  </Theme>
+  <Theme backgroundColor-Button="rgb(255, 100, 100)" applyIf="false">
+    <VStack>
+      <H3>Theme Not Applied (applyIf="false"):</H3>
+      <Button>Default Button</Button>
+    </VStack>
+  </Theme>
+  <Theme backgroundColor-Button="rgb(100, 192, 100)" applyIf="{apply}">
+    <VStack>
+      <H3>Conditional Theme (dynamic):</H3>
+      <Button onClick="apply = !apply">
+        {apply ? 'Themed' : 'Default'} - Click to Toggle
+      </Button>
+    </VStack>
+  </Theme>
+</App>
+```
+
+This property is particularly useful for:
+- **Conditional styling**: Apply themes based on user preferences, feature flags, or application state
+- **Theme debugging**: Temporarily disable themes during development
+- **Progressive enhancement**: Provide fallback styling when themes fail to load
+- **Dynamic theming**: Switch themes on and off based on user interactions or data conditions
+
+%-PROP-END
+
 %-STYLE-START
 
 The `Theme` component is a styling wrapper that influences the nested components' visual appearance. It cannot be styled.

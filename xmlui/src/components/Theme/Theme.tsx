@@ -25,6 +25,12 @@ export const ThemeMd = createMetadata({
       "boolean",
       defaultProps.root,
     ),
+    applyIf: d(
+      `This property controls whether the theme wrapper is applied. When true (default), the theme wraps the children. When false, children are rendered unwrapped.`,
+      undefined,
+      "boolean",
+      true,
+    ),
   },
   opaque: true,
 });
@@ -43,6 +49,7 @@ export const themeComponentRenderer = createComponentRenderer(
       <Theme
         id={extractValue.asOptionalString(node.props.themeId)}
         isRoot={extractValue.asOptionalBoolean(node.props.root)}
+        applyIf={extractValue.asOptionalBoolean(node.props.applyIf)}
         layoutContext={layoutContext}
         renderChild={renderChild}
         tone={themeTone as ThemeTone}

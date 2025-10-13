@@ -25,6 +25,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 type Props = {
   id?: string;
   isRoot?: boolean;
+  applyIf?: boolean;
   layoutContext?: LayoutContext;
   renderChild?: RenderChildFn;
   node?: ComponentDef;
@@ -36,6 +37,7 @@ type Props = {
 
 export const defaultProps = {
   isRoot: false,
+  applyIf: true,
   toastDuration: 5000,
   themeVars: EMPTY_OBJECT,
   root: false,
@@ -44,6 +46,7 @@ export const defaultProps = {
 export function Theme({
   id,
   isRoot = defaultProps.isRoot,
+  applyIf,
   renderChild,
   node,
   tone,
@@ -178,6 +181,19 @@ export function Theme({
 
   if (indexing) {
     return children;
+  }
+
+  // Use default value if applyIf is undefined
+  const shouldApplyTheme = applyIf ?? defaultProps.applyIf;
+  
+  // If applyIf is false, render children unwrapped without theme context
+  if (!shouldApplyTheme) {
+    return (
+      <>
+        {renderChild && renderChild(node.children)}
+        {children}
+      </>
+    );
   }
 
   if (isRoot) {
