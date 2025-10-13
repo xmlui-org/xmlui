@@ -8,7 +8,6 @@ import styles from "./FormItem.module.scss";
 import type { LabelPosition } from "../abstractions";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
-import { EMPTY_OBJECT } from "../../components-core/constants";
 
 // Component part names
 
@@ -116,12 +115,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        {cloneElement(children as ReactElement, { 
+        {cloneElement(children as ReactElement, {
           id: !isInputTemplateUsed ? inputId : undefined,
           style: undefined,
           className: undefined,
           "data-part-id": PART_LABELED_ITEM,
-         })}
+        })}
       </div>
       {validationResult}
     </div>

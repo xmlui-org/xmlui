@@ -1,14 +1,11 @@
-import { useId } from "react";
+import { cloneElement, type ReactElement } from "react";
 import {
   Animation,
   parseAnimation,
-  parseAnimationOptions
+  parseAnimationOptions,
 } from "../../components/Animation/AnimationNative";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
-import {
-  parseTooltipOptions,
-  Tooltip
-} from "../../components/Tooltip/TooltipNative";
+import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
 import type { Behavior } from "./Behavior";
 
 /**
@@ -47,15 +44,16 @@ export const animationBehavior: Behavior = {
   attach: (context, node) => {
     const { extractValue } = context;
     const animation = extractValue(context.node.props?.animation, true);
-    const animationOptions = extractValue(
-      context.node.props?.animationOptions,
-      true
-    );
+    const animationOptions = extractValue(context.node.props?.animationOptions, true);
     const parsedOptions = parseAnimationOptions(animationOptions);
 
     return (
       <Animation animation={parseAnimation(animation)} {...parsedOptions}>
-        {node}
+        {context.node.type === "ModalDialog"
+          ? cloneElement(node as ReactElement, {
+              externalAnimation: true,
+            })
+          : node}
       </Animation>
     );
   },
@@ -67,7 +65,6 @@ export const animationBehavior: Behavior = {
 export const labelBehavior: Behavior = {
   name: "label",
   canAttach: (node, metadata) => {
-
     /**
      * This behavior can be attached if the component has a 'label' prop
      * and is not a component that handles its own labeling.
@@ -111,7 +108,6 @@ export const labelBehavior: Behavior = {
     );
   },
 };
-
 
 export const getCoreBehaviors = () => {
   return [tooltipBehavior, animationBehavior, labelBehavior];
