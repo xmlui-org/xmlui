@@ -9,10 +9,20 @@ $themeVars: ();
 
 $backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
 $size-ContentSeparator: createThemeVar("size-ContentSeparator");
+$marginTop-ContentSeparator: createThemeVar("marginTop-ContentSeparator");
+$marginBottom-ContentSeparator: createThemeVar("marginBottom-ContentSeparator");
+$marginVertical-ContentSeparator: createThemeVar("marginVertical-ContentSeparator");
+$marginLeft-ContentSeparator: createThemeVar("marginLeft-ContentSeparator");
+$marginRight-ContentSeparator: createThemeVar("marginRight-ContentSeparator");
+$marginHorizontal-ContentSeparator: createThemeVar("marginHorizontal-ContentSeparator");
 
 @layer components {
   .separator {
     background-color: $backgroundColor-ContentSeparator;
+    margin-top: t.createVarWithDefault("marginTop-ContentSeparator", #{$marginVertical-ContentSeparator});
+    margin-bottom: t.createVarWithDefault("marginBottom-ContentSeparator", #{$marginVertical-ContentSeparator});
+    margin-left: t.createVarWithDefault("marginLeft-ContentSeparator", #{$marginHorizontal-ContentSeparator});
+    margin-right: t.createVarWithDefault("marginRight-ContentSeparator", #{$marginHorizontal-ContentSeparator});
 
     &.horizontal {
       height: $size-ContentSeparator;
