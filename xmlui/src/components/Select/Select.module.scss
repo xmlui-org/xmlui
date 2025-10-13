@@ -11,8 +11,9 @@ $animDuration: 0.1s;
 }
 
 $componentName: "Select";
-$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
+$themeVars: t.composeBorderVars($themeVars, $componentName);
 $themeVars: t.composePaddingVars($themeVars, $componentName);
+$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 
 
 // --- CSS properties of a particular Select variant
@@ -49,6 +50,13 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
 }
 
 @layer components {
+  // =============================================================================
+  // SHARED COMPONENTS (used by both SimpleSelect and MultiSelect)
+  // =============================================================================
+
+  /**
+   * Common trigger styles for both SimpleSelect and searchable/multiSelect
+   */
   .selectTrigger {
     outline: none;
     width: 100%;
@@ -86,6 +94,11 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
       outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
     }
+
+    .placeholder {
+      flex: 1;
+      color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+    }
   }
 
   .selectTrigger>span {
@@ -96,11 +109,49 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     overflow: hidden;
   }
 
+  /**
+   * Common trigger value and actions
+   */
+  .placeholder {
+    display: block;
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+
+  /**
+   * Common empty state
+   */
+  .emptyList {
+    display: flex;
+    gap: .2rem;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  // =============================================================================
+  // MULTI-SELECT SPECIFIC (searchable + multiSelect)
+  // =============================================================================
+
+  /**
+   * Badge display for multi-select values
+   */
   .badgeListContainer {
     display: flex;
+    flex: 1;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
   }
 
   .badgeList {
@@ -147,54 +198,14 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     }
   }
 
-  .actions {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  .action {
-    cursor: pointer;
-  }
-
-  .placeholder {
-    display: block;
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-  }
-
-  .emptyList {
-    display: flex;
-    gap: .2rem;
-    padding: 10px 0;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    width: 100%;
-  }
-
-  .selectScrollUpButton {
-    display: flex;
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .selectScrollDownButton {
-    display: flex;
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
+  /**
+   * Search input and dropdown for searchable/multi-select
+   */
 
   .command {
     width: 100%;
     height: auto;
     overflow: visible;
-    background-color: transparent;
   }
 
   .commandInputContainer {
@@ -214,9 +225,7 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       opacity: 0.5;
     }
 
-    &::placeholder {
-      color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-    }
+
 
     &:focus-within {
       outline: none;
@@ -224,75 +233,33 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 
   .commandList {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .selectContent {
-    position: relative;
     width: 100%;
-    max-height: 280px;
-    z-index: 1000;
-    overflow: auto;
+    position: absolute;
+    overflow: hidden;
+    top: t.$space-1;
+    z-index: 999;
+    outline: none;
     background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
     border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
     box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
-    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
-
-    &[data-state='open'] {
-      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
-    }
-
-    &[data-state='closed'] {
-      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
-    }
-
-    &[data-side='bottom'] {
-      animation: slideInFromTop 0.08s ease-in-out;
-    }
-
-    &[data-side='left'] {
-      animation: slideInFromRight $animDuration ease-in-out;
-    }
-
-    &[data-side='right'] {
-      animation: slideInFromLeft $animDuration ease-in-out;
-    }
-
-    &[data-side='top'] {
-      animation: slideInFromBottom $animDuration ease-in-out;
-    }
-
-    &[data-side='bottom'] {
-      transform: translateY(0.15rem);
-    }
-
-    &[data-side='left'] {
-      transform: translateX(-0.15rem);
-    }
-
-    &[data-side='right'] {
-      transform: translateX(0.15rem);
-    }
-
-    &[data-side='top'] {
-      transform: translateY(-0.15rem);
-    }
+    animation: fade-in 0.3s ease-in-out;
   }
 
-  .multiComboboxOption {
-    padding: 0.5rem 1rem;
+  /**
+   * MultiSelectOption component (used in searchable/multi-select dropdown)
+   */
+  .multiSelectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
     display: flex;
-    gap: 1rem;
+    gap: t.$space-1;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     transition: background-color 0.2s ease;
     background-color: createThemeVar("backgroundColor-item-#{$componentName}");
 
-    .multiComboboxOptionContent {
+    .multiSelectOptionContent {
       width: 100%;
-      gap: 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -323,56 +290,91 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     }
   }
 
-  .selectItem {
-    position: relative;
+  // =============================================================================
+  // SIMPLE SELECT (non-searchable, single select using Radix UI)
+  // =============================================================================
+
+  /**
+   * Trigger value display for SimpleSelect
+   */
+  .selectValue {
+    flex: 1;
     display: flex;
-    cursor: pointer;
-    user-select: none;
     align-items: center;
+    min-height: t.$space-7;
     outline: none;
-    font-size: createThemeVar("fontSize-#{$componentName}");
-
-    &[data-highlighted] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-    }
-
-    &[data-state=checked] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
-    }
-
-    .selectItemContent {
-      display: flex;
-      flex: 1;
-      cursor: pointer;
-      user-select: none;
-      align-items: center;
-      outline: none;
-      @include t.paddingVars($themeVars, "item-#{$componentName}");
-    }
+    background-color: transparent;
+    font-size: t.$fontSize;
   }
 
-  .selectItem[data-disabled] {
-    pointer-events: none;
-    opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
-    cursor: not-allowed;
-    font-style: italic;
+  .action {
+    font-size: t.$fontSize;
   }
 
-  .selectItemIndicator {
-    display: flex;
-    margin-right: 0.5rem;
-    flex-shrink: 0;
-    height: 0.875rem;
-    width: 0.875rem;
-    align-items: center;
-    justify-content: center;
-    color: createThemeVar("textColor-indicator-#{$componentName}");
+  /**
+   * Dropdown content container
+   */
+  .selectDropdownContent {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    z-index: 1000;
+    overflow: auto;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
+
+    &[data-state='open'] {
+      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
+    }
+
+    &[data-state='closed'] {
+      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
+    }
+
+    &[data-side='bottom'] {
+      animation: slideInFromTop 0.08s ease-in-out;
+      transform: translateY(0.15rem);
+    }
+
+    &[data-side='left'] {
+      animation: slideInFromRight $animDuration ease-in-out;
+      transform: translateX(-0.15rem);
+    }
+
+    &[data-side='right'] {
+      animation: slideInFromLeft $animDuration ease-in-out;
+      transform: translateX(0.15rem);
+    }
+
+    &[data-side='top'] {
+      animation: slideInFromBottom $animDuration ease-in-out;
+      transform: translateY(-0.15rem);
+    }
   }
 
   .selectViewport {
     height: fit-content;
     width: 100%;
-    min-width: var(--radix-select-trigger-width);
+  }
+
+  .selectScrollUpButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .selectScrollDownButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
   }
 
   .selectEmpty {
@@ -385,6 +387,62 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     font-size: 14px;
     width: 100%;
   }
+
+  /**
+   * SelectOption component (used in SimpleSelect dropdown)
+   */
+  .selectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+    gap: t.$space-1;
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    outline: none;
+    justify-content: space-between;
+
+    &[data-highlighted] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    &[data-state=checked] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    .selectOptionContent {
+      display: flex;
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+      align-items: center;
+      outline: none;
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
+      cursor: not-allowed;
+      font-style: italic;
+    }
+  }
+
+  .selectOptionIndicator {
+    display: flex;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    height: 0.875rem;
+    width: 0.875rem;
+    align-items: center;
+    justify-content: center;
+    color: createThemeVar("textColor-indicator-#{$componentName}");
+  }
+
+  // =============================================================================
+  // UTILITY CLASSES
+  // =============================================================================
 
   .loading {
     padding: 0.5rem 1rem;

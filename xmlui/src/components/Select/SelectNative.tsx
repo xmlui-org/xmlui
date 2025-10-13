@@ -1,23 +1,18 @@
-import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 import {
-  Content as SelectContent,
-  Icon as SelectIcon,
-  Item as SelectItem,
-  ItemIndicator as SelectItemIndicator,
-  ItemText as SelectItemText,
-  Portal as SelectPortal,
-  Root as SelectRoot,
-  SelectViewport,
-  ScrollDownButton,
-  ScrollUpButton,
-  Trigger as SelectTrigger,
-} from "@radix-ui/react-select";
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
 import { FocusScope } from "@radix-ui/react-focus-scope";
-
+import { SelectOption } from "./SelectOption";
 import styles from "./Select.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -26,11 +21,13 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
-import { SelectContext, useSelect } from "./SelectContext";
+import { SelectContext } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext, useOption } from "./OptionContext";
+import { OptionContext } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
 import { useIsInsideForm } from "../Form/FormContext";
+import { SimpleSelect } from "./SimpleSelect";
+import { MultiSelectOption } from "./MultiSelectOption";
 
 export const defaultProps = {
   enabled: true,
@@ -93,131 +90,121 @@ interface SelectProps {
   children?: ReactNode;
 }
 
-// SimpleSelect props interface for better type safety
-interface SimpleSelectProps {
-  value: SingleValueType;
-  onValueChange: (selectedValue: SingleValueType) => void;
-  id: string;
-  style: React.CSSProperties;
-  className?: string;
-  onFocus: () => void;
-  onBlur: () => void;
-  enabled: boolean;
-  validationStatus: ValidationStatus;
-  triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
-  autoFocus: boolean;
+// Common trigger value display props
+interface SelectTriggerValueProps {
+  value: ValueType;
   placeholder: string;
-  height: CSSProperties["height"];
-  width: number;
-  children: ReactNode;
   readOnly: boolean;
-  emptyListNode: ReactNode;
+  multiSelect: boolean;
+  options: Set<Option>;
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
+  toggleOption: (value: SingleValueType) => void;
 }
 
-const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
-  function SimpleSelect(props, forwardedRef) {
-    const { root } = useTheme();
-    const {
-      enabled,
-      onBlur,
-      autoFocus,
-      onValueChange,
-      validationStatus,
-      value,
-      height,
-      style,
-      placeholder,
-      id,
-      triggerRef,
-      onFocus,
-      width,
-      children,
-      readOnly,
-      emptyListNode,
-      className,
-      ...rest
-    } = props;
-
-    const { options } = useSelect();
-    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
-
-    // Convert value to string for Radix UI compatibility
-    const stringValue = useMemo(() => {
-      return value != undefined ? String(value) : undefined;
-    }, [value]);
-
-    // Handle value changes with proper type conversion
-    const handleValueChange = useCallback(
-      (val: string) => {
-        if (readOnly) return;
-        onValueChange(val);
-      },
-      [onValueChange, readOnly],
-    );
-
-    const optionsArray = useMemo(() => Array.from(options), [options]);
-
-    const selectedOption = useMemo(() => {
-      return optionsArray.find((option) => String(option.value) === String(value));
-    }, [optionsArray, value]);
-
-    return (
-      <SelectRoot value={stringValue} onValueChange={handleValueChange}>
-        <SelectTrigger
-          {...rest}
-          id={id}
-          ref={composedRef}
-          aria-haspopup="listbox"
-          style={style}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          disabled={!enabled}
-          className={classnames(className, styles.selectTrigger, {
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          })}
-          onClick={(event) => {
-            // Prevent event propagation to parent elements (e.g., DropdownMenu)
-            // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
-            event.stopPropagation();
-          }}
-          autoFocus={autoFocus}
-        >
-          <div
-            className={classnames(styles.selectValue, {
-              [styles.selectValue]: value !== undefined,
-              [styles.placeholder]: value === undefined,
-            })}
-          >
-            {selectedOption ? selectedOption.label : readOnly ? "" : placeholder}
+// Common trigger value display component
+const SelectTriggerValue = ({
+  value,
+  placeholder,
+  readOnly,
+  multiSelect,
+  options,
+  valueRenderer,
+  toggleOption,
+}: SelectTriggerValueProps) => {
+  if (multiSelect) {
+    if (Array.isArray(value) && value.length > 0) {
+      return (
+        <div className={styles.badgeListContainer}>
+          <div className={styles.badgeList}>
+            {value.map((v) =>
+              valueRenderer ? (
+                valueRenderer(
+                  Array.from(options).find((o) => o.value === `${v}`),
+                  () => {
+                    toggleOption(v);
+                  },
+                )
+              ) : (
+                <span key={v} className={styles.badge}>
+                  {Array.from(options).find((o) => o.value === `${v}`)?.label}
+                  <Icon
+                    name="close"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      toggleOption(v);
+                    }}
+                  />
+                </span>
+              ),
+            )}
           </div>
-          <SelectIcon asChild>
-            <Icon name="chevrondown" />
-          </SelectIcon>
-        </SelectTrigger>
-        <SelectPortal container={root}>
-          <SelectContent
-            className={styles.selectContent}
-            position="popper"
-            style={{ maxHeight: height, minWidth: width }}
-          >
-            <ScrollUpButton className={styles.selectScrollUpButton}>
-              <Icon name="chevronup" />
-            </ScrollUpButton>
-            <SelectViewport className={styles.selectViewport} role="listbox">
-              {children}
-              {optionsArray.length === 0 && emptyListNode}
-            </SelectViewport>
-            <ScrollDownButton className={styles.selectScrollDownButton}>
-              <Icon name="chevrondown" />
-            </ScrollDownButton>
-          </SelectContent>
-        </SelectPortal>
-      </SelectRoot>
+        </div>
+      );
+    }
+    return (
+      <span placeholder={placeholder} className={styles.placeholder}>
+        {placeholder}
+      </span>
     );
-  },
-);
+  }
+
+  // Single select
+  if (value !== undefined && value !== null && value !== "") {
+    const selectedOption = Array.from(options).find((o) => o.value === value);
+    return <div>{selectedOption?.label}</div>;
+  }
+
+  return (
+    <span aria-placeholder={placeholder} className={styles.placeholder}>
+      {readOnly ? "" : placeholder || ""}
+    </span>
+  );
+};
+
+// Common trigger actions (clear button + chevron)
+interface SelectTriggerActionsProps {
+  value: ValueType;
+  multiSelect: boolean;
+  enabled: boolean;
+  readOnly: boolean;
+  clearValue: () => void;
+  showChevron?: boolean;
+}
+
+const SelectTriggerActions = ({
+  value,
+  multiSelect,
+  enabled,
+  readOnly,
+  clearValue,
+  showChevron = true,
+}: SelectTriggerActionsProps) => {
+  const hasValue = multiSelect
+    ? Array.isArray(value) && value.length > 0
+    : value !== undefined && value !== null && value !== "";
+
+  return (
+    <div className={styles.actions}>
+      {hasValue && enabled && !readOnly && (
+        <span
+          className={styles.action}
+          onClick={(event) => {
+            event.stopPropagation();
+            clearValue();
+          }}
+        >
+          <Icon name="close" />
+        </span>
+      )}
+      {showChevron && (
+        <span className={styles.action}>
+          <Icon name="chevrondown" />
+        </span>
+      )}
+    </div>
+  );
+};
 
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
@@ -537,67 +524,22 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 )}
                 autoFocus={autoFocus}
               >
-                <>
-                  {multiSelect ? (
-                    Array.isArray(value) && value.length > 0 ? (
-                      <div className={styles.badgeListContainer}>
-                        <div className={styles.badgeList}>
-                          {value.map((v) =>
-                            valueRenderer ? (
-                              valueRenderer(
-                                Array.from(options).find((o) => o.value === `${v}`),
-                                () => {
-                                  toggleOption(v);
-                                },
-                              )
-                            ) : (
-                              <span key={v} className={styles.badge}>
-                                {Array.from(options).find((o) => o.value === `${v}`)?.label}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <span placeholder={placeholder} className={styles.placeholder}>
-                        {placeholder}
-                      </span>
-                    )
-                  ) : value !== undefined && value !== null ? (
-                    <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
-                  ) : (
-                    <span aria-placeholder={placeholder} className={styles.placeholder}>
-                      {placeholder || ""}
-                    </span>
-                  )}
-                  <div className={styles.actions}>
-                    {((multiSelect && Array.isArray(value) && value.length > 0) ||
-                      (!multiSelect && value !== undefined && value !== null && value !== "")) &&
-                      enabled &&
-                      !readOnly && (
-                        <span
-                          className={styles.action}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        >
-                          <Icon name="close" />
-                        </span>
-                      )}
-                    <span className={styles.action}>
-                      <Icon name="chevrondown" />
-                    </span>
-                  </div>
-                </>
+                <SelectTriggerValue
+                  value={value}
+                  placeholder={placeholder}
+                  readOnly={readOnly}
+                  multiSelect={multiSelect}
+                  options={options}
+                  valueRenderer={valueRenderer}
+                  toggleOption={toggleOption}
+                />
+                <SelectTriggerActions
+                  value={value}
+                  multiSelect={multiSelect}
+                  enabled={enabled}
+                  readOnly={readOnly}
+                  clearValue={clearValue}
+                />
               </PopoverTrigger>
               {open && (
                 <Portal container={root}>
@@ -628,7 +570,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                             <div className={styles.loading}>{inProgressNotificationMessage}</div>
                           )}
                           {filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                            <ComboboxOption
+                            <MultiSelectOption
                               key={value}
                               readOnly={readOnly}
                               value={value}
@@ -682,158 +624,3 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     </SelectContext.Provider>
   );
 });
-
-export const ComboboxOption = forwardRef(function Combobox(
-  option: Option & { isHighlighted?: boolean; itemIndex?: number },
-  forwardedRef: ForwardedRef<HTMLDivElement>,
-) {
-  const id = useId();
-  const {
-    label,
-    value,
-    enabled = true,
-    keywords,
-    readOnly,
-    children,
-    isHighlighted = false,
-    itemIndex,
-  } = option;
-  const {
-    value: selectedValue,
-    onChange,
-    multiSelect,
-    setOpen,
-    setSelectedIndex,
-    optionRenderer,
-  } = useSelect();
-  const selected = useMemo(() => {
-    return Array.isArray(selectedValue) && multiSelect
-      ? selectedValue.map((v) => String(v)).includes(value)
-      : String(selectedValue) === String(value);
-  }, [selectedValue, value, multiSelect]);
-
-  const handleClick = () => {
-    if (readOnly) {
-      setOpen(false);
-      return;
-    }
-    if (enabled) {
-      onChange(value);
-    }
-  };
-
-  return (
-    <div
-      id={id}
-      ref={forwardedRef}
-      role="option"
-      aria-disabled={!enabled}
-      aria-selected={isHighlighted}
-      className={classnames(styles.multiComboboxOption, {
-        [styles.disabledOption]: !enabled,
-        [styles.highlighted]: isHighlighted,
-      })}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseEnter={() => {
-        if (itemIndex !== undefined && setSelectedIndex && enabled) {
-          setSelectedIndex(itemIndex);
-        }
-      }}
-      onClick={handleClick}
-      data-state={selected ? "checked" : undefined}
-    >
-      <div className={styles.multiComboboxOptionContent}>
-        {optionRenderer ? (
-          optionRenderer({ label, value, enabled, keywords }, selectedValue as any, false)
-        ) : (
-          <>
-            {children || label}
-            {selected && <Icon name="checkmark" />}
-          </>
-        )}
-      </div>
-    </div>
-  );
-});
-
-const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
-  (option, ref) => {
-    const visibleContentRef = useRef<HTMLDivElement>(null);
-    const { value, label, enabled = true, children, className } = option;
-    const { value: selectedValue, optionRenderer } = useSelect();
-    const { onOptionRemove, onOptionAdd } = useOption();
-
-    const opt: Option = useMemo(() => {
-      return {
-        ...option,
-        label: label ?? "",
-        keywords: [label ?? ""],
-      };
-    }, [option, label]);
-
-    useEffect(() => {
-      onOptionAdd(opt);
-      return () => onOptionRemove(opt);
-    }, [opt, onOptionAdd, onOptionRemove]);
-
-    return (
-      <SelectItem
-        ref={ref}
-        className={classnames(styles.selectItem, className)}
-        value={value}
-        textValue={label}
-        disabled={!enabled}
-        onClick={(event) => {
-          event.stopPropagation();
-        }}
-        data-state={selectedValue === value && "checked"}
-      >
-        {/* SelectItemText is used by SelectValue to display the selected value */}
-        <span style={{ display: "none" }}>
-          <SelectItemText>{label}</SelectItemText>
-        </span>
-        {/* Visible content in the dropdown */}
-        {children ? (
-          <>
-            <div className={styles.selectItemContent} ref={visibleContentRef}>
-              {children}
-            </div>
-            {selectedValue === value && (
-              <SelectItemIndicator className={styles.selectItemIndicator}>
-                <Icon name="checkmark" />
-              </SelectItemIndicator>
-            )}
-          </>
-        ) : optionRenderer ? (
-          <div className={styles.selectItemContent} ref={visibleContentRef}>
-            {optionRenderer(
-              {
-                label,
-                value,
-                enabled,
-              },
-              selectedValue as any,
-              false,
-            )}
-          </div>
-        ) : (
-          <>
-            <div className={styles.selectItemContent} ref={visibleContentRef}>
-              {label}
-            </div>
-            {selectedValue === value && (
-              <SelectItemIndicator className={styles.selectItemIndicator}>
-                <Icon name="checkmark" />
-              </SelectItemIndicator>
-            )}
-          </>
-        )}
-      </SelectItem>
-    );
-  },
-);
-
-SelectOption.displayName = "SelectOption";

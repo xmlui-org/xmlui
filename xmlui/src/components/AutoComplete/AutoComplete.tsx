@@ -1,4 +1,4 @@
-import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+import styles from "./AutoComplete.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -74,7 +74,7 @@ export const AutoCompleteMd = createMetadata({
     },
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
-      `a list item use the \`$item\` context variable.`,
+        `a list item use the \`$item\` context variable.`,
     ),
     emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
@@ -85,9 +85,10 @@ export const AutoCompleteMd = createMetadata({
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
     itemCreated: {
-      description: "This event is triggered when a new item is created by the user " +
+      description:
+        "This event is triggered when a new item is created by the user " +
         "(if `creatable` is enabled).",
-    }
+    },
   },
   apis: {
     focus: {
@@ -113,8 +114,8 @@ export const AutoCompleteMd = createMetadata({
   contextVars: {
     $item: d(
       "This context value represents an item when you define an option item template. " +
-      "Use `$item.value` and `$item.label` to refer to the value and label of the " +
-      "particular option.",
+        "Use `$item.value` and `$item.label` to refer to the value and label of the " +
+        "particular option.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -131,6 +132,8 @@ export const AutoCompleteMd = createMetadata({
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-sm",
     [`borderRadius-${COMP}-badge`]: "$borderRadius",
+    [`paddingHorizontal-item-${COMP}`]: "$space-2",
+    [`paddingVertical-item-${COMP}`]: "$space-2",
     [`paddingHorizontal-${COMP}-badge`]: "$space-2",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
     [`paddingHorizontal-${COMP}`]: "$space-1",
@@ -179,18 +182,18 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
-              return (
-                <MemoizedItem
-                  node={node.props.optionTemplate}
-                  item={item}
-                  context={{
-                    $selectedValue: val,
-                    $inTrigger: inTrigger,
-                  }}
-                  renderChild={renderChild}
-                />
-              );
-            }
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    context={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
             : undefined
         }
       >
