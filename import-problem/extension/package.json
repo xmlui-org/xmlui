@@ -1,0 +1,16 @@
+{
+  "name": "extension",
+  "version": "1.0.0",
+  "description": "Extension package using ES modules",
+  "type": "module",
+  "main": "print.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "core": "file:../core"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
