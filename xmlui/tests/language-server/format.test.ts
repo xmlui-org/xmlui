@@ -1,157 +1,150 @@
-import { describe, test, expect } from 'vitest';
-import { format, type FormatOptions } from '../../src/language-server/services/format';
-import { createXmlUiParser, toDbgString } from '../../src/parsers/xmlui-parser';
+import { describe, test, expect } from "vitest";
+import { format, type FormatOptions } from "../../src/language-server/services/format";
+import { createXmlUiParser, toDbgString } from "../../src/parsers/xmlui-parser";
 
-describe('XML Formatter', () => {
-  function formatFromString(input: string, options: FormatOptions = {tabSize: 2, insertSpaces: true}){
-
-    const parser = createXmlUiParser(input);
-    const { node } = parser.parse();
-    const defaultOptions: FormatOptions = { insertSpaces: true, tabSize: 2, ...options };
-
-    return format(node, parser.getText, defaultOptions);
-  }
-  // Helper function to test idempotency
-  function testIdempotency(input: string, options: FormatOptions = {tabSize: 2, insertSpaces: true}) {
-    const firstFormat = formatFromString(input, options)
-    const secondFormat = formatFromString(firstFormat, options)
-
-    expect(secondFormat).toBe(firstFormat);
-    return firstFormat;
-  }
-
-  describe('Format Options', () => {
-    test('should respect custom indentation', () => {
-      const input = '<Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input, { tabSize: 4, insertSpaces: true});
+describe("XML Formatter", () => {
+  describe("Format Options", () => {
+    test("should respect custom indentation", () => {
+      const input = "<Fragment><Text>Content</Text></Fragment>";
+      const result = testIdempotency(input, { tabSize: 4, insertSpaces: true });
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
     <Text>
         Content
     </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should respect tab indentation', () => {
-      const input = '<Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input, { tabSize: 4, insertSpaces: false});
+    test("should respect tab indentation", () => {
+      const input = "<Fragment><Text>Content</Text></Fragment>";
+      const result = testIdempotency(input, { tabSize: 4, insertSpaces: false });
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
 \t<Text>
 \t\tContent
 \t</Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
-
   });
 
-  describe('Basic XML Formatting', () => {
-    test('should format simple xmlui fragment', () => {
+  describe("Basic XML Formatting", () => {
+    test("should format simple xmlui fragment", () => {
       const input = '<Fragment><Text testId="textShort" width="200px">Short</Text></Fragment>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text testId="textShort" width="200px">
     Short
   </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should format nested xmlui elements', () => {
-      const input = '<Fragment><Text testId="textShort" width="200px">Short</Text><Text testId="textLong" width="200px" maxLines="2">Long text content</Text></Fragment>';
+    test("should format nested xmlui elements", () => {
+      const input =
+        '<Fragment><Text testId="textShort" width="200px">Short</Text><Text testId="textLong" width="200px" maxLines="2">Long text content</Text></Fragment>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text testId="textShort" width="200px">
     Short
   </Text>
   <Text testId="textLong" width="200px" maxLines="2">
     Long text content
   </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should preserve text content', () => {
-      const input = '<Text>Though this long text does not fit into a single line, please do not break it!</Text>';
+    test("should preserve text content", () => {
+      const input =
+        "<Text>Though this long text does not fit into a single line, please do not break it!</Text>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Text>
+        `<Text>
   Though this long text does not fit into a single line, please do not break it!
-</Text>`);
+</Text>`,
+      );
     });
 
-    test('should format self-closing tags', () => {
+    test("should format self-closing tags", () => {
       const input = '<Fragment><Input type="text"/><Button/></Fragment>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Input type="text" />
   <Button />
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should format key-only attribue', () => {
+    test("should format key-only attribue", () => {
       const input = '<Fragment><Input type="text" enabled/><Button/></Fragment>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Input type="text" enabled />
   <Button />
-</Fragment>`);
+</Fragment>`,
+      );
     });
   });
 
-  describe('CDATA Handling', () => {
-    test('should preserve CDATA sections', () => {
-      const input = '<Fragment><Text><![CDATA[Some <special> content & more]]></Text></Fragment>';
+  describe("CDATA Handling", () => {
+    test("should preserve CDATA sections", () => {
+      const input = "<Fragment><Text><![CDATA[Some <special> content & more]]></Text></Fragment>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text>
     <![CDATA[Some <special> content & more]]>
   </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should format XML with multiple CDATA sections', () => {
-      const input = '<Fragment><Text><![CDATA[First CDATA]]></Text><Text><![CDATA[Second CDATA with <tags>]]></Text></Fragment>';
+    test("should format XML with multiple CDATA sections", () => {
+      const input =
+        "<Fragment><Text><![CDATA[First CDATA]]></Text><Text><![CDATA[Second CDATA with <tags>]]></Text></Fragment>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text>
     <![CDATA[First CDATA]]>
   </Text>
   <Text>
     <![CDATA[Second CDATA with <tags>]]>
   </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should handle CDATA with special characters', () => {
-      const input = '<Text><![CDATA[Content with & < > " \' characters]]></Text>';
+    test("should handle CDATA with special characters", () => {
+      const input = "<Text><![CDATA[Content with & < > \" ' characters]]></Text>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Text>
+        `<Text>
   <![CDATA[Content with & < > " ' characters]]>
-</Text>`);
+</Text>`,
+      );
     });
   });
 
-
-  describe('comments', () => {
-    test('single comment #1', () => {
-      const input =
-`<<!--c-->n attr="val" attr2>
+  describe("comments", () => {
+    test("single comment #1", () => {
+      const input = `<<!--c-->n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -161,18 +154,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`< <!--c--> n attr="val" attr2>
+        `< <!--c--> n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #2', () => {
-      const input =
-`<n<!--c--> attr="val" attr2>
+    test("single comment #2", () => {
+      const input = `<n<!--c--> attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -182,18 +175,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n <!--c--> attr="val" attr2>
+        `<n <!--c--> attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #3', () => {
-      const input =
-`<n attr<!--c-->="val" attr2>
+    test("single comment #3", () => {
+      const input = `<n attr<!--c-->="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -203,18 +196,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr <!--c--> ="val" attr2>
+        `<n attr <!--c--> ="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #4', () => {
-      const input =
-`<n attr=<!--c-->"val" attr2>
+    test("single comment #4", () => {
+      const input = `<n attr=<!--c-->"val" attr2>
   text1
   <n2
     attr3="val2"
@@ -224,18 +217,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr= <!--c--> "val" attr2>
+        `<n attr= <!--c--> "val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #5', () => {
-      const input =
-`<n attr="val"<!--c--> attr2>
+    test("single comment #5", () => {
+      const input = `<n attr="val"<!--c--> attr2>
   text1
   <n2
     attr3="val2"
@@ -245,18 +238,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" <!--c--> attr2>
+        `<n attr="val" <!--c--> attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #6', () => {
-      const input =
-`<n attr="val" attr2<!--c-->>
+    test("single comment #6", () => {
+      const input = `<n attr="val" attr2<!--c-->>
   text1
   <n2
     attr3="val2"
@@ -266,18 +259,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2 <!--c-->>
+        `<n attr="val" attr2 <!--c-->>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #7', () => {
-      const input =
-`<n attr="val" attr2><!--c-->
+    test("single comment #7", () => {
+      const input = `<n attr="val" attr2><!--c-->
   text1
   <n2
     attr3="val2"
@@ -287,19 +280,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   <!--c-->
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #8', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #8", () => {
+      const input = `<n attr="val" attr2>
   <!--c-->text1
   <n2
     attr3="val2"
@@ -309,18 +302,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   <!--c-->text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #9', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #9", () => {
+      const input = `<n attr="val" attr2>
   text1<!--c-->
   <n2
     attr3="val2"
@@ -330,18 +323,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1 <!--c-->
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #10', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #10", () => {
+      const input = `<n attr="val" attr2>
   text1
   <!--c--><n2
     attr3="val2"
@@ -351,19 +344,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <!--c-->
   <n2
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #11', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #11", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2<!--c-->
     attr3="val2"
@@ -373,19 +366,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     <!--c-->
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #12', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #12", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     <!--c-->attr3="val2"
@@ -395,19 +388,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     <!--c-->
     attr3="val2"
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #13', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #13", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"<!--c-->
@@ -417,19 +410,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     <!--c-->
     attr4 />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #14', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #14", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -439,19 +432,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4
     <!--c--> />
   text2
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #15', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #15", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -461,19 +454,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
   <!--c-->
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #16', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #16", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -484,19 +477,19 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
   <!--c-->
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment #17', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #17", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -506,18 +499,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n> <!--c-->`);
+</n> <!--c-->`,
+      );
     });
 
-    test('single comment #19', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #19", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -527,18 +520,18 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</ <!--c--> n>`);
+</ <!--c--> n>`,
+      );
     });
 
-    test('single comment #20', () => {
-      const input =
-`<n attr="val" attr2>
+    test("single comment #20", () => {
+      const input = `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
@@ -548,33 +541,33 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2>
+        `<n attr="val" attr2>
   text1
   <n2
     attr3="val2"
     attr4 />
   text2
-</n <!--c-->>`);
+</n <!--c-->>`,
+      );
     });
 
-    test('single comment between tags does not break line', () => {
-      const input =
-`<n>
+    test("single comment between tags does not break line", () => {
+      const input = `<n>
   <n1 /> <!-- c -->
   <n2 />
 </n>`;
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n>
+        `<n>
   <n1 /> <!-- c -->
   <n2 />
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment between tags keeps linebreak', () => {
-      const input =
-`<n>
+    test("single comment between tags keeps linebreak", () => {
+      const input = `<n>
   <n1 />
 <!-- c -->
   <n2 />
@@ -582,48 +575,50 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n>
+        `<n>
   <n1 />
   <!-- c -->
   <n2 />
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment as the only content in tag', () => {
-      const input =`<n> <!-- c --> </n>`;
+    test("single comment as the only content in tag", () => {
+      const input = `<n> <!-- c --> </n>`;
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n>
+        `<n>
   <!-- c -->
-</n>`);
+</n>`,
+      );
     });
 
-    test('single comment, error node in before attributes', () => {
-          const input =
-    `<n attr="val" <!-- long, long commonet long, long commonet long, long commonet long, long commonet --> attr2 ? ></n2>`;
-          const result = testIdempotency(input);
+    test("single comment, error node in before attributes", () => {
+      const input = `<n attr="val" <!-- long, long commonet long, long commonet long, long commonet long, long commonet --> attr2 ? ></n2>`;
+      const result = testIdempotency(input);
 
-          expect(result).toEqual(
-`<n
+      expect(result).toEqual(
+        `<n
   attr="val"
   <!-- long, long commonet long, long commonet long, long commonet long, long commonet -->
-  attr2 ?></n2>`);
-        });
+  attr2 ?></n2>`,
+      );
+    });
 
     test("single comment before ':' in tag name ", () => {
-      const input =`<ns<!-- c -->:n attr="val" />`;
+      const input = `<ns<!-- c -->:n attr="val" />`;
       const result = testIdempotency(input);
 
       expect(result).toEqual(`<ns <!-- c --> :n attr="val" />`);
-    })
+    });
 
     test("single comment after ':' in tag name ", () => {
-      const input =`<ns:<!-- c -->n attr="val" />`;
+      const input = `<ns:<!-- c -->n attr="val" />`;
       const result = testIdempotency(input);
 
       expect(result).toEqual(`<ns: <!-- c --> n attr="val" />`);
-    })
+    });
 
     test("single comment before ':' in attr name", () => {
       const input = `<n ns<!-- c -->:attr="val" />`;
@@ -639,45 +634,46 @@ describe('XML Formatter', () => {
       expect(result).toEqual(`<n ns: <!-- c --> attr="val" />`);
     });
 
-    test('should handle comments before eof', () => {
+    test("should handle comments before eof", () => {
       const input = `<Fragment><Text>Content</Text></Fragment>
         <!-- This is a comment -->`;
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text>
     Content
   </Text>
 </Fragment>
-<!-- This is a comment -->`);
+<!-- This is a comment -->`,
+      );
     });
-
   });
-  describe('Edge Cases', () => {
-    test('should handle empty string', () => {
-      const result = testIdempotency('');
+  describe("Edge Cases", () => {
+    test("should handle empty string", () => {
+      const result = testIdempotency("");
       expect(result).toEqual("");
     });
 
-    test('should handle whitespace-only string', () => {
-      const result = testIdempotency('   \n  \t  ', );
+    test("should handle whitespace-only string", () => {
+      const result = testIdempotency("   \n  \t  ");
       expect(result).toEqual("");
     });
 
-    test('should handle single self-closing tag', () => {
+    test("should handle single self-closing tag", () => {
       const input = '<Input type="text"/>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(`<Input type="text" />`);
     });
 
-    test('should handle deeply nested elements', () => {
-      const input = '<Fragment><Container><Section><Text>Deep content</Text></Section></Container></Fragment>';
+    test("should handle deeply nested elements", () => {
+      const input =
+        "<Fragment><Container><Section><Text>Deep content</Text></Section></Container></Fragment>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Container>
     <Section>
       <Text>
@@ -685,26 +681,28 @@ describe('XML Formatter', () => {
       </Text>
     </Section>
   </Container>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should handle mixed content', () => {
-      const input = '<Text>Before<Bold>bold</Bold>After</Text>';
+    test("should handle mixed content", () => {
+      const input = "<Text>Before<Bold>bold</Bold>After</Text>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Text>
+        `<Text>
   Before
   <Bold>
     bold
   </Bold>
   After
-</Text>`);
+</Text>`,
+      );
     });
   });
 
-  describe('Real-world xmlui Examples', () => {
-    test('should format typical xmlui component', () => {
+  describe("Real-world xmlui Examples", () => {
+    test("should format typical xmlui component", () => {
       const input = `<Fragment>
   <Text testId="textShort" width="200px">Short</Text>
   <Text testId="textLong" width="200px" maxLines="2">
@@ -715,50 +713,56 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Text testId="textShort" width="200px">
     Short
   </Text>
   <Text testId="textLong" width="200px" maxLines="2">
     Though this long text does not fit into a single line, please do not break it!
   </Text>
-</Fragment>`);
+</Fragment>`,
+      );
     });
 
-    test('should format long attribute list in paired tag', () => {
-      const input = '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick">Submit</Button>';
+    test("should format long attribute list in paired tag", () => {
+      const input =
+        '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick">Submit</Button>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Button
+        `<Button
   testId="submitBtn"
   variant="primary"
   size="large"
   disabled="false"
   onClick="handleClick">
   Submit
-</Button>`);
+</Button>`,
+      );
     });
 
-    test('should format long attribute list in self-closing tag', () => {
-      const input = '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick"/>';
+    test("should format long attribute list in self-closing tag", () => {
+      const input =
+        '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick"/>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Button
+        `<Button
   testId="submitBtn"
   variant="primary"
   size="large"
   disabled="false"
-  onClick="handleClick" />`);
+  onClick="handleClick" />`,
+      );
     });
 
-    test('should format complex xmlui layout', () => {
-      const input = '<Fragment><Header><Title>Page Title</Title></Header><Main><Section><Text>Content</Text><Button>Action</Button></Section></Main><Footer><Text>Footer content</Text></Footer></Fragment>';
+    test("should format complex xmlui layout", () => {
+      const input =
+        "<Fragment><Header><Title>Page Title</Title></Header><Main><Section><Text>Content</Text><Button>Action</Button></Section></Main><Footer><Text>Footer content</Text></Footer></Fragment>";
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<Fragment>
+        `<Fragment>
   <Header>
     <Title>
       Page Title
@@ -779,7 +783,30 @@ describe('XML Formatter', () => {
       Footer content
     </Text>
   </Footer>
-</Fragment>`);
+</Fragment>`,
+      );
     });
   });
 });
+
+function formatFromString(
+  input: string,
+  options: FormatOptions = { tabSize: 2, insertSpaces: true },
+) {
+  const parser = createXmlUiParser(input);
+  const { node } = parser.parse();
+  const defaultOptions: FormatOptions = { insertSpaces: true, tabSize: 2, ...options };
+
+  return format(node, parser.getText, defaultOptions);
+}
+// Helper function to test idempotency
+function testIdempotency(
+  input: string,
+  options: FormatOptions = { tabSize: 2, insertSpaces: true },
+) {
+  const firstFormat = formatFromString(input, options);
+  const secondFormat = formatFromString(firstFormat, options);
+
+  expect(secondFormat).toBe(firstFormat);
+  return firstFormat;
+}
