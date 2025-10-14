@@ -1,14 +1,11 @@
 import { describe, expect, it } from "vitest";
-import {
-  handleCompletion,
-  handleCompletionResolve,
-} from "../../src/language-server/services/completion";
-import { createXmlUiParser, toDbgString } from "../../src/parsers/xmlui-parser";
+import { handleCompletion, handleCompletionResolve } from "../../src/language-server/services/completion";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
 import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
 import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
+import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -75,7 +72,6 @@ describe("Completion", () => {
     const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
     const docs = (resolvedItem.documentation as MarkupContent).value;
-    console.log(resolvedItem);
 
     // Here the focus is on the data.metadataAccessInfo.componentName, the label is not so important
     const expected: Partial<CompletionItem> = {
@@ -162,6 +158,18 @@ describe("Completion", () => {
   it("suggest all components if no identifier provided", () => {
     const suggestions = completeAtPoundSign("<><#").map(({ label }) => label);
     expect(suggestions).toStrictEqual(Object.keys(mockMetadata));
+  });
+
+  it("places closing tag after accepting code completion of opened component", () => {
+    const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
+    expect(item.textEdit.newText).toEqual("/Button>");
+  });
+
+  it("don't suggest closing tag if completion item is not the one that has an opened tag", () => {
+    const items = completeAtPoundSign("<Button><#").filter(({ label }) => label !== "/Button");
+    for (const item of items) {
+      expect(item.textEdit).toBeUndefined();
+    }
   });
 });
 
