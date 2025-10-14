@@ -201,6 +201,15 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
    * Search input and dropdown for searchable/multi-select
    */
 
+  .selectContent {
+    z-index: 1000;
+    outline: none;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
+  }
+
   .command {
     width: 100%;
     height: auto;
@@ -218,6 +227,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     width: 100%;
     background-color: transparent;
     outline: none;
+    padding: t.$space-2;
 
     &:disabled {
       cursor: not-allowed;
@@ -233,15 +243,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 
   .commandList {
     width: 100%;
-    position: absolute;
-    overflow: hidden;
-    top: t.$space-1;
-    z-index: 999;
-    outline: none;
-    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
-    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
-    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
-    animation: fade-in 0.3s ease-in-out;
+    overflow: auto;
   }
 
   /**
@@ -264,13 +266,17 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
       justify-content: space-between;
     }
 
-    &[aria-selected="true"],
-    &:hover {
+    &[aria-selected="true"] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    &:hover,
+    &.highlighted {
       background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
     }
 
     &[data-selected=true] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
     }
 
     &[aria-disabled="true"],
