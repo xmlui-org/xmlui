@@ -96,7 +96,10 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     }
 
     .placeholder {
-      flex: 1;
+      flex:1;
+      display: flex;
+      justify-content: start;
+      align-items: center;
       color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
     }
   }
@@ -112,10 +115,6 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   /**
    * Common trigger value and actions
    */
-  .placeholder {
-    display: block;
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-  }
 
   .actions {
     display: flex;

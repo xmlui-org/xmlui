@@ -50,7 +50,7 @@ export const MultiSelectOption = forwardRef<
       ref={forwardedRef}
       role="option"
       aria-disabled={!enabled}
-      aria-selected={isHighlighted}
+      aria-selected={selected}
       className={classnames(styles.multiSelectOption, {
         [styles.disabledOption]: !enabled,
         [styles.highlighted]: isHighlighted,

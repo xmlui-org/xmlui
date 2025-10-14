@@ -193,12 +193,13 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
     transition: background-color 0.2s ease;
     background-color: createThemeVar("backgroundColor-item-#{$component}");
 
-    &:hover {
-      background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
-    }
-
     &[aria-selected="true"] {
       background-color: createThemeVar("backgroundColor-item-#{$component}--active");
+    }
+
+    &:hover,
+    &.highlighted {
+      background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
     }
 
     &[aria-disabled="true"],

@@ -152,13 +152,13 @@ const SelectTriggerValue = ({
   // Single select
   if (value !== undefined && value !== null && value !== "") {
     const selectedOption = Array.from(options).find((o) => o.value === value);
-    return <div>{selectedOption?.label}</div>;
+    return <div className={styles.selectValue}>{selectedOption?.label}</div>;
   }
 
   return (
-    <span aria-placeholder={placeholder} className={styles.placeholder}>
+    <div aria-placeholder={placeholder} className={styles.placeholder}>
       {readOnly ? "" : placeholder || ""}
-    </span>
+    </div>
   );
 };
 
