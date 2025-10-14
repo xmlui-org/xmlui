@@ -404,12 +404,12 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
     outline: none;
     justify-content: space-between;
 
-    &[data-highlighted] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-    }
-
     &[data-state=checked] {
       background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    &[data-highlighted] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
     }
 
     .selectOptionContent {
