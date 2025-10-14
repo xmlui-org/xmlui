@@ -459,7 +459,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       <OptionContext.Provider value={optionContextValue}>
         <OptionTypeProvider Component={HiddenOption}>
           <Popover
-            open={true}
+            open={open}
             onOpenChange={(isOpen) => {
               if (readOnly) return;
               setOpen(isOpen);
@@ -585,7 +585,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 </div>
               </div>
             </PopoverTrigger>
-            {true && (
+            {open && (
               <Portal container={root}>
                 <PopoverContent
                   style={{ width, height: dropdownHeight }}
@@ -695,7 +695,6 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
     value,
     label,
     enabled = true,
-    keywords,
     readOnly,
     children,
     isHighlighted = false,

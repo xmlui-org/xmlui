@@ -1,4 +1,4 @@
-import type { CSSProperties, ForwardedRef, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useMemo } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
@@ -22,7 +22,7 @@ interface SimpleSelectProps {
   value: SingleValueType;
   onValueChange: (selectedValue: SingleValueType) => void;
   id: string;
-  style: React.CSSProperties;
+  style: CSSProperties;
   className?: string;
   onFocus: () => void;
   onBlur: () => void;

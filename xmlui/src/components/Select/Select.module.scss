@@ -99,6 +99,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
       flex: 1;
       color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
     }
+
   }
 
   .selectTrigger>span {

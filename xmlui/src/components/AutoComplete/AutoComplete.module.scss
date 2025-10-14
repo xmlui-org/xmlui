@@ -14,7 +14,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
 
-// --- CSS properties of a particular Select variant
+// --- CSS properties of a particular AutoComplete variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$component}-#{$variantName}");
   border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}");
