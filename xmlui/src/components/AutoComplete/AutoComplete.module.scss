@@ -177,6 +177,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
     top: t.$space-1;
     z-index: 999;
     outline: none;
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
     border: createThemeVar("Input:borderWidth-menu-#{$component}") solid createThemeVar("Input:borderColor-menu-#{$component}");
     background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
     box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
