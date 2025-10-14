@@ -1,4 +1,4 @@
-import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+import styles from "./AutoComplete.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -74,7 +74,7 @@ export const AutoCompleteMd = createMetadata({
     },
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
-      `a list item use the \`$item\` context variable.`,
+        `a list item use the \`$item\` context variable.`,
     ),
     emptyListTemplate: dComponent(
       "This property defines the template to display when the list of options is empty.",
@@ -85,9 +85,10 @@ export const AutoCompleteMd = createMetadata({
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
     itemCreated: {
-      description: "This event is triggered when a new item is created by the user " +
+      description:
+        "This event is triggered when a new item is created by the user " +
         "(if `creatable` is enabled).",
-    }
+    },
   },
   apis: {
     focus: {
@@ -113,32 +114,37 @@ export const AutoCompleteMd = createMetadata({
   contextVars: {
     $item: d(
       "This context value represents an item when you define an option item template. " +
-      "Use `$item.value` and `$item.label` to refer to the value and label of the " +
-      "particular option.",
+        "Use `$item.value` and `$item.label` to refer to the value and label of the " +
+        "particular option.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-menu-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
     [`borderColor-menu-${COMP}`]: "$borderColor",
-    [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
-    [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--active",
-    [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
-    [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-sm",
+    [`paddingHorizontal-${COMP}-badge`]: "$space-2_5",
+    [`paddingVertical-${COMP}-badge`]: "$space-0_5",
     [`borderRadius-${COMP}-badge`]: "$borderRadius",
-    [`paddingHorizontal-${COMP}-badge`]: "$space-2",
-    [`paddingVertical-${COMP}-badge`]: "$space-1",
-    [`paddingHorizontal-${COMP}`]: "$space-1",
+    [`paddingHorizontal-item-${COMP}`]: "$space-2",
+    [`paddingVertical-item-${COMP}`]: "$space-2",
+    [`paddingHorizontal-${COMP}`]: "$space-2",
     [`paddingVertical-${COMP}`]: "$space-2",
+    [`opacity-text-item-${COMP}--disabled`]: "0.5",
+    [`opacity-${COMP}--disabled`]: "0.5",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
     [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
     [`textColor-${COMP}-badge`]: "$const-color-surface-50",
+    [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
+    [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
+    [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
+    // Default borderColor-Input--disabled is too light so the disabled component is barely visible
+    [`borderColor-${COMP}--disabled`]: "initial",
   },
 });
 
@@ -179,18 +185,18 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
-              return (
-                <MemoizedItem
-                  node={node.props.optionTemplate}
-                  item={item}
-                  context={{
-                    $selectedValue: val,
-                    $inTrigger: inTrigger,
-                  }}
-                  renderChild={renderChild}
-                />
-              );
-            }
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    context={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
             : undefined
         }
       >

@@ -676,7 +676,7 @@ function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps)
       }}
       onClick={handleClick}
       role="option"
-      aria-selected={isHighlighted}
+      aria-selected={false}
     >
       {`Create "${searchTerm}"`}
     </div>
@@ -695,7 +695,6 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
     value,
     label,
     enabled = true,
-    keywords,
     readOnly,
     children,
     isHighlighted = false,
@@ -724,7 +723,7 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
       id={id}
       role="option"
       aria-disabled={!enabled}
-      aria-selected={isHighlighted}
+      aria-selected={selected}
       className={classnames(styles.autoCompleteOption, {
         [styles.disabledOption]: !enabled,
         [styles.highlighted]: isHighlighted,

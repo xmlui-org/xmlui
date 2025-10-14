@@ -12,8 +12,9 @@ $themeVars: (
 $component: "AutoComplete";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
 
-// --- CSS properties of a particular Select variant
+// --- CSS properties of a particular AutoComplete variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$component}-#{$variantName}");
   border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}");
@@ -53,8 +54,6 @@ $themeVars: t.composePaddingVars($themeVars, $component);
     flex-direction: row;
     flex-wrap: wrap;
     @include t.paddingVars($themeVars, $component);
-    min-height: 2.5rem;
-    /* h-12 */
 
     @include variant("default");
 
@@ -172,31 +171,35 @@ $themeVars: t.composePaddingVars($themeVars, $component);
   }
 
   .commandList {
+    width: 100%;
     position: absolute;
     overflow: hidden;
-    top: 0.25rem;
-    z-index: 10;
-    width: 100%;
+    top: t.$space-1;
+    z-index: 999;
     outline: none;
-    background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
     border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
+    border: createThemeVar("Input:borderWidth-menu-#{$component}") solid createThemeVar("Input:borderColor-menu-#{$component}");
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
     box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
     animation: fade-in 0.3s ease-in-out;
-    /* animate-in */
   }
 
   .autoCompleteOption {
-    padding: 0.5rem 1rem;
+    @include t.paddingVars($themeVars, "item-#{$component}");
     display: flex;
-    gap: 1rem;
+    gap: t.$space-1;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     transition: background-color 0.2s ease;
     background-color: createThemeVar("backgroundColor-item-#{$component}");
 
-    &[aria-selected="true"],
-    &:hover {
+    &[aria-selected="true"] {
+      background-color: createThemeVar("backgroundColor-item-#{$component}--active");
+    }
+
+    &:hover,
+    &.highlighted {
       background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
     }
 

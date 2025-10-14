@@ -1,4 +1,4 @@
-import styles from "../Select/Select.module.scss";
+import styles from "./Select.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -39,7 +39,7 @@ export const SelectMd = createMetadata({
     initialValue: dInitialValue(),
     value: {
       description: "This property sets the current value of the component.",
-      isInternal: true  //TODO illesg temp
+      isInternal: true, //TODO illesg temp
     },
     autoFocus: {
       ...dAutoFocus(),
@@ -147,7 +147,7 @@ export const SelectMd = createMetadata({
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
     [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
-    [`textColor-${COMP}-badge`]: "$color-surface-50",
+    [`textColor-${COMP}-badge`]: "$const-color-surface-50",
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
@@ -216,24 +216,24 @@ export const selectComponentRenderer = createComponentRenderer(
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
-              return (
-                <MemoizedItem
-                  node={node.props.optionTemplate}
-                  item={item}
-                  contextVars={{
-                    $selectedValue: val,
-                    $inTrigger: inTrigger,
-                  }}
-                  renderChild={(...args) =>
-                    multiSelect || searchable ? (
-                      renderChild(...args)
-                    ) : (
-                      <SelectItemText>{renderChild(...args)}</SelectItemText>
-                    )
-                  }
-                />
-              );
-            }
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    contextVars={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
+                    renderChild={(...args) =>
+                      multiSelect || searchable ? (
+                        renderChild(...args)
+                      ) : (
+                        <SelectItemText>{renderChild(...args)}</SelectItemText>
+                      )
+                    }
+                  />
+                );
+              }
             : undefined
         }
       >
