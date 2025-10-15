@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { handleCompletion, handleCompletionResolve } from "../../src/language-server/services/completion";
+import {
+  handleCompletion,
+  handleCompletionResolve,
+} from "../../src/language-server/services/completion";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
 import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
 import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
 import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
+import { createDocumentCursor } from "../../src/components-core/xmlui-parser";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -73,13 +77,6 @@ describe("Completion", () => {
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
     const docs = (resolvedItem.documentation as MarkupContent).value;
 
-    // Here the focus is on the data.metadataAccessInfo.componentName, the label is not so important
-    const expected: Partial<CompletionItem> = {
-      kind: CompletionItemKind.Constructor,
-      data: { metadataAccessInfo: { componentName: "Button" } },
-    };
-
-    expect(resolvedItem).toMatchObject(expected);
     expect(docs).toContain(mockMetadata.Button.description);
     expect(docs).toContain(mockMetadata.Button.events.click.description);
     expect(docs).toContain(mockMetadata.Button.props.label.description);
@@ -162,7 +159,21 @@ describe("Completion", () => {
 
   it("places closing tag after accepting code completion of opened component", () => {
     const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
-    expect(item.textEdit.newText).toEqual("/Button>");
+
+    const expected: CompletionItem = {
+      kind: CompletionItemKind.Constructor,
+      data: { metadataAccessInfo: { componentName: "Button" } },
+      label: "/Button",
+      textEdit: {
+        newText: "/Button>",
+        range: {
+          start: { line: 0, character: "<Button><".length },
+          end: { line: 0, character: "<Button><".length },
+        },
+      },
+    };
+
+    expect(item).toMatchObject(expected);
   });
 
   it("don't suggest closing tag if completion item is not the one that has an opened tag", () => {
@@ -183,12 +194,14 @@ function completeAtPoundSign(source: string) {
   }
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
-  const parseResult = parser.parse();
-
-  //console.log(toDbgString(parseResult.node, parser.getText));
 
   return handleCompletion(
-    { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
+    {
+      getText: parser.getText,
+      parseResult: parser.parse(),
+      metaByComp: mockMetadataProvider,
+      offsetToPos: createDocumentCursor(source).offsetToPos,
+    },
     position,
   );
 }
