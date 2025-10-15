@@ -1,17 +1,7 @@
 name: Deploy blog (optimized)
 
-#on:
-#  workflow_dispatch:
-#    inputs:
-#      max_releases:
-#        description: "Maximum number of releases to include in blog"
-#        type: number
-#        required: false
-#        default: 10
 on:
-  push:
-    branches:
-      - captaaint/blog-deploy
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -59,7 +49,6 @@ jobs:
       - run: cd blog && npm run build-optimized
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
