@@ -1,5 +1,5 @@
 import type React from "react";
-import { type CSSProperties, forwardRef, memo, useEffect, useImperativeHandle, useRef } from "react";
+import { type CSSProperties, forwardRef, memo, useEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./IFrame.module.scss";
@@ -34,9 +34,6 @@ export const IFrame = memo(forwardRef(function IFrame(
   ref: React.ForwardedRef<HTMLIFrameElement>,
 ) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Expose the iframe element to parent via ref
-  useImperativeHandle(ref, () => iframeRef.current!, []);
 
   // Register component APIs
   useEffect(() => {

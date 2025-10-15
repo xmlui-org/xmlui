@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { forwardRef, useEffect, useRef, useState, useCallback, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export interface TimerApi {
@@ -103,8 +103,6 @@ export const Timer = forwardRef(function Timer(
   }), [pause, resume, isPaused, isRunning]);
 
   // Register both APIs together
-  useImperativeHandle(forwardedRef, () => timerApi as TimerApi & HTMLDivElement, [timerApi]);
-  
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi(timerApi);

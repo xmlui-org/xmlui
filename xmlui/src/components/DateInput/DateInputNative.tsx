@@ -3,7 +3,6 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -590,8 +589,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   }, [day, month, year]);
 
   // Component API registration
-  useImperativeHandle(ref, () => dateInputRef.current as HTMLDivElement);
-
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({

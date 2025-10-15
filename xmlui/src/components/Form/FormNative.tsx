@@ -6,7 +6,6 @@ import {
   forwardRef,
   type ReactNode,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useReducer,
   useRef,
@@ -312,7 +311,6 @@ const Form = forwardRef(function (
   ref: ForwardedRef<HTMLFormElement>,
 ) {
   const formRef = useRef<HTMLFormElement>(null);
-  useImperativeHandle(ref, () => formRef.current!);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
 
