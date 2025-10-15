@@ -1,4 +1,4 @@
-# XMLUI Standalone Rendering Architecture
+# Standalone Rendering Architecture
 
 This document provides comprehensive documentation of XMLUI's standalone app architecture for developers working on the XMLUI core framework. It covers the complete rendering pipeline from app bootstrapping through component rendering, explaining how XMLUI source files (.xmlui, .xmlui.xs) are transformed into running React applications.
 
