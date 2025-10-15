@@ -142,6 +142,56 @@ describe("XML Formatter", () => {
     });
   });
 
+  describe("newlines", () => {
+    test("keeps single blank line", () => {
+      const result = testIdempotency("<A>\n\n</A>");
+      expect(result).toEqual(`<A>\n\n</A>`);
+    });
+
+    test("converts single whitespace only line to blank line", () => {
+      const result = testIdempotency("<A>\n   \n</A>");
+      expect(result).toEqual(`<A>\n\n</A>`);
+    });
+
+    test("keeps comment only line", () => {
+      const result = testIdempotency(`<A>
+
+  <!--c-->
+
+</A>`);
+      expect(result).toEqual(`<A>
+
+  <!--c-->
+
+</A>`);
+    });
+
+    test("collapses multiple blank lines around comment only line", () => {
+      const result = testIdempotency(`<A>
+
+
+  <!--c-->
+
+
+</A>`);
+      expect(result).toEqual(`<A>
+
+  <!--c-->
+
+</A>`);
+    });
+
+    test("collapses multiple blank lines into single one", () => {
+      const result = testIdempotency("<A>\n\n\n</A>");
+      expect(result).toEqual(`<A>\n\n</A>`);
+    });
+
+    test("collapses multiple whitespace only lines into single blank line", () => {
+      const result = testIdempotency("<A>\n    \n  \n</A>");
+      expect(result).toEqual(`<A>\n\n</A>`);
+    });
+  });
+
   describe("comments", () => {
     test("single comment #1", () => {
       const input = `<<!--c-->n attr="val" attr2>
