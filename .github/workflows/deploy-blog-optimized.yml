@@ -62,9 +62,9 @@ jobs:
           DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
 
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2.0.0
+        uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: ./xmlui-optimized-output
+          publish-dir: ./blog/xmlui-optimized-output
           production-deploy: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
