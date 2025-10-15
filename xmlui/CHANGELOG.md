@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.10.20
+
+### Patch Changes
+
+- 26eac90: fix: Autocomplete handles animations correctly
+- f53edff: Add margin-related theme variables to ContentSeparator
+- 1840916: Add applyIf property to Theme
+- c6be7a3: fix: external animation is now correctly applied to ModalDialogs as well
+- 6aaefaf: Added better error text when rendering FormItem outside of a Form.
+- 28d2585: refactor: Select and AutoComplete components
+- e29a231: The itemLabelWidth value of Form now supports theme variables ($space-\* values).
+- 22162c0: AppState now uses a merge operation to set initialValue
+- e90232b: fix: itemWithLabel - layout issue
+
 ## 0.10.19
 
 ### Patch Changes
