@@ -31,13 +31,7 @@ export function xmlUiMarkupToComponent(source: string, fileId: string | number =
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (errors.length > 0) {
-    const newlinePositions = [];
-    for (let i = 0; i < source.length; ++i) {
-      if (source[i] === "\n") {
-        newlinePositions.push(i);
-      }
-    }
-    const errorsForDisplay = addDisplayFieldsToErrors(errors, source, newlinePositions);
+    const errorsForDisplay = addDisplayFieldsToErrors(errors, source);
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
     return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
   }
@@ -530,33 +524,6 @@ export function errReportModuleErrors(errors: ModuleErrors, fileName: number | s
   return comp;
 }
 
-/**
- * Converts a position in a string to a line and column number.
- * @param offset the offset of the position in the string
- * @param newlinePositions the offsets of the newlines in the string in ascending order
- */
-function offsetToPosition(
-  offset: number,
-  newlinePositions: number[],
-): { line: number; col: number } {
-  let left = 0;
-  let right = newlinePositions.length;
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-
-    if (newlinePositions[mid] < offset) {
-      left = mid + 1;
-    } else {
-      right = mid;
-    }
-  }
-
-  let line = left + 1;
-  let col = left === 0 ? offset + 1 : offset - newlinePositions[left - 1];
-
-  return { line, col };
-}
-
 function getCompoundCompName(node: Node, getText: GetText) {
   const rootTag = node?.children?.[0];
   const rootTagNameTokens = rootTag?.children?.find(
@@ -580,14 +547,11 @@ function getCompoundCompName(node: Node, getText: GetText) {
   return undefined;
 }
 
-function addDisplayFieldsToErrors(
-  errors: ParseError[],
-  source: string,
-  newlinePositions: number[],
-): ErrorForDisplay[] {
+function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorForDisplay[] {
+  const { offsetToPosForDisplay } = createDocumentCursor(source);
   return errors.map((err) => {
-    const { line: errPosLine, col: errPosCol } = offsetToPosition(err.pos, newlinePositions);
-    const { line: contextStartLine } = offsetToPosition(err.contextPos, newlinePositions);
+    const { line: errPosLine, character: errPosCol } = offsetToPosForDisplay(err.pos);
+    const { line: contextStartLine } = offsetToPosForDisplay(err.contextPos);
 
     return {
       ...err,
@@ -597,4 +561,57 @@ function addDisplayFieldsToErrors(
       contextSource: source.substring(err.contextPos, err.contextEnd),
     };
   });
+}
+
+type Position = { line: number; character: number };
+type DocumentCursor = {
+  offsetToPos: (offset: number) => Position;
+  offsetToPosForDisplay: (offset: number) => Position;
+};
+
+export function createDocumentCursor(text: string): DocumentCursor {
+  const newlinePositions = [];
+  for (let i = 0; i < text.length; ++i) {
+    if (text[i] === "\n") {
+      newlinePositions.push(i);
+    }
+  }
+
+  return {
+    offsetToPos,
+    offsetToPosForDisplay,
+  };
+
+  /**
+   * Converts a position in a string to 0 based line and column number.
+   * @param offset the 0 based offset into the string
+   */
+  function offsetToPos(offset: number): Position {
+    let left = 0;
+    let right = newlinePositions.length;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+
+      if (newlinePositions[mid] < offset) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+
+    let col = left === 0 ? offset : offset - newlinePositions[left - 1] - 1;
+
+    return { line: left, character: col };
+  }
+
+  /**
+   * Converts a position in a string to base 1 line and column number.
+   * @param offset the 0 based offset into the string
+   */
+  function offsetToPosForDisplay(offset: number): Position {
+    let pos = offsetToPos(offset);
+    pos.line += 1;
+    pos.character += 1;
+    return pos;
+  }
 }

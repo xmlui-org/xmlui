@@ -108,6 +108,7 @@ export function start(connection: Connection) {
         parseResult: parseResult.parseResult,
         getText: parseResult.getText,
         metaByComp: metadataProvider,
+        offsetToPos: (offset: number) => document.positionAt(offset),
       },
       document.offsetAt(position),
     );
@@ -183,7 +184,7 @@ export function start(connection: Connection) {
     const { parseResult } = parseDocument(document);
     const ctx = {
       parseResult,
-      offsetToPos: (offset) => document.positionAt(offset),
+      offsetToPos: (offset: number) => document.positionAt(offset),
     };
 
     const diagnostics = getDiagnostics(ctx);

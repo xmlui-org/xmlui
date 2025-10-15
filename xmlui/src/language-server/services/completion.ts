@@ -1,4 +1,4 @@
-import type { MarkupContent, CompletionItem } from "vscode-languageserver";
+import type { MarkupContent, CompletionItem, Position } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
@@ -74,10 +74,11 @@ type CompletionContext = {
   parseResult: ParseResult;
   getText: GetText;
   metaByComp: MetadataProvider;
+  offsetToPos: (offset: number) => Position;
 };
 
 export function handleCompletion(
-  { parseResult: { node }, getText, metaByComp }: CompletionContext,
+  { parseResult: { node }, getText, metaByComp, offsetToPos }: CompletionContext,
   position: number,
 ): XmluiCompletionItem[] | null {
   const findRes = findTokenAtPos(node, position);
@@ -106,7 +107,7 @@ export function handleCompletion(
         const compName = getNameFromElement(matchingNode, getText);
         if (!compName) return defaultCompNames;
 
-        const compNameSuggestion = closingComponentCompletionItem(compName, 0);
+        const compNameSuggestion = closingComponentCompletionItem(compName, offsetToPos, position);
         return [compNameSuggestion, ...defaultCompNames.map((c) => ({ ...c, sortText: "1" }))];
       }
       return defaultCompNames;
@@ -306,25 +307,18 @@ function componentCompletionItem(
 
 function closingComponentCompletionItem(
   componentName: string,
-  sortingOrder?: number,
+  offsetToPos: (offset: number) => Position,
+  cursorOffset: number,
 ): XmluiCompletionItem {
-  const sortText =
-    sortingOrder !== undefined &&
-    sortingOrder !== 0 &&
-    sortingOrder !== null &&
-    !isNaN(sortingOrder)
-      ? sortingOrder.toString()
-      : "";
-
-  // TODO
-  const updatedText = /* globals.clientSupports.insertReplaceEdit ? Handle this case : */ {
+  const cursorPos = offsetToPos(cursorOffset);
+  const updatedText = /* TODO globals.clientSupports.insertReplaceEdit ? Handle this case : */ {
     newText: `/${componentName}>`,
-    range: null,
+    range: { start: cursorPos, end: cursorPos },
   };
   return {
     label: `/${componentName}`,
     kind: CompletionItemKind.Constructor,
-    sortText,
+    sortText: "0",
     textEdit: updatedText,
     data: {
       metadataAccessInfo: {
