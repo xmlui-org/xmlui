@@ -60,6 +60,13 @@ const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
+type RuntimeProps = {
+  default?: any;
+  component?: ComponentDef | CompoundComponentDef;
+  file?: string;
+  src?: string;
+}
+
 // --- The properties of the standalone app
 type StandaloneAppProps = {
   // --- The standalone app description (the engine renders this definition)
@@ -73,7 +80,7 @@ type StandaloneAppProps = {
   debugEnabled?: boolean;
 
   // --- The runtime environment of the standalone app (for pre-compiled apps)
-  runtime?: any;
+  runtime?: RuntimeProps;
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
