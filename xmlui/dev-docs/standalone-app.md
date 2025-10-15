@@ -12,7 +12,173 @@ XMLUI supports two distinct deployment modes that determine how source files are
 
 **Buildless Apps** fetch and parse sources at runtime using sophisticated fallback logic, enabling rapid development and deployment without a build step. This approach allows zero-config deployment to any static web server.
 
-Both modes converge on the same rendering pipeline once the app's internal representation is prepared. This section explains the bootstrapping process, architectural differences, and component hierarchy for both deployment modes.
+Both modes converge on the same rendering pipeline once the app's internal representation is prepared. Both use the `StandaloneApp` component as their entry point, but pass different arguments based on how component definitions are resolved.
+
+### Understanding the Modes Through Examples
+
+**Pure Buildless App: xmlui-invoice**
+
+Standalone applications like xmlui-invoice exemplify the buildless approach:
+
+```
+xmlui-invoice/
+  ├── index.html          # Loads xmlui-standalone.umd.js
+  ├── Main.xmlui          # App entry point
+  ├── components/         # Component source files
+  │   ├── InvoiceList.xmlui
+  │   └── InvoiceForm.xmlui
+  └── xmlui/
+      └── 0.9.90.js       # XMLUI runtime
+```
+
+When the browser loads `index.html`, the standalone runtime automatically:
+1. Detects `Main.xmlui` as the entry point
+2. Fetches and parses it at runtime
+3. Discovers referenced components (`InvoiceList`, `InvoiceForm`)
+4. Recursively fetches and parses them from the `components/` directory
+5. Passes `undefined` as the `runtime` parameter to `StandaloneApp`
+
+```typescript
+// From index-standalone.ts (bundled in xmlui-standalone.umd.js)
+startApp(undefined, undefined, Xmlui);
+```
+
+The `StandaloneApp` component's `useStandalone()` hook recognizes the missing runtime and triggers the fallback logic that fetches source files on-demand.
+
+**Built App: The XMLUI Documentation Site**
+
+The documentation site at xmlui.com demonstrates the built approach:
+
+```
+docs/
+  ├── index.html          # Loads bundled JavaScript
+  ├── index.ts            # Entry point with import.meta.glob
+  ├── src/
+  │   └── Main.xmlui      # Source files for development
+  ├── package.json        # Build scripts
+  └── dist/               # Compiled output
+      ├── index.html
+      └── internal/
+          └── chunks/     # Pre-compiled bundles
+```
+
+The `index.ts` entry point uses Vite's `import.meta.glob()` to pre-compile all source files:
+
+```typescript
+// From docs/index.ts
+import { startApp } from "xmlui";
+
+export const runtime = import.meta.glob(`/src/**`, { eager: true });
+startApp(runtime, usedExtensions);
+```
+
+During the build process (`npm run build:docs`):
+1. Vite's xmlui plugin transforms all `.xmlui` files into component definitions
+2. Component definitions are bundled into JavaScript modules
+3. The `runtime` object contains pre-compiled components
+4. `StandaloneApp` receives the populated `runtime` parameter and skips fetching
+
+The resulting `dist/` folder contains optimized bundles that start faster since parsing already happened at build time.
+
+**Hybrid Case: Extension Development**
+
+The build-hello-world-component tutorial shows an interesting hybrid pattern - a **built extension consumed by buildless apps**:
+
+Extension development uses a build step:
+```bash
+npm run build:extension  # Creates dist/xmlui-hello-world.js
+```
+
+But the resulting extension is consumed by buildless standalone apps:
+
+```html
+<!-- Buildless app index.html -->
+<script src="https://unpkg.com/xmlui@latest/dist/standalone/xmlui-standalone.umd.js"></script>
+<script src="xmlui/xmlui-hello-world.js"></script>
+```
+
+The extension package itself is pre-compiled (built), but the app loading it remains buildless. The extension registers its components with `StandaloneApp`'s extension manager, which makes them available to the runtime component discovery system.
+
+### How StandaloneApp Unifies Both Modes
+
+The `startApp()` function is the universal bootstrapping mechanism:
+
+```typescript
+export function startApp(
+  runtime: any,  // Pre-compiled components or undefined
+  extensions: Extension[] | Extension = [],
+  extensionManager: StandaloneExtensionManager = new StandaloneExtensionManager(),
+) {
+  extensionManager.registerExtension(extensions);
+  let rootElement: HTMLElement | null = document.getElementById("root");
+  if (!rootElement) {
+    rootElement = document.createElement("div");
+    rootElement.setAttribute("id", "root");
+    document.body.appendChild(rootElement);
+  }
+  if (!contentRoot) {
+    contentRoot = ReactDOM.createRoot(rootElement);
+  }
+  contentRoot.render(
+    <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
+  );
+  return contentRoot;
+}
+```
+
+The `StandaloneApp` component's internal logic adapts based on what it receives:
+
+**Built Mode (runtime provided):**
+- `mergeAppDefWithRuntime()` extracts pre-compiled definitions
+- No network requests for component source files
+- Immediate rendering pipeline initialization
+
+**Buildless Mode (runtime is undefined):**
+- `useStandalone()` hook detects missing runtime
+- Fetches `Main.xmlui` using `xmlUiMarkupToComponent()`
+- Loads `config.json` for configuration
+- Recursively discovers and loads components via `collectMissingComponents()`
+- Parses both `.xmlui` markup and `.xmlui.xs` code-behind files
+- Assembles `StandaloneAppDescription` for rendering
+
+Both paths converge at the same point: a fully-prepared `StandaloneAppDescription` object passed to `AppRoot` for rendering. The component hierarchy, state management, and rendering pipeline are identical regardless of deployment mode.
+
+### When the Mode is Determined
+
+The built vs buildless decision is made **at project inception**, not during development:
+
+**Creating a standalone app (buildless by design):**
+```bash
+mkdir my-app
+cd my-app
+# Create index.html, Main.xmlui
+# Deploy to any web server
+```
+
+As a standalone app developer, you work exclusively in buildless mode. There is no choice to make - you edit `.xmlui` files, refresh the browser, and see changes immediately.
+
+**Creating an extension (requires build):**
+```bash
+npm init -y
+npm install --save-dev xmlui
+# Extensions must use the build system
+npm run build:extension
+```
+
+Extension developers work in built mode to create distributable packages. The build step compiles TypeScript to JavaScript and packages the extension for consumption by buildless apps.
+
+**Creating a documentation/demo site (architectural decision):**
+```bash
+# Decision point: Do we need HMR and build-time optimization?
+# If yes → built mode (like the docs site)
+# If no → buildless mode (like example apps)
+```
+
+The docs site was architected as a built app to support hot module reloading during development and build-time optimization for production. This decision was made once at project inception.
+
+### Key Takeaway
+
+The mode is inherent to the project type. Standalone app developers never think about builds. Extension developers always use builds. The docs site developers work with builds because that's how the docs site was designed. Once the initial architecture is established, the mode doesn't change.
 
 ### Buildless Apps: Direct Source File Execution
 
