@@ -662,6 +662,34 @@ xmlui build --prod --withHostingMetaFiles
 xmlui zip-dist
 ```
 
+### Quick Reference Table
+
+This table summarizes when to run builds across different contexts:
+
+| Context | Scenario | npm Script | Underlying CLI | When to Run | Comments |
+|---------|----------|------------|---------------|-------------|----------|
+| **docs/** | Editing `.md` files | `npm start` | `xmlui start` | No build - just refresh browser | Markdown files are served directly; dev server provides hot reload for instant feedback |
+| **docs/** | Building docs site | `npm run build:docs` | `xmlui build --buildMode=INLINE_ALL --withMock` | Before deployment | Creates optimized production build with INLINE_ALL mode, downloads latest XMLUI release, generates RSS feed |
+| **docs/** | Preview production build | `npm run preview` | `xmlui preview` | After building | Serves production build locally for testing before deployment |
+| **xmlui/** | Testing component changes | `npm start-test-bed` | `cd src/testing/infrastructure && xmlui start` | Automatic HMR | Runs dev server in `src/testing/infrastructure`; component changes appear instantly via HMR |
+| **xmlui/** | Building framework | `npm run build:xmlui` | `vite build --mode lib` | Before npm publish | Builds library for npm distribution using Vite directly (not xmlui CLI); generates .mjs, .d.ts, and CSS |
+| **xmlui/** | Building standalone | `npm run build:xmlui-standalone` | `vite build --mode standalone` | For CDN/buildless | Creates self-contained UMD bundle for `<script>` tag usage; framework builds itself with Vite directly |
+| **xmlui/** | Generating metadata | `npm run build:xmlui-metadata` | `vite build --mode metadata` | After component changes, before doc generation | Extracts component metadata into `xmlui-metadata.js` for documentation generation and language server autocomplete. This is the source of truth for component APIs, props, and descriptions. Framework uses Vite directly. |
+| **xmlui/** | Full doc generation | `npm run generate-all-docs` | Node scripts (not CLI) | After metadata changes | Runs three scripts: (1) `build:xmlui-metadata` - extracts metadata, (2) `generate-docs` - creates component .md files from metadata, (3) `generate-docs-summaries` - creates overview/summary files. This is the complete pipeline from source code → documentation |
+| **xmlui/** | Compile bin scripts | `npm run build:bin` | `tsc -p tsconfig.bin.json` | After changes to bin/*.ts files | Compiles TypeScript bin scripts (CLI tools) to JavaScript using TypeScript directly; needed when modifying build system or CLI commands |
+| **extension/** | Development | `npm start` | `xmlui start` | Keep running during dev | Runs dev server with HMR for demo app; use with build-watch in separate terminal |
+| **extension/** | Watch mode build | `npm run build-watch` | `xmlui build-lib --watch` | Keep running during dev | Continuously rebuilds extension library on changes; pair with `npm start` for rapid iteration |
+| **extension/** | Building for publish | `npm run build:extension` | `xmlui build-lib` | Before npm publish | Creates distributable library bundle (.mjs, .js, .d.ts, CSS) for npm package |
+| **extension/** | Build demo app | `npm run build:demo` | `xmlui build` | For demo deployment | Builds the demo application (not the extension itself) for hosting |
+| **extension/** | Extract metadata | `npm run build:meta` | `xmlui build-lib --mode=metadata` | For LSP/docs support | Extracts extension component metadata for language server and documentation |
+
+**Key principles:**
+- **Development mode uses HMR** - No manual builds needed when running `xmlui start`
+- **Production requires explicit builds** - Use `xmlui build` or `npm run build:*` scripts
+- **Framework builds itself differently** - XMLUI uses Vite directly (`vite build --mode lib`) instead of the `xmlui` CLI
+- **Extensions use the CLI** - Extension developers use `xmlui build-lib` and `xmlui start`
+- **npm scripts wrap CLI commands** - Convenience shortcuts with project-specific flags
+
 ### Build Optimization Tips
 
 1. **Development:** Use `xmlui start` for instant feedback
