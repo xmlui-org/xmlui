@@ -3,9 +3,6 @@ import React, { useMemo } from "react";
 
 import type { ComponentDef, ParentRenderContext } from "../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
-import type { UploadActionComponent } from "./action/FileUploadAction";
-import type { DownloadActionComponent } from "./action/FileDownloadAction";
-import type { ApiActionComponent } from "../components/APICall/APICall";
 import { parseAttributeValue } from "./script-runner/AttributeValueParser";
 
 type ApiBoundComponentProps = {
