@@ -3,7 +3,6 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -595,8 +594,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   }, [hour, minute, second, amPm, is12HourFormat]);
 
   // Component API registration
-  useImperativeHandle(ref, () => timeInputRef.current as HTMLDivElement);
-
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({
