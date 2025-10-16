@@ -119,185 +119,1218 @@ function Component() {
 
 ---
 
-## `useState` - Local State Management
+## React State Management Patterns
 
-**Purpose:** Manage component-local state that triggers re-renders when updated.
+Fundamental patterns for managing state in React, from local component state to shared state across component trees.
+
+### `useState` - Local State
 
 **Syntax:** `const [state, setState] = useState(initialValue)`
 
-### Basic Usage
-
 ```tsx
-function Counter() {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
-}
+// Basic
+const [count, setCount] = useState(0);
+
+// Functional update (when new state depends on old)
+setCount(prev => prev + 1);
+
+// Lazy initialization (expensive initial state)
+const [data, setData] = useState(() => expensiveComputation());
+
+// Immutable updates
+setUser(prev => ({ ...prev, name }));
+setItems(prev => [...prev, newItem]);
 ```
 
-### Functional Updates
-
-Use functional updates when the new state depends on the previous state. This avoids stale closure issues.
-
-```tsx
-function Counter() {
-  const [count, setCount] = useState(0);
-  
-  const incrementTwice = () => {
-    // ❌ WRONG - Both updates use the same `count` value
-    setCount(count + 1);
-    setCount(count + 1); // Still increments by 1 total
-    
-    // ✅ CORRECT - Each update uses the latest state
-    setCount(prev => prev + 1);
-    setCount(prev => prev + 1); // Increments by 2 total
-  };
-  
-  return <button onClick={incrementTwice}>+2</button>;
-}
-```
-
-### Lazy Initialization
-
-For expensive initial state calculations, pass a function to `useState`. It only runs once on mount.
-
-```tsx
-function ExpensiveComponent() {
-  // ❌ WRONG - Runs on every render
-  const [data, setData] = useState(expensiveComputation());
-  
-  // ✅ CORRECT - Runs only once
-  const [data, setData] = useState(() => expensiveComputation());
-  
-  return <div>{data}</div>;
-}
-```
-
-### Object and Array State
-
-State updates must be immutable. Create new objects/arrays instead of mutating existing ones.
-
-```tsx
-function UserForm() {
-  const [user, setUser] = useState({ name: "", email: "" });
-  const [items, setItems] = useState<string[]>([]);
-  
-  // Update object - spread to create new object
-  const updateName = (name: string) => {
-    setUser(prev => ({ ...prev, name }));
-  };
-  
-  // Update array - use immutable methods
-  const addItem = (item: string) => {
-    setItems(prev => [...prev, item]);
-  };
-  
-  const removeItem = (index: number) => {
-    setItems(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  return <div>...</div>;
-}
-```
-
-### State Batching
-
-React batches multiple state updates in event handlers into a single re-render for performance.
-
-```tsx
-function Form() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  
-  const handleSubmit = () => {
-    // Both updates batched - component re-renders once
-    setName("");
-    setEmail("");
-  };
-  
-  return <form onSubmit={handleSubmit}>...</form>;
-}
-```
-
-### Common Patterns in XMLUI
-
-**Form Input State:**
-```tsx
-function TextInput({ initialValue, onDidChange }: Props) {
-  const [value, setValue] = useState(initialValue || "");
-  
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-    onDidChange?.(newValue);
-  };
-  
-  return <input value={value} onChange={handleChange} />;
-}
-```
-
-**Toggle State:**
-```tsx
-function Collapsible({ children }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <div>
-      <button onClick={() => setIsOpen(prev => !prev)}>
-        {isOpen ? "Collapse" : "Expand"}
-      </button>
-      {isOpen && <div>{children}</div>}
-    </div>
-  );
-}
-```
-
-**Derived State (Avoid):**
-```tsx
-// ❌ WRONG - Redundant state that can be computed
-function SearchList({ items }: Props) {
-  const [query, setQuery] = useState("");
-  const [filtered, setFiltered] = useState(items);
-  
-  useEffect(() => {
-    setFiltered(items.filter(item => item.includes(query)));
-  }, [items, query]);
-}
-
-// ✅ CORRECT - Compute during render
-function SearchList({ items }: Props) {
-  const [query, setQuery] = useState("");
-  const filtered = items.filter(item => item.includes(query));
-}
-```
-
-### When to Use useState
-
-**Use `useState` when:**
-- State is local to a single component
-- State updates are simple (primitives, simple objects)
-- No complex state transitions or validation logic
-
-**Consider alternatives when:**
-- State is shared across components → Use `useContext` or prop drilling
-- State logic is complex → Use `useReducer`
-- State synchronizes with external systems → Use `useEffect` + `useState` or `useSyncExternalStore`
+**Use when:** State is local, updates are simple, no complex transitions.  
+**Consider alternatives:** Multiple components → Context, complex logic → useReducer.
 
 ---
 
-## `useEffect` - Side Effects and Lifecycle
+### `useReducer` - Complex State Logic
+
+**Syntax:** `const [state, dispatch] = useReducer(reducer, initialState)`
+
+```tsx
+type Action = { type: 'increment' } | { type: 'decrement' } | { type: 'reset' };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'increment': return { count: state.count + 1 };
+    case 'decrement': return { count: state.count - 1 };
+    case 'reset': return { count: 0 };
+    default: return state;
+  }
+}
+
+const [state, dispatch] = useReducer(reducer, { count: 0 });
+dispatch({ type: 'increment' });
+```
+
+**With Immer (XMLUI pattern):**
+```tsx
+import produce from 'immer';
+
+const reducer = produce((draft, action) => {
+  switch (action.type) {
+    case 'ADD_TODO':
+      draft.todos.push(action.payload); // Direct mutation
+      break;
+  }
+});
+```
+
+**Use when:** Multiple related state values, complex transitions, want to separate state logic.  
+**Use useState when:** Simple independent values, straightforward updates.
+
+---
+
+### Context API - Avoid Prop Drilling
+
+**Purpose:** Share state across component tree without passing props through every level.
+
+**Pattern:** Create context → Provider component → Custom hook → Consume
+
+```tsx
+// 1. Create context
+const AuthContext = createContext<AuthContext | null>(null);
+
+// 2. Custom hook with validation
+function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
+}
+
+// 3. Provider component
+function AuthProvider({ children }: Props) {
+  const [user, setUser] = useState<User | null>(null);
+  
+  const value = useMemo(() => ({
+    user,
+    login: async (creds: Credentials) => { /* ... */ },
+    logout: () => setUser(null),
+  }), [user]);
+  
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// 4. Consume anywhere in tree
+function Component() {
+  const { user, logout } = useAuth(); // No prop drilling!
+  return <button onClick={logout}>{user.name}</button>;
+}
+```
+
+**XMLUI Example:**
+```tsx
+// AppLayoutContext - Provides layout state to nested navigation
+const AppLayoutContext = createContext<IAppLayoutContext | null>(null);
+
+export const App = forwardRef(function App(props, ref) {
+  const layoutContextValue = useMemo(() => ({
+    layout,
+    navPanelVisible,
+    toggleDrawer,
+  }), [layout, navPanelVisible, toggleDrawer]);
+  
+  return (
+    <AppLayoutContext.Provider value={layoutContextValue}>
+      {content}
+    </AppLayoutContext.Provider>
+  );
+});
+
+// NavLink accesses layout directly
+export const NavLink = forwardRef(function NavLink(props, ref) {
+  const { layout } = useAppLayoutContext();
+  // No prop drilling!
+});
+```
+
+**Use when:** Many nested components need access, >3 levels of prop drilling, global state (theme, auth).  
+**Don't use when:** 1-2 levels of nesting (props fine), high-frequency updates (re-renders all consumers).
+
+**Performance tip:** Split contexts by update frequency - separate user/theme/settings contexts instead of one combined context.
+
+---
+
+### State Lifting
+
+**Pattern:** Move state to common ancestor to share between siblings.
+
+```tsx
+// ❌ WRONG - Siblings can't communicate
+<Parent><InputA /><InputB /></Parent>
+
+// ✅ CORRECT - Lift state to parent
+function Parent() {
+  const [value, setValue] = useState('');
+  return (
+    <>
+      <InputA value={value} onChange={setValue} />
+      <InputB value={value} />
+    </>
+  );
+}
+```
+
+**XMLUI Pattern:** Container-based state flows down automatically:
+```tsx
+<Stack var.selectedId="{null}">
+  <Button onClick={"{() => selectedId = 'item1'}" />
+  <Display value="{selectedId}" />
+</Stack>
+```
+
+**Use when:** Siblings need to coordinate, parent orchestrates behavior.  
+**Don't use when:** State only used by one component, excessive prop drilling (use context).
+
+---
+
+### Controlled vs Uncontrolled Components
+
+**Controlled:** Parent manages state via `value` prop.
+```tsx
+function Controlled({ value, onChange }: Props) {
+  return <input value={value} onChange={e => onChange(e.target.value)} />;
+}
+```
+
+**Uncontrolled:** Component manages own state via `initialValue`.
+```tsx
+function Uncontrolled({ initialValue = '', onDidChange }: Props) {
+  const [value, setValue] = useState(initialValue);
+  return <input value={value} onChange={e => { setValue(e.target.value); onDidChange?.(e.target.value); }} />;
+}
+```
+
+**Hybrid (XMLUI pattern):** Support both modes.
+```tsx
+function Flexible({ value, initialValue = '', onDidChange }: Props) {
+  const [localValue, setLocalValue] = useState(initialValue);
+  
+  useEffect(() => {
+    if (value !== undefined) setLocalValue(value);
+  }, [value]);
+  
+  const handleChange = (e) => {
+    setLocalValue(e.target.value);
+    onDidChange?.(e.target.value);
+  };
+  
+  return <input value={localValue} onChange={handleChange} />;
+}
+```
+
+**Use controlled:** Validate/format input, value affects other UI, programmatic changes.  
+**Use uncontrolled:** Simple forms (read on submit), performance critical.  
+**Use hybrid:** Reusable component libraries.
+
+---
+
+### Compound Components
+
+**Purpose:** Components work together as cohesive unit, sharing state via context.
+
+```tsx
+const TabsContext = createContext<{
+  activeTab: string;
+  setActiveTab: (id: string) => void;
+} | null>(null);
+
+function Tabs({ children }: Props) {
+  const [activeTab, setActiveTab] = useState('tab1');
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      <div className="tabs">{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+function Tab({ id, children }: Props) {
+  const { activeTab, setActiveTab } = useContext(TabsContext)!;
+  return (
+    <button
+      className={activeTab === id ? 'active' : ''}
+      onClick={() => setActiveTab(id)}
+    >
+      {children}
+    </button>
+  );
+}
+
+Tabs.Tab = Tab;
+Tabs.Panel = TabPanel;
+
+// Usage - Flexible composition
+<Tabs>
+  <Tabs.Tab id="tab1">First</Tabs.Tab>
+  <Tabs.Tab id="tab2">Second</Tabs.Tab>
+  <Tabs.Panel id="tab1">Content 1</Tabs.Panel>
+  <Tabs.Panel id="tab2">Content 2</Tabs.Panel>
+</Tabs>
+```
+
+**Use when:** Tightly coupled components (tabs, accordion), need flexible composition, building libraries.  
+**Don't use when:** Simple parent-child, no shared state, prop drilling is simple.
+
+---
+
+### Advanced Patterns
+
+**Provider Composition:**
+```tsx
+function AppProviders({ children }: Props) {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider>
+          {children}
+        </RouterProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+**Async Initialization:**
+```tsx
+function AuthProvider({ children }: Props) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    checkAuth().then(user => { setUser(user); setLoading(false); });
+  }, []);
+  
+  if (loading) return <LoadingScreen />;
+  return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
+}
+```
+
+**Reducer with Immer (XMLUI):**
+```tsx
+// StateContainer reducer
+export function createContainerReducer(debugView: IDebugViewContext) {
+  return produce((state: ContainerState, action: ContainerAction) => {
+    switch (action.type) {
+      case ContainerActionKind.COMPONENT_STATE_CHANGED:
+        state[uid] = { ...state[uid], ...action.payload.state };
+        break;
+    }
+  });
+}
+```
+
+---
+
+## React Performance Optimization Patterns
+
+This section covers React's performance optimization tools and patterns. **Always profile before optimizing**—premature optimization adds complexity without real benefits.
+
+### Core Optimization Hooks
+
+#### `useMemo` - Computation Caching
+
+Cache expensive calculations between renders.
+
+```tsx
+const filtered = useMemo(() => 
+  items.filter(item => item.includes(filter)), 
+  [items, filter]
+);
+```
+
+**Use when:** Computation is expensive (>10ms), creating objects/arrays for memoized children, or calculations in dependency arrays.  
+**Don't use when:** Computation is cheap (<1ms), result used only once, or component rarely re-renders.
+
+#### `useCallback` - Function Caching
+
+Cache function definitions to prevent child re-renders.
+
+```tsx
+const handleClick = useCallback(() => {
+  doSomething(value);
+}, [value]);
+```
+
+**Use when:** Passing callbacks to memoized children or to dependency arrays.  
+**Don't use when:** Function isn't passed to memoized components or deps arrays.
+
+**Note:** `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`.
+
+#### `useTransition` - Non-Urgent Updates
+
+Mark state updates as low-priority to keep UI responsive.
+
+```tsx
+const [isPending, startTransition] = useTransition();
+
+startTransition(() => {
+  setExpensiveState(newValue); // Won't block UI
+});
+```
+
+**Use when:** Updating expensive state that doesn't need immediate feedback (filtering large lists, complex calculations).
+
+#### `memo` - Component Memoization
+
+Prevent re-renders when props haven't changed.
+
+```tsx
+const MemoChild = memo(function MemoChild({ data }: Props) {
+  return <div>{data.value}</div>;
+});
+```
+
+**Use when:** Component renders frequently with same props, has expensive rendering, or is in large lists.  
+**Don't use when:** Component rarely re-renders, props change every render, or rendering is cheap.
+
+**Important:** `memo` only works if props are stable. Use `useMemo`/`useCallback` for object/function props.
+
+---
+
+### Memoization Strategy Pattern
+
+**Principle:** `memo` + `useMemo` + `useCallback` work together. `memo` prevents re-renders, but only if props stay stable. Use `useMemo`/`useCallback` to keep props stable.
+
+#### The Memoization Cascade
+
+```tsx
+// ❌ ANTI-PATTERN - memo without stable props
+const Child = memo(({ data, onClick }: Props) => <div onClick={onClick}>{data.value}</div>);
+
+function Parent() {
+  return <Child data={{ value: 123 }} onClick={() => {}} />; // New refs every render!
+}
+
+// ✅ CORRECT - memo with stable props
+function Parent() {
+  const data = useMemo(() => ({ value: 123 }), []);
+  const onClick = useCallback(() => console.log('clicked'), []);
+  return <Child data={data} onClick={onClick} />;
+}
+```
+
+#### Decision Tree
+
+1. **Performance problem?** No → Don't optimize. Yes → Step 2.
+2. **What's the cause?**
+   - Parent re-renders often → Use `memo()` on child
+   - Expensive computation → Use `useMemo()` on calculation  
+   - New function props → Use `useCallback()` on function
+3. **Passing objects/arrays/functions to memoized component?** Yes → Memoize those too.
+
+#### Common Patterns
+
+```tsx
+// Pattern 1: Context values
+const contextValue = useMemo(() => ({
+  state,
+  setState,
+  isLoading: state.status === 'loading',
+}), [state]);
+
+// Pattern 2: Event handlers with deps
+const handleSearch = useCallback(() => {
+  if (query.length >= minLength) onSearch(query);
+}, [query, minLength, onSearch]);
+
+// Pattern 3: Expensive selectors
+const filteredData = useMemo(() => {
+  return data.filter(item => item.name.includes(filter)).sort((a, b) => a.name.localeCompare(b.name));
+}, [data, filter]);
+
+// Pattern 4: Derived state
+const summary = useMemo(() => ({
+  total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+}), [items]);
+```
+
+#### Anti-Patterns
+
+```tsx
+// ❌ Over-memoization
+const greeting = useMemo(() => `Hello, ${name}`, [name]); // Too simple!
+
+// ❌ Incomplete chain
+<MemoChild config={{ theme: 'dark' }} />; // New object defeats memo
+
+// ❌ Unstable dependencies
+useMemo(() => formatUser(user), [user]); // user object recreated every render
+// ✅ Fix: useMemo(() => formatUser(user), [user.id, user.name]);
+```
+
+#### Checklist
+
+**✅ DO memoize:**
+- Components rendering frequently with same props
+- Expensive computations (>10ms)
+- Objects/arrays/functions passed to memoized children
+- Context values
+
+**❌ DON'T memoize:**
+- Cheap operations (<1ms)
+- Values that change every render
+- Without profiling first
+
+---
+
+### Virtualization Pattern
+
+**Purpose:** Render only visible items in large lists by using "windowing." Instead of rendering 10,000 items, render only ~10 visible items.
+
+**Libraries:** XMLUI uses three based on component needs:
+- **react-window** (Tree) - Fixed-size lists, simple API
+- **virtua** (List) - Chat interfaces, reverse scrolling, auto-sizing
+- **@tanstack/react-virtual** (Table) - Dynamic measurements, flexible
+
+**Library Comparison:**
+
+| Feature | react-window | virtua | @tanstack/react-virtual |
+|---------|-------------|--------|------------------------|
+| **Bundle Size** | ~7KB | ~6KB | ~4KB |
+| **API** | Components | Render props | Hooks |
+| **Dynamic heights** | Manual | Automatic | Automatic |
+| **Reverse scroll** | No | ✅ Built-in | Manual |
+| **XMLUI Usage** | Tree | List | Table |
+
+**Basic Example (react-window):**
+
+```tsx
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+
+const Row = memo(({ index, style, data }: ListChildComponentProps) => (
+  <div style={style}>{data.items[index].name}</div>
+));
+
+function VirtualizedList({ items }: Props) {
+  const itemData = useMemo(() => ({ items }), [items]);
+  
+  return (
+    <AutoSizer>
+      {({ height, width }) => (
+        <FixedSizeList
+          height={height}
+          width={width}
+          itemCount={items.length}
+          itemSize={50}
+          itemData={itemData}
+        >
+          {Row}
+        </FixedSizeList>
+      )}
+    </AutoSizer>
+  );
+}
+```
+
+**virtua Example (XMLUI List):**
+
+```tsx
+import { Virtualizer } from 'virtua';
+
+function ChatList({ messages }: Props) {
+  return (
+    <Virtualizer count={messages.length}>
+      {(index) => {
+        const msg = messages[index];
+        return (
+          <div key={msg.id}>
+            <div>{msg.author}</div>
+            <div>{msg.content}</div>
+          </div>
+        );
+      }}
+    </Virtualizer>
+  );
+}
+```
+
+**@tanstack/react-virtual Example:**
+
+```tsx
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+function DataTable({ rows }: Props) {
+  const tableRef = useRef<HTMLDivElement>(null);
+  
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => tableRef.current,
+    estimateSize: () => 30,
+    overscan: 5,
+  });
+  
+  return (
+    <div ref={tableRef} style={{ height: '400px', overflow: 'auto' }}>
+      {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+        <div
+          key={virtualRow.index}
+          ref={(el) => rowVirtualizer.measureElement(el)}
+          style={{ transform: `translateY(${virtualRow.start}px)` }}
+        >
+          {rows[virtualRow.index].content}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+**Critical Rules:**
+1. **Memoize row components** - Use `React.memo()`
+2. **Apply style prop** - Required for positioning (react-window, @tanstack)
+3. **Memoize itemData** - Prevent row re-renders
+4. **Use AutoSizer** - Responsive sizing (react-window only)
+
+**Performance Impact:**
+
+| Items | Normal | Virtualized | Improvement |
+|-------|--------|-------------|-------------|
+| 100 | 50ms | 10ms | 5x faster |
+| 1,000 | 500ms | 10ms | 50x faster |
+| 10,000 | 5s | 10ms | 500x faster |
+
+**When to Use:**
+- ✅ >100 items
+- ✅ Uniform item sizes
+- ✅ Scrollable datasets
+- ❌ <100 items (overhead not worth it)
+- ❌ Already paginated
+- ❌ Complex/unpredictable heights
+
+---
+
+### Rate Limiting: Debouncing and Throttling
+
+**Purpose:** Control the frequency of expensive operations during high-frequency events (user input, scrolling, resizing).
+
+**Key Difference:**
+- **Debouncing**: Wait until activity **stops** (search, autosave)
+- **Throttling**: Execute at **regular intervals** during activity (scroll, mousemove)
+
+```tsx
+// User types "search" continuously
+
+// DEBOUNCING: Executes ONCE after user stops typing
+// Timeline: [type...type...type...STOP] → Execute
+
+// THROTTLING: Executes EVERY 200ms while typing  
+// Timeline: Execute → [200ms] → Execute → [200ms] → Execute...
+```
+
+#### Debouncing Solutions
+
+**1. useDeferredValue (React 18+) - Recommended**
+
+```tsx
+function Search() {
+  const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+  
+  const results = useMemo(() => {
+    if (deferredQuery.length < 2) return [];
+    return performSearch(deferredQuery);
+  }, [deferredQuery]);
+  
+  return (
+    <>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      <ResultsList results={results} />
+    </>
+  );
+}
+```
+
+**2. Custom useDebounce Hook**
+
+```tsx
+function useDebounce<T>(value: T, delay: number = 500): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// Usage
+const debouncedQuery = useDebounce(query, 300);
+```
+
+**3. Lodash debounce**
+
+```tsx
+const debouncedSave = useMemo(
+  () => debounce((text: string) => saveToServer(text), 1000),
+  []
+);
+
+useEffect(() => {
+  return () => debouncedSave.cancel();
+}, [debouncedSave]);
+```
+
+#### Throttling Solutions
+
+**1. Custom useThrottle Hook**
+
+```tsx
+function useThrottle<T extends (...args: any[]) => any>(
+  callback: T,
+  delay: number = 200
+): T {
+  const lastRun = useRef(Date.now());
+  
+  return useCallback((...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastRun.current >= delay) {
+      lastRun.current = now;
+      return callback(...args);
+    }
+  }, [callback, delay]) as T;
+}
+
+// Usage
+const handleScroll = useThrottle(() => {
+  setScrollPos(window.scrollY);
+}, 200);
+```
+
+**2. Lodash throttle**
+
+```tsx
+const throttledScroll = useMemo(
+  () => throttle(() => {
+    updateScrollPosition();
+  }, 200, {
+    leading: true,   // Execute on first call
+    trailing: true   // Execute after interval ends
+  }),
+  []
+);
+
+useEffect(() => {
+  return () => throttledScroll.cancel();
+}, [throttledScroll]);
+```
+
+#### XMLUI Examples
+
+**Debounced Search (Search.tsx):**
+```tsx
+function Search({ data, limit }: Props) {
+  const [inputValue, setInputValue] = useState("");
+  const debouncedValue = useDeferredValue(inputValue);
+  
+  const results = useMemo(() => {
+    if (debouncedValue.length <= 1) return [];
+    return fuse.search(debouncedValue, { limit });
+  }, [debouncedValue, limit]);
+  
+  return (
+    <>
+      <input value={inputValue} onChange={e => setInputValue(e.target.value)} />
+      <SearchResults results={results} />
+    </>
+  );
+}
+```
+
+**Throttled Change Listener (ChangeListenerNative.tsx):**
+```tsx
+function ChangeListener({ listenTo, onChange, throttleWaitInMs = 0 }: Props) {
+  const throttledOnChange = useMemo(() => {
+    if (throttleWaitInMs !== 0 && onChange) {
+      return throttle(onChange, throttleWaitInMs, { leading: true });
+    }
+    return onChange;
+  }, [onChange, throttleWaitInMs]);
+  
+  useEffect(() => {
+    if (throttledOnChange) {
+      throttledOnChange({ prevValue, newValue: listenTo });
+    }
+  }, [listenTo, throttledOnChange]);
+}
+```
+
+**Async Throttle for Validation (misc.ts):**
+```tsx
+function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
+  func: F,
+  wait?: number,
+  options?: ThrottleSettings
+) {
+  const throttled = throttle(
+    (resolve, reject, args: Parameters<F>) => {
+      void func(...args).then(resolve).catch(reject);
+    },
+    wait,
+    options
+  );
+  
+  return (...args: Parameters<F>): ReturnType<F> =>
+    new Promise((resolve, reject) => {
+      throttled(resolve, reject, args);
+    }) as ReturnType<F>;
+}
+```
+
+#### Decision Guide
+
+| Scenario | Solution | Timing |
+|----------|----------|--------|
+| Search input | Debounce | 300ms |
+| Form validation | Debounce | 500ms |
+| Autosave | Debounce | 1000ms |
+| Scroll position | Throttle | 100-200ms |
+| Window resize | Throttle | 200-300ms |
+| Mouse tracking | Throttle | 50-100ms |
+| API rate limiting | Throttle | 500-1000ms |
+
+#### Performance Impact
+
+| Operation | Without | With (300ms) | Improvement |
+|-----------|---------|--------------|-------------|
+| Search (6 chars typed) | 6 API calls | 1 API call | 83% reduction |
+| Scroll (1s) | ~60 events | 5 events | 92% reduction |
+| Window resize | ~30 events | 5 events | 83% reduction |
+
+#### Critical Rules
+
+**1. Always memoize** rate-limited functions:
+```tsx
+// ❌ WRONG - Creates new function every render
+const handle = debounce(() => search(), 500);
+
+// ✅ CORRECT - Memoized
+const handle = useMemo(() => debounce(() => search(), 500), []);
+```
+
+**2. Always cleanup**:
+```tsx
+useEffect(() => {
+  return () => debouncedFn.cancel();
+}, [debouncedFn]);
+```
+
+**3. Don't rate-limit UI state** - only side effects:
+```tsx
+// ❌ WRONG - UI lags
+const handleChange = debounce((e) => setValue(e.target.value), 300);
+
+// ✅ CORRECT - Immediate UI, debounced side effect
+const handleChange = (e) => {
+  setValue(e.target.value); // Instant
+  debouncedSearch(e.target.value); // Delayed
+};
+```
+
+**4. Choose appropriate delays**:
+- Search: 300ms
+- Autosave: 1000ms  
+- Scroll/resize: 100-200ms
+- Mousemove: 50ms
+
+#### When to Use
+
+**Debouncing:**
+- ✅ Search, autosave, validation
+- ✅ Wait for user to finish action
+- ❌ Don't use for immediate feedback
+
+**Throttling:**
+- ✅ Scroll, resize, mousemove
+- ✅ Execute during continuous activity
+- ❌ Don't use when only final value matters
+
+#### Resources
+
+- [useDeferredValue](https://react.dev/reference/react/useDeferredValue) - React 18 docs
+- [lodash.debounce](https://lodash.com/docs/#debounce) - Debounce docs
+- [lodash.throttle](https://lodash.com/docs/#throttle) - Throttle docs
+- [XMLUI Search](packages/xmlui-search/src/Search.tsx) - Production example
+
+---
+
+## React Event Handling Patterns
+
+Patterns for handling user interactions efficiently and correctly in React applications.
+
+### Event Delegation Pattern
+
+**Purpose:** Handle events for multiple children at parent level instead of attaching handlers to each child.
+
+**Benefits:**
+- Fewer event listeners (better memory usage)
+- Works with dynamically added/removed children
+- Simplifies event handler management
+
+```tsx
+// ❌ ANTI-PATTERN - Handler on every item
+function List({ items }: Props) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id} onClick={() => handleClick(item.id)}>
+          {item.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ✅ CORRECT - Single handler on parent
+function List({ items }: Props) {
+  const handleClick = (e: React.MouseEvent<HTMLUListElement>) => {
+    const target = e.target as HTMLElement;
+    const li = target.closest('li');
+    if (li) {
+      const itemId = li.dataset.id;
+      console.log('Clicked item:', itemId);
+    }
+  };
+  
+  return (
+    <ul onClick={handleClick}>
+      {items.map(item => (
+        <li key={item.id} data-id={item.id}>
+          {item.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**XMLUI Example (Tree component):**
+```tsx
+function Tree({ items }: Props) {
+  // Single click handler for entire tree
+  const handleTreeClick = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const treeItem = target.closest('[data-tree-item]');
+    
+    if (treeItem) {
+      const itemId = treeItem.getAttribute('data-item-id');
+      const action = target.getAttribute('data-action');
+      
+      if (action === 'expand') {
+        toggleExpand(itemId);
+      } else if (action === 'select') {
+        selectItem(itemId);
+      }
+    }
+  }, [toggleExpand, selectItem]);
+  
+  return (
+    <div className="tree" onClick={handleTreeClick}>
+      {renderTreeItems(items)}
+    </div>
+  );
+}
+```
+
+**When to use:**
+- Lists with many items (>50)
+- Dynamic children (added/removed frequently)
+- Multiple event types on same children
+- Performance-critical rendering
+
+**When NOT to use:**
+- Few items (<10) - overhead not worth it
+- Need precise event target info
+- Event handler logic is complex per-item
+
+---
+
+### Synthetic Event Pattern
+
+**Purpose:** React wraps native browser events in `SyntheticEvent` for cross-browser consistency.
+
+**Key differences from native events:**
+
+| Feature | Native Event | Synthetic Event |
+|---------|-------------|-----------------|
+| **Type** | Browser-specific | Unified React type |
+| **Pooling (React 16)** | No | Yes (reused) |
+| **Pooling (React 17+)** | No | No (deprecated) |
+| **Properties** | Browser-specific | Normalized |
+| **Access after handler** | ✅ Always available | ⚠️ Nullified (React 16 only) |
+
+**Basic usage:**
+```tsx
+function Input() {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // e is SyntheticEvent, not native Event
+    console.log(e.target.value); // ✅ Works
+    console.log(e.currentTarget); // ✅ Works
+    
+    // Access native event if needed
+    const nativeEvent = e.nativeEvent;
+  };
+  
+  return <input onChange={handleChange} />;
+}
+```
+
+**Event pooling (React 16 only):**
+```tsx
+// ❌ WRONG - Async access (React 16)
+function Bad() {
+  const handleClick = (e: React.MouseEvent) => {
+    setTimeout(() => {
+      console.log(e.target); // null in React 16!
+    }, 1000);
+  };
+  return <button onClick={handleClick}>Click</button>;
+}
+
+// ✅ CORRECT - Persist event (React 16)
+function Good() {
+  const handleClick = (e: React.MouseEvent) => {
+    e.persist(); // Keep event alive
+    setTimeout(() => {
+      console.log(e.target); // ✅ Works
+    }, 1000);
+  };
+  return <button onClick={handleClick}>Click</button>;
+}
+
+// ✅ BETTER - Extract values (React 16 & 17+)
+function Better() {
+  const handleClick = (e: React.MouseEvent) => {
+    const target = e.target; // Capture immediately
+    setTimeout(() => {
+      console.log(target); // ✅ Works in all versions
+    }, 1000);
+  };
+  return <button onClick={handleClick}>Click</button>;
+}
+```
+
+**Note:** React 17+ removed event pooling, so `e.persist()` is no longer needed.
+
+**Common event types:**
+```tsx
+// Mouse events
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {};
+const handleDoubleClick = (e: React.MouseEvent) => {};
+
+// Keyboard events
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === 'Enter') submitForm();
+};
+
+// Form events
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+};
+
+// Focus events
+const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {};
+const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {};
+
+// Clipboard events
+const handleCopy = (e: React.ClipboardEvent) => {};
+const handlePaste = (e: React.ClipboardEvent) => {
+  const text = e.clipboardData.getData('text');
+};
+
+// Drag events
+const handleDragStart = (e: React.DragEvent) => {};
+const handleDrop = (e: React.DragEvent) => {
+  e.preventDefault();
+  const data = e.dataTransfer.getData('text');
+};
+```
+
+**Accessing native event:**
+```tsx
+function Component() {
+  const handleClick = (e: React.MouseEvent) => {
+    // React synthetic event
+    console.log(e.currentTarget); // Element handler is attached to
+    console.log(e.target); // Element that triggered event
+    
+    // Native browser event
+    const nativeEvent = e.nativeEvent;
+    console.log(nativeEvent); // MouseEvent object
+  };
+  
+  return <button onClick={handleClick}>Click</button>;
+}
+```
+
+---
+
+### Event Callback Composition Pattern
+
+**Purpose:** Combine multiple event handlers into a single handler, useful for library components that accept user callbacks.
+
+**Pattern 1: Sequential execution**
+```tsx
+function composeHandlers<E>(...handlers: Array<((e: E) => void) | undefined>) {
+  return (event: E) => {
+    handlers.forEach(handler => {
+      if (handler) {
+        handler(event);
+      }
+    });
+  };
+}
+
+// Usage
+function Button({ onClick, onClickInternal }: Props) {
+  const handleClick = composeHandlers(onClickInternal, onClick);
+  return <button onClick={handleClick}>Click</button>;
+}
+```
+
+**Pattern 2: Conditional execution (stop on preventDefault)**
+```tsx
+function composeEventHandlers<E extends React.SyntheticEvent>(
+  internalHandler?: (e: E) => void,
+  externalHandler?: (e: E) => void
+) {
+  return (event: E) => {
+    internalHandler?.(event);
+    
+    // If internal handler called preventDefault, stop
+    if (!event.defaultPrevented) {
+      externalHandler?.(event);
+    }
+  };
+}
+
+// Usage - XMLUI pattern
+function Select({ onChange, onDidChange }: Props) {
+  const handleInternalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // Internal logic (validation, state updates)
+    validateValue(e.target.value);
+    
+    // Prevent external handler if validation fails
+    if (!isValid) {
+      e.preventDefault();
+    }
+  };
+  
+  const handleChange = composeEventHandlers(handleInternalChange, onChange);
+  
+  return <select onChange={handleChange}>...</select>;
+}
+```
+
+**Pattern 3: Merge handlers from props**
+```tsx
+function mergeEventHandlers<T extends React.SyntheticEvent>(
+  ours: ((e: T) => void) | undefined,
+  theirs: ((e: T) => void) | undefined
+): ((e: T) => void) | undefined {
+  if (!ours) return theirs;
+  if (!theirs) return ours;
+  
+  return (event: T) => {
+    ours(event);
+    if (!event.defaultPrevented) {
+      theirs(event);
+    }
+  };
+}
+
+// Usage - Wrapper component
+function Wrapper({ children, onClick }: Props) {
+  const internalClick = (e: React.MouseEvent) => {
+    console.log('Wrapper clicked');
+  };
+  
+  return cloneElement(children, {
+    onClick: mergeEventHandlers(internalClick, children.props.onClick),
+  });
+}
+```
+
+**XMLUI Example (Container component):**
+```tsx
+function Container({ children, ...props }: Props, ref: Ref<HTMLElement>) {
+  const renderedChild = renderChild(children);
+  
+  if (ref && renderedChild && isValidElement(renderedChild)) {
+    // Merge event handlers from both Container and child
+    const mergedProps = {
+      ...renderedChild.props,
+      onClick: composeEventHandlers(props.onClick, renderedChild.props.onClick),
+      onKeyDown: composeEventHandlers(props.onKeyDown, renderedChild.props.onKeyDown),
+      ref: composeRefs(ref, (renderedChild as any).ref),
+    };
+    
+    return cloneElement(renderedChild, mergedProps);
+  }
+  
+  return renderedChild;
+}
+```
+
+**Pattern 4: Callback with additional args**
+```tsx
+function withArgs<E, T>(
+  handler: ((e: E, ...args: T[]) => void) | undefined,
+  ...args: T[]
+) {
+  if (!handler) return undefined;
+  
+  return (event: E) => {
+    handler(event, ...args);
+  };
+}
+
+// Usage
+function List({ items, onItemClick }: Props) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id} onClick={withArgs(onItemClick, item.id)}>
+          {item.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**When to compose handlers:**
+- Building reusable component libraries
+- Wrapper components that add behavior
+- Components with internal + external handlers
+- Need to call parent handler conditionally
+
+**Best practices:**
+- Always check if handler exists before calling
+- Respect `preventDefault()` and `stopPropagation()`
+- Execute internal handlers first
+- Document composition order clearly
+
+---
+
+## React Lifecycle and Effect Patterns
+
+Patterns for managing side effects, synchronization, and component lifecycle in React applications.
+
+### `useEffect` - Side Effects and Lifecycle
 
 **Purpose:** Run side effects after render (data fetching, subscriptions, DOM manipulation).
 
 **Syntax:** `useEffect(() => { /* effect */ return () => { /* cleanup */ } }, [dependencies])`
 
-### Basic Usage
-
+**Basic usage:**
 ```tsx
 function UserProfile({ userId }: Props) {
   const [user, setUser] = useState(null);
@@ -313,35 +1346,35 @@ function UserProfile({ userId }: Props) {
 }
 ```
 
-**With async/await (using IIFE):**
+**With async/await:**
 ```tsx
-function UserProfile({ userId }: Props) {
-  const [user, setUser] = useState(null);
-  
-  useEffect(() => {
-    // Can't make useEffect callback async directly, so use IIFE
-    (async () => {
-      const res = await fetch(`/api/users/${userId}`);
-      const data = await res.json();
-      setUser(data);
-    })();
-  }, [userId]);
-  
-  return <div>{user?.name}</div>;
-}
+useEffect(() => {
+  // Can't make callback async directly, use IIFE
+  (async () => {
+    const res = await fetch(`/api/users/${userId}`);
+    const data = await res.json();
+    setUser(data);
+  })();
+}, [userId]);
 ```
 
-### Cleanup Functions
+**Use when:** Data fetching, subscriptions, event listeners, DOM manipulation, integrating with non-React libraries.  
+**Avoid when:** Computing derived values (use `useMemo`), handling events (use handlers), initializing state (use initializer).
 
-Return a cleanup function to prevent memory leaks and cancel ongoing operations.
+---
 
+### Effect Cleanup Pattern
+
+**Purpose:** Properly clean up subscriptions, timers, and event listeners to prevent memory leaks.
+
+**Pattern: Always return cleanup function for subscriptions**
 ```tsx
 function Chat({ roomId }: Props) {
   useEffect(() => {
     const connection = createConnection(roomId);
     connection.connect();
     
-    // Cleanup runs before next effect and on unmount
+    // ✅ Cleanup runs before next effect and on unmount
     return () => {
       connection.disconnect();
     };
@@ -351,66 +1384,29 @@ function Chat({ roomId }: Props) {
 }
 ```
 
-### Dependency Array Patterns
-
-```tsx
-// ❌ WRONG - Missing dependencies (stale closure bug)
-useEffect(() => {
-  console.log(count); // Always logs initial count value
-}, []); // Should include [count]
-
-// ❌ WRONG - Object in dependencies (runs every render)
-useEffect(() => {
-  fetchData(config);
-}, [config]); // config is recreated every render
-
-// ✅ CORRECT - Destructure or memoize objects
-useEffect(() => {
-  fetchData(config);
-}, [config.id, config.filter]); // Only primitive values
-
-// ✅ CORRECT - Empty array = run once on mount
-useEffect(() => {
-  initializeApp();
-  return () => cleanupApp();
-}, []); // No dependencies
-
-// ✅ CORRECT - No array = run after every render (rarely needed)
-useEffect(() => {
-  updateDocumentTitle();
-}); // Runs after every render
-```
-
-### Common Patterns in XMLUI
-
-**Data Fetching:**
+**Pattern: Cancel async operations**
 ```tsx
 function DataComponent({ url }: Props) {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     let cancelled = false;
     
-    setLoading(true);
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        if (!cancelled) {
-          setData(data);
-          setLoading(false);
-        }
+        if (!cancelled) setData(data);
       });
     
+    // ✅ Prevent state updates after unmount
     return () => { cancelled = true; };
   }, [url]);
   
-  if (loading) return <div>Loading...</div>;
   return <div>{JSON.stringify(data)}</div>;
 }
 ```
 
-**Event Listeners:**
+**Pattern: Remove event listeners**
 ```tsx
 function WindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -423,6 +1419,7 @@ function WindowSize() {
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial size
     
+    // ✅ Always remove listeners
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
@@ -430,17 +1427,35 @@ function WindowSize() {
 }
 ```
 
-**Syncing with External Systems:**
+**Pattern: Clear timers and intervals**
+```tsx
+function Timer() {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(c => c + 1);
+    }, 1000);
+    
+    // ✅ Clear interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+  
+  return <div>{count}s</div>;
+}
+```
+
+**Pattern: Unsubscribe from external stores**
 ```tsx
 function ExternalStore({ store }: Props) {
   const [value, setValue] = useState(store.getValue());
   
   useEffect(() => {
-    // Subscribe to external store
     const unsubscribe = store.subscribe(newValue => {
       setValue(newValue);
     });
     
+    // ✅ Unsubscribe when component unmounts
     return unsubscribe;
   }, [store]);
   
@@ -448,19 +1463,399 @@ function ExternalStore({ store }: Props) {
 }
 ```
 
-### When to Use useEffect
+**Critical rules:**
+- Return cleanup for subscriptions, listeners, timers
+- Use cancellation flags for async operations
+- Cleanup runs before next effect and on unmount
+- Don't forget to remove event listeners
 
-**Use `useEffect` when:**
-- Fetching data from APIs
-- Setting up subscriptions or event listeners
-- Manually manipulating DOM elements
-- Integrating with non-React libraries
-- Logging or analytics
+---
 
-**Avoid `useEffect` when:**
-- Computing derived values → Use direct calculation or `useMemo`
-- Handling user events → Use event handlers
-- Initializing state → Use `useState` initializer or `useMemo`
+### Effect Dependencies Pattern
+
+**Purpose:** Correctly manage dependency arrays to avoid stale closures and unnecessary re-runs.
+
+**Anti-pattern: Missing dependencies (stale closure bug)**
+```tsx
+// ❌ WRONG - Stale closure
+function Counter() {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    setInterval(() => {
+      console.log(count); // Always logs 0!
+    }, 1000);
+  }, []); // Missing count
+  
+  return <button onClick={() => setCount(count + 1)}>Increment</button>;
+}
+
+// ✅ CORRECT - Use functional update
+useEffect(() => {
+  setInterval(() => {
+    setCount(c => c + 1); // Uses latest value
+  }, 1000);
+}, []); // No dependencies needed
+```
+
+**Anti-pattern: Object/array in dependencies**
+```tsx
+// ❌ WRONG - Object recreated every render
+function Component({ config }: Props) {
+  useEffect(() => {
+    fetchData(config);
+  }, [config]); // Runs every render if config is new object
+}
+
+// ✅ CORRECT - Destructure primitive values
+useEffect(() => {
+  fetchData(config);
+}, [config.id, config.filter]); // Only re-run when these change
+```
+
+**Pattern: Empty array = run once on mount**
+```tsx
+useEffect(() => {
+  // Initialization logic
+  initializeApp();
+  
+  return () => {
+    // Cleanup on unmount
+    cleanupApp();
+  };
+}, []); // Runs once on mount, cleanup on unmount
+```
+
+**Pattern: No array = run after every render**
+```tsx
+useEffect(() => {
+  // Runs after every render (rarely needed)
+  updateDocumentTitle(`Page - ${count}`);
+}); // No dependency array
+```
+
+**Pattern: Avoid callback dependencies with useRef**
+```tsx
+function Component({ callback }: Props) {
+  const callbackRef = useRef(callback);
+  
+  // Keep ref updated
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // ✅ Always uses latest callback
+      callbackRef.current();
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []); // No callback in deps
+}
+```
+
+**Common mistakes:**
+```tsx
+// ❌ Wrong - Missing dependencies
+useEffect(() => {
+  doSomething(prop); // prop not in deps
+}, []);
+
+// ❌ Wrong - Object identity
+useEffect(() => {
+  fetchData(user);
+}, [user]); // user object changes every render
+
+// ❌ Wrong - Function identity
+useEffect(() => {
+  callback();
+}, [callback]); // callback recreated every render
+
+// ✅ Correct - Destructure objects
+useEffect(() => {
+  fetchData({ id: user.id, name: user.name });
+}, [user.id, user.name]);
+
+// ✅ Correct - Memoize callbacks
+const memoizedCallback = useCallback(callback, [dep]);
+useEffect(() => {
+  memoizedCallback();
+}, [memoizedCallback]);
+```
+
+**ESLint rule:** Always enable `react-hooks/exhaustive-deps` to catch dependency issues.
+
+---
+
+### Layout Effect Pattern
+
+**Purpose:** Run effects synchronously after DOM mutations but before browser paint to prevent visual flickering.
+
+**When to use `useLayoutEffect`:**
+
+**Pattern: DOM measurements before paint**
+```tsx
+function Tooltip() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const ref = useRef<HTMLDivElement>(null);
+  
+  // ✅ CORRECT - Measure before paint
+  useLayoutEffect(() => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+      });
+    }
+  }, []);
+  
+  return <div ref={ref} style={{ left: position.x, top: position.y }}>Tooltip</div>;
+}
+
+// ❌ WRONG - useEffect causes visible flicker
+useEffect(() => {
+  // DOM measurements happen AFTER paint
+  // User sees element jump from old to new position
+}, []);
+```
+
+**Pattern: Synchronize scroll position**
+```tsx
+function ScrollSync({ targetRef }: Props) {
+  useLayoutEffect(() => {
+    if (targetRef.current) {
+      // ✅ Scroll before paint, no flicker
+      targetRef.current.scrollTop = savedPosition;
+    }
+  }, [targetRef, savedPosition]);
+}
+```
+
+**Pattern: Prevent layout shift**
+```tsx
+function AutoResizeTextarea({ value }: Props) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  
+  useLayoutEffect(() => {
+    if (ref.current) {
+      // ✅ Adjust height before paint
+      ref.current.style.height = 'auto';
+      ref.current.style.height = `${ref.current.scrollHeight}px`;
+    }
+  }, [value]);
+  
+  return <textarea ref={ref} value={value} />;
+}
+```
+
+**Pattern: Third-party DOM library integration**
+```tsx
+function Chart({ data }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      // ✅ Initialize library before paint
+      const chart = new ChartLibrary(containerRef.current);
+      chart.render(data);
+      
+      return () => chart.destroy();
+    }
+  }, [data]);
+  
+  return <div ref={containerRef} />;
+}
+```
+
+**Comparison: useEffect vs useLayoutEffect**
+
+| Aspect | `useEffect` | `useLayoutEffect` |
+|--------|------------|-------------------|
+| **Timing** | After paint (async) | Before paint (sync) |
+| **Blocks rendering** | ❌ No | ✅ Yes |
+| **Use for** | Data fetching, subscriptions | DOM measurements, preventing flicker |
+| **Performance** | Better (non-blocking) | Worse (blocks paint) |
+| **SSR** | ✅ Works | ⚠️ Warning (no DOM on server) |
+
+**When to use each:**
+- **useEffect**: 99% of cases - data fetching, subscriptions, analytics
+- **useLayoutEffect**: DOM measurements, scroll sync, preventing visual flicker
+
+**Warning:** `useLayoutEffect` blocks visual updates. Only use when you need synchronous DOM access before paint.
+
+**SSR consideration:**
+```tsx
+// ⚠️ useLayoutEffect doesn't run on server
+useLayoutEffect(() => {
+  // This code only runs in browser
+  measureDOM();
+}, []);
+
+// ✅ Better: Use useEffect for SSR-compatible code
+useEffect(() => {
+  measureDOM();
+}, []);
+```
+
+---
+
+### Insertion Effect Pattern
+
+**Purpose:** Insert styles into DOM before layout effects run. Used by CSS-in-JS libraries.
+
+**Syntax:** `useInsertionEffect(() => { /* insert styles */ }, [dependencies])`
+
+**Effect execution order:**
+1. `useInsertionEffect` - Insert styles
+2. `useLayoutEffect` - Measure layout (reads styles)
+3. Browser paints
+4. `useEffect` - Other side effects
+
+**Pattern: CSS-in-JS style injection**
+```tsx
+function useCSS(rule: string) {
+  useInsertionEffect(() => {
+    // ✅ Inject styles before layout reads
+    const style = document.createElement('style');
+    style.textContent = rule;
+    document.head.appendChild(style);
+    
+    return () => document.head.removeChild(style);
+  }, [rule]);
+}
+
+// Usage
+function Button({ color }: Props) {
+  useCSS(`
+    .button-${color} {
+      background: ${color};
+      border: 1px solid ${darken(color)};
+    }
+  `);
+  
+  return <button className={`button-${color}`}>Click</button>;
+}
+```
+
+**Pattern: Dynamic theme injection (XMLUI)**
+```tsx
+function ThemeProvider({ theme, children }: Props) {
+  useInsertionEffect(() => {
+    // ✅ Insert theme CSS before components measure
+    const styleElement = document.createElement('style');
+    styleElement.id = 'theme-styles';
+    styleElement.textContent = generateThemeCSS(theme);
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.getElementById('theme-styles')?.remove();
+    };
+  }, [theme]);
+  
+  return children;
+}
+```
+
+**Pattern: Critical CSS injection**
+```tsx
+function useCriticalCSS(css: string) {
+  useInsertionEffect(() => {
+    // ✅ Inject before any layout calculations
+    const style = document.createElement('style');
+    style.setAttribute('data-critical', 'true');
+    style.textContent = css;
+    document.head.insertBefore(style, document.head.firstChild);
+    
+    return () => style.remove();
+  }, [css]);
+}
+```
+
+**When to use:**
+- Building CSS-in-JS libraries
+- Dynamic style generation
+- Theme system implementation
+- Critical CSS injection
+
+**When NOT to use:**
+- Regular application code (use `useEffect`)
+- Static stylesheets (use `<link>` tags)
+- Non-style DOM manipulation
+
+**Note:** Rarely used directly in application code. Primarily for library authors. XMLUI uses this in `StyleContext` for theme style injection.
+
+**Comparison with other effects:**
+
+```tsx
+// ❌ WRONG - useEffect runs too late
+useEffect(() => {
+  injectStyles(); // Styles added after layout measured
+}, []);
+
+// ❌ WRONG - useLayoutEffect causes double layout
+useLayoutEffect(() => {
+  injectStyles(); // Layout measured, then styles added, then re-measured
+}, []);
+
+// ✅ CORRECT - useInsertionEffect runs first
+useInsertionEffect(() => {
+  injectStyles(); // Styles ready before any layout measurement
+}, []);
+```
+
+---
+
+### Effect Best Practices Summary
+
+**1. Always clean up:**
+```tsx
+useEffect(() => {
+  const subscription = subscribe();
+  return () => subscription.unsubscribe(); // ✅ Cleanup
+}, []);
+```
+
+**2. Handle dependencies correctly:**
+```tsx
+// ✅ Include all dependencies
+useEffect(() => {
+  doSomething(prop, state);
+}, [prop, state]);
+
+// ✅ Or use functional updates
+useEffect(() => {
+  setState(prev => prev + 1);
+}, []); // No state dependency needed
+```
+
+**3. Choose the right effect hook:**
+- `useEffect` - Default choice (async, after paint)
+- `useLayoutEffect` - DOM measurements, prevent flicker (sync, before paint)
+- `useInsertionEffect` - CSS-in-JS only (before layout)
+
+**4. Avoid common pitfalls:**
+```tsx
+// ❌ Don't use objects in deps
+useEffect(() => {}, [config]); // Runs every render
+
+// ✅ Destructure primitive values
+useEffect(() => {}, [config.id, config.name]);
+
+// ❌ Don't make effect callback async
+useEffect(async () => {}, []); // Type error
+
+// ✅ Use IIFE for async
+useEffect(() => {
+  (async () => await fetch())();
+}, []);
+```
+
+**5. Profile before optimizing:**
+- Most effects are cheap
+- Don't prematurely optimize with `useLayoutEffect`
+- Measure actual performance impact
 
 ---
 
@@ -574,466 +1969,6 @@ function Component({ count }: Props) {
 
 ---
 
-## `useMemo` - Expensive Computation Caching
-
-**Purpose:** Cache expensive calculation results between renders.
-
-**Syntax:** `const memoized = useMemo(() => computeValue(), [dependencies])`
-
-### Basic Usage
-
-```tsx
-function FilteredList({ items, filter }: Props) {
-  // Only recomputes when items or filter changes
-  const filtered = useMemo(() => {
-    console.log('Filtering...');
-    return items.filter(item => item.includes(filter));
-  }, [items, filter]);
-  
-  return <ul>{filtered.map(item => <li key={item}>{item}</li>)}</ul>;
-}
-```
-
-### Referential Stability
-
-```tsx
-function Parent() {
-  const [count, setCount] = useState(0);
-  
-  // ❌ WRONG - New object every render
-  const config = { theme: 'dark', size: 'large' };
-  
-  // ✅ CORRECT - Same object reference until dependencies change
-  const config = useMemo(() => ({ theme: 'dark', size: 'large' }), []);
-  
-  return <ExpensiveChild config={config} />;
-}
-
-const ExpensiveChild = React.memo(({ config }: Props) => {
-  // Only re-renders when config reference changes
-  return <div>{config.theme}</div>;
-});
-```
-
-### Complex Computations
-
-```tsx
-function DataAnalysis({ data }: Props) {
-  const statistics = useMemo(() => {
-    return {
-      mean: data.reduce((a, b) => a + b, 0) / data.length,
-      median: [...data].sort()[Math.floor(data.length / 2)],
-      mode: findMode(data),
-      stdDev: calculateStdDev(data),
-    };
-  }, [data]);
-  
-  return <div>{JSON.stringify(statistics)}</div>;
-}
-```
-
-### When to Use useMemo
-
-**Use `useMemo` when:**
-- Computation is expensive (>10ms)
-- Creating objects/arrays passed to memoized children
-- Calculations used in dependency arrays
-
-**Don't use `useMemo` when:**
-- Computation is cheap (<1ms) - premature optimization
-- Result only used once in render
-- Component rarely re-renders
-
----
-
-## `useCallback` - Function Reference Caching
-
-**Purpose:** Cache function definitions between renders to prevent child re-renders.
-
-**Syntax:** `const memoized = useCallback(() => { /* function */ }, [dependencies])`
-
-### Basic Usage
-
-```tsx
-function Parent() {
-  const [count, setCount] = useState(0);
-  
-  // ❌ WRONG - New function every render
-  const handleClick = () => {
-    console.log('Clicked');
-  };
-  
-  // ✅ CORRECT - Same function reference
-  const handleClick = useCallback(() => {
-    console.log('Clicked');
-  }, []);
-  
-  return <MemoizedChild onClick={handleClick} />;
-}
-
-const MemoizedChild = React.memo(({ onClick }: Props) => {
-  console.log('Child rendered');
-  return <button onClick={onClick}>Click</button>;
-});
-```
-
-### With Dependencies
-
-```tsx
-function TodoList() {
-  const [todos, setTodos] = useState([]);
-  const [filter, setFilter] = useState('all');
-  
-  const addTodo = useCallback((text: string) => {
-    setTodos(prev => [...prev, { id: Date.now(), text }]);
-  }, []); // No dependencies needed with functional updates
-  
-  const filterTodos = useCallback((todos) => {
-    return filter === 'all' 
-      ? todos 
-      : todos.filter(t => t.status === filter);
-  }, [filter]); // Recreated when filter changes
-  
-  return <TodoForm onAdd={addTodo} />;
-}
-```
-
-### Common Pattern in XMLUI
-
-```tsx
-function Form({ onSubmit }: Props) {
-  const [name, setName] = useState('');
-  
-  const handleSubmit = useCallback(() => {
-    onSubmit({ name });
-  }, [name, onSubmit]); // Include all used values
-  
-  return (
-    <form onSubmit={handleSubmit}>
-      <input value={name} onChange={e => setName(e.target.value)} />
-      <SubmitButton onSubmit={handleSubmit} />
-    </form>
-  );
-}
-```
-
-### useCallback vs useMemo
-
-```tsx
-// These are equivalent:
-const memoized = useCallback(() => doSomething(), [dep]);
-const memoized = useMemo(() => () => doSomething(), [dep]);
-
-// useCallback is just sugar for useMemo returning a function
-```
-
----
-
-## `useReducer` - Complex State Logic
-
-**Purpose:** Manage complex state with predictable state transitions using reducer pattern.
-
-**Syntax:** `const [state, dispatch] = useReducer(reducer, initialState)`
-
-### Basic Usage
-
-```tsx
-type State = { count: number };
-type Action = { type: 'increment' } | { type: 'decrement' } | { type: 'reset' };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'increment':
-      return { count: state.count + 1 };
-    case 'decrement':
-      return { count: state.count - 1 };
-    case 'reset':
-      return { count: 0 };
-    default:
-      return state;
-  }
-}
-
-function Counter() {
-  const [state, dispatch] = useReducer(reducer, { count: 0 });
-  
-  return (
-    <div>
-      Count: {state.count}
-      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
-      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
-      <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
-    </div>
-  );
-}
-```
-
-### With Immer for Immutability
-
-```tsx
-import produce from 'immer';
-
-const reducer = produce((state, action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      state.todos.push(action.payload); // Direct mutation with Immer
-      break;
-    case 'TOGGLE_TODO':
-      const todo = state.todos.find(t => t.id === action.payload);
-      if (todo) todo.completed = !todo.completed;
-      break;
-  }
-});
-```
-
-### Common Pattern in XMLUI (Form State)
-
-```tsx
-type FormState = {
-  values: Record<string, any>;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-};
-
-type FormAction =
-  | { type: 'SET_VALUE'; field: string; value: any }
-  | { type: 'SET_ERROR'; field: string; error: string }
-  | { type: 'TOUCH_FIELD'; field: string }
-  | { type: 'RESET' };
-
-function formReducer(state: FormState, action: FormAction): FormState {
-  switch (action.type) {
-    case 'SET_VALUE':
-      return {
-        ...state,
-        values: { ...state.values, [action.field]: action.value },
-      };
-    case 'SET_ERROR':
-      return {
-        ...state,
-        errors: { ...state.errors, [action.field]: action.error },
-      };
-    case 'TOUCH_FIELD':
-      return {
-        ...state,
-        touched: { ...state.touched, [action.field]: true },
-      };
-    case 'RESET':
-      return { values: {}, errors: {}, touched: {} };
-    default:
-      return state;
-  }
-}
-```
-
-### When to Use useReducer
-
-**Use `useReducer` when:**
-- Multiple related state values
-- Complex state transitions
-- Next state depends on previous state
-- Want to separate state logic from component
-
-**Use `useState` when:**
-- Simple independent state values
-- State updates are straightforward
-- No complex validation or transformation
-
----
-
-## `useContext` - Consume Context Values
-
-**Purpose:** Access values from React Context without prop drilling. Always used with `createContext` - see that section for full pattern.
-
-**Syntax:** `const value = useContext(MyContext)`
-
-### Basic Usage
-
-```tsx
-// Assuming ThemeContext was created with createContext
-const ThemeContext = createContext<'light' | 'dark'>('light');
-
-// Consumer component
-function ThemedButton() {
-  const theme = useContext(ThemeContext);
-  
-  return <button className={`btn-${theme}`}>Click</button>;
-}
-```
-
-### Creating Custom Hooks
-
-Wrap `useContext` in custom hooks for better error messages and type safety:
-
-```tsx
-// ❌ Using useContext directly - no error if outside provider
-function Component() {
-  const auth = useContext(AuthContext); // Might be null!
-  return <div>{auth?.user?.name}</div>; // Need null checks everywhere
-}
-
-// ✅ Custom hook with validation
-function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context; // TypeScript knows it's not null
-}
-
-function Component() {
-  const { user } = useAuth(); // Guaranteed to exist or throw
-  return <div>{user.name}</div>; // No null checks needed
-}
-```
-
-### Common Pattern in XMLUI
-
-```tsx
-// Pattern: Create context + custom hook together
-const FormContext = createContext<FormContextValue | null>(null);
-
-export function useFormContext() {
-  const context = useContext(FormContext);
-  if (!context) {
-    throw new Error('Form fields must be used within a Form component');
-  }
-  return context;
-}
-
-// Usage in components
-function FormField({ name }: Props) {
-  const { values, errors, setFieldValue } = useFormContext();
-  
-  return (
-    <div>
-      <input
-        value={values[name]}
-        onChange={e => setFieldValue(name, e.target.value)}
-      />
-      {errors[name] && <span>{errors[name]}</span>}
-    </div>
-  );
-}
-```
-
-### When to Use useContext
-
-**Use `useContext` for:**
-- Consuming values from context created with `createContext`
-- Avoiding prop drilling through many component levels
-- Accessing global/shared state (theme, auth, config)
-
-**Always:**
-- Wrap in custom hook with error checking
-- Document that component must be used within a provider
-
-**Note:** See `createContext` section for complete examples of creating contexts, providers, and performance optimization.
-
----
-
-## `useTransition` - Non-Urgent Updates
-
-**Purpose:** Mark state updates as non-urgent to keep UI responsive during slow updates.
-
-**Syntax:** `const [isPending, startTransition] = useTransition()`
-
-### Basic Usage
-
-```tsx
-function SearchResults() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [isPending, startTransition] = useTransition();
-  
-  const handleSearch = (value: string) => {
-    setQuery(value); // Urgent: Update input immediately
-    
-    startTransition(() => {
-      // Non-urgent: Filter can be slow, won't block input
-      const filtered = largeDataset.filter(item => item.includes(value));
-      setResults(filtered);
-    });
-  };
-  
-  return (
-    <div>
-      <input value={query} onChange={e => handleSearch(e.target.value)} />
-      {isPending && <div>Loading...</div>}
-      <ul>{results.map(r => <li key={r.id}>{r.name}</li>)}</ul>
-    </div>
-  );
-}
-```
-
-### Usage in XMLUI
-
-XMLUI uses `useTransition` in container infrastructure to batch state changes during script execution, preventing excessive re-renders.
-
-```tsx
-function StatementExecutor({ statements }: Props) {
-  const [, startTransition] = useTransition();
-  
-  const executeStatements = () => {
-    startTransition(() => {
-      // Multiple state changes batched as low-priority
-      statements.forEach(stmt => {
-        executeStatement(stmt); // May trigger multiple state updates
-      });
-    });
-  };
-  
-  return <button onClick={executeStatements}>Execute</button>;
-}
-```
-
----
-
-## `useLayoutEffect` - Synchronous DOM Effects
-
-**Purpose:** Run effects synchronously after DOM mutations but before browser paint.
-
-**Syntax:** `useLayoutEffect(() => { /* effect */ }, [dependencies])`
-
-### When to Use
-
-```tsx
-function Tooltip() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const ref = useRef<HTMLDivElement>(null);
-  
-  // ✅ CORRECT - Use useLayoutEffect to measure DOM before paint
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setPosition({
-        x: rect.left + rect.width / 2,
-        y: rect.top - 10,
-      });
-    }
-  }, []);
-  
-  return <div ref={ref} style={{ left: position.x, top: position.y }}>Tooltip</div>;
-}
-
-// ❌ WRONG - useEffect causes flicker as position updates after paint
-useEffect(() => {
-  // DOM measurements happen after screen paint
-  // User sees element jump from old to new position
-}, []);
-```
-
-### Use Cases
-
-- Measuring DOM elements before paint
-- Synchronizing scrollbar position
-- Preventing layout shift/flicker
-- Integrating with DOM-based libraries
-
-**Warning:** Blocks visual updates. Use `useEffect` unless you specifically need synchronous behavior.
-
----
-
 ## `useId` - Unique ID Generation
 
 **Purpose:** Generate stable unique IDs for accessibility attributes.
@@ -1075,37 +2010,6 @@ function ComplexForm() {
 ```
 
 **Why not just use a counter?** `useId` generates IDs that are stable across server and client rendering, preventing hydration mismatches.
-
----
-
-## `useInsertionEffect` - Style Injection
-
-**Purpose:** Insert styles into DOM before layout effects run. Used by CSS-in-JS libraries.
-
-**Syntax:** `useInsertionEffect(() => { /* insert styles */ }, [dependencies])`
-
-### Typical Usage (CSS-in-JS libraries)
-
-```tsx
-function useCSS(rule: string) {
-  useInsertionEffect(() => {
-    // Inject styles before layout reads
-    const style = document.createElement('style');
-    style.textContent = rule;
-    document.head.appendChild(style);
-    
-    return () => document.head.removeChild(style);
-  }, [rule]);
-}
-```
-
-**Note:** Rarely used directly in application code. Primarily for library authors building CSS-in-JS solutions. XMLUI uses this in `StyleContext` for theme style injection.
-
-**Effect execution order:**
-1. `useInsertionEffect` - Insert styles
-2. `useLayoutEffect` - Measure layout
-3. Browser paints
-4. `useEffect` - Other side effects
 
 ---
 
@@ -1400,342 +2304,6 @@ const AlsoGood = forwardRef((props, ref) => {
   return <CustomComponent ref={ref} />; // Works because CustomComponent forwards
 });
 ```
-
----
-
-## `memo` - Component Memoization
-
-**Purpose:** Prevent unnecessary re-renders by memoizing components. Re-renders only when props actually change.
-
-**Syntax:** `const MemoizedComponent = memo(Component, arePropsEqual?)`
-
-### Basic Usage
-
-```tsx
-const ExpensiveComponent = memo(function ExpensiveComponent({ data }: Props) {
-  console.log('Rendering ExpensiveComponent'); // Only logs when data changes
-  
-  return (
-    <div>
-      {data.map(item => <Item key={item.id} {...item} />)}
-    </div>
-  );
-});
-
-function Parent() {
-  const [count, setCount] = useState(0);
-  const data = useMemo(() => computeData(), []); // Stable reference
-  
-  return (
-    <div>
-      <ExpensiveComponent data={data} /> {/* Doesn't re-render when count changes */}
-      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
-    </div>
-  );
-}
-```
-
-### How memo Works
-
-```tsx
-// ❌ WITHOUT memo - re-renders every time parent renders
-function Child({ name }: Props) {
-  console.log('Child rendered'); // Logs on every parent render
-  return <div>{name}</div>;
-}
-
-// ✅ WITH memo - only re-renders when props change
-const Child = memo(function Child({ name }: Props) {
-  console.log('Child rendered'); // Only logs when name changes
-  return <div>{name}</div>;
-});
-
-function Parent() {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div>
-      <Child name="Alice" /> {/* With memo: doesn't re-render when count changes */}
-      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
-    </div>
-  );
-}
-```
-
-### Custom Comparison Function
-
-```tsx
-// Default: shallow comparison of props
-const DefaultMemo = memo(Component);
-
-// Custom: deep comparison or specific logic
-const CustomMemo = memo(Component, (prevProps, nextProps) => {
-  // Return true if props are equal (skip re-render)
-  // Return false if props changed (do re-render)
-  return prevProps.id === nextProps.id && 
-         prevProps.data.length === nextProps.data.length;
-});
-
-// Example: Only re-render if specific props change
-const SmartComponent = memo(
-  function SmartComponent({ id, data, onChange }: Props) {
-    return <div onClick={onChange}>{data[id]}</div>;
-  },
-  (prev, next) => {
-    // Ignore onChange function changes, only check id and data
-    return prev.id === next.id && prev.data === next.data;
-  }
-);
-```
-
-### Combining memo with forwardRef
-
-```tsx
-// Correct order: memo(forwardRef(...))
-export const IFrame = memo(forwardRef(function IFrame(
-  { src, title, style }: Props,
-  ref: ForwardedRef<HTMLIFrameElement>,
-) {
-  return <iframe ref={ref} src={src} title={title} style={style} />;
-}));
-
-// Also works with TypeScript generics
-export const Avatar = memo(forwardRef<HTMLDivElement, AvatarProps>(
-  function Avatar({ name, src, size }, ref) {
-    return <div ref={ref} className={`avatar-${size}`}>{name}</div>;
-  }
-));
-```
-
-### Common Pattern in XMLUI
-
-```tsx
-// Container components are memoized to prevent re-renders
-export const Container = memo(
-  forwardRef(function Container(props, ref) {
-    // Complex rendering logic
-    return <div ref={ref}>...</div>;
-  })
-);
-
-// List row components are memoized for performance
-const TreeRow = memo(({ index, style, data }: ListChildComponentProps) => {
-  const item = data.items[index];
-  return <div style={style}>{item.name}</div>;
-});
-
-// Option components memoized to prevent re-renders during filtering
-export const OptionNative = memo((props: Option) => {
-  return <div className="option">{props.label}</div>;
-});
-```
-
-### When to Use memo
-
-**Use `memo` when:**
-- Component re-renders frequently with same props
-- Component has expensive rendering logic
-- Component is in a large list (virtualized rows)
-- Parent re-renders often but child props rarely change
-
-**Don't use `memo` when:**
-- Component already re-renders rarely
-- Props change on every render anyway
-- Rendering is cheap (<1ms)
-- Premature optimization (profile first!)
-
-### Common Pitfalls
-
-```tsx
-// ❌ WRONG - New object/array/function on every render defeats memo
-function Parent() {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <>
-      <MemoChild data={{ value: 123 }} /> {/* New object every render! */}
-      <MemoChild items={[1, 2, 3]} /> {/* New array every render! */}
-      <MemoChild onClick={() => {}} /> {/* New function every render! */}
-    </>
-  );
-}
-
-// ✅ CORRECT - Stable references with useMemo/useCallback
-function Parent() {
-  const [count, setCount] = useState(0);
-  const data = useMemo(() => ({ value: 123 }), []);
-  const items = useMemo(() => [1, 2, 3], []);
-  const handleClick = useCallback(() => {}, []);
-  
-  return (
-    <>
-      <MemoChild data={data} /> {/* Same reference */}
-      <MemoChild items={items} /> {/* Same reference */}
-      <MemoChild onClick={handleClick} /> {/* Same reference */}
-    </>
-  );
-}
-```
-
----
-
-## `createContext` - Context Creation
-
-**Purpose:** Create a context for sharing state across component trees without prop drilling.
-
-**Syntax:** `const MyContext = createContext(defaultValue)`
-
-### Basic Pattern
-
-```tsx
-import { createContext, useContext, useState } from 'react';
-
-// 1. Create context with default value
-const ThemeContext = createContext<'light' | 'dark'>('light');
-
-// 2. Create provider component
-function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  
-  return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-// 3. Create custom hook for consuming context
-function useTheme() {
-  return useContext(ThemeContext);
-}
-
-// 4. Use in components
-function Button() {
-  const theme = useTheme();
-  return <button className={`btn-${theme}`}>Click</button>;
-}
-```
-
-### Context with Complex State
-
-```tsx
-type SelectContextValue = {
-  multiSelect?: boolean;
-  value: ValueType | null;
-  onChange?: (selectedValue: SingleValueType) => void;
-  setOpen: (open: boolean) => void;
-  options: Set<Option>;
-};
-
-export const SelectContext = createContext<SelectContextValue>({
-  value: null,
-  onChange: () => {},
-  setOpen: () => {},
-  options: new Set(),
-});
-
-export function useSelect() {
-  return useContext(SelectContext);
-}
-
-// Provider usage
-function Select({ children }: Props) {
-  const [value, setValue] = useState(null);
-  const [open, setOpen] = useState(false);
-  
-  const contextValue = useMemo(() => ({
-    value,
-    onChange: setValue,
-    setOpen,
-    options: new Set(),
-  }), [value, open]);
-  
-  return (
-    <SelectContext.Provider value={contextValue}>
-      {children}
-    </SelectContext.Provider>
-  );
-}
-```
-
-### Context with Type Safety
-
-```tsx
-// Require context to be used within provider
-type AuthContext = {
-  user: User | null;
-  login: (credentials: Credentials) => Promise<void>;
-  logout: () => void;
-};
-
-const AuthContext = createContext<AuthContext | null>(null);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-}
-
-function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<User | null>(null);
-  
-  const value = useMemo(() => ({
-    user,
-    login: async (creds: Credentials) => { /* ... */ },
-    logout: () => setUser(null),
-  }), [user]);
-  
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-```
-
-### Common Patterns in XMLUI
-
-**Form Context:**
-```tsx
-const FormContext = createContext<FormContextValue | null>(null);
-
-export function useFormContext() {
-  const context = useContext(FormContext);
-  if (!context) {
-    throw new Error('Form fields must be used within a Form component');
-  }
-  return context;
-}
-```
-
-**List Context:**
-```tsx
-export const ListContext = React.createContext<IExpandableListContext>({
-  expandedItems: new Set(),
-  toggleExpand: () => {},
-  isExpanded: () => false,
-});
-```
-
-**Modal Context:**
-```tsx
-const ModalStateContext = React.createContext(null);
-
-export function useModalState() {
-  return useContext(ModalStateContext);
-}
-```
-
-### When to Use createContext
-
-**Use `createContext` when:**
-- State needs to be accessed by many nested components
-- Prop drilling becomes cumbersome (>3 levels)
-- Theme, authentication, or configuration data
-- Component coordination (tabs, forms, modals)
-
-**Don't use when:**
-- State is only needed by 1-2 components
-- Simple parent-child relationships
-- Performance-critical frequent updates (context triggers all consumers)
 
 ---
 
@@ -2537,125 +3105,360 @@ root.unmount();
 
 ---
 
-## React Hooks and Patterns Used in XMLUI
+## React Accessibility Patterns
 
-Based on the analysis of the XMLUI codebase, here is a comprehensive list of React hooks, methods, and patterns that are actually used. These represent the fundamental React concepts that developers should understand when working with XMLUI components.
+### ARIA Attributes Pattern
 
-### Advanced Patterns
+**Key ARIA attributes:** `role`, `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-hidden`, `aria-live`, `aria-expanded`, `aria-selected`, `aria-disabled`, `aria-current`
 
-23. **Controlled vs Uncontrolled Component Pattern** - Different approaches to form input management
-24. **Compound Component Pattern** - Components that work together to form a complete UI
-25. **Context Provider Pattern** - Providing context values to component trees
-
-### State Management Patterns
-
-26. **Reducer Pattern with Immer** - Using Immer's `produce` for immutable state updates
-27. **State Lifting Pattern** - Moving state up to common ancestors
-28. **Prop Drilling Solution Pattern** - Using context to avoid deep prop passing
-
-### Performance Optimization Patterns
-
-29. **Memoization Strategy Pattern** - Strategic use of useMemo and useCallback
-30. **Virtualization Pattern** - Rendering only visible items in large lists
-31. **Debouncing Pattern** - Reducing frequency of expensive operations
-32. **Throttling Pattern** - Limiting execution rate of functions
-
-### Event Handling Patterns
-
-33. **Event Delegation Pattern** - Handling events at parent level
-34. **Synthetic Event Pattern** - React's cross-browser event wrapper
-35. **Event Callback Composition Pattern** - Combining multiple event handlers
-
-### Lifecycle and Effect Patterns
-
-36. **Effect Cleanup Pattern** - Properly cleaning up subscriptions and timers
-37. **Effect Dependencies Pattern** - Managing dependency arrays correctly
-38. **Layout Effect Pattern** - Using useLayoutEffect for DOM measurements
-39. **Insertion Effect Pattern** - Using useInsertionEffect for style injection
-
-### TypeScript Integration Patterns
-
-40. **Generic Component Pattern** - Type-safe generic components
-41. **ForwardRef with TypeScript Pattern** - Properly typing forwardRef components
-42. **Props Interface Pattern** - Defining component prop types
-43. **Ref Type Pattern** - Typing refs correctly
-
-### Accessibility Patterns
-
-44. **ARIA Attributes Pattern** - Adding accessibility attributes
-45. **Focus Management Pattern** - Controlling focus programmatically
-46. **Keyboard Navigation Pattern** - Implementing keyboard shortcuts and navigation
-
----
-
-## Code Review Notes: Potential Derived State Anti-Patterns
-
-The following files contain patterns that may warrant review for potential simplification or refactoring. These are not necessarily bugs but could indicate unnecessary complexity.
-
-### 1. TableNative.tsx (Lines 339-348)
-
-**Issue:** Mirrors props in local state and syncs with `useLayoutEffect`
+**Common patterns:**
 
 ```tsx
-const [_sortBy, _setSortBy] = useState(sortBy);
-const [_sortingDirection, _setSortingDirection] = useState(sortingDirection);
+// Icon button with accessible label
+<button onClick={onClick} aria-label="Close dialog">
+  <Icon name="close" aria-hidden="true" />
+</button>
 
-useLayoutEffect(() => {
-  _setSortBy(sortBy);
-}, [sortBy]);
+// Form field with error/help text
+function FormField({ label, error, helpText }: Props) {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} aria-describedby={`${id}-desc`} aria-invalid={!!error} />
+      <span id={`${id}-desc`} role={error ? "alert" : undefined}>
+        {error || helpText}
+      </span>
+    </>
+  );
+}
 
-useLayoutEffect(() => {
-  _setSortingDirection(sortingDirection);
-}, [sortingDirection]);
+// Accordion/expandable section
+<button aria-expanded={isOpen} aria-controls={contentId}>
+  {title}
+</button>
+<div id={contentId} hidden={!isOpen} role="region">
+  {children}
+</div>
+
+// Live region for announcements
+<div role="status" aria-live="polite" aria-atomic="true">
+  {message}
+</div>
+
+// Modal dialog
+<div role="dialog" aria-modal="true" aria-labelledby={titleId}>
+  <h2 id={titleId}>{title}</h2>
+  {children}
+</div>
+
+// Tab navigation
+<div role="tablist">
+  <button role="tab" aria-selected={isActive} aria-controls={panelId}>
+    {label}
+  </button>
+</div>
+<div role="tabpanel" id={panelId} aria-labelledby={tabId}>
+  {content}
+</div>
 ```
 
-**Why it might be wrong:** If `sortBy` and `sortingDirection` props are sufficient, local state is redundant.
-
-**Possible justification:** May be needed for controlled/uncontrolled pattern or internal sorting before syncing back to parent.
-
-**Review action:** Determine if local state serves a purpose or can be replaced with direct prop usage.
+**Rules:** Use semantic HTML first, add ARIA only when needed, keep attributes in sync with state, test with screen readers.
 
 ---
 
-### 2. TimeInputNative.tsx (Lines 189+)
+### Focus Management Pattern
 
-**Issue:** Derives multiple state variables from parsed `localValue` in `useEffect`
+**Common scenarios:** Auto-focus on mount, focus traps in modals, focus restoration, roving tab index.
 
 ```tsx
-useEffect(() => {
-  if (localValue) {
-    const { amPm, hour, minute, second } = parseTimeString(localValue, is12HourFormat);
-    setAmPm(amPm);
-    setHour(hour);
-    setMinute(minute);
-    setSecond(second);
-  }
-}, [localValue]);
+// Auto-focus first element in dialog
+function Dialog({ isOpen }: Props) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  
+  useEffect(() => {
+    if (isOpen) buttonRef.current?.focus();
+  }, [isOpen]);
+  
+  return <button ref={buttonRef}>Close</button>;
+}
+
+// Focus trap + restoration in modal
+function Modal({ isOpen, onClose, children }: Props) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    restoreFocusRef.current = document.activeElement as HTMLElement;
+    modalRef.current?.querySelector<HTMLElement>('button')?.focus();
+    
+    return () => restoreFocusRef.current?.focus();
+  }, [isOpen]);
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+    
+    // Trap Tab key
+    if (e.key === 'Tab') {
+      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
+  
+  return (
+    <div ref={modalRef} role="dialog" aria-modal="true" onKeyDown={handleKeyDown}>
+      {children}
+    </div>
+  );
+}
+
+// Focus after delete action
+function DeleteButton({ itemId, onDelete }: Props) {
+  const handleDelete = () => {
+    const current = document.getElementById(`item-${itemId}`);
+    const next = (current?.nextElementSibling || current?.previousElementSibling)
+      ?.querySelector('button') as HTMLElement;
+    
+    onDelete(itemId);
+    setTimeout(() => next?.focus(), 0);
+  };
+  
+  return <button onClick={handleDelete}>Delete</button>;
+}
+
+// Roving tab index for lists
+function RadioGroup({ options, value, onChange }: Props) {
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let newIndex = index;
+    if (e.key === 'ArrowDown') newIndex = (index + 1) % options.length;
+    if (e.key === 'ArrowUp') newIndex = index === 0 ? options.length - 1 : index - 1;
+    if (e.key === 'Home') newIndex = 0;
+    if (e.key === 'End') newIndex = options.length - 1;
+    
+    if (newIndex !== index) {
+      e.preventDefault();
+      setFocusedIndex(newIndex);
+    }
+  };
+  
+  return (
+    <div role="radiogroup">
+      {options.map((opt, i) => (
+        <div
+          key={opt.id}
+          role="radio"
+          aria-checked={value === opt.id}
+          tabIndex={focusedIndex === i ? 0 : -1}
+          onClick={() => onChange(opt.id)}
+          onKeyDown={(e) => handleKeyDown(e, i)}
+          onFocus={() => setFocusedIndex(i)}
+        >
+          {opt.label}
+        </div>
+      ))}
+    </div>
+  );
+}
 ```
 
-**Why it might be wrong:** Parsed values could potentially be computed directly during render with `useMemo`.
-
-**Possible justification:** Component needs to track individual field state for complex user interactions (validation, focus management, etc.).
-
-**Review action:** Evaluate if parsing can be memoized instead of stored in state, or if interactive state tracking justifies current approach.
+**Rules:** Always restore focus when closing modals, trap focus within modal contexts, use `focus-visible` for keyboard-only indicators, test thoroughly.
 
 ---
 
-### 3. DateInputNative.tsx (Similar pattern to TimeInput)
+### Keyboard Navigation Pattern
 
-**Issue:** Likely uses similar derived state pattern for parsing date values into day/month/year components.
+**Standard keyboard shortcuts:** Escape (close), Tab/Shift+Tab (navigate), Arrow keys (move focus), Enter/Space (activate), Home/End (first/last).
 
-**Review action:** Check if pattern matches TimeInput and apply same analysis.
+```tsx
+// Dropdown with full keyboard support
+function Dropdown({ trigger, items, onSelect }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        } else {
+          const next = (focusedIndex + 1) % items.length;
+          setFocusedIndex(next);
+          itemsRef.current[next]?.focus();
+        }
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (isOpen) {
+          const prev = focusedIndex === 0 ? items.length - 1 : focusedIndex - 1;
+          setFocusedIndex(prev);
+          itemsRef.current[prev]?.focus();
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setIsOpen(false);
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (isOpen) {
+          onSelect(items[focusedIndex]);
+          setIsOpen(false);
+        } else {
+          setIsOpen(true);
+        }
+        break;
+    }
+  };
+  
+  return (
+    <div onKeyDown={handleKeyDown}>
+      <button onClick={() => setIsOpen(!isOpen)} aria-expanded={isOpen}>
+        {trigger}
+      </button>
+      {isOpen && (
+        <ul role="menu">
+          {items.map((item, i) => (
+            <li key={item.id} role="none">
+              <button
+                ref={el => itemsRef.current[i] = el}
+                role="menuitem"
+                onClick={() => { onSelect(item); setIsOpen(false); }}
+                onFocus={() => setFocusedIndex(i)}
+              >
+                {item.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// Global keyboard shortcuts hook
+function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const keys: string[] = [];
+      if (e.ctrlKey || e.metaKey) keys.push('Ctrl');
+      if (e.shiftKey) keys.push('Shift');
+      if (e.altKey) keys.push('Alt');
+      keys.push(e.key.toUpperCase());
+      
+      const handler = shortcuts[keys.join('+')];
+      if (handler) {
+        e.preventDefault();
+        handler();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [shortcuts]);
+}
+
+// Usage: Editor with shortcuts
+function Editor() {
+  useKeyboardShortcuts({
+    'Ctrl+S': handleSave,
+    'Ctrl+Z': handleUndo,
+    'Ctrl+Shift+Z': handleRedo,
+  });
+  return <div>Editor</div>;
+}
+
+// Data table with arrow key navigation
+function DataTable({ columns, rows }: Props) {
+  const [focusedCell, setFocusedCell] = useState({ row: 0, col: 0 });
+  const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
+  
+  const handleKeyDown = (e: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
+    let newRow = rowIndex, newCol = colIndex;
+    
+    if (e.key === 'ArrowUp') newRow = Math.max(0, rowIndex - 1);
+    if (e.key === 'ArrowDown') newRow = Math.min(rows.length - 1, rowIndex + 1);
+    if (e.key === 'ArrowLeft') newCol = Math.max(0, colIndex - 1);
+    if (e.key === 'ArrowRight') newCol = Math.min(columns.length - 1, colIndex + 1);
+    if (e.key === 'Home') newCol = 0;
+    if (e.key === 'End') newCol = columns.length - 1;
+    
+    if (newRow !== rowIndex || newCol !== colIndex) {
+      e.preventDefault();
+      setFocusedCell({ row: newRow, col: newCol });
+      cellRefs.current[newRow]?.[newCol]?.focus();
+    }
+  };
+  
+  return (
+    <table>
+      <tbody>
+        {rows.map((row, ri) => (
+          <tr key={row.id}>
+            {columns.map((col, ci) => (
+              <td
+                key={col.id}
+                ref={el => {
+                  if (!cellRefs.current[ri]) cellRefs.current[ri] = [];
+                  cellRefs.current[ri][ci] = el;
+                }}
+                tabIndex={focusedCell.row === ri && focusedCell.col === ci ? 0 : -1}
+                onKeyDown={e => handleKeyDown(e, ri, ci)}
+                onFocus={() => setFocusedCell({ row: ri, col: ci })}
+              >
+                {row[col.id]}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+```
+
+**Rules:** Support standard shortcuts (Escape, Tab, Arrows), don't override browser/OS shortcuts, provide visible focus feedback, test keyboard-only navigation.
 
 ---
 
-### General Recommendation
+### Accessibility Best Practices Summary
 
-Before refactoring, consider:
-1. Does the component need to maintain interactive state independent of props?
-2. Is there a controlled/uncontrolled pattern requirement?
-3. Would removing the state break existing functionality?
-4. Does the current pattern create measurable performance issues?
+**Key principles:**
+- Use semantic HTML first (`<button>`, `<nav>`, `<main>`)
+- Add ARIA only when semantic HTML isn't enough
+- All interactive elements must be keyboard accessible
+- Provide visible focus indicators (use `:focus-visible`)
+- Keep ARIA attributes in sync with visual state
+- Restore focus after closing modals/dialogs
+- Test with screen readers and keyboard only
 
-Not all derived state is bad—the key is whether it serves a legitimate purpose beyond simple computation.
+**Testing checklist:**
+- [ ] Navigate entire app with keyboard only
+- [ ] Focus indicators visible and high contrast
+- [ ] Screen reader announces all content correctly
+- [ ] Color not the only state indicator
+- [ ] Text contrast ≥ 4.5:1 for normal text
+- [ ] Interactive elements have accessible names
+- [ ] Form fields have associated labels
+- [ ] Error messages are announced
 
+**Tools:** [axe DevTools](https://www.deque.com/axe/devtools/), [WAVE](https://wave.webaim.org/), [Lighthouse](https://developers.google.com/web/tools/lighthouse), screen readers (NVDA, JAWS, VoiceOver)
