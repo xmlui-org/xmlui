@@ -25,20 +25,31 @@ export const TabsMd = createMetadata({
       description:
         `This property indicates the orientation of the component. In horizontal orientation, ` +
         `the tab sections are laid out on the left side of the content panel, while in vertical ` +
-        `orientation, the buttons are at the top.`,
+        `orientation, the buttons are at the top. Note: This property is ignored when ` +
+        `accordionView is set to true.`,
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
     tabAlignment: {
       description:
-        `This property controls how tabs are aligned within the tab header container. ` +
-        `Use 'start' to align tabs to the left (horizontal) or top (vertical), 'end' to align ` +
-        `to the right (horizontal) or bottom (vertical), 'center' to center the tabs, and ` +
-        `'stretch' to make tabs fill the full width of the header.`,
+        `This property controls how tabs are aligned within the tab header container in ` +
+        `horizontal orientation. Use 'start' to align tabs to the left, 'end' to align to the ` +
+        `right, 'center' to center the tabs, and 'stretch' to make tabs fill the full width ` +
+        `of the header. Note: This property is ignored when orientation is set to 'vertical' ` +
+        `or when accordionView is enabled.`,
       availableValues: ["start", "end", "center", "stretch"],
       defaultValue: defaultProps.tabAlignment,
       valueType: "string",
+    },
+    accordionView: {
+      description:
+        `When enabled, displays tabs in an accordion-like view where tab headers are stacked ` +
+        `vertically and only the active tab's content is visible. Each tab header remains visible ` +
+        `and clicking a header opens its content while closing others. When enabled, the ` +
+        `orientation property is ignored.`,
+      defaultValue: defaultProps.accordionView,
+      valueType: "boolean",
     },
     headerTemplate: {
       ...dComponent(`This property declares the template for the clickable tab area.`),
@@ -105,6 +116,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         activeTab={extractValue(node.props?.activeTab)}
         orientation={extractValue(node.props?.orientation)}
         tabAlignment={extractValue(node.props?.tabAlignment)}
+        accordionView={extractValue(node.props?.accordionView)}
         onDidChange={lookupEventHandler("didChange")}
         registerComponentApi={registerComponentApi}
       >

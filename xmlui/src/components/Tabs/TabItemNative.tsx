@@ -12,7 +12,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerId = useId();
-  const { register, unRegister, activeTabId } = useTabContext();
+  const { register, unRegister, activeTabId, getTabItems } = useTabContext();
 
   useEffect(() => {
     register({
@@ -37,6 +37,11 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   if (activeTabId !== innerId) return null;
 
+  // Find the index of this tab for ordering
+  const tabItems = getTabItems();
+  const tabIndex = tabItems?.findIndex(item => item.innerId === innerId) ?? 0;
+  const contentOrder = tabIndex * 2 + 1;
+
   return (
     <Content
       {...rest}
@@ -44,7 +49,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
       value={innerId}
       className={styles.tabsContent}
       ref={forwardedRef}
-      style={style}
+      style={{ ...style, order: contentOrder }}
     >
       {children}
     </Content>

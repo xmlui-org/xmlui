@@ -27,6 +27,7 @@ type Props = {
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
   tabAlignment?: "start" | "end" | "center" | "stretch";
+  accordionView?: boolean;
   headerRenderer?: (item: {
     id?: string;
     index: number;
@@ -45,6 +46,7 @@ export const defaultProps = {
   activeTab: 0,
   orientation: "horizontal" as "horizontal" | "vertical",
   tabAlignment: "start" as "start" | "end" | "center" | "stretch",
+  accordionView: false,
   distributeEvenly: false,
 };
 
@@ -53,6 +55,7 @@ export const Tabs = forwardRef(function Tabs(
     activeTab = defaultProps.activeTab,
     orientation = defaultProps.orientation,
     tabAlignment = defaultProps.tabAlignment,
+    accordionView = defaultProps.accordionView,
     headerRenderer,
     style,
     children,
@@ -136,6 +139,73 @@ export const Tabs = forwardRef(function Tabs(
     });
   }, [next, prev, setActiveTabIndex, setActiveTabById, registerComponentApi]);
 
+  // Accordion view: render tabs with interleaved headers and content
+  if (accordionView) {
+    return (
+      <TabContext.Provider value={tabContextValue}>
+        <div
+          {...rest}
+          id={tabsId}
+          ref={forwardedRef}
+          className={classnames(className, styles.tabs, styles.accordionView)}
+          style={style}
+        >
+          <RTabsRoot
+            value={`${currentTab}`}
+            onValueChange={(tab) => {
+              const tabItem = tabItems.find((item) => item.innerId === tab);
+              const newIndex = tabItems.findIndex((item) => item.innerId === tab);
+              if (newIndex !== activeIndex) {
+                tabContextValue.setActiveTabId(tab);
+                setActiveIndex(newIndex);
+                onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+              }
+            }}
+            orientation="vertical"
+            className={styles.accordionRoot}
+          >
+            <div className={styles.accordionInterleaved}>
+              <RTabsList className={styles.accordionList}>
+                {tabItems.map((tab, index) => (
+                  <RTabsTrigger 
+                    key={tab.innerId} 
+                    value={tab.innerId} 
+                    asChild
+                    style={{ order: index * 2 }}
+                  >
+                    <div
+                      role="tab"
+                      aria-label={tab.label}
+                      className={classnames(styles.tabTrigger, styles.accordionTrigger)}
+                    >
+                      {tab.headerRenderer
+                        ? tab.headerRenderer({
+                            ...(tab.id !== undefined && { id: tab.id }),
+                            index,
+                            label: tab.label,
+                            isActive: tab.innerId === currentTab,
+                          })
+                        : headerRenderer
+                          ? headerRenderer({
+                              ...(tab.id !== undefined && { id: tab.id }),
+                              index,
+                              label: tab.label,
+                              isActive: tab.innerId === currentTab,
+                            })
+                          : tab.label}
+                    </div>
+                  </RTabsTrigger>
+                ))}
+              </RTabsList>
+              {children}
+            </div>
+          </RTabsRoot>
+        </div>
+      </TabContext.Provider>
+    );
+  }
+
+  // Standard tabs view
   return (
     <TabContext.Provider value={tabContextValue}>
       <RTabsRoot
