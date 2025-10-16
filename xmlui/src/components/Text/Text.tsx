@@ -28,7 +28,11 @@ export const TextMd = createMetadata({
       description:
         "An optional string value that provides named presets for text variants with a " +
         "unique combination of font style, weight, size, color, and other parameters. " +
-        "If not defined, the text uses the current style of its context.",
+        "If not defined, the text uses the current style of its context. " +
+        "In addition to predefined variants, you can specify custom variant names and style them " +
+        "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
+        "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
+        "See the documentation for a complete list of supported CSS properties.",
       availableValues: variantOptionsMd,
     },
     maxLines: d(

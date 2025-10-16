@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type React from "react";
-import { forwardRef, useMemo, useRef, useCallback, useEffect } from "react";
+import { forwardRef, useMemo, useRef, useCallback, useEffect, memo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -14,6 +14,128 @@ import {
   TextVariantElement,
 } from "../abstractions";
 import type { RegisterComponentApiFn } from "../..";
+import { useAppId } from "../../components-core/rendering/AppIdContext";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import { toCssVar } from "../../components-core/theming/layout-resolver";
+
+// =============================================================================
+// Custom Variant CSS Cache Infrastructure
+// =============================================================================
+
+/**
+ * Key type for the custom variant cache.
+ * Combines app ID and variant value to ensure style isolation per app instance.
+ */
+type CustomVariantCacheKey = `${string}:${string}`;
+
+/**
+ * Cached CSS information for a custom variant.
+ */
+interface CustomVariantCacheEntry {
+  /** The generated CSS class name for this variant */
+  className: string;
+  /** The CSS text content that defines the styles for this variant */
+  cssText: string;
+  /** Timestamp when this entry was created (for debugging/cleanup) */
+  createdAt: number;
+}
+
+/**
+ * Global cache that stores custom variant CSS styles.
+ * Key format: "appId:variantValue"
+ *
+ * This cache ensures:
+ * - Each app instance (including nested apps) has its own variant styles
+ * - The same variant value always generates the same CSS within an app
+ * - Style isolation between parent and nested apps
+ */
+const customVariantCache = new Map<CustomVariantCacheKey, CustomVariantCacheEntry>();
+
+/**
+ * Creates a cache key from app ID and variant value.
+ */
+function createCacheKey(appId: string | undefined, variant: string): CustomVariantCacheKey {
+  const safeAppId = appId || "default";
+  return `${safeAppId}:${variant}`;
+}
+
+/**
+ * Retrieves a cached custom variant entry if it exists.
+ */
+export function getCustomVariantCache(
+  appId: string | undefined,
+  variant: string,
+): CustomVariantCacheEntry | undefined {
+  const key = createCacheKey(appId, variant);
+  return customVariantCache.get(key);
+}
+
+/**
+ * Stores a custom variant entry in the cache.
+ */
+export function setCustomVariantCache(
+  appId: string | undefined,
+  variant: string,
+  entry: Omit<CustomVariantCacheEntry, "createdAt">,
+): void {
+  const key = createCacheKey(appId, variant);
+  customVariantCache.set(key, {
+    ...entry,
+    createdAt: Date.now(),
+  });
+}
+
+/**
+ * Checks if a custom variant is already cached.
+ */
+export function hasCustomVariantCache(appId: string | undefined, variant: string): boolean {
+  const key = createCacheKey(appId, variant);
+  return customVariantCache.has(key);
+}
+
+/**
+ * Clears all custom variant cache entries for a specific app ID.
+ * Useful for cleanup when an app instance unmounts.
+ */
+export function clearCustomVariantCacheForApp(appId: string | undefined): void {
+  const safeAppId = appId || "default";
+  const keysToDelete: CustomVariantCacheKey[] = [];
+
+  for (const key of customVariantCache.keys()) {
+    if (key.startsWith(`${safeAppId}:`)) {
+      keysToDelete.push(key);
+    }
+  }
+
+  keysToDelete.forEach((key) => customVariantCache.delete(key));
+}
+
+/**
+ * Clears the entire custom variant cache.
+ * Useful for testing or full app resets.
+ */
+export function clearCustomVariantCache(): void {
+  customVariantCache.clear();
+}
+
+/**
+ * Gets cache statistics for debugging.
+ */
+export function getCustomVariantCacheStats() {
+  return {
+    totalEntries: customVariantCache.size,
+    entries: Array.from(customVariantCache.entries()).map(([key, entry]) => ({
+      key,
+      className: entry.className,
+      createdAt: new Date(entry.createdAt).toISOString(),
+    })),
+  };
+}
+
+// =============================================================================
+// Component Definition
+// =============================================================================
 
 type TextProps = {
   uid?: string;
@@ -58,15 +180,18 @@ export const Text = forwardRef(function Text(
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
+  // Get the app ID for variant cache isolation
+  const appId = useAppId();
+
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
     const element = innerRef.current;
     if (!element) return false;
-    
+
     // Check both horizontal and vertical overflow
     const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
     const hasVerticalOverflow = element.scrollHeight > element.clientHeight;
-    
+
     return hasHorizontalOverflow || hasVerticalOverflow;
   }, []);
 
@@ -85,6 +210,67 @@ export const Text = forwardRef(function Text(
     if (!variant || !TextVariantElement[variant]) return "div";
     return TextVariantElement[variant];
   }, [variant]);
+
+  // Custom variant CSS generation
+  // Following React hook rules: hooks must be called unconditionally
+  // We always call useComponentStyle, passing empty object for known variants
+  const isCustomVariant = useMemo(() => {
+    return variant && !TextVariantElement[variant];
+  }, [variant]);
+
+  // Always call useComponentStyle (React hook rule: no conditional hooks)
+  // For now, pass empty object; later this will contain assembled CSS properties
+  const variantSpec = useMemo(
+    () => {
+      if (!isCustomVariant) return EMPTY_OBJECT;
+      const subject = `-Text-${variant}`;
+      const cssInput = {
+        color: toCssVar(`$textColor${subject}`),
+        "font-family": toCssVar(`$fontFamily${subject}`),
+        "font-size": toCssVar(`$fontSize${subject}`),
+        "font-style": toCssVar(`$fontStyle${subject}`),
+        "font-weight": toCssVar(`$fontWeight${subject}`),
+        "font-stretch": toCssVar(`$fontStretch${subject}`),
+        "text-decoration-line": toCssVar(`$textDecorationLine${subject}`),
+        "text-decoration-color": toCssVar(`$textDecorationColor${subject}`),
+        "text-decoration-style": toCssVar(`$textDecorationStyle${subject}`),
+        "text-decoration-thickness": toCssVar(`$textDecorationThickness${subject}`),
+        "text-underline-offset": toCssVar(`$textUnderlineOffset${subject}`),
+        "line-height": toCssVar(`$lineHeight${subject}`),
+        "background-color": toCssVar(`$backgroundColor${subject}`),
+        "text-transform": toCssVar(`$textTransform${subject}`),
+        "letter-spacing": toCssVar(`$letterSpacing${subject}`),
+        "word-spacing": toCssVar(`$wordSpacing${subject}`),
+        "text-shadow": toCssVar(`$textShadow${subject}`),
+        "text-indent": toCssVar(`$textIndent${subject}`),
+        "text-align": toCssVar(`$textAlign${subject}`),
+        "text-align-last": toCssVar(`$textAlignLast${subject}`),
+        "word-break": toCssVar(`$wordBreak${subject}`),
+        "word-wrap": toCssVar(`$wordWrap${subject}`),
+        direction: toCssVar(`$direction${subject}`),
+        "writing-mode": toCssVar(`$writingMode${subject}`),
+        "line-break": toCssVar(`$lineBreak${subject}`),
+      };
+      return cssInput;
+    },
+    [isCustomVariant, variant],
+  );
+  const customVariantClassName = useComponentStyle(variantSpec);
+
+  // Store custom variant in cache if it's a new custom variant
+  useEffect(() => {
+    if (isCustomVariant && variant && customVariantClassName) {
+      // Check if this variant is already cached for this app
+      if (!hasCustomVariantCache(appId, variant)) {
+        // TODO: When CSS generation is implemented, extract the actual CSS text
+        // For now, store placeholder information
+        setCustomVariantCache(appId, variant, {
+          className: customVariantClassName,
+          cssText: "", // Will be populated when CSS generation is implemented
+        });
+      }
+    }
+  }, [isCustomVariant, variant, customVariantClassName, appId]);
 
   // Determine overflow mode classes based on overflowMode and existing props
   const overflowClasses = useMemo(() => {
@@ -170,7 +356,8 @@ export const Text = forwardRef(function Text(
       className={classnames(
         syntaxHighlightClasses,
         styles.text,
-        styles[variant || "default"],
+        // Use custom variant className if it's a custom variant, otherwise use predefined variant style
+        isCustomVariant ? customVariantClassName : styles[variant || "default"],
         {
           [styles.preserveLinebreaks]: preserveLinebreaks,
           ...overflowClasses,
