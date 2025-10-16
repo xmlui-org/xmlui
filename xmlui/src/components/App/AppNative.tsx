@@ -18,7 +18,6 @@ import styles from "./App.module.scss";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
-import { useAppId } from "../../components-core/rendering/AppIdContext";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
@@ -108,7 +107,6 @@ export function App({
 }: Props) {
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
-  const appId = useAppId();
 
   const mounted = useRef(false);
 
@@ -149,15 +147,6 @@ export function App({
   useEffect(() => {
     onReady();
   }, [onReady]);
-
-  // Register component API
-  useEffect(() => {
-    if (registerComponentApi) {
-      registerComponentApi({
-        getAppId: () => appId,
-      });
-    }
-  }, [registerComponentApi, appId]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {

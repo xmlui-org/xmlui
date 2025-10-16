@@ -14,7 +14,6 @@ import {
   TextVariantElement,
 } from "../abstractions";
 import type { RegisterComponentApiFn } from "../..";
-import { useAppId } from "../../components-core/rendering/AppIdContext";
 import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
@@ -22,12 +21,6 @@ import { toCssVar } from "../../components-core/theming/layout-resolver";
 // =============================================================================
 // Custom Variant CSS Cache Infrastructure
 // =============================================================================
-
-/**
- * Key type for the custom variant cache.
- * Combines app ID and variant value to ensure style isolation per app instance.
- */
-type CustomVariantCacheKey = `${string}:${string}`;
 
 /**
  * Cached CSS information for a custom variant.
@@ -43,44 +36,29 @@ interface CustomVariantCacheEntry {
 
 /**
  * Global cache that stores custom variant CSS styles.
- * Key format: "appId:variantValue"
+ * Key: variant value (string)
  *
- * This cache ensures:
- * - Each app instance (including nested apps) has its own variant styles
- * - The same variant value always generates the same CSS within an app
- * - Style isolation between parent and nested apps
+ * This cache ensures the same variant value always generates the same CSS.
  */
-const customVariantCache = new Map<CustomVariantCacheKey, CustomVariantCacheEntry>();
-
-/**
- * Creates a cache key from app ID and variant value.
- */
-function createCacheKey(appId: string | undefined, variant: string): CustomVariantCacheKey {
-  const safeAppId = appId || "default";
-  return `${safeAppId}:${variant}`;
-}
+const customVariantCache = new Map<string, CustomVariantCacheEntry>();
 
 /**
  * Retrieves a cached custom variant entry if it exists.
  */
 export function getCustomVariantCache(
-  appId: string | undefined,
   variant: string,
 ): CustomVariantCacheEntry | undefined {
-  const key = createCacheKey(appId, variant);
-  return customVariantCache.get(key);
+  return customVariantCache.get(variant);
 }
 
 /**
  * Stores a custom variant entry in the cache.
  */
 export function setCustomVariantCache(
-  appId: string | undefined,
   variant: string,
   entry: Omit<CustomVariantCacheEntry, "createdAt">,
 ): void {
-  const key = createCacheKey(appId, variant);
-  customVariantCache.set(key, {
+  customVariantCache.set(variant, {
     ...entry,
     createdAt: Date.now(),
   });
@@ -89,26 +67,8 @@ export function setCustomVariantCache(
 /**
  * Checks if a custom variant is already cached.
  */
-export function hasCustomVariantCache(appId: string | undefined, variant: string): boolean {
-  const key = createCacheKey(appId, variant);
-  return customVariantCache.has(key);
-}
-
-/**
- * Clears all custom variant cache entries for a specific app ID.
- * Useful for cleanup when an app instance unmounts.
- */
-export function clearCustomVariantCacheForApp(appId: string | undefined): void {
-  const safeAppId = appId || "default";
-  const keysToDelete: CustomVariantCacheKey[] = [];
-
-  for (const key of customVariantCache.keys()) {
-    if (key.startsWith(`${safeAppId}:`)) {
-      keysToDelete.push(key);
-    }
-  }
-
-  keysToDelete.forEach((key) => customVariantCache.delete(key));
+export function hasCustomVariantCache(variant: string): boolean {
+  return customVariantCache.has(variant);
 }
 
 /**
@@ -179,9 +139,6 @@ export const Text = forwardRef(function Text(
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
-
-  // Get the app ID for variant cache isolation
-  const appId = useAppId();
 
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
@@ -260,17 +217,17 @@ export const Text = forwardRef(function Text(
   // Store custom variant in cache if it's a new custom variant
   useEffect(() => {
     if (isCustomVariant && variant && customVariantClassName) {
-      // Check if this variant is already cached for this app
-      if (!hasCustomVariantCache(appId, variant)) {
+      // Check if this variant is already cached
+      if (!hasCustomVariantCache(variant)) {
         // TODO: When CSS generation is implemented, extract the actual CSS text
         // For now, store placeholder information
-        setCustomVariantCache(appId, variant, {
+        setCustomVariantCache(variant, {
           className: customVariantClassName,
           cssText: "", // Will be populated when CSS generation is implemented
         });
       }
     }
-  }, [isCustomVariant, variant, customVariantClassName, appId]);
+  }, [isCustomVariant, variant, customVariantClassName]);
 
   // Determine overflow mode classes based on overflowMode and existing props
   const overflowClasses = useMemo(() => {

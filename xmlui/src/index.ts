@@ -23,7 +23,6 @@ import { Stack } from "./components/Stack/StackNative";
 import { Button } from "./components/Button/ButtonNative";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
-import { useAppId } from "./components-core/rendering/AppIdContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
@@ -163,7 +162,6 @@ export {
   parseScssVar,
   startApp,
   useTheme,
-  useAppId,
   AppRoot,
   ErrorBoundary,
   Icon,

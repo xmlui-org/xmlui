@@ -503,33 +503,33 @@ Returns true when the displayed text overflows its container boundaries.
 
 When using custom variants, you can style them using theme variables with the naming pattern `{propertyName}-Text-{variantName}`. The following CSS properties are supported:
 
-| Theme Variable Name | CSS Property | Description | Example Value |
-|---------------------|--------------|-------------|---------------|
-| `textColor-Text-{variant}` | `color` | Text color | `rgb(255, 0, 0)`, `#ff0000`, `red` |
-| `fontFamily-Text-{variant}` | `font-family` | Font family | `"Arial, sans-serif"`, `monospace` |
-| `fontSize-Text-{variant}` | `font-size` | Font size | `16px`, `1.5rem`, `large` |
-| `fontStyle-Text-{variant}` | `font-style` | Font style | `normal`, `italic`, `oblique` |
-| `fontWeight-Text-{variant}` | `font-weight` | Font weight | `normal`, `bold`, `700` |
-| `fontStretch-Text-{variant}` | `font-stretch` | Font stretch | `normal`, `expanded`, `condensed` |
-| `textDecorationLine-Text-{variant}` | `text-decoration-line` | Decoration line type | `none`, `underline`, `overline`, `line-through` |
-| `textDecorationColor-Text-{variant}` | `text-decoration-color` | Decoration color | `rgb(255, 0, 0)`, `currentColor` |
-| `textDecorationStyle-Text-{variant}` | `text-decoration-style` | Decoration style | `solid`, `dashed`, `dotted`, `wavy` |
-| `textDecorationThickness-Text-{variant}` | `text-decoration-thickness` | Decoration thickness | `2px`, `from-font`, `auto` |
-| `textUnderlineOffset-Text-{variant}` | `text-underline-offset` | Underline offset | `5px`, `0.2em`, `auto` |
-| `lineHeight-Text-{variant}` | `line-height` | Line height | `1.5`, `24px`, `normal` |
-| `backgroundColor-Text-{variant}` | `background-color` | Background color | `rgb(255, 255, 0)`, `transparent` |
-| `textTransform-Text-{variant}` | `text-transform` | Text transformation | `none`, `uppercase`, `lowercase`, `capitalize` |
-| `letterSpacing-Text-{variant}` | `letter-spacing` | Space between letters | `1px`, `0.1em`, `normal` |
-| `wordSpacing-Text-{variant}` | `word-spacing` | Space between words | `5px`, `0.2em`, `normal` |
-| `textShadow-Text-{variant}` | `text-shadow` | Text shadow | `2px 2px 4px rgba(0,0,0,0.5)` |
-| `textIndent-Text-{variant}` | `text-indent` | First line indentation | `20px`, `2em`, `0` |
-| `textAlign-Text-{variant}` | `text-align` | Horizontal alignment | `left`, `center`, `right`, `justify` |
-| `textAlignLast-Text-{variant}` | `text-align-last` | Last line alignment | `left`, `center`, `right`, `justify` |
-| `wordBreak-Text-{variant}` | `word-break` | Word breaking behavior | `normal`, `break-all`, `keep-all` |
-| `wordWrap-Text-{variant}` | `word-wrap` | Word wrapping | `normal`, `break-word` |
-| `direction-Text-{variant}` | `direction` | Text direction | `ltr`, `rtl` |
-| `writingMode-Text-{variant}` | `writing-mode` | Writing mode | `horizontal-tb`, `vertical-rl`, `vertical-lr` |
-| `lineBreak-Text-{variant}` | `line-break` | Line breaking rules | `auto`, `normal`, `strict`, `loose` |
+| Theme Variable Name | Description | Example Value |
+|---------------------|-------------|---------------|
+| `textColor-Text-{variant}` | Text color | `rgb(255, 0, 0)`, `#ff0000`, `red` |
+| `fontFamily-Text-{variant}` | Font family | `"Arial, sans-serif"`, `monospace` |
+| `fontSize-Text-{variant}` | Font size | `16px`, `1.5rem`, `large` |
+| `fontStyle-Text-{variant}` | Font style | `normal`, `italic`, `oblique` |
+| `fontWeight-Text-{variant}` | Font weight | `normal`, `bold`, `700` |
+| `fontStretch-Text-{variant}` | Font stretch | `normal`, `expanded`, `condensed` |
+| `textDecorationLine-Text-{variant}` | Decoration line type | `none`, `underline`, `overline`, `line-through` |
+| `textDecorationColor-Text-{variant}` | Decoration color | `rgb(255, 0, 0)`, `currentColor` |
+| `textDecorationStyle-Text-{variant}` | Decoration style | `solid`, `dashed`, `dotted`, `wavy` |
+| `textDecorationThickness-Text-{variant}` | Decoration thickness | `2px`, `from-font`, `auto` |
+| `textUnderlineOffset-Text-{variant}` | Underline offset | `5px`, `0.2em`, `auto` |
+| `lineHeight-Text-{variant}` | Line height | `1.5`, `24px`, `normal` |
+| `backgroundColor-Text-{variant}` | Background color | `rgb(255, 255, 0)`, `transparent` |
+| `textTransform-Text-{variant}` | Text transformation | `none`, `uppercase`, `lowercase`, `capitalize` |
+| `letterSpacing-Text-{variant}` | Space between letters | `1px`, `0.1em`, `normal` |
+| `wordSpacing-Text-{variant}` | Space between words | `5px`, `0.2em`, `normal` |
+| `textShadow-Text-{variant}` | Text shadow | `2px 2px 4px rgba(0,0,0,0.5)` |
+| `textIndent-Text-{variant}` | First line indentation | `20px`, `2em`, `0` |
+| `textAlign-Text-{variant}` | Horizontal alignment | `left`, `center`, `right`, `justify` |
+| `textAlignLast-Text-{variant}` | Last line alignment | `left`, `center`, `right`, `justify` |
+| `wordBreak-Text-{variant}` | Word breaking behavior | `normal`, `break-all`, `keep-all` |
+| `wordWrap-Text-{variant}` | Word wrapping | `normal`, `break-word` |
+| `direction-Text-{variant}` | Text direction | `ltr`, `rtl` |
+| `writingMode-Text-{variant}` | Writing mode | `horizontal-tb`, `vertical-rl`, `vertical-lr` |
+| `lineBreak-Text-{variant}` | Line breaking rules | `auto`, `normal`, `strict`, `loose` |
 
 ```xmlui-pg  display name="Example: custom variant styles" /highlight/
 <App>
