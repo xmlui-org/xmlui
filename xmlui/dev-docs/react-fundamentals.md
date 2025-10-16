@@ -582,51 +582,20 @@ useMemo(() => formatUser(user), [user]); // user object recreated every render
 
 **Purpose:** Render only visible items in large lists by using "windowing." Instead of rendering 10,000 items, render only ~10 visible items.
 
-**Libraries:** XMLUI uses three based on component needs:
-- **react-window** (Tree) - Fixed-size lists, simple API
-- **virtua** (List) - Chat interfaces, reverse scrolling, auto-sizing
+**Libraries:** XMLUI uses two based on component needs:
+- **virtua** (Tree, List) - Chat interfaces, reverse scrolling, auto-sizing, fixed-size lists
 - **@tanstack/react-virtual** (Table) - Dynamic measurements, flexible
 
 **Library Comparison:**
 
-| Feature | react-window | virtua | @tanstack/react-virtual |
-|---------|-------------|--------|------------------------|
-| **Bundle Size** | ~7KB | ~6KB | ~4KB |
-| **API** | Components | Render props | Hooks |
-| **Dynamic heights** | Manual | Automatic | Automatic |
-| **Reverse scroll** | No | ✅ Built-in | Manual |
-| **XMLUI Usage** | Tree | List | Table |
-
-**Basic Example (react-window):**
-
-```tsx
-import { FixedSizeList } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
-
-const Row = memo(({ index, style, data }: ListChildComponentProps) => (
-  <div style={style}>{data.items[index].name}</div>
-));
-
-function VirtualizedList({ items }: Props) {
-  const itemData = useMemo(() => ({ items }), [items]);
-  
-  return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <FixedSizeList
-          height={height}
-          width={width}
-          itemCount={items.length}
-          itemSize={50}
-          itemData={itemData}
-        >
-          {Row}
-        </FixedSizeList>
-      )}
-    </AutoSizer>
-  );
-}
-```
+| Feature | virtua | @tanstack/react-virtual |
+|---------|--------|------------------------|
+| **Bundle Size** | ~6KB | ~4KB |
+| **API** | Render props | Hooks |
+| **Dynamic heights** | Automatic | Automatic |
+| **Reverse scroll** | ✅ Built-in | Manual |
+| **Auto-sizing** | ✅ Built-in | Manual |
+| **XMLUI Usage** | Tree, List | Table |
 
 **virtua Example (XMLUI List):**
 
@@ -683,9 +652,9 @@ function DataTable({ rows }: Props) {
 
 **Critical Rules:**
 1. **Memoize row components** - Use `React.memo()`
-2. **Apply style prop** - Required for positioning (react-window, @tanstack)
-3. **Memoize itemData** - Prevent row re-renders
-4. **Use AutoSizer** - Responsive sizing (react-window only)
+2. **Apply transform/style** - Required for positioning (@tanstack)
+3. **Memoize data** - Prevent row re-renders
+4. **Handle scroll container** - Each library handles sizing differently
 
 **Performance Impact:**
 
