@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useId } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
@@ -11,6 +11,7 @@ import type { AppWrapperProps } from "./AppWrapper";
 import { AppWrapper } from "./AppWrapper";
 import type { ComponentCompilation } from "../../abstractions/scripting/Compilation";
 import { StyleProvider } from "../theming/StyleContext";
+import { AppIdContext } from "./AppIdContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -60,6 +61,9 @@ export function AppRoot({
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
 }) {
+  // --- Generate a unique ID for this AppRoot instance
+  const appId = useId();
+
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
@@ -99,33 +103,35 @@ export function AppRoot({
   // --- Render the app providing a component registry (in which the engine finds a
   // --- component definition by its name). Ensure the app has a context for debugging.
   return (
-    <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
-      <StyleProvider>
-          <DebugViewProvider debugConfig={globalProps?.debug}>
-            <AppWrapper
-              projectCompilation={projectCompilation}
-              resourceMap={resourceMap}
-              apiInterceptor={apiInterceptor}
-              node={rootNode as ComponentLike}
-              contributes={contributes}
-              resources={resources}
-              routerBaseName={routerBaseName}
-              decorateComponentsWithTestId={decorateComponentsWithTestId}
-              debugEnabled={debugEnabled}
-              defaultTheme={defaultTheme}
-              defaultTone={defaultTone}
-              globalProps={enhancedGlobalProps}
-              standalone={standalone}
-              trackContainerHeight={trackContainerHeight}
-              previewMode={previewMode}
-              sources={sources}
-              onInit={onInit}
-            >
-              {children}
-            </AppWrapper>
-          </DebugViewProvider>
-      </StyleProvider>
-    </ComponentProvider>
+    <AppIdContext.Provider value={appId}>
+      <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
+        <StyleProvider>
+            <DebugViewProvider debugConfig={globalProps?.debug}>
+              <AppWrapper
+                projectCompilation={projectCompilation}
+                resourceMap={resourceMap}
+                apiInterceptor={apiInterceptor}
+                node={rootNode as ComponentLike}
+                contributes={contributes}
+                resources={resources}
+                routerBaseName={routerBaseName}
+                decorateComponentsWithTestId={decorateComponentsWithTestId}
+                debugEnabled={debugEnabled}
+                defaultTheme={defaultTheme}
+                defaultTone={defaultTone}
+                globalProps={enhancedGlobalProps}
+                standalone={standalone}
+                trackContainerHeight={trackContainerHeight}
+                previewMode={previewMode}
+                sources={sources}
+                onInit={onInit}
+              >
+                {children}
+              </AppWrapper>
+            </DebugViewProvider>
+        </StyleProvider>
+      </ComponentProvider>
+    </AppIdContext.Provider>
   );
 }
 

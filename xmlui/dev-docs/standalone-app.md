@@ -277,6 +277,7 @@ Here's a comprehensive table of all objects involved in rendering XMLUI apps:
 | **StandaloneApp** | React Component | Root component that prepares app internal representation and initiates rendering via ApiInterceptorProvider → AppRoot |
 | **ApiInterceptorProvider** | React Component | Wraps the app to provide mocked API functionality and routing context; waits for API interceptor initialization if needed |
 | **AppRoot** | React Component | Main rendering orchestrator that wraps app definition in root Container and Theme components; sets up component registry |
+| **AppIdContext** | React Context | Provides unique identifier for each AppRoot instance; enables components to determine which app they belong to, particularly useful in nested app scenarios |
 | **ComponentProvider** | React Context | Provides component registry that maps component names to their renderer functions; manages core and compound components |
 | **StyleProvider** | React Component | Provides CSS-in-JS styling context and theme-based styling capabilities for components |
 | **DebugViewProvider** | React Context | Provides debug configuration and development tooling context for the application |
@@ -324,13 +325,14 @@ This segment provides the foundational app bootstrapping and API infrastructure.
 
 ```
 AppRoot
-  └── ComponentProvider (component registry)
-      └── StyleProvider (CSS-in-JS)
-          └── DebugViewProvider (debug context)
-              └── AppWrapper (multiple providers)
+  └── AppIdContext.Provider (unique app ID)
+      └── ComponentProvider (component registry)
+          └── StyleProvider (CSS-in-JS)
+              └── DebugViewProvider (debug context)
+                  └── AppWrapper (multiple providers)
 ```
 
-This segment establishes the core rendering infrastructure and development environment. ComponentProvider sets up the component registry that maps component names to their renderers. StyleProvider enables CSS-in-JS styling capabilities, while DebugViewProvider configures development tooling and debugging context throughout the application.
+This segment establishes the core rendering infrastructure and development environment. AppRoot generates a unique ID for the app instance using React's `useId()` hook and provides it via AppIdContext.Provider, enabling components throughout the tree to identify which app instance they belong to. ComponentProvider sets up the component registry that maps component names to their renderers. StyleProvider enables CSS-in-JS styling capabilities, while DebugViewProvider configures development tooling and debugging context throughout the application.
 
 #### AppWrapper Hierarchy
 
@@ -424,10 +426,11 @@ On mount it resolves any provided `runtime`. If no runtime is available (or buil
 
 ### The `AppRoot` Component
 
-`AppRoot` is the main rendering orchestrator. It receives the resolved `StandaloneAppDescription`, registers components and themes, and mounts the provider stack that supplies styling, routing, data clients, and debugging tools. In short: `AppRoot` turns the prepared app description into a live React environment and hands control to `AppContent`/`StandaloneComponent` to start rendering.
+`AppRoot` is the main rendering orchestrator. It receives the resolved `StandaloneAppDescription`, registers components and themes, and mounts the provider stack that supplies styling, routing, data clients, and debugging tools. It also generates a unique identifier for each app instance using React's `useId()` hook. In short: `AppRoot` turns the prepared app description into a live React environment and hands control to `AppContent`/`StandaloneComponent` to start rendering.
 
 #### Behavior
 
+- Generates a unique identifier for the app instance using React's `useId()` hook and provides it via `AppIdContext.Provider`, enabling components to query which AppRoot instance they belong to—critical for nested app scenarios where multiple AppRoot instances may exist simultaneously.
 - Installs the `ComponentProvider` registry and registers core plus app-provided component renderers. It merges runtime and inline definitions and exposes the registry to children.
 - Wraps the app in styling and utility providers (`StyleProvider`, `QueryClientProvider`, `HelmetProvider`, `LoggerProvider`, `ThemeProvider`, etc.) via `AppWrapper` so components get consistent styling, data fetching, and logging contexts.
 - Forwards `globalProps`, `extensionManager`, and runtime flags into `AppContent` so navigation, toasts, theme switching, and extension resolution work at runtime.
@@ -436,10 +439,37 @@ On mount it resolves any provided `runtime`. If no runtime is available (or buil
 
 #### See Also
 
+- `AppIdContext` / `useAppId()` — context and hook for accessing the unique app instance identifier.
 - `ComponentProvider` — component registry used by `AppRoot` to resolve renderers.
 - `AppWrapper` — the layered provider composition that `AppRoot` mounts for routing, theming, and tooling.
 - `AppContent` — supplies global functions and application state to rendered components.
 - `StandaloneComponent` / `renderChild()` — the entry point that begins recursive component rendering.
+
+### The `AppIdContext` Context
+
+`AppIdContext` is a React context that provides a unique identifier for each `AppRoot` instance. This context enables components to determine which app instance they belong to, which is particularly valuable in nested app scenarios where multiple independent `AppRoot` instances exist simultaneously.
+
+#### Behavior
+
+- Each `AppRoot` generates a unique ID using React's `useId()` hook during component initialization. This ID is stable across renders but unique per component instance.
+- The ID is provided to all descendant components via `AppIdContext.Provider`, which wraps the entire component tree at the outermost level of `AppRoot`.
+- Components can access the current app ID using the `useAppId()` hook, which returns `string | undefined` (undefined if called outside an AppRoot context).
+- In nested app scenarios (e.g., when using `NestedApp` component), each nested app has its own `AppRoot` with its own unique ID, properly isolating the contexts.
+- The app ID can be accessed programmatically via the App component's `getAppId()` API method, making it available in XMLUI event handlers and expressions.
+
+#### Use Cases
+
+- **Debugging**: Identify which app instance a component belongs to in complex multi-app scenarios
+- **Logging & Analytics**: Tag logs or events with specific app instance IDs for better traceability
+- **Nested App Coordination**: Distinguish between parent and child app contexts when coordinating behavior
+- **Testing**: Verify proper app instance isolation in e2e tests
+
+#### See Also
+
+- `AppRoot` — generates the unique ID and provides the context
+- `useAppId()` — hook for accessing the current app ID from any component
+- `NestedApp` — component that creates nested AppRoot instances with separate IDs
+- `App` component's `getAppId()` API — programmatic access to the app ID from XMLUI markup
 
 ### The `ComponentProvider` Component
 

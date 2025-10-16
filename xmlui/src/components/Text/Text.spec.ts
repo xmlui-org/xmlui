@@ -1348,6 +1348,377 @@ test.describe("Theme Variables", () => {
 });
 
 // =============================================================================
+// CUSTOM VARIANT TESTS
+// =============================================================================
+
+test.describe("Custom Variants", () => {
+  test("custom variant textColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0)";
+    await initTestBed(`
+      <App>
+        <Theme textColor-Text-customRed="${EXPECTED}">
+          <Text variant="customRed" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("color", EXPECTED);
+  });
+
+  test("custom variant fontFamily theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "monospace";
+    await initTestBed(`
+      <App>
+        <Theme fontFamily-Text-customMono="${EXPECTED}">
+          <Text variant="customMono" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-family", EXPECTED);
+  });
+
+  test("custom variant fontSize theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "24px";
+    await initTestBed(`
+      <App>
+        <Theme fontSize-Text-customLarge="${EXPECTED}">
+          <Text variant="customLarge" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-size", EXPECTED);
+  });
+
+  test("custom variant fontStyle theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "italic";
+    await initTestBed(`
+      <App>
+        <Theme fontStyle-Text-customItalic="${EXPECTED}">
+          <Text variant="customItalic" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-style", EXPECTED);
+  });
+
+  test("custom variant fontWeight theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "700";
+    await initTestBed(`
+      <App>
+        <Theme fontWeight-Text-customBold="bold">
+          <Text variant="customBold" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-weight", EXPECTED);
+  });
+
+  test("custom variant fontStretch theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "125%";
+    await initTestBed(`
+      <App>
+        <Theme fontStretch-Text-customExpanded="expanded">
+          <Text variant="customExpanded" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-stretch", EXPECTED);
+  });
+
+  test("custom variant textDecorationLine theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "underline";
+    await initTestBed(`
+      <App>
+        <Theme textDecorationLine-Text-customUnderline="${EXPECTED}">
+          <Text variant="customUnderline" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-line", EXPECTED);
+  });
+
+  test("custom variant textDecorationColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0)";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customDeco="underline"
+          textDecorationColor-Text-customDeco="${EXPECTED}"
+        >
+          <Text variant="customDeco" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-color", EXPECTED);
+  });
+
+  test("custom variant textDecorationStyle theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "wavy";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customWavy="underline"
+          textDecorationStyle-Text-customWavy="${EXPECTED}"
+        >
+          <Text variant="customWavy" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-style", EXPECTED);
+  });
+
+  test("custom variant textDecorationThickness theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "3px";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customThick="underline"
+          textDecorationThickness-Text-customThick="${EXPECTED}"
+        >
+          <Text variant="customThick" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-thickness", EXPECTED);
+  });
+
+  test("custom variant textUnderlineOffset theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "5px";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customOffset="underline"
+          textUnderlineOffset-Text-customOffset="${EXPECTED}"
+        >
+          <Text variant="customOffset" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-underline-offset", EXPECTED);
+  });
+
+  test("custom variant lineHeight theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "32px";
+    await initTestBed(`
+      <App>
+        <Theme lineHeight-Text-customLineHeight="${EXPECTED}">
+          <Text variant="customLineHeight" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("line-height", EXPECTED);
+  });
+
+  test("custom variant backgroundColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 255, 0)";
+    await initTestBed(`
+      <App>
+        <Theme backgroundColor-Text-customBg="${EXPECTED}">
+          <Text variant="customBg" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("background-color", EXPECTED);
+  });
+
+  test("custom variant textTransform theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "uppercase";
+    await initTestBed(`
+      <App>
+        <Theme textTransform-Text-customUpper="${EXPECTED}">
+          <Text variant="customUpper" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-transform", EXPECTED);
+  });
+
+  test("custom variant letterSpacing theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "5px";
+    await initTestBed(`
+      <App>
+        <Theme letterSpacing-Text-customSpaced="${EXPECTED}">
+          <Text variant="customSpaced" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("letter-spacing", EXPECTED);
+  });
+
+  test("custom variant wordSpacing theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "10px";
+    await initTestBed(`
+      <App>
+        <Theme wordSpacing-Text-customWordSpace="${EXPECTED}">
+          <Text variant="customWordSpace" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-spacing", EXPECTED);
+  });
+
+  test("custom variant textShadow theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0) 2px 2px 4px";
+    await initTestBed(`
+      <App>
+        <Theme textShadow-Text-customShadow="${EXPECTED}">
+          <Text variant="customShadow" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-shadow", EXPECTED);
+  });
+
+  test("custom variant textIndent theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "20px";
+    await initTestBed(`
+      <App>
+        <Theme textIndent-Text-customIndent="${EXPECTED}">
+          <Text variant="customIndent" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-indent", EXPECTED);
+  });
+
+  test("custom variant textAlign theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "center";
+    await initTestBed(`
+      <App>
+        <Theme textAlign-Text-customCenter="${EXPECTED}">
+          <Text variant="customCenter" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-align", EXPECTED);
+  });
+
+  test("custom variant textAlignLast theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "right";
+    await initTestBed(`
+      <App>
+        <Theme textAlignLast-Text-customAlignLast="${EXPECTED}">
+          <Text variant="customAlignLast" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-align-last", EXPECTED);
+  });
+
+  test("custom variant wordBreak theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "break-all";
+    await initTestBed(`
+      <App>
+        <Theme wordBreak-Text-customBreak="${EXPECTED}">
+          <Text variant="customBreak" breakMode="'{undefined}'" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-break", EXPECTED);
+  });
+
+  test("custom variant wordWrap theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "break-word";
+    await initTestBed(`
+      <App>
+        <Theme wordWrap-Text-customWrap="${EXPECTED}">
+          <Text variant="customWrap" breakMode="'{undefined}'" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-wrap", EXPECTED);
+  });
+
+  test("custom variant direction theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rtl";
+    await initTestBed(`
+      <App>
+        <Theme direction-Text-customRtl="${EXPECTED}">
+          <Text variant="customRtl" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("direction", EXPECTED);
+  });
+
+  test("custom variant writingMode theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "vertical-rl";
+    await initTestBed(`
+      <App>
+        <Theme writingMode-Text-customVertical="${EXPECTED}">
+          <Text variant="customVertical" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("writing-mode", EXPECTED);
+  });
+
+  test("custom variant lineBreak theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "strict";
+    await initTestBed(`
+      <App>
+        <Theme lineBreak-Text-customLineBreak="${EXPECTED}">
+          <Text variant="customLineBreak" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("line-break", EXPECTED);
+  });
+
+  test("custom variant with multiple theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Theme 
+          textColor-Text-pinkElephant="rgb(255, 192, 203)" 
+          fontWeight-Text-pinkElephant="bold"
+          textColor-Text-greenDog="rgb(0, 128, 0)" 
+          fontStyle-Text-greenDog="italic"
+        >
+          <Text variant="pinkElephant" testId="pink">
+            Hello Pink Elephant!
+          </Text>
+          <Text variant="greenDog" testId="green">
+            Hello Green Dog!
+          </Text>
+        </Theme>
+      </App>
+    `);
+
+    const pinkText = page.getByTestId("pink");
+    const greenText = page.getByTestId("green");
+
+    await expect(pinkText).toHaveCSS("color", "rgb(255, 192, 203)");
+    await expect(pinkText).toHaveCSS("font-weight", "700");
+    await expect(greenText).toHaveCSS("color", "rgb(0, 128, 0)");
+    await expect(greenText).toHaveCSS("font-style", "italic");
+  });
+});
+
+// =============================================================================
 // SMOKE TESTS (kept for compatibility)
 // =============================================================================
 

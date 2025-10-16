@@ -109,6 +109,12 @@ export const AppMd = createMetadata({
       description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
     },
   },
+  apis: {
+    getAppId: {
+      description: "Returns the unique identifier for the current AppRoot instance. This ID is unique across all app instances, including nested apps.",
+      signature: "getAppId(): string | undefined",
+    },
+  },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
   themeVarDescriptions: {
@@ -142,7 +148,7 @@ export const AppMd = createMetadata({
 });
 
 
-function AppNode({ node, extractValue, renderChild, className, lookupEventHandler }) {
+function AppNode({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -405,6 +411,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
     >
       {renderedContent}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
@@ -582,7 +589,7 @@ function PageIndexer({
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     return (
       <AppNode
         node={node}
@@ -590,6 +597,7 @@ export const appRenderer = createComponentRenderer(
         extractValue={extractValue}
         className={className}
         lookupEventHandler={lookupEventHandler}
+        registerComponentApi={registerComponentApi}
       />
     );
   },
