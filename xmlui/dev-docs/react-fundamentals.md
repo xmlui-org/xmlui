@@ -2537,21 +2537,966 @@ root.unmount();
 
 ---
 
+## Controlled vs Uncontrolled Components
+
+**Purpose:** Two approaches for managing form input state - externally controlled via props or internally managed with local state.
+
+### Uncontrolled Components
+
+**What:** Component manages its own internal state. Parent provides initial value but doesn't control updates.
+
+**Pattern:** Use `initialValue` prop + internal `useState`, parent notified via callbacks.
+
+```tsx
+function UncontrolledInput({ initialValue = '', onDidChange }: Props) {
+  const [value, setValue] = useState(initialValue);
+  
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setValue(newValue);
+    onDidChange?.(newValue); // Notify parent, but parent doesn't control state
+  };
+  
+  return <input value={value} onChange={handleChange} />;
+}
+
+// Usage - parent doesn't control value
+function Form() {
+  const handleChange = (value: string) => {
+    console.log('Input changed:', value);
+  };
+  
+  return <UncontrolledInput initialValue="Hello" onDidChange={handleChange} />;
+}
+```
+
+**Characteristics:**
+- Component owns state (`useState` inside component)
+- Parent passes `initialValue` (only used on mount)
+- Parent notified of changes via callback
+- Component is source of truth for current value
+- Simpler parent component code
+
+### Controlled Components
+
+**What:** Parent component manages state. Component is "controlled" by parent via props.
+
+**Pattern:** Use `value` prop + `onChange` callback, no internal state for the value.
+
+```tsx
+function ControlledInput({ value, onChange }: Props) {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onChange?.(e.target.value);
+  };
+  
+  // No internal state - value comes from parent
+  return <input value={value} onChange={handleChange} />;
+}
+
+// Usage - parent controls value
+function Form() {
+  const [inputValue, setInputValue] = useState('Hello');
+  
+  return (
+    <div>
+      <ControlledInput value={inputValue} onChange={setInputValue} />
+      <button onClick={() => setInputValue('')}>Clear</button>
+    </div>
+  );
+}
+```
+
+**Characteristics:**
+- Parent owns state
+- Component receives current `value` as prop
+- Component calls `onChange` to request state change
+- Parent is source of truth
+- Parent can control, validate, or transform input
+
+### Hybrid Pattern (Common in XMLUI)
+
+**What:** Support both controlled and uncontrolled modes in the same component.
+
+**Pattern:** Accept both `value` and `initialValue`, use local state that syncs with `value` prop.
+
+```tsx
+function FlexibleInput({ value, initialValue = '', onDidChange }: Props) {
+  // Local state for uncontrolled mode
+  const [localValue, setLocalValue] = useState(initialValue);
+  
+  // Sync local state when controlled value changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setLocalValue(value);
+    }
+  }, [value]);
+  
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalValue(newValue);
+    onDidChange?.(newValue);
+  };
+  
+  return <input value={localValue} onChange={handleChange} />;
+}
+
+// Uncontrolled usage
+<FlexibleInput initialValue="Hello" onDidChange={handleChange} />
+
+// Controlled usage
+<FlexibleInput value={inputValue} onDidChange={setInputValue} />
+```
+
+### XMLUI TextBox Example
+
+```tsx
+export const TextBox = forwardRef(function TextBox({
+  value = '',           // For controlled mode
+  initialValue = '',    // For uncontrolled mode
+  onDidChange = noop,
+  updateState = noop,
+  // ... other props
+}: Props, ref) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Local state for internal management
+  const [localValue, setLocalValue] = useState(value);
+  
+  // Sync with controlled value prop
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+  
+  // Initialize with initialValue on mount
+  useEffect(() => {
+    updateState({ value: initialValue }, { initial: true });
+  }, [initialValue, updateState]);
+  
+  const updateValue = useCallback((value: string) => {
+    setLocalValue(value);      // Update local state
+    updateState({ value });     // Update XMLUI state system
+    onDidChange(value);         // Notify parent
+  }, [onDidChange, updateState]);
+  
+  const onInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    updateValue(event.target.value);
+  }, [updateValue]);
+  
+  return (
+    <input 
+      ref={inputRef}
+      value={localValue}
+      onChange={onInputChange}
+    />
+  );
+});
+```
+
+### When to Use Each Pattern
+
+**Use Uncontrolled when:**
+- Simple forms where you read values on submit
+- Component state doesn't affect other components
+- Don't need to validate on every keystroke
+- Performance matters (no parent re-renders)
+- Building form libraries
+
+**Use Controlled when:**
+- Need to validate, format, or transform input immediately
+- Input value affects other UI elements
+- Implementing features like "disable submit until valid"
+- Need to programmatically change input value
+- Synchronizing multiple inputs
+
+**Use Hybrid when:**
+- Building reusable component libraries (like XMLUI)
+- Want flexibility for consumers
+- Need to support both patterns without code duplication
+
+### Common Pitfalls
+
+```tsx
+// ❌ WRONG - Mixing controlled and uncontrolled incorrectly
+function BadInput({ value, initialValue, onChange }: Props) {
+  const [localValue, setLocalValue] = useState(initialValue);
+  // Problem: Never syncs with value prop, always uncontrolled
+  
+  return <input value={localValue} onChange={e => {
+    setLocalValue(e.target.value);
+    onChange?.(e.target.value);
+  }} />;
+}
+
+// ❌ WRONG - Fighting against controlled value
+function AlsoBad({ value, onChange }: Props) {
+  const [localValue, setLocalValue] = useState('');
+  // Problem: Creates conflicting state, ignores controlled value
+  
+  return <input value={localValue} onChange={e => {
+    setLocalValue(e.target.value);
+    onChange?.(e.target.value);
+  }} />;
+}
+
+// ✅ CORRECT - Proper hybrid implementation
+function GoodInput({ value, initialValue = '', onChange }: Props) {
+  const [localValue, setLocalValue] = useState(initialValue);
+  
+  // Sync when controlled value changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setLocalValue(value);
+    }
+  }, [value]);
+  
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalValue(newValue);
+    onChange?.(newValue);
+  };
+  
+  return <input value={localValue} onChange={handleChange} />;
+}
+```
+
+### Warning: React's Controlled Component Rules
+
+```tsx
+// ❌ React will warn - switching from uncontrolled to controlled
+function SwitchingComponent() {
+  const [value, setValue] = useState<string | undefined>(undefined);
+  
+  return (
+    <div>
+      {/* Initially uncontrolled (value is undefined), then becomes controlled */}
+      <input value={value} onChange={e => setValue(e.target.value)} />
+      <button onClick={() => setValue('controlled')}>Make Controlled</button>
+    </div>
+  );
+  // Warning: A component is changing an uncontrolled input to be controlled...
+}
+
+// ✅ CORRECT - Consistent behavior
+function ConsistentComponent() {
+  const [value, setValue] = useState(''); // Start with empty string, not undefined
+  
+  return <input value={value} onChange={e => setValue(e.target.value)} />;
+}
+```
+
+**Key principle:** Once an input is controlled or uncontrolled, it should remain that way for its entire lifecycle. Don't switch between `undefined` and a defined value.
+
+---
+
+## Compound Component Pattern
+
+**Purpose:** Multiple components work together as a cohesive unit, sharing state through context while remaining composable.
+
+**Pattern:** Parent manages state via context, children consume it, users compose flexibly.
+
+### Basic Pattern
+
+```tsx
+// 1. Context for shared state
+const TabsContext = createContext<{
+  activeTab: string;
+  setActiveTab: (id: string) => void;
+} | null>(null);
+
+// 2. Parent manages state
+function Tabs({ children }: Props) {
+  const [activeTab, setActiveTab] = useState('tab1');
+  
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      <div className="tabs">{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+// 3. Children consume context
+function Tab({ id, children }: Props) {
+  const context = useContext(TabsContext);
+  if (!context) throw new Error('Tab must be used within Tabs');
+  
+  return (
+    <button
+      className={context.activeTab === id ? 'tab active' : 'tab'}
+      onClick={() => context.setActiveTab(id)}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TabPanel({ id, children }: Props) {
+  const context = useContext(TabsContext);
+  if (!context) throw new Error('TabPanel must be used within Tabs');
+  if (context.activeTab !== id) return null;
+  return <div className="tab-panel">{children}</div>;
+}
+
+// 4. Export as compound
+Tabs.Tab = Tab;
+Tabs.Panel = TabPanel;
+```
+
+**Usage:**
+```tsx
+<Tabs>
+  <Tabs.Tab id="tab1">First</Tabs.Tab>
+  <Tabs.Tab id="tab2">Second</Tabs.Tab>
+  <Tabs.Panel id="tab1">First content</Tabs.Panel>
+  <Tabs.Panel id="tab2">Second content</Tabs.Panel>
+</Tabs>
+```
+
+### XMLUI Examples
+
+**Tabs with Registration:**
+```tsx
+// Context
+const TabContext = createContext<{
+  activeTabId: string;
+  registerTab: (id: string, label: string) => void;
+} | null>(null);
+
+// Parent
+export const Tabs = forwardRef(function Tabs({ children, onDidChange }: Props, ref) {
+  const [tabItems, setTabItems] = useState<TabItem[]>([]);
+  
+  const contextValue = useMemo(() => ({
+    activeTabId: tabItems[0]?.id,
+    registerTab: (id: string, label: string) => {
+      setTabItems(prev => [...prev, { id, label }]);
+    },
+  }), [tabItems]);
+  
+  return (
+    <TabContext.Provider value={contextValue}>
+      <div ref={ref}>{children}</div>
+    </TabContext.Provider>
+  );
+});
+
+// Child
+export const TabItem = forwardRef(function TabItem({ id, label }: Props, ref) {
+  const { activeTabId, registerTab } = useTabContext();
+  
+  useEffect(() => {
+    registerTab(id, label);
+  }, [id, label, registerTab]);
+  
+  return <div ref={ref} className={activeTabId === id ? 'active' : ''}>{label}</div>;
+});
+```
+
+**Accordion:**
+```tsx
+const AccordionContext = createContext<{
+  expandedItems: string[];
+  toggleItem: (id: string) => void;
+} | null>(null);
+
+export const Accordion = forwardRef(function Accordion({ children }: Props, ref) {
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  const contextValue = useMemo(() => ({
+    expandedItems,
+    toggleItem: (id: string) => {
+      setExpandedItems(prev => 
+        prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+      );
+    },
+  }), [expandedItems]);
+  
+  return (
+    <AccordionContext.Provider value={contextValue}>
+      <div ref={ref}>{children}</div>
+    </AccordionContext.Provider>
+  );
+});
+
+export const AccordionItem = forwardRef(function AccordionItem({ id, title }: Props, ref) {
+  const { expandedItems, toggleItem } = useContext(AccordionContext)!;
+  const isExpanded = expandedItems.includes(id);
+  
+  return (
+    <div ref={ref}>
+      <button onClick={() => toggleItem(id)}>{title}</button>
+      {isExpanded && <div>{children}</div>}
+    </div>
+  );
+});
+```
+
+**Select with Options:**
+```tsx
+const SelectContext = createContext<{
+  value: string | string[];
+  onChange: (value: string) => void;
+  multiSelect?: boolean;
+} | null>(null);
+
+export const SelectOption = forwardRef(function SelectOption({ value, label }: Props, ref) {
+  const context = useContext(SelectContext)!;
+  const isSelected = context.multiSelect
+    ? Array.isArray(context.value) && context.value.includes(value)
+    : context.value === value;
+  
+  return (
+    <div ref={ref} onClick={() => context.onChange(value)}>
+      {label} {isSelected && '✓'}
+    </div>
+  );
+});
+```
+
+### Common Patterns
+
+**Registration:**
+```tsx
+useEffect(() => {
+  context.register(id, data);
+  return () => context.unregister(id);
+}, [id, data, context]);
+```
+
+**Active State:**
+```tsx
+const contextValue = {
+  activeId,
+  setActive: setActiveId,
+  isActive: (id: string) => activeId === id,
+};
+```
+
+**Collection Management:**
+```tsx
+const [items, setItems] = useState<Item[]>([]);
+const register = useCallback((item: Item) => {
+  setItems(prev => [...prev, item]);
+}, []);
+```
+
+### When to Use
+
+**Use when:**
+- Components tightly coupled (tabs, accordion, select)
+- Need flexible composition
+- Shared state between children
+- Building component libraries
+
+**Don't use when:**
+- Simple parent-child relationship
+- No shared state
+- Props drilling is simple
+- Structure is rigid
+
+---
+
+## Context Provider Pattern
+
+**Purpose:** Advanced patterns for composing and organizing context providers in real applications. Builds on `createContext` and `useContext` fundamentals.
+
+**Note:** See `createContext` and `useContext` sections for basic context creation and consumption patterns.
+
+### Provider Composition
+
+**Multiple providers:**
+```tsx
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider>
+          <Content />
+        </RouterProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+**Composition helper:**
+```tsx
+function AppProviders({ children }: Props) {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider>
+          {children}
+        </RouterProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+// Usage
+<AppProviders>
+  <App />
+</AppProviders>
+```
+
+### Provider Initialization Pattern
+
+**Async initialization with loading state:**
+```tsx
+function AuthProvider({ children }: Props) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Initialize on mount
+  useEffect(() => {
+    checkAuth().then(user => {
+      setUser(user);
+      setLoading(false);
+    });
+  }, []);
+  
+  const value = useMemo(() => ({
+    user,
+    login: async (creds: Credentials) => {
+      const user = await api.login(creds);
+      setUser(user);
+    },
+    logout: () => setUser(null),
+  }), [user]);
+  
+  if (loading) return <LoadingScreen />;
+  
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+```
+
+### XMLUI Provider Examples
+
+**Style injection provider:**
+```tsx
+export function StyleProvider({ children }: Props) {
+  const [styles, setStyles] = useState<Map<string, CSSStyleSheet>>(new Map());
+  
+  const injectStyles = useCallback((id: string, css: string) => {
+    setStyles(prev => new Map(prev).set(id, createStyleSheet(css)));
+  }, []);
+  
+  const value = useMemo(() => ({ styles, injectStyles }), [styles, injectStyles]);
+  
+  return <StyleContext.Provider value={value}>{children}</StyleContext.Provider>;
+}
+```
+
+**App state with reducer:**
+```tsx
+export function AppStateProvider({ children }: Props) {
+  const [state, dispatch] = useReducer(appReducer, initialState);
+  
+  const value = useMemo(() => ({
+    state,
+    dispatch,
+    updateField: (field: string, value: any) => {
+      dispatch({ type: 'UPDATE_FIELD', field, value });
+    },
+  }), [state]);
+  
+  return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
+}
+```
+
+### Splitting Contexts for Performance
+
+```tsx
+// ❌ WRONG - Single context causes all consumers to re-render
+const AppContext = createContext({ user, theme, settings });
+
+// ✅ CORRECT - Separate contexts, consumers only re-render when needed
+const UserContext = createContext(user);
+const ThemeContext = createContext(theme);
+const SettingsContext = createContext(settings);
+
+function App() {
+  return (
+    <UserProvider>
+      <ThemeProvider>
+        <SettingsProvider>
+          <Content />
+        </SettingsProvider>
+      </ThemeProvider>
+    </UserProvider>
+  );
+}
+```
+
+### Conditional Provider
+
+```tsx
+function ConditionalProvider({ enabled, children }: Props) {
+  if (!enabled) return children;
+  
+  return <FeatureProvider>{children}</FeatureProvider>;
+}
+```
+
+---
+
+## Reducer Pattern with Immer
+
+**Purpose:** Simplify complex state updates using Immer's `produce` to write "mutative" code that produces immutable updates.
+
+**Pattern:** Wrap reducer in `produce()`, write direct mutations that Immer converts to immutable updates.
+
+**Note:** See `useReducer` section for basic reducer fundamentals. XMLUI uses Immer selectively for complex state management.
+
+### Basic Pattern
+
+```tsx
+import produce from 'immer';
+
+const reducer = produce((draft: State, action: Action) => {
+  switch (action.type) {
+    case 'ADD_ITEM':
+      draft.items.push(action.item);
+      break;
+    case 'UPDATE_NESTED':
+      draft.user.profile.settings.theme = action.payload; // Direct mutation
+      break;
+  }
+});
+```
+
+### XMLUI Usage Examples
+
+**StateContainer reducer:**
+```tsx
+export function createContainerReducer(debugView: IDebugViewContext) {
+  return produce((state: ContainerState, action: ContainerAction) => {
+    switch (action.type) {
+      case ContainerActionKind.COMPONENT_STATE_CHANGED:
+        state[uid] = { ...state[uid], ...action.payload.state };
+        break;
+      case ContainerActionKind.STATE_PART_CHANGED:
+        setWith(state, action.payload.path, action.payload.value, Object);
+        break;
+    }
+  });
+}
+```
+
+**TabContext registration:**
+```tsx
+setTabItems(
+  produce((draft) => {
+    const existing = draft.findIndex(item => item.innerId === tabItem.innerId);
+    if (existing < 0) {
+      draft.push(tabItem);
+    } else {
+      draft[existing] = tabItem;
+    }
+  })
+);
+```
+
+**Async operations with createDraft/finishDraft:**
+```tsx
+import { createDraft, finishDraft } from 'immer';
+
+const draft = createDraft(currentData);
+draft.push(...newItems);
+const nextData = finishDraft(draft);
+setData(nextData);
+```
+
+### When to Use
+
+**Use Immer when:**
+- Deeply nested state structures
+- Complex array/object manipulations
+- Multiple related updates in one action
+
+**Don't use when:**
+- Shallow state updates (simple spreading is fine)
+- Performance-critical paths (Immer has overhead)
+- Simple `useState` suffices
+
+---
+
+## State Lifting Pattern
+
+**Purpose:** Share state between sibling components by moving state to their closest common ancestor.
+
+**Pattern:** Move state up to parent, pass down as props and callbacks.
+
+### Basic Pattern
+
+```tsx
+// ❌ WRONG - Siblings can't communicate
+function Parent() {
+  return (
+    <>
+      <InputA /> {/* Has its own state */}
+      <InputB /> {/* Can't access InputA's state */}
+    </>
+  );
+}
+
+// ✅ CORRECT - State lifted to parent
+function Parent() {
+  const [value, setValue] = useState('');
+  
+  return (
+    <>
+      <InputA value={value} onChange={setValue} />
+      <InputB value={value} /> {/* Can access shared state */}
+    </>
+  );
+}
+```
+
+### Common Scenario: Form Fields
+
+```tsx
+function SignupForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const passwordsMatch = password === confirmPassword;
+  
+  return (
+    <form>
+      <EmailInput value={email} onChange={setEmail} />
+      <PasswordInput value={password} onChange={setPassword} />
+      <ConfirmPasswordInput 
+        value={confirmPassword} 
+        onChange={setConfirmPassword}
+        error={!passwordsMatch && 'Passwords must match'}
+      />
+      <SubmitButton disabled={!passwordsMatch} />
+    </form>
+  );
+}
+```
+
+### Multiple Levels of Lifting
+
+```tsx
+function App() {
+  const [user, setUser] = useState(null);
+  
+  return (
+    <div>
+      <Header user={user} onLogout={() => setUser(null)} />
+      <Sidebar user={user} />
+      <MainContent user={user} onUserUpdate={setUser} />
+    </div>
+  );
+}
+```
+
+### XMLUI Pattern
+
+XMLUI uses container-based state management where state naturally flows down from parent containers to children through the `StateContainer` hierarchy:
+
+```tsx
+// Parent container state flows down automatically
+<Stack var.selectedId="{null}">
+  <Button id="btn1" onClick={"{() => selectedId = 'item1'}" />
+  <Button id="btn2" onClick={"{() => selectedId = 'item2'}" />
+  <Display value="{selectedId}" /> {/* Accesses parent state */}
+</Stack>
+```
+
+### When to Use
+
+**Lift state when:**
+- Multiple components need to access the same state
+- Sibling components need to coordinate
+- Parent needs to orchestrate child behavior
+- State affects multiple parts of the UI
+
+**Don't lift when:**
+- State is only used by one component
+- Would create excessive prop drilling (use context instead)
+- State is purely local to a component
+
+---
+
+## Prop Drilling Solution Pattern
+
+**Purpose:** Share data across deeply nested components without passing props through every intermediate level.
+
+**Pattern:** Use Context API to provide values at the top and consume them anywhere in the tree.
+
+### The Problem: Prop Drilling
+
+```tsx
+// ❌ WRONG - Props passed through components that don't use them
+function App() {
+  const [theme, setTheme] = useState('light');
+  return <Header theme={theme} setTheme={setTheme} />;
+}
+
+function Header({ theme, setTheme }: Props) {
+  // Header doesn't use theme, just passes it down
+  return <Navigation theme={theme} setTheme={setTheme} />;
+}
+
+function Navigation({ theme, setTheme }: Props) {
+  // Navigation doesn't use theme either, keeps passing
+  return <UserMenu theme={theme} setTheme={setTheme} />;
+}
+
+function UserMenu({ theme, setTheme }: Props) {
+  // Finally used here, but passed through 3 levels
+  return <button onClick={() => setTheme('dark')}>{theme}</button>;
+}
+```
+
+### The Solution: Context
+
+```tsx
+// ✅ CORRECT - Context eliminates intermediate props
+const ThemeContext = createContext<{
+  theme: string;
+  setTheme: (theme: string) => void;
+} | null>(null);
+
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error('useTheme must be used within ThemeProvider');
+  return context;
+}
+
+function App() {
+  const [theme, setTheme] = useState('light');
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Header />
+    </ThemeContext.Provider>
+  );
+}
+
+function Header() {
+  return <Navigation />; // No theme props needed
+}
+
+function Navigation() {
+  return <UserMenu />; // No theme props needed
+}
+
+function UserMenu() {
+  const { theme, setTheme } = useTheme(); // Direct access
+  return <button onClick={() => setTheme('dark')}>{theme}</button>;
+}
+```
+
+### XMLUI Examples
+
+**App Layout Context:**
+```tsx
+// Provides layout state to deeply nested navigation components
+const AppLayoutContext = createContext<IAppLayoutContext | null>(null);
+
+export function useAppLayoutContext() {
+  return useContext(AppLayoutContext);
+}
+
+// App component provides context at top
+export const App = forwardRef(function App(props, ref) {
+  const layoutContextValue = useMemo(() => ({
+    layout,
+    navPanelVisible,
+    drawerVisible,
+    toggleDrawer,
+    // ...other layout state
+  }), [layout, navPanelVisible, drawerVisible, toggleDrawer]);
+  
+  return (
+    <AppLayoutContext.Provider value={layoutContextValue}>
+      {content}
+    </AppLayoutContext.Provider>
+  );
+});
+
+// NavLink deep in the tree accesses layout directly
+export const NavLink = forwardRef(function NavLink(props, ref) {
+  const appLayoutContext = useAppLayoutContext();
+  const layoutIsVertical = getAppLayoutOrientation(appLayoutContext.layout).includes('vertical');
+  // No prop drilling needed!
+});
+```
+
+**Nav Panel Context:**
+```tsx
+// Tells nested components they're in a drawer
+const NavPanelContext = createContext<{ inDrawer: boolean } | null>(null);
+
+function DrawerNavPanel({ children }: Props) {
+  return (
+    <NavPanelContext.Provider value={{ inDrawer: true }}>
+      <div>{children}</div>
+    </NavPanelContext.Provider>
+  );
+}
+
+// NavGroup consumes context without drilling
+export const NavGroup = forwardRef(function NavGroup(props, ref) {
+  const navPanelContext = useContext(NavPanelContext);
+  const inline = navPanelContext?.inDrawer;
+  // Adapts rendering based on context
+});
+```
+
+**Inspector Context:**
+```tsx
+// Development tools context for component inspection
+export const InspectorContext = createContext<IInspectorContext | null>(null);
+
+export function InspectorProvider({ children, sources, projectCompilation }: Props) {
+  const value = useMemo(() => ({
+    sources,
+    projectCompilation,
+    inspectedNode,
+    setInspectedNode,
+    // ...inspector state
+  }), [sources, projectCompilation, inspectedNode]);
+  
+  return (
+    <InspectorContext.Provider value={value}>
+      {children}
+    </InspectorContext.Provider>
+  );
+}
+
+// Components anywhere in tree can inspect themselves
+export function useInspector(node: ComponentDef, uid: symbol) {
+  const inspector = useContext(InspectorContext);
+  // Access dev tools without prop drilling
+}
+```
+
+### When to Use
+
+**Use Context when:**
+- Data needed by many components at different nesting levels
+- Passing props through 3+ intermediate components that don't use them
+- Global or semi-global state (theme, auth, i18n, layout)
+- Component coordination across the tree (modals, inspectors)
+
+**Don't use when:**
+- Only 1-2 levels of nesting (props are fine)
+- Only adjacent siblings need to share state (lift state instead)
+- High-frequency updates to many consumers (causes all to re-render)
+- Data flow is simple and linear
+
+**Note:** See `createContext` and `useContext` sections for implementation details and best practices.
+
+---
+
 ## React Hooks and Patterns Used in XMLUI
 
 Based on the analysis of the XMLUI codebase, here is a comprehensive list of React hooks, methods, and patterns that are actually used. These represent the fundamental React concepts that developers should understand when working with XMLUI components.
-
-### Advanced Patterns
-
-23. **Controlled vs Uncontrolled Component Pattern** - Different approaches to form input management
-24. **Compound Component Pattern** - Components that work together to form a complete UI
-25. **Context Provider Pattern** - Providing context values to component trees
-
-### State Management Patterns
-
-26. **Reducer Pattern with Immer** - Using Immer's `produce` for immutable state updates
-27. **State Lifting Pattern** - Moving state up to common ancestors
-28. **Prop Drilling Solution Pattern** - Using context to avoid deep prop passing
 
 ### Performance Optimization Patterns
 
