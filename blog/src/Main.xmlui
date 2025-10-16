@@ -10,13 +10,6 @@
             author: "Jon Udell",
             date: "2025-09-10",
             image: "blog-scrabble.png"
-          },
-          {
-            title: "Lorem Ipsum!",
-            slug: "lorem-ipsum",
-            author: "H. Rackham",
-            date: "1914-06-03",
-            image: "lorem-ipsum.png"
           }
         ]}`
         >
@@ -42,7 +35,6 @@
             </Stack>
             <NavGroup label="Recent posts" to="/blog" >
               <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
-              <NavLink label="Loreum ipsum" to="/blog/{posts[1].slug}" />
             </NavGroup>
         </NavPanel>
         <Pages fallbackPath="/404">
@@ -54,9 +46,6 @@
             </Page>
             <Page url="/blog/{posts[0].slug}">
                 <BlogPage post="{posts[0]}" />
-            </Page>
-            <Page url="/blog/{posts[1].slug}">
-                <BlogPage post="{posts[1]}" />
             </Page>
             <Page url="/404">
                 <PageNotFound />

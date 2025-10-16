@@ -275,6 +275,7 @@ Suppose you wanted to decouple the blog engine from the monorepo and use it stan
 
 
 ```
+
 ├── Main.xmlui
 ├── blog
 │   ├── images
@@ -461,6 +462,8 @@ Here is `BlogSearch`. It provides a reactive search box so as you type, another 
 With these ingredients in place, I dragged the folder containing the standalone app onto Netlify's drop target. Check it out!
 
 [https://test-xmlui-blog.netlify.app/](https://test-xmlui-blog.netlify.app/)
+
+The post you are reading here was deployed in a similar way.
 
 ## XMLUI for publishing
 
