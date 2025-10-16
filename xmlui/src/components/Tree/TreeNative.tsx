@@ -1,6 +1,5 @@
 import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { FixedSizeList, type ListChildComponentProps } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import Icon from "../Icon/IconNative";
 import { Spinner } from "../Spinner/SpinnerNative";
@@ -41,7 +40,12 @@ interface RowContext {
   expandRotation: number;
 }
 
-const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext>) => {
+interface TreeRowProps {
+  index: number;
+  data: RowContext;
+}
+
+const TreeRow = memo(({ index, data }: TreeRowProps) => {
   const {
     nodes,
     toggleNode,
@@ -115,7 +119,7 @@ const TreeRow = memo(({ index, style, data }: ListChildComponentProps<RowContext
   const isLoading = nodeWithState.loadingState === "loading";
 
   return (
-    <div style={{ ...style, width: "auto", minWidth: "100%", display: "flex" }}>
+    <div style={{ width: "100%", display: "flex" }}>
       <div
         className={classnames(styles.rowWrapper, {
           [styles.selected]: isSelected,
@@ -527,7 +531,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   // Simplified focus management
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const treeContainerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<FixedSizeList>(null);
+  const listRef = useRef<VirtualizerHandle>(null);
 
   const flatTreeData = useMemo(() => {
     return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates);
@@ -924,11 +928,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     expandRotation,
   ]);
 
-  const getItemKey = useCallback((index: number, data: RowContext) => {
-    const node = data.nodes[index];
-    return node?.key || node?.id || `fallback-${index}`;
-  }, []);
-
   // Shared API implementation to avoid duplication between ref and component APIs
   const treeApiMethods = useMemo(() => {
     return {
@@ -1167,8 +1166,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           );
 
           if (nodeIndex >= 0 && listRef.current) {
-            // Scroll to the item using the FixedSizeList's scrollToItem method
-            listRef.current.scrollToItem(nodeIndex, "center");
+            // Scroll to the item using virtua's scrollToIndex method
+            listRef.current.scrollToIndex(nodeIndex, { align: "center" });
           }
         }, 0);
       },
@@ -1178,7 +1177,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         const nodeIndex = findNodeIndexById(nodeId);
 
         if (nodeIndex >= 0 && listRef.current) {
-          listRef.current.scrollToItem(nodeIndex, "center");
+          listRef.current.scrollToIndex(nodeIndex, { align: "center" });
         }
       },
 
@@ -1608,22 +1607,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
+      style={{ height: "100%", overflow: "auto" }}
     >
-      <AutoSizer>
-        {({ width, height }) => (
-          <FixedSizeList
-            ref={listRef}
-            height={height}
-            itemCount={itemData.nodes.length}
-            itemData={itemData}
-            itemSize={itemHeight}
-            itemKey={getItemKey}
-            width={width}
-          >
-            {TreeRow}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
+      <Virtualizer ref={listRef}>
+        {flatTreeData.map((node, index) => (
+          <TreeRow key={node.key} index={index} data={itemData} />
+        ))}
+      </Virtualizer>
     </div>
   );
 });
