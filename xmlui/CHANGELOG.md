@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.10.21
+
+### Patch Changes
+
+- 6fd4d62: Add custom Text variant styling
+
 ## 0.10.20
 
 ### Patch Changes
