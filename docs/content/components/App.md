@@ -403,11 +403,7 @@ Use it as `onReady` when inlining it on the component.
 
 ## Exposed Methods [#exposed-methods]
 
-### `getAppId` [#getappid]
-
-Returns the unique identifier for the current AppRoot instance. This ID is unique across all app instances, including nested apps.
-
-**Signature**: `getAppId(): string | undefined`
+This component does not expose any methods.
 
 ## Styling [#styling]
 

@@ -109,12 +109,6 @@ export const AppMd = createMetadata({
       description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
     },
   },
-  apis: {
-    getAppId: {
-      description: "Returns the unique identifier for the current AppRoot instance. This ID is unique across all app instances, including nested apps.",
-      signature: "getAppId(): string | undefined",
-    },
-  },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
   themeVarDescriptions: {
