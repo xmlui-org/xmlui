@@ -99,7 +99,7 @@ function generateRSS(blogPosts) {
 <rss version="2.0">
   <channel>
     <title>XMLUI Blog</title>
-    <link>https://docs.xmlui.org</link>
+    <link>https://blog.xmlui.org</link>
     <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
     <language>en</language>
     <lastBuildDate>${now}</lastBuildDate>
@@ -110,7 +110,7 @@ function generateRSS(blogPosts) {
 
   blogPosts.forEach(post => {
     const pubDate = formatDate(post.date);
-    const postUrl = `https://docs.xmlui.org/${post.slug}`;
+    const postUrl = `https://blog.xmlui.org/${post.slug}`;
     const description = getPostDescription(post.slug);
 
     rss += `
@@ -171,7 +171,7 @@ function main() {
 
     fs.writeFileSync(outputPath, rssContent);
     console.log(`RSS feed generated successfully: ${outputPath}`);
-    console.log(`Feed will be available at: https://docs.xmlui.org/feed.rss`);
+    console.log(`Feed will be available at: https://blog.xmlui.org/feed.rss`);
 
   } catch (error) {
     console.error('Error generating RSS feed:', error);
