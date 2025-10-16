@@ -126,6 +126,22 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
     &[data-orientation="horizontal"] {
       flex-direction: row;
     }
+
+    &.alignStart {
+      justify-content: flex-start;
+    }
+
+    &.alignEnd {
+      justify-content: flex-end;
+    }
+
+    &.alignCenter {
+      justify-content: center;
+    }
+
+    &.alignStretch {
+      justify-content: stretch;
+    }
   }
 
   .tabsList:hover {

@@ -30,6 +30,16 @@ export const TabsMd = createMetadata({
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
+    tabAlignment: {
+      description:
+        `This property controls how tabs are aligned within the tab header container. ` +
+        `Use 'start' to align tabs to the left (horizontal) or top (vertical), 'end' to align ` +
+        `to the right (horizontal) or bottom (vertical), 'center' to center the tabs, and ` +
+        `'stretch' to make tabs fill the full width of the header.`,
+      availableValues: ["start", "end", "center", "stretch"],
+      defaultValue: defaultProps.tabAlignment,
+      valueType: "string",
+    },
     headerTemplate: {
       ...dComponent(`This property declares the template for the clickable tab area.`),
     },
@@ -94,6 +104,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         }
         activeTab={extractValue(node.props?.activeTab)}
         orientation={extractValue(node.props?.orientation)}
+        tabAlignment={extractValue(node.props?.tabAlignment)}
         onDidChange={lookupEventHandler("didChange")}
         registerComponentApi={registerComponentApi}
       >
