@@ -1,5 +1,53 @@
 [
   {
+    "tag_name": "xmlui@0.10.20",
+    "published_at": "2025-10-15T12:46:33Z",
+    "changes": [
+      {
+        "description": "fix: Autocomplete handles animations correctly",
+        "commit_sha": "26eac90"
+      },
+      {
+        "description": "Add margin-related theme variables to ContentSeparator",
+        "commit_sha": "f53edff"
+      },
+      {
+        "description": "Add applyIf property to Theme",
+        "commit_sha": "1840916"
+      },
+      {
+        "description": "fix: external animation is now correctly applied to ModalDialogs as well",
+        "commit_sha": "c6be7a3"
+      },
+      {
+        "description": "Added better error text when rendering FormItem outside of a Form.",
+        "commit_sha": "6aaefaf"
+      },
+      {
+        "description": "refactor: Select and AutoComplete components",
+        "commit_sha": "28d2585"
+      },
+      {
+        "description": "The itemLabelWidth value of Form now supports theme variables ($space-\\* values).",
+        "commit_sha": "e29a231"
+      },
+      {
+        "description": "AppState now uses a merge operation to set initialValue",
+        "commit_sha": "22162c0"
+      },
+      {
+        "description": "fix: itemWithLabel - layout issue",
+        "commit_sha": "e90232b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.20.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.20/xmlui-0.10.20.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.19",
     "published_at": "2025-10-07T09:22:39Z",
     "changes": [
