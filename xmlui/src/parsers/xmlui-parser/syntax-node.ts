@@ -40,6 +40,14 @@ export class Node {
     return this.kind === SyntaxKind.AttributeNode;
   }
 
+  isTagLike(): boolean {
+    return (
+      this.kind === SyntaxKind.ElementNode ||
+      this.kind === SyntaxKind.CData ||
+      this.kind == SyntaxKind.Script
+    );
+  }
+
   isAttributeKeyNode(): this is AttributeKeyNode {
     return this.kind === SyntaxKind.AttributeKeyNode;
   }
@@ -58,6 +66,16 @@ export class Node {
 
   findTokenAtPos(position: number) {
     return findTokenAtPos(this, position);
+  }
+
+  getTriviaNodes(): Node[] | null {
+    if (this.pos === this.start) {
+      return null;
+    } else if (this.triviaBefore) {
+      return this.triviaBefore;
+    } else {
+      return this.children![0].getTriviaNodes();
+    }
   }
 }
 

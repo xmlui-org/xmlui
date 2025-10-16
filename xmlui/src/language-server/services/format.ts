@@ -1,6 +1,5 @@
 import type { FormattingOptions, TextEdit, Range, Position } from "vscode-languageserver";
-import { SyntaxKind, type GetText, type Node, toDbgString } from "../../parsers/xmlui-parser";
-import { getTriviaNodes } from "./common/syntax-node-utilities";
+import { type GetText, type Node, SyntaxKind, toDbgString } from "../../parsers/xmlui-parser";
 
 type FormattingContex = {
   node: Node;
@@ -39,6 +38,7 @@ export function handleDocumentFormatting({
     },
   ];
 }
+
 class XmluiFormatter {
   private readonly getText: GetText;
   private readonly startingNode: Node;
@@ -81,12 +81,7 @@ class XmluiFormatter {
   }
 
   private printContentListNode(node: Node): string {
-    let acc: string = this.printEveryTrivia(node);
-    if (!node.children) {
-      acc += this.getText(node);
-      return acc;
-    }
-
+    let acc: string = "";
     for (let i = 0; i < node.children.length; i++) {
       const c = node.children[i];
       const prevChild = i > 0 ? node.children[i - 1] : null;
@@ -95,32 +90,9 @@ class XmluiFormatter {
         case SyntaxKind.CData:
         case SyntaxKind.Script:
         case SyntaxKind.ElementNode: {
-          const comment = this.getCommentsSpaceJoined(c);
-          const prevIsText = prevChild?.kind === SyntaxKind.TextNode;
+          acc += this.printTagLikeTriviaInContent(prevChild, c);
 
-          if (comment) {
-            let commentInline: boolean = true;
-
-            if (this.hasNewlineTriviaBeforeComment(c)) {
-              commentInline = false;
-            } else if (prevIsText) {
-              const prevText = this.getText(prevChild);
-              commentInline = !hasNewlineInTrailingWhitespace(prevText);
-            }
-
-            if (commentInline) {
-              if (acc.at(-1) === this.newlineToken) {
-                acc = acc.substring(0, acc.length - this.newlineToken.length);
-              }
-              acc += ` ${comment}${this.newlineToken}`;
-            } else {
-              acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
-            }
-          }
-
-          acc += this.indent(this.indentationLvl);
           acc += this.printTagLike(c);
-          acc += this.newlineToken;
           break;
         }
 
@@ -151,6 +123,102 @@ class XmluiFormatter {
           break;
       }
     }
+    return acc;
+  }
+
+  printTagLikeTriviaInContent(prevSibling: Node | null, node: Node) {
+    if (prevSibling?.isTagLike()) {
+      return this.printTriviaBetweenTagLikes(node);
+    }
+
+    console.log(
+      "todo: code below also handles printTriviaBetweenTagLikes, but it should be handled by now",
+    );
+    let acc = "";
+    const comment = this.getCommentsSpaceJoined(node);
+    const prevIsText = prevSibling?.kind === SyntaxKind.TextNode;
+
+    if (comment) {
+      let commentInline: boolean = true;
+
+      if (this.hasNewlineTriviaBeforeComment(node)) {
+        commentInline = false;
+      } else if (prevIsText) {
+        const prevText = this.getText(prevSibling);
+        commentInline = !hasNewlineInTrailingWhitespace(prevText);
+      }
+
+      if (commentInline) {
+        if (acc.at(-1) === this.newlineToken) {
+          acc = acc.substring(0, acc.length - this.newlineToken.length);
+        }
+        acc += ` ${comment}${this.newlineToken}`;
+      } else {
+        acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
+      }
+    }
+
+    acc += this.indent(this.indentationLvl);
+    return acc;
+  }
+
+  printTriviaBetweenTagLikes(node: Node): string {
+    /* returns newline and comment nodes so that at most 1 blank line is permitted */
+    function collapseBlankLines(trivias: Node[]) {
+      let consecutiveNewlines = 0;
+      const accTrivias: Node[] = [];
+
+      for (let t of trivias) {
+        if (t.kind === SyntaxKind.NewLineTrivia) {
+          consecutiveNewlines++;
+          if (consecutiveNewlines <= 2) {
+            accTrivias.push(t);
+          }
+        } else if (t.kind === SyntaxKind.CommentTrivia) {
+          consecutiveNewlines = 0;
+          accTrivias.push(t);
+        }
+      }
+
+      return accTrivias;
+    }
+
+    const addWsToCollapsedTrivia = (trivias: Node[]) => {
+      let acc = "";
+      for (let i = 0; i < trivias.length; i++) {
+        const t = trivias[i];
+        switch (t.kind) {
+          case SyntaxKind.CommentTrivia: {
+            if (i === 0) {
+              acc += " ";
+              acc += this.getText(t);
+            } else if (i === trivias.length - 1) {
+              acc += this.indent(this.indentationLvl) + this.getText(t) + this.newlineToken;
+            } else {
+              acc += this.indent(this.indentationLvl) + this.getText(t);
+            }
+            if (trivias[i + 1]?.kind === SyntaxKind.CommentTrivia) {
+              acc += this.newlineToken;
+            }
+            break;
+          }
+          case SyntaxKind.NewLineTrivia: {
+            acc += this.newlineToken;
+            break;
+          }
+        }
+      }
+      return acc;
+    };
+
+    const triviaBetweenTaglikes = node.getTriviaNodes();
+    if (!triviaBetweenTaglikes) {
+      return this.newlineToken + this.indent(this.indentationLvl);
+    }
+
+    const collapsedTrivias = collapseBlankLines(triviaBetweenTaglikes);
+    let acc = addWsToCollapsedTrivia(collapsedTrivias);
+    acc += this.indent(this.indentationLvl);
     return acc;
   }
 
@@ -279,7 +347,9 @@ class XmluiFormatter {
           attrSegmentsFormatted = this.printAttrList(c);
 
           attrsAlreadyMultiline = c.children.some((attr) =>
-            getTriviaNodes(attr).some((attrTrivia) => attrTrivia.kind === SyntaxKind.NewLineTrivia),
+            attr
+              .getTriviaNodes()
+              ?.some((attrTrivia) => attrTrivia.kind === SyntaxKind.NewLineTrivia),
           );
           attrListOffsetInAcc = acc.length;
           break;
@@ -450,7 +520,7 @@ class XmluiFormatter {
   }
 
   getComments(node: Node): string[] {
-    const triviaNodes = getTriviaNodes(node);
+    const triviaNodes = node.getTriviaNodes() ?? [];
     return triviaNodes
       .filter(({ kind }) => kind === SyntaxKind.CommentTrivia)
       .map((comment) => this.getText(comment));
@@ -473,7 +543,10 @@ class XmluiFormatter {
    * Check if comments have newlines before them
    */
   hasNewlineTriviaBeforeComment(node: Node): boolean {
-    const triviaNodes = getTriviaNodes(node);
+    const triviaNodes = node.getTriviaNodes();
+    if (!triviaNodes) {
+      return false;
+    }
     for (let c of triviaNodes) {
       if (c.kind === SyntaxKind.NewLineTrivia) {
         return true;
@@ -487,8 +560,7 @@ class XmluiFormatter {
 
 export function format(node: Node, getText: GetText, options: FormatOptions): string | null {
   const formatter = new XmluiFormatter(node, getText, options);
-  const formattedString = formatter.format();
-  return formattedString;
+  return formatter.format();
 }
 
 function hasNewlineInTrailingWhitespace(text: string): boolean {

@@ -6,7 +6,7 @@ describe("XML Formatter", () => {
   describe("Format Options", () => {
     test("should respect custom indentation", () => {
       const input = "<Fragment><Text>Content</Text></Fragment>";
-      const result = testIdempotency(input, { tabSize: 4, insertSpaces: true });
+      const result = formatTwice(input, { tabSize: 4, insertSpaces: true });
 
       expect(result).toEqual(
         `<Fragment>
@@ -19,7 +19,7 @@ describe("XML Formatter", () => {
 
     test("should respect tab indentation", () => {
       const input = "<Fragment><Text>Content</Text></Fragment>";
-      const result = testIdempotency(input, { tabSize: 4, insertSpaces: false });
+      const result = formatTwice(input, { tabSize: 4, insertSpaces: false });
 
       expect(result).toEqual(
         `<Fragment>
@@ -34,7 +34,7 @@ describe("XML Formatter", () => {
   describe("Basic XML Formatting", () => {
     test("should format simple xmlui fragment", () => {
       const input = '<Fragment><Text testId="textShort" width="200px">Short</Text></Fragment>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -48,7 +48,7 @@ describe("XML Formatter", () => {
     test("should format nested xmlui elements", () => {
       const input =
         '<Fragment><Text testId="textShort" width="200px">Short</Text><Text testId="textLong" width="200px" maxLines="2">Long text content</Text></Fragment>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -65,7 +65,7 @@ describe("XML Formatter", () => {
     test("should preserve text content", () => {
       const input =
         "<Text>Though this long text does not fit into a single line, please do not break it!</Text>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Text>
@@ -76,7 +76,7 @@ describe("XML Formatter", () => {
 
     test("should format self-closing tags", () => {
       const input = '<Fragment><Input type="text"/><Button/></Fragment>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -88,7 +88,7 @@ describe("XML Formatter", () => {
 
     test("should format key-only attribue", () => {
       const input = '<Fragment><Input type="text" enabled/><Button/></Fragment>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -102,7 +102,7 @@ describe("XML Formatter", () => {
   describe("CDATA Handling", () => {
     test("should preserve CDATA sections", () => {
       const input = "<Fragment><Text><![CDATA[Some <special> content & more]]></Text></Fragment>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -116,7 +116,7 @@ describe("XML Formatter", () => {
     test("should format XML with multiple CDATA sections", () => {
       const input =
         "<Fragment><Text><![CDATA[First CDATA]]></Text><Text><![CDATA[Second CDATA with <tags>]]></Text></Fragment>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -132,7 +132,7 @@ describe("XML Formatter", () => {
 
     test("should handle CDATA with special characters", () => {
       const input = "<Text><![CDATA[Content with & < > \" ' characters]]></Text>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Text>
@@ -144,51 +144,77 @@ describe("XML Formatter", () => {
 
   describe("newlines", () => {
     test("keeps single blank line", () => {
-      const result = testIdempotency("<A>\n\n</A>");
-      expect(result).toEqual(`<A>\n\n</A>`);
+      const result = formatTwice("<A />\n\n<A />");
+      expect(result).toEqual(`<A />\n\n<A />`);
     });
 
     test("converts single whitespace only line to blank line", () => {
-      const result = testIdempotency("<A>\n   \n</A>");
-      expect(result).toEqual(`<A>\n\n</A>`);
+      const result = formatTwice("<A />\n   \n<A />");
+      expect(result).toEqual(`<A />\n\n<A />`);
     });
 
-    test("keeps comment only line", () => {
-      const result = testIdempotency(`<A>
+    test("keeps blank line around comment only line", () => {
+      const result = formatTwice(`<A />
+
+<!--c-->
+
+<A />`);
+      expect(result).toEqual(`<A />
+
+  <!--c-->
+
+<A />`);
+    });
+
+    test("removes blank lines around comment if it's the only content", () => {
+      const result = formatTwice(`<A>
 
   <!--c-->
 
 </A>`);
       expect(result).toEqual(`<A>
-
   <!--c-->
-
 </A>`);
     });
 
     test("collapses multiple blank lines around comment only line", () => {
-      const result = testIdempotency(`<A>
+      const result = formatTwice(`<A />
 
 
   <!--c-->
 
 
-</A>`);
-      expect(result).toEqual(`<A>
+<A />`);
+      expect(result).toEqual(`<A />
 
-  <!--c-->
+<!--c-->
 
-</A>`);
+<A />`);
+    });
+    test("collapses multiple blank lines around 2 comment only line", () => {
+      const result = formatTwice(`<A />
+
+
+  <!--c--><!--c-->
+
+
+<A />`);
+      expect(result).toEqual(`<A />
+
+<!--c-->
+<!--c-->
+
+<A />`);
     });
 
     test("collapses multiple blank lines into single one", () => {
-      const result = testIdempotency("<A>\n\n\n</A>");
-      expect(result).toEqual(`<A>\n\n</A>`);
+      const result = formatTwice("<A />\n\n\n<A />");
+      expect(result).toEqual(`<A />\n\n<A />`);
     });
 
     test("collapses multiple whitespace only lines into single blank line", () => {
-      const result = testIdempotency("<A>\n    \n  \n</A>");
-      expect(result).toEqual(`<A>\n\n</A>`);
+      const result = formatTwice("<A />\n    \n  \n<A />");
+      expect(result).toEqual(`<A />\n\n<A />`);
     });
   });
 
@@ -201,7 +227,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `< <!--c--> n attr="val" attr2>
@@ -222,7 +248,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n <!--c--> attr="val" attr2>
@@ -243,7 +269,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr <!--c--> ="val" attr2>
@@ -264,7 +290,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr= <!--c--> "val" attr2>
@@ -285,7 +311,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" <!--c--> attr2>
@@ -306,7 +332,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2 <!--c-->>
@@ -327,7 +353,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -349,7 +375,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -370,7 +396,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -391,7 +417,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -413,7 +439,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -435,7 +461,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -457,7 +483,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -479,7 +505,7 @@ describe("XML Formatter", () => {
     attr4<!--c--> />
   text2
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -501,7 +527,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2<!--c-->
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -524,7 +550,7 @@ describe("XML Formatter", () => {
   text2
   <!--c-->
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -546,7 +572,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n><!--c-->`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -567,7 +593,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </<!--c-->n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -588,7 +614,7 @@ describe("XML Formatter", () => {
     attr4 />
   text2
 </n<!--c-->>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n attr="val" attr2>
@@ -606,7 +632,7 @@ describe("XML Formatter", () => {
   <n1 /> <!-- c -->
   <n2 />
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n>
@@ -622,7 +648,23 @@ describe("XML Formatter", () => {
 <!-- c -->
   <n2 />
 </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
+
+      expect(result).toEqual(
+        `<n>
+  <n1 />
+  <!-- c -->
+  <n2 />
+</n>`,
+      );
+    });
+
+    test("adds newline after single comment between tags", () => {
+      const input = `<n>
+  <n1 />
+<!-- c --><n2 />
+</n>`;
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n>
@@ -635,7 +677,7 @@ describe("XML Formatter", () => {
 
     test("single comment as the only content in tag", () => {
       const input = `<n> <!-- c --> </n>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n>
@@ -646,7 +688,7 @@ describe("XML Formatter", () => {
 
     test("single comment, error node in before attributes", () => {
       const input = `<n attr="val" <!-- long, long commonet long, long commonet long, long commonet long, long commonet --> attr2 ? ></n2>`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<n
@@ -658,28 +700,28 @@ describe("XML Formatter", () => {
 
     test("single comment before ':' in tag name ", () => {
       const input = `<ns<!-- c -->:n attr="val" />`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(`<ns <!-- c --> :n attr="val" />`);
     });
 
     test("single comment after ':' in tag name ", () => {
       const input = `<ns:<!-- c -->n attr="val" />`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(`<ns: <!-- c --> n attr="val" />`);
     });
 
     test("single comment before ':' in attr name", () => {
       const input = `<n ns<!-- c -->:attr="val" />`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(`<n ns <!-- c --> :attr="val" />`);
     });
 
     test("single comment after ':' in attr name", () => {
       const input = `<n ns:<!-- c -->attr="val" />`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(`<n ns: <!-- c --> attr="val" />`);
     });
@@ -687,7 +729,7 @@ describe("XML Formatter", () => {
     test("should handle comments before eof", () => {
       const input = `<Fragment><Text>Content</Text></Fragment>
         <!-- This is a comment -->`;
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -701,18 +743,18 @@ describe("XML Formatter", () => {
   });
   describe("Edge Cases", () => {
     test("should handle empty string", () => {
-      const result = testIdempotency("");
+      const result = formatTwice("");
       expect(result).toEqual("");
     });
 
     test("should handle whitespace-only string", () => {
-      const result = testIdempotency("   \n  \t  ");
+      const result = formatTwice("   \n  \t  ");
       expect(result).toEqual("");
     });
 
     test("should handle single self-closing tag", () => {
       const input = '<Input type="text"/>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(`<Input type="text" />`);
     });
@@ -720,7 +762,7 @@ describe("XML Formatter", () => {
     test("should handle deeply nested elements", () => {
       const input =
         "<Fragment><Container><Section><Text>Deep content</Text></Section></Container></Fragment>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -737,7 +779,7 @@ describe("XML Formatter", () => {
 
     test("should handle mixed content", () => {
       const input = "<Text>Before<Bold>bold</Bold>After</Text>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Text>
@@ -760,7 +802,7 @@ describe("XML Formatter", () => {
   </Text>
 </Fragment>`;
 
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -777,7 +819,7 @@ describe("XML Formatter", () => {
     test("should format long attribute list in paired tag", () => {
       const input =
         '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick">Submit</Button>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Button
@@ -794,7 +836,7 @@ describe("XML Formatter", () => {
     test("should format long attribute list in self-closing tag", () => {
       const input =
         '<Button testId="submitBtn" variant="primary" size="large" disabled="false" onClick="handleClick"/>';
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Button
@@ -809,7 +851,7 @@ describe("XML Formatter", () => {
     test("should format complex xmlui layout", () => {
       const input =
         "<Fragment><Header><Title>Page Title</Title></Header><Main><Section><Text>Content</Text><Button>Action</Button></Section></Main><Footer><Text>Footer content</Text></Footer></Fragment>";
-      const result = testIdempotency(input);
+      const result = formatTwice(input);
 
       expect(result).toEqual(
         `<Fragment>
@@ -849,14 +891,12 @@ function formatFromString(
 
   return format(node, parser.getText, defaultOptions);
 }
-// Helper function to test idempotency
-function testIdempotency(
-  input: string,
-  options: FormatOptions = { tabSize: 2, insertSpaces: true },
-) {
+
+/* also tests idempotency */
+function formatTwice(input: string, options: FormatOptions = { tabSize: 2, insertSpaces: true }) {
   const firstFormat = formatFromString(input, options);
   const secondFormat = formatFromString(firstFormat, options);
 
-  expect(secondFormat).toBe(firstFormat);
+  expect(firstFormat).toBe(secondFormat);
   return firstFormat;
 }
