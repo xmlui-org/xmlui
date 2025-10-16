@@ -46,6 +46,9 @@ jobs:
         # This step will give a clear error if authentication is the problem
         run: npm install ./xmlui-optimizer
 
+      - name: Build extensions
+        run: npm run build-extensions
+
       - run: cd blog && npm run build-optimized
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
