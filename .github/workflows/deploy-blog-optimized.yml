@@ -2,6 +2,13 @@ name: Deploy blog (optimized)
 
 on:
   workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - 'captaaint/blog'
+    paths:
+      - 'blog/**'
+
 
 permissions:
   contents: write
@@ -46,10 +53,7 @@ jobs:
         # This step will give a clear error if authentication is the problem
         run: npm install ./xmlui-optimizer
 
-      - name: Build extensions
-        run: npm run build-extensions
-
-      - run: cd blog && npm run build-optimized
+      - run: cd blog && npm run release-ci-optimized
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
