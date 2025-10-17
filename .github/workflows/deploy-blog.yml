@@ -1,13 +1,11 @@
-name: Deploy blog (optimized)
+name: Deploy blog
 
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches:
-      - 'captaaint/blog'
-    paths:
-      - 'blog/**'
+      - main
 
 
 permissions:

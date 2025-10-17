@@ -5,8 +5,6 @@
   "scripts": {
     "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
-    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
-    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
     "gen:rss": "node scripts/generate-rss.js",
     "build:blog": "npm run gen:rss && xmlui build --buildMode=INLINE_ALL --withMock",
     "build-optimized": "npx xmlui-optimizer",
@@ -17,7 +15,6 @@
     "@shikijs/langs": "3.4.2",
     "shiki": "^3.3.0",
     "xmlui": "*",
-    "xmlui-playground": "*",
     "xmlui-search": "*",
     "xmlui-hello-world": "*"
   },
