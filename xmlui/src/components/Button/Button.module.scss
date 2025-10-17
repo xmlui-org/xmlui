@@ -14,6 +14,26 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-sm");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-md");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
+$fontFamily-Button: createThemeVar('fontFamily-#{$component}');
+$fontSize-Button: createThemeVar('fontSize-#{$component}');
+$fontWeight-Button: createThemeVar('fontWeight-#{$component}');
+$fontStyle-Button: createThemeVar('fontStyle-#{$component}');
+$borderRadius-Button: createThemeVar('borderRadius-#{$component}');
+$borderWidth-Button: createThemeVar('borderWidth-#{$component}');
+$borderWidth-Button--hover: createThemeVar('borderWidth-#{$component}--hover');
+$borderColor-Button: createThemeVar('borderColor-#{$component}');
+$borderColor-Button--hover: createThemeVar('borderColor-#{$component}--hover');
+$borderStyle-Button: createThemeVar('borderStyle-#{$component}');
+$borderStyle-Button--hover: createThemeVar('borderStyle-#{$component}--hover');
+$backgroundColor-Button: createThemeVar('backgroundColor-#{$component}');
+$backgroundColor-Button--hover: createThemeVar('backgroundColor-#{$component}--hover');
+$textColor-Button: createThemeVar('textColor-#{$component}');
+$textColor-Button--hover: createThemeVar('textColor-#{$component}--hover');
+$boxShadow-Button: createThemeVar('boxShadow-#{$component}');
+$boxShadow-Button--hover: createThemeVar('boxShadow-#{$component}--hover');
+
+$gap-Button: createThemeVar('gap-#{$component}');
+$transition-Button: createThemeVar('transition-#{$component}');
 
 // --- CSS properties of solid buttons with the specified color scheme
 @mixin solid($colorScheme){
@@ -27,7 +47,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   background: createThemeVar('backgroundColor-#{$component}-#{$colorScheme}-solid');
   color: createThemeVar('textColor-#{$component}-#{$colorScheme}-solid');
   box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid');
-
+  transition: createThemeVar('transition-#{$component}-#{$colorScheme}-solid');
 
   &:focus-visible {
     outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-solid--focus');
@@ -148,11 +168,11 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
     padding: 0;
     margin: 0;
     border-style: solid;
-    transition: color 0.2s, background 0.2s;
+    transition: $transition-Button;
     user-select: none;
     cursor: pointer;
     display: flex;
-    gap: t.$space-2;
+    gap: $gap-Button;
     justify-content: center;
     align-items: center;
 

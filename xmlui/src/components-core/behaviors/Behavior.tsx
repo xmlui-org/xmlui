@@ -26,7 +26,8 @@ export interface Behavior {
    * A function that attaches the behavior to the component's React node.
    * @param context The renderer context of the component.
    * @param node The React node to attach.
+   * @param metadata The metadata of the component.
    * @returns The attached React node.
    */
-  attach: (context: RendererContext<any>, node: ReactNode) => ReactNode;
+  attach: (context: RendererContext<any>, node: ReactNode, metadata?: ComponentMetadata) => ReactNode;
 }
