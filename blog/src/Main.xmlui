@@ -17,23 +17,16 @@
             showNavPanelThreshold: showNavPanelThreshold,
             posts: posts.length
         }}" />
-    <CHStack marginTop="$space-4" width="98%">
-        <Logo when="{! showNav()}" height="$space-6" />
-        <SpaceFiller />
-        <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
-            <Button label="Home" />
-        </Link>
-        <Search data="{appGlobals.plainTextContent}" />
-    </CHStack>
-    <NavPanel
-        when="{navState.value.showNavPanel}">
-        <Stack
-            paddingHorizontal="$space-4"
-            paddingBottom="$space-4"
-            when="{mediaSize.sizeIndex <= 2}">
+    <AppHeader>
+        <property name="profileMenuTemplate">
+            <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
+                <Button label="Home" />
+            </Link>
             <Search data="{appGlobals.plainTextContent}" />
-        </Stack>
-        <NavGroup label="Recent posts" to="/blog">
+        </property>
+    </AppHeader>
+    <NavPanel when="{showNav()}">
+       <NavGroup label="Recent posts" to="/blog">
             <NavLink
                 label="Welcome to the XMLUI blog!"
                 to="/blog/{posts[0].slug}" />
