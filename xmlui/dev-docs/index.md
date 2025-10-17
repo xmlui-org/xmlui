@@ -13,6 +13,10 @@ This article helps you understand the implementation details of xmlui so that yo
 - [Container-Based State Management](./containers.md)
 - ...
 
+**Rendering Techniques**
+- [Component Behaviors](./component-behaviors.md)
+- ...
+
 Topics to elaborate on:
 
 - **How deployment and build systems work** ✓ _[standalone-app.md, build-system.md, build-xmlui.md, xmlui-repo.md]_
