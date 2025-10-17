@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -17,10 +17,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
-  },
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
   },
   "include": ["src", "tests", "index.ts"],
   "exclude": ["ests"]
