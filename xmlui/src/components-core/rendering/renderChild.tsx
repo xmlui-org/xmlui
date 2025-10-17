@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { ComponentDef } from "../../abstractions/ComponentDefs";
-import { InnerRendererContext } from "../abstractions/ComponentRenderer";
-import { ComponentCleanupFn } from "../rendering/ContainerWrapper";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
+import type { ComponentCleanupFn } from "../rendering/ContainerWrapper";
 import { shouldKeep, extractParam } from "../utils/extractParam";
 import { ComponentWrapper } from "./ComponentWrapper";
-import { StatePartChangedFn } from "./ContainerWrapper";
+import type { StatePartChangedFn } from "./ContainerWrapper";
 
 /**
  * This type represents the context in which the React component belonging to a

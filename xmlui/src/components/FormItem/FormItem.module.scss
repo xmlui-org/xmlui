@@ -1,7 +1,9 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -87,7 +89,9 @@ $themeVars: ();
   }
 
   .itemWithLabel {
-    width: 100%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
   }
 }
 

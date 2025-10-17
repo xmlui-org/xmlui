@@ -3,7 +3,6 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -17,7 +16,6 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import Icon from "../Icon/IconNative";
 
 // Import utilities and types from merged utils file
@@ -31,7 +29,6 @@ import {
   safeMin,
   type AmPmType,
 } from "./utils";
-import { partClassName } from "../../components-core/parts";
 
 // Component part names
 const PART_HOUR = "hour";
@@ -74,10 +71,6 @@ type Props = {
   endText?: string;
   endIcon?: string;
   gap?: string;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
@@ -91,10 +84,8 @@ export const defaultProps = {
   clearable: false,
   clearToInitialValue: true,
   required: false,
-  labelPosition: "top",
   readOnly: false,
   autoFocus: false,
-  labelBreak: false,
   emptyCharacter: "-",
 };
 
@@ -126,10 +117,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     endText,
     endIcon,
     gap,
-    label,
-    labelPosition = defaultProps.labelPosition,
-    labelWidth,
-    labelBreak = defaultProps.labelBreak,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
@@ -311,7 +298,8 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         const normalizedValue = normalizeFn(currentValue);
 
         // Check if the current value was invalid (needed normalization or couldn't be normalized)
-        const wasInvalid = currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+        const wasInvalid =
+          currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
 
         if (normalizedValue !== null && normalizedValue !== currentValue) {
           setValue(normalizedValue);
@@ -357,7 +345,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           handleChange(timeString);
         }
       },
-    [hour, minute, second, amPm, is12HourFormat, handleChange],
+    [hour, minute, second, formatTimeValue, amPm, is12HourFormat, handleChange],
   );
 
   // Handle changes from individual inputs
@@ -428,7 +416,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     // Always call handleChange to update the time value
     const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
     handleChange(timeString);
-  }, [amPm, hour, minute, second, is12HourFormat, handleChange]);
+  }, [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange]);
 
   const handleAmPmSet = useCallback(
     (targetAmPm: AmPmType) => {
@@ -440,7 +428,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       const timeString = formatTimeValue(hour, minute, second, targetAmPm, is12HourFormat);
       handleChange(timeString);
     },
-    [amPm, hour, minute, second, is12HourFormat, handleChange],
+    [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange],
   );
 
   // Focus method
@@ -483,11 +471,11 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   const createArrowKeyHandler = useCallback(() => {
     return (event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) => {
       const { key } = event;
-      
+
       if (key === "ArrowRight") {
         event.preventDefault();
         const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
-        
+
         // Determine next input based on current input
         if (currentTarget === hourInputRef.current && minuteInputRef.current) {
           minuteInputRef.current.focus();
@@ -499,13 +487,17 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           } else if (!showSeconds && is12HourFormat && amPmButtonRef.current) {
             amPmButtonRef.current.focus();
           }
-        } else if (currentTarget === secondInputRef.current && is12HourFormat && amPmButtonRef.current) {
+        } else if (
+          currentTarget === secondInputRef.current &&
+          is12HourFormat &&
+          amPmButtonRef.current
+        ) {
           amPmButtonRef.current.focus();
         }
       } else if (key === "ArrowLeft") {
         event.preventDefault();
         const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
-        
+
         // Determine previous input based on current input
         if (currentTarget === minuteInputRef.current && hourInputRef.current) {
           hourInputRef.current.focus();
@@ -563,21 +555,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     setTimeout(() => {
       focus();
     }, 0);
-  }, [
-    stableInitialValue,
-    handleChange,
-    localValue,
-    controlledValue,
-    hour,
-    minute,
-    second,
-    amPm,
-    setHour,
-    setMinute,
-    setSecond,
-    setAmPm,
-    focus,
-  ]);
+  }, [clearToInitialValue, stableInitialValue, handleChange, is12HourFormat, focus]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
@@ -597,9 +575,10 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     let hour24: number;
     if (is12HourFormat && amPm) {
       const hourInt = parseInt(hour, 10);
-      if (amPm === 'am') {
+      if (amPm === "am") {
         hour24 = hourInt === 12 ? 0 : hourInt;
-      } else { // pm
+      } else {
+        // pm
         hour24 = hourInt === 12 ? 12 : hourInt + 12;
       }
     } else {
@@ -610,13 +589,11 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     const h24 = hour24.toString().padStart(2, "0");
     const m24 = minute.padStart(2, "0");
     const s24 = (second || "00").padStart(2, "0");
-    
+
     return `${h24}:${m24}:${s24}`;
   }, [hour, minute, second, amPm, is12HourFormat]);
 
   // Component API registration
-  useImperativeHandle(ref, () => timeInputRef.current as HTMLDivElement);
-
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({
@@ -689,6 +666,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
         <div className={styles.inputGroup}>
           {/* Hour input */}
           <HourInput
+            id={id}
             amPm={amPm}
             autoFocus={autoFocus}
             disabled={!enabled}
@@ -772,11 +750,8 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
 
         {clearable && (
           <button
-            className={classnames(
-              partClassName(PART_CLEAR_BUTTON),
-              styles.clearButton,
-              styles.button,
-            )}
+            data-part-id={PART_CLEAR_BUTTON}
+            className={classnames(styles.clearButton, styles.button)}
             disabled={!enabled}
             onClick={clear}
             onFocus={stopPropagation}
@@ -789,25 +764,6 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       {endAdornment}
     </div>
   );
-
-  // Wrap with label if needed
-  if (label) {
-    return (
-      <ItemWithLabel
-        label={label}
-        labelPosition={labelPosition as any}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-      >
-        <>
-          {startAdornment}
-          {timeInputComponent}
-          {endAdornment}
-        </>
-      </ItemWithLabel>
-    );
-  }
 
   return timeInputComponent;
 });
@@ -880,9 +836,10 @@ function AmPmButton({
   return (
     <button
       type="button"
+      data-part-id={PART_AMPM}
       aria-label={ariaLabel || "Toggle AM/PM (Press A for AM, P for PM)"}
       autoFocus={autoFocus}
-      className={classnames(partClassName(PART_AMPM), styles.amPmButton, styles.button, className)}
+      className={classnames(styles.amPmButton, styles.button, className)}
       disabled={isDisabled}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -915,6 +872,7 @@ type TimeInputElementProps = {
 
 // HourInput component
 type HourInputProps = {
+  id?: string;
   amPm?: AmPmType | null;
   maxTime?: string;
   minTime?: string;
@@ -925,6 +883,7 @@ type HourInputProps = {
 } & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
 
 function HourInput({
+  id,
   amPm,
   maxTime,
   minTime,
@@ -988,6 +947,8 @@ function HourInput({
 
   return (
     <PartialInput
+      id={id}
+      data-part-id={PART_HOUR}
       value={displayValue}
       emptyCharacter={emptyCharacter}
       placeholderLength={2}
@@ -1003,7 +964,7 @@ function HourInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_HOUR), styles.input, styles.hour)}
+      className={classnames(styles.input, styles.hour)}
       invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
@@ -1049,6 +1010,7 @@ function MinuteInput({
 
   return (
     <PartialInput
+      data-part-id={PART_MINUTE}
       max={maxMinute}
       min={minMinute}
       name="minute"
@@ -1065,7 +1027,7 @@ function MinuteInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_MINUTE), styles.input, styles.minute)}
+      className={classnames(styles.input, styles.minute)}
       invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
@@ -1112,6 +1074,7 @@ function SecondInput({
 
   return (
     <PartialInput
+      data-part-id={PART_SECOND}
       max={maxSecond}
       min={minSecond}
       name="second"
@@ -1128,7 +1091,7 @@ function SecondInput({
         }
       }}
       onKeyDown={otherProps.onKeyDown}
-      className={classnames(partClassName(PART_SECOND), styles.input, styles.second)}
+      className={classnames(styles.input, styles.second)}
       invalidClassName={styles.invalid}
       disabled={otherProps.disabled}
       readOnly={otherProps.readOnly}
@@ -1156,7 +1119,7 @@ function parseTimeString(timeValue: any, targetIs12Hour: boolean = false) {
   }
 
   // If not a string, return empty values for type safety
-  if (typeof timeValue !== 'string') {
+  if (typeof timeValue !== "string") {
     return {
       amPm: null,
       hour: "",
@@ -1180,7 +1143,13 @@ function parseTimeString(timeValue: any, targetIs12Hour: boolean = false) {
   let parsedSecond = getSeconds(timePart);
 
   // If parsing with the current format fails (all zeros), try ISO time format
-  if (parsedHour === 0 && parsedMinute === 0 && parsedSecond === 0 && timePart !== "00:00:00" && timePart !== "00:00") {
+  if (
+    parsedHour === 0 &&
+    parsedMinute === 0 &&
+    parsedSecond === 0 &&
+    timePart !== "00:00:00" &&
+    timePart !== "00:00"
+  ) {
     try {
       // Try parsing as ISO time format using Date constructor
       const isoDate = new Date(`1970-01-01T${timePart}`);

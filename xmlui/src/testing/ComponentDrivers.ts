@@ -1,6 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
 import { getPseudoStyles } from "./component-test-helpers";
-import { partClassName } from "../components-core/parts";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -35,14 +34,30 @@ export class ComponentDriver {
     return this.locator;
   }
 
+  getByTestId(testId: string): Locator {
+    return this.component.getByTestId(testId).first();
+  }
+
   getByPartName(part: string): Locator {
-    return this.component.locator(`.${partClassName(part)}`).first();
+    return this.component.locator(`[data-part-id="${part}"]`).first();
+  }
+
+  getIcons(): Locator {
+    return this.component.locator('[data-icon-name="*"]');
+  }
+
+  getIconsByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`);
+  }
+
+  getIconByName(name: string): Locator {
+    return this.component.locator(`[data-icon-name="${name}"]`).first();
   }
 
   /**
    * Gets the html tag name of the final rendered component
    */
-  async getComponentTagName() {
+  getComponentTagName() {
     return this.component.evaluate((el) => el.tagName.toLowerCase());
   }
 
@@ -288,14 +303,14 @@ export class SplitterDriver extends ComponentDriver {
   /**
    * Gets the primary panel element
    */
-  async getPrimaryPanel() {
+  getPrimaryPanel() {
     return this.locator.locator('[class*="primaryPanel"]').first();
   }
 
   /**
    * Gets the secondary panel element
    */
-  async getSecondaryPanel() {
+  getSecondaryPanel() {
     return this.locator.locator('[class*="secondaryPanel"]').first();
   }
 }
@@ -455,12 +470,38 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 
   async triggerDrop(files: string[] = ["test.txt"]) {
-    // Simulate file drop event
-    await this.component.dispatchEvent("drop", {
-      dataTransfer: {
-        files: files.map((name) => ({ name, type: "text/plain", size: 100 })),
-      },
+    // Simulate file drop event by creating File objects and using setInputFiles
+    const hiddenInput = this.getHiddenInput();
+
+    // Create temporary files for testing
+    const fileObjects = files.map((name) => {
+      return {
+        name,
+        mimeType: "text/plain",
+        buffer: Buffer.from("test content"),
+      };
     });
+
+    // Set files on the hidden input
+    await hiddenInput.setInputFiles(fileObjects);
+
+    // Trigger the drop event with a proper structure
+    await this.component.evaluate((element, fileNames) => {
+      // Create a proper drop event
+      const event = new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer(),
+      });
+
+      // Add files to dataTransfer if needed for component logic
+      fileNames.forEach((fileName: string) => {
+        const file = new File(["test content"], fileName, { type: "text/plain" });
+        event.dataTransfer?.items.add(file);
+      });
+
+      element.dispatchEvent(event);
+    }, files);
   }
 
   async triggerPaste() {
@@ -515,18 +556,22 @@ export class FormDriver extends ComponentDriver {
     );
   }
 
-  getSubmitButton() {
-    return this.component.locator("button[type='submit']");
+  get submitButton() {
+    return this.getByPartName("submitButton");
+  }
+
+  get cancelButton() {
+    return this.getByPartName("cancelButton");
   }
 
   async hasSubmitButton() {
-    return (await this.getSubmitButton().count()) > 0;
+    return (await this.submitButton.count()) > 0;
   }
 
   async submitForm(trigger: SubmitTrigger = "click") {
     if (trigger === "keypress") {
-      if ((await this.hasSubmitButton()) && (await this.getSubmitButton().isEnabled())) {
-        await this.getSubmitButton().focus();
+      if ((await this.hasSubmitButton()) && (await this.submitButton.isEnabled())) {
+        await this.submitButton.focus();
       }
       await this.locator.locator("input").waitFor();
       const firstInputChild = this.locator.locator("input");
@@ -535,7 +580,7 @@ export class FormDriver extends ComponentDriver {
       }
       await this.page.keyboard.press("Enter");
     } else if (trigger === "click") {
-      await this.getSubmitButton().click();
+      await this.submitButton.click();
     }
   }
 
@@ -555,7 +600,7 @@ export class FormDriver extends ComponentDriver {
     return requestPromise;
   }
 
-  async getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+  getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes(endpoint) && response.status() === responseStatus,
       { timeout },
@@ -567,7 +612,7 @@ export class FormDriver extends ComponentDriver {
    * Gets the validation summary component inside the Form.
    * Uses the 'data-validation-summary' attribute to find the component
    */
-  async getValidationSummary() {
+  getValidationSummary() {
     return this.component.locator("[data-validation-summary='true']");
   }
 
@@ -576,13 +621,13 @@ export class FormDriver extends ComponentDriver {
    * Uses the 'data-validation-display-severity' attribute to find the components.
    * The attribute contains the severity of the validation.
    */
-  async getValidationDisplays() {
+  getValidationDisplays() {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator("[data-validation-display-severity]");
   }
 
-  async getValidationDisplaysBySeverity(severity: string) {
+  getValidationDisplaysBySeverity(severity: string) {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator(`[data-validation-display-severity="${severity}"]`);
@@ -610,7 +655,7 @@ export class ValidationSummaryDriver extends ComponentDriver {
    * Uses the 'data-validation-display-severity' attribute to find the components.
    * The attribute contains the severity of the validation.
    */
-  async getValidationDisplays() {
+  getValidationDisplays() {
     return this.component
       .locator("[data-validation-summary='true']")
       .locator("[data-validation-display-severity]");
@@ -620,11 +665,11 @@ export class ValidationSummaryDriver extends ComponentDriver {
 // --- ValidationDisplay
 
 export class ValidationDisplayDriver extends ComponentDriver {
-  async getSeverity() {
+  getSeverity() {
     return this.component.getAttribute("data-validation-display-severity");
   }
 
-  async getText() {
+  getText() {
     return this.component.locator("li").textContent();
   }
 }
@@ -642,10 +687,6 @@ export class MarkdownDriver extends ComponentDriver {
 // --- Items
 
 export class ItemsDriver extends ComponentDriver {}
-
-// --- Slider
-
-export class SliderDriver extends ComponentDriver {}
 
 // --- Range
 
@@ -744,38 +785,9 @@ export class SelectDriver extends ComponentDriver {
 
 export class RadioGroupDriver extends ComponentDriver {}
 
-// --- NumberBox
-
-export class NumberBoxDriver extends ComponentDriver {
-  get field() {
-    return this.component.locator("input");
-  }
-
-  get label() {
-    return this.component.locator("label");
-  }
-
-  get placeholder() {
-    return this.field.getAttribute("placeholder");
-  }
-
-  get spinnerUpButton() {
-    return this.component.locator("button").and(this.component.locator("[data-spinner='up']"));
-  }
-
-  get spinnerDownButton() {
-    return this.component.locator("button").and(this.component.locator("[data-spinner='down']"));
-  }
-}
-
-// --- TextBox
-
-export class TextBoxDriver extends InputComponentDriver {}
-
 // --- TextArea
 
-export class TextAreaDriver extends InputComponentDriver {
-}
+export class TextAreaDriver extends InputComponentDriver {}
 
 // --- ProgressBar
 
@@ -1044,7 +1056,7 @@ export class FormItemDriver extends ComponentDriver {
     return "data-validation-status";
   }
 
-  async getValidationStatusIndicator() {
+  get validationStatusIndicator() {
     return this.component.locator(`[${this.validationStatusTag}]`);
   }
 }
@@ -1364,5 +1376,70 @@ export class DropdownMenuDriver extends ComponentDriver {
    */
   async waitForClose() {
     await this.getMenuContent().waitFor({ state: "hidden" });
+  }
+}
+
+// --- Slider
+
+export class SliderDriver extends ComponentDriver {
+  private async getActiveThumb(thumbNumber: number = 0) {
+    const thumbs = this.page.getByRole("slider");
+    const thumbCount = await thumbs.count();
+    if (thumbCount === 0) {
+      throw new Error("No slider thumb found to drag");
+    }
+    if (thumbNumber < 0) {
+      thumbNumber = 0;
+    } else if (thumbNumber >= thumbCount) {
+      thumbNumber = thumbCount - 1;
+    }
+    return thumbs.nth(thumbNumber);
+  }
+
+  async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber: number = 0) {
+    const track = this.page.locator("[data-track]");
+    await track.waitFor({ state: "visible" });
+
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.waitFor({ state: "visible" });
+
+    // Get the thumb's current position for relative movement
+    const thumbBox = await activeThumb.boundingBox();
+    if (!thumbBox) {
+      throw new Error("Could not get thumb bounding box");
+    }
+    const trackBox = await track.boundingBox();
+    if (!trackBox) {
+      throw new Error("Could not get track bounding box");
+    }
+
+    // Calculate target position relative to track
+    let targetX: number;
+    if (location === "start") {
+      targetX = trackBox.x;
+    } else if (location === "end") {
+      targetX = trackBox.x + trackBox.width;
+    } else {
+      // middle
+      targetX = trackBox.x + trackBox.width / 2;
+    }
+    const targetY = trackBox.y + trackBox.height / 2;
+
+    await activeThumb.hover();
+    await this.page.mouse.down({ button: "left" });
+    await this.page.mouse.move(targetX, targetY);
+    await this.page.mouse.up();
+  }
+
+  async stepThumbByKeyboard(
+    key: "ArrowLeft" | "ArrowRight" | "Home" | "End",
+    thumbNumber: number = 0,
+    repeat: number = 1,
+  ) {
+    const activeThumb = await this.getActiveThumb(thumbNumber);
+    await activeThumb.focus();
+    for (let i = 0; i < repeat; i++) {
+      await this.page.keyboard.press(key);
+    }
   }
 }

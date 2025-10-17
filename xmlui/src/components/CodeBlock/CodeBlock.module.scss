@@ -50,7 +50,7 @@ $paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-Code
     padding-left: t.$space-3;
     background-color: $backgroundColor-CodeBlock-header;
     border-bottom: $color-CodeBlock-headerSeparator solid 2px;
-    font-size: t.$fontSize-small;
+    font-size: t.$fontSize-sm;
     border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
     border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
   }

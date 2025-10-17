@@ -10,10 +10,6 @@ import {
   dEnabled,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
   dRequired,
@@ -33,10 +29,6 @@ export const SliderMd = createMetadata({
     "Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
   props: {
     initialValue: dInitialValue(),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     minValue: {
       description: `This property specifies the minimum value of the allowed input range.`,
       valueType: "number",
@@ -112,6 +104,8 @@ export const SliderMd = createMetadata({
     [`borderStyle-thumb-${COMP}`]: "solid",
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
+    [`backgroundColor-thumb-${COMP}--focus`]: "$color-primary",
+    [`boxShadow-thumb-${COMP}--focus`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--hover`]: "$color-primary",
     [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
@@ -168,10 +162,6 @@ export const sliderComponentRenderer = createComponentRenderer(
         enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        label={extractValue.asOptionalString(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         rangeStyle={extractValue(node.props?.rangeStyle)}
         thumbStyle={extractValue(node.props?.thumbStyle)}

@@ -9,7 +9,7 @@ $themeVars: ();
 
 @layer components {
   .icon {
-    font-size: t.$fontSize-normal;
+    font-size: t.$fontSize-base;
   }
 
   .inspectButton {

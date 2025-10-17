@@ -1,4 +1,5 @@
-import { MediaBreakpointType, MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
+import type { MediaBreakpointType} from "../../abstractions/AppContextDefs";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 export type ParsedLayout = {
   value: any;

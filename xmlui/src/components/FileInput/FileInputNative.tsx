@@ -1,5 +1,5 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useId, useRef } from "react";
+import { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from "react";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -11,10 +11,9 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
-import type { ButtonThemeColor, ButtonVariant, ComponentSize, IconPosition } from "../abstractions";
+import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { TextBox } from "../TextBox/TextBoxNative";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -32,7 +31,7 @@ type Props = {
   buttonLabel?: string;
   variant?: ButtonVariant;
   buttonThemeColor?: ButtonThemeColor;
-  buttonSize?: ComponentSize;
+  buttonSize?: SizeType;
   buttonIcon?: React.ReactNode;
   buttonIconPosition?: IconPosition;
   // Input props
@@ -49,10 +48,6 @@ type Props = {
   acceptsFileType?: string | string[];
   multiple?: boolean;
   directory?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   placeholder?: string;
   buttonPosition?: "start" | "end";
@@ -109,10 +104,6 @@ export const FileInput = ({
   acceptsFileType,
   multiple = defaultProps.multiple,
   directory = defaultProps.directory,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
   required,
   ...rest
 }: Props) => {
@@ -139,8 +130,19 @@ export const FileInput = ({
     updateState({ value: _initialValue }, { initial: true });
   }, [_initialValue, updateState]);
 
-  const handleOnBlur = useCallback(() => {
-    onBlur?.();
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback((e: React.FocusEvent) => {
+    // Only fire onFocus if focus is coming from outside the component
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onFocus?.();
+    }
+  }, [onFocus]);
+
+  const handleOnBlur = useCallback((e: React.FocusEvent) => {
+    // Only fire onBlur if focus is leaving the component entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onBlur?.();
+    }
   }, [onBlur]);
 
   const focus = useCallback(() => {
@@ -167,11 +169,6 @@ export const FileInput = ({
     useFsAccessApi: directory === false,
   });
 
-  // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    onFocus?.();
-  }, [onFocus]);
-
   const doOpen = useEvent(() => {
     open();
   });
@@ -185,33 +182,21 @@ export const FileInput = ({
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
-    <ItemWithLabel
-      {...rest}
-      id={id}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-      isInputTemplateUsed={true}
-    >
       <div
-        className={classnames(styles.container, {
+        className={classnames(styles.container, className, {
           [styles.buttonStart]: buttonPosition === "start",
           [styles.buttonEnd]: buttonPosition === "end",
         })}
+        style={style}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        tabIndex={-1}
+        {...rest}
       >
         <button
           id={id}
           {...getRootProps({
             tabIndex: 0,
-            onFocus: handleOnFocus,
-            onBlur: handleOnBlur,
             disabled: !enabled,
             className: styles.textBoxWrapper,
             onClick: open,
@@ -252,7 +237,6 @@ export const FileInput = ({
           {buttonLabel}
         </Button>
       </div>
-    </ItemWithLabel>
   );
 };
 

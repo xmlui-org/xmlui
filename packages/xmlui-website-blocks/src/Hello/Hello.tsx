@@ -1,23 +1,18 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
-import { Hello } from "./HelloNative";
+import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import componentSource from "./Hello.xmlui";
+import codeBehind from "./Hello.xmlui.xs";
 
 const COMP = "Hello";
 
 export const HelloMd = createMetadata({
-  status: "experimental",
-  description: "Hello",
-  props: {
-  },
-  events: {
-  },
-  apis: {
-  },
+  status: "internal",
+  description:
+    "A sample component",
+  props: {},
 });
 
-export const helloComponentRenderer = createComponentRenderer(
-  COMP,
+export const helloRenderer = createUserDefinedComponentRenderer(
   HelloMd,
-  ({  }) => {
-    return <Hello />;
-  },
+  componentSource,
+  codeBehind
 );

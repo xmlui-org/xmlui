@@ -165,6 +165,7 @@ export function resolveLayoutProps(
   collectCss("zoom");
   collectCss("cursor");
   collectCss("whiteSpace");
+  collectCss("transform");
 
   // --- Outline
   collectCss("outline");
@@ -389,6 +390,7 @@ export type LayoutProps = {
   overflowY?: string;
   zIndex?: number | string;
   opacity?: string | number;
+  transform?: string;
 
   // --- Typography
   color?: string;
@@ -538,6 +540,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   textDecorationStyle: [],
   textDecorationThickness: [],
   textUnderlineOffset: [],
+  transform: [],
 
   // --- Outline
   outline: [],

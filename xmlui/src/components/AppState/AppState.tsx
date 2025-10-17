@@ -11,6 +11,12 @@ export const AppStateMd = createMetadata({
     "across your entire application. Unlike component variables that are scoped " +
     "locally, AppState allows any component to access and update shared state " +
     "without prop drilling.",
+  events: {
+    didUpdate: d(
+      "This event is fired when the AppState value is updated. The event provides " +
+        "the new state value as its parameter.",
+    ),
+  },
   props: {
     bucket: {
       description:
@@ -25,8 +31,9 @@ export const AppStateMd = createMetadata({
         `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
         `component instances for the same bucket with their \`initialValue\` set, it may result ` +
         `in faulty app logic. When xmlui instantiates an \`${COMP}\` with an explicit initial ` +
-        `value, that value is immediately set. Multiple initial values may result in ` +
-        `undesired initialization. By default, the bucked's initial state is undefined.`,
+        `value, that value is immediately merged with the existing state. ` +
+        `The issue may come from the behavior that \`initialValue\` is set (merged) only when a component mounts. ` +
+        `By default, the bucket's initial state is undefined.`,
     },
   },
   apis: {
@@ -38,6 +45,35 @@ export const AppStateMd = createMetadata({
         newState: "An object that specifies the new state value.",
       },
     },
+    appendToList: {
+      signature: "appendToList(key: string, id: any)",
+      description:
+        "This method appends an item to an array in the application state object bound to the" +
+        " `AppState` instance.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to append to the array.",
+      },
+    },
+    removeFromList: {
+      signature: "removeFromList(key: string, id: any)",
+      description:
+        "This method removes an item from an array in the application state object bound to the" +
+        " `AppState` instance.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to remove from the array.",
+      },
+    },
+    listIncludes: {
+      signature: "listIncludes(key: string, id: any)",
+      description:
+        "This method checks if an array in the application state object contains a specific item.",
+      parameters: {
+        key: "The key of the array in the state object.",
+        id: "The item to check for in the array.",
+      },
+    },
   },
   nonVisual: true,
 });
@@ -45,13 +81,14 @@ export const AppStateMd = createMetadata({
 export const appStateComponentRenderer = createComponentRenderer(
   COMP,
   AppStateMd,
-  ({ node, extractValue, updateState, registerComponentApi }) => {
+  ({ node, extractValue, updateState, registerComponentApi, lookupEventHandler }) => {
     return (
       <AppState
         bucket={extractValue(node.props.bucket)}
         initialValue={extractValue(node.props.initialValue)}
         updateState={updateState}
         registerComponentApi={registerComponentApi}
+        onDidUpdate={lookupEventHandler("didUpdate")}
       />
     );
   },

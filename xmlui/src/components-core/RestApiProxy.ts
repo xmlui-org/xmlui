@@ -56,19 +56,96 @@ function isAxiosResponse(response: AxiosResponse | Response): response is AxiosR
   return "data" in response;
 }
 
-async function parseResponseJson(response: AxiosResponse | Response, logError = false) {
+function getContentType(response: AxiosResponse | Response): string {
+  if (isAxiosResponse(response)) {
+    return response.headers['content-type'] || response.headers['Content-Type'] || '';
+  } else {
+    return response.headers.get('content-type') || '';
+  }
+}
+
+// --- Tests for the most common binary types
+function isBinaryContentType(contentType: string): boolean {
+  const binaryTypes = [
+    // Images
+    'image/',
+    // Audio
+    'audio/',
+    // Video
+    'video/',
+    // Documents
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    // Archives
+    'application/zip',
+    'application/x-rar-compressed',
+    'application/x-tar',
+    'application/gzip',
+    'application/x-7z-compressed',
+    // Other binary
+    'application/octet-stream',
+    'application/x-binary',
+  ];
+  
+  return binaryTypes.some(type => contentType.toLowerCase().includes(type.toLowerCase()));
+}
+
+// --- Tests if a particular content type returns an ArrayBuffer
+function shouldReturnAsArrayBuffer(contentType: string): boolean {
+  const arrayBufferTypes = [
+    'application/zip',
+    'application/x-rar-compressed',
+    'application/x-tar',
+    'application/gzip',
+    'application/x-7z-compressed',
+    'application/x-binary',
+  ];
+  
+  return arrayBufferTypes.some(type => contentType.toLowerCase().includes(type.toLowerCase()));
+}
+
+async function parseResponseBody(response: AxiosResponse | Response, logError = false) {
   let resp: any;
   if (isAxiosResponse(response)) {
     resp = response.data;
   } else {
-    try {
-      resp = await response.clone().json();
-    } catch (e: any) {
+    const contentType = getContentType(response);
+    
+    // Handle binary content types
+    if (isBinaryContentType(contentType)) {
       try {
-        resp = await response.clone().text();
+        if (shouldReturnAsArrayBuffer(contentType)) {
+          resp = await response.clone().arrayBuffer();
+        } else {
+          resp = await response.clone().blob();
+        }
       } catch (e) {
         if (logError) {
-          console.error("Failed to parse response as text or JSON", response.body);
+          console.error("Failed to parse binary response", e, contentType);
+        }
+        // Fallback to text if binary parsing fails
+        try {
+          resp = await response.clone().text();
+        } catch (textError) {
+          if (logError) {
+            console.error("Failed to parse response as text after binary parsing failed", textError);
+          }
+        }
+      }
+    } else {
+      // Handle text-based content types (JSON, text, etc.)
+      try {
+        resp = await response.clone().json();
+      } catch (e: any) {
+        try {
+          resp = await response.clone().text();
+        } catch (e) {
+          if (logError) {
+            console.error("Failed to parse response as text or JSON", response.body);
+          }
         }
       }
     }
@@ -388,9 +465,10 @@ export default class RestApiProxy {
     const includeClientTxId = method && method !== "get" && !!transactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);
+    const hasBody = body !== undefined;
 
     const aggregatedHeaders = omitBy(
-      { ...(body ? this.getHeaders() : headersWithoutContentType), ...headers },
+      { ...(hasBody ? this.getHeaders() : headersWithoutContentType), ...headers },
       isUndefined,
     ) as Record<string, string>;
     if (includeClientTxId) {
@@ -405,7 +483,7 @@ export default class RestApiProxy {
     }
 
     let requestBody;
-    if (rawBody) {
+    if (rawBody !== undefined) {
       requestBody = rawBody;
     } else {
       if (payloadType === "multipart-form" || payloadType === "form") {
@@ -423,7 +501,7 @@ export default class RestApiProxy {
           aggregatedHeaders["Content-Type"] = "application/x-www-form-urlencoded";
         }
       } else {
-        requestBody = body ? JSON.stringify(body) : undefined;
+        requestBody = hasBody ? JSON.stringify(body) : undefined;
       }
     }
 
@@ -456,7 +534,7 @@ export default class RestApiProxy {
         }
       }
     } else {
-      let response;
+      let response: any;
       if (this.apiInstance && this.apiInstance.hasMockForRequest(url, options)) {
         response = await this.apiInstance.executeMockedFetch(url, options);
       } else {
@@ -474,7 +552,7 @@ export default class RestApiProxy {
   };
 
   private tryParseResponse = async (response: Response | AxiosResponse, logError = false) => {
-    return await parseResponseJson(response, logError);
+    return await parseResponseBody(response, logError);
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
@@ -521,7 +599,9 @@ export default class RestApiProxy {
             : respObject,
           response.status,
         );
-      } catch {}
+      } catch {
+        return new GenericBackendError("<No error description>", response.status);
+      }
     }
 
     return new Error(

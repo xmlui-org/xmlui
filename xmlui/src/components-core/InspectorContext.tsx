@@ -265,7 +265,7 @@ function InspectButton({
       htmlElement.removeEventListener("mouseenter", mouseenter);
       htmlElement.removeEventListener("mouseleave", mouseleave);
     };
-  }, [inspectId, node, inspectMode, setShowCode]);
+  }, [inspectId, node, inspectMode, setShowCode, setInspectedNode]);
 
   return (
     <>

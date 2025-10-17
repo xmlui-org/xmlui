@@ -261,7 +261,7 @@ export function useCustomSvgIconRenderer(resourceUrl?: string) {
     if (!resourceUrl) {
       return;
     }
-    ensureCustomSvgIcon(resourceUrl);
+    void ensureCustomSvgIcon(resourceUrl);
   }, [ensureCustomSvgIcon, resourceUrl]);
   const customSvg = resourceUrl ? customSvgs[resourceUrl] : null;
 

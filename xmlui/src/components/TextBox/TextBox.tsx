@@ -15,10 +15,6 @@ import {
   dEndText,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dMaxLength,
   dPlaceholder,
@@ -58,10 +54,6 @@ export const TextBoxMd = createMetadata({
       ...dInitialValue(),
       defaultValue: defaultProps.initialValue,
     },
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -197,10 +189,6 @@ function renderTextBox(
       gap={extractValue.asOptionalString(node.props.gap)}
       autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
       readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      label={extractValue.asOptionalString(node.props.label)}
-      labelPosition={extractValue(node.props.labelPosition)}
-      labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
-      labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       required={extractValue.asOptionalBoolean(node.props.required)}
       showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
       passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}

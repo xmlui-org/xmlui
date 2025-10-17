@@ -19,7 +19,7 @@ export const FooterMd = createMetadata({
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-AppHeader",
     [`verticalAlignment-${COMP}`]: "center",
-    [`fontSize-${COMP}`]: "$fontSize-small",
+    [`fontSize-${COMP}`]: "$fontSize-sm",
     [`textColor-${COMP}`]: "$textColor-secondary",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
     [`borderTop-${COMP}`]: `1px solid $borderColor`,

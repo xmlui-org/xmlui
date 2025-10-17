@@ -166,45 +166,29 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   });
 });
 
-test.skip(
-  "only renders if children are strings",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("only renders if children are strings", async ({ initTestBed, createMarkdownDriver }) => {
+  await initTestBed(`
+      <Markdown>
+        <Button label="Hey!" />
+      </Markdown>
+    `);
 
-test.skip(
-  "renders if children are provided through CDATA",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  // Check if page is empty (no text)
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("");
+});
 
-test.skip("renders body text", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
+test("renders if children are provided through CDATA", async ({ initTestBed, createMarkdownDriver }) => {
+  await initTestBed(`
+    <Markdown>
+      <![CDATA[Hello World!]]>
+    </Markdown>
+  `);
 
-test.skip("renders strong text", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders emphasis text", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders heading", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders link", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders image", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders unordered list", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders ordered list", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders inline code", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders table", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip("renders blockquote", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {});
-
-test.skip(
-  "renders horizontal rule",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  // Check if page is empty (no text)
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("Hello World!");
+});
 
 test("renders code block", async ({ initTestBed, createMarkdownDriver }) => {
   const code = "```\n" + "I did not expect this\n" + "```";
@@ -213,12 +197,6 @@ test("renders code block", async ({ initTestBed, createMarkdownDriver }) => {
   await expect(driver.component).toHaveText("I did not expect this");
   expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
 });
-
-test.skip(
-  "renders code block with mock highlighter",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
 
 test("4space/1 tab indent is not code block by default", async ({
   initTestBed,

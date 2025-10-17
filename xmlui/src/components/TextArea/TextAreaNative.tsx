@@ -19,18 +19,12 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import TextAreaResizable from "./TextAreaResizable";
-import { PART_INPUT, partClassName } from "../../components-core/parts";
+import { PART_INPUT } from "../../components-core/parts";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
-
-const resizeMap = {
-  horizontal: styles.resizeHorizontal,
-  vertical: styles.resizeVertical,
-  both: styles.resizeBoth,
-};
 
 type Props = {
   id?: string;
@@ -59,10 +53,6 @@ type Props = {
   maxLength?: number;
   rows?: number;
   enabled?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
 };
 
 export const defaultProps = {
@@ -111,16 +101,13 @@ export const TextArea = forwardRef(function TextArea(
     maxLength,
     rows = defaultProps.rows,
     enabled = defaultProps.enabled,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
 ) {
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const ref = forwardRef ? composeRefs(forwardedRef, inputRef) : inputRef;
   const [cursorPosition, setCursorPosition] = useState(null);
   const [focused, setFocused] = React.useState(false);
 
@@ -142,6 +129,14 @@ export const TextArea = forwardRef(function TextArea(
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
+
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [autoFocus, inputRef.current]);
 
   // --- Execute this function when the user copies the value
   const handleCopy = (event: React.SyntheticEvent) => {
@@ -237,12 +232,13 @@ export const TextArea = forwardRef(function TextArea(
   });
   const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
     React.RefAttributes<HTMLTextAreaElement> = {
+    ...rest,
+    id,
     className: classes,
-    ref: inputRef,
+    ref,
     style: style as any,
     value: controlled ? value || "" : undefined,
     disabled: !enabled,
-    autoFocus,
     name: id,
     placeholder,
     required,
@@ -260,79 +256,37 @@ export const TextArea = forwardRef(function TextArea(
 
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
-      <ItemWithLabel
-        {...rest}
-        ref={forwardedRef as any}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-      >
-        <TextAreaResizable
-          {...textareaProps}
-          ref={inputRef}
-          style={style as any}
-          className={classnames(partClassName(PART_INPUT), classes)}
-          maxRows={maxRows}
-          minRows={minRows}
-          rows={rows}
-        />
-      </ItemWithLabel>
+      <TextAreaResizable
+        {...textareaProps}
+        data-part-id={PART_INPUT}
+        style={style as any}
+        className={classnames(classes)}
+        maxRows={maxRows}
+        minRows={minRows}
+        rows={rows}
+      />
     );
   }
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
-      <ItemWithLabel
-        {...rest}
-        ref={forwardedRef as any}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-      >
-        <TextareaAutosize
-          {...textareaProps}
-          ref={inputRef}
-          style={style as any}
-          className={classnames(partClassName(PART_INPUT), classes)}
-          maxRows={maxRows}
-          minRows={minRows}
-          rows={rows}
-        />
-      </ItemWithLabel>
+      <TextareaAutosize
+        {...textareaProps}
+        data-part-id={PART_INPUT}
+        style={style as any}
+        className={classnames(classes)}
+        maxRows={maxRows}
+        minRows={minRows}
+        rows={rows}
+      />
     );
   }
 
   return (
-    <ItemWithLabel
-      {...rest}
-      ref={forwardedRef as any}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-    >
-      <textarea
-        {...textareaProps}
-        ref={inputRef}
-        rows={rows}
-        className={classnames(partClassName(PART_INPUT), classes)}
-      />
-    </ItemWithLabel>
+    <textarea
+      {...textareaProps}
+      data-part-id={PART_INPUT}
+      rows={rows}
+      className={classnames(classes)}
+    />
   );
 });

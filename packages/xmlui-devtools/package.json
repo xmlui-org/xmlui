@@ -1,6 +1,6 @@
 {
   "name": "xmlui-devtools",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "sideEffects": false,
   "scripts": {
     "start": "xmlui start",

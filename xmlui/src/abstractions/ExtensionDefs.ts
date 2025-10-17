@@ -1,8 +1,7 @@
-import type { ComponentRendererDef } from "./RendererDefs";
-import type { CompoundComponentDef } from "./ComponentDefs";
+import type { ComponentRendererDef, CompoundComponentRendererInfo } from "./RendererDefs";
 import type { ThemeDefinition } from "./ThemingDefs";
 
-export type ComponentExtension = ComponentRendererDef | CompoundComponentDef;
+export type ComponentExtension = ComponentRendererDef | CompoundComponentRendererInfo;
 
 export interface Extension{
   namespace?: string;

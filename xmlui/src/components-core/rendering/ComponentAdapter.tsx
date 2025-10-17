@@ -181,19 +181,26 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Set up the mouse event handlers for the component
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
-    descriptor?.nonVisual || isApiBound,
+    descriptor?.nonVisual || isApiBound || isCompoundComponent,
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
-  const { getResourceUrl, themeVars } = useTheme();
+  const { getResourceUrl } = useTheme();
 
   // --- Obtain a function that can extract a resource URL from a logical URL
   const extractResourceUrl = useCallback(
-    (url?: string) => {
+    (url?: unknown) => {
       const extractedUrl = valueExtractor(url);
+      if (typeof extractedUrl !== "string" || extractedUrl.trim() === "") {
+        console.warn(
+          `Component '${safeNode.type}': ` +
+            `the extracted resource URL is not a valid string: value ${extractedUrl}, type ${typeof extractedUrl}`,
+        );
+        return undefined;
+      }
       return getResourceUrl(extractedUrl);
     },
-    [getResourceUrl, valueExtractor],
+    [getResourceUrl, valueExtractor, safeNode.type],
   );
 
   // --- Collect and compile the layout property values
@@ -233,28 +240,29 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
+  // --- Assemble the renderer context we pass down the rendering chain
+  const rendererContext: RendererContext<any> = {
+    node: safeNode,
+    state: state[uid] || EMPTY_OBJECT,
+    updateState: memoedUpdateState,
+    appContext,
+    extractValue: valueExtractor,
+    lookupEventHandler: memoedLookupEventHandler,
+    lookupAction: memoedLookupAction,
+    lookupSyncCallback: memoedLookupSyncCallback,
+    extractResourceUrl,
+    renderChild: memoedRenderChild,
+    registerComponentApi: memoedRegisterComponentApi,
+    className,
+    layoutContext: layoutContextRef?.current,
+    uid,
+  };
+
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
   let renderingError = null;
-  try {
-    // --- Assemble the renderer context we pass down the rendering chain
-    const rendererContext: RendererContext<any> = {
-      node: safeNode,
-      state: state[uid] || EMPTY_OBJECT,
-      updateState: memoedUpdateState,
-      appContext,
-      extractValue: valueExtractor,
-      lookupEventHandler: memoedLookupEventHandler,
-      lookupAction: memoedLookupAction,
-      lookupSyncCallback: memoedLookupSyncCallback,
-      extractResourceUrl,
-      renderChild: memoedRenderChild,
-      registerComponentApi: memoedRegisterComponentApi,
-      className,
-      layoutContext: layoutContextRef?.current,
-      uid,
-    };
 
+  try {
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
       // --- the compound component
@@ -269,6 +277,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
       // --- Render the component using the renderer function obtained from the component registry
       renderedNode = renderer(rendererContext);
+    }
+
+    /**
+     * Apply any behaviors to the component.
+     */
+    const behaviors = componentRegistry.getBehaviors();
+    if (!isCompoundComponent) {
+      for (const behavior of behaviors) {
+        if (behavior.canAttach(rendererContext.node, descriptor)) {
+          renderedNode = behavior.attach(rendererContext, renderedNode);
+        }
+      }
     }
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
@@ -382,36 +402,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         : renderedNode;
   }
 
-  // --- Check if the component has a tooltip property
-  const tooltipText = useMemo(
-    () => valueExtractor(safeNode.props?.tooltip, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  // --- Check if the component has a tooltip property
-  const tooltipMarkdown = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipMarkdown, true),
-    [safeNode.props, valueExtractor],
-  );
-  // --- Check if the component has a tooltipOptions property
-  const tooltipOptions = useMemo(
-    () => valueExtractor(safeNode.props?.tooltipOptions, true),
-    [safeNode.props, valueExtractor],
-  );
-
-  // --- Handle tooltips
-  if (tooltipMarkdown || tooltipText) {
-    // --- Obtain options
-    const parsedOptions = parseTooltipOptions(tooltipOptions);
-
-    return (
-      <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
-        {nodeToRender}
-      </Tooltip>
-    );
-  }
-
-  // --- Done
   return nodeToRender;
 });
 

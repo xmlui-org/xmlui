@@ -21,12 +21,12 @@ export const COMPONENT_STATES = {
   INTERNAL: "internal",
   EXPERIMENTAL: "experimental",
   STABLE: "stable",
-  DEPRECATED: "deprecated"
+  DEPRECATED: "deprecated",
 };
 
 export const FILE_EXTENSIONS = {
   MARKDOWN: [".md", ".mdx"],
-  METADATA: "_meta.json"
+  METADATA: "_meta.json",
 };
 
 export const FOLDER_NAMES = {
@@ -37,32 +37,32 @@ export const FOLDER_NAMES = {
   PAGES: "pages",
   SRC: "src",
   DIST: "dist",
-  META: "meta"
+  META: "meta",
 };
 
 export const CONFIG_FILES = {
   COMPONENTS: "components-config.json",
-  EXTENSIONS: "extensions-config.json"
+  EXTENSIONS: "extensions-config.json",
 };
 
 export const SUMMARY_CONFIG = {
   COMPONENTS: {
     title: "Components Overview",
-    fileName: "_overview"
+    fileName: "_overview",
   },
   EXTENSIONS: {
     title: "Extension Overview",
-    fileName: "_overview"
-  }
+    fileName: "_overview",
+  },
 };
 
 export const PACKAGE_PATTERNS = {
   XMLUI_PREFIX: "xmlui-",
-  METADATA_SUFFIX: "-metadata.js"
+  METADATA_SUFFIX: "-metadata.js",
 };
 
 export const FILE_NAMES = {
-  COMPONENTS_METADATA: "componentsMetadata.ts"
+  COMPONENTS_METADATA: "componentsMetadata.ts",
 };
 
 export const LOG_MESSAGES = {
@@ -74,8 +74,10 @@ export const LOG_MESSAGES = {
   SKIPPING_INTERNAL_PACKAGE: "Skipping internal extension package:",
   LOADED_EXTENSION_PACKAGE: "Loaded extension package:",
   NO_DIST_FOLDER: (dir) => `No dist folder found for ${dir}`,
-  NO_METADATA_OBJECT: (packageName) => `No meta object found for package: ${packageName}.\n Have you built the package?`,
-  NO_COMPONENT_METADATA: (packageName) => `No component metadata found in meta object for package: ${packageName}. Check the "${FOLDER_NAMES.META}/${FILE_NAMES.COMPONENTS_METADATA}" file.`
+  NO_METADATA_OBJECT: (packageName) =>
+    `No meta object found for package: ${packageName}.\n Have you built the package?`,
+  NO_COMPONENT_METADATA: (packageName) =>
+    `No component metadata found in meta object for package: ${packageName}. Check the "${FOLDER_NAMES.META}/${FILE_NAMES.COMPONENTS_METADATA}" file.`,
 };
 
 export const ERROR_MESSAGES = {
@@ -87,15 +89,15 @@ export const ERROR_MESSAGES = {
   FILE_WRITE_ERROR: "Failed to write file",
   DIRECTORY_CREATE_ERROR: "Failed to create directory",
   METADATA_LOAD_ERROR: "Failed to load metadata",
-  CONFIG_VALIDATION_ERROR: "Configuration validation failed"
+  CONFIG_VALIDATION_ERROR: "Configuration validation failed",
 };
 
 export const METADATA_PROPERTIES = {
-  IS_HTML_TAG: "isHtmlTag"
+  IS_HTML_TAG: "isHtmlTag",
 };
 
 export const TEMPLATE_STRINGS = {
-  PACKAGE_HEADER: (packageName) => `# ${fromKebabtoReadable(packageName)} Package`
+  PACKAGE_HEADER: (packageName) => `# ${fromKebabtoReadable(packageName)} Package`,
 };
 
 // From DocsGenerator.mjs
@@ -103,7 +105,7 @@ export const OUTPUT_FILES = {
   METADATA_JSON: "metadata.json",
   LANDING_METADATA_JSON: "landing-metadata.json",
   PAGES_MAP: "pages.js",
-  DOWNLOADS_MAP: "downloads.js"
+  DOWNLOADS_MAP: "downloads.js",
 };
 
 export const URL_REFERENCES = {
@@ -119,7 +121,7 @@ export const METADATA_SECTIONS = {
   API: "apis",
   EVENTS: "events",
   PARTS: "parts",
-  STYLES: "styles"
+  STYLES: "styles",
 };
 
 export const DIRECTIVE_CONFIG = {
@@ -132,8 +134,8 @@ export const DIRECTIVE_CONFIG = {
     parts: "PART",
     styles: "STYLE",
     apis: "API",
-    contextVars: "CONTEXT_VAR"
-  }
+    contextVars: "CONTEXT_VAR",
+  },
 };
 
 export const SECTION_DISPLAY_NAMES = {
@@ -142,12 +144,12 @@ export const SECTION_DISPLAY_NAMES = {
   styles: "Styling",
   apis: "Exposed Methods",
   contextVars: "Context Values",
-  parts: "Parts"
+  parts: "Parts",
 };
 
 export const SECTION_REFERENCE_KEYS = {
   DESCRIPTION: "description",
-  DESCRIPTION_REF: "descriptionRef"
+  DESCRIPTION_REF: "descriptionRef",
 };
 
 // From utils.mjs
@@ -155,56 +157,56 @@ export const TABLE_CONFIG = {
   STYLES: {
     LEFT: "left",
     CENTER: "center",
-    RIGHT: "right"
+    RIGHT: "right",
   },
   MARKDOWN_ALIGNMENTS: {
     LEFT: ":---",
     CENTER: ":---:",
     RIGHT: "---:",
-    DEFAULT: "---"
+    DEFAULT: "---",
   },
-  DEFAULT_ROW_NUM_HEADER: { value: "Num", style: "center" }
+  DEFAULT_ROW_NUM_HEADER: { value: "Num", style: "center" },
 };
 
 export const COMMON_TABLE_HEADERS = {
   VALUE_DESCRIPTION: ["Value", "Description"],
   PARAMETER_DESCRIPTION: ["Name", "Description"],
-  THEME_VARIABLE_DESCRIPTION: ["Theme Variable", "Description"]
+  THEME_VARIABLE_DESCRIPTION: ["Theme Variable", "Description"],
 };
 
 // From logger.mjs
 export const LOGGER_SEVERITY = {
   INFO: "info",
   WARNING: "warning",
-  ERROR: "error"
+  ERROR: "error",
 };
 
 export const LOGGER_LEVEL_VALUES = {
   ALL: "all",
-  NONE: "none"
+  NONE: "none",
 };
 
 // From generate-summary-files.mjs
 export const COMPONENT_STATUS_CONFIG = {
   ACCEPTED_STATUSES: ["stable", "experimental", "deprecated", "in progress"],
-  DEFAULT_STATUS: "stable"
+  DEFAULT_STATUS: "stable",
 };
 
 export const SUMMARY_FILE_CONFIG = {
   COMPONENTS_OVERVIEW_HEADER: "# Components Overview [#components-overview]",
-  PACKAGE_COMPONENTS_HEADER: "## Package Components"
+  PACKAGE_COMPONENTS_HEADER: "## Package Components",
 };
 
 // From build-pages-map.mjs
 export const PAGES_MAP_CONFIG = {
   PATH_CUTOFF: "pages",
-  INCLUDED_FILE_EXTENSIONS: [".mdx", ".md"]
+  INCLUDED_FILE_EXTENSIONS: [".mdx", ".md"],
 };
 
 // From build-downloads-map.mjs
 export const DOWNLOADS_MAP_CONFIG = {
   BASE_URL_CUTOFF: "files",
-  INCLUDED_FILE_EXTENSIONS: [".zip"]
+  INCLUDED_FILE_EXTENSIONS: [".zip"],
 };
 
 // Error handling utilities
@@ -214,9 +216,9 @@ export const ERROR_HANDLING = {
     GENERAL_ERROR: 1,
     INVALID_CONFIG: 2,
     FILE_NOT_FOUND: 3,
-    METADATA_ERROR: 4
+    METADATA_ERROR: 4,
   },
-  DEFAULT_EXIT_CODE: 1
+  DEFAULT_EXIT_CODE: 1,
 };
 
 // Component navigation generation constants
@@ -224,22 +226,42 @@ export const COMPONENT_NAVIGATION = {
   DELIMITERS: {
     START: "<!-- GENERATED CONTENT/Component references links -->",
     END: "<!-- END GENERATED CONTENT/Component references links -->",
-    START_REGEX: /<!--\s*GENERATED CONTENT.*?-->/,
-    END_REGEX: /<!--\s*END GENERATED CONTENT.*?-->/
+    START_REGEX: /<!--\s*GENERATED CONTENT\/Component references links.*?-->/,
+    END_REGEX: /<!--\s*END GENERATED CONTENT\/Component references links.*?-->/,
   },
   OVERVIEW_LINK: {
     LABEL: "Components Overview",
-    TO: "/components/_overview"
+    TO: "/components/_overview",
   },
   TEMPLATES: {
-    NAVLINK: (componentName) => `<NavLink label="${componentName}" to="/components/${componentName}" />`,
-    OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`
-  }
+    NAVLINK: (componentName) =>
+      `<NavLink label="${componentName}" to="/components/${componentName}" />`,
+    OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`,
+  },
+};
+
+export const EXTENSIONS_NAVIGATION = {
+  DELIMITERS: {
+    START: "<!-- GENERATED CONTENT/Extension references links -->",
+    END: "<!-- END GENERATED CONTENT/Extension references links -->",
+    START_REGEX: /<!--\s*GENERATED CONTENT\/Extension references links.*?-->/,
+    END_REGEX: /<!--\s*END GENERATED CONTENT\/Extension references links.*?-->/,
+  },
+  OVERVIEW_LINK: {
+    LABEL: "Extension Overview",
+    TO: (packageName) => `/extensions/${packageName}/_overview`
+  },
+  TEMPLATES: {
+    NAVGROUP: (label, children) => `<NavGroup label="${label}">\n${children}\n</NavGroup>`,
+    NAVLINK: (packageName, componentName) =>
+      `<NavLink label="${componentName}" to="/extensions/${packageName}/${componentName}" />`,
+    OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`,
+  },
 };
 
 // File paths used in the documentation generation
 export const FILE_PATHS = {
-  MAIN_XMLUI: "src/Main.xmlui"
+  MAIN_XMLUI: "src/Main.xmlui",
 };
 
 // Path constants for resolving workspace locations
@@ -247,21 +269,21 @@ export const PATH_CONSTANTS = {
   XMLUI_SRC_COMPONENTS: "xmlui/src/components",
   DOCS_COMPONENT_SAMPLES: "docs/component-samples",
   WORKSPACE: "workspace",
-  PACKAGES: "packages"
+  PACKAGES: "packages",
 };
 
 // Text constants and encoding
 export const TEXT_CONSTANTS = {
   NO_DESCRIPTION_AVAILABLE: "No description available",
   UTF8_ENCODING: "utf8",
-  NEWLINE_SEPARATOR: "\n"
+  NEWLINE_SEPARATOR: "\n",
 };
 
 // Error contexts for operation handling
 export const ERROR_CONTEXTS = {
   EXTENSION_PACKAGES_METADATA: "extension packages metadata generation",
   FOLDER_CLEANUP: "folder cleanup",
-  LOADING_EXTENSION_PACKAGE: "loading extension package"
+  LOADING_EXTENSION_PACKAGE: "loading extension package",
 };
 
 // Error messages for component navigation
@@ -273,5 +295,5 @@ export const COMPONENT_NAV_ERRORS = {
   INVALID_DELIMITER_ORDER: "Invalid delimiter order in Main.xmlui",
   DELIMITERS_NOT_FOUND: "Delimiters not found in Main.xmlui",
   OVERVIEW_GENERATION_FAILED: "Failed to generate components overview",
-  CONTENT_REPLACEMENT_FAILED: "Failed to replace generated content"
+  CONTENT_REPLACEMENT_FAILED: "Failed to replace generated content",
 };

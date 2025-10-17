@@ -19,7 +19,9 @@ import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
-import { rest } from "lodash-es";
+
+const PART_TITLE = "title";
+const PART_CONTENT = "content";
 
 // Default props for ModalDialog component
 export const defaultProps = {
@@ -42,6 +44,7 @@ type ModalProps = {
   fullScreen?: boolean;
   title?: string;
   closeButtonVisible?: boolean;
+  externalAnimation?: boolean;
 };
 
 type ModalDialogFrameProps = {
@@ -131,8 +134,10 @@ export const ModalDialog = React.forwardRef(
       fullScreen = defaultProps.fullScreen,
       title,
       closeButtonVisible = defaultProps.closeButtonVisible,
+      className,
       onOpen,
       onClose,
+      externalAnimation = true,
       ...rest
     }: ModalProps,
     ref,
@@ -195,11 +200,19 @@ export const ModalDialog = React.forwardRef(
     const Content = (
       <Dialog.Content
         {...rest}
-        className={classnames(styles.content)}
+        data-part-id={PART_CONTENT}
+        className={classnames(
+          {
+            [styles.contentAnimation]: !externalAnimation,
+          },
+          styles.content,
+          className,
+        )}
         onPointerDownOutside={(event) => {
           if (
             event.target instanceof Element &&
-            event.target.closest("._debug-inspect-button") !== null
+            (event.target.closest("._debug-inspect-button") !== null ||
+              event.target.localName === "com-1password-button")
           ) {
             //we prevent the auto modal close on clicking the inspect button
             event.preventDefault();
@@ -210,7 +223,7 @@ export const ModalDialog = React.forwardRef(
       >
         {!!title && (
           <Dialog.Title style={{ marginTop: 0 }}>
-            <header id="dialogTitle" className={styles.dialogTitle}>
+            <header id="dialogTitle" className={styles.dialogTitle} data-part-id={PART_TITLE}>
               {title}
             </header>
           </Dialog.Title>

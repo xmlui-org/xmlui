@@ -126,31 +126,6 @@ This property indicates whether the component is in progress. It can be used to 
 
 This property indicates the message to display when the component is in progress.
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: false) [#labelbreak-default-false]
-
-This boolean value indicates whether the `Select` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "top") [#labelposition-default-top]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `multiSelect` (default: false) [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
@@ -418,8 +393,14 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-success--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
+| [border](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [borderBottom](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
+| [borderColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |
@@ -430,6 +411,16 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderColor](../styles-and-themes/common-units/#color)-Select-success--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-warning | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Select-warning--hover | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
+| [borderLeft](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-badge | $borderRadius | $borderRadius |
@@ -437,12 +428,28 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-error | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-success | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-warning | *none* | *none* |
+| [borderRight](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Select-default | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Select-error | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Select-success | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Select-warning | *none* | *none* |
+| [borderTop](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [borderTopColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Select | *none* | *none* |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-Select | *none* | *none* |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-default | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
@@ -461,27 +468,30 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-Select-warning | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-error--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-success--focus | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-warning--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Select-default--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Select-error--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Select-success--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Select-warning--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-Select-default--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-Select-error--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-Select-success--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-Select-warning--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-default--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-error--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-success--focus | *none* | *none* |
@@ -510,8 +520,8 @@ This API retrieves the current value of the `Select`. You can use it to get the 
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-success | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-warning | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
-| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge--active | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select-badge--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Select-default | *none* | *none* |

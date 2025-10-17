@@ -59,13 +59,12 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-
   //accept is in the format {'image/*': [], 'video/*': []} see https://react-dropzone.js.org/#section-accepting-specific-file-types
   const accept = acceptedFileTypes
     ? acceptedFileTypes.split(",").reduce((acc, type) => ({ ...acc, [type.trim()]: [] }), {})
     : undefined;
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
+    (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) {
         return;
       }
@@ -84,7 +83,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     noDragEventsBubbling: true,
     disabled,
     accept,
-    maxFiles
+    maxFiles,
   });
 
   const doOpen = useEvent(() => {
@@ -140,10 +139,10 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
 
   const rootRef = getComposedRef(ref, forwardedRef);
   return (
-    <div {...rootProps} ref={rootRef}>
+    <div {...rootProps} data-drop-enabled={!disabled} ref={rootRef}>
       <input {...getInputProps()} />
       {children}
-      {(isDragActive && isDragAccept) && (
+      {isDragActive && isDragAccept && (
         <div className={styles.dropPlaceholder}>
           <Icon name={"upload"}></Icon>
           {text}

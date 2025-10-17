@@ -5,7 +5,8 @@ const COMP = "Animation";
 
 export const AnimationMd = createMetadata({
   status: "experimental",
-  description: ``,
+  description: `The \`${COMP}\` component represents a generic animation wrapper that can apply various animations to its children.`,
+  docFolder: "src",
   props: {
     animation: {
       description: `The animation object to be applied to the component`,

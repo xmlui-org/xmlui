@@ -132,7 +132,7 @@ import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T, ref: ForwardedRef<HTMLElement>) => React.ReactElement<T>;
 
-type IconRegistryEntry = {
+export type IconRegistryEntry = {
   renderer: IconRenderer<any>;
 };
 

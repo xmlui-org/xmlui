@@ -4,7 +4,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
-  d,
   dAutoFocus,
   dDidChange,
   dEnabled,
@@ -12,14 +11,9 @@ import {
   dEndText,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -48,10 +42,6 @@ export const DatePickerMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     mode: {
       description: "The mode of the datepicker (single or range)",
       valueType: "string",
@@ -104,24 +94,30 @@ export const DatePickerMd = createMetadata({
         },
       ],
     },
-    minValue: {
+    startDate: {
       description:
-        "The optional start date of the selectable date range. If not defined, the range " +
-        "allows any dates in the past.",
+        "The earliest month to start the month navigation from (inclusive). " +
+        "If not defined, the component allows any dates in the past. " +
+        "Accepts the same date format as the `initialValue`." +
+        "Example: '2023-01-01' ensures the first month to select a date from is January 2023.",
       valueType: "string",
     },
-    maxValue: {
+    endDate: {
       description:
-        "The optional end date of the selectable date range. If not defined, the range allows " +
-        "any future dates.",
+        "The latest month to start the month navigation from (inclusive). " +
+        "If not defined, the component allows any future dates. " +
+        "Accepts the same date format as the `initialValue`." +
+        "Example: '2023-12-31' ensures the last month to select a date from is December 2023.",
       valueType: "string",
     },
     disabledDates: {
-      description: "An optional array of dates that are disabled",
+      description: "An optional array of dates that are to be disabled.",
       valueType: "any",
     },
     inline: {
-      description: "Whether to display the datepicker inline",
+      description:
+        "If set to true, the calendar is always visible and its panel is rendered as part of the layout." +
+        " If false, the calendar is shown in a popup when the input is focused or clicked.",
       valueType: "boolean",
       defaultValue: defaultProps.inline,
     },
@@ -180,7 +176,6 @@ export const datePickerComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <DatePicker
-        id={node.uid}
         className={className}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
@@ -196,8 +191,8 @@ export const datePickerComponentRenderer = createComponentRenderer(
         dateFormat={extractValue(node.props.dateFormat)}
         showWeekNumber={extractValue.asOptionalBoolean(node.props.showWeekNumber)}
         weekStartsOn={extractValue(node.props.weekStartsOn)}
-        minValue={extractValue(node.props.minValue)}
-        maxValue={extractValue(node.props.maxValue)}
+        startDate={extractValue(node.props.startDate)}
+        endDate={extractValue(node.props.endDate)}
         disabledDates={extractValue(node.props.disabledDates)}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         startText={extractValue.asOptionalString(node.props.startText)}
@@ -206,10 +201,6 @@ export const datePickerComponentRenderer = createComponentRenderer(
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       />
     );
   },

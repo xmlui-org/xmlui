@@ -1,4 +1,4 @@
-import styles from "../Select/Select.module.scss";
+import styles from "./Select.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -13,14 +13,7 @@ import {
   dDidChange,
   dGotFocus,
   dLostFocus,
-  dFocus,
-  dSetValueApi,
   dMulti,
-  dLabel,
-  dLabelPosition,
-  dLabelWidth,
-  dLabelBreak,
-  dValue,
   dComponent,
   createMetadata,
   d,
@@ -46,7 +39,7 @@ export const SelectMd = createMetadata({
     initialValue: dInitialValue(),
     value: {
       description: "This property sets the current value of the component.",
-      isInternal: true  //TODO illesg temp
+      isInternal: true, //TODO illesg temp
     },
     autoFocus: {
       ...dAutoFocus(),
@@ -67,13 +60,6 @@ export const SelectMd = createMetadata({
     validationStatus: {
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
-    },
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: {
-      ...dLabelBreak(COMP),
-      defaultValue: defaultProps.labelBreak,
     },
     optionLabelTemplate: dComponent(
       `This property allows replacing the default template to display an option in the dropdown list.`,
@@ -148,7 +134,7 @@ export const SelectMd = createMetadata({
     [`borderWidth-menu-${COMP}`]: "1px",
     [`borderColor-menu-${COMP}`]: "$borderColor",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
-    [`fontSize-${COMP}-badge`]: "$fontSize-small",
+    [`fontSize-${COMP}-badge`]: "$fontSize-sm",
     [`paddingHorizontal-${COMP}-badge`]: "$space-2_5",
     [`paddingVertical-${COMP}-badge`]: "$space-0_5",
     [`borderRadius-${COMP}-badge`]: "$borderRadius",
@@ -161,7 +147,7 @@ export const SelectMd = createMetadata({
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
     [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
-    [`textColor-${COMP}-badge`]: "$color-surface-50",
+    [`textColor-${COMP}-badge`]: "$const-color-surface-50",
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
@@ -210,10 +196,6 @@ export const selectComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         valueRenderer={
           node.props.valueTemplate
@@ -234,24 +216,24 @@ export const selectComponentRenderer = createComponentRenderer(
         optionRenderer={
           node.props.optionTemplate
             ? (item, val, inTrigger) => {
-              return (
-                <MemoizedItem
-                  node={node.props.optionTemplate}
-                  item={item}
-                  contextVars={{
-                    $selectedValue: val,
-                    $inTrigger: inTrigger,
-                  }}
-                  renderChild={(...args) =>
-                    multiSelect || searchable ? (
-                      renderChild(...args)
-                    ) : (
-                      <SelectItemText>{renderChild(...args)}</SelectItemText>
-                    )
-                  }
-                />
-              );
-            }
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    contextVars={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger,
+                    }}
+                    renderChild={(...args) =>
+                      multiSelect || searchable ? (
+                        renderChild(...args)
+                      ) : (
+                        <SelectItemText>{renderChild(...args)}</SelectItemText>
+                      )
+                    }
+                  />
+                );
+              }
             : undefined
         }
       >

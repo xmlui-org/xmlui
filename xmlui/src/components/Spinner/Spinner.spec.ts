@@ -42,21 +42,19 @@ test.describe("Accessibility", () => {
 });
 
 test.describe("Theme Variables", () => {
-  test.skip(
-    "component applies theme variables",
-    SKIP_REASON.UNSURE("about the actual assertions"),
-    async ({ page, initTestBed }) => {
-      await initTestBed(`<Spinner delay="0" />`, {
-        testThemeVars: {
-          "size-Spinner": "60px",
-          "thickness-Spinner": "6px",
-          "borderColor-Spinner": "#ff0000",
-        },
-      });
+  test("component applies theme variables", async ({ page, initTestBed }) => {
+    await initTestBed(`<Spinner delay="0" />`, {
+      testThemeVars: {
+        "size-Spinner": "60px",
+        "thickness-Spinner": "6px",
+        "borderColor-Spinner": "rgb(255, 0, 0)",
+      },
+    });
 
-      const spinner = page.getByRole("status");
-    },
-  );
+    const spinnerRing = page.locator("[data-part-id='ring']").first();
+
+    await expect(spinnerRing).toHaveCSS("border-top-color", "rgb(255, 0, 0)");
+  });
 });
 
 test.describe("Delay Behavior", () => {
@@ -188,6 +186,6 @@ test.describe("Edge Cases", { tag: "@smoke" }, () => {
 
     await page.getByRole("button").click({ force: true });
 
-    expect.poll(testStateDriver.testState).not.toEqual("clicked");
+    await expect.poll(testStateDriver.testState).not.toEqual("clicked");
   });
 });

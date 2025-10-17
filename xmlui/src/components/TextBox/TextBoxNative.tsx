@@ -8,9 +8,8 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
-import { partClassName, PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
+import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT } from "../../components-core/parts";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -46,10 +45,6 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   /**
    * When true and type is "password", displays a toggle icon to show/hide password text
@@ -123,10 +118,6 @@ export const TextBox = forwardRef(function TextBox(
     autoFocus,
     readOnly,
     tabIndex,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
     required,
     showPasswordToggle,
     passwordVisibleIcon = defaultProps.passwordVisibleIcon,
@@ -135,8 +126,6 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
 
   // State to control password visibility
@@ -156,7 +145,7 @@ export const TextBox = forwardRef(function TextBox(
         inputRef.current?.focus();
       }, 0);
     }
-  }, [autoFocus, inputRef.current]);
+  }, [autoFocus, inputRef]);
 
   // --- NOTE: This is a workaround for the jumping caret issue.
   // --- Local state can sync up values that can get set asynchronously outside the component.
@@ -213,76 +202,62 @@ export const TextBox = forwardRef(function TextBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <ItemWithLabel
+    <div
       {...rest}
-      id={id}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      style={style}
-      className={className}
       ref={ref}
-      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
-      isInputTemplateUsed={true}
+      className={classnames(className, styles.inputRoot, {
+        [styles.disabled]: !enabled,
+        [styles.readOnly]: readOnly,
+        [styles.error]: validationStatus === "error",
+        [styles.warning]: validationStatus === "warning",
+        [styles.valid]: validationStatus === "valid",
+      })}
+      tabIndex={-1}
+      onFocus={focus}
+      style={{ ...style, gap }}
     >
-      <div
-        className={classnames(styles.inputRoot, {
-          [styles.disabled]: !enabled,
+      <Adornment
+        data-part-id={PART_START_ADORNMENT}
+        text={startText}
+        iconName={startIcon}
+        className={classnames(styles.adornment)}
+      />
+      <input
+        id={id}
+        ref={inputRef}
+        data-part-id={PART_INPUT}
+        type={actualType}
+        className={classnames(styles.input, {
           [styles.readOnly]: readOnly,
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
         })}
-        tabIndex={-1}
-        onFocus={focus}
-        style={{ gap }}
-      >
+        disabled={!enabled}
+        value={localValue}
+        maxLength={maxLength}
+        placeholder={placeholder}
+        onChange={onInputChange}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        onKeyDown={onKeyDown}
+        readOnly={readOnly}
+        autoFocus={autoFocus}
+        tabIndex={enabled ? tabIndex : -1}
+        required={required}
+      />
+      {type === "password" && showPasswordToggle ? (
         <Adornment
-          text={startText}
-          iconName={startIcon}
-          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+          data-part-id={PART_END_ADORNMENT}
+          iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+          className={classnames(styles.adornment, styles.passwordToggle)}
+          onClick={togglePasswordVisibility}
         />
-        <input
-          id={id}
-          type={actualType}
-          className={classnames(partClassName(PART_INPUT), styles.input, {
-            [styles.readOnly]: readOnly,
-          })}
-          disabled={!enabled}
-          value={localValue}
-          maxLength={maxLength}
-          placeholder={placeholder}
-          onChange={onInputChange}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-          onKeyDown={onKeyDown}
-          ref={inputRef}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          tabIndex={enabled ? tabIndex : -1}
-          required={required}
+      ) : (
+        <Adornment
+          data-part-id={PART_END_ADORNMENT}
+          text={endText}
+          iconName={endIcon}
+          className={styles.adornment}
         />
-        {type === "password" && showPasswordToggle ? (
-          <Adornment
-            iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
-            className={classnames(
-              partClassName(PART_END_ADORNMENT),
-              styles.adornment,
-              styles.passwordToggle,
-            )}
-            onClick={togglePasswordVisibility}
-          />
-        ) : (
-          <Adornment
-            text={endText}
-            iconName={endIcon}
-            className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
-          />
-        )}
-      </div>
-    </ItemWithLabel>
+      )}
+    </div>
   );
 });

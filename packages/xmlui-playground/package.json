@@ -1,6 +1,6 @@
 {
   "name": "xmlui-playground",
-  "version": "0.1.7",
+  "version": "0.1.10",
   "sideEffects": false,
   "scripts": {
     "start": "xmlui start",
@@ -20,6 +20,7 @@
     "xmlui-devtools": "*"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "xmlui": "*"
   },
   "main": "./dist/xmlui-playground.js",

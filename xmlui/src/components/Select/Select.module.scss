@@ -11,8 +11,9 @@ $animDuration: 0.1s;
 }
 
 $componentName: "Select";
-$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
+$themeVars: t.composeBorderVars($themeVars, $componentName);
 $themeVars: t.composePaddingVars($themeVars, $componentName);
+$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 
 
 // --- CSS properties of a particular Select variant
@@ -34,7 +35,7 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
     }
 
-    &:focus {
+    &:focus-visible {
       outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
       outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
       outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
@@ -48,44 +49,22 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   }
 }
 
-@mixin valueVariant($variantName) {
-  &>span {
-    font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
-
-    &>div {
-      color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
-      font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-    }
-  }
-}
-
 @layer components {
-  .selectValue {
-    @include valueVariant("default");
+  // =============================================================================
+  // SHARED COMPONENTS (used by both SimpleSelect and MultiSelect)
+  // =============================================================================
 
-    &.error {
-      @include valueVariant("error");
-    }
-
-    &.warning {
-      @include valueVariant("warning");
-    }
-
-    &.valid {
-      @include valueVariant("success");
-    }
-  }
-
+  /**
+   * Common trigger styles for both SimpleSelect and searchable/multiSelect
+   */
   .selectTrigger {
-    min-height: 2.6rem;
-    display: flex;
-    @include t.paddingVars($themeVars, $componentName);
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
     outline: none;
-    overflow: hidden;
+    width: 100%;
+    gap: t.$space-1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    @include t.paddingVars($themeVars, $componentName);
 
     @include variant("default");
 
@@ -101,12 +80,27 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       @include variant("success");
     }
 
-    &:disabled {
+    &.disabled {
       cursor: not-allowed;
-      opacity: createThemeVar("opacity-#{$componentName}--disabled");
+      opacity: 0.5;
       background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
       color: createThemeVar("Input:textColor-#{$componentName}--disabled");
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+    }
+
+    &.focused {
+      outline-width: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+      outline-color: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+      outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+      outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+    }
+
+    .placeholder {
+      flex:1;
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
     }
   }
 
@@ -118,18 +112,61 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     overflow: hidden;
   }
 
-  .badgeListContainer {
+  /**
+   * Common trigger value and actions
+   */
+
+  .actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+
+  /**
+   * Common empty state
+   */
+  .emptyList {
+    display: flex;
+    gap: .2rem;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
     width: 100%;
   }
 
+  // =============================================================================
+  // MULTI-SELECT SPECIFIC (searchable + multiSelect)
+  // =============================================================================
+
+  /**
+   * Badge display for multi-select values
+   */
+  .badgeListContainer {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .badgeList {
-    gap: 4px;
+    position: relative;
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .inputWrapper {
+    display: flex;
     align-items: center;
+    min-width: fit-content;
+    flex: 1;
+    gap: t.$space-1;
   }
 
   .badge {
@@ -160,24 +197,170 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     }
   }
 
-  .actions {
+  /**
+   * Search input and dropdown for searchable/multi-select
+   */
+
+  .selectContent {
+    z-index: 1000;
+    outline: none;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
+  }
+
+  .command {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .commandInputContainer {
     display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid t.$borderColor;
+  }
+
+  .commandInput {
+    width: 100%;
+    background-color: transparent;
+    outline: none;
+    padding: t.$space-2;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+
+
+    &:focus-within {
+      outline: none;
+    }
+  }
+
+  .commandList {
+    width: 100%;
+    overflow: auto;
+  }
+
+  /**
+   * MultiSelectOption component (used in searchable/multi-select dropdown)
+   */
+  .multiSelectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    display: flex;
+    gap: t.$space-1;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+
+    .multiSelectOptionContent {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &[aria-selected="true"] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    &:hover,
+    &.highlighted {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    &[data-selected=true] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    &[aria-disabled="true"],
+    &.disabledOption {
+      pointer-events: none;
+      cursor: not-allowed;
+      color: createThemeVar("textColor-item-#{$componentName}--disabled");
+      font-style: italic;
+    }
+
+    &[data-disabled=true] {
+      pointer-events: none;
+      opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
+      cursor: not-allowed;
+      font-style: italic;
+    }
   }
 
-  .placeholder {
-    display: block;
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
-  }
+  // =============================================================================
+  // SIMPLE SELECT (non-searchable, single select using Radix UI)
+  // =============================================================================
 
-  .emptyList {
+  /**
+   * Trigger value display for SimpleSelect
+   */
+  .selectValue {
+    flex: 1;
     display: flex;
-    gap: .2rem;
-    padding: 10px 0;
-    justify-content: center;
     align-items: center;
-    font-size: 14px;
+    min-height: t.$space-7;
+    outline: none;
+    background-color: transparent;
+    font-size: t.$fontSize;
+  }
+
+  .action {
+    font-size: t.$fontSize;
+  }
+
+  /**
+   * Dropdown content container
+   */
+  .selectDropdownContent {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    z-index: 1000;
+    overflow: auto;
+    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
+
+    &[data-state='open'] {
+      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
+    }
+
+    &[data-state='closed'] {
+      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
+    }
+
+    &[data-side='bottom'] {
+      animation: slideInFromTop 0.08s ease-in-out;
+      transform: translateY(0.15rem);
+    }
+
+    &[data-side='left'] {
+      animation: slideInFromRight $animDuration ease-in-out;
+      transform: translateX(-0.15rem);
+    }
+
+    &[data-side='right'] {
+      animation: slideInFromLeft $animDuration ease-in-out;
+      transform: translateX(0.15rem);
+    }
+
+    &[data-side='top'] {
+      animation: slideInFromBottom $animDuration ease-in-out;
+      transform: translateY(-0.15rem);
+    }
+  }
+
+  .selectViewport {
+    height: fit-content;
     width: 100%;
   }
 
@@ -199,177 +382,6 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     padding-bottom: 0.25rem;
   }
 
-  .command {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-    border-radius: 6px;
-    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
-  }
-
-  .commandInputContainer {
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    border-bottom: 1px solid t.$borderColor;
-  }
-
-  .commandInput {
-    flex: 1;
-    background-color: transparent;
-    padding: 0.5rem;
-    font-size: 14px;
-    outline: none;
-    border: none;
-
-    &:focus {
-      outline: none;
-      box-shadow: none;
-      border: 0;
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: createThemeVar("opacity-#{$componentName}--disabled");
-    }
-  }
-
-  .commandList {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .selectContent {
-    position: relative;
-    width: 100%;
-    max-height: 280px;
-    z-index: 1000;
-    overflow: auto;
-    background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
-    border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
-    box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
-    border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
-
-    &[data-state='open'] {
-      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
-    }
-
-    &[data-state='closed'] {
-      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
-    }
-
-    &[data-side='bottom'] {
-      animation: slideInFromTop 0.08s ease-in-out;
-    }
-
-    &[data-side='left'] {
-      animation: slideInFromRight $animDuration ease-in-out;
-    }
-
-    &[data-side='right'] {
-      animation: slideInFromLeft $animDuration ease-in-out;
-    }
-
-    &[data-side='top'] {
-      animation: slideInFromBottom $animDuration ease-in-out;
-    }
-
-    &[data-side='bottom'] {
-      transform: translateY(0.15rem);
-    }
-
-    &[data-side='left'] {
-      transform: translateX(-0.15rem);
-    }
-
-    &[data-side='right'] {
-      transform: translateX(0.15rem);
-    }
-
-    &[data-side='top'] {
-      transform: translateY(-0.15rem);
-    }
-  }
-
-  .multiComboboxOption {
-    .multiComboboxOptionContent {
-      width: 100%;
-      gap: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}");
-      @include t.paddingVars($themeVars, "item-#{$componentName}");
-    }
-
-    &[data-selected=true] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-    }
-
-    &[data-disabled=true] {
-      pointer-events: none;
-      opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
-      cursor: not-allowed;
-      font-style: italic;
-    }
-  }
-
-  .selectItem {
-    position: relative;
-    display: flex;
-    cursor: pointer;
-    user-select: none;
-    align-items: center;
-    outline: none;
-    font-size: createThemeVar("fontSize-#{$componentName}");
-
-    &[data-highlighted] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
-    }
-
-    &[data-state=checked] {
-      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
-    }
-
-    .selectItemContent {
-      display: flex;
-      flex: 1;
-      cursor: pointer;
-      user-select: none;
-      align-items: center;
-      outline: none;
-      @include t.paddingVars($themeVars, "item-#{$componentName}");
-    }
-  }
-
-  .selectItem[data-disabled] {
-    pointer-events: none;
-    opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
-    cursor: not-allowed;
-    font-style: italic;
-  }
-
-  .selectItemIndicator {
-    display: flex;
-    margin-right: 0.5rem;
-    flex-shrink: 0;
-    height: 0.875rem;
-    width: 0.875rem;
-    align-items: center;
-    justify-content: center;
-    color: createThemeVar("textColor-indicator-#{$componentName}");
-  }
-
-  .selectViewport {
-    height: fit-content;
-    width: 100%;
-    min-width: var(--radix-select-trigger-width);
-  }
-
   .selectEmpty {
     display: flex;
     gap: .2rem;
@@ -380,6 +392,62 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
     font-size: 14px;
     width: 100%;
   }
+
+  /**
+   * SelectOption component (used in SimpleSelect dropdown)
+   */
+  .selectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+    gap: t.$space-1;
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    outline: none;
+    justify-content: space-between;
+
+    &[data-state=checked] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+    }
+
+    &[data-highlighted] {
+      background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+    }
+
+    .selectOptionContent {
+      display: flex;
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+      align-items: center;
+      outline: none;
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
+      cursor: not-allowed;
+      font-style: italic;
+    }
+  }
+
+  .selectOptionIndicator {
+    display: flex;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    height: 0.875rem;
+    width: 0.875rem;
+    align-items: center;
+    justify-content: center;
+    color: createThemeVar("textColor-indicator-#{$componentName}");
+  }
+
+  // =============================================================================
+  // UTILITY CLASSES
+  // =============================================================================
 
   .loading {
     padding: 0.5rem 1rem;

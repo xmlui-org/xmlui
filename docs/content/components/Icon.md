@@ -74,4 +74,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [size](../styles-and-themes/common-units/#size)-Icon | 1.25em | 1.25em |
+| [size](../styles-and-themes/common-units/#size)-Icon | 1.2em | 1.2em |

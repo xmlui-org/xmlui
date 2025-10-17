@@ -131,16 +131,32 @@ export const LineChart = forwardRef(function LineChart({
     (props: any) => {
       if (!tooltipRenderer) return <TooltipContent {...props}/>;
 
+      const payloadArray: Array<{ label: string; value: any; color: string }> = [];
+      
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        const originalPayload = props.payload[0].payload;
+        // Transform dataKeys into array of objects with label, value, and color
+        dataKeys.forEach((dataKey, index) => {
+          if (dataKey in originalPayload) {
+            payloadArray.push({
+              label: dataKey,
+              value: originalPayload[dataKey],
+              color: colorValues[index] || colorValues[0]
+            });
+          }
+        });
+      }
+
       // Extract tooltip data from Recharts props
       const tooltipData = {
         label: props.label,
-        payload: props.payload,
+        payload: payloadArray,
         active: props.active,
       };
 
       return tooltipRenderer(tooltipData);
     },
-    [tooltipRenderer]
+    [tooltipRenderer, dataKeys, colorValues]
   );
 
   useEffect(() => {

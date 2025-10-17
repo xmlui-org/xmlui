@@ -1,6 +1,5 @@
 import { usePlayground } from "../hooks/usePlayground";
 import { MdOutlinePalette } from "react-icons/md";
-import * as React from "react";
 import styles from "./ThemeSwitcher.module.scss";
 import classnames from "classnames";
 import * as RadixMenu from "@radix-ui/react-dropdown-menu";
@@ -18,7 +17,7 @@ export const ThemeSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
       <RadixMenu.Root modal={false}>
         <RadixMenu.Trigger className={styles.button} {...props} asChild ref={ref}>
           <Button variant="ghost">
-            <MdOutlinePalette size={18}/>
+            <MdOutlinePalette size={18} />
           </Button>
         </RadixMenu.Trigger>
         <RadixMenu.Portal container={root}>
@@ -48,7 +47,6 @@ export const ThemeSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
         </RadixMenu.Portal>
       </RadixMenu.Root>
     </div>
-
   );
 });
 

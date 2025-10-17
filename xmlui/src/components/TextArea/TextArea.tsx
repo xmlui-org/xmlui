@@ -9,13 +9,8 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
-  dFocus,
   dGotFocus,
   dInitialValue,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dMaxLength,
   dPlaceholder,
@@ -89,10 +84,6 @@ export const TextAreaMd = createMetadata({
     },
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -164,10 +155,6 @@ export const textAreaComponentRenderer = createComponentRenderer(
         rows={extractValue.asOptionalNumber(node.props.rows)}
         autoSize={extractValue.asOptionalBoolean(node.props.autoSize)}
         validationStatus={extractValue(node.props.validationStatus)}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
       />
     );

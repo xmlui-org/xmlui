@@ -49,6 +49,63 @@ You can create `TabItem` children dynamically:
 
 ## Properties [#properties]
 
+### `accordionView` (default: false) [#accordionview-default-false]
+
+When enabled, displays tabs in an accordion-like view where tab headers are stacked vertically and only the active tab's content is visible. Each tab header remains visible and clicking a header opens its content while closing others. When enabled, the orientation property is ignored.
+
+The `accordionView` property enables an accordion-like layout where tab headers are stacked vertically and only the active tab's content is visible. All tab headers remain visible, and clicking a header opens its content while closing others.
+
+> [!NOTE] When `accordionView` is enabled, the `orientation` property is ignored.
+
+```xmlui-pg copy display name="Example: accordionView" /accordionView/ height="480px"
+<App>
+  <Tabs accordionView="true">
+    <TabItem label="Account Information">
+      <Card title="Account Details">
+        <Text>Your account is active and in good standing.</Text>
+        <Text>Account ID: 12345</Text>
+        <Text>Member since: January 2024</Text>
+      </Card>
+    </TabItem>
+    <TabItem label="Billing & Payments">
+      <Card title="Payment Methods">
+        <Text>Current Plan: Professional</Text>
+        <Text>Next billing date: November 1, 2025</Text>
+        <Text>Payment method: xxxx 4242</Text>
+      </Card>
+    </TabItem>
+    <TabItem label="Security Settings">
+      <Card title="Security Options">
+        <Text>Two-factor authentication: Enabled</Text>
+        <Text>Last password change: September 15, 2025</Text>
+        <Text>Active sessions: 2</Text>
+      </Card>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+The accordion view is particularly useful for mobile layouts or when you need to present expandable sections in a vertical format. Each section can be opened independently by clicking its header.
+
+```xmlui-pg copy display name="Example: accordionView with dynamic content" /accordionView/ height="450px"
+<App>
+  <Tabs accordionView="true">
+    <Items data="{[
+        {title: 'Overview', content: 'Dashboard and quick statistics'},
+        {title: 'Reports', content: 'Monthly and annual reports'},
+        {title: 'Analytics', content: 'User behavior and metrics'},
+        {title: 'Export', content: 'Download data in various formats'}
+      ]}">
+      <TabItem label="{$item.title}">
+        <Card>
+          <Text>{$item.content}</Text>
+        </Card>
+      </TabItem>
+    </Items>
+  </Tabs>
+</App>
+```
+
 ### `activeTab` [#activetab]
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.
@@ -108,9 +165,75 @@ Individual tab items have an optional identifier, which is passed to the header 
 
 ### `orientation` (default: "horizontal") [#orientation-default-horizontal]
 
-This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.
+This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top. Note: This property is ignored when accordionView is set to true.
 
 Available values: `horizontal` **(default)**, `vertical`
+
+### `tabAlignment` (default: "start") [#tabalignment-default-start]
+
+This property controls how tabs are aligned within the tab header container in horizontal orientation. Use 'start' to align tabs to the left, 'end' to align to the right, 'center' to center the tabs, and 'stretch' to make tabs fill the full width of the header. Note: This property is ignored when orientation is set to 'vertical' or when accordionView is enabled.
+
+Available values: `start` **(default)**, `end`, `center`, `stretch`
+
+The `tabAlignment` property controls how tabs are aligned within the tab header container in horizontal orientation. It accepts four values: `start`, `end`, `center`, and `stretch`.
+
+> [!NOTE] The `tabAlignment` property is ignored when `orientation` is set to `vertical` or when `accordionView` is enabled.
+
+**Alignment: start**
+
+Aligns tabs to the left side of the container:
+
+```xmlui-pg copy display name="Example: tabAlignment='start'" /tabAlignment/ height="200px"
+<App>
+  <Tabs tabAlignment="start" style="width: 100%">
+    <TabItem label="Home">Home content</TabItem>
+    <TabItem label="Profile">Profile content</TabItem>
+    <TabItem label="Settings">Settings content</TabItem>
+  </Tabs>
+</App>
+```
+
+**Alignment: center**
+
+Centers tabs within the container:
+
+```xmlui-pg copy display name="Example: tabAlignment='center'" /tabAlignment/ height="200px"
+<App>
+  <Tabs tabAlignment="center" style="width: 100%">
+    <TabItem label="Home">Home content</TabItem>
+    <TabItem label="Profile">Profile content</TabItem>
+    <TabItem label="Settings">Settings content</TabItem>
+  </Tabs>
+</App>
+```
+
+**Alignment: end**
+
+Aligns tabs to the right side of the container:
+
+```xmlui-pg copy display name="Example: tabAlignment='end'" /tabAlignment/ height="200px"
+<App>
+  <Tabs tabAlignment="end" style="width: 100%">
+    <TabItem label="Home">Home content</TabItem>
+    <TabItem label="Profile">Profile content</TabItem>
+    <TabItem label="Settings">Settings content</TabItem>
+  </Tabs>
+</App>
+```
+
+**Alignment: stretch**
+
+Makes tabs fill the full width of the container, distributing them evenly:
+
+```xmlui-pg copy display name="Example: tabAlignment='stretch'" /tabAlignment/ height="200px"
+<App>
+  <Tabs tabAlignment="stretch" style="width: 100%">
+    <TabItem label="Home">Home content</TabItem>
+    <TabItem label="Profile">Profile content</TabItem>
+    <TabItem label="Settings">Settings content</TabItem>
+  </Tabs>
+</App>
+```
 
 ## Events [#events]
 

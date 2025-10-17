@@ -96,6 +96,10 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
       border-color: createThemeVar("Input:borderColor-NumberBox--disabled");
     }
 
+    &.rtl {
+      flex-direction: row-reverse;
+    }
+
     .input {
       font-size: inherit;
       color: inherit;

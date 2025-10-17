@@ -2,6 +2,8 @@
 
 `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
 
+> **Note:** `FormItem` must be used inside a `Form` component.
+
 **Key features:**
 - **Data binding**: Automatically syncs control values with form data using the `bindTo` property
 - **Validation**: Displays validation states and error messages for the associated input
@@ -542,7 +544,7 @@ Removes the item specified by its index from the list held by the FormItem. The 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-FormItemLabel | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel-required | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |

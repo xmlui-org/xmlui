@@ -115,7 +115,7 @@ export function processStatementQueue(
     let outcome: ProcessOutcome | undefined;
     try {
       // --- Sign that the statement is about to start
-      evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
+      void evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
 
       // --- Execute the statement
       outcome = processStatement(
@@ -166,7 +166,7 @@ export function processStatementQueue(
     }
 
     // --- Sign that the statement has been completed
-    evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
+    void evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
 
     // --- Provide diagnostics
     if (queue.length > diagInfo.maxQueueLength) {

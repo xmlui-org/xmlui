@@ -19,7 +19,8 @@ import styles from "./NestedApp.module.scss";
 import classnames from "classnames";
 import {
   StyleInjectionTargetContext,
-  StyleProvider, useStyles
+  StyleProvider,
+  useStyles,
 } from "../../components-core/theming/StyleContext";
 
 type NestedAppProps = {
@@ -185,7 +186,7 @@ export function NestedApp({
       });
 
       // When your component mounts and the shadow root is available...
-      Promise.all(sheetPromises).then((sheets) => {
+      void Promise.all(sheetPromises).then((sheets) => {
         // Filter out any sheets that failed to load
         const validSheets = sheets.filter(Boolean);
 
@@ -317,7 +318,13 @@ export function NestedApp({
   );
 }
 
-function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; themeStylesToReset?: Record<string, string>}) {
+function NestedAppRoot({
+  children,
+  themeStylesToReset,
+}: {
+  children: ReactNode;
+  themeStylesToReset?: Record<string, string>;
+}) {
   // css variables are leaking into to shadow dom, so we reset them here
   const themeVarReset = useMemo(() => {
     const vars = {};
@@ -329,10 +336,9 @@ function NestedAppRoot({children, themeStylesToReset}: {children: ReactNode; the
 
   const resetClassName = useStyles(themeVarReset, { prepend: true });
 
-  return <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>
-    <div className={styles.content}>
-      {children}
+  return (
+    <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>
+      <div className={styles.content}>{children}</div>
     </div>
-  </div>
+  );
 }
-

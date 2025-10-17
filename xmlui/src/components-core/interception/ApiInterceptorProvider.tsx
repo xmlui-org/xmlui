@@ -14,7 +14,7 @@ type Props = {
   parentInterceptorContext?: IApiInterceptorContext;
   waitForApiInterceptor?: boolean;
   useHashBasedRouting?: boolean;
-}
+};
 
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({
@@ -35,18 +35,16 @@ export function ApiInterceptorProvider({
   let forceInitializeParent = parentInterceptorContext?.forceInitialize;
   let parentInterceptorWorker = parentInterceptorContext?.interceptorWorker;
 
-
-
   //// if we don't use a worker, we initialize the api instance directly
-  useEffect(()=>{
-    if(useWorker){
+  useEffect(() => {
+    if (useWorker) {
       return;
     }
     if (!interceptor) {
       return;
     }
 
-    (async () => {
+    void (async () => {
       const { initMock } = await import("./initMock");
       const apiInstance = await initMock(interceptor);
       setApiInstance(apiInstance);
@@ -56,7 +54,7 @@ export function ApiInterceptorProvider({
 
   //// if we use a worker, we initialize the worker with the api instance
   useEffect(() => {
-    if(!useWorker){
+    if (!useWorker) {
       return;
     }
     if (!hasParentInterceptorContext) {
@@ -65,7 +63,7 @@ export function ApiInterceptorProvider({
 
         // --- We use "msw" to manage the API interception
         let interceptorWorker: SetupWorker;
-        (async () => {
+        void (async () => {
           // --- Create the worker on the fly
           if (process.env.VITE_MOCK_ENABLED) {
             const [{ createApiInterceptorWorker }, { initMock }] = await Promise.all([
@@ -109,7 +107,7 @@ export function ApiInterceptorProvider({
         return;
       }
       if (parentInterceptorWorker) {
-        (async () => {
+        void (async () => {
           const [{ createApiInterceptorWorker }, { initMock }] = await Promise.all([
             import("./apiInterceptorWorker"),
             import("./initMock"),

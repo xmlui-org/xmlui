@@ -1,4 +1,5 @@
-import { ReactNode, useLayoutEffect, useRef } from "react";
+import type { ReactNode} from "react";
+import { useLayoutEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -83,7 +84,7 @@ export const AppHeader = ({
   }, []);
 
   return (
-    <div {...rest} className={classnames(styles.header, className)} style={style}>
+    <div {...rest} className={classnames(styles.header, className)} style={style} role="banner">
       <div
         className={classnames(styles.headerInner, {
           [styles.full]: !canRestrictContentWidth,

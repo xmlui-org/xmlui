@@ -13,8 +13,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -29,8 +29,8 @@ The LineChart component accommodates the size of its parent unless you set it ex
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
   />
 </Card>
 ```
@@ -101,8 +101,8 @@ A function that formats the X-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterX="{(value) => '(' + value + ')'}"
   />
 </App>
@@ -122,8 +122,8 @@ A function that formats the Y-axis tick labels. It receives a tick value and ret
         { 'sprint': 'Sprint 3', 'A': 48 },
         { 'sprint': 'Sprint 4', 'A': 72 }
        ]}"
-    xKeys="{['A']}"
-    yKey="sprint"
+    yKeys="{['A']}"
+    xKey="sprint"
     tickFormatterY="{(value) => '$' + value}"
   />
 </App>
@@ -133,13 +133,50 @@ A function that formats the Y-axis tick labels. It receives a tick value and ret
 
 This property allows replacing the default template to display a tooltip.
 
-### `xKeys` [#xkeys]
+```xmlui-pg copy display height="320px" name="Example: tooltipTemplate" /tooltipTemplate/
+<App>
+  <LineChart
+    height="240px"
+    data="{[
+        { 'sprint': 'Sprint 1', 'A': 44, 'B': 28 },
+        { 'sprint': 'Sprint 2', 'A': 32, 'B': 41 },
+        { 'sprint': 'Sprint 3', 'A': 48, 'B': 35 },
+        { 'sprint': 'Sprint 4', 'A': 72, 'B': 58 }
+       ]}"
+    yKeys="{['A', 'B']}"
+    xKey="sprint"
+  >
+      <property name="tooltipTemplate">
+        <VStack backgroundColor='white' padding="$space-2">
+          <Text fontWeight='bold'>{$tooltip.label}</Text>
+          <Items data="{$tooltip.payload}">
+            <HStack gap="$space-2" verticalAlignment="center">
+              <Stack
+                width="8px"
+                height="8px"
+                backgroundColor="{$item.color}" />
+              <Text>{$item.label}: {$item.value}</Text>
+            </HStack>
+          </Items>
+        </VStack>
+      </property>
+  </LineChart>
+</App>
+```
 
-This property specifies the keys in the data objects that should be used for rendering the lines.
+The `tooltipTemplate` prop allows you to customize the appearance and content of chart tooltips. The template receives a `$tooltip` context variable containing:
 
-### `yKey` [#ykey]
+- `$tooltip.label`: The label for the data point (typically the yKey value)
+- `$tooltip.payload`: An object containing all data values for the hovered point
+- `$tooltip.active`: Boolean indicating if the tooltip is currently active
+
+### `xKey` [#xkey]
 
 The key in the data objects used for labeling different data series.
+
+### `yKeys` [#ykeys]
+
+This property specifies the keys in the data objects that should be used for rendering the lines.
 
 ## Events [#events]
 

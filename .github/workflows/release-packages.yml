@@ -44,9 +44,7 @@ jobs:
         run: npm ci --prefer-offline
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.2.1
-        with:
-          max-age: 1mo
+        uses: rharkor/caching-for-turbo@v2.3.1
 
       - name: Store Playwright's Version
         run: |
@@ -135,7 +133,6 @@ jobs:
         if: steps.changesets_publish.outputs.published == 'true' && steps.xmlui_vscode_info.outputs.tagExists == 'false'
         run: |
           cd tools/vscode
-          npx vsce publish --packagePath *.vsix
           npx vsce publish \
             --packagePath *.vsix \
             --no-git-tag-version \

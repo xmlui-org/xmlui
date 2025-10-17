@@ -58,7 +58,8 @@ test("handles menu item clicks", async ({ initTestBed, createDropdownMenuDriver,
   await expect.poll(testStateDriver.testState).toEqual("item1-clicked");
 
   // Menu should close after click
-  await expect(page.getByRole("menuitem")).not.toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 1" })).not.toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Item 2" })).not.toBeVisible();
 });
 
 test("alignment='start' aligns popup menu left", async ({
@@ -168,7 +169,7 @@ test("has correct accessibility attributes", async ({
   await expect(btn).toHaveAttribute("aria-expanded", "false");
 
   await driver.open();
-  page.getByRole("button", { includeHidden: true, expanded: true }).waitFor();
+  await page.getByRole("button", { includeHidden: true, expanded: true }).waitFor();
   await page.getByRole("menu").waitFor();
 });
 
@@ -180,11 +181,11 @@ test("is keyboard accessible", async ({ initTestBed, createDropdownMenuDriver, p
   `);
 
   const btn = page.getByRole("button");
-  page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
   await expect(btn).toBeFocused();
 
   // Open with Enter
-  page.keyboard.press("Enter");
+  await page.keyboard.press("Enter");
   await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
 
   // Navigate and select with keyboard

@@ -5,6 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dAutoFocus,
+  dClick,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -35,10 +36,6 @@ export const SwitchMd = createMetadata({
     },
   },
   props: {
-    label: dLabel(),
-    labelPosition: dLabelPosition("end"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
     required: dRequired(),
     initialValue: dInitialValue(defaultProps.initialValue),
     autoFocus: dAutoFocus(),
@@ -51,6 +48,7 @@ export const SwitchMd = createMetadata({
     ),
   },
   events: {
+    click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
@@ -120,13 +118,10 @@ export const switchComponentRenderer = createComponentRenderer(
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        onClick={lookupEventHandler("click")}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        label={extractValue(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         variant="switch"
         registerComponentApi={registerComponentApi}

@@ -1,7 +1,6 @@
 import styles from "./PlaygroundContent.module.scss";
 import { usePlayground } from "../hooks/usePlayground";
 import classnames from "classnames";
-import React from "react";
 import { Preview } from "./Preview";
 import { Splitter } from "xmlui";
 import { Editor } from "./Editor";
@@ -10,7 +9,6 @@ type PlaygroundContentProps = {
   height?: number | string;
   initialPrimarySize?: string;
   standalone?: boolean;
-  loading?: boolean;
 };
 
 export const PlaygroundContent = ({

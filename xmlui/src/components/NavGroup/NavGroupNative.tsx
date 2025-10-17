@@ -77,7 +77,7 @@ export const NavGroup = forwardRef(function NavGroup(
     renderChild,
     to,
     disabled = false,
-    initiallyExpanded,
+    initiallyExpanded = false,
     iconHorizontalCollapsed,
     iconHorizontalExpanded,
     iconVerticalCollapsed,
@@ -107,7 +107,11 @@ export const NavGroup = forwardRef(function NavGroup(
       layoutIsVertical,
       iconHorizontalCollapsed: iconHorizontalCollapsed ?? defaultProps.iconHorizontalCollapsed,
       iconHorizontalExpanded: iconHorizontalExpanded ?? defaultProps.iconHorizontalExpanded,
-      iconVerticalCollapsed: iconVerticalCollapsed ?? defaultProps.iconVerticalCollapsed,
+      iconVerticalCollapsed:
+        iconVerticalCollapsed ??
+        (level < 0 && !inline
+          ? defaultProps.iconVerticalExpanded
+          : defaultProps.iconVerticalCollapsed),
       iconVerticalExpanded: iconVerticalExpanded ?? defaultProps.iconVerticalExpanded,
     };
   }, [
@@ -117,6 +121,7 @@ export const NavGroup = forwardRef(function NavGroup(
     iconVerticalExpanded,
     level,
     layoutIsVertical,
+    inline,
   ]);
 
   return (
@@ -143,6 +148,7 @@ export const NavGroup = forwardRef(function NavGroup(
           renderChild={renderChild}
           ref={ref}
           to={to}
+          initiallyExpanded={initiallyExpanded}
           disabled={disabled}
         />
       )}
@@ -203,12 +209,14 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         icon={icon}
         to={to}
         disabled={disabled}
+        aria-expanded={expanded}
       >
         {label}
         <div style={{ flex: 1 }} />
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
+        aria-hidden={!expanded}
         className={classnames(styles.groupContent, {
           [styles.expanded]: expanded,
         })}
@@ -229,6 +237,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     node,
     to,
     disabled = false,
+    initiallyExpanded = false,
     ...rest
   }: {
     style?: CSSProperties;
@@ -238,6 +247,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     renderChild: RenderChildFn;
     to?: string;
     disabled?: boolean;
+    initiallyExpanded?: boolean;
   },
   ref,
 ) {
@@ -258,9 +268,19 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     Trigger = DropdownMenuSubTrigger as any;
     Content = DropdownMenuSubContent;
   }
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [renderCount, setRenderCount] = useState(false);
+
+  useEffect(() => setRenderCount(true), []);
+
   return (
-    <Wrapper {...rest} onOpenChange={(open) => setExpanded(open)}>
+    <Wrapper
+      {...rest}
+      open={expanded}
+      onOpenChange={(open) => {
+        if (renderCount) setExpanded(open);
+      }}
+    >
       <Trigger asChild disabled={disabled}>
         <NavLink
           icon={icon}
@@ -271,7 +291,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         >
           {label}
           <div style={{ flex: 1 }} />
-          {level === 0 && <Icon name={iconVerticalExpanded} />}
+          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
             <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}

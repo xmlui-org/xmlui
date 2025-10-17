@@ -27,31 +27,6 @@ This property sets the component's initial value.
 <Slider initialValue="5" />
 ```
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `Slider` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "top") [#labelposition-default-top]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `maxValue` (default: 10) [#maxvalue-default-10]
 
 This property specifies the maximum value of the allowed input range.
@@ -162,6 +137,8 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
@@ -218,5 +195,7 @@ This API retrieves the current value of the `Slider`. You can use it to get the 
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |

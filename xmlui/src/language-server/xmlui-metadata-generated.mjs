@@ -1540,7 +1540,7 @@ export default {
       "borderEndEndRadius-HtmlTr": "var(--xmlui-borderEndEndRadius-HtmlTr, var(--xmlui-borderRadius-HtmlTr))"
     },
     "defaultThemeVars": {
-      "fontSize-HtmlTr": "$fontSize-small",
+      "fontSize-HtmlTr": "$fontSize-sm",
       "backgroundColor-row-HtmlTr": "inherit"
     }
   },
@@ -1878,7 +1878,7 @@ export default {
       "paddingHorizontal-header-Accordion": "$space-3",
       "paddingVertical-header-Accordion": "$space-3",
       "verticalAlignment-header-Accordion": "center",
-      "fontSize-header-Accordion": "$fontSize-normal",
+      "fontSize-header-Accordion": "$fontSize-base",
       "fontWeight-header-Accordion": "$fontWeight-normal",
       "fontFamily-header-Accordion": "$fontFamily",
       "border-Accordion": "0px solid $borderColor",
@@ -1999,10 +1999,10 @@ export default {
         "description": "Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)"
       },
       "$result": {
-        "description": "Response data (available in `completedNotificationMessage` and `success` event)"
+        "description": "Response data (available in `completedNotificationMessage`)"
       },
       "$error": {
-        "description": "Error details (available in `errorNotificationMessage` and `error` event)"
+        "description": "Error details (available in `errorNotificationMessage`)"
       }
     },
     "apis": {
@@ -2097,6 +2097,11 @@ export default {
       "defaultTheme": {
         "description": "This property sets the app's default theme.",
         "valueType": "string"
+      },
+      "autoDetectTone": {
+        "description": "This boolean property enables automatic detection of the system theme preference. When set to true and no defaultTone is specified, the app will automatically use \"light\" or \"dark\" tone based on the user's system theme setting. The app will also respond to changes in the system theme preference.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -2237,7 +2242,7 @@ export default {
       "paddingTop-logo-AppHeader": "$paddingVertical-logo-AppHeader",
       "paddingBottom-logo-AppHeader": "$paddingVertical-logo-AppHeader",
       "paddingHorizontal-logo-AppHeader": "$space-0",
-      "paddingVertical-logo-AppHeader": "$space-4",
+      "paddingVertical-logo-AppHeader": "$space-0",
       "padding-logo-AppHeader": "$paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader",
       "paddingLeft-AppHeader": "$paddingHorizontal-AppHeader",
       "paddingRight-AppHeader": "$paddingHorizontal-AppHeader",
@@ -2308,6 +2313,12 @@ export default {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "initiallyOpen": {
+        "description": "This property determines whether the dropdown list is open when the component is first rendered.",
+        "availableValues": null,
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "creatable": {
         "description": "This property allows the user to create new items that are not present in the list of options.",
@@ -2392,6 +2403,9 @@ export default {
       },
       "didChange": {
         "description": "This event is triggered when value of AutoComplete has changed."
+      },
+      "itemCreated": {
+        "description": "This event is triggered when a new item is created by the user (if `creatable` is enabled)."
       }
     },
     "apis": {
@@ -2449,6 +2463,13 @@ export default {
       "borderStartEndRadius-AutoComplete": "var(--xmlui-borderStartEndRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
       "borderEndStartRadius-AutoComplete": "var(--xmlui-borderEndStartRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
       "borderEndEndRadius-AutoComplete": "var(--xmlui-borderEndEndRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
+      "padding-AutoComplete": "var(--xmlui-padding-AutoComplete)",
+      "paddingHorizontal-AutoComplete": "var(--xmlui-paddingHorizontal-AutoComplete, var(--xmlui-padding-AutoComplete))",
+      "paddingVertical-AutoComplete": "var(--xmlui-paddingVertical-AutoComplete, var(--xmlui-padding-AutoComplete))",
+      "paddingLeft-AutoComplete": "var(--xmlui-paddingLeft-AutoComplete, var(--xmlui-paddingHorizontal-AutoComplete, var(--xmlui-padding-AutoComplete)))",
+      "paddingRight-AutoComplete": "var(--xmlui-paddingRight-AutoComplete, var(--xmlui-paddingHorizontal-AutoComplete, var(--xmlui-padding-AutoComplete)))",
+      "paddingTop-AutoComplete": "var(--xmlui-paddingTop-AutoComplete, var(--xmlui-paddingVertical-AutoComplete, var(--xmlui-padding-AutoComplete)))",
+      "paddingBottom-AutoComplete": "var(--xmlui-paddingBottom-AutoComplete, var(--xmlui-paddingVertical-AutoComplete, var(--xmlui-padding-AutoComplete)))",
       "Input:borderRadius-AutoComplete-default": "var(--xmlui-borderRadius-AutoComplete-default)",
       "Input:borderColor-AutoComplete-default": "var(--xmlui-borderColor-AutoComplete-default)",
       "Input:borderWidth-AutoComplete-default": "var(--xmlui-borderWidth-AutoComplete-default)",
@@ -2514,6 +2535,7 @@ export default {
       "Input:outlineOffset-AutoComplete--focus": "var(--xmlui-outlineOffset-AutoComplete--focus)",
       "paddingVertical-AutoComplete-badge": "var(--xmlui-paddingVertical-AutoComplete-badge)",
       "paddingHorizontal-AutoComplete-badge": "var(--xmlui-paddingHorizontal-AutoComplete-badge)",
+      "borderRadius-AutoComplete-badge": "var(--xmlui-borderRadius-AutoComplete-badge)",
       "Input:fontSize-AutoComplete-badge": "var(--xmlui-fontSize-AutoComplete-badge)",
       "Input:backgroundColor-AutoComplete-badge": "var(--xmlui-backgroundColor-AutoComplete-badge)",
       "Input:textColor-AutoComplete-badge": "var(--xmlui-textColor-AutoComplete-badge)",
@@ -2540,9 +2562,12 @@ export default {
       "backgroundColor-item-AutoComplete--active": "$backgroundColor-dropdown-item--active",
       "minHeight-Input": "39px",
       "backgroundColor-AutoComplete-badge": "$color-primary-500",
-      "fontSize-AutoComplete-badge": "$fontSize-small",
+      "fontSize-AutoComplete-badge": "$fontSize-sm",
+      "borderRadius-AutoComplete-badge": "$borderRadius",
       "paddingHorizontal-AutoComplete-badge": "$space-2",
       "paddingVertical-AutoComplete-badge": "$space-1",
+      "paddingHorizontal-AutoComplete": "$space-1",
+      "paddingVertical-AutoComplete": "$space-2",
       "backgroundColor-AutoComplete-badge--hover": "$color-primary-400",
       "backgroundColor-AutoComplete-badge--active": "$color-primary-500",
       "textColor-item-AutoComplete--disabled": "$color-surface-200",
@@ -2571,6 +2596,10 @@ export default {
           {
             "value": "lg",
             "description": "Large"
+          },
+          {
+            "value": "xl",
+            "description": "Extra large"
           }
         ],
         "valueType": "string",
@@ -2954,6 +2983,10 @@ export default {
           {
             "value": "lg",
             "description": "Large"
+          },
+          {
+            "value": "xl",
+            "description": "Extra large"
           }
         ],
         "defaultValue": "sm"
@@ -3264,7 +3297,7 @@ export default {
       "width-Button": "fit-content",
       "height-Button": "fit-content",
       "borderRadius-Button": "$borderRadius",
-      "fontSize-Button": "$fontSize-small",
+      "fontSize-Button": "$fontSize-sm",
       "fontWeight-Button": "$fontWeight-medium",
       "backgroundColor-Button-primary": "$color-primary-500",
       "backgroundColor-Button-attention": "$backgroundColor-attention",
@@ -3441,7 +3474,7 @@ export default {
     }
   },
   "Carousel": {
-    "status": "in progress",
+    "status": "stable",
     "description": "This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel.",
     "props": {
       "orientation": {
@@ -3460,56 +3493,52 @@ export default {
         "defaultValue": "horizontal"
       },
       "indicators": {
-        "description": "This property indicates whether the carousel displays the indicators.",
+        "description": "Display the individual slides as buttons (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
       },
       "controls": {
-        "description": "This property indicates whether the carousel displays the controls.",
+        "description": "Display the previous/next controls (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
       },
       "autoplay": {
-        "description": "This property indicates whether the carousel automatically scrolls.",
+        "description": "Start scrolling the carousel automatically (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": false
       },
       "loop": {
-        "description": "This property indicates whether the carousel loops.",
+        "description": "Sets whether the carousel should loop back to the start/end when it reaches the last/first slide.",
         "valueType": "boolean",
         "defaultValue": false
       },
       "startIndex": {
-        "description": "This property indicates the index of the first slide to display.",
+        "description": "The index of the first slide to display.",
         "valueType": "number",
         "defaultValue": 0
       },
       "transitionDuration": {
-        "description": "This property indicates the duration of the transition between slides.",
+        "description": "The duration of the transition between slides.",
         "valueType": "number",
         "defaultValue": 25
       },
       "autoplayInterval": {
-        "description": "This property specifies the interval between autoplay transitions.",
+        "description": "Specifies the interval between autoplay transitions.",
         "valueType": "number",
         "defaultValue": 5000
       },
       "stopAutoplayOnInteraction": {
-        "description": "This property indicates whether autoplay stops on interaction.",
+        "description": "This property indicates whether autoplay stops on user interaction.",
         "valueType": "boolean",
         "defaultValue": true
       },
       "prevIcon": {
-        "description": "This property specifies the icon to display for the previous control.",
+        "description": "The icon to display for the previous control.",
         "valueType": "string"
       },
       "nextIcon": {
-        "description": "This property specifies the icon to display for the next control.",
+        "description": "The icon to display for the next control.",
         "valueType": "string"
-      },
-      "keyboard": {
-        "description": "This property indicates whether the carousel responds to keyboard events.",
-        "valueType": "boolean"
       }
     },
     "events": {
@@ -3565,9 +3594,6 @@ export default {
       "backgroundColor-indicator-active-Carousel": "var(--xmlui-backgroundColor-indicator-active-Carousel)",
       "textColor-indicator-active-Carousel": "var(--xmlui-textColor-indicator-active-Carousel)"
     },
-    "themeVarDescriptions": {
-      "width-indicator-Carousel": "Sets the width of the indicator."
-    },
     "defaultThemeVars": {
       "backgroundColor-control-Carousel": "$color-primary",
       "textColor-control-Carousel": "$textColor",
@@ -3615,6 +3641,14 @@ export default {
   "Checkbox": {
     "status": "stable",
     "description": "`Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the checkbox."
+      },
+      "input": {
+        "description": "The checkbox input area."
+      }
+    },
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
@@ -3707,6 +3741,9 @@ export default {
     },
     "childrenAsTemplate": "inputTemplate",
     "events": {
+      "click": {
+        "description": "This event is triggered when the Checkbox is clicked."
+      },
       "gotFocus": {
         "description": "This event is triggered when the Checkbox has received the focus."
       },
@@ -4377,6 +4414,13 @@ export default {
       }
     },
     "themeVars": {
+      "padding-DatePicker": "var(--xmlui-padding-DatePicker)",
+      "paddingHorizontal-DatePicker": "var(--xmlui-paddingHorizontal-DatePicker, var(--xmlui-padding-DatePicker))",
+      "paddingVertical-DatePicker": "var(--xmlui-paddingVertical-DatePicker, var(--xmlui-padding-DatePicker))",
+      "paddingLeft-DatePicker": "var(--xmlui-paddingLeft-DatePicker, var(--xmlui-paddingHorizontal-DatePicker, var(--xmlui-padding-DatePicker)))",
+      "paddingRight-DatePicker": "var(--xmlui-paddingRight-DatePicker, var(--xmlui-paddingHorizontal-DatePicker, var(--xmlui-padding-DatePicker)))",
+      "paddingTop-DatePicker": "var(--xmlui-paddingTop-DatePicker, var(--xmlui-paddingVertical-DatePicker, var(--xmlui-padding-DatePicker)))",
+      "paddingBottom-DatePicker": "var(--xmlui-paddingBottom-DatePicker, var(--xmlui-paddingVertical-DatePicker, var(--xmlui-padding-DatePicker)))",
       "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
       "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
       "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
@@ -4390,7 +4434,6 @@ export default {
       "Input:backgroundColor-DatePicker-default": "var(--xmlui-backgroundColor-DatePicker-default)",
       "Input:boxShadow-DatePicker-default": "var(--xmlui-boxShadow-DatePicker-default)",
       "Input:textColor-DatePicker-default": "var(--xmlui-textColor-DatePicker-default)",
-      "Input:padding-DatePicker-default": "var(--xmlui-padding-DatePicker-default)",
       "Input:borderColor-DatePicker-default--hover": "var(--xmlui-borderColor-DatePicker-default--hover)",
       "Input:backgroundColor-DatePicker-default--hover": "var(--xmlui-backgroundColor-DatePicker-default--hover)",
       "Input:boxShadow-DatePicker-default--hover": "var(--xmlui-boxShadow-DatePicker-default--hover)",
@@ -4409,7 +4452,6 @@ export default {
       "Input:backgroundColor-DatePicker-error": "var(--xmlui-backgroundColor-DatePicker-error)",
       "Input:boxShadow-DatePicker-error": "var(--xmlui-boxShadow-DatePicker-error)",
       "Input:textColor-DatePicker-error": "var(--xmlui-textColor-DatePicker-error)",
-      "Input:padding-DatePicker-error": "var(--xmlui-padding-DatePicker-error)",
       "Input:borderColor-DatePicker-error--hover": "var(--xmlui-borderColor-DatePicker-error--hover)",
       "Input:backgroundColor-DatePicker-error--hover": "var(--xmlui-backgroundColor-DatePicker-error--hover)",
       "Input:boxShadow-DatePicker-error--hover": "var(--xmlui-boxShadow-DatePicker-error--hover)",
@@ -4428,7 +4470,6 @@ export default {
       "Input:backgroundColor-DatePicker-warning": "var(--xmlui-backgroundColor-DatePicker-warning)",
       "Input:boxShadow-DatePicker-warning": "var(--xmlui-boxShadow-DatePicker-warning)",
       "Input:textColor-DatePicker-warning": "var(--xmlui-textColor-DatePicker-warning)",
-      "Input:padding-DatePicker-warning": "var(--xmlui-padding-DatePicker-warning)",
       "Input:borderColor-DatePicker-warning--hover": "var(--xmlui-borderColor-DatePicker-warning--hover)",
       "Input:backgroundColor-DatePicker-warning--hover": "var(--xmlui-backgroundColor-DatePicker-warning--hover)",
       "Input:boxShadow-DatePicker-warning--hover": "var(--xmlui-boxShadow-DatePicker-warning--hover)",
@@ -4447,7 +4488,6 @@ export default {
       "Input:backgroundColor-DatePicker-success": "var(--xmlui-backgroundColor-DatePicker-success)",
       "Input:boxShadow-DatePicker-success": "var(--xmlui-boxShadow-DatePicker-success)",
       "Input:textColor-DatePicker-success": "var(--xmlui-textColor-DatePicker-success)",
-      "Input:padding-DatePicker-success": "var(--xmlui-padding-DatePicker-success)",
       "Input:borderColor-DatePicker-success--hover": "var(--xmlui-borderColor-DatePicker-success--hover)",
       "Input:backgroundColor-DatePicker-success--hover": "var(--xmlui-backgroundColor-DatePicker-success--hover)",
       "Input:boxShadow-DatePicker-success--hover": "var(--xmlui-boxShadow-DatePicker-success--hover)",
@@ -4473,7 +4513,423 @@ export default {
       "borderColor-selectedItem-DatePicker": "$color-primary-200",
       "backgroundColor-menu-DatePicker": "$color-surface-50",
       "backgroundColor-item-DatePicker--hover": "$color-surface-100",
-      "backgroundColor-item-DatePicker--active": "$color-surface-200"
+      "backgroundColor-item-DatePicker--active": "$color-surface-200",
+      "paddingVertical-DatePicker": "$space-2",
+      "paddingHorizontal-DatePicker": "$space-2"
+    }
+  },
+  "DateInput": {
+    "status": "experimental",
+    "description": "`DateInput` provides a text-based date input interface for selecting single dates or date ranges, with direct keyboard input similar to TimeInput. It offers customizable formatting and validation options without dropdown calendars.",
+    "parts": {
+      "day": {
+        "description": "The day input field."
+      },
+      "month": {
+        "description": "The month input field."
+      },
+      "year": {
+        "description": "The year input field."
+      },
+      "clearButton": {
+        "description": "The button to clear the date input."
+      }
+    },
+    "props": {
+      "initialValue": {
+        "description": "This property sets the component's initial value."
+      },
+      "autoFocus": {
+        "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "readOnly": {
+        "description": "Set this property to `true` to disallow changing the component value.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "enabled": {
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "validationStatus": {
+        "description": "This property allows you to set the validation status of the input component.",
+        "availableValues": [
+          {
+            "value": "valid",
+            "description": "Visual indicator for an input that is accepted"
+          },
+          {
+            "value": "warning",
+            "description": "Visual indicator for an input that produced a warning"
+          },
+          {
+            "value": "error",
+            "description": "Visual indicator for an input that produced an error"
+          }
+        ],
+        "defaultValue": "none"
+      },
+      "label": {
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
+        "valueType": "string"
+      },
+      "labelPosition": {
+        "description": "Places the label at the given position of the component.",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
+          },
+          {
+            "value": "end",
+            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
+          },
+          {
+            "value": "top",
+            "description": "The top of the input"
+          },
+          {
+            "value": "bottom",
+            "description": "The bottom of the input"
+          }
+        ],
+        "defaultValue": "top"
+      },
+      "labelWidth": {
+        "description": "This property sets the width of the `DateInput` component's label. If not defined, the label's width will be determined by its content and the available space."
+      },
+      "labelBreak": {
+        "description": "This boolean value indicates whether the `DateInput` label can be split into multiple lines if it would overflow the available label width.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "mode": {
+        "description": "The mode of the date input (single or range)",
+        "valueType": "string",
+        "availableValues": [
+          "single",
+          "range"
+        ],
+        "defaultValue": "single"
+      },
+      "dateFormat": {
+        "description": "The format of the date displayed in the input field",
+        "valueType": "string",
+        "defaultValue": "MM/dd/yyyy",
+        "availableValues": [
+          "MM/dd/yyyy",
+          "MM-dd-yyyy",
+          "yyyy/MM/dd",
+          "yyyy-MM-dd",
+          "dd/MM/yyyy",
+          "dd-MM-yyyy",
+          "yyyyMMdd",
+          "MMddyyyy"
+        ]
+      },
+      "emptyCharacter": {
+        "description": "Character used to create placeholder text for empty input fields",
+        "valueType": "string",
+        "defaultValue": "-"
+      },
+      "showWeekNumber": {
+        "description": "Whether to show the week number (compatibility with DatePicker, not used in DateInput)",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "weekStartsOn": {
+        "description": "The first day of the week. 0 is Sunday, 1 is Monday, etc. (compatibility with DatePicker, not used in DateInput)",
+        "valueType": "number",
+        "defaultValue": 0,
+        "availableValues": [
+          {
+            "value": 0,
+            "description": "Sunday"
+          },
+          {
+            "value": 1,
+            "description": "Monday"
+          },
+          {
+            "value": 2,
+            "description": "Tuesday"
+          },
+          {
+            "value": 3,
+            "description": "Wednesday"
+          },
+          {
+            "value": 4,
+            "description": "Thursday"
+          },
+          {
+            "value": 5,
+            "description": "Friday"
+          },
+          {
+            "value": 6,
+            "description": "Saturday"
+          }
+        ]
+      },
+      "minValue": {
+        "description": "The optional start date of the selectable date range. If not defined, the range allows any dates in the past.",
+        "valueType": "string"
+      },
+      "maxValue": {
+        "description": "The optional end date of the selectable date range. If not defined, the range allows any future dates.",
+        "valueType": "string"
+      },
+      "disabledDates": {
+        "description": "An optional array of dates that are disabled (compatibility with DatePicker, not used in DateInput)",
+        "valueType": "any"
+      },
+      "inline": {
+        "description": "Whether to display the date input inline (compatibility with DatePicker, always true for DateInput)",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "clearable": {
+        "description": "Whether to show a clear button to reset the input",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "clearIcon": {
+        "description": "Icon name for the clear button",
+        "valueType": "string"
+      },
+      "clearToInitialValue": {
+        "description": "Whether clearing resets to initial value or null",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "gap": {
+        "description": "The gap between input elements",
+        "valueType": "string"
+      },
+      "required": {
+        "description": "Whether the input is required",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "startText": {
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "startIcon": {
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "endText": {
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "endIcon": {
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      }
+    },
+    "events": {
+      "didChange": {
+        "description": "This event is triggered when value of DateInput has changed."
+      },
+      "gotFocus": {
+        "description": "This event is triggered when the DateInput has received the focus."
+      },
+      "lostFocus": {
+        "description": "This event is triggered when the DateInput has lost the focus."
+      }
+    },
+    "apis": {
+      "focus": {
+        "description": "Focus the DateInput component.",
+        "signature": "focus(): void"
+      },
+      "value": {
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): any"
+      },
+      "setValue": {
+        "description": "This method sets the current value of the DateInput.",
+        "signature": "set value(value: any): void",
+        "parameters": {
+          "value": "The new value to set for the date input."
+        }
+      },
+      "isoValue": {
+        "description": "Get the current date value formatted in ISO standard (YYYY-MM-DD) format, suitable for JSON serialization.",
+        "signature": "isoValue(): string | null"
+      }
+    },
+    "themeVars": {
+      "padding-DateInput": "var(--xmlui-padding-DateInput)",
+      "paddingHorizontal-DateInput": "var(--xmlui-paddingHorizontal-DateInput, var(--xmlui-padding-DateInput))",
+      "paddingVertical-DateInput": "var(--xmlui-paddingVertical-DateInput, var(--xmlui-padding-DateInput))",
+      "paddingLeft-DateInput": "var(--xmlui-paddingLeft-DateInput, var(--xmlui-paddingHorizontal-DateInput, var(--xmlui-padding-DateInput)))",
+      "paddingRight-DateInput": "var(--xmlui-paddingRight-DateInput, var(--xmlui-paddingHorizontal-DateInput, var(--xmlui-padding-DateInput)))",
+      "paddingTop-DateInput": "var(--xmlui-paddingTop-DateInput, var(--xmlui-paddingVertical-DateInput, var(--xmlui-padding-DateInput)))",
+      "paddingBottom-DateInput": "var(--xmlui-paddingBottom-DateInput, var(--xmlui-paddingVertical-DateInput, var(--xmlui-padding-DateInput)))",
+      "border-DateInput": "var(--xmlui-border-DateInput)",
+      "borderHorizontal-DateInput": "var(--xmlui-borderHorizontal-DateInput, var(--xmlui-border-DateInput))",
+      "borderVertical-DateInput": "var(--xmlui-borderVertical-DateInput, var(--xmlui-border-DateInput))",
+      "borderLeft-DateInput": "var(--xmlui-borderLeft-DateInput, var(--xmlui-borderHorizontal-DateInput, var(--xmlui-border-DateInput)))",
+      "borderRight-DateInput": "var(--xmlui-borderRight-DateInput, var(--xmlui-borderHorizontal-DateInput, var(--xmlui-border-DateInput)))",
+      "borderTop-DateInput": "var(--xmlui-borderTop-DateInput, var(--xmlui-borderVertical-DateInput, var(--xmlui-border-DateInput)))",
+      "borderBottom-DateInput": "var(--xmlui-borderBottom-DateInput, var(--xmlui-borderVertical-DateInput, var(--xmlui-border-DateInput)))",
+      "borderWidth-DateInput": "var(--xmlui-borderWidth-DateInput)",
+      "borderHorizontalWidth-DateInput": "var(--xmlui-borderHorizontalWidth-DateInput, var(--xmlui-borderWidth-DateInput))",
+      "borderLeftWidth-DateInput": "var(--xmlui-borderLeftWidth-DateInput, var(--xmlui-borderHorizontalWidth-DateInput, var(--xmlui-borderWidth-DateInput)))",
+      "borderRightWidth-DateInput": "var(--xmlui-borderRightWidth-DateInput, var(--xmlui-borderHorizontalWidth-DateInput, var(--xmlui-borderWidth-DateInput)))",
+      "borderVerticalWidth-DateInput": "var(--xmlui-borderVerticalWidth-DateInput, var(--xmlui-borderWidth-DateInput))",
+      "borderTopWidth-DateInput": "var(--xmlui-borderTopWidth-DateInput, var(--xmlui-borderVerticalWidth-DateInput, var(--xmlui-borderWidth-DateInput)))",
+      "borderBottomWidth-DateInput": "var(--xmlui-borderBottomWidth-DateInput, var(--xmlui-borderVerticalWidth-DateInput, var(--xmlui-borderWidth-DateInput)))",
+      "borderStyle-DateInput": "var(--xmlui-borderStyle-DateInput)",
+      "borderHorizontalStyle-DateInput": "var(--xmlui-borderHorizontalStyle-DateInput, var(--xmlui-borderStyle-DateInput))",
+      "borderLeftStyle-DateInput": "var(--xmlui-borderLeftStyle-DateInput, var(--xmlui-borderHorizontalStyle-DateInput, var(--xmlui-borderStyle-DateInput)))",
+      "borderRightStyle-DateInput": "var(--xmlui-borderRightStyle-DateInput, var(--xmlui-borderHorizontalStyle-DateInput, var(--xmlui-borderStyle-DateInput)))",
+      "borderVerticalStyle-DateInput": "var(--xmlui-borderVerticalStyle-DateInput, var(--xmlui-borderStyle-DateInput))",
+      "borderTopStyle-DateInput": "var(--xmlui-borderTopStyle-DateInput, var(--xmlui-borderVerticalStyle-DateInput, var(--xmlui-borderStyle-DateInput)))",
+      "borderBottomStyle-DateInput": "var(--xmlui-borderBottomStyle-DateInput, var(--xmlui-borderVerticalStyle-DateInput, var(--xmlui-borderStyle-DateInput)))",
+      "borderColor-DateInput": "var(--xmlui-borderColor-DateInput)",
+      "borderHorizontalColor-DateInput": "var(--xmlui-borderHorizontalColor-DateInput, var(--xmlui-borderColor-DateInput))",
+      "borderLeftColor-DateInput": "var(--xmlui-borderLeftColor-DateInput, var(--xmlui-borderHorizontalColor-DateInput, var(--xmlui-borderColor-DateInput)))",
+      "borderRightColor-DateInput": "var(--xmlui-borderRightColor-DateInput, var(--xmlui-borderHorizontalColor-DateInput, var(--xmlui-borderColor-DateInput)))",
+      "borderVerticalColor-DateInput": "var(--xmlui-borderVerticalColor-DateInput, var(--xmlui-borderColor-DateInput))",
+      "borderTopColor-DateInput": "var(--xmlui-borderTopColor-DateInput, var(--xmlui-borderVerticalColor-DateInput, var(--xmlui-borderColor-DateInput)))",
+      "borderBottomColor-DateInput": "var(--xmlui-borderBottomColor-DateInput, var(--xmlui-borderVerticalColor-DateInput, var(--xmlui-borderColor-DateInput)))",
+      "borderStartStartRadius-DateInput": "var(--xmlui-borderStartStartRadius-DateInput, var(--xmlui-borderRadius-DateInput))",
+      "borderStartEndRadius-DateInput": "var(--xmlui-borderStartEndRadius-DateInput, var(--xmlui-borderRadius-DateInput))",
+      "borderEndStartRadius-DateInput": "var(--xmlui-borderEndStartRadius-DateInput, var(--xmlui-borderRadius-DateInput))",
+      "borderEndEndRadius-DateInput": "var(--xmlui-borderEndEndRadius-DateInput, var(--xmlui-borderRadius-DateInput))",
+      "color-divider-DateInput": "var(--xmlui-color-divider-DateInput)",
+      "spacing-divider-DateInput": "var(--xmlui-spacing-divider-DateInput)",
+      "width-input-DateInput": "var(--xmlui-width-input-DateInput)",
+      "minWidth-input-DateInput": "var(--xmlui-minWidth-input-DateInput)",
+      "padding-input-DateInput": "var(--xmlui-padding-input-DateInput)",
+      "textAlign-input-DateInput": "var(--xmlui-textAlign-input-DateInput)",
+      "fontSize-input-DateInput": "var(--xmlui-fontSize-input-DateInput)",
+      "borderRadius-input-DateInput": "var(--xmlui-borderRadius-input-DateInput)",
+      "backgroundColor-input-DateInput-invalid": "var(--xmlui-backgroundColor-input-DateInput-invalid)",
+      "padding-button-DateInput": "var(--xmlui-padding-button-DateInput)",
+      "borderRadius-button-DateInput": "var(--xmlui-borderRadius-button-DateInput)",
+      "hoverColor-button-DateInput": "var(--xmlui-hoverColor-button-DateInput)",
+      "disabledColor-button-DateInput": "var(--xmlui-disabledColor-button-DateInput)",
+      "outlineColor-button-DateInput--focused": "var(--xmlui-outlineColor-button-DateInput--focused)",
+      "outlineWidth-button-DateInput--focused": "var(--xmlui-outlineWidth-button-DateInput--focused)",
+      "outlineOffset-button-DateInput--focused": "var(--xmlui-outlineOffset-button-DateInput--focused)",
+      "opacity-DateInput--disabled": "var(--xmlui-opacity-DateInput--disabled)",
+      "backgroundColor-DateInput--hover": "var(--xmlui-backgroundColor-DateInput--hover)",
+      "margin-input-DateInput": "var(--xmlui-margin-input-DateInput)",
+      "transition-background-DateInput": "var(--xmlui-transition-background-DateInput)",
+      "Input:gap-adornment-DateInput": "var(--xmlui-gap-adornment-DateInput)",
+      "Input:borderRadius-DateInput-default": "var(--xmlui-borderRadius-DateInput-default)",
+      "Input:borderColor-DateInput-default": "var(--xmlui-borderColor-DateInput-default)",
+      "Input:borderWidth-DateInput-default": "var(--xmlui-borderWidth-DateInput-default)",
+      "Input:borderStyle-DateInput-default": "var(--xmlui-borderStyle-DateInput-default)",
+      "Input:backgroundColor-DateInput-default": "var(--xmlui-backgroundColor-DateInput-default)",
+      "Input:boxShadow-DateInput-default": "var(--xmlui-boxShadow-DateInput-default)",
+      "Input:textColor-DateInput-default": "var(--xmlui-textColor-DateInput-default)",
+      "Input:borderColor-DateInput-default--hover": "var(--xmlui-borderColor-DateInput-default--hover)",
+      "Input:backgroundColor-DateInput-default--hover": "var(--xmlui-backgroundColor-DateInput-default--hover)",
+      "Input:boxShadow-DateInput-default--hover": "var(--xmlui-boxShadow-DateInput-default--hover)",
+      "Input:textColor-DateInput-default--hover": "var(--xmlui-textColor-DateInput-default--hover)",
+      "Input:borderColor-DateInput-default--focus": "var(--xmlui-borderColor-DateInput-default--focus)",
+      "Input:backgroundColor-DateInput-default--focus": "var(--xmlui-backgroundColor-DateInput-default--focus)",
+      "Input:boxShadow-DateInput-default--focus": "var(--xmlui-boxShadow-DateInput-default--focus)",
+      "Input:textColor-DateInput-default--focus": "var(--xmlui-textColor-DateInput-default--focus)",
+      "Input:outlineWidth-DateInput-default--focus": "var(--xmlui-outlineWidth-DateInput-default--focus)",
+      "Input:outlineColor-DateInput-default--focus": "var(--xmlui-outlineColor-DateInput-default--focus)",
+      "Input:outlineStyle-DateInput-default--focus": "var(--xmlui-outlineStyle-DateInput-default--focus)",
+      "Input:outlineOffset-DateInput-default--focus": "var(--xmlui-outlineOffset-DateInput-default--focus)",
+      "Input:color-adornment-DateInput-default": "var(--xmlui-color-adornment-DateInput-default)",
+      "Input:borderRadius-DateInput-error": "var(--xmlui-borderRadius-DateInput-error)",
+      "Input:borderColor-DateInput-error": "var(--xmlui-borderColor-DateInput-error)",
+      "Input:borderWidth-DateInput-error": "var(--xmlui-borderWidth-DateInput-error)",
+      "Input:borderStyle-DateInput-error": "var(--xmlui-borderStyle-DateInput-error)",
+      "Input:backgroundColor-DateInput-error": "var(--xmlui-backgroundColor-DateInput-error)",
+      "Input:boxShadow-DateInput-error": "var(--xmlui-boxShadow-DateInput-error)",
+      "Input:textColor-DateInput-error": "var(--xmlui-textColor-DateInput-error)",
+      "Input:borderColor-DateInput-error--hover": "var(--xmlui-borderColor-DateInput-error--hover)",
+      "Input:backgroundColor-DateInput-error--hover": "var(--xmlui-backgroundColor-DateInput-error--hover)",
+      "Input:boxShadow-DateInput-error--hover": "var(--xmlui-boxShadow-DateInput-error--hover)",
+      "Input:textColor-DateInput-error--hover": "var(--xmlui-textColor-DateInput-error--hover)",
+      "Input:borderColor-DateInput-error--focus": "var(--xmlui-borderColor-DateInput-error--focus)",
+      "Input:backgroundColor-DateInput-error--focus": "var(--xmlui-backgroundColor-DateInput-error--focus)",
+      "Input:boxShadow-DateInput-error--focus": "var(--xmlui-boxShadow-DateInput-error--focus)",
+      "Input:textColor-DateInput-error--focus": "var(--xmlui-textColor-DateInput-error--focus)",
+      "Input:outlineWidth-DateInput-error--focus": "var(--xmlui-outlineWidth-DateInput-error--focus)",
+      "Input:outlineColor-DateInput-error--focus": "var(--xmlui-outlineColor-DateInput-error--focus)",
+      "Input:outlineStyle-DateInput-error--focus": "var(--xmlui-outlineStyle-DateInput-error--focus)",
+      "Input:outlineOffset-DateInput-error--focus": "var(--xmlui-outlineOffset-DateInput-error--focus)",
+      "Input:color-adornment-DateInput-error": "var(--xmlui-color-adornment-DateInput-error)",
+      "Input:borderRadius-DateInput-warning": "var(--xmlui-borderRadius-DateInput-warning)",
+      "Input:borderColor-DateInput-warning": "var(--xmlui-borderColor-DateInput-warning)",
+      "Input:borderWidth-DateInput-warning": "var(--xmlui-borderWidth-DateInput-warning)",
+      "Input:borderStyle-DateInput-warning": "var(--xmlui-borderStyle-DateInput-warning)",
+      "Input:backgroundColor-DateInput-warning": "var(--xmlui-backgroundColor-DateInput-warning)",
+      "Input:boxShadow-DateInput-warning": "var(--xmlui-boxShadow-DateInput-warning)",
+      "Input:textColor-DateInput-warning": "var(--xmlui-textColor-DateInput-warning)",
+      "Input:borderColor-DateInput-warning--hover": "var(--xmlui-borderColor-DateInput-warning--hover)",
+      "Input:backgroundColor-DateInput-warning--hover": "var(--xmlui-backgroundColor-DateInput-warning--hover)",
+      "Input:boxShadow-DateInput-warning--hover": "var(--xmlui-boxShadow-DateInput-warning--hover)",
+      "Input:textColor-DateInput-warning--hover": "var(--xmlui-textColor-DateInput-warning--hover)",
+      "Input:borderColor-DateInput-warning--focus": "var(--xmlui-borderColor-DateInput-warning--focus)",
+      "Input:backgroundColor-DateInput-warning--focus": "var(--xmlui-backgroundColor-DateInput-warning--focus)",
+      "Input:boxShadow-DateInput-warning--focus": "var(--xmlui-boxShadow-DateInput-warning--focus)",
+      "Input:textColor-DateInput-warning--focus": "var(--xmlui-textColor-DateInput-warning--focus)",
+      "Input:outlineWidth-DateInput-warning--focus": "var(--xmlui-outlineWidth-DateInput-warning--focus)",
+      "Input:outlineColor-DateInput-warning--focus": "var(--xmlui-outlineColor-DateInput-warning--focus)",
+      "Input:outlineStyle-DateInput-warning--focus": "var(--xmlui-outlineStyle-DateInput-warning--focus)",
+      "Input:outlineOffset-DateInput-warning--focus": "var(--xmlui-outlineOffset-DateInput-warning--focus)",
+      "Input:color-adornment-DateInput-warning": "var(--xmlui-color-adornment-DateInput-warning)",
+      "Input:borderRadius-DateInput-success": "var(--xmlui-borderRadius-DateInput-success)",
+      "Input:borderColor-DateInput-success": "var(--xmlui-borderColor-DateInput-success)",
+      "Input:borderWidth-DateInput-success": "var(--xmlui-borderWidth-DateInput-success)",
+      "Input:borderStyle-DateInput-success": "var(--xmlui-borderStyle-DateInput-success)",
+      "Input:backgroundColor-DateInput-success": "var(--xmlui-backgroundColor-DateInput-success)",
+      "Input:boxShadow-DateInput-success": "var(--xmlui-boxShadow-DateInput-success)",
+      "Input:textColor-DateInput-success": "var(--xmlui-textColor-DateInput-success)",
+      "Input:borderColor-DateInput-success--hover": "var(--xmlui-borderColor-DateInput-success--hover)",
+      "Input:backgroundColor-DateInput-success--hover": "var(--xmlui-backgroundColor-DateInput-success--hover)",
+      "Input:boxShadow-DateInput-success--hover": "var(--xmlui-boxShadow-DateInput-success--hover)",
+      "Input:textColor-DateInput-success--hover": "var(--xmlui-textColor-DateInput-success--hover)",
+      "Input:borderColor-DateInput-success--focus": "var(--xmlui-borderColor-DateInput-success--focus)",
+      "Input:backgroundColor-DateInput-success--focus": "var(--xmlui-backgroundColor-DateInput-success--focus)",
+      "Input:boxShadow-DateInput-success--focus": "var(--xmlui-boxShadow-DateInput-success--focus)",
+      "Input:textColor-DateInput-success--focus": "var(--xmlui-textColor-DateInput-success--focus)",
+      "Input:outlineWidth-DateInput-success--focus": "var(--xmlui-outlineWidth-DateInput-success--focus)",
+      "Input:outlineColor-DateInput-success--focus": "var(--xmlui-outlineColor-DateInput-success--focus)",
+      "Input:outlineStyle-DateInput-success--focus": "var(--xmlui-outlineStyle-DateInput-success--focus)",
+      "Input:outlineOffset-DateInput-success--focus": "var(--xmlui-outlineOffset-DateInput-success--focus)",
+      "Input:color-adornment-DateInput-success": "var(--xmlui-color-adornment-DateInput-success)",
+      "Input:backgroundColor-DateInput--disabled": "var(--xmlui-backgroundColor-DateInput--disabled)",
+      "Input:textColor-DateInput--disabled": "var(--xmlui-textColor-DateInput--disabled)",
+      "Input:borderColor-DateInput--disabled": "var(--xmlui-borderColor-DateInput--disabled)"
+    },
+    "defaultThemeVars": {
+      "paddingHorizontal-DateInput": "$space-2",
+      "paddingVertical-DateInput": "$space-2",
+      "color-divider-DateInput": "$textColor-secondary",
+      "spacing-divider-DateInput": "1px 0",
+      "width-input-DateInput": "1.8em",
+      "minWidth-input-DateInput": "0.54em",
+      "padding-input-DateInput": "0 2px",
+      "textAlign-input-DateInput": "center",
+      "fontSize-input-DateInput": "inherit",
+      "borderRadius-input-DateInput": "$borderRadius",
+      "backgroundColor-input-DateInput-invalid": "rgba(220, 53, 69, 0.15)",
+      "padding-button-DateInput": "4px 6px",
+      "borderRadius-button-DateInput": "$borderRadius",
+      "hoverColor-button-DateInput": "$color-surface-800",
+      "disabledColor-button-DateInput": "$textColor-disabled",
+      "outlineColor-button-DateInput--focused": "$color-accent-500",
+      "outlineWidth-button-DateInput--focused": "2px",
+      "outlineOffset-button-DateInput--focused": "2px",
+      "minWidth-ampm-DateInput": "2em",
+      "fontSize-ampm-DateInput": "inherit"
     }
   },
   "DropdownMenu": {
@@ -4716,7 +5172,7 @@ export default {
       "color-MenuItem": "$textColor-primary",
       "color-MenuItem--disabled": "$textColor--disabled",
       "fontFamily-MenuItem": "$fontFamily",
-      "fontSize-MenuItem": "$fontSize-small",
+      "fontSize-MenuItem": "$fontSize-sm",
       "paddingVertical-MenuItem": "$space-2",
       "paddingHorizontal-MenuItem": "$space-3",
       "backgroundColor-MenuItem--hover": "$backgroundColor-dropdown-item--hover",
@@ -5058,6 +5514,10 @@ export default {
           {
             "value": "lg",
             "description": "Large"
+          },
+          {
+            "value": "xl",
+            "description": "Extra large"
           }
         ]
       },
@@ -5135,6 +5595,12 @@ export default {
         "availableValues": null,
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "acceptedFileTypes": {
+        "description": "Accepted file MIME types, separated by commas. For example: 'image/*,application/pdf'."
+      },
+      "maxFiles": {
+        "description": "The maximum number of files that can be selected."
       }
     },
     "events": {
@@ -5234,7 +5700,7 @@ export default {
     "defaultThemeVars": {
       "backgroundColor-Footer": "$backgroundColor-AppHeader",
       "verticalAlignment-Footer": "center",
-      "fontSize-Footer": "$fontSize-small",
+      "fontSize-Footer": "$fontSize-sm",
       "textColor-Footer": "$textColor-secondary",
       "maxWidth-content-Footer": "$maxWidth-content",
       "borderTop-Footer": "1px solid $borderColor",
@@ -5691,7 +6157,7 @@ export default {
     },
     "defaultThemeVars": {
       "textColor-FormItemLabel": "$textColor-primary",
-      "fontSize-FormItemLabel": "$fontSize-small",
+      "fontSize-FormItemLabel": "$fontSize-sm",
       "fontWeight-FormItemLabel": "$fontWeight-medium",
       "fontStyle-FormItemLabel": "normal",
       "textTransform-FormItemLabel": "none",
@@ -5788,13 +6254,18 @@ export default {
       },
       "showAnchor": {
         "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
-        "type": "boolean"
+        "type": "boolean",
+        "defaultValue": false
       }
     },
     "apis": {
       "scrollIntoView": {
         "signature": "scrollIntoView()",
         "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -6282,10 +6753,35 @@ export default {
       "maxLines": {
         "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -6750,10 +7246,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H1": "$fontSize-large",
+      "fontSize-H1": "$fontSize-2xl",
+      "lineHeight-H1": "$lineHeight-2xl",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
-      "fontSize-H1-markdown": "$fontSize-large",
+      "fontSize-H1-markdown": "$fontSize-2xl",
+      "lineHeight-H1-markdown": "$lineHeight-2xl",
       "marginTop-H1-markdown": "0",
       "marginBottom-H1-markdown": "$space-6",
       "light": {},
@@ -6771,10 +7269,35 @@ export default {
       "maxLines": {
         "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -7239,9 +7762,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H2": "$fontSize-medium",
+      "fontSize-H2": "$fontSize-xl",
+      "lineHeight-H2": "$lineHeight-xl",
       "marginTop-H2": "0",
       "marginBottom-H2": "0",
+      "fontSize-H2-markdown": "$fontSize-xl",
+      "lineHeight-H2-markdown": "$lineHeight-xl",
       "marginTop-H2-markdown": "$space-10",
       "marginBottom-H2-markdown": "$space-3",
       "light": {},
@@ -7259,10 +7785,35 @@ export default {
       "maxLines": {
         "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -7727,9 +8278,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H3": "$fontSize-normal",
+      "fontSize-H3": "$fontSize-lg",
+      "lineHeight-H3": "$lineHeight-lg",
       "marginTop-H3": "0",
       "marginBottom-H3": "0",
+      "fontSize-H3-markdown": "$fontSize-lg",
+      "lineHeight-H3-markdown": "$lineHeight-lg",
       "marginTop-H3-markdown": "$space-6",
       "marginBottom-H3-markdown": "$space-2",
       "light": {},
@@ -7751,6 +8305,31 @@ export default {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -8215,9 +8794,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H4": "$fontSize-small",
+      "fontSize-H4": "$fontSize-base",
+      "lineHeight-H4": "$lineHeight-base",
       "marginTop-H4": "0",
       "marginBottom-H4": "0",
+      "fontSize-H4-markdown": "$fontSize-base",
+      "lineHeight-H4-markdown": "$lineHeight-base",
       "marginTop-H4-markdown": "$space-5",
       "marginBottom-H4-markdown": "$space-1",
       "light": {},
@@ -8239,6 +8821,31 @@ export default {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -8703,9 +9310,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H5": "$fontSize-smaller",
+      "fontSize-H5": "$fontSize-sm",
+      "lineHeight-H5": "$lineHeight-sm",
       "marginTop-H5": "0",
       "marginBottom-H5": "0",
+      "fontSize-H5-markdown": "$fontSize-sm",
+      "lineHeight-H5-markdown": "$lineHeight-sm",
       "marginTop-H5-markdown": "0",
       "marginBottom-H5-markdown": "$space-0",
       "light": {},
@@ -8727,6 +9337,31 @@ export default {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
+        "type": "boolean",
+        "defaultValue": true
+      },
+      "preserveLinebreaks": {
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean",
+        "defaultValue": false
+      }
+    },
+    "apis": {
+      "scrollIntoView": {
+        "signature": "scrollIntoView()",
+        "description": "Scrolls the heading into view."
+      },
+      "hasOverflow": {
+        "signature": "hasOverflow()",
+        "description": "Returns true when the displayed text overflows the bounds of this heading component."
       }
     },
     "themeVars": {
@@ -9191,9 +9826,12 @@ export default {
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
     "defaultThemeVars": {
-      "fontSize-H6": "$fontSize-tiny",
+      "fontSize-H6": "$fontSize-xs",
+      "lineHeight-H6": "$lineHeight-xs",
       "marginTop-H6": "0",
       "marginBottom-H6": "0",
+      "fontSize-H6-markdown": "$fontSize-xs",
+      "lineHeight-H6-markdown": "$lineHeight-xs",
       "marginTop-H6-markdown": "0",
       "marginBottom-H6-markdown": "$space-0",
       "light": {},
@@ -9500,6 +10138,11 @@ export default {
       },
       "icon": {
         "description": "This property allows you to add an optional icon (specify the icon's name) to the link."
+      }
+    },
+    "events": {
+      "click": {
+        "description": "This event is triggered when the link is clicked."
       }
     },
     "themeVars": {
@@ -9884,6 +10527,10 @@ export default {
       "marginLeft-Admonition-content": "var(--xmlui-marginLeft-Admonition-content)",
       "marginTop-HtmlVideo": "var(--xmlui-marginTop-HtmlVideo)",
       "marginBottom-HtmlVideo": "var(--xmlui-marginBottom-HtmlVideo)",
+      "marginTop-Text-markdown": "var(--xmlui-marginTop-Text-markdown)",
+      "marginBottom-Text-markdown": "var(--xmlui-marginBottom-Text-markdown)",
+      "marginLeft-Text-markdown": "var(--xmlui-marginLeft-Text-markdown)",
+      "marginRight-Text-markdown": "var(--xmlui-marginRight-Text-markdown)",
       "marginTop-H1-markdown": "var(--xmlui-marginTop-H1-markdown)",
       "marginBottom-H1-markdown": "var(--xmlui-marginBottom-H1-markdown)",
       "fontSize-H1-markdown": "var(--xmlui-fontSize-H1-markdown)",
@@ -9963,6 +10610,10 @@ export default {
       "marginBottom-Image-markdown": "$space-4",
       "marginLeft-Image-markdown": "$space-0",
       "marginRight-Image-markdown": "$space-0",
+      "marginTop-Text-markdown": "$space-3",
+      "marginBottom-Text-markdown": "$space-6",
+      "fontSize-Text-markdown": "fontSize-${COMP}",
+      "fontWeight-Text-markdown": "fontWeight-Text",
       "light": {},
       "dark": {
         "backgroundColor-Blockquote": "$color-surface-50",
@@ -10015,6 +10666,14 @@ export default {
   "ModalDialog": {
     "status": "stable",
     "description": "`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.",
+    "parts": {
+      "content": {
+        "description": "The main content area of the modal dialog."
+      },
+      "title": {
+        "description": "The title area of the modal dialog."
+      }
+    },
     "props": {
       "fullScreen": {
         "description": "Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).",
@@ -10300,7 +10959,7 @@ export default {
       "backgroundColor-NavLink": "transparent",
       "paddingHorizontal-NavLink": "$space-4",
       "paddingVertical-NavLink": "$space-2",
-      "fontSize-NavLink": "$fontSize-small",
+      "fontSize-NavLink": "$fontSize-sm",
       "fontWeight-NavLink": "$fontWeight-normal",
       "fontFamily-NavLink": "$fontFamily",
       "textColor-NavLink": "$textColor-primary",
@@ -10475,6 +11134,20 @@ export default {
   "NumberBox": {
     "status": "stable",
     "description": "`NumberBox` provides a specialized input field for numeric values with built-in validation, spinner buttons, and flexible formatting options. It supports both integer and floating-point numbers, handles empty states as null values, and integrates seamlessly with form validation.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the text box."
+      },
+      "startAdornment": {
+        "description": "The adornment displayed at the start of the text box."
+      },
+      "endAdornment": {
+        "description": "The adornment displayed at the end of the text box."
+      },
+      "input": {
+        "description": "The text box input area."
+      }
+    },
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
@@ -10639,13 +11312,19 @@ export default {
       }
     },
     "themeVars": {
+      "padding-NumberBox": "var(--xmlui-padding-NumberBox)",
+      "paddingHorizontal-NumberBox": "var(--xmlui-paddingHorizontal-NumberBox, var(--xmlui-padding-NumberBox))",
+      "paddingVertical-NumberBox": "var(--xmlui-paddingVertical-NumberBox, var(--xmlui-padding-NumberBox))",
+      "paddingLeft-NumberBox": "var(--xmlui-paddingLeft-NumberBox, var(--xmlui-paddingHorizontal-NumberBox, var(--xmlui-padding-NumberBox)))",
+      "paddingRight-NumberBox": "var(--xmlui-paddingRight-NumberBox, var(--xmlui-paddingHorizontal-NumberBox, var(--xmlui-padding-NumberBox)))",
+      "paddingTop-NumberBox": "var(--xmlui-paddingTop-NumberBox, var(--xmlui-paddingVertical-NumberBox, var(--xmlui-padding-NumberBox)))",
+      "paddingBottom-NumberBox": "var(--xmlui-paddingBottom-NumberBox, var(--xmlui-paddingVertical-NumberBox, var(--xmlui-padding-NumberBox)))",
       "Input:gap-adornment-NumberBox": "var(--xmlui-gap-adornment-NumberBox)",
       "Input:borderRadius-NumberBox-default": "var(--xmlui-borderRadius-NumberBox-default)",
       "Input:borderColor-NumberBox-default": "var(--xmlui-borderColor-NumberBox-default)",
       "Input:borderWidth-NumberBox-default": "var(--xmlui-borderWidth-NumberBox-default)",
       "Input:borderStyle-NumberBox-default": "var(--xmlui-borderStyle-NumberBox-default)",
       "Input:fontSize-NumberBox-default": "var(--xmlui-fontSize-NumberBox-default)",
-      "Input:padding-NumberBox-default": "var(--xmlui-padding-NumberBox-default)",
       "Input:backgroundColor-NumberBox-default": "var(--xmlui-backgroundColor-NumberBox-default)",
       "Input:boxShadow-NumberBox-default": "var(--xmlui-boxShadow-NumberBox-default)",
       "Input:textColor-NumberBox-default": "var(--xmlui-textColor-NumberBox-default)",
@@ -10669,7 +11348,6 @@ export default {
       "Input:borderWidth-NumberBox-error": "var(--xmlui-borderWidth-NumberBox-error)",
       "Input:borderStyle-NumberBox-error": "var(--xmlui-borderStyle-NumberBox-error)",
       "Input:fontSize-NumberBox-error": "var(--xmlui-fontSize-NumberBox-error)",
-      "Input:padding-NumberBox-error": "var(--xmlui-padding-NumberBox-error)",
       "Input:backgroundColor-NumberBox-error": "var(--xmlui-backgroundColor-NumberBox-error)",
       "Input:boxShadow-NumberBox-error": "var(--xmlui-boxShadow-NumberBox-error)",
       "Input:textColor-NumberBox-error": "var(--xmlui-textColor-NumberBox-error)",
@@ -10693,7 +11371,6 @@ export default {
       "Input:borderWidth-NumberBox-warning": "var(--xmlui-borderWidth-NumberBox-warning)",
       "Input:borderStyle-NumberBox-warning": "var(--xmlui-borderStyle-NumberBox-warning)",
       "Input:fontSize-NumberBox-warning": "var(--xmlui-fontSize-NumberBox-warning)",
-      "Input:padding-NumberBox-warning": "var(--xmlui-padding-NumberBox-warning)",
       "Input:backgroundColor-NumberBox-warning": "var(--xmlui-backgroundColor-NumberBox-warning)",
       "Input:boxShadow-NumberBox-warning": "var(--xmlui-boxShadow-NumberBox-warning)",
       "Input:textColor-NumberBox-warning": "var(--xmlui-textColor-NumberBox-warning)",
@@ -10717,7 +11394,6 @@ export default {
       "Input:borderWidth-NumberBox-success": "var(--xmlui-borderWidth-NumberBox-success)",
       "Input:borderStyle-NumberBox-success": "var(--xmlui-borderStyle-NumberBox-success)",
       "Input:fontSize-NumberBox-success": "var(--xmlui-fontSize-NumberBox-success)",
-      "Input:padding-NumberBox-success": "var(--xmlui-padding-NumberBox-success)",
       "Input:backgroundColor-NumberBox-success": "var(--xmlui-backgroundColor-NumberBox-success)",
       "Input:boxShadow-NumberBox-success": "var(--xmlui-boxShadow-NumberBox-success)",
       "Input:textColor-NumberBox-success": "var(--xmlui-textColor-NumberBox-success)",
@@ -10739,6 +11415,10 @@ export default {
       "Input:backgroundColor-NumberBox--disabled": "var(--xmlui-backgroundColor-NumberBox--disabled)",
       "Input:textColor-NumberBox--disabled": "var(--xmlui-textColor-NumberBox--disabled)",
       "Input:borderColor-NumberBox--disabled": "var(--xmlui-borderColor-NumberBox--disabled)"
+    },
+    "defaultThemeVars": {
+      "paddingVertical-NumberBox": "$space-2",
+      "paddingHorizontal-NumberBox": "$space-2"
     }
   },
   "Option": {
@@ -10790,6 +11470,168 @@ export default {
         "description": "The fallback path when the current URL does not match any of the paths of the pages.",
         "defaultValue": "/"
       }
+    }
+  },
+  "Pagination": {
+    "status": "experimental",
+    "description": "`Pagination` enables navigation through large datasets by dividing content into pages. It provides controls for page navigation and can display current page information.",
+    "props": {
+      "enabled": {
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "itemCount": {
+        "description": "Total number of items to paginate. If not provided, the component renders simplified pagination controls that are enabled/disabled using the `hasPrevPage` and `hasNextPage` props.",
+        "valueType": "number"
+      },
+      "pageSize": {
+        "description": "Number of items per page",
+        "valueType": "number",
+        "defaultValue": 10
+      },
+      "pageIndex": {
+        "description": "Current page index (0-based)",
+        "valueType": "number",
+        "defaultValue": 0
+      },
+      "maxVisiblePages": {
+        "description": "Maximum number of page buttons to display. If the value is not among the allowed values, it will fall back to the default.",
+        "availableValues": [
+          1,
+          3,
+          5
+        ],
+        "valueType": "number",
+        "defaultValue": 1
+      },
+      "showPageInfo": {
+        "description": "Whether to show page information",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "showPageSizeSelector": {
+        "description": "Whether to show the page size selector",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "showCurrentPage": {
+        "description": "Whether to show the current page indicator",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "pageSizeOptions": {
+        "description": "Array of page sizes the user can select from. If provided, shows a page size selector dropdown"
+      },
+      "hasPrevPage": {
+        "description": "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",
+        "valueType": "boolean"
+      },
+      "hasNextPage": {
+        "description": "Whether to disable the next page button. Only takes effect if itemCount is not provided.",
+        "valueType": "boolean"
+      },
+      "orientation": {
+        "description": "Layout orientation of the pagination component",
+        "options": [
+          "horizontal",
+          "vertical"
+        ],
+        "type": "string",
+        "availableValues": [
+          {
+            "value": "horizontal",
+            "description": "The component will fill the available space horizontally"
+          },
+          {
+            "value": "vertical",
+            "description": "The component will fill the available space vertically"
+          }
+        ],
+        "default": "horizontal"
+      },
+      "pageSizeSelectorPosition": {
+        "description": "Determines where to place the page size selector in the layout.",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "type": "string",
+        "default": "start"
+      },
+      "pageInfoPosition": {
+        "description": "Determines where to place the page information in the layout.",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "type": "string",
+        "default": "end"
+      },
+      "buttonRowPosition": {
+        "description": "Determines where to place the pagination button row in the layout.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "center"
+      }
+    },
+    "events": {
+      "pageDidChange": {
+        "description": "Fired when the current page changes"
+      },
+      "pageSizeDidChange": {
+        "description": "Fired when the page size changes"
+      }
+    },
+    "apis": {
+      "moveFirst": {
+        "description": "Moves to the first page",
+        "signature": "moveFirst(): void"
+      },
+      "moveLast": {
+        "description": "Moves to the last page",
+        "signature": "moveLast(): void"
+      },
+      "movePrev": {
+        "description": "Moves to the previous page",
+        "signature": "movePrev(): void"
+      },
+      "moveNext": {
+        "description": "Moves to the next page",
+        "signature": "moveNext(): void"
+      },
+      "currentPage": {
+        "description": "Gets the current page number (1-based)"
+      },
+      "currentPageSize": {
+        "description": "Gets the current page size"
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Pagination": "var(--xmlui-backgroundColor-Pagination)",
+      "borderColor-Pagination": "var(--xmlui-borderColor-Pagination)",
+      "borderRadius-selector-Pagination": "var(--xmlui-borderRadius-selector-Pagination)",
+      "textColor-Pagination": "var(--xmlui-textColor-Pagination)",
+      "backgroundColor-selector-Pagination": "var(--xmlui-backgroundColor-selector-Pagination)",
+      "textColor-selector-Pagination": "var(--xmlui-textColor-selector-Pagination)",
+      "padding-Pagination": "var(--xmlui-padding-Pagination)",
+      "gap-buttonRow-Pagination": "var(--xmlui-gap-buttonRow-Pagination)"
+    },
+    "defaultThemeVars": {
+      "padding-Pagination": "$space-4",
+      "backgroundColor-Pagination": "transparent",
+      "borderColor-Pagination": "$color-gray-300",
+      "textColor-Pagination": "$color-gray-600",
+      "backgroundColor-selector-Pagination": "transparent",
+      "textColor-selector-Pagination": "$color-gray-600",
+      "borderRadius-selector-Pagination": "$borderRadius",
+      "gap-buttonRow-Pagination": "$space-2"
     }
   },
   "PositionedContainer": {
@@ -10902,7 +11744,7 @@ export default {
   },
   "RadioGroup": {
     "status": "stable",
-    "description": "`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.",
+    "description": "`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.\n\nRadio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions.",
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value.",
@@ -11037,7 +11879,7 @@ export default {
       "backgroundColor-RadioGroupOption--disabled": "$backgroundColor--disabled",
       "backgroundColor-checked-RadioGroupOption": "$color-primary-500",
       "backgroundColor-checked-RadioGroupOption--disabled": "$textColor--disabled",
-      "fontSize-RadioGroupOption": "$fontSize-small",
+      "fontSize-RadioGroupOption": "$fontSize-sm",
       "fontWeight-RadioGroupOption": "$fontWeight-bold"
     }
   },
@@ -11081,6 +11923,10 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
+      },
+      "value": {
+        "description": "This property sets the current value of the component.",
+        "isInternal": true
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -11239,6 +12085,13 @@ export default {
       "paddingRight-item-Select": "var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
       "paddingTop-item-Select": "var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
       "paddingBottom-item-Select": "var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
+      "padding-Select": "var(--xmlui-padding-Select)",
+      "paddingHorizontal-Select": "var(--xmlui-paddingHorizontal-Select, var(--xmlui-padding-Select))",
+      "paddingVertical-Select": "var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select))",
+      "paddingLeft-Select": "var(--xmlui-paddingLeft-Select, var(--xmlui-paddingHorizontal-Select, var(--xmlui-padding-Select)))",
+      "paddingRight-Select": "var(--xmlui-paddingRight-Select, var(--xmlui-paddingHorizontal-Select, var(--xmlui-padding-Select)))",
+      "paddingTop-Select": "var(--xmlui-paddingTop-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select)))",
+      "paddingBottom-Select": "var(--xmlui-paddingBottom-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select)))",
       "Input:fontSize-Select-default": "var(--xmlui-fontSize-Select-default)",
       "Input:textColor-placeholder-Select-default": "var(--xmlui-textColor-placeholder-Select-default)",
       "Input:textColor-Select-default": "var(--xmlui-textColor-Select-default)",
@@ -11317,6 +12170,7 @@ export default {
       "Input:borderColor-Select--disabled": "var(--xmlui-borderColor-Select--disabled)",
       "paddingVertical-Select-badge": "var(--xmlui-paddingVertical-Select-badge)",
       "paddingHorizontal-Select-badge": "var(--xmlui-paddingHorizontal-Select-badge)",
+      "borderRadius-Select-badge": "var(--xmlui-borderRadius-Select-badge)",
       "Input:fontSize-Select-badge": "var(--xmlui-fontSize-Select-badge)",
       "Input:backgroundColor-Select-badge": "var(--xmlui-backgroundColor-Select-badge)",
       "Input:textColor-Select-badge": "var(--xmlui-textColor-Select-badge)",
@@ -11344,11 +12198,14 @@ export default {
       "borderWidth-menu-Select": "1px",
       "borderColor-menu-Select": "$borderColor",
       "backgroundColor-Select-badge": "$color-primary-500",
-      "fontSize-Select-badge": "$fontSize-small",
-      "paddingHorizontal-Select-badge": "$space-1",
-      "paddingVertical-Select-badge": "$space-1",
+      "fontSize-Select-badge": "$fontSize-sm",
+      "paddingHorizontal-Select-badge": "$space-2_5",
+      "paddingVertical-Select-badge": "$space-0_5",
+      "borderRadius-Select-badge": "$borderRadius",
       "paddingHorizontal-item-Select": "$space-2",
       "paddingVertical-item-Select": "$space-2",
+      "paddingHorizontal-Select": "$space-2",
+      "paddingVertical-Select": "$space-2",
       "opacity-text-item-Select--disabled": "0.5",
       "opacity-Select--disabled": "0.5",
       "backgroundColor-Select-badge--hover": "$color-primary-400",
@@ -11373,7 +12230,7 @@ export default {
   },
   "Slider": {
     "status": "stable",
-    "description": "`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.",
+    "description": "`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.\n\nHover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
@@ -11703,6 +12560,159 @@ export default {
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
+    }
+  },
+  "Tooltip": {
+    "status": "stable",
+    "description": "A tooltip component that displays text when hovering over trigger content.",
+    "props": {
+      "text": {
+        "description": "The text content to display in the tooltip",
+        "type": "string",
+        "isRequired": false
+      },
+      "markdown": {
+        "description": "The markdown content to display in the tooltip",
+        "type": "string",
+        "isRequired": false
+      },
+      "tooltipTemplate": {
+        "description": "The template for the tooltip content",
+        "type": "Component",
+        "isRequired": false
+      },
+      "delayDuration": {
+        "description": "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
+        "type": "number",
+        "defaultValue": 700
+      },
+      "skipDelayDuration": {
+        "description": "How much time a user has to enter another trigger without incurring a delay again (in ms)",
+        "type": "number",
+        "defaultValue": 300
+      },
+      "defaultOpen": {
+        "description": "The open state of the tooltip when it is initially rendered",
+        "type": "boolean",
+        "defaultValue": false
+      },
+      "showArrow": {
+        "description": "Whether to show the arrow pointing to the trigger element",
+        "type": "boolean",
+        "defaultValue": false
+      },
+      "side": {
+        "description": "The preferred side of the trigger to render against when open",
+        "type": "string",
+        "availableValues": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "defaultValue": "top"
+      },
+      "align": {
+        "description": "The preferred alignment against the trigger",
+        "type": "string",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "defaultValue": "center"
+      },
+      "sideOffset": {
+        "description": "The distance in pixels from the trigger",
+        "type": "number",
+        "defaultValue": 4
+      },
+      "alignOffset": {
+        "description": "An offset in pixels from the 'start' or 'end' alignment options",
+        "type": "number",
+        "defaultValue": 0
+      },
+      "avoidCollisions": {
+        "description": "When true, overrides the side and align preferences to prevent collisions with boundary edges",
+        "type": "boolean",
+        "defaultValue": true
+      }
+    },
+    "events": {},
+    "apis": {},
+    "contextVars": {},
+    "themeVars": {
+      "padding-Tooltip": "var(--xmlui-padding-Tooltip)",
+      "paddingHorizontal-Tooltip": "var(--xmlui-paddingHorizontal-Tooltip, var(--xmlui-padding-Tooltip))",
+      "paddingVertical-Tooltip": "var(--xmlui-paddingVertical-Tooltip, var(--xmlui-padding-Tooltip))",
+      "paddingLeft-Tooltip": "var(--xmlui-paddingLeft-Tooltip, var(--xmlui-paddingHorizontal-Tooltip, var(--xmlui-padding-Tooltip)))",
+      "paddingRight-Tooltip": "var(--xmlui-paddingRight-Tooltip, var(--xmlui-paddingHorizontal-Tooltip, var(--xmlui-padding-Tooltip)))",
+      "paddingTop-Tooltip": "var(--xmlui-paddingTop-Tooltip, var(--xmlui-paddingVertical-Tooltip, var(--xmlui-padding-Tooltip)))",
+      "paddingBottom-Tooltip": "var(--xmlui-paddingBottom-Tooltip, var(--xmlui-paddingVertical-Tooltip, var(--xmlui-padding-Tooltip)))",
+      "border-Tooltip": "var(--xmlui-border-Tooltip)",
+      "borderHorizontal-Tooltip": "var(--xmlui-borderHorizontal-Tooltip, var(--xmlui-border-Tooltip))",
+      "borderVertical-Tooltip": "var(--xmlui-borderVertical-Tooltip, var(--xmlui-border-Tooltip))",
+      "borderLeft-Tooltip": "var(--xmlui-borderLeft-Tooltip, var(--xmlui-borderHorizontal-Tooltip, var(--xmlui-border-Tooltip)))",
+      "borderRight-Tooltip": "var(--xmlui-borderRight-Tooltip, var(--xmlui-borderHorizontal-Tooltip, var(--xmlui-border-Tooltip)))",
+      "borderTop-Tooltip": "var(--xmlui-borderTop-Tooltip, var(--xmlui-borderVertical-Tooltip, var(--xmlui-border-Tooltip)))",
+      "borderBottom-Tooltip": "var(--xmlui-borderBottom-Tooltip, var(--xmlui-borderVertical-Tooltip, var(--xmlui-border-Tooltip)))",
+      "borderWidth-Tooltip": "var(--xmlui-borderWidth-Tooltip)",
+      "borderHorizontalWidth-Tooltip": "var(--xmlui-borderHorizontalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip))",
+      "borderLeftWidth-Tooltip": "var(--xmlui-borderLeftWidth-Tooltip, var(--xmlui-borderHorizontalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip)))",
+      "borderRightWidth-Tooltip": "var(--xmlui-borderRightWidth-Tooltip, var(--xmlui-borderHorizontalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip)))",
+      "borderVerticalWidth-Tooltip": "var(--xmlui-borderVerticalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip))",
+      "borderTopWidth-Tooltip": "var(--xmlui-borderTopWidth-Tooltip, var(--xmlui-borderVerticalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip)))",
+      "borderBottomWidth-Tooltip": "var(--xmlui-borderBottomWidth-Tooltip, var(--xmlui-borderVerticalWidth-Tooltip, var(--xmlui-borderWidth-Tooltip)))",
+      "borderStyle-Tooltip": "var(--xmlui-borderStyle-Tooltip)",
+      "borderHorizontalStyle-Tooltip": "var(--xmlui-borderHorizontalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip))",
+      "borderLeftStyle-Tooltip": "var(--xmlui-borderLeftStyle-Tooltip, var(--xmlui-borderHorizontalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip)))",
+      "borderRightStyle-Tooltip": "var(--xmlui-borderRightStyle-Tooltip, var(--xmlui-borderHorizontalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip)))",
+      "borderVerticalStyle-Tooltip": "var(--xmlui-borderVerticalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip))",
+      "borderTopStyle-Tooltip": "var(--xmlui-borderTopStyle-Tooltip, var(--xmlui-borderVerticalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip)))",
+      "borderBottomStyle-Tooltip": "var(--xmlui-borderBottomStyle-Tooltip, var(--xmlui-borderVerticalStyle-Tooltip, var(--xmlui-borderStyle-Tooltip)))",
+      "borderColor-Tooltip": "var(--xmlui-borderColor-Tooltip)",
+      "borderHorizontalColor-Tooltip": "var(--xmlui-borderHorizontalColor-Tooltip, var(--xmlui-borderColor-Tooltip))",
+      "borderLeftColor-Tooltip": "var(--xmlui-borderLeftColor-Tooltip, var(--xmlui-borderHorizontalColor-Tooltip, var(--xmlui-borderColor-Tooltip)))",
+      "borderRightColor-Tooltip": "var(--xmlui-borderRightColor-Tooltip, var(--xmlui-borderHorizontalColor-Tooltip, var(--xmlui-borderColor-Tooltip)))",
+      "borderVerticalColor-Tooltip": "var(--xmlui-borderVerticalColor-Tooltip, var(--xmlui-borderColor-Tooltip))",
+      "borderTopColor-Tooltip": "var(--xmlui-borderTopColor-Tooltip, var(--xmlui-borderVerticalColor-Tooltip, var(--xmlui-borderColor-Tooltip)))",
+      "borderBottomColor-Tooltip": "var(--xmlui-borderBottomColor-Tooltip, var(--xmlui-borderVerticalColor-Tooltip, var(--xmlui-borderColor-Tooltip)))",
+      "borderStartStartRadius-Tooltip": "var(--xmlui-borderStartStartRadius-Tooltip, var(--xmlui-borderRadius-Tooltip))",
+      "borderStartEndRadius-Tooltip": "var(--xmlui-borderStartEndRadius-Tooltip, var(--xmlui-borderRadius-Tooltip))",
+      "borderEndStartRadius-Tooltip": "var(--xmlui-borderEndStartRadius-Tooltip, var(--xmlui-borderRadius-Tooltip))",
+      "borderEndEndRadius-Tooltip": "var(--xmlui-borderEndEndRadius-Tooltip, var(--xmlui-borderRadius-Tooltip))",
+      "backgroundColor-Tooltip": "var(--xmlui-backgroundColor-Tooltip)",
+      "textColor-Tooltip": "var(--xmlui-textColor-Tooltip)",
+      "fontSize-Tooltip": "var(--xmlui-fontSize-Tooltip)",
+      "lineHeight-Tooltip": "var(--xmlui-lineHeight-Tooltip)",
+      "boxShadow-Tooltip": "var(--xmlui-boxShadow-Tooltip)",
+      "fill-arrow-Tooltip": "var(--xmlui-fill-arrow-Tooltip)",
+      "stroke-arrow-Tooltip": "var(--xmlui-stroke-arrow-Tooltip)",
+      "strokeWidth-arrow-Tooltip": "var(--xmlui-strokeWidth-arrow-Tooltip)",
+      "animationDuration-Tooltip": "var(--xmlui-animationDuration-Tooltip)",
+      "animation-Tooltip": "var(--xmlui-animation-Tooltip)"
+    },
+    "limitThemeVarsToComponent": true,
+    "defaultThemeVars": {
+      "backgroundColor-Tooltip": "$color-surface-0",
+      "border-Tooltip": "none",
+      "textColor-Tooltip": "$textcolor-primary",
+      "borderRadius-Tooltip": "4px",
+      "fontSize-Tooltip": "15px",
+      "lineHeight-Tooltip": "1",
+      "paddingTop-Tooltip": "10px",
+      "paddingBottom-Tooltip": "10px",
+      "paddingLeft-Tooltip": "15px",
+      "paddingRight-Tooltip": "15px",
+      "boxShadow-Tooltip": "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
+      "fill-arrow-Tooltip": "$color-surface-200",
+      "stroke-arrow-Tooltip": "$color-surface-200",
+      "strokeWidth-arrow-Tooltip": "0",
+      "animationDuration-Tooltip": "400ms",
+      "animation-Tooltip": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "dark": {
+        "backgroundColor-Tooltip": "$color-surface-200"
+      }
     }
   },
   "HSplitter": {
@@ -12219,6 +13229,14 @@ export default {
   "Switch": {
     "status": "stable",
     "description": "`Switch` enables users to toggle between two states: on and off.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the switch."
+      },
+      "input": {
+        "description": "The switch input area."
+      }
+    },
     "props": {
       "label": {
         "description": "This property sets the label of the component.  If not set, the component will not display a label.",
@@ -12302,6 +13320,9 @@ export default {
       }
     },
     "events": {
+      "click": {
+        "description": "This event is triggered when the Switch is clicked."
+      },
       "gotFocus": {
         "description": "This event is triggered when the Switch has received the focus."
       },
@@ -12438,8 +13459,56 @@ export default {
       "rowsSelectable": {
         "description": "Indicates whether the rows are selectable (`true`) or not (`false`)."
       },
-      "pageSizes": {
+      "pageSize": {
+        "description": "This property defines the number of rows to display per page when pagination is enabled."
+      },
+      "pageSizeOptions": {
         "description": "This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items."
+      },
+      "showPageInfo": {
+        "description": "Whether to show page information. It works the same as the [Pagination component property](./Pagination#showpageinfo).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "showPageSizeSelector": {
+        "description": "Whether to show the page size selector. It works the same as the [Pagination component property](./Pagination#showpagesizeselector).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "showCurrentPage": {
+        "description": "Whether to show the current page indicator. It works the same as the [Pagination component property](./Pagination#showcurrentpage).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "pageSizeSelectorPosition": {
+        "description": "Determines where to place the page size selector in the layout. It works the same as the [Pagination component property](./Pagination#pagesizeselectorposition).",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "type": "string",
+        "default": "start"
+      },
+      "pageInfoPosition": {
+        "description": "Determines where to place the page information in the layout. It works the same as the [Pagination component property](./Pagination#pageinfoposition).",
+        "options": [
+          "start",
+          "center",
+          "end"
+        ],
+        "type": "string",
+        "default": "end"
+      },
+      "buttonRowPosition": {
+        "description": "Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "valueType": "string",
+        "defaultValue": "center"
       },
       "rowDisabledPredicate": {
         "description": "This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value."
@@ -12487,6 +13556,26 @@ export default {
         "description": "This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "paginationControlsLocation": {
+        "description": "This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.",
+        "valueType": "string",
+        "availableValues": [
+          "top",
+          "bottom",
+          "both"
+        ],
+        "defaultValue": "bottom"
+      },
+      "cellVerticalAlign": {
+        "description": "This property controls the vertical alignment of cell content. It can be set to `top`, `center`, or `bottom`.",
+        "valueType": "string",
+        "availableValues": [
+          "top",
+          "center",
+          "bottom"
+        ],
+        "defaultValue": "center"
       }
     },
     "events": {
@@ -12608,7 +13697,7 @@ export default {
       "fontSize-heading-Table": "$fontSize-tiny",
       "fontWeight-heading-Table": "$fontWeight-bold",
       "textTransform-heading-Table": "uppercase",
-      "fontSize-row-Table": "$fontSize-small",
+      "fontSize-row-Table": "$fontSize-sm",
       "backgroundColor-selected-Table--hover": "$backgroundColor-row-Table--hover",
       "backgroundColor-pagination-Table": "$backgroundColor-Table",
       "outlineColor-heading-Table--focus": "$outlineColor--focus",
@@ -13023,7 +14112,7 @@ export default {
       "fontWeight-TableOfContentsItem-level-5--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-5--hover)",
       "fontWeight-TableOfContentsItem-level-6--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-6--hover)",
       "backgroundColor-TableOfContentsItem--active": "var(--xmlui-backgroundColor-TableOfContentsItem--active)",
-      "color-TableOfContentsItem--active": "var(--xmlui-color-TableOfContentsItem--active)",
+      "textColor-TableOfContentsItem--active": "var(--xmlui-textColor-TableOfContentsItem--active)",
       "fontWeight-TableOfContentsItem--active": "var(--xmlui-fontWeight-TableOfContentsItem--active)",
       "fontWeight-TableOfContentsItem-level-1--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-1--active)",
       "fontWeight-TableOfContentsItem-level-2--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-2--active)",
@@ -13036,7 +14125,7 @@ export default {
       "padding-TableOfContents": "$space-2",
       "textColor-TableOfContentsItem": "$color-secondary-500",
       "textColor-TableOfContentsItem--hover": "$textColor-primary",
-      "fontSize-TableOfContentsItem": "$fontSize-small",
+      "fontSize-TableOfContentsItem": "$fontSize-sm",
       "wordWrap-TableOfContentsItem": "break-word",
       "paddingVertical-TableOfContentsItem": "$space-1",
       "paddingLeft-TableOfContentsItem": "$space-1",
@@ -13068,6 +14157,11 @@ export default {
         "valueType": "ComponentDef"
       }
     },
+    "events": {
+      "activated": {
+        "description": "This event is triggered when the tab is activated."
+      }
+    },
     "contextVars": {
       "$header": {
         "description": "This context value represents the header context with props: id (optional), index, label, isActive."
@@ -13093,6 +14187,11 @@ export default {
       "headerTemplate": {
         "description": "This property declares the template for the clickable tab area.",
         "valueType": "ComponentDef"
+      }
+    },
+    "events": {
+      "didChange": {
+        "description": "This event is triggered when value of Tabs has changed."
       }
     },
     "apis": {
@@ -13169,10 +14268,6 @@ export default {
           {
             "value": "code",
             "description": "Represents a line of code"
-          },
-          {
-            "value": "codefence",
-            "description": "Handles the display of code blocks if combined with a `code` variant"
           },
           {
             "value": "deleted",
@@ -13268,6 +14363,62 @@ export default {
         "description": "This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "breakMode": {
+        "description": "This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
+        "valueType": "string",
+        "defaultValue": "normal",
+        "availableValues": [
+          {
+            "value": "normal",
+            "description": "Uses standard word boundaries for breaking"
+          },
+          {
+            "value": "word",
+            "description": "Breaks long words when necessary to prevent overflow"
+          },
+          {
+            "value": "anywhere",
+            "description": "Breaks at any character if needed to fit content"
+          },
+          {
+            "value": "keep",
+            "description": "Prevents breaking within words entirely"
+          },
+          {
+            "value": "hyphenate",
+            "description": "Uses automatic hyphenation when breaking words"
+          }
+        ]
+      },
+      "overflowMode": {
+        "description": "This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.",
+        "valueType": "string",
+        "defaultValue": "not specified",
+        "availableValues": [
+          {
+            "value": "none",
+            "description": "No wrapping, text stays on a single line with no overflow indicator"
+          },
+          {
+            "value": "ellipsis",
+            "description": "Truncates with an ellipsis (default)"
+          },
+          {
+            "value": "scroll",
+            "description": "Forces single line with horizontal scrolling when content overflows"
+          },
+          {
+            "value": "flow",
+            "description": "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)"
+          }
+        ]
+      }
+    },
+    "apis": {
+      "hasOverflow": {
+        "description": "Returns true when the displayed text overflows its container boundaries.",
+        "signature": "hasOverflow(): boolean"
       }
     },
     "themeVars": {
@@ -13276,26 +14427,10 @@ export default {
       "marginLeft-Text": "var(--xmlui-marginLeft-Text)",
       "marginRight-Text": "var(--xmlui-marginRight-Text)",
       "verticalAlignment-Text": "var(--xmlui-verticalAlignment-Text)",
-      "marginTop-Text-markdown": "var(--xmlui-marginTop-Text-markdown)",
-      "marginBottom-Text-markdown": "var(--xmlui-marginBottom-Text-markdown)",
-      "marginLeft-Text-markdown": "var(--xmlui-marginLeft-Text-markdown)",
-      "marginRight-Text-markdown": "var(--xmlui-marginRight-Text-markdown)",
-      "verticalAlignment-Text-markdown": "var(--xmlui-verticalAlignment-Text-markdown)",
       "fontWeight-Text-abbr": "var(--xmlui-fontWeight-Text-abbr)",
       "textTransform-Text-abbr": "var(--xmlui-textTransform-Text-abbr)",
       "fontStyle-Text-cite": "var(--xmlui-fontStyle-Text-cite)",
       "fontStyle-Text-em": "var(--xmlui-fontStyle-Text-em)",
-      "marginTop-Text-codefence": "var(--xmlui-marginTop-Text-codefence)",
-      "marginBottom-Text-codefence": "var(--xmlui-marginBottom-Text-codefence)",
-      "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
-      "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
-      "marginLeft-Text-code": "var(--xmlui-marginLeft-Text-code)",
-      "marginRight-Text-code": "var(--xmlui-marginRight-Text-code)",
-      "verticalAlignment-Text-code": "var(--xmlui-verticalAlignment-Text-code)",
-      "marginLeft-Text-codefence": "var(--xmlui-marginLeft-Text-codefence)",
-      "marginRight-Text-codefence": "var(--xmlui-marginRight-Text-codefence)",
-      "verticalAlignment-Text-codefence": "var(--xmlui-verticalAlignment-Text-codefence)",
-      "fontFamily-Text-codefence": "var(--xmlui-fontFamily-Text-codefence)",
       "textDecorationLine-Text-deleted": "var(--xmlui-textDecorationLine-Text-deleted)",
       "textDecorationColor-Text-deleted": "var(--xmlui-textDecorationColor-Text-deleted)",
       "textDecorationStyle-Text-deleted": "var(--xmlui-textDecorationStyle-Text-deleted)",
@@ -13357,19 +14492,22 @@ export default {
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
       "borderStyle-Text": "solid",
-      "fontSize-Text": "$fontSize-small",
+      "fontSize-Text": "$fontSize-sm",
+      "lineHeight-Text": "$lineHeight-sm",
       "borderWidth-Text": "$space-0",
       "lineHeight-Text-codefence": "1.5",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
-      "fontSize-Text-secondary": "$fontSize-small",
+      "fontSize-Text-secondary": "$fontSize-sm",
+      "lineHeight-Text-secondary": "$lineHeight-sm",
       "fontStyle-Text-cite": "italic",
       "textColor-Text": "$textColor-primary",
       "fontFamily-Text": "$fontFamily",
       "fontWeight-Text": "$fontWeight-normal",
       "fontSize-Text-codefence": "$fontSize-code",
       "fontFamily-Text-code": "$fontFamily-monospace",
-      "fontSize-Text-code": "$fontSize-small",
+      "fontSize-Text-code": "$fontSize-sm",
+      "lineHeight-Text-code": "$lineHeight-xs",
       "borderWidth-Text-code": "1px",
       "borderStyle-Text-code": "solid",
       "borderRadius-Text-code": "4px",
@@ -13378,30 +14516,38 @@ export default {
       "textDecorationLine-Text-deleted": "line-through",
       "textDecorationLine-Text-inserted": "underline",
       "fontFamily-Text-keyboard": "$fontFamily-monospace",
-      "fontSize-Text-keyboard": "$fontSize-small",
+      "fontSize-Text-keyboard": "$fontSize-sm",
+      "lineHeight-Text-keyboard": "$lineHeight-sm",
       "fontWeight-Text-keyboard": "$fontWeight-bold",
       "borderWidth-Text-keyboard": "1px",
       "paddingHorizontal-Text-keyboard": "$space-1",
       "fontFamily-Text-sample": "$fontFamily-monospace",
-      "fontSize-Text-sample": "$fontSize-small",
-      "fontSize-Text-sup": "$fontSize-smaller",
+      "fontSize-Text-sample": "$fontSize-sm",
+      "lineHeight-Text-sample": "$lineHeight-sm",
+      "fontSize-Text-sup": "$fontSize-xs",
+      "lineHeight-Text-sup": "$lineHeight-xs",
       "verticalAlignment-Text-sup": "super",
-      "fontSize-Text-sub": "$fontSize-smaller",
+      "fontSize-Text-sub": "$fontSize-xs",
+      "lineHeight-Text-sub": "$lineHeight-xs",
       "verticalAlignment-Text-sub": "sub",
       "fontStyle-Text-var": "italic",
       "fontStyle-Text-em": "italic",
       "fontFamily-Text-mono": "$fontFamily-monospace",
-      "fontSize-Text-title": "$fontSize-large",
-      "fontSize-Text-subtitle": "$fontSize-medium",
-      "fontSize-Text-small": "$fontSize-small",
-      "lineHeight-Text-small": "$lineHeight-tight",
+      "fontSize-Text-title": "$fontSize-2xl",
+      "lineHeight-Text-title": "$lineHeight-2xl",
+      "fontSize-Text-subtitle": "$fontSize-xl",
+      "lineHeight-Text-subtitle": "$lineHeight-xl",
+      "fontSize-Text-small": "$fontSize-sm",
+      "lineHeight-Text-small": "$lineHeight-sm",
       "letterSpacing-Text-caption": "0.05rem",
-      "fontSize-Text-placeholder": "$fontSize-smaller",
+      "fontSize-Text-placeholder": "$fontSize-xs",
+      "lineHeight-Text-placeholder": "$lineHeight-xs",
       "fontFamily-Text-codefence": "$fontFamily-monospace",
       "paddingHorizontal-Text-codefence": "$space-4",
       "paddingVertical-Text-codefence": "$space-3",
       "paddingVertical-Text-paragraph": "$space-1",
       "fontSize-Text-subheading": "$fontSize-H6",
+      "lineHeight-Text-subheading": "$lineHeight-sm",
       "fontWeight-Text-subheading": "$fontWeight-bold",
       "letterSpacing-Text-subheading": "0.04em",
       "textTransform-Text-subheading": "uppercase",
@@ -13409,11 +14555,8 @@ export default {
       "marginBottom-Text-tableheading": "$space-4",
       "paddingHorizontal-Text-tableheading": "$space-1",
       "fontSize-Text-tableheading": "$fontSize-H6",
+      "lineHeight-Text-tableheading": "$lineHeight-sm",
       "fontWeight-Text-tableheading": "$fontWeight-bold",
-      "marginTop-Text-markdown": "$space-3",
-      "marginBottom-Text-markdown": "$space-6",
-      "fontSize-Text-markdown": "fontSize-Text",
-      "fontWeight-Text-markdown": "fontWeight-Text",
       "backgroundColor-Text-code": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-code": "$color-surface-100",
       "backgroundColor-Text-keyboard": "rgb(from $color-surface-100 r g b / 0.4)",
@@ -13431,6 +14574,20 @@ export default {
   "TextArea": {
     "status": "stable",
     "description": "`TextArea` provides a multiline text input area.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the text area."
+      },
+      "startAdornment": {
+        "description": "The adornment displayed at the start of the text area."
+      },
+      "endAdornment": {
+        "description": "The adornment displayed at the end of the text area."
+      },
+      "input": {
+        "description": "The text area input."
+      }
+    },
     "props": {
       "enterSubmits": {
         "description": "This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.",
@@ -13588,106 +14745,128 @@ export default {
       }
     },
     "themeVars": {
-      "Input:borderRadius-Textarea-default": "var(--xmlui-borderRadius-Textarea-default)",
-      "Input:borderColor-Textarea-default": "var(--xmlui-borderColor-Textarea-default)",
-      "Input:borderWidth-Textarea-default": "var(--xmlui-borderWidth-Textarea-default)",
-      "Input:borderStyle-Textarea-default": "var(--xmlui-borderStyle-Textarea-default)",
-      "Input:fontSize-Textarea-default": "var(--xmlui-fontSize-Textarea-default)",
-      "Input:padding-Textarea-default": "var(--xmlui-padding-Textarea-default)",
-      "Input:backgroundColor-Textarea-default": "var(--xmlui-backgroundColor-Textarea-default)",
-      "Input:boxShadow-Textarea-default": "var(--xmlui-boxShadow-Textarea-default)",
-      "Input:textColor-Textarea-default": "var(--xmlui-textColor-Textarea-default)",
-      "Input:borderColor-Textarea-default--hover": "var(--xmlui-borderColor-Textarea-default--hover)",
-      "Input:backgroundColor-Textarea-default--hover": "var(--xmlui-backgroundColor-Textarea-default--hover)",
-      "Input:boxShadow-Textarea-default--hover": "var(--xmlui-boxShadow-Textarea-default--hover)",
-      "Input:textColor-Textarea-default--hover": "var(--xmlui-textColor-Textarea-default--hover)",
-      "Input:borderColor-Textarea-default--focus": "var(--xmlui-borderColor-Textarea-default--focus)",
-      "Input:backgroundColor-Textarea-default--focus": "var(--xmlui-backgroundColor-Textarea-default--focus)",
-      "Input:boxShadow-Textarea-default--focus": "var(--xmlui-boxShadow-Textarea-default--focus)",
-      "Input:textColor-Textarea-default--focus": "var(--xmlui-textColor-Textarea-default--focus)",
-      "Input:outlineWidth-Textarea-default--focus": "var(--xmlui-outlineWidth-Textarea-default--focus)",
-      "Input:outlineColor-Textarea-default--focus": "var(--xmlui-outlineColor-Textarea-default--focus)",
-      "Input:outlineStyle-Textarea-default--focus": "var(--xmlui-outlineStyle-Textarea-default--focus)",
-      "Input:outlineOffset-Textarea-default--focus": "var(--xmlui-outlineOffset-Textarea-default--focus)",
-      "Input:textColor-placeholder-Textarea-default": "var(--xmlui-textColor-placeholder-Textarea-default)",
-      "Input:fontSize-placeholder-Textarea-default": "var(--xmlui-fontSize-placeholder-Textarea-default)",
-      "Input:borderRadius-Textarea-error": "var(--xmlui-borderRadius-Textarea-error)",
-      "Input:borderColor-Textarea-error": "var(--xmlui-borderColor-Textarea-error)",
-      "Input:borderWidth-Textarea-error": "var(--xmlui-borderWidth-Textarea-error)",
-      "Input:borderStyle-Textarea-error": "var(--xmlui-borderStyle-Textarea-error)",
-      "Input:fontSize-Textarea-error": "var(--xmlui-fontSize-Textarea-error)",
-      "Input:padding-Textarea-error": "var(--xmlui-padding-Textarea-error)",
-      "Input:backgroundColor-Textarea-error": "var(--xmlui-backgroundColor-Textarea-error)",
-      "Input:boxShadow-Textarea-error": "var(--xmlui-boxShadow-Textarea-error)",
-      "Input:textColor-Textarea-error": "var(--xmlui-textColor-Textarea-error)",
-      "Input:borderColor-Textarea-error--hover": "var(--xmlui-borderColor-Textarea-error--hover)",
-      "Input:backgroundColor-Textarea-error--hover": "var(--xmlui-backgroundColor-Textarea-error--hover)",
-      "Input:boxShadow-Textarea-error--hover": "var(--xmlui-boxShadow-Textarea-error--hover)",
-      "Input:textColor-Textarea-error--hover": "var(--xmlui-textColor-Textarea-error--hover)",
-      "Input:borderColor-Textarea-error--focus": "var(--xmlui-borderColor-Textarea-error--focus)",
-      "Input:backgroundColor-Textarea-error--focus": "var(--xmlui-backgroundColor-Textarea-error--focus)",
-      "Input:boxShadow-Textarea-error--focus": "var(--xmlui-boxShadow-Textarea-error--focus)",
-      "Input:textColor-Textarea-error--focus": "var(--xmlui-textColor-Textarea-error--focus)",
-      "Input:outlineWidth-Textarea-error--focus": "var(--xmlui-outlineWidth-Textarea-error--focus)",
-      "Input:outlineColor-Textarea-error--focus": "var(--xmlui-outlineColor-Textarea-error--focus)",
-      "Input:outlineStyle-Textarea-error--focus": "var(--xmlui-outlineStyle-Textarea-error--focus)",
-      "Input:outlineOffset-Textarea-error--focus": "var(--xmlui-outlineOffset-Textarea-error--focus)",
-      "Input:textColor-placeholder-Textarea-error": "var(--xmlui-textColor-placeholder-Textarea-error)",
-      "Input:fontSize-placeholder-Textarea-error": "var(--xmlui-fontSize-placeholder-Textarea-error)",
-      "Input:borderRadius-Textarea-warning": "var(--xmlui-borderRadius-Textarea-warning)",
-      "Input:borderColor-Textarea-warning": "var(--xmlui-borderColor-Textarea-warning)",
-      "Input:borderWidth-Textarea-warning": "var(--xmlui-borderWidth-Textarea-warning)",
-      "Input:borderStyle-Textarea-warning": "var(--xmlui-borderStyle-Textarea-warning)",
-      "Input:fontSize-Textarea-warning": "var(--xmlui-fontSize-Textarea-warning)",
-      "Input:padding-Textarea-warning": "var(--xmlui-padding-Textarea-warning)",
-      "Input:backgroundColor-Textarea-warning": "var(--xmlui-backgroundColor-Textarea-warning)",
-      "Input:boxShadow-Textarea-warning": "var(--xmlui-boxShadow-Textarea-warning)",
-      "Input:textColor-Textarea-warning": "var(--xmlui-textColor-Textarea-warning)",
-      "Input:borderColor-Textarea-warning--hover": "var(--xmlui-borderColor-Textarea-warning--hover)",
-      "Input:backgroundColor-Textarea-warning--hover": "var(--xmlui-backgroundColor-Textarea-warning--hover)",
-      "Input:boxShadow-Textarea-warning--hover": "var(--xmlui-boxShadow-Textarea-warning--hover)",
-      "Input:textColor-Textarea-warning--hover": "var(--xmlui-textColor-Textarea-warning--hover)",
-      "Input:borderColor-Textarea-warning--focus": "var(--xmlui-borderColor-Textarea-warning--focus)",
-      "Input:backgroundColor-Textarea-warning--focus": "var(--xmlui-backgroundColor-Textarea-warning--focus)",
-      "Input:boxShadow-Textarea-warning--focus": "var(--xmlui-boxShadow-Textarea-warning--focus)",
-      "Input:textColor-Textarea-warning--focus": "var(--xmlui-textColor-Textarea-warning--focus)",
-      "Input:outlineWidth-Textarea-warning--focus": "var(--xmlui-outlineWidth-Textarea-warning--focus)",
-      "Input:outlineColor-Textarea-warning--focus": "var(--xmlui-outlineColor-Textarea-warning--focus)",
-      "Input:outlineStyle-Textarea-warning--focus": "var(--xmlui-outlineStyle-Textarea-warning--focus)",
-      "Input:outlineOffset-Textarea-warning--focus": "var(--xmlui-outlineOffset-Textarea-warning--focus)",
-      "Input:textColor-placeholder-Textarea-warning": "var(--xmlui-textColor-placeholder-Textarea-warning)",
-      "Input:fontSize-placeholder-Textarea-warning": "var(--xmlui-fontSize-placeholder-Textarea-warning)",
-      "Input:borderRadius-Textarea-success": "var(--xmlui-borderRadius-Textarea-success)",
-      "Input:borderColor-Textarea-success": "var(--xmlui-borderColor-Textarea-success)",
-      "Input:borderWidth-Textarea-success": "var(--xmlui-borderWidth-Textarea-success)",
-      "Input:borderStyle-Textarea-success": "var(--xmlui-borderStyle-Textarea-success)",
-      "Input:fontSize-Textarea-success": "var(--xmlui-fontSize-Textarea-success)",
-      "Input:padding-Textarea-success": "var(--xmlui-padding-Textarea-success)",
-      "Input:backgroundColor-Textarea-success": "var(--xmlui-backgroundColor-Textarea-success)",
-      "Input:boxShadow-Textarea-success": "var(--xmlui-boxShadow-Textarea-success)",
-      "Input:textColor-Textarea-success": "var(--xmlui-textColor-Textarea-success)",
-      "Input:borderColor-Textarea-success--hover": "var(--xmlui-borderColor-Textarea-success--hover)",
-      "Input:backgroundColor-Textarea-success--hover": "var(--xmlui-backgroundColor-Textarea-success--hover)",
-      "Input:boxShadow-Textarea-success--hover": "var(--xmlui-boxShadow-Textarea-success--hover)",
-      "Input:textColor-Textarea-success--hover": "var(--xmlui-textColor-Textarea-success--hover)",
-      "Input:borderColor-Textarea-success--focus": "var(--xmlui-borderColor-Textarea-success--focus)",
-      "Input:backgroundColor-Textarea-success--focus": "var(--xmlui-backgroundColor-Textarea-success--focus)",
-      "Input:boxShadow-Textarea-success--focus": "var(--xmlui-boxShadow-Textarea-success--focus)",
-      "Input:textColor-Textarea-success--focus": "var(--xmlui-textColor-Textarea-success--focus)",
-      "Input:outlineWidth-Textarea-success--focus": "var(--xmlui-outlineWidth-Textarea-success--focus)",
-      "Input:outlineColor-Textarea-success--focus": "var(--xmlui-outlineColor-Textarea-success--focus)",
-      "Input:outlineStyle-Textarea-success--focus": "var(--xmlui-outlineStyle-Textarea-success--focus)",
-      "Input:outlineOffset-Textarea-success--focus": "var(--xmlui-outlineOffset-Textarea-success--focus)",
-      "Input:textColor-placeholder-Textarea-success": "var(--xmlui-textColor-placeholder-Textarea-success)",
-      "Input:fontSize-placeholder-Textarea-success": "var(--xmlui-fontSize-placeholder-Textarea-success)",
-      "Input:backgroundColor-Textarea--disabled": "var(--xmlui-backgroundColor-Textarea--disabled)",
-      "Input:textColor-Textarea--disabled": "var(--xmlui-textColor-Textarea--disabled)",
-      "Input:borderColor-Textarea--disabled": "var(--xmlui-borderColor-Textarea--disabled)"
+      "padding-TextArea": "var(--xmlui-padding-TextArea)",
+      "paddingHorizontal-TextArea": "var(--xmlui-paddingHorizontal-TextArea, var(--xmlui-padding-TextArea))",
+      "paddingVertical-TextArea": "var(--xmlui-paddingVertical-TextArea, var(--xmlui-padding-TextArea))",
+      "paddingLeft-TextArea": "var(--xmlui-paddingLeft-TextArea, var(--xmlui-paddingHorizontal-TextArea, var(--xmlui-padding-TextArea)))",
+      "paddingRight-TextArea": "var(--xmlui-paddingRight-TextArea, var(--xmlui-paddingHorizontal-TextArea, var(--xmlui-padding-TextArea)))",
+      "paddingTop-TextArea": "var(--xmlui-paddingTop-TextArea, var(--xmlui-paddingVertical-TextArea, var(--xmlui-padding-TextArea)))",
+      "paddingBottom-TextArea": "var(--xmlui-paddingBottom-TextArea, var(--xmlui-paddingVertical-TextArea, var(--xmlui-padding-TextArea)))",
+      "Input:borderRadius-TextArea-default": "var(--xmlui-borderRadius-TextArea-default)",
+      "Input:borderColor-TextArea-default": "var(--xmlui-borderColor-TextArea-default)",
+      "Input:borderWidth-TextArea-default": "var(--xmlui-borderWidth-TextArea-default)",
+      "Input:borderStyle-TextArea-default": "var(--xmlui-borderStyle-TextArea-default)",
+      "Input:fontSize-TextArea-default": "var(--xmlui-fontSize-TextArea-default)",
+      "Input:backgroundColor-TextArea-default": "var(--xmlui-backgroundColor-TextArea-default)",
+      "Input:boxShadow-TextArea-default": "var(--xmlui-boxShadow-TextArea-default)",
+      "Input:textColor-TextArea-default": "var(--xmlui-textColor-TextArea-default)",
+      "Input:borderColor-TextArea-default--hover": "var(--xmlui-borderColor-TextArea-default--hover)",
+      "Input:backgroundColor-TextArea-default--hover": "var(--xmlui-backgroundColor-TextArea-default--hover)",
+      "Input:boxShadow-TextArea-default--hover": "var(--xmlui-boxShadow-TextArea-default--hover)",
+      "Input:textColor-TextArea-default--hover": "var(--xmlui-textColor-TextArea-default--hover)",
+      "Input:borderColor-TextArea-default--focus": "var(--xmlui-borderColor-TextArea-default--focus)",
+      "Input:backgroundColor-TextArea-default--focus": "var(--xmlui-backgroundColor-TextArea-default--focus)",
+      "Input:boxShadow-TextArea-default--focus": "var(--xmlui-boxShadow-TextArea-default--focus)",
+      "Input:textColor-TextArea-default--focus": "var(--xmlui-textColor-TextArea-default--focus)",
+      "Input:outlineWidth-TextArea-default--focus": "var(--xmlui-outlineWidth-TextArea-default--focus)",
+      "Input:outlineColor-TextArea-default--focus": "var(--xmlui-outlineColor-TextArea-default--focus)",
+      "Input:outlineStyle-TextArea-default--focus": "var(--xmlui-outlineStyle-TextArea-default--focus)",
+      "Input:outlineOffset-TextArea-default--focus": "var(--xmlui-outlineOffset-TextArea-default--focus)",
+      "Input:textColor-placeholder-TextArea-default": "var(--xmlui-textColor-placeholder-TextArea-default)",
+      "Input:fontSize-placeholder-TextArea-default": "var(--xmlui-fontSize-placeholder-TextArea-default)",
+      "Input:borderRadius-TextArea-error": "var(--xmlui-borderRadius-TextArea-error)",
+      "Input:borderColor-TextArea-error": "var(--xmlui-borderColor-TextArea-error)",
+      "Input:borderWidth-TextArea-error": "var(--xmlui-borderWidth-TextArea-error)",
+      "Input:borderStyle-TextArea-error": "var(--xmlui-borderStyle-TextArea-error)",
+      "Input:fontSize-TextArea-error": "var(--xmlui-fontSize-TextArea-error)",
+      "Input:backgroundColor-TextArea-error": "var(--xmlui-backgroundColor-TextArea-error)",
+      "Input:boxShadow-TextArea-error": "var(--xmlui-boxShadow-TextArea-error)",
+      "Input:textColor-TextArea-error": "var(--xmlui-textColor-TextArea-error)",
+      "Input:borderColor-TextArea-error--hover": "var(--xmlui-borderColor-TextArea-error--hover)",
+      "Input:backgroundColor-TextArea-error--hover": "var(--xmlui-backgroundColor-TextArea-error--hover)",
+      "Input:boxShadow-TextArea-error--hover": "var(--xmlui-boxShadow-TextArea-error--hover)",
+      "Input:textColor-TextArea-error--hover": "var(--xmlui-textColor-TextArea-error--hover)",
+      "Input:borderColor-TextArea-error--focus": "var(--xmlui-borderColor-TextArea-error--focus)",
+      "Input:backgroundColor-TextArea-error--focus": "var(--xmlui-backgroundColor-TextArea-error--focus)",
+      "Input:boxShadow-TextArea-error--focus": "var(--xmlui-boxShadow-TextArea-error--focus)",
+      "Input:textColor-TextArea-error--focus": "var(--xmlui-textColor-TextArea-error--focus)",
+      "Input:outlineWidth-TextArea-error--focus": "var(--xmlui-outlineWidth-TextArea-error--focus)",
+      "Input:outlineColor-TextArea-error--focus": "var(--xmlui-outlineColor-TextArea-error--focus)",
+      "Input:outlineStyle-TextArea-error--focus": "var(--xmlui-outlineStyle-TextArea-error--focus)",
+      "Input:outlineOffset-TextArea-error--focus": "var(--xmlui-outlineOffset-TextArea-error--focus)",
+      "Input:textColor-placeholder-TextArea-error": "var(--xmlui-textColor-placeholder-TextArea-error)",
+      "Input:fontSize-placeholder-TextArea-error": "var(--xmlui-fontSize-placeholder-TextArea-error)",
+      "Input:borderRadius-TextArea-warning": "var(--xmlui-borderRadius-TextArea-warning)",
+      "Input:borderColor-TextArea-warning": "var(--xmlui-borderColor-TextArea-warning)",
+      "Input:borderWidth-TextArea-warning": "var(--xmlui-borderWidth-TextArea-warning)",
+      "Input:borderStyle-TextArea-warning": "var(--xmlui-borderStyle-TextArea-warning)",
+      "Input:fontSize-TextArea-warning": "var(--xmlui-fontSize-TextArea-warning)",
+      "Input:backgroundColor-TextArea-warning": "var(--xmlui-backgroundColor-TextArea-warning)",
+      "Input:boxShadow-TextArea-warning": "var(--xmlui-boxShadow-TextArea-warning)",
+      "Input:textColor-TextArea-warning": "var(--xmlui-textColor-TextArea-warning)",
+      "Input:borderColor-TextArea-warning--hover": "var(--xmlui-borderColor-TextArea-warning--hover)",
+      "Input:backgroundColor-TextArea-warning--hover": "var(--xmlui-backgroundColor-TextArea-warning--hover)",
+      "Input:boxShadow-TextArea-warning--hover": "var(--xmlui-boxShadow-TextArea-warning--hover)",
+      "Input:textColor-TextArea-warning--hover": "var(--xmlui-textColor-TextArea-warning--hover)",
+      "Input:borderColor-TextArea-warning--focus": "var(--xmlui-borderColor-TextArea-warning--focus)",
+      "Input:backgroundColor-TextArea-warning--focus": "var(--xmlui-backgroundColor-TextArea-warning--focus)",
+      "Input:boxShadow-TextArea-warning--focus": "var(--xmlui-boxShadow-TextArea-warning--focus)",
+      "Input:textColor-TextArea-warning--focus": "var(--xmlui-textColor-TextArea-warning--focus)",
+      "Input:outlineWidth-TextArea-warning--focus": "var(--xmlui-outlineWidth-TextArea-warning--focus)",
+      "Input:outlineColor-TextArea-warning--focus": "var(--xmlui-outlineColor-TextArea-warning--focus)",
+      "Input:outlineStyle-TextArea-warning--focus": "var(--xmlui-outlineStyle-TextArea-warning--focus)",
+      "Input:outlineOffset-TextArea-warning--focus": "var(--xmlui-outlineOffset-TextArea-warning--focus)",
+      "Input:textColor-placeholder-TextArea-warning": "var(--xmlui-textColor-placeholder-TextArea-warning)",
+      "Input:fontSize-placeholder-TextArea-warning": "var(--xmlui-fontSize-placeholder-TextArea-warning)",
+      "Input:borderRadius-TextArea-success": "var(--xmlui-borderRadius-TextArea-success)",
+      "Input:borderColor-TextArea-success": "var(--xmlui-borderColor-TextArea-success)",
+      "Input:borderWidth-TextArea-success": "var(--xmlui-borderWidth-TextArea-success)",
+      "Input:borderStyle-TextArea-success": "var(--xmlui-borderStyle-TextArea-success)",
+      "Input:fontSize-TextArea-success": "var(--xmlui-fontSize-TextArea-success)",
+      "Input:backgroundColor-TextArea-success": "var(--xmlui-backgroundColor-TextArea-success)",
+      "Input:boxShadow-TextArea-success": "var(--xmlui-boxShadow-TextArea-success)",
+      "Input:textColor-TextArea-success": "var(--xmlui-textColor-TextArea-success)",
+      "Input:borderColor-TextArea-success--hover": "var(--xmlui-borderColor-TextArea-success--hover)",
+      "Input:backgroundColor-TextArea-success--hover": "var(--xmlui-backgroundColor-TextArea-success--hover)",
+      "Input:boxShadow-TextArea-success--hover": "var(--xmlui-boxShadow-TextArea-success--hover)",
+      "Input:textColor-TextArea-success--hover": "var(--xmlui-textColor-TextArea-success--hover)",
+      "Input:borderColor-TextArea-success--focus": "var(--xmlui-borderColor-TextArea-success--focus)",
+      "Input:backgroundColor-TextArea-success--focus": "var(--xmlui-backgroundColor-TextArea-success--focus)",
+      "Input:boxShadow-TextArea-success--focus": "var(--xmlui-boxShadow-TextArea-success--focus)",
+      "Input:textColor-TextArea-success--focus": "var(--xmlui-textColor-TextArea-success--focus)",
+      "Input:outlineWidth-TextArea-success--focus": "var(--xmlui-outlineWidth-TextArea-success--focus)",
+      "Input:outlineColor-TextArea-success--focus": "var(--xmlui-outlineColor-TextArea-success--focus)",
+      "Input:outlineStyle-TextArea-success--focus": "var(--xmlui-outlineStyle-TextArea-success--focus)",
+      "Input:outlineOffset-TextArea-success--focus": "var(--xmlui-outlineOffset-TextArea-success--focus)",
+      "Input:textColor-placeholder-TextArea-success": "var(--xmlui-textColor-placeholder-TextArea-success)",
+      "Input:fontSize-placeholder-TextArea-success": "var(--xmlui-fontSize-placeholder-TextArea-success)",
+      "Input:backgroundColor-TextArea--disabled": "var(--xmlui-backgroundColor-TextArea--disabled)",
+      "Input:textColor-TextArea--disabled": "var(--xmlui-textColor-TextArea--disabled)",
+      "Input:borderColor-TextArea--disabled": "var(--xmlui-borderColor-TextArea--disabled)"
+    },
+    "defaultThemeVars": {
+      "paddingVertical-TextArea": "$space-2",
+      "paddingHorizontal-TextArea": "$space-2"
     }
   },
   "TextBox": {
     "status": "stable",
     "description": "`TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the text box."
+      },
+      "startAdornment": {
+        "description": "The adornment displayed at the start of the text box."
+      },
+      "endAdornment": {
+        "description": "The adornment displayed at the end of the text box."
+      },
+      "input": {
+        "description": "The text box input area."
+      }
+    },
+    "defaultPart": "input",
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
@@ -13836,13 +15015,19 @@ export default {
       }
     },
     "themeVars": {
+      "padding-TextBox": "var(--xmlui-padding-TextBox)",
+      "paddingHorizontal-TextBox": "var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox))",
+      "paddingVertical-TextBox": "var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox))",
+      "paddingLeft-TextBox": "var(--xmlui-paddingLeft-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingRight-TextBox": "var(--xmlui-paddingRight-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingTop-TextBox": "var(--xmlui-paddingTop-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingBottom-TextBox": "var(--xmlui-paddingBottom-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)))",
       "Input:gap-adornment-TextBox": "var(--xmlui-gap-adornment-TextBox)",
       "Input:borderRadius-TextBox-default": "var(--xmlui-borderRadius-TextBox-default)",
       "Input:borderColor-TextBox-default": "var(--xmlui-borderColor-TextBox-default)",
       "Input:borderWidth-TextBox-default": "var(--xmlui-borderWidth-TextBox-default)",
       "Input:borderStyle-TextBox-default": "var(--xmlui-borderStyle-TextBox-default)",
       "Input:fontSize-TextBox-default": "var(--xmlui-fontSize-TextBox-default)",
-      "Input:padding-TextBox-default": "var(--xmlui-padding-TextBox-default)",
       "Input:backgroundColor-TextBox-default": "var(--xmlui-backgroundColor-TextBox-default)",
       "Input:boxShadow-TextBox-default": "var(--xmlui-boxShadow-TextBox-default)",
       "Input:textColor-TextBox-default": "var(--xmlui-textColor-TextBox-default)",
@@ -13871,7 +15056,6 @@ export default {
       "Input:borderWidth-TextBox-error": "var(--xmlui-borderWidth-TextBox-error)",
       "Input:borderStyle-TextBox-error": "var(--xmlui-borderStyle-TextBox-error)",
       "Input:fontSize-TextBox-error": "var(--xmlui-fontSize-TextBox-error)",
-      "Input:padding-TextBox-error": "var(--xmlui-padding-TextBox-error)",
       "Input:backgroundColor-TextBox-error": "var(--xmlui-backgroundColor-TextBox-error)",
       "Input:boxShadow-TextBox-error": "var(--xmlui-boxShadow-TextBox-error)",
       "Input:textColor-TextBox-error": "var(--xmlui-textColor-TextBox-error)",
@@ -13895,7 +15079,6 @@ export default {
       "Input:borderWidth-TextBox-warning": "var(--xmlui-borderWidth-TextBox-warning)",
       "Input:borderStyle-TextBox-warning": "var(--xmlui-borderStyle-TextBox-warning)",
       "Input:fontSize-TextBox-warning": "var(--xmlui-fontSize-TextBox-warning)",
-      "Input:padding-TextBox-warning": "var(--xmlui-padding-TextBox-warning)",
       "Input:backgroundColor-TextBox-warning": "var(--xmlui-backgroundColor-TextBox-warning)",
       "Input:boxShadow-TextBox-warning": "var(--xmlui-boxShadow-TextBox-warning)",
       "Input:textColor-TextBox-warning": "var(--xmlui-textColor-TextBox-warning)",
@@ -13919,7 +15102,6 @@ export default {
       "Input:borderWidth-TextBox-success": "var(--xmlui-borderWidth-TextBox-success)",
       "Input:borderStyle-TextBox-success": "var(--xmlui-borderStyle-TextBox-success)",
       "Input:fontSize-TextBox-success": "var(--xmlui-fontSize-TextBox-success)",
-      "Input:padding-TextBox-success": "var(--xmlui-padding-TextBox-success)",
       "Input:backgroundColor-TextBox-success": "var(--xmlui-backgroundColor-TextBox-success)",
       "Input:boxShadow-TextBox-success": "var(--xmlui-boxShadow-TextBox-success)",
       "Input:textColor-TextBox-success": "var(--xmlui-textColor-TextBox-success)",
@@ -13948,7 +15130,8 @@ export default {
       "backgroundColor-Input--disabled": "$backgroundColor--disabled",
       "borderWidth-Input": "1px",
       "minHeight-Input": "39px",
-      "padding-Input": "$space-2",
+      "paddingHorizontal-TextBox": "$space-2",
+      "paddingVertical-TextBox": "$space-2",
       "gap-adornment-Input": "$space-2",
       "borderStyle-Input": "solid",
       "borderColor-Input--disabled": "$borderColor--disabled",
@@ -13970,6 +15153,21 @@ export default {
   "PasswordInput": {
     "status": "stable",
     "description": "`Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords.",
+    "parts": {
+      "label": {
+        "description": "The label displayed for the text box."
+      },
+      "startAdornment": {
+        "description": "The adornment displayed at the start of the text box."
+      },
+      "endAdornment": {
+        "description": "The adornment displayed at the end of the text box."
+      },
+      "input": {
+        "description": "The text box input area."
+      }
+    },
+    "defaultPart": "input",
     "props": {
       "placeholder": {
         "description": "An optional placeholder text that is visible in the input field when its empty.",
@@ -14118,13 +15316,19 @@ export default {
       }
     },
     "themeVars": {
+      "padding-TextBox": "var(--xmlui-padding-TextBox)",
+      "paddingHorizontal-TextBox": "var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox))",
+      "paddingVertical-TextBox": "var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox))",
+      "paddingLeft-TextBox": "var(--xmlui-paddingLeft-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingRight-TextBox": "var(--xmlui-paddingRight-TextBox, var(--xmlui-paddingHorizontal-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingTop-TextBox": "var(--xmlui-paddingTop-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)))",
+      "paddingBottom-TextBox": "var(--xmlui-paddingBottom-TextBox, var(--xmlui-paddingVertical-TextBox, var(--xmlui-padding-TextBox)))",
       "Input:gap-adornment-TextBox": "var(--xmlui-gap-adornment-TextBox)",
       "Input:borderRadius-TextBox-default": "var(--xmlui-borderRadius-TextBox-default)",
       "Input:borderColor-TextBox-default": "var(--xmlui-borderColor-TextBox-default)",
       "Input:borderWidth-TextBox-default": "var(--xmlui-borderWidth-TextBox-default)",
       "Input:borderStyle-TextBox-default": "var(--xmlui-borderStyle-TextBox-default)",
       "Input:fontSize-TextBox-default": "var(--xmlui-fontSize-TextBox-default)",
-      "Input:padding-TextBox-default": "var(--xmlui-padding-TextBox-default)",
       "Input:backgroundColor-TextBox-default": "var(--xmlui-backgroundColor-TextBox-default)",
       "Input:boxShadow-TextBox-default": "var(--xmlui-boxShadow-TextBox-default)",
       "Input:textColor-TextBox-default": "var(--xmlui-textColor-TextBox-default)",
@@ -14153,7 +15357,6 @@ export default {
       "Input:borderWidth-TextBox-error": "var(--xmlui-borderWidth-TextBox-error)",
       "Input:borderStyle-TextBox-error": "var(--xmlui-borderStyle-TextBox-error)",
       "Input:fontSize-TextBox-error": "var(--xmlui-fontSize-TextBox-error)",
-      "Input:padding-TextBox-error": "var(--xmlui-padding-TextBox-error)",
       "Input:backgroundColor-TextBox-error": "var(--xmlui-backgroundColor-TextBox-error)",
       "Input:boxShadow-TextBox-error": "var(--xmlui-boxShadow-TextBox-error)",
       "Input:textColor-TextBox-error": "var(--xmlui-textColor-TextBox-error)",
@@ -14177,7 +15380,6 @@ export default {
       "Input:borderWidth-TextBox-warning": "var(--xmlui-borderWidth-TextBox-warning)",
       "Input:borderStyle-TextBox-warning": "var(--xmlui-borderStyle-TextBox-warning)",
       "Input:fontSize-TextBox-warning": "var(--xmlui-fontSize-TextBox-warning)",
-      "Input:padding-TextBox-warning": "var(--xmlui-padding-TextBox-warning)",
       "Input:backgroundColor-TextBox-warning": "var(--xmlui-backgroundColor-TextBox-warning)",
       "Input:boxShadow-TextBox-warning": "var(--xmlui-boxShadow-TextBox-warning)",
       "Input:textColor-TextBox-warning": "var(--xmlui-textColor-TextBox-warning)",
@@ -14201,7 +15403,6 @@ export default {
       "Input:borderWidth-TextBox-success": "var(--xmlui-borderWidth-TextBox-success)",
       "Input:borderStyle-TextBox-success": "var(--xmlui-borderStyle-TextBox-success)",
       "Input:fontSize-TextBox-success": "var(--xmlui-fontSize-TextBox-success)",
-      "Input:padding-TextBox-success": "var(--xmlui-padding-TextBox-success)",
       "Input:backgroundColor-TextBox-success": "var(--xmlui-backgroundColor-TextBox-success)",
       "Input:boxShadow-TextBox-success": "var(--xmlui-boxShadow-TextBox-success)",
       "Input:textColor-TextBox-success": "var(--xmlui-textColor-TextBox-success)",
@@ -14230,7 +15431,8 @@ export default {
       "backgroundColor-Input--disabled": "$backgroundColor--disabled",
       "borderWidth-Input": "1px",
       "minHeight-Input": "39px",
-      "padding-Input": "$space-2",
+      "paddingHorizontal-TextBox": "$space-2",
+      "paddingVertical-TextBox": "$space-2",
       "gap-adornment-Input": "$space-2",
       "borderStyle-Input": "solid",
       "borderColor-Input--disabled": "$borderColor--disabled",
@@ -14273,6 +15475,394 @@ export default {
       }
     },
     "opaque": true
+  },
+  "TimeInput": {
+    "status": "experimental",
+    "description": "`TimeInput` provides time input with support for 12-hour and 24-hour formats and configurable precision for hours, minutes, and seconds.",
+    "parts": {
+      "hour": {
+        "description": "The hour input field."
+      },
+      "minute": {
+        "description": "The minute input field."
+      },
+      "second": {
+        "description": "The second input field."
+      },
+      "ampm": {
+        "description": "The AM/PM indicator."
+      },
+      "clearButton": {
+        "description": "The button to clear the time input."
+      }
+    },
+    "props": {
+      "initialValue": {
+        "description": "This property sets the component's initial value."
+      },
+      "autoFocus": {
+        "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "readOnly": {
+        "description": "Set this property to `true` to disallow changing the component value.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "enabled": {
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "validationStatus": {
+        "description": "This property allows you to set the validation status of the input component.",
+        "availableValues": [
+          {
+            "value": "valid",
+            "description": "Visual indicator for an input that is accepted"
+          },
+          {
+            "value": "warning",
+            "description": "Visual indicator for an input that produced a warning"
+          },
+          {
+            "value": "error",
+            "description": "Visual indicator for an input that produced an error"
+          }
+        ],
+        "defaultValue": "none"
+      },
+      "label": {
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
+        "valueType": "string"
+      },
+      "labelPosition": {
+        "description": "Places the label at the given position of the component.",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
+          },
+          {
+            "value": "end",
+            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
+          },
+          {
+            "value": "top",
+            "description": "The top of the input"
+          },
+          {
+            "value": "bottom",
+            "description": "The bottom of the input"
+          }
+        ],
+        "defaultValue": "top"
+      },
+      "labelWidth": {
+        "description": "This property sets the width of the `TimeInput` component's label. If not defined, the label's width will be determined by its content and the available space."
+      },
+      "labelBreak": {
+        "description": "This boolean value indicates whether the `TimeInput` label can be split into multiple lines if it would overflow the available label width.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "hour24": {
+        "description": "Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "seconds": {
+        "description": "Whether to show and allow input of seconds",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "minTime": {
+        "description": "Minimum time that the user can select",
+        "valueType": "string"
+      },
+      "maxTime": {
+        "description": "Maximum time that the user can select",
+        "valueType": "string"
+      },
+      "clearable": {
+        "description": "Whether to show a clear button that allows clearing the selected time",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "clearIcon": {
+        "description": "The icon to display in the clear button.",
+        "valueType": "string"
+      },
+      "clearToInitialValue": {
+        "description": "Whether the clear button resets the time input to its initial value",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "required": {
+        "description": "Whether the time input should be required",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "startText": {
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "startIcon": {
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "endText": {
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "endIcon": {
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "valueType": "string"
+      },
+      "gap": {
+        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.",
+        "valueType": "string"
+      },
+      "emptyCharacter": {
+        "description": "Character to use as placeholder for empty time values. If longer than 1 character, uses the first character. Defaults to '-'",
+        "valueType": "string",
+        "defaultValue": "-"
+      }
+    },
+    "events": {
+      "didChange": {
+        "description": "This event is triggered when value of TimeInput has changed."
+      },
+      "gotFocus": {
+        "description": "This event is triggered when the TimeInput has received the focus."
+      },
+      "lostFocus": {
+        "description": "This event is triggered when the TimeInput has lost the focus."
+      },
+      "invalidTime": {
+        "description": "Fired when the user enters an invalid time"
+      }
+    },
+    "apis": {
+      "focus": {
+        "description": "Focus the TimeInput component.",
+        "signature": "focus(): void"
+      },
+      "value": {
+        "description": "You can query the component's value. If no value is set, it will retrieve `undefined`.",
+        "signature": "get value(): any"
+      },
+      "setValue": {
+        "description": "This method sets the current value of the TimeInput.",
+        "signature": "set value(value: any): void",
+        "parameters": {
+          "value": "The new time value to set for the time picker."
+        }
+      },
+      "isoValue": {
+        "description": "Get the current time value formatted in ISO standard (HH:MM:SS) using 24-hour format, suitable for JSON serialization.",
+        "signature": "isoValue(): string | null"
+      }
+    },
+    "themeVars": {
+      "padding-TimeInput": "var(--xmlui-padding-TimeInput)",
+      "paddingHorizontal-TimeInput": "var(--xmlui-paddingHorizontal-TimeInput, var(--xmlui-padding-TimeInput))",
+      "paddingVertical-TimeInput": "var(--xmlui-paddingVertical-TimeInput, var(--xmlui-padding-TimeInput))",
+      "paddingLeft-TimeInput": "var(--xmlui-paddingLeft-TimeInput, var(--xmlui-paddingHorizontal-TimeInput, var(--xmlui-padding-TimeInput)))",
+      "paddingRight-TimeInput": "var(--xmlui-paddingRight-TimeInput, var(--xmlui-paddingHorizontal-TimeInput, var(--xmlui-padding-TimeInput)))",
+      "paddingTop-TimeInput": "var(--xmlui-paddingTop-TimeInput, var(--xmlui-paddingVertical-TimeInput, var(--xmlui-padding-TimeInput)))",
+      "paddingBottom-TimeInput": "var(--xmlui-paddingBottom-TimeInput, var(--xmlui-paddingVertical-TimeInput, var(--xmlui-padding-TimeInput)))",
+      "color-divider-TimeInput": "var(--xmlui-color-divider-TimeInput)",
+      "spacing-divider-TimeInput": "var(--xmlui-spacing-divider-TimeInput)",
+      "width-input-TimeInput": "var(--xmlui-width-input-TimeInput)",
+      "minWidth-input-TimeInput": "var(--xmlui-minWidth-input-TimeInput)",
+      "textAlign-input-TimeInput": "var(--xmlui-textAlign-input-TimeInput)",
+      "fontSize-input-TimeInput": "var(--xmlui-fontSize-input-TimeInput)",
+      "borderRadius-input-TimeInput": "var(--xmlui-borderRadius-input-TimeInput)",
+      "backgroundColor-input-TimeInput-invalid": "var(--xmlui-backgroundColor-input-TimeInput-invalid)",
+      "padding-button-TimeInput": "var(--xmlui-padding-button-TimeInput)",
+      "borderRadius-button-TimeInput": "var(--xmlui-borderRadius-button-TimeInput)",
+      "hoverColor-button-TimeInput": "var(--xmlui-hoverColor-button-TimeInput)",
+      "disabledColor-button-TimeInput": "var(--xmlui-disabledColor-button-TimeInput)",
+      "outlineColor-button-TimeInput--focused": "var(--xmlui-outlineColor-button-TimeInput--focused)",
+      "outlineWidth-button-TimeInput--focused": "var(--xmlui-outlineWidth-button-TimeInput--focused)",
+      "outlineOffset-button-TimeInput--focused": "var(--xmlui-outlineOffset-button-TimeInput--focused)",
+      "minWidth-ampm-TimeInput": "var(--xmlui-minWidth-ampm-TimeInput)",
+      "fontSize-ampm-TimeInput": "var(--xmlui-fontSize-ampm-TimeInput)",
+      "opacity-TimeInput--disabled": "var(--xmlui-opacity-TimeInput--disabled)",
+      "backgroundColor-TimeInput--hover": "var(--xmlui-backgroundColor-TimeInput--hover)",
+      "margin-input-TimeInput": "var(--xmlui-margin-input-TimeInput)",
+      "transition-background-TimeInput": "var(--xmlui-transition-background-TimeInput)",
+      "backgroundColor-menu-TimeInput": "var(--xmlui-backgroundColor-menu-TimeInput)",
+      "borderRadius-menu-TimeInput": "var(--xmlui-borderRadius-menu-TimeInput)",
+      "boxShadow-menu-TimeInput": "var(--xmlui-boxShadow-menu-TimeInput)",
+      "borderColor-menu-TimeInput": "var(--xmlui-borderColor-menu-TimeInput)",
+      "backgroundColor-item-TimeInput--hover": "var(--xmlui-backgroundColor-item-TimeInput--hover)",
+      "backgroundColor-item-TimeInput--active": "var(--xmlui-backgroundColor-item-TimeInput--active)",
+      "maxHeight-menu-TimeInput": "var(--xmlui-maxHeight-menu-TimeInput)",
+      "padding-item-TimeInput": "var(--xmlui-padding-item-TimeInput)",
+      "opacity-item-TimeInput--disabled": "var(--xmlui-opacity-item-TimeInput--disabled)",
+      "margin-icon-TimeInput": "var(--xmlui-margin-icon-TimeInput)",
+      "outlineColor-ampm-TimeInput--focused": "var(--xmlui-outlineColor-ampm-TimeInput--focused)",
+      "outlineWidth-ampm-TimeInput--focused": "var(--xmlui-outlineWidth-ampm-TimeInput--focused)",
+      "outlineOffset-ampm-TimeInput--focused": "var(--xmlui-outlineOffset-ampm-TimeInput--focused)",
+      "Input:gap-adornment-TimeInput": "var(--xmlui-gap-adornment-TimeInput)",
+      "Input:borderRadius-TimeInput-default": "var(--xmlui-borderRadius-TimeInput-default)",
+      "Input:borderColor-TimeInput-default": "var(--xmlui-borderColor-TimeInput-default)",
+      "Input:borderWidth-TimeInput-default": "var(--xmlui-borderWidth-TimeInput-default)",
+      "Input:borderStyle-TimeInput-default": "var(--xmlui-borderStyle-TimeInput-default)",
+      "Input:backgroundColor-TimeInput-default": "var(--xmlui-backgroundColor-TimeInput-default)",
+      "Input:boxShadow-TimeInput-default": "var(--xmlui-boxShadow-TimeInput-default)",
+      "Input:textColor-TimeInput-default": "var(--xmlui-textColor-TimeInput-default)",
+      "Input:borderColor-TimeInput-default--hover": "var(--xmlui-borderColor-TimeInput-default--hover)",
+      "Input:backgroundColor-TimeInput-default--hover": "var(--xmlui-backgroundColor-TimeInput-default--hover)",
+      "Input:boxShadow-TimeInput-default--hover": "var(--xmlui-boxShadow-TimeInput-default--hover)",
+      "Input:textColor-TimeInput-default--hover": "var(--xmlui-textColor-TimeInput-default--hover)",
+      "Input:borderColor-TimeInput-default--focus": "var(--xmlui-borderColor-TimeInput-default--focus)",
+      "Input:backgroundColor-TimeInput-default--focus": "var(--xmlui-backgroundColor-TimeInput-default--focus)",
+      "Input:boxShadow-TimeInput-default--focus": "var(--xmlui-boxShadow-TimeInput-default--focus)",
+      "Input:textColor-TimeInput-default--focus": "var(--xmlui-textColor-TimeInput-default--focus)",
+      "Input:outlineWidth-TimeInput-default--focus": "var(--xmlui-outlineWidth-TimeInput-default--focus)",
+      "Input:outlineColor-TimeInput-default--focus": "var(--xmlui-outlineColor-TimeInput-default--focus)",
+      "Input:outlineStyle-TimeInput-default--focus": "var(--xmlui-outlineStyle-TimeInput-default--focus)",
+      "Input:outlineOffset-TimeInput-default--focus": "var(--xmlui-outlineOffset-TimeInput-default--focus)",
+      "Input:color-adornment-TimeInput-default": "var(--xmlui-color-adornment-TimeInput-default)",
+      "Input:borderRadius-TimeInput-error": "var(--xmlui-borderRadius-TimeInput-error)",
+      "Input:borderColor-TimeInput-error": "var(--xmlui-borderColor-TimeInput-error)",
+      "Input:borderWidth-TimeInput-error": "var(--xmlui-borderWidth-TimeInput-error)",
+      "Input:borderStyle-TimeInput-error": "var(--xmlui-borderStyle-TimeInput-error)",
+      "Input:backgroundColor-TimeInput-error": "var(--xmlui-backgroundColor-TimeInput-error)",
+      "Input:boxShadow-TimeInput-error": "var(--xmlui-boxShadow-TimeInput-error)",
+      "Input:textColor-TimeInput-error": "var(--xmlui-textColor-TimeInput-error)",
+      "Input:borderColor-TimeInput-error--hover": "var(--xmlui-borderColor-TimeInput-error--hover)",
+      "Input:backgroundColor-TimeInput-error--hover": "var(--xmlui-backgroundColor-TimeInput-error--hover)",
+      "Input:boxShadow-TimeInput-error--hover": "var(--xmlui-boxShadow-TimeInput-error--hover)",
+      "Input:textColor-TimeInput-error--hover": "var(--xmlui-textColor-TimeInput-error--hover)",
+      "Input:borderColor-TimeInput-error--focus": "var(--xmlui-borderColor-TimeInput-error--focus)",
+      "Input:backgroundColor-TimeInput-error--focus": "var(--xmlui-backgroundColor-TimeInput-error--focus)",
+      "Input:boxShadow-TimeInput-error--focus": "var(--xmlui-boxShadow-TimeInput-error--focus)",
+      "Input:textColor-TimeInput-error--focus": "var(--xmlui-textColor-TimeInput-error--focus)",
+      "Input:outlineWidth-TimeInput-error--focus": "var(--xmlui-outlineWidth-TimeInput-error--focus)",
+      "Input:outlineColor-TimeInput-error--focus": "var(--xmlui-outlineColor-TimeInput-error--focus)",
+      "Input:outlineStyle-TimeInput-error--focus": "var(--xmlui-outlineStyle-TimeInput-error--focus)",
+      "Input:outlineOffset-TimeInput-error--focus": "var(--xmlui-outlineOffset-TimeInput-error--focus)",
+      "Input:color-adornment-TimeInput-error": "var(--xmlui-color-adornment-TimeInput-error)",
+      "Input:borderRadius-TimeInput-warning": "var(--xmlui-borderRadius-TimeInput-warning)",
+      "Input:borderColor-TimeInput-warning": "var(--xmlui-borderColor-TimeInput-warning)",
+      "Input:borderWidth-TimeInput-warning": "var(--xmlui-borderWidth-TimeInput-warning)",
+      "Input:borderStyle-TimeInput-warning": "var(--xmlui-borderStyle-TimeInput-warning)",
+      "Input:backgroundColor-TimeInput-warning": "var(--xmlui-backgroundColor-TimeInput-warning)",
+      "Input:boxShadow-TimeInput-warning": "var(--xmlui-boxShadow-TimeInput-warning)",
+      "Input:textColor-TimeInput-warning": "var(--xmlui-textColor-TimeInput-warning)",
+      "Input:borderColor-TimeInput-warning--hover": "var(--xmlui-borderColor-TimeInput-warning--hover)",
+      "Input:backgroundColor-TimeInput-warning--hover": "var(--xmlui-backgroundColor-TimeInput-warning--hover)",
+      "Input:boxShadow-TimeInput-warning--hover": "var(--xmlui-boxShadow-TimeInput-warning--hover)",
+      "Input:textColor-TimeInput-warning--hover": "var(--xmlui-textColor-TimeInput-warning--hover)",
+      "Input:borderColor-TimeInput-warning--focus": "var(--xmlui-borderColor-TimeInput-warning--focus)",
+      "Input:backgroundColor-TimeInput-warning--focus": "var(--xmlui-backgroundColor-TimeInput-warning--focus)",
+      "Input:boxShadow-TimeInput-warning--focus": "var(--xmlui-boxShadow-TimeInput-warning--focus)",
+      "Input:textColor-TimeInput-warning--focus": "var(--xmlui-textColor-TimeInput-warning--focus)",
+      "Input:outlineWidth-TimeInput-warning--focus": "var(--xmlui-outlineWidth-TimeInput-warning--focus)",
+      "Input:outlineColor-TimeInput-warning--focus": "var(--xmlui-outlineColor-TimeInput-warning--focus)",
+      "Input:outlineStyle-TimeInput-warning--focus": "var(--xmlui-outlineStyle-TimeInput-warning--focus)",
+      "Input:outlineOffset-TimeInput-warning--focus": "var(--xmlui-outlineOffset-TimeInput-warning--focus)",
+      "Input:color-adornment-TimeInput-warning": "var(--xmlui-color-adornment-TimeInput-warning)",
+      "Input:borderRadius-TimeInput-success": "var(--xmlui-borderRadius-TimeInput-success)",
+      "Input:borderColor-TimeInput-success": "var(--xmlui-borderColor-TimeInput-success)",
+      "Input:borderWidth-TimeInput-success": "var(--xmlui-borderWidth-TimeInput-success)",
+      "Input:borderStyle-TimeInput-success": "var(--xmlui-borderStyle-TimeInput-success)",
+      "Input:backgroundColor-TimeInput-success": "var(--xmlui-backgroundColor-TimeInput-success)",
+      "Input:boxShadow-TimeInput-success": "var(--xmlui-boxShadow-TimeInput-success)",
+      "Input:textColor-TimeInput-success": "var(--xmlui-textColor-TimeInput-success)",
+      "Input:borderColor-TimeInput-success--hover": "var(--xmlui-borderColor-TimeInput-success--hover)",
+      "Input:backgroundColor-TimeInput-success--hover": "var(--xmlui-backgroundColor-TimeInput-success--hover)",
+      "Input:boxShadow-TimeInput-success--hover": "var(--xmlui-boxShadow-TimeInput-success--hover)",
+      "Input:textColor-TimeInput-success--hover": "var(--xmlui-textColor-TimeInput-success--hover)",
+      "Input:borderColor-TimeInput-success--focus": "var(--xmlui-borderColor-TimeInput-success--focus)",
+      "Input:backgroundColor-TimeInput-success--focus": "var(--xmlui-backgroundColor-TimeInput-success--focus)",
+      "Input:boxShadow-TimeInput-success--focus": "var(--xmlui-boxShadow-TimeInput-success--focus)",
+      "Input:textColor-TimeInput-success--focus": "var(--xmlui-textColor-TimeInput-success--focus)",
+      "Input:outlineWidth-TimeInput-success--focus": "var(--xmlui-outlineWidth-TimeInput-success--focus)",
+      "Input:outlineColor-TimeInput-success--focus": "var(--xmlui-outlineColor-TimeInput-success--focus)",
+      "Input:outlineStyle-TimeInput-success--focus": "var(--xmlui-outlineStyle-TimeInput-success--focus)",
+      "Input:outlineOffset-TimeInput-success--focus": "var(--xmlui-outlineOffset-TimeInput-success--focus)",
+      "Input:color-adornment-TimeInput-success": "var(--xmlui-color-adornment-TimeInput-success)",
+      "Input:backgroundColor-TimeInput--disabled": "var(--xmlui-backgroundColor-TimeInput--disabled)",
+      "Input:textColor-TimeInput--disabled": "var(--xmlui-textColor-TimeInput--disabled)",
+      "Input:borderColor-TimeInput--disabled": "var(--xmlui-borderColor-TimeInput--disabled)"
+    },
+    "defaultThemeVars": {
+      "paddingHorizontal-TimeInput": "$space-2",
+      "paddingVertical-TimeInput": "$space-2",
+      "color-divider-TimeInput": "$textColor-secondary",
+      "spacing-divider-TimeInput": "1px 0",
+      "width-input-TimeInput": "1.8em",
+      "minWidth-input-TimeInput": "0.54em",
+      "padding-input-TimeInput": "0 2px",
+      "textAlign-input-TimeInput": "center",
+      "fontSize-input-TimeInput": "inherit",
+      "borderRadius-input-TimeInput": "$borderRadius",
+      "backgroundColor-input-TimeInput-invalid": "rgba(220, 53, 69, 0.15)",
+      "padding-button-TimeInput": "4px 4px",
+      "borderRadius-button-TimeInput": "$borderRadius",
+      "hoverColor-button-TimeInput": "$color-surface-800",
+      "disabledColor-button-TimeInput": "$textColor-disabled",
+      "outlineColor-button-TimeInput--focused": "$color-accent-500",
+      "outlineWidth-button-TimeInput--focused": "2px",
+      "outlineOffset-button-TimeInput--focused": "0",
+      "minWidth-ampm-TimeInput": "2.2em",
+      "fontSize-ampm-TimeInput": "inherit"
+    }
+  },
+  "Timer": {
+    "status": "stable",
+    "description": "`Timer` is a non-visual component that fires events at regular intervals. It can be enabled or disabled and ensures that the timer event handler completes before firing the next event.",
+    "props": {
+      "enabled": {
+        "description": "Whether the timer is enabled and should fire events.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "interval": {
+        "description": "The interval in milliseconds between timer events.",
+        "valueType": "number",
+        "defaultValue": 1000
+      },
+      "initialDelay": {
+        "description": "The delay in milliseconds before the first timer event.",
+        "valueType": "number",
+        "defaultValue": 0
+      },
+      "once": {
+        "description": "Whether the timer should stop after firing its first tick event.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "tick": {
+        "description": "This event is triggered at each interval when the ${COMP} is enabled."
+      }
+    },
+    "apis": {
+      "pause": {
+        "description": "Pauses the timer. The timer can be resumed later from where it left off.",
+        "signature": "pause()"
+      },
+      "resume": {
+        "description": "Resumes a paused timer. If the timer is not paused, this method has no effect.",
+        "signature": "resume()"
+      },
+      "isPaused": {
+        "description": "Returns whether the timer is currently paused.",
+        "signature": "isPaused(): boolean"
+      },
+      "isRunning": {
+        "description": "Returns whether the timer is currently running (enabled and not paused).",
+        "signature": "isRunning(): boolean"
+      }
+    }
   },
   "ToneChangerButton": {
     "status": "stable",
@@ -14357,7 +15947,7 @@ export default {
       "data": {
         "description": "This property is used to provide the component with data to display.The data needs to be an array of objects."
       },
-      "dataKeys": {
+      "xKeys": {
         "description": "This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.",
         "valueType": "string"
       },
@@ -14366,7 +15956,7 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
-      "layout": {
+      "orientation": {
         "description": "This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.",
         "valueType": "string",
         "availableValues": [
@@ -14375,7 +15965,7 @@ export default {
         ],
         "defaultValue": "vertical"
       },
-      "nameKey": {
+      "yKey": {
         "description": "Specifies the key in the data objects that will be used to label the different data series.",
         "valueType": "string"
       },
@@ -14405,10 +15995,18 @@ export default {
       "tickFormatterY": {
         "description": "A function that formats the tick labels on the Y-axis. "
       },
+      "hideTooltip": {
+        "description": "Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "showLegend": {
         "description": "Determines whether the legend should be displayed.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "tooltipTemplate": {
+        "description": "This property allows replacing the default template to display a tooltip."
       }
     }
   },
@@ -14531,11 +16129,11 @@ export default {
       "data": {
         "description": "The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point."
       },
-      "dataKeys": {
+      "xKeys": {
         "description": "This property specifies the keys in the data objects that should be used for rendering the lines.",
         "valueType": "string"
       },
-      "nameKey": {
+      "yKey": {
         "description": "The key in the data objects used for labeling different data series.",
         "valueType": "string"
       },
@@ -14575,6 +16173,9 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "tooltipTemplate": {
+        "description": "This property allows replacing the default template to display a tooltip."
+      },
       "marginTop": {
         "description": "The top margin of the chart"
       },
@@ -14587,6 +16188,10 @@ export default {
       "marginLeft": {
         "description": "The left margin of the chart"
       }
+    },
+    "themeVars": [],
+    "defaultThemeVars": {
+      "width-line-LineChart": "1px"
     }
   },
   "PieChart": {

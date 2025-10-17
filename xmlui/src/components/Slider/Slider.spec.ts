@@ -41,8 +41,8 @@ test.describe("Basic Functionality", () => {
   });
 
   [
-    { label: "int", value: 25, expected: "25" },
-    { label: "float", value: 25.5, expected: "25.5" },
+    { label: "int", value: 5, expected: "5" },
+    { label: "float", value: 5.5, expected: "5.5" },
   ].forEach(({ label, value, expected }) => {
     test(`handles ${label} correctly`, async ({ initTestBed, page }) => {
       await initTestBed(`
@@ -55,8 +55,8 @@ test.describe("Basic Functionality", () => {
   });
 
   [
-    { label: "string that resolves to int", value: "25", expected: "25" },
-    { label: "string that resolves to float", value: "25.5", expected: "25.5" },
+    { label: "string that resolves to int", value: "5", expected: "5" },
+    { label: "string that resolves to float", value: "5.5", expected: "5.5" },
   ].forEach(({ label, value, expected }) => {
     test(`handles ${label} correctly`, async ({ initTestBed, page }) => {
       await initTestBed(`
@@ -68,7 +68,6 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  // TODO: Review!
   [
     { label: "NaN", value: NaN },
     { label: "null", value: null },
@@ -76,129 +75,151 @@ test.describe("Basic Functionality", () => {
     { label: "empty string", value: "" },
     { label: "string not resolving to number", value: "abc" },
   ].forEach(({ label, value }) => {
-    test.skip(
-      `handles ${label} gracefully`,
-      SKIP_REASON.UNSURE("Need to confirm expected behavior"),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`
+    test(`handles ${label} gracefully`, async ({ initTestBed, page }) => {
+      await initTestBed(`
         <Fragment>
           <Slider id="slider" initialValue="${value}" />
           <Text testId="slider-value" value="{slider.value}" />
         </Fragment>`);
-        await expect(page.getByTestId("slider-value")).toHaveText("0");
-      },
-    );
-  });
-
-  test.describe("minValue and maxValue", () => {
-    test.skip(
-    "minValue sets the lower bound",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
-        <Fragment>
-          <Slider id="slider" minValue="10" initialValue="5" />
-          <Text testId="slider-value" value="{slider.value}" />
-        </Fragment>`);
-      await expect(page.getByTestId("slider-value")).toHaveValue("10");
-    },
-  );
-
-    test.skip(
-      "maxValue sets the upper bound",
-      SKIP_REASON.TO_BE_IMPLEMENTED(
-        "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-      ),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider maxValue="50" initialValue="75" />`);
-        await expect(page.getByRole("slider")).toHaveValue("50");
-      },
-    );
-
-    test.skip(
-      "value cannot be lower than minValue",
-      SKIP_REASON.TO_BE_IMPLEMENTED(
-        "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-      ),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider minValue="20" maxValue="80" initialValue="10" />`);
-        await expect(page.getByRole("slider")).toHaveValue("20");
-      },
-    );
-
-    test.skip(
-      "value cannot be larger than maxValue",
-      SKIP_REASON.TO_BE_IMPLEMENTED(
-        "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-      ),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider minValue="20" maxValue="80" initialValue="100" />`);
-        await expect(page.getByRole("slider")).toHaveValue("80");
-      },
-    );
-
-    test("handles invalid minValue/maxValue gracefully", async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider minValue="invalid" maxValue="invalid" />`);
-      await expect(page.getByRole("slider")).toBeVisible();
+      await expect(page.getByTestId("slider-value")).toHaveText("0");
     });
   });
 
-  test.skip(
-    "step defines increment value",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider step="5" initialValue="0" />`);
-      const slider = page.getByRole("slider");
-      await slider.press("ArrowRight");
-      await expect(slider).toHaveValue("5");
-    },
-  );
+  test("minValue sets the lower bound", async ({ initTestBed, page }) => {
+    await initTestBed(`
+        <Fragment>
+          <Slider id="slider" minValue="5" />
+          <Text testId="slider-value" value="{slider.value}" />
+        </Fragment>`);
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveAttribute("aria-valuemin", "5");
+  });
 
-  test.skip(
-    "handles fractional step values",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider step="0.1" initialValue="0" />`);
-      const slider = page.getByRole("slider");
-      await slider.press("ArrowRight");
-      await expect(slider).toHaveValue("0.1");
-    },
-  );
+  test("value cannot be lower than minValue", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" minValue="20" maxValue="30" initialValue="10" />
+        <Text testId="slider-value" value="{slider.value}" />
+      </Fragment>`);
+    await expect(page.getByTestId("slider-value")).toHaveText("20");
+  });
 
-  test.skip(
-    "minStepsBetweenThumbs maintains thumb separation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test actual thumb separation logic"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider initialValue="{[10, 15]}" minStepsBetweenThumbs="5" />`);
-      // Test that thumbs maintain minimum separation
-      await expect(page.getByRole("slider")).toBeVisible();
-    },
-  );
+  test("maxValue sets the upper bound", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider maxValue="50" />`);
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveAttribute("aria-valuemax", "50");
+  });
+
+  test("value cannot be larger than maxValue", async ({ initTestBed, page }) => {
+    await initTestBed(`
+        <Fragment>
+          <Slider id="slider" maxValue="30" initialValue="40" />
+          <Text testId="slider-value" value="{slider.value}" />
+        </Fragment>`);
+    await expect(page.getByTestId("slider-value")).toHaveText("30");
+  });
+
+  test("handles invalid minValue/maxValue gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider minValue="invalid" maxValue="invalid" />`);
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveAttribute("aria-valuemin", "0");
+    await expect(slider).toHaveAttribute("aria-valuemax", "10");
+  });
+
+  test("step defines increment value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+    <Fragment>
+      <Slider id="slider" step="2" initialValue="0" />
+      <Text testId="slider-value" value="{slider.value}" />
+    </Fragment>`);
+    const slider = page.getByRole("slider");
+    await slider.press("ArrowRight");
+    await expect(page.getByTestId("slider-value")).toHaveText("2");
+  });
+
+  test("handles fractional step values", async ({ initTestBed, page }) => {
+    await initTestBed(`
+    <Fragment>
+      <Slider id="slider" step="0.1" initialValue="0" />
+      <Text testId="slider-value" value="{slider.value}" />
+    </Fragment>`);
+    const slider = page.getByRole("slider");
+    await slider.press("ArrowRight");
+    await expect(page.getByTestId("slider-value")).toHaveText("0.1");
+  });
+
+  test("component handles multiple thumbs", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider initialValue="{[2, 4]}" />`);
+    const thumbs = page.getByRole("slider");
+    await expect(thumbs).toHaveCount(2);
+  });
+
+  test("all thumbs are interactable via mouse", async ({
+    initTestBed,
+    createSliderDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />
+        <Text testId="sliderValue0">{slider.value[0]}</Text>
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.dragThumbByMouse("start", 0);
+    await driver.dragThumbByMouse("end", 1);
+
+    await expect(page.getByTestId("sliderValue0")).toHaveText("0");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("10");
+  });
+
+  test("all thumbs are interactable via keyboard", async ({ initTestBed, createSliderDriver, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />
+        <Text testId="sliderValue0">{slider.value[0]}</Text>
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.stepThumbByKeyboard("ArrowLeft", 0);
+    await driver.stepThumbByKeyboard("ArrowRight", 1);
+    await expect(page.getByTestId("sliderValue0")).toHaveText("1");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("5");
+  });
+
+  test("minStepsBetweenThumbs maintains thumb separation", async ({ initTestBed, createSliderDriver, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="slider" initialValue="{[0, 5]}" minStepsBetweenThumbs="3" minValue="0" maxValue="10" />
+        <Text testId="sliderValue1">{slider.value[1]}</Text>
+      </Fragment>
+    `);
+    const driver = await createSliderDriver("slider");
+    await driver.stepThumbByKeyboard("ArrowLeft", 1, 3); // Try to move left by 3 steps
+    await expect(page.getByTestId("sliderValue1")).toHaveText("3");
+  });
 
   test("enabled=false disables control", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider enabled="false" />`);
     await expect(page.getByRole("slider")).toBeDisabled();
   });
 
-  test.skip(
-    "readOnly prevents interaction",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider readOnly="true" initialValue="50" />`);
-      const slider = page.getByRole("slider");
-      await expect(slider).toHaveAttribute("readonly");
-      await expect(slider).toHaveValue("50");
-    },
-  );
+  test("readOnly prevents interaction", async ({ initTestBed, page, createSliderDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" readOnly="true" />
+        <Text testId="slider-value" value="{mySlider.value}" />
+      </Fragment>`);
+    const driver = await createSliderDriver("mySlider");
+    await driver.dragThumbByMouse("end");
+    await expect(page.getByTestId("slider-value")).toHaveText("0"); // Value should remain unchanged
+  });
 
-  test.skip(
+  test.fixme(
     "autoFocus focuses slider on mount",
-    SKIP_REASON.TO_BE_IMPLEMENTED("autoFocus behavior not implemented correctly"),
+    SKIP_REASON.XMLUI_BUG("autoFocus does not seem to work with radix-ui, need to double-check"),
     async ({ initTestBed, page }) => {
       await initTestBed(`<Slider autoFocus="true" />`);
       await expect(page.getByRole("slider")).toBeFocused();
@@ -211,53 +232,41 @@ test.describe("Basic Functionality", () => {
   });
 
   test("showValues=true displays current value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Slider showValues="true" initialValue="75" />`);
+    await initTestBed(`<Slider showValues="true" initialValue="10" />`);
     await page.getByRole("slider").hover();
-    await expect(page.getByText("75")).toBeVisible();
+    await expect(page.getByText("10")).toBeVisible();
   });
 
   test("showValues=false hides current value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Slider showValues="false" initialValue="75" />`);
+    await initTestBed(`<Slider showValues="false" initialValue="10" />`);
     await page.getByRole("slider").hover();
-    await expect(page.getByText("75")).not.toBeVisible();
+    await expect(page.getByText("10")).not.toBeVisible();
   });
 
-  test.skip(
-    "valueFormat customizes value display",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test custom formatting function"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(
-        `<Slider showValues="true" initialValue="75" valueFormat="(v) => v + '%'" />`,
-      );
-      await expect(page.getByText("75%")).toBeVisible();
-    },
-  );
-
-  test.describe("range sliders", () => {
-    test.skip(
-      "handles array initialValue for range",
-      SKIP_REASON.TO_BE_IMPLEMENTED(
-        "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-      ),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider initialValue="{[25, 75]}" />`);
-        const sliders = page.getByRole("slider");
-        await expect(sliders.first()).toHaveValue("25");
-        await expect(sliders.last()).toHaveValue("75");
-      },
+  test("valueFormat customizes value display", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Slider showValues="true" initialValue="10" valueFormat="{(v) => v + '%'}" />`,
     );
+    await page.getByRole("slider").hover();
+    await expect(page.getByText("10%")).toBeVisible();
+  });
 
-    test.skip(
-      "maintains thumb order in range mode",
-      SKIP_REASON.TO_BE_IMPLEMENTED("Need to test thumb auto-correction logic"),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider initialValue="{[75, 25]}" />`);
-        // Should auto-correct to [25, 75]
-        const sliders = page.getByRole("slider");
-        await expect(sliders.first()).toHaveValue("25");
-        await expect(sliders.last()).toHaveValue("75");
-      },
-    );
+  test("handles array initialValue for range", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider initialValue="{[2, 6]}" />`);
+    const sliders = page.getByRole("slider");
+
+    await sliders.first().hover();
+    await expect(page.getByText("2")).toBeVisible();
+    await expect(page.getByText("6")).toBeVisible();
+  });
+
+  test("maintains thumb order in range mode", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider initialValue="{[6, 2]}" />`);
+    const sliders = page.getByRole("slider");
+    // Should auto-correct to [2, 6]
+    await sliders.first().hover();
+    await expect(page.getByText("2")).toBeVisible();
+    await expect(page.getByText("6")).toBeVisible();
   });
 });
 
@@ -266,101 +275,62 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test.skip(
-    "has correct ARIA role",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to verify role=slider is actually set by component"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider />`);
-      await expect(page.getByRole("slider")).toBeVisible();
-    },
-  );
+  test("has correct ARIA role", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider />`);
+    await expect(page.getByRole("slider")).toBeVisible();
+  });
+  test("label is properly associated", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider label="Volume Control" />`);
+    await page.getByText("Volume Control").click();
+    await expect(page.getByRole("slider")).toBeFocused();
+  });
 
-  test.skip(
-    "label is properly associated",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Label association not implemented correctly - getByLabel can't find slider",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider label="Volume Control" />`);
-      await expect(page.getByLabel("Volume Control")).toBeVisible();
-    },
-  );
+  test("supports keyboard navigation", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" initialValue="5" />
+        <Text testId="slider-value">{mySlider.value}</Text>
+      </Fragment>`);
+    const slider = page.getByRole("slider");
+    await slider.focus();
 
-  test.skip(
-    "supports keyboard navigation",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value and actual keyboard behavior",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider initialValue="50" />`);
-      const slider = page.getByRole("slider");
-      await slider.focus();
-      await expect(slider).toBeFocused();
+    await slider.press("ArrowRight");
+    await expect(page.getByTestId("slider-value")).toHaveText("6");
 
-      await slider.press("ArrowRight");
-      await expect(slider).toHaveValue("51");
+    await slider.press("ArrowLeft");
+    await expect(page.getByTestId("slider-value")).toHaveText("5");
+  });
 
-      await slider.press("ArrowLeft");
-      await expect(slider).toHaveValue("50");
-    },
-  );
+  test("supports Home/End key navigation", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" minValue="0" maxValue="100" initialValue="50" />
+        <Text testId="slider-value">{mySlider.value}</Text>
+      </Fragment>`);
+    const slider = page.getByRole("slider");
+    await slider.focus();
 
-  test.skip(
-    "supports Home/End key navigation",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need proper assertion for slider value"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider minValue="0" maxValue="100" initialValue="50" />`);
-      const slider = page.getByRole("slider");
-      await slider.focus();
+    await slider.press("Home");
+    await expect(page.getByTestId("slider-value")).toHaveText("0");
 
-      await slider.press("Home");
-      await expect(slider).toHaveValue("0");
+    await slider.press("End");
+    await expect(page.getByTestId("slider-value")).toHaveText("100");
+  });
 
-      await slider.press("End");
-      await expect(slider).toHaveValue("100");
-    },
-  );
+  test("disabled slider has proper ARIA attributes", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider enabled="false" />`);
+    await expect(page.locator("span").first()).toHaveAttribute("aria-disabled", "true");
+  });
 
-  test.skip(
-    "disabled slider has proper ARIA attributes",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to verify ARIA attribute implementation"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider enabled="false" />`);
-      await expect(page.getByRole("slider")).toHaveAttribute("aria-disabled", "true");
-    },
-  );
+  test("required slider has proper ARIA attributes", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider required="true" />`);
+    await expect(page.getByRole("slider")).toHaveAttribute("aria-required", "true");
+  });
 
-  test.skip(
-    "required slider has proper ARIA attributes",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to verify ARIA attribute implementation"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider required="true" />`);
-      await expect(page.getByRole("slider")).toHaveAttribute("aria-required", "true");
-    },
-  );
-
-  test.describe("range slider accessibility", () => {
-    test.skip(
-      "range slider has multiple slider roles",
-      SKIP_REASON.TO_BE_IMPLEMENTED(
-        "Need to verify if range sliders actually render multiple elements with slider role",
-      ),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider initialValue="{[25, 75]}" />`);
-        const sliders = page.getByRole("slider");
-        await expect(sliders).toHaveCount(2);
-      },
-    );
-
-    test.skip(
-      "range slider thumbs have proper labels",
-      SKIP_REASON.TO_BE_IMPLEMENTED("Need to test ARIA labeling for individual thumbs"),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider label="Price Range" initialValue="{[25, 75]}" />`);
-        await expect(page.getByRole("slider", { name: /minimum/i })).toBeVisible();
-        await expect(page.getByRole("slider", { name: /maximum/i })).toBeVisible();
-      },
-    );
+  test("range slider has multiple slider roles", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider initialValue="{[3, 5]}" />`);
+    const sliders = page.getByRole("slider");
+    await expect(sliders).toHaveCount(2);
   });
 });
 
@@ -394,17 +364,13 @@ test.describe("Label", () => {
     expect(width).toEqual(expected);
   });
 
-  test.skip(
-    "labelBreak enables label line breaks",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to measure actual line break behavior"),
-    async ({ initTestBed, page }) => {
-      const labelText = "Very long label text that should break";
-      await initTestBed(`<Slider label="${labelText}" labelWidth="100px" labelBreak="true" />`);
-      const label = page.getByText(labelText);
-      const { height } = await getBounds(label);
-      expect(height).toBeGreaterThan(20); // Assumes multi-line height
-    },
-  );
+  test("labelBreak enables label line breaks", async ({ initTestBed, page }) => {
+    const labelText = "Very long label text that should break";
+    await initTestBed(`<Slider label="${labelText}" labelWidth="100px" labelBreak="true" />`);
+    const label = page.getByText(labelText);
+    const { height } = await getBounds(label);
+    expect(height).toBeGreaterThan(20); // Assumes multi-line height
+  });
 
   test("handles invalid labelPosition gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider labelPosition="invalid" label="test" />`);
@@ -420,33 +386,37 @@ test.describe("Label", () => {
 test.describe("Event Handling", () => {
   test("didChange event fires on value change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Slider onDidChange="testState = 'changed'" initialValue="50" />
+      <Slider onDidChange="testState = 'changed'" initialValue="0" />
     `);
     const slider = page.getByRole("slider");
+    await slider.focus();
     await slider.press("ArrowRight");
     await expect.poll(testStateDriver.testState).toEqual("changed");
   });
 
-  test.skip(
-    "didChange event passes new value",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Keyboard navigation and event value passing not working correctly",
-    ),
-    async ({ initTestBed, page }) => {
-      const { testStateDriver } = await initTestBed(`
-      <Slider onDidChange="arg => testState = arg" initialValue="50" />
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Slider onDidChange="arg => testState = arg" initialValue="1" />
     `);
-      const slider = page.getByRole("slider");
-      await slider.press("ArrowRight");
-      await expect.poll(testStateDriver.testState).toEqual(51);
-    },
-  );
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
 
   test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Slider onGotFocus="testState = 'focused'" />
     `);
     await page.getByRole("slider").focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Slider label="Volume" onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByText("Volume").click();
     await expect.poll(testStateDriver.testState).toEqual("focused");
   });
 
@@ -479,45 +449,36 @@ test.describe("Api", () => {
   test("value API returns current state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>
-        <Slider id="mySlider" initialValue="50" />
+        <Slider id="mySlider" initialValue="5" />
         <Text testId="value">{mySlider.value}</Text>
       </Fragment>
     `);
-    await expect(page.getByTestId("value")).toHaveText("50");
+    await expect(page.getByTestId("value")).toHaveText("5");
   });
 
-  test.skip(
-    "value API returns state after change",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Keyboard navigation not updating value correctly"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("value API returns state after change", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Fragment>
-        <Slider id="mySlider" initialValue="50" />
+        <Slider id="mySlider" initialValue="1" />
         <Text testId="value">{mySlider.value}</Text>
       </Fragment>
     `);
-      const slider = page.getByRole("slider");
-      await slider.press("ArrowRight");
-      await expect(page.getByTestId("value")).toHaveText("51");
-    },
-  );
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect(page.getByTestId("value")).toHaveText("2");
+  });
 
-  test.skip(
-    "setValue API updates state",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("setValue API updates state", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Fragment>
         <Slider id="mySlider" />
-        <Button testId="setBtn" onClick="mySlider.setValue(75)" />
+        <Button testId="setBtn" onClick="mySlider.setValue(5)" label="{mySlider.value}" />
       </Fragment>
     `);
-      await page.getByTestId("setBtn").click();
-      await expect(page.getByRole("slider")).toHaveValue("75");
-    },
-  );
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("setBtn")).toHaveText("5");
+  });
 
   test("setValue API triggers events", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
@@ -530,23 +491,19 @@ test.describe("Api", () => {
     await expect.poll(testStateDriver.testState).toEqual("api-changed");
   });
 
-  test.skip(
-    "focus API focuses the slider",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Focus API not working correctly"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("focus API focuses the slider", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Fragment>
         <Slider id="mySlider" />
         <Button testId="focusBtn" onClick="mySlider.focus()" />
       </Fragment>
     `);
-      const slider = page.getByRole("slider");
-      await expect(slider).not.toBeFocused();
+    const slider = page.getByRole("slider");
+    await expect(slider).not.toBeFocused();
 
-      await page.getByTestId("focusBtn").click();
-      await expect(slider).toBeFocused();
-    },
-  );
+    await page.getByTestId("focusBtn").click();
+    await expect(slider).toBeFocused();
+  });
 
   test("focus API does nothing when disabled", async ({ initTestBed, page }) => {
     await initTestBed(`
@@ -559,39 +516,27 @@ test.describe("Api", () => {
     await expect(page.getByRole("slider")).not.toBeFocused();
   });
 
-  test.skip(
-    "setValue does not update when disabled",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("setValue does not update when disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Fragment>
-        <Slider id="mySlider" enabled="false" initialValue="50" />
-        <Button testId="setBtn" onClick="mySlider.setValue(75)" />
+        <Slider id="mySlider" enabled="false" initialValue="5" />
+        <Button testId="setBtn" onClick="mySlider.setValue(10)" label="{mySlider.value}" />
       </Fragment>
     `);
-      await page.getByTestId("setBtn").click();
-      await expect(page.getByRole("slider")).toHaveValue("50");
-    },
-  );
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("setBtn")).toHaveText("5");
+  });
 
-  test.skip(
-    "setValue handles invalid values gracefully",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("setValue handles invalid values gracefully", async ({ initTestBed, page }) => {
+    await initTestBed(`
       <Fragment>
-        <Slider id="mySlider" initialValue="50" />
-        <Button testId="setBtn" onClick="mySlider.setValue('invalid')" />
+        <Slider id="mySlider" initialValue="5" minValue="0" />
+        <Button testId="setBtn" onClick="mySlider.setValue('invalid')" label="{mySlider.value}" />
       </Fragment>
     `);
-      await page.getByTestId("setBtn").click();
-      await expect(page.getByRole("slider")).toHaveValue("50");
-    },
-  );
+    await page.getByTestId("setBtn").click();
+    await expect(page.getByTestId("setBtn")).toHaveText("0");
+  });
 });
 
 // =============================================================================
@@ -599,92 +544,67 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test.skip(
-    "backgroundColor-track applies correctly",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test internal track element styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" />`, {
-        testThemeVars: {
-          "backgroundColor-track-Slider": "rgb(255, 0, 0)",
-        },
-      });
-      const track = page.getByTestId("slider").locator(".track");
-      await expect(track).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    },
-  );
+  test("backgroundColor-track applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" />`, {
+      testThemeVars: {
+        "backgroundColor-track-Slider": "rgb(255, 0, 0)",
+      },
+    });
+    const track = page.locator("[data-track]");
+    await expect(track).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
 
-  test.skip(
-    "backgroundColor-range applies correctly",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test internal range element styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" initialValue="50" />`, {
-        testThemeVars: {
-          "backgroundColor-range-Slider": "rgb(0, 255, 0)",
-        },
-      });
-      const range = page.getByTestId("slider").locator(".range");
-      await expect(range).toHaveCSS("background-color", "rgb(0, 255, 0)");
-    },
-  );
+  test("backgroundColor-range applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" initialValue="5" />`, {
+      testThemeVars: {
+        "backgroundColor-range-Slider": "rgb(0, 255, 0)",
+      },
+    });
+    const range = page.locator("[data-range]");
+    await expect(range).toHaveCSS("background-color", "rgb(0, 255, 0)");
+  });
 
-  test.skip(
-    "backgroundColor-thumb applies correctly",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test internal thumb element styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" />`, {
-        testThemeVars: {
-          "backgroundColor-thumb-Slider": "rgb(0, 0, 255)",
-        },
-      });
-      const thumb = page.getByTestId("slider").locator(".thumb");
-      await expect(thumb).toHaveCSS("background-color", "rgb(0, 0, 255)");
-    },
-  );
+  test("backgroundColor-thumb applies correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" />`, {
+      testThemeVars: {
+        "backgroundColor-thumb-Slider": "rgb(0, 0, 255)",
+      },
+    });
+    const thumb = page.getByRole("slider");
+    await expect(thumb).toHaveCSS("background-color", "rgb(0, 0, 255)");
+  });
 
-  test.skip(
-    "disabled theme variables apply when disabled",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test disabled state styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" enabled="false" />`, {
-        testThemeVars: {
-          "backgroundColor-track-Slider--disabled": "rgb(200, 200, 200)",
-        },
-      });
-      const track = page.getByTestId("slider").locator(".track");
-      await expect(track).toHaveCSS("background-color", "rgb(200, 200, 200)");
-    },
-  );
+  test("disabled theme variables apply when disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" enabled="false" />`, {
+      testThemeVars: {
+        "backgroundColor-track-Slider--disabled": "rgb(200, 200, 200)",
+      },
+    });
+    const track = page.locator("[data-track]");
+    await expect(track).toHaveCSS("background-color", "rgb(200, 200, 200)");
+  });
 
-  test.skip(
-    "focus theme variables apply on focus",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test focus state styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" />`, {
-        testThemeVars: {
-          "boxShadow-thumb-Slider--focus": "0px 0px 10px rgb(0, 123, 255)",
-        },
-      });
-      const slider = page.getByRole("slider");
-      await slider.focus();
-      const thumb = page.getByTestId("slider").locator(".thumb");
-      await expect(thumb).toHaveCSS("box-shadow", "0px 0px 10px rgb(0, 123, 255)");
-    },
-  );
+  test("focus theme variables apply on focus", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" />`, {
+      testThemeVars: {
+        "boxShadow-thumb-Slider--focus": "rgb(0, 123, 255) 0px 0px 10px 0px",
+      },
+    });
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await expect(slider).toHaveCSS("box-shadow", "rgb(0, 123, 255) 0px 0px 10px 0px");
+  });
 
-  test.skip(
-    "hover theme variables apply on hover",
-    SKIP_REASON.TO_BE_IMPLEMENTED("Need to test hover state styling"),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider testId="slider" />`, {
-        testThemeVars: {
-          "boxShadow-thumb-Slider--hover": "0px 0px 5px rgb(0, 0, 0)",
-        },
-      });
-      const thumb = page.getByTestId("slider").locator(".thumb");
-      await thumb.hover();
-      await expect(thumb).toHaveCSS("box-shadow", "0px 0px 5px rgb(0, 0, 0)");
-    },
-  );
+  test("hover theme variables apply on hover", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider testId="slider" />`, {
+      testThemeVars: {
+        "boxShadow-thumb-Slider--hover": "rgb(0, 0, 0) 0px 0px 5px 0px",
+      },
+    });
+    const slider = page.getByRole("slider");
+    await slider.hover();
+    await expect(slider).toHaveCSS("box-shadow", "rgb(0, 0, 0) 0px 0px 5px 0px");
+  });
 });
 
 // =============================================================================
@@ -692,18 +612,35 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  const validationStatuses = validationStatusValues.filter((v) => v !== "none");
-
-  validationStatuses.forEach((status) => {
-    test.skip(
-      `validationStatus=${status} applies correctly`,
-      SKIP_REASON.TO_BE_IMPLEMENTED("Need to test actual validation status attribute or styling"),
-      async ({ initTestBed, page }) => {
-        await initTestBed(`<Slider testId="slider" validationStatus="${status}" />`);
-        const slider = page.getByTestId("slider");
-        await expect(slider).toHaveAttribute("data-validation-status", status);
+  test(`validationStatus=error applies correctly`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider validationStatus="error" />`, {
+      testThemeVars: {
+        [`borderColor-Slider-error`]: "rgb(255, 0, 0)",
       },
-    );
+    });
+    const sliderTrack = page.locator("[data-track]");
+    await expect(sliderTrack).toHaveCSS("border-color", "rgb(255, 0, 0)");
+  });
+
+  // NOTE: warning color is not applied correctly
+  test.fixme(`validationStatus=warning applies correctly`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider validationStatus="warning" />`, {
+      testThemeVars: {
+        [`borderColor-Slider-warning`]: "rgb(255, 165, 0)",
+      },
+    });
+    const sliderTrack = page.locator("[data-track]");
+    await expect(sliderTrack).toHaveCSS("border-color", "rgb(218, 127, 0)");
+  });
+
+  test(`validationStatus=valid applies correctly`, async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider validationStatus="valid" />`, {
+      testThemeVars: {
+        [`borderColor-Slider-success`]: "rgb(0, 255, 0)",
+      },
+    });
+    const sliderTrack = page.locator("[data-track]");
+    await expect(sliderTrack).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
   test("handles invalid validationStatus gracefully", async ({ initTestBed, page }) => {
@@ -717,40 +654,35 @@ test.describe("Validation", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  test.skip(
-    "handles extremely large values",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider initialValue="999999999" maxValue="1000000000" />`);
-      await expect(page.getByRole("slider")).toHaveValue("999999999");
-    },
-  );
+  test("handles extremely large values", async ({ initTestBed, page }) => {
+    await initTestBed(`
+    <Fragment>
+      <Slider id="mySlider" initialValue="${Number.MAX_SAFE_INTEGER}" maxValue="${Number.MAX_SAFE_INTEGER}" />
+      <Text testId="slider-value" value="{mySlider.value}" />
+    </Fragment>`);
+    await expect(page.getByTestId("slider-value")).toHaveText(Number.MAX_SAFE_INTEGER.toString());
+  });
 
-  test.skip(
-    "handles negative values",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider minValue="-100" maxValue="0" initialValue="-50" />`);
-      await expect(page.getByRole("slider")).toHaveValue("-50");
-    },
-  );
+  test("handles negative values", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" minValue="-100" maxValue="0" initialValue="-50" />
+        <Text testId="slider-value" value="{mySlider.value}" />
+      </Fragment>`);
+    await expect(page.getByTestId("slider-value")).toHaveText("-50");
+  });
 
-  test.skip(
-    "handles very small step values",
-    SKIP_REASON.TO_BE_IMPLEMENTED(
-      "Need proper assertion for slider value - toHaveValue doesn't work on sliders",
-    ),
-    async ({ initTestBed, page }) => {
-      await initTestBed(`<Slider step="0.001" initialValue="0" />`);
-      const slider = page.getByRole("slider");
-      await slider.press("ArrowRight");
-      await expect(slider).toHaveValue("0.001");
-    },
-  );
+  test("handles very small step values", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" step="0.000000001" initialValue="0" />
+        <Text testId="slider-value" value="{mySlider.value}" />
+      </Fragment>`);
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect(page.getByTestId("slider-value")).toHaveText((0.000000001).toExponential());
+  });
 
   test("handles conflicting min/max values", async ({ initTestBed, page }) => {
     await initTestBed(`<Slider minValue="100" maxValue="50" />`);
@@ -767,4 +699,42 @@ test.describe("Edge Cases", () => {
     const sliders = page.getByRole("slider");
     await expect(sliders).toHaveCount(2);
   });
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("input has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<Slider width="200px" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<Slider width="200px" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<Slider width="50%" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<Slider width="50%" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
 });

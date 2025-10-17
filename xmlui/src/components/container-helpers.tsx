@@ -5,6 +5,7 @@ import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs"
 import type { ContainerWrapperDef } from "../components-core/rendering/ContainerWrapper";
 import { EMPTY_OBJECT } from "../components-core/constants";
 import { useShallowCompareMemoize } from "../components-core/utils/hooks";
+import { rest } from "lodash-es";
 
 type MemoizedItemProps = {
   node: ComponentDef | Array<ComponentDef>;

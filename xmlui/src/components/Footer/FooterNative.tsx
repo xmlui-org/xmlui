@@ -1,4 +1,6 @@
-import React, { ForwardedRef, forwardRef, ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
+import type React from "react";
+import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Footer.module.scss";
@@ -28,7 +30,7 @@ export const Footer = forwardRef(function Footer(
   const { layout } = useAppLayoutContext() || {};
   const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
-    <div {...rest} className={styles.outerWrapper} ref={forwardedRef} style={style}>
+    <div {...rest} className={styles.outerWrapper} ref={forwardedRef} style={style} role="contentinfo">
       <div
         className={classnames(styles.wrapper, className, {
           [styles.full]: !canRestrictContentWidth,

@@ -21,37 +21,38 @@ export interface PartialInputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (direction: BlurDirection, event: React.FocusEvent<HTMLInputElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
-  
+
   // EmptyCharacter support
   /** Character to use for generating placeholders. Defaults to "-" if not provided */
   emptyCharacter?: string;
   /** Number of characters to repeat for placeholder. Defaults to 2 */
   placeholderLength?: number;
-  
+
   // Validation & constraints (context-dependent)
   max: number;
   min: number;
   maxLength?: number; // PartialInput derives auto-advance logic from this
   validateFn?: (value: string) => boolean;
   onBeep?: () => void;
-  
+
   // Navigation (context-dependent)
   nextInputRef?: React.RefObject<HTMLInputElement | null>;
   nextButtonRef?: React.RefObject<HTMLButtonElement | null>;
-  
+
   // Identification & accessibility (varies)
+  id?: string;
   name: string;
   ariaLabel?: string;
   className?: string;
   invalidClassName?: string;
-  
+
   // Standard props (can vary per input)
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
   autoFocus?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
-  
+
   // Optional overrides (with sensible defaults)
   step?: number; // Default: 1
   isInvalid?: boolean; // Default: false (prevents auto-advance when true)
@@ -59,17 +60,17 @@ export interface PartialInputProps {
 
 /**
  * PartialInput is a specialized input component designed for multi-field input scenarios.
- * 
+ *
  * Key features:
  * - Auto-advance: Automatically moves to the next input when max length is reached
  * - Enhanced blur detection: Provides direction information (next/previous/external)
  * - Consistent styling: Common base styles with component-specific overrides via className
  * - Accessibility: Proper ARIA labels and keyboard navigation support
  * - Validation integration: Works with validation functions and provides feedback
- * 
+ *
  * This component encapsulates common patterns found in multi-field input components,
  * reducing code duplication and ensuring consistent behavior.
- * 
+ *
  * @param props - PartialInputProps configuration
  * @returns A configured input element with enhanced multi-field input behavior
  */
@@ -88,6 +89,7 @@ export function PartialInput({
   onBeep,
   nextInputRef,
   nextButtonRef,
+  id,
   name,
   ariaLabel,
   className,
@@ -99,8 +101,8 @@ export function PartialInput({
   inputRef,
   step = 1,
   isInvalid = false,
+  ...restProps
 }: PartialInputProps) {
-  
   /**
    * Process emptyCharacter according to requirements.
    * Handles null/empty values, multi-character strings, and unicode characters.
@@ -127,7 +129,7 @@ export function PartialInput({
     }
     return processedEmptyCharacter.repeat(placeholderLength);
   }, [placeholder, processedEmptyCharacter, placeholderLength]);
-  
+
   /**
    * Internal focus handler that automatically selects all text for easier editing.
    * This is a common UX pattern for numeric inputs in multi-field components.
@@ -155,7 +157,7 @@ export function PartialInput({
       if (newValue.length === maxLength && /^\d+$/.test(newValue) && !isInvalid) {
         // Check if the new value is valid before auto-tabbing
         const isValueInvalid = validateFn ? validateFn(newValue) : false;
-        
+
         if (!isValueInvalid) {
           // Small delay to ensure the current input is properly updated
           setTimeout(() => {
@@ -232,6 +234,8 @@ export function PartialInput({
 
   return (
     <input
+      {...restProps}
+      id={id}
       aria-label={ariaLabel}
       autoComplete="off"
       // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision

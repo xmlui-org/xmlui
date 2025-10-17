@@ -6,7 +6,6 @@ import {
   forwardRef,
   type ReactNode,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useReducer,
   useRef,
@@ -49,6 +48,11 @@ import type { InteractionFlags, SingleValidationResult, ValidationResult } from 
 import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
 import classnames from "classnames";
+import { Slot } from "@radix-ui/react-slot";
+import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+
+const PART_CANCEL_BUTTON = "cancelButton";
+const PART_SUBMIT_BUTTON = "submitButton";
 
 export const getByPath = (obj: any, path: string) => {
   return get(obj, path);
@@ -63,6 +67,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       isValidOnFocus: false,
       isValidLostFocus: false,
       focused: false,
+      afterFirstDirtyBlur: false,
       forceShowValidationResult: false,
     };
   }
@@ -110,8 +115,10 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       } else {
         state.validationResults[uid] = action.payload.validationResult;
       }
-      state.interactionFlags[uid].invalidToValid =
-        !prevValid && state.validationResults[uid].isValid;
+      const currentIsInvalidToValid = !prevValid && state.validationResults[uid].isValid;
+      if (currentIsInvalidToValid) {
+        state.interactionFlags[uid].invalidToValid = true;
+      }
       break;
     }
     case FormActionKind.FIELD_FOCUSED: {
@@ -122,6 +129,8 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     case FormActionKind.FIELD_LOST_FOCUS: {
       state.interactionFlags[uid].isValidLostFocus = !!state.validationResults[uid]?.isValid;
       state.interactionFlags[uid].focused = false;
+      state.interactionFlags[uid].afterFirstDirtyBlur = state.interactionFlags[uid].isDirty;
+      state.interactionFlags[uid].invalidToValid = false;
       break;
     }
     case FormActionKind.TRIED_TO_SUBMIT: {
@@ -228,13 +237,14 @@ type Props = {
   onSubmit?: OnSubmit;
   onCancel?: OnCancel;
   onReset?: OnReset;
-  onSuccess?: (result: any)=>void;
+  onSuccess?: (result: any) => void;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
   itemLabelWidth?: string;
   itemLabelPosition?: string; // type LabelPosition
   keepModalOpenOnSubmit?: boolean;
+  hideButtonRowUntilDirty?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -246,6 +256,7 @@ export const defaultProps: Pick<
   | "itemLabelBreak"
   | "keepModalOpenOnSubmit"
   | "swapCancelAndSave"
+  | "hideButtonRowUntilDirty"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -254,6 +265,7 @@ export const defaultProps: Pick<
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
   swapCancelAndSave: false,
+  hideButtonRowUntilDirty: false,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -293,16 +305,24 @@ const Form = forwardRef(function (
     itemLabelWidth,
     itemLabelPosition = defaultProps.itemLabelPosition,
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
+    hideButtonRowUntilDirty,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
   const formRef = useRef<HTMLFormElement>(null);
-  useImperativeHandle(ref, () => formRef.current!);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
 
   const isEnabled = enabled && !formState.submitInProgress;
+  const isDirty = useMemo(() => {
+    return Object.entries(formState.interactionFlags).some(([key, flags]) => {
+      if (flags.isDirty) {
+        return true;
+      }
+      return false;
+    });
+  }, [formState.interactionFlags]);
 
   const formContextValue = useMemo(() => {
     return {
@@ -330,10 +350,18 @@ const Form = forwardRef(function (
 
   const doCancel = useEvent(() => {
     onCancel?.();
-    requestModalFormClose();
+    void requestModalFormClose();
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
+    /* console.log(`🚀 Form submit started`);
+    console.log(`🔍 Initial values:`, {
+      initialValue,
+      EMPTY_OBJECT,
+      isEqual: initialValue === EMPTY_OBJECT,
+      initialValueType: typeof initialValue,
+      emptyObjectType: typeof EMPTY_OBJECT
+    }); */
     event?.preventDefault();
     if (!isEnabled) {
       return;
@@ -356,13 +384,13 @@ const Form = forwardRef(function (
       const filteredSubject = cleanUpSubject(formState.subject);
 
       const result = await onSubmit?.(filteredSubject, {
-        passAsDefaultBody: true
+        passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
-        requestModalFormClose();
+        void requestModalFormClose();
       }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
@@ -437,6 +465,7 @@ const Form = forwardRef(function (
   const cancelButton =
     cancelLabel === "" ? null : (
       <Button
+        data-part-id={PART_CANCEL_BUTTON}
         key="cancel"
         type="button"
         themeColor={"secondary"}
@@ -448,7 +477,7 @@ const Form = forwardRef(function (
     );
   const submitButton = useMemo(
     () => (
-      <Button key="submit" type={"submit"} disabled={!isEnabled}>
+      <Button data-part-id={PART_SUBMIT_BUTTON} key="submit" type={"submit"} disabled={!isEnabled}>
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
@@ -462,6 +491,16 @@ const Form = forwardRef(function (
     });
   }, [doReset, updateData, registerComponentApi]);
 
+  let safeButtonRow = (
+    <>
+      {buttonRow || (
+        <div className={styles.buttonRow}>
+          {swapCancelAndSave && [submitButton, cancelButton]}
+          {!swapCancelAndSave && [cancelButton, submitButton]}
+        </div>
+      )}
+    </>
+  );
   return (
     <>
       <form
@@ -476,12 +515,7 @@ const Form = forwardRef(function (
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>
-        {buttonRow || (
-          <div className={styles.buttonRow}>
-            {swapCancelAndSave && [submitButton, cancelButton]}
-            {!swapCancelAndSave && [cancelButton, submitButton]}
-          </div>
-        )}
+        {(!hideButtonRowUntilDirty || isDirty) && safeButtonRow}
       </form>
       {confirmSubmitModalVisible && (
         <ModalDialog
@@ -520,23 +554,26 @@ Form.displayName = "Form";
 
 type FormComponentDef = ComponentDef<typeof FormMd>;
 
-export function FormWithContextVar({
-  node,
-  renderChild,
-  extractValue,
-  style,
-  className,
-  lookupEventHandler,
-  registerComponentApi,
-}: {
-  node: FormComponentDef;
-  renderChild: RenderChildFn;
-  extractValue: ValueExtractor;
-  style?: CSSProperties;
-  className?: string;
-  lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
-  registerComponentApi: RegisterComponentApiFn;
-}) {
+export const FormWithContextVar = forwardRef(function (
+  {
+    node,
+    renderChild,
+    extractValue,
+    style,
+    className,
+    lookupEventHandler,
+    registerComponentApi,
+  }: {
+    node: FormComponentDef;
+    renderChild: RenderChildFn;
+    extractValue: ValueExtractor;
+    style?: CSSProperties;
+    className?: string;
+    lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
+    registerComponentApi: RegisterComponentApiFn;
+  },
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const $data = useMemo(() => {
@@ -582,53 +619,59 @@ export function FormWithContextVar({
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
 
+  const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth });
+
   return (
-    <Form
-      keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}
-      itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
-      itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
-      itemLabelWidth={extractValue.asOptionalString(node.props.itemLabelWidth)}
-      formState={formState}
-      dispatch={dispatch}
-      id={node.uid}
-      style={style}
-      className={className}
-      cancelLabel={extractValue(node.props.cancelLabel)}
-      saveLabel={extractValue(node.props.saveLabel)}
-      saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
-      swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
-      onSubmit={lookupEventHandler("submit", {
-        defaultHandler: submitUrl
-          ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`
-          : undefined,
-        context: {
-          $data,
-        },
-      })}
-      onCancel={lookupEventHandler("cancel", {
-        context: {
-          $data,
-        },
-      })}
-      onReset={lookupEventHandler("reset", {
-        context: {
-          $data,
-        },
-      })}
-      onSuccess={lookupEventHandler("success", {
-        context: {
-          $data,
-        },
-      })}
-      initialValue={initialValue}
-      buttonRow={renderChild(node.props.buttonRowTemplate)}
-      registerComponentApi={registerComponentApi}
-      enabled={
-        extractValue.asOptionalBoolean(node.props.enabled, true) &&
-        !extractValue.asOptionalBoolean((node.props as any).loading, false)
-      } //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
-    >
-      {renderChild(nodeWithItem)}
-    </Form>
+    <Slot ref={ref} style={style}>
+      <Form
+        keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}
+        itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
+        itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
+        itemLabelWidth={itemLabelWidthCssProps.width as string}
+        hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
+        formState={formState}
+        dispatch={dispatch}
+        id={node.uid}
+        className={className}
+        cancelLabel={extractValue(node.props.cancelLabel)}
+        saveLabel={extractValue(node.props.saveLabel)}
+        saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
+        swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
+        onSubmit={lookupEventHandler("submit", {
+          defaultHandler: submitUrl
+            ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`
+            : undefined,
+          context: {
+            $data,
+          },
+        })}
+        onCancel={lookupEventHandler("cancel", {
+          context: {
+            $data,
+          },
+        })}
+        onReset={lookupEventHandler("reset", {
+          context: {
+            $data,
+          },
+        })}
+        onSuccess={lookupEventHandler("success", {
+          context: {
+            $data,
+          },
+        })}
+        initialValue={initialValue}
+        buttonRow={renderChild(node.props.buttonRowTemplate)}
+        registerComponentApi={registerComponentApi}
+        enabled={
+          extractValue.asOptionalBoolean(node.props.enabled, true) &&
+          !extractValue.asOptionalBoolean((node.props as any).loading, false)
+        } //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
+      >
+        {renderChild(nodeWithItem)}
+      </Form>
+    </Slot>
   );
-}
+});
+FormWithContextVar.displayName = "FormWithContextVar";

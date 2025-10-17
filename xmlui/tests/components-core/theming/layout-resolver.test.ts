@@ -1506,4 +1506,20 @@ describe("Layout resolver", () => {
     expect(result.cssProps[PROP]).toBe(THEME_ID_VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
+
+  it("transform", () => {
+    const PROP = "transform";
+    const VALUE = "rotate(23deg)";
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps[PROP]).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+  
+  it("transform (themeVar)", () => {
+    const PROP = "transform";
+    const VALUE = THEME_ID;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps[PROP]).toBe(THEME_ID_VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
 });

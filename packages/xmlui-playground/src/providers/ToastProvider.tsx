@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from "react";
+import { createContext, useState, type ReactNode } from "react";
 import { noop } from "lodash-es";
 import * as RadixToast from "@radix-ui/react-toast";
 import styles from "./Toast.module.scss";
@@ -9,7 +9,7 @@ type ToastMessage = {
   type: "success" | "warning" | "error" | "info";
   title?: string;
   description: string;
-}
+};
 
 type ToastContextDefinition = {
   toastMessage: ToastMessage | null;
@@ -30,7 +30,6 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
   const [open, setOpen] = useState(false);
 
   const showToast = (toastMessage: ToastMessage) => {
-    console.log("showToast", toastMessage.description);
     setToastMessage(toastMessage);
     setOpen(true);
   };
@@ -39,14 +38,20 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
     <ToastContext.Provider value={{ toastMessage, showToast }}>
       <RadixToast.Provider swipeDirection="right">
         {children}
-        <RadixToast.Root open={open} onOpenChange={setOpen} className={classnames(styles.ToastRoot, {
+        <RadixToast.Root
+          open={open}
+          onOpenChange={setOpen}
+          className={classnames(styles.ToastRoot, {
             [styles.success]: toastMessage?.type === "success",
             [styles.warning]: toastMessage?.type === "warning",
             [styles.error]: toastMessage?.type === "error",
-        })} >
-          <RadixToast.Close className={styles.ToastClose}><MdOutlineClose /></RadixToast.Close>
-          { toastMessage?.title && (
-              <RadixToast.Title className={styles.ToastTitle}>{toastMessage?.title}</RadixToast.Title>
+          })}
+        >
+          <RadixToast.Close className={styles.ToastClose}>
+            <MdOutlineClose />
+          </RadixToast.Close>
+          {toastMessage?.title && (
+            <RadixToast.Title className={styles.ToastTitle}>{toastMessage?.title}</RadixToast.Title>
           )}
           <RadixToast.Description className={styles.ToastDescription} asChild>
             <div>{toastMessage?.description}</div>

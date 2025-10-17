@@ -1,5 +1,146 @@
 # xmlui
 
+## 0.10.22
+
+### Patch Changes
+
+- 501f60a: The behavior infrastructure now uses ComponentProvider and allows adding custom behaviors
+- 1020f1c: Extend Tab with the tabAlignment and accordionView properties
+
+## 0.10.21
+
+### Patch Changes
+
+- 6fd4d62: Add custom Text variant styling
+
+## 0.10.20
+
+### Patch Changes
+
+- 26eac90: fix: Autocomplete handles animations correctly
+- f53edff: Add margin-related theme variables to ContentSeparator
+- 1840916: Add applyIf property to Theme
+- c6be7a3: fix: external animation is now correctly applied to ModalDialogs as well
+- 6aaefaf: Added better error text when rendering FormItem outside of a Form.
+- 28d2585: refactor: Select and AutoComplete components
+- e29a231: The itemLabelWidth value of Form now supports theme variables ($space-\* values).
+- 22162c0: AppState now uses a merge operation to set initialValue
+- e90232b: fix: itemWithLabel - layout issue
+
+## 0.10.19
+
+### Patch Changes
+
+- facb257: Add checkboxTolerance property to Table
+- 6084c14: test: review onFocus, onBlur e2e tests
+- e1fa9d7: Renamed the following properties in DatePicker: minValue -> startDate, maxValue -> endDate. Also updated component documentation.
+
+## 0.10.18
+
+### Patch Changes
+
+- 202f2b2: refactor: use labelBehavior instead of ItemWithLabel
+- 6650ee8: Add back removed RadioItem
+- da98994: Fixed FormItem validation indicators to use a relaxed validation indication strategy.
+- 8394663: fix: labelBehavior, input components - styling issue
+
+## 0.10.17
+
+### Patch Changes
+
+- 07dae0b: fix: AccordionItem produces the right error outside of Accordion component
+
+## 0.10.16
+
+### Patch Changes
+
+- 0ba6612: Undust and improve the Tree component
+- 7b78052: Fixed Slider ranged version where only the first thumb is interactable.
+- 314b429: improve: remove cmdk from autocomple, add keywords prop to option
+- a1dea8f: fix: NumberBox initialValue ignores non-convertible string values, minValue and maxValue now applies to typed-in input as well as to increments / decrements with spinner buttons.
+- cff754c: refactor: move behavior application earlier in ComponentAdapter render flow
+
+## 0.10.15
+
+### Patch Changes
+
+- 3c8ad14: Add the data property to the Pdf component
+- 5502fea: Add the "transform" layout property
+- e08f0ba: Add syncWithAppState and initiallySelected properties to Table
+- 5502fea: Fix MenuSeparator and SubMenuitem (forwardRef)
+- db618b5: fix: NavGroup componenet's iconVertical{Expanded,Collapsed} properties now apply based on it's 'open' state. Only the Expanded one was present before the fix.
+- a795b3d: Allow event handlers to use nested action components recursively
+- 5851c02: feat: introducing behaviors - tooltip, animation, label
+
+## 0.10.14
+
+### Patch Changes
+
+- 618049b: fix: Modal dialog scrolling issue
+- 215a142: Allow image to accept binary data (and use it instead of src)
+- 65b52e1: Allow user-defined components in extension packages
+- 0cc2178: Fixed Slider input type, label focus, readOnly property, as well as min & max value issues.
+- 53d4ed9: Fixed feature to add custom icons for the Carousel prev/next page buttons.
+
+## 0.10.13
+
+### Patch Changes
+
+- 9401ee0: Added short debounce to ColorPicker to make changing color values with slider a bit smoother.
+- eb62858: fix: assigning new properties to objects in xmlui script
+- eb62858: fix: stricter empty body detection in RestApiProxy
+- eb62858: fix: TextArea autofocus
+- eb62858: fix: dropdownMenu overflow
+- eb62858: fix: ability to use user defined components in triggerTemplate (dropdownMenu)
+- eb62858: select: use focus-visible instead of focus for outline
+- 243b7fa: fix: modal dialog/toast issue
+- eb62858: form: hideButtonRowUntilDirty
+
+## 0.10.12
+
+### Patch Changes
+
+- f12a042: fix: report errors in script tag
+- 8731eb8: Avatar does not issue a resource URL warning when "url" is not specified
+- eb6454f: refactor: change LineChart/BarChart property names
+- 1210852: Fix the layout property usage of ModalDialog
+
+## 0.10.11
+
+### Patch Changes
+
+- 8c76c8d: feat: style the error report colors and spaces in the browser for xmlui syntax errors
+- d56c3e5: RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.
+- e42d367: Add FancyButton to xmlui-website-blocks
+- f539526: feat: BarChart - add tooltip position tracking
+- 19ce234: Review Option handling in Select and RadioGroup
+- 455b6c0: feat: add animation support to all relevant components via animation and animationOptions props
+- e90dc73: feat: add support for 'uses' property
+- 819b563: Update fontSize and lineHeight themes and style (may break existing xmlui code)
+- b57dfa2: Add the autoDetectTone property to App
+- 9dd0f97: Update Checkbox and Switch with click event metadata
+- 19ce234: Select accepts null as an option value; it converts a value to a string no longer
+- 898346d: Extend Text and Heading APIs with hasOverflow
+- 705dd04: Fix RestApiProxy to deliver response status when no error body specified
+
+## 0.10.10
+
+### Patch Changes
+
+- fff80c5: Bump package version
+
+## 0.10.9
+
+### Patch Changes
+
+- 879c09d: Component part handling and testing refactored
+- 3ad8514: Added tooltip value display to Slider thumbs. Removed value display from Slider label.
+- 0c69245: fix: virtualized list/table in ModalDialog
+- 4ad31fc: refactor: rename dataKeys/nameKey to xKeys/yKey and layout to orientation in chart components - BarChart, LineChart
+- c99f184: Fix ExpandableItem focus issue
+- 5032e4a: Experimenting with HeroSection
+- 2394f36: Enhance DateInput and TimeInput
+
 ## 0.10.8
 
 ### Patch Changes

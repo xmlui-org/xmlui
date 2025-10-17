@@ -7,6 +7,7 @@ import type {
   ComponentRendererOptions,
   CompoundComponentRendererInfo,
 } from "../abstractions/RendererDefs";
+import type { Behavior } from "../components-core/behaviors/Behavior";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
@@ -66,7 +67,6 @@ import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdap
 import { formComponentRenderer } from "./Form/Form";
 import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
-import { numberBox2ComponentRenderer } from "./NumberBox/NumberBox2";
 import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
 import { navPanelRenderer } from "./NavPanel/NavPanel";
@@ -80,6 +80,7 @@ import { footerRenderer } from "./Footer/Footer";
 import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
 import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
+import { radioItemComponentRenderer} from "./RadioGroup/RadioItem";
 import { SlotHolder } from "./Slot/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
@@ -107,6 +108,7 @@ import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
 import { timedAction } from "../components-core/action/TimedAction";
+import { tooltipBehavior, animationBehavior, labelBehavior } from "../components-core/behaviors/CoreBehaviors";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -244,17 +246,18 @@ import {
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
-import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
+import { areaChartComponentRenderer } from "./Charts/AreaChart/AreaChart";
 import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
 import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
 import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
 import { legendComponentRenderer } from "./Charts/Legend/Legend";
 import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
+import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
@@ -292,6 +295,11 @@ export type ContributesDefinition = {
    * Themes that come with the app.
    */
   themes?: ThemeDefinition[];
+
+  /**
+   * Custom behaviors that come with the app.
+   */
+  behaviors?: Behavior[];
 };
 
 type ComponentName = {
@@ -325,6 +333,9 @@ export class ComponentRegistry {
 
   // --- The pool of available loader renderers
   private loaders = new Map<string, LoaderRenderer<any>>();
+
+  // --- The pool of available behaviors
+  private behaviors: Behavior[] = [];
 
   /**
    * The component constructor registers all xmlui core components, so each
@@ -367,7 +378,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerCoreComponent(spaceFillerComponentRenderer);
     }
-
     if (process.env.VITE_USED_COMPONENTS_Textarea !== "false") {
       this.registerCoreComponent(textAreaComponentRenderer);
     }
@@ -487,9 +497,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
       this.registerCoreComponent(carouselItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_RadioItem !== "false") {
-      this.registerCoreComponent(radioItemComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
@@ -518,12 +525,14 @@ export class ComponentRegistry {
     }
 
     if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
+      this.registerCoreComponent(areaChartComponentRenderer);
       this.registerCoreComponent(barChartComponentRenderer);
       this.registerCoreComponent(donutChartComponentRenderer);
       this.registerCoreComponent(labelListComponentRenderer);
       this.registerCoreComponent(legendComponentRenderer);
       this.registerCoreComponent(lineChartComponentRenderer);
       this.registerCoreComponent(pieChartComponentRenderer);
+      this.registerCoreComponent(radarChartComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false") {
@@ -551,9 +560,9 @@ export class ComponentRegistry {
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
-      this.registerCoreComponent(numberBox2ComponentRenderer);
       this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
+      this.registerCoreComponent(radioItemComponentRenderer);
       this.registerCoreComponent(fileInputRenderer);
       this.registerCoreComponent(spinnerComponentRenderer);
       this.registerCoreComponent(selectComponentRenderer);
@@ -800,6 +809,15 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(labelBehavior);
+
+    // Register external behaviors from contributes
+    contributes.behaviors?.forEach((behavior) => {
+      this.registerBehavior(behavior);
+    });
+
     this.extensionManager?.subscribeToRegistrations(this.extensionRegistered);
   }
 
@@ -906,8 +924,11 @@ export class ComponentRegistry {
   private extensionRegistered = (extension: Extension) => {
     extension.components?.forEach((c) => {
       if ("type" in c) {
-        //we handle just the js components for now
+        // --- This is a regular component
         this.registerComponentRenderer(c, extension.namespace);
+      } else if ("compoundComponentDef" in c) {
+        // --- This is a user defined component
+        this.registerCompoundComponentRenderer(c, extension.namespace);
       }
     });
   };
@@ -982,7 +1003,7 @@ export class ComponentRegistry {
         return (
           <CompoundComponent
             api={compoundComponentDef.api}
-            scriptCollected={compoundComponentDef.scriptCollected}
+            scriptCollected={compoundComponentDef.component.scriptCollected}
             compound={compoundComponentDef.component as ComponentDef}
             {...rendererContext}
           />
@@ -998,6 +1019,31 @@ export class ComponentRegistry {
   // --- Registers an action function using its definition
   private registerActionFn({ actionName: functionName, actionFn }: ActionRendererDef) {
     this.actionFns.set(functionName, actionFn);
+  }
+
+  // --- Registers a behavior
+  private registerBehavior(
+    behavior: Behavior,
+    location: "before" | "after" = "after",
+    position?: string
+  ) {
+    // If position is specified, insert relative to that behavior
+    if (position) {
+      const targetIndex = this.behaviors.findIndex(b => b.name === position);
+      if (targetIndex !== -1) {
+        const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
+        this.behaviors.splice(insertIndex, 0, behavior);
+        return;
+      }
+    }
+    
+    // Default: append to the end
+    this.behaviors.push(behavior);
+  }
+
+  // --- Returns all registered behaviors
+  getBehaviors(): Behavior[] {
+    return this.behaviors;
   }
 }
 

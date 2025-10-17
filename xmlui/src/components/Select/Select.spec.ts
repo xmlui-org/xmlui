@@ -1,26 +1,33 @@
 import { expect, test } from "../../testing/fixtures";
 
-test("dynamic options displayed with Items component", async ({
-  initTestBed,
-  createSelectDriver,
-  page,
-}) => {
-  await initTestBed(`
-    <Select>
-      <Items data="{['One', 'Two', 'Three']}" >
-        <Option value="{$itemIndex}" label="{$item}" />
-      </Items>
-    </Select>`);
-  const driver = await createSelectDriver();
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
-  await driver.click();
-  await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Three" })).toBeVisible();
-});
+test.describe("Basic Functionality", () => {
+  // --- Component rendering
 
-test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
-  await initTestBed(`
+  test("dynamic options displayed with Items component", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select>
+        <Items data="{['One', 'Two', 'Three']}" >
+          <Option value="{$itemIndex}" label="{$item}" />
+        </Items>
+      </Select>`);
+    const driver = await createSelectDriver();
+
+    await driver.click();
+    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Three" })).toBeVisible();
+  });
+
+  test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
+    await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
       <FormItem testId="mySelect" type="select" bindTo="sel">
         <Option value="opt1" label="first"/>
@@ -28,16 +35,18 @@ test("changing selected option in form", async ({ initTestBed, createSelectDrive
         <Option value="opt3" label="third"/>
       </FormItem>
     </Form>`);
-  const driver = await createSelectDriver("mySelect");
+    const driver = await createSelectDriver("mySelect");
 
-  await expect(driver.component.locator("select")).toHaveValue("opt1");
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("second");
-  await expect(driver.component.locator("select")).toHaveValue("opt2");
-});
+    await expect(driver.component.locator("select")).toHaveValue("opt1");
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("second");
+    await expect(driver.component.locator("select")).toHaveValue("opt2");
+  });
 
-test("initialValue set to first valid value", async ({ page, initTestBed }) => {
-  await initTestBed(`
+  // --- initialValue prop
+
+  test("initialValue set to first valid value", async ({ page, initTestBed }) => {
+    await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
         <Option value="{0}" label="Zero"/>
@@ -47,13 +56,13 @@ test("initialValue set to first valid value", async ({ page, initTestBed }) => {
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
   `);
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
-  await expect(page.getByText("Zero", { exact: true })).toBeVisible();
-  await expect(page.getByText("One", { exact: true })).not.toBeVisible();
-});
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
+    await expect(page.getByText("Zero", { exact: true })).toBeVisible();
+    await expect(page.getByText("One", { exact: true })).not.toBeVisible();
+  });
 
-test("initialValue set to non-existant option", async ({ page, initTestBed }) => {
-  await initTestBed(`
+  test("initialValue set to non-existant option", async ({ page, initTestBed }) => {
+    await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{42}">
         <Option value="{0}" label="Zero"/>
@@ -63,16 +72,16 @@ test("initialValue set to non-existant option", async ({ page, initTestBed }) =>
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
   `);
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 42");
-});
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 42");
+  });
 
-test("reset works with initialValue", async ({
-  page,
-  initTestBed,
-  createSelectDriver,
-  createButtonDriver,
-}) => {
-  await initTestBed(`
+  test("reset works with initialValue", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
         <Option value="{0}" label="Zero"/>
@@ -82,24 +91,24 @@ test("reset works with initialValue", async ({
       <Button id="resetBtn" label="reset" onClick="mySelect.reset()"/>
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
-  `);
-  const selectDrv = await createSelectDriver("mySelect");
-  await selectDrv.toggleOptionsVisibility();
-  await selectDrv.selectLabel("One");
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
-  const btnDriver = await createButtonDriver("resetBtn");
-  await btnDriver.click();
+    `);
+    const selectDrv = await createSelectDriver("mySelect");
+    await selectDrv.toggleOptionsVisibility();
+    await selectDrv.selectLabel("One");
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
+    const btnDriver = await createButtonDriver("resetBtn");
+    await btnDriver.click();
 
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
-});
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
+  });
 
-test("reset works with no intialValue", async ({
-  page,
-  initTestBed,
-  createSelectDriver,
-  createButtonDriver,
-}) => {
-  await initTestBed(`
+  test("reset works with no intialValue", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
     <Fragment>
       <Select id="mySelect">
         <Option value="{0}" label="Zero"/>
@@ -109,110 +118,114 @@ test("reset works with no intialValue", async ({
       <Button id="resetBtn" label="reset" onClick="mySelect.reset()"/>
       <Text testId="text">Selected value: {mySelect.value}</Text>
     </Fragment>
-  `);
-  const selectDrv = await createSelectDriver("mySelect");
-  await selectDrv.toggleOptionsVisibility();
-  await selectDrv.selectLabel("One");
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
-  const btnDriver = await createButtonDriver("resetBtn");
-  await btnDriver.click();
+    `);
+    const selectDrv = await createSelectDriver("mySelect");
+    await selectDrv.toggleOptionsVisibility();
+    await selectDrv.selectLabel("One");
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
+    const btnDriver = await createButtonDriver("resetBtn");
+    await btnDriver.click();
 
-  await expect(page.getByTestId("text")).not.toContainText("1");
-});
+    await expect(page.getByTestId("text")).not.toContainText("1");
+  });
 
-test("disabled Select cannot be opened", async ({ page, createSelectDriver, initTestBed }) => {
-  await initTestBed(`
+  // --- enabled prop
+
+  test("disabled Select cannot be opened", async ({ page, createSelectDriver, initTestBed }) => {
+    await initTestBed(`
     <Select enabled="{false}">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
-  `);
-  const driver = await createSelectDriver();
-  await driver.click({ force: true });
-  await expect(page.getByText("One")).not.toBeVisible();
-});
+    `);
+    const driver = await createSelectDriver();
+    await driver.click({ force: true });
+    await expect(page.getByText("One")).not.toBeVisible();
+  });
 
-test("readOnly Select shows options, but value cannot be changed", async ({
-  page,
-  initTestBed,
-  createSelectDriver,
-}) => {
-  await initTestBed(`
+  // --- readOnly prop
+
+  test("readOnly Select shows options, but value cannot be changed", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
     <Select readOnly initialValue="1">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
-  `);
-  const driver = await createSelectDriver();
-  await expect(page.getByText("Two")).not.toBeVisible();
-  await expect(page.getByText("One")).toBeVisible();
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("Two");
-  await expect(page.getByText("Two")).not.toBeVisible();
-  await expect(page.getByText("One")).toBeVisible();
+    `);
+    const driver = await createSelectDriver();
+    await expect(page.getByText("Two")).not.toBeVisible();
+    await expect(page.getByText("One")).toBeVisible();
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Two");
+    await expect(page.getByText("Two")).not.toBeVisible();
+    await expect(page.getByText("One")).toBeVisible();
 
-  // verify dropdown is not visible but value is shown
-});
+    // verify dropdown is not visible but value is shown
+  });
 
-test("readOnly multi-Select shows options, but value cannot be changed", async ({
-  page,
-  initTestBed,
-  createSelectDriver,
-}) => {
-  await initTestBed(`
+  test("readOnly multi-Select shows options, but value cannot be changed", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
     <Select readOnly initialValue="{[1, 2]}" multiSelect>
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
       <Option value="3" label="Three"/>
     </Select>
-  `);
-  const driver = await createSelectDriver();
-  await expect(page.getByText("Three")).not.toBeVisible();
-  await expect(page.getByText("One")).toBeVisible();
-  await expect(page.getByText("Two")).toBeVisible();
+    `);
+    const driver = await createSelectDriver();
+    await expect(page.getByText("Three")).not.toBeVisible();
+    await expect(page.getByText("One")).toBeVisible();
+    await expect(page.getByText("Two")).toBeVisible();
 
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("Three");
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Three");
 
-  await expect(page.getByText("Three")).not.toBeVisible();
-  await expect(page.getByText("One")).toBeVisible();
-  await expect(page.getByText("Two")).toBeVisible();
-});
+    await expect(page.getByText("Three")).not.toBeVisible();
+    await expect(page.getByText("One")).toBeVisible();
+    await expect(page.getByText("Two")).toBeVisible();
+  });
 
-test("disabled Option cannot be selected", async ({ initTestBed, createSelectDriver, page }) => {
-  await initTestBed(`
+  test("disabled Option cannot be selected", async ({ initTestBed, createSelectDriver, page }) => {
+    await initTestBed(`
     <Select>
       <Option value="1" label="One"/>
       <Option value="2" label="Two" enabled="{false}"/>
     </Select>
-  `);
-  await expect(page.getByRole("option", { name: "One" })).not.toBeVisible();
-  await expect(page.getByRole("option", { name: "Two" })).not.toBeVisible();
-  const driver = await createSelectDriver();
-  await driver.toggleOptionsVisibility();
-  await driver.selectLabel("Two");
-  await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-});
+    `);
+    await expect(page.getByRole("option", { name: "One" })).not.toBeVisible();
+    await expect(page.getByRole("option", { name: "Two" })).not.toBeVisible();
+    const driver = await createSelectDriver();
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Two");
+    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+  });
 
-test(
-  "clicking label brings up the options",
-  { tag: "@smoke" },
-  async ({ initTestBed, page, createSelectDriver }) => {
-    await initTestBed(`
+  test(
+    "clicking label brings up the options",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
     <Select label="Choose an option">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
   `);
-    await page.getByLabel("Choose an option").click();
-    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-  },
-);
+      await page.getByLabel("Choose an option").click();
+      await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+    },
+  );
 
-test("label displayed for selected numeric value", async ({ page, initTestBed }) => {
-  await initTestBed(`
+  test("label displayed for selected numeric value", async ({ page, initTestBed }) => {
+    await initTestBed(`
     <Fragment>
       <Select initialValue="{0}" >
         <Option value="{0}" label="Zero"/>
@@ -221,15 +234,17 @@ test("label displayed for selected numeric value", async ({ page, initTestBed })
       </Select>
     </Fragment>
   `);
-  await expect(page.getByText("Zero")).toBeVisible();
-});
+    await expect(page.getByText("Zero")).toBeVisible();
+  });
 
-test("autoFocus brings the focus to component", async ({
-  initTestBed,
-  page,
-  createSelectDriver,
-}) => {
-  await initTestBed(`
+  // --- autoFocus prop
+
+  test("autoFocus brings the focus to component", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
     <Select>
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
@@ -238,18 +253,20 @@ test("autoFocus brings the focus to component", async ({
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
-  `);
-  const driver = await createSelectDriver("focused-select");
+    `);
+    const driver = await createSelectDriver("focused-select");
 
-  await expect(driver.component).toBeFocused();
-});
+    await expect(driver.component).toBeFocused();
+  });
 
-test("emptyListTemplate shown when wrapped inside an App component", async ({
-  initTestBed,
-  page,
-  createSelectDriver,
-}) => {
-  await initTestBed(`
+  // --- Templates
+
+  test("emptyListTemplate shown when wrapped inside an App component", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
     <App>
       <Select testId="mySelect">
         <property name="emptyListTemplate">
@@ -257,16 +274,15 @@ test("emptyListTemplate shown when wrapped inside an App component", async ({
         </property>
       </Select>
     </App>
-  `);
-  const driver = await createSelectDriver("mySelect");
-  await driver.click();
+    `);
+    const driver = await createSelectDriver("mySelect");
+    await driver.click();
 
-  await expect(page.getByText("Nothing to see here!", { exact: true })).toBeVisible();
-});
+    await expect(page.getByText("Nothing to see here!", { exact: true })).toBeVisible();
+  });
 
-test("optionTemplate is shown", async ({ initTestBed, page, createSelectDriver }) => {
-
-  await initTestBed(`
+  test("optionTemplate is shown", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
     <Select>
       <Items items="{[
         { value: 'opt1', label: 'first' },
@@ -278,80 +294,108 @@ test("optionTemplate is shown", async ({ initTestBed, page, createSelectDriver }
         </Option>
       </Items>
     </Select>
-  `);
-  const driver = await createSelectDriver();
-  await driver.click();
-  await expect(page.getByText("Template for value opt1")).toBeVisible();
-  await expect(page.getByText("Template for value opt2")).toBeVisible();
-  await expect(page.getByText("Template for value opt3")).toBeVisible();
+    `);
+    const driver = await createSelectDriver();
+    await driver.click();
+    await expect(page.getByText("Template for value opt1")).toBeVisible();
+    await expect(page.getByText("Template for value opt2")).toBeVisible();
+    await expect(page.getByText("Template for value opt3")).toBeVisible();
+  });
+
+  // --- placeholder prop
+
+  test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
+      <Select placeholder="Please select an item">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    `);
+    await expect(page.getByText("Please select an item")).toBeVisible();
+  });
+
+  test(
+    "Option without label and value is not rendered",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Select placeholder="Please select an item">
+        <Option />
+        <Option />
+        <Option />
+      </Select>
+    `);
+      const driver = await createSelectDriver();
+      await driver.click();
+      await expect(page.getByRole("option")).not.toBeVisible();
+    },
+  );
+
+  test(
+    "Option value defaults to label",
+    { tag: "@smoke" },
+    async ({ initTestBed, page, createSelectDriver }) => {
+      await initTestBed(`
+      <Fragment>
+        <Select id="mySelect">
+          <Option label="Zero"/>
+          <Option label="One"/>
+          <Option label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+      const driver = await createSelectDriver("mySelect");
+      await driver.toggleOptionsVisibility();
+      await driver.selectLabel("Zero");
+      await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
+    },
+  );
 });
 
-test("labelBreak prop defaults to false", async ({ initTestBed, page, createSelectDriver }) => {
-  await page.setViewportSize({ width: 300, height: 720 });
+// =============================================================================
+// LABEL POSITIONING TESTS
+// =============================================================================
 
-  await initTestBed(`
+test.describe("Label", () => {
+  test("labelBreak prop defaults to false", async ({ initTestBed, page, createSelectDriver }) => {
+    await page.setViewportSize({ width: 300, height: 720 });
+
+    await initTestBed(`
     <Select
       label="Dignissimos esse quasi esse cupiditate qui qui. Ut provident ad voluptatem tenetur sit consequuntur. Aliquam nisi fugit ut temporibus itaque ducimus rerum. Dolorem reprehenderit qui adipisci. Ullam harum atque ipsa."
-
       >
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
-  `);
-  const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
-  const select = page.getByRole("button").or(page.getByRole("combobox")).first();
-  const { width: selectWidth } = await select.boundingBox();
-  expect(labelWidth).toBeGreaterThan(selectWidth);
-});
+    `);
+    const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { width: selectWidth } = await select.boundingBox();
+    expect(labelWidth).toBe(selectWidth);
+  });
 
-test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
-  await initTestBed(`
-    <Select placeholder="Please select an item">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-  `);
-  await expect(page.getByText("Please select an item")).toBeVisible();
-});
+  test('labelWidth applies with labelPosition="start"', async ({ initTestBed, page }) => {
+    await page.setViewportSize({ width: 300, height: 720 });
 
-test(
-  "Option without label and value is not rendered",
-  { tag: "@smoke" },
-  async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
-    <Select placeholder="Please select an item">
-      <Option />
-      <Option />
-      <Option />
-    </Select>
-  `);
-    const driver = await createSelectDriver();
-    await driver.click();
-    await expect(page.getByRole("option")).not.toBeVisible();
-  },
-);
-
-test(
-  "Option value defaults to label",
-  { tag: "@smoke" },
-  async ({ initTestBed, page, createSelectDriver }) => {
-    await initTestBed(`
-    <Fragment>
-      <Select id="mySelect">
-        <Option label="Zero"/>
-        <Option label="One"/>
-        <Option label="Two"/>
+      <Select label="Dignissimos esse quasi" labelWidth="200px" labelPosition="start" >
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
       </Select>
-      <Text testId="text">Selected value: {mySelect.value}</Text>
-    </Fragment>
-  `);
-    const driver = await createSelectDriver("mySelect");
-    await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Zero");
-    await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
-  },
-);
+    `);
+    const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
+    expect(labelWidth).toBeGreaterThanOrEqual(200);
+  });
+});
+
+// =============================================================================
+// SEARCHABLE SELECT TESTS
+// =============================================================================
 
 test.describe("searchable select", () => {
   test("placeholder is shown", async ({ initTestBed, page, createSelectDriver }) => {
@@ -420,25 +464,9 @@ test.describe("searchable select", () => {
   );
 });
 
-test('labelWidth applies with labelPosition="start"', async ({
-  initTestBed,
-  page,
-  createSelectDriver,
-}) => {
-  await page.setViewportSize({ width: 300, height: 720 });
-
-  await initTestBed(`
-    <Select label="Dignissimos esse quasi" labelWidth="200px" labelPosition="start" >
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-      <Option value="opt4" label="fourth"/>
-      <Option value="opt5" label="fifth"/>
-    </Select>
-  `);
-  const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
-  expect(labelWidth).toBeGreaterThanOrEqual(200);
-});
+// =============================================================================
+// MULTISELECT TESTS
+// =============================================================================
 
 test.describe("multiSelect", () => {
   test("initialValue='{[0]}' works", async ({ page, initTestBed }) => {
@@ -475,7 +503,6 @@ test.describe("multiSelect", () => {
     page,
     initTestBed,
     createSelectDriver,
-    createButtonDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -525,15 +552,10 @@ test.describe("multiSelect", () => {
     const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
     const select = page.getByRole("button").or(page.getByRole("combobox")).first();
     const { width: selectWidth } = await select.boundingBox();
-    expect(labelWidth).toBeGreaterThan(selectWidth);
+    expect(labelWidth).toBe(selectWidth);
   });
 
-  test('labelPosition="start" is left in ltr language', async ({
-    initTestBed,
-    browser,
-    createSelectDriver,
-    page,
-  }) => {
+  test('labelPosition="start" is left in ltr language', async ({ initTestBed, page }) => {
     await initTestBed(`
       <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
         <Option value="1" label="One"/>
@@ -546,27 +568,19 @@ test.describe("multiSelect", () => {
     expect(labelX).toBeLessThan(selectX);
   });
 
-  test.skip('labelPosition="start" is right to select in rtl language', async ({ browser }) => {
-    // TODO: fix this test
-    // const rightToLeftLanguage = "ar";
-    // const context = await browser.newContext({
-    //   locale: rightToLeftLanguage,
-    // });
-    // const page = await context.newPage();
-    // await initComponent(page, {
-    //   entryPoint: `
-    //       <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
-    //         <Option value="1" label="One"/>
-    //         <Option value="2" label="Two"/>
-    //       </Select>
-    //     `,
-    // });
-    // const { x: labelX } = await page.getByText("hi there").boundingBox();
-    // const select = page.getByRole("button").or(page.getByRole("combobox")).first();
-    // const { x: selectX } = await select.boundingBox();
-    // expect(labelX).toBeGreaterThan(selectX);
-    // const checkedBrowserIsActuallyRTL_inThisTestCase = false;
-    // expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
+  test('labelPosition="start" is right in rtl language', async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack direction="rtl">
+        <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
+          <Option value="1" label="One" />
+          <Option value="2" label="Two" />
+        </Select>
+      </VStack>
+    `);
+    const { x: labelX } = await page.getByText("hi there").boundingBox();
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { x: selectX } = await select.boundingBox();
+    expect(labelX).toBeGreaterThan(selectX);
   });
 
   test("multiSelect autoFocus brings the focus to component", async ({
@@ -622,6 +636,10 @@ test.describe("multiSelect", () => {
   });
 });
 
+// =============================================================================
+// SEARCHABLE MULTISELECT TESTS
+// =============================================================================
+
 test.describe("searchable multiselect", { tag: "@smoke" }, () => {
   test("searching for and selecting 2 items works", async ({
     page,
@@ -647,6 +665,52 @@ test.describe("searchable multiselect", { tag: "@smoke" }, () => {
   });
 });
 
+// =============================================================================
+// EVENT HANDLING TESTS
+// =============================================================================
+
+test.describe("Event Handling", () => {
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Select onGotFocus="testState = 'focused'">
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    const selectButton = page.getByRole("combobox");
+    await selectButton.focus();
+    await expect.poll(testStateDriver.testState).toBe("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Select label="Choose" onGotFocus="testState = 'focused'">
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    await page.getByText("Choose").click();
+    await expect.poll(testStateDriver.testState).toBe("focused");
+  });
+
+  test("lostFocus event fires on blur", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Select onLostFocus="testState = 'blurred'">
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    const selectButton = page.getByRole("combobox");
+    await selectButton.focus();
+    await selectButton.blur();
+    await expect.poll(testStateDriver.testState).toBe("blurred");
+  });
+});
+
+// =============================================================================
+// FORM INTEGRATION TESTS
+// =============================================================================
+
 //this is an upstream issue: https://github.com/radix-ui/primitives/issues/3135
 test("initialValue honored when used within Form", async ({ initTestBed, page }) => {
   await initTestBed(`
@@ -660,4 +724,44 @@ test("initialValue honored when used within Form", async ({ initTestBed, page })
     </Form>`);
 
   await expect(page.getByTestId("text")).toHaveText("Selected value: opt3");
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test.describe("Visual State", () => {
+  test("input has correct width in px", async ({ page, initTestBed }) => {
+    await initTestBed(`<Select width="200px" testId="test"/>`, {});
+
+    const input = page.getByTestId("test");
+    const { width } = await input.boundingBox();
+    expect(width).toBe(200);
+  });
+
+  test("input with label has correct width in px", async ({ page, initTestBed }) => {
+    await initTestBed(`<Select width="200px" label="test" testId="test"/>`, {});
+
+    const input = page.getByTestId("test");
+    const { width } = await input.boundingBox();
+    expect(width).toBe(200);
+  });
+
+  test("input has correct width in %", async ({ page, initTestBed }) => {
+    await page.setViewportSize({ width: 400, height: 300 });
+    await initTestBed(`<Select width="50%" testId="test"/>`, {});
+
+    const input = page.getByTestId("test");
+    const { width } = await input.boundingBox();
+    expect(width).toBe(200);
+  });
+
+  test("input with label has correct width in %", async ({ page, initTestBed }) => {
+    await page.setViewportSize({ width: 400, height: 300 });
+    await initTestBed(`<Select width="50%" label="test" testId="test"/>`, {});
+
+    const input = page.getByTestId("test");
+    const { width } = await input.boundingBox();
+    expect(width).toBe(200);
+  });
 });

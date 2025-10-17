@@ -1,4 +1,4 @@
-import { DelayMode } from "msw";
+import type { DelayMode } from "msw";
 
 export type AuthDefinition = {
   defaultLoggedInUser?: any
@@ -50,7 +50,7 @@ export type ApiInterceptorDefinition = {
 // Represents a single operation of the interceptor
 export type InterceptorOperationDef = {
   // Operation method (can be extended in the future)
-  method: "get" | "post" | "put" | "delete";
+  method: "get" | "post" | "put" | "delete" | "patch" | "head" | "options";
 
   // Operation URL(s)
   url: string | Array<string>;

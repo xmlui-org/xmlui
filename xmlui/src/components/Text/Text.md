@@ -5,6 +5,29 @@ You can learn more about this component in the [Working with Text](/working-with
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
 
+## Custom Variants
+
+In addition to the predefined variants, the `Text` component supports **custom variant names** that can be styled using theme variables. This allows you to create application-specific text styles without modifying the component itself.
+
+When you use a custom variant name (one not in the predefined list), the component automatically applies theme variables following the naming pattern: `{cssProperty}-Text-{variantName}`.
+
+```xmlui-pg display name="Example: custom variants"
+<App>
+  <Theme 
+    textColor-Text-brandTitle="rgb(41, 128, 185)"
+    fontSize-Text-brandTitle="28px"
+    fontWeight-Text-brandTitle="bold"
+    letterSpacing-Text-brandTitle="2px"
+  >
+    <Text variant="brandTitle">
+      Welcome to Our Application
+    </Text>
+  </Theme>
+</App>
+```
+
+In this example, the custom variant `brandTitle` is styled using theme variables. Any CSS text property can be configured, including `textColor`, `fontSize`, `fontWeight`, `fontFamily`, `textDecoration*`, `lineHeight`, `backgroundColor`, `textTransform`, `letterSpacing`, `wordSpacing`, `textShadow`, and more.
+
 %-DESC-END
 
 %-PROP-START maxLines
@@ -414,3 +437,54 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 ```
 
 %-PROP-END
+
+%-STYLE-START
+
+### Custom Variant Theme Variables
+
+When using custom variants, you can style them using theme variables with the naming pattern `{propertyName}-Text-{variantName}`. The following CSS properties are supported:
+
+| Theme Variable Name | Description | Example Value |
+|---------------------|-------------|---------------|
+| `textColor-Text-{variant}` | Text color | `rgb(255, 0, 0)`, `#ff0000`, `red` |
+| `fontFamily-Text-{variant}` | Font family | `"Arial, sans-serif"`, `monospace` |
+| `fontSize-Text-{variant}` | Font size | `16px`, `1.5rem`, `large` |
+| `fontStyle-Text-{variant}` | Font style | `normal`, `italic`, `oblique` |
+| `fontWeight-Text-{variant}` | Font weight | `normal`, `bold`, `700` |
+| `fontStretch-Text-{variant}` | Font stretch | `normal`, `expanded`, `condensed` |
+| `textDecorationLine-Text-{variant}` | Decoration line type | `none`, `underline`, `overline`, `line-through` |
+| `textDecorationColor-Text-{variant}` | Decoration color | `rgb(255, 0, 0)`, `currentColor` |
+| `textDecorationStyle-Text-{variant}` | Decoration style | `solid`, `dashed`, `dotted`, `wavy` |
+| `textDecorationThickness-Text-{variant}` | Decoration thickness | `2px`, `from-font`, `auto` |
+| `textUnderlineOffset-Text-{variant}` | Underline offset | `5px`, `0.2em`, `auto` |
+| `lineHeight-Text-{variant}` | Line height | `1.5`, `24px`, `normal` |
+| `backgroundColor-Text-{variant}` | Background color | `rgb(255, 255, 0)`, `transparent` |
+| `textTransform-Text-{variant}` | Text transformation | `none`, `uppercase`, `lowercase`, `capitalize` |
+| `letterSpacing-Text-{variant}` | Space between letters | `1px`, `0.1em`, `normal` |
+| `wordSpacing-Text-{variant}` | Space between words | `5px`, `0.2em`, `normal` |
+| `textShadow-Text-{variant}` | Text shadow | `2px 2px 4px rgba(0,0,0,0.5)` |
+| `textIndent-Text-{variant}` | First line indentation | `20px`, `2em`, `0` |
+| `textAlign-Text-{variant}` | Horizontal alignment | `left`, `center`, `right`, `justify` |
+| `textAlignLast-Text-{variant}` | Last line alignment | `left`, `center`, `right`, `justify` |
+| `wordBreak-Text-{variant}` | Word breaking behavior | `normal`, `break-all`, `keep-all` |
+| `wordWrap-Text-{variant}` | Word wrapping | `normal`, `break-word` |
+| `direction-Text-{variant}` | Text direction | `ltr`, `rtl` |
+| `writingMode-Text-{variant}` | Writing mode | `horizontal-tb`, `vertical-rl`, `vertical-lr` |
+| `lineBreak-Text-{variant}` | Line breaking rules | `auto`, `normal`, `strict`, `loose` |
+
+```xmlui-pg  display name="Example: custom variant styles" /highlight/
+<App>
+  <Theme 
+    textColor-Text-highlight="rgb(255, 193, 7)"
+    fontWeight-Text-highlight="bold"
+    backgroundColor-Text-highlight="rgba(0, 0, 0, 0.8)"
+    padding-Text-highlight="4px 8px"
+    textShadow-Text-highlight="0 2px 4px rgba(0,0,0,0.5)"
+  >
+    <Text variant="highlight">Important Notice</Text>
+    <Text variant="highlight">This is Important Too</Text>
+  </Theme>
+</App>
+```
+
+%-STYLE-END

@@ -14,7 +14,7 @@ import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
 
 const ConfirmationModalContext = React.createContext({
-  confirm: async (title: string, message?: string, actionLabel?: string) => false,
+  confirm: (title: string, message?: string, actionLabel?: string) => Promise.resolve(false),
 });
 
 export const useConfirm = () => useContext(ConfirmationModalContext);
@@ -59,7 +59,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
   }, [showConfirmationModal]);
 
   const handleShow = useCallback(
-    async (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
+    (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
       if (typeof title === "string") {
         setTitle(title);
         setButtons([

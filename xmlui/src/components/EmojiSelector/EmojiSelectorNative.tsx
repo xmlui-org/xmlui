@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
-import EmojiPicker, { EmojiStyle, Theme as EmojiPickerTheme } from "emoji-picker-react";
-import { AsyncFunction } from "../../abstractions/FunctionDefs";
+import type { Theme as EmojiPickerTheme } from "emoji-picker-react";
+import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { noop } from "../../components-core/constants";
 
 // =====================================================================================================================

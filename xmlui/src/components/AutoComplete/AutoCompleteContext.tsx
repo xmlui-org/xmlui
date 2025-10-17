@@ -9,9 +9,11 @@ type AutoCompleteContextValue = {
   value: string | string[] | null;
   onChange?: (selectedValue: string) => void;
   inputValue: string;
+  searchTerm: string;
   options: Set<Option>;
   open?: boolean;
   setOpen?: (open: boolean) => void;
+  setSelectedIndex?: (index: number) => void;
   optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => ReactNode;
 };
 
@@ -19,9 +21,11 @@ export const AutoCompleteContext = createContext<AutoCompleteContextValue>({
   value: null,
   onChange: (selectedValue: string) => {},
   inputValue: "",
+  searchTerm: "",
   options: new Set<Option>(),
   open: false,
   setOpen: (open: boolean) => {},
+  setSelectedIndex: (index: number) => {},
   optionRenderer: (option: Option, selectedValue: SingleValueType, inTrigger: boolean) => null,
 });
 

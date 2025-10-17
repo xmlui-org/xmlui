@@ -21,21 +21,17 @@ export type ParserResult = {
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
 };
-const COLOR_DANER_100 = "hsl(356, 100%, 91%)";
-const COLOR_DANER_300 = "hsl(356, 100%, 70%)";
-const SPACE_2 = "0.5rem";
+const COLOR_DANGER_100 = "hsl(356, 100%, 91%)";
+const COLOR_DANGER_300 = "hsl(356, 100%, 70%)";
+const COLOR_PRIMARY = "hsl(204, 30.3%, 13%)";
+const COLOR_PRIMARY_LINE_NUMS = "#555b5e";
+const RADIUS = "0.5rem";
 
 export function xmlUiMarkupToComponent(source: string, fileId: string | number = 0): ParserResult {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (errors.length > 0) {
-    const newlinePositions = [];
-    for (let i = 0; i < source.length; ++i) {
-      if (source[i] === "\n") {
-        newlinePositions.push(i);
-      }
-    }
-    const errorsForDisplay = addDisplayFieldsToErrors(errors, source, newlinePositions);
+    const errorsForDisplay = addDisplayFieldsToErrors(errors, source);
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
     return { component: null, errors: errorsForDisplay, erroneousCompoundComponentName };
   }
@@ -140,13 +136,20 @@ function createErrorReportComponent(
 
         const lineChildren: ComponentDef[] = [
           {
-            type: "Text",
-            props: {
-              value: linePrefix,
-              fontFamily: "monospace",
-              color: "hsl(204, 30.3%, 45%)",
-            },
+            type: "Theme",
+            props: {},
+            children: [
+              {
+                type: "Text",
+                props: {
+                  value: linePrefix,
+                  fontFamily: "monospace",
+                  color: COLOR_PRIMARY_LINE_NUMS,
+                },
+              },
+            ],
           },
+          ,
         ];
 
         if (errorStartInContext >= lineStart && errorStartInContext < lineEnd) {
@@ -176,7 +179,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -199,7 +202,7 @@ function createErrorReportComponent(
               fontFamily: "monospace",
               textDecorationLine: "underline",
               textDecorationColor: "$color-error",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
             },
           });
         } else if (
@@ -219,7 +222,7 @@ function createErrorReportComponent(
                 fontFamily: "monospace",
                 textDecorationLine: "underline",
                 textDecorationColor: "$color-error",
-                backgroundColor: COLOR_DANER_100,
+                backgroundColor: COLOR_DANGER_100,
               },
             });
           }
@@ -250,7 +253,7 @@ function createErrorReportComponent(
               textDecorationLine: "underline",
               fontFamily: "monospace",
               fontWeight: "bold",
-              backgroundColor: COLOR_DANER_100,
+              backgroundColor: COLOR_DANGER_100,
               color: "$color-error",
             },
           });
@@ -280,7 +283,7 @@ function createErrorReportComponent(
             type: "Text",
             props: {
               value: `#${idx + 1}: ${fileName} (${e.errPosLine}:${e.errPosCol}):`,
-              color: "hsl(204, 30.3%, 27%)",
+              // color: "hsl(204, 30.3%, 27%)",
             },
           },
           {
@@ -316,7 +319,7 @@ function createErrorReportComponent(
           gap: "$gap-none",
           padding: "16px",
           backgroundColor: "white",
-          borderRadius: SPACE_2,
+          borderRadius: RADIUS,
         },
         children: [errMsgComponenet],
       };
@@ -326,50 +329,58 @@ function createErrorReportComponent(
       return errComponent;
     });
   const comp: ComponentDef = {
-    type: "VStack",
+    type: "Theme",
     props: {
-      padding: "5px 10px 10px 38px",
-      gap: 0,
-      backgroundColor: COLOR_DANER_100,
-      margin: "10px",
-      border: "2px solid " + COLOR_DANER_300,
-      borderRadius: SPACE_2,
+      "textColor-primary": COLOR_PRIMARY,
     },
     children: [
       {
-        type: "HStack",
+        type: "VStack",
         props: {
-          verticalAlignment: "center",
-          marginLeft: "-34px",
-          padding: "15px 0px",
-          gap: "4px",
+          padding: "16px 32px 16px 38px",
+          gap: 0,
+          backgroundColor: COLOR_DANGER_100,
+          margin: "10px",
+          border: "2px solid " + COLOR_DANGER_300,
+          borderRadius: RADIUS,
         },
         children: [
           {
-            type: "Icon",
+            type: "HStack",
             props: {
-              name: "error",
-              size: "30px",
-              color: "$color-error",
+              verticalAlignment: "center",
+              marginLeft: "-34px",
+              padding: "0px 0px 15px 0px",
+              gap: "4px",
             },
+            children: [
+              {
+                type: "Icon",
+                props: {
+                  name: "error",
+                  size: "30px",
+                  color: "$color-error",
+                },
+              },
+              {
+                type: "H2",
+                props: {
+                  value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
+                  fontWeight: "bold",
+                  showAnchor: false,
+                },
+              },
+            ],
           },
           {
-            type: "H2",
+            type: "VStack",
             props: {
-              value: `${errList.length} ${errList.length > 1 ? "errors" : "error"} while processing XMLUI markup`,
-              fontWeight: "bold",
-              showAnchor: false,
+              padding: "$padding-none",
+              gap: "16px",
             },
+            children: errList,
           },
         ],
-      },
-      {
-        type: "VStack",
-        props: {
-          padding: "$padding-none",
-          gap: "16px",
-        },
-        children: errList,
       },
     ],
   };
@@ -513,33 +524,6 @@ export function errReportModuleErrors(errors: ModuleErrors, fileName: number | s
   return comp;
 }
 
-/**
- * Converts a position in a string to a line and column number.
- * @param offset the offset of the position in the string
- * @param newlinePositions the offsets of the newlines in the string in ascending order
- */
-function offsetToPosition(
-  offset: number,
-  newlinePositions: number[],
-): { line: number; col: number } {
-  let left = 0;
-  let right = newlinePositions.length;
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-
-    if (newlinePositions[mid] < offset) {
-      left = mid + 1;
-    } else {
-      right = mid;
-    }
-  }
-
-  let line = left + 1;
-  let col = left === 0 ? offset + 1 : offset - newlinePositions[left - 1];
-
-  return { line, col };
-}
-
 function getCompoundCompName(node: Node, getText: GetText) {
   const rootTag = node?.children?.[0];
   const rootTagNameTokens = rootTag?.children?.find(
@@ -562,14 +546,12 @@ function getCompoundCompName(node: Node, getText: GetText) {
   }
   return undefined;
 }
-function addDisplayFieldsToErrors(
-  errors: ParseError[],
-  source: string,
-  newlinePositions: number[],
-): ErrorForDisplay[] {
+
+function addDisplayFieldsToErrors(errors: ParseError[], source: string): ErrorForDisplay[] {
+  const { offsetToPosForDisplay } = createDocumentCursor(source);
   return errors.map((err) => {
-    const { line: errPosLine, col: errPosCol } = offsetToPosition(err.pos, newlinePositions);
-    const { line: contextStartLine } = offsetToPosition(err.contextPos, newlinePositions);
+    const { line: errPosLine, character: errPosCol } = offsetToPosForDisplay(err.pos);
+    const { line: contextStartLine } = offsetToPosForDisplay(err.contextPos);
 
     return {
       ...err,
@@ -579,4 +561,57 @@ function addDisplayFieldsToErrors(
       contextSource: source.substring(err.contextPos, err.contextEnd),
     };
   });
+}
+
+type Position = { line: number; character: number };
+type DocumentCursor = {
+  offsetToPos: (offset: number) => Position;
+  offsetToPosForDisplay: (offset: number) => Position;
+};
+
+export function createDocumentCursor(text: string): DocumentCursor {
+  const newlinePositions = [];
+  for (let i = 0; i < text.length; ++i) {
+    if (text[i] === "\n") {
+      newlinePositions.push(i);
+    }
+  }
+
+  return {
+    offsetToPos,
+    offsetToPosForDisplay,
+  };
+
+  /**
+   * Converts a position in a string to 0 based line and column number.
+   * @param offset the 0 based offset into the string
+   */
+  function offsetToPos(offset: number): Position {
+    let left = 0;
+    let right = newlinePositions.length;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+
+      if (newlinePositions[mid] < offset) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+
+    let col = left === 0 ? offset : offset - newlinePositions[left - 1] - 1;
+
+    return { line: left, character: col };
+  }
+
+  /**
+   * Converts a position in a string to base 1 line and column number.
+   * @param offset the 0 based offset into the string
+   */
+  function offsetToPosForDisplay(offset: number): Position {
+    let pos = offsetToPos(offset);
+    pos.line += 1;
+    pos.character += 1;
+    return pos;
+  }
 }

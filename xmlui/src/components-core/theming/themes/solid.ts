@@ -1,4 +1,4 @@
-import { ThemeDefinition } from "../../../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 
 export const SolidThemeDefinition: ThemeDefinition = {
   id: "solid",
@@ -10,7 +10,7 @@ export const SolidThemeDefinition: ThemeDefinition = {
     "maxWidth-content": "100%",
 
     borderRadius: "0",
-    "fontSize": "$fontSize-normal",
+    "fontSize": "$fontSize-base",
     "size-Icon": "1rem",
   }
 };

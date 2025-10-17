@@ -1,3 +1,5 @@
+@use "xmlui/themes.scss" as themes;
+
 .standalonePlayground {
   display: flex;
   flex-direction: column;
@@ -5,4 +7,63 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
+}
+
+.loadingContainer {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 25px);
+  transform: translateX(-50%);
+  /* Center perfectly on the X axis */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Center the content horizontally */
+  width: 300px;
+  height: 50px;
+}
+
+.logoWrapper {
+  width: 50px;
+  height: 50px;
+  transform: translateZ(0);
+
+  .animatedLogoPath {
+    will-change: stroke-dashoffset, stroke-dasharray;
+    /* The total length of the rectangle path is ~82. */
+    stroke-dasharray: 82;
+    stroke-dashoffset: 82;
+
+    /* Animation: name, duration, easing, and iteration count */
+    animation: draw-loop 3s ease-in-out infinite;
+  }
+}
+
+.loadingText {
+  margin-right: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  /* Increased by 20% from 16px */
+  font-weight: 500;
+  color: themes.$color-primary-500;
+  text-align: right;
+}
+
+/* Defines the animation steps */
+@keyframes draw-loop {
+
+  /* At the start, the path is not drawn */
+  0% {
+    stroke-dashoffset: 82;
+  }
+
+  /* Animate to fully drawn over 40% of the duration */
+  40% {
+    stroke-dashoffset: 0;
+  }
+
+  /* Hold the fully drawn state until the end */
+  100% {
+    stroke-dashoffset: 0;
+  }
 }

@@ -3,6 +3,7 @@ import type {
   ComponentRendererFn,
   ComponentRendererDef,
   ComponentRendererOptions,
+  CompoundComponentRendererInfo
 } from "../abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
 
@@ -10,7 +11,7 @@ import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRen
 export function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
-  renderer: ComponentRendererFn<ComponentDef<TMd>>,
+  renderer: ComponentRendererFn<ComponentDef<any>>,
   options?: ComponentRendererOptions
 ): ComponentRendererDef {
   return {
@@ -53,5 +54,42 @@ export function createLoaderRenderer<TMd extends ComponentMetadata>(
     type,
     renderer,
     hints,
+  };
+}
+
+/**
+ * This helper function creates a user defined component renderer definition from its arguments.
+ * @param metadata The metadata of the user-defined component
+ * @param componentMarkup The XMLUI markup that defines the user-defined component
+ * @param codeBehind Optional code-behind script that contains variable and function definitions
+ * used by the component
+ * @returns The view renderer definition composed of the arguments
+ */
+export function createUserDefinedComponentRenderer<TMd extends ComponentMetadata>(
+  metadata: TMd,
+  def: any,
+  codeBehind?: any,
+): CompoundComponentRendererInfo {
+  // --- Parse the component definition from the markup
+  // --- Parse the optional code-behind script
+  const component = def.component.component;;
+  if (codeBehind) {
+    if (codeBehind.vars) {
+      component.vars ??= {};
+      component.vars = { ...component.vars, ...codeBehind.vars };
+    }
+    if (codeBehind.functions) {
+      component.functions ??= {};
+      component.functions = {
+        ...component.functions,
+        ...codeBehind.functions,
+      };
+    }
+  }
+
+  // --- Done.
+  return {
+    compoundComponentDef: def.component,
+    metadata,
   };
 }

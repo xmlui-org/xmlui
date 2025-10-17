@@ -1,456 +1,579 @@
-<Fragment>
-    <App
-        layout="vertical-full-header"
-        noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}">
-        <AppHeader>
-            <property name="logoTemplate">
-                <Link to="https://xmlui.org/">
-                    <Logo height="$space-8" />
-                </Link>
-            </property>
-            <SpaceFiller />
-            <Search
-                data="{appGlobals.plainTextContent}"
-                when="{mediaSize.sizeIndex > 2}" />
-            <ToneSwitch />
-        </AppHeader>
-        <NavPanel
-            when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
-            <Stack
-                paddingHorizontal="$space-4"
-                paddingBottom="$space-4"
-                when="{mediaSize.sizeIndex <= 2}">
-                <Search data="{appGlobals.plainTextContent}" />
-            </Stack>
-            <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
-                <NavLink label="Introduction" to="/" />
-                <NavLink label="Reactive Data" to="/reactive-intro" />
-                <NavLink label="Components" to="/components-intro" />
-                <NavLink label="Themes" to="/themes-intro" />
+<App
+    layout="vertical-full-header"
+    noScrollbarGutters="false">
+    <AppHeader>
+        <property name="logoTemplate">
+            <Link to="https://xmlui.org/">
+                <Logo height="$space-8" />
+            </Link>
+        </property>
+        <SpaceFiller />
+        <Search
+            data="{appGlobals.plainTextContent}"
+            when="{mediaSize.sizeIndex > 2}" />
+        <ToneSwitch />
+    </AppHeader>
+    <NavPanel
+        when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
+        <Stack
+            paddingHorizontal="$space-4"
+            paddingBottom="$space-4"
+            when="{mediaSize.sizeIndex <= 2}">
+            <Search data="{appGlobals.plainTextContent}" />
+        </Stack>
+        <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
+            <NavLink label="Introduction" to="/" />
+            <NavLink label="Reactive Data" to="/reactive-intro" />
+            <NavLink label="Components" to="/components-intro" />
+            <NavLink label="Themes" to="/themes-intro" />
+        </NavGroup>
+        <NavGroup label="Tutorial">
+            <NavLink label="XMLUI Invoice" to="/tutorial-01" />
+            <NavLink label="Main.xmlui" to="/tutorial-02" />
+            <NavLink label="Navigation" to="/tutorial-03" />
+            <NavLink label="InfoCards" to="/tutorial-04" />
+            <NavLink label="Charts" to="/tutorial-05" />
+            <NavLink label="Slider" to="/tutorial-06" />
+            <NavLink label="Invoices" to="/tutorial-07" />
+            <NavLink label="Create Invoice" to="/tutorial-08" />
+            <NavLink label="Invoice Details" to="/tutorial-09" />
+            <NavLink label="Search" to="/tutorial-10" />
+            <NavLink label="Import" to="/tutorial-11" />
+            <NavLink label="Settings" to="/tutorial-12" />
+        </NavGroup>
+        <NavGroup label="Guides">
+            <NavLink label="App Structure" to="/app-structure" />
+            <NavLink label="Markup" to="/markup" />
+            <NavLink label="Scoping" to="/scoping" />
+            <NavLink label="Scripting" to="/scripting" />
+            <NavLink label="Layout" to="/layout" />
+            <NavLink label="Working with Text" to="/working-with-text" />
+            <NavLink
+                label="Working with Markdown"
+                to="/working-with-markdown" />
+            <NavLink label="Routing and Links" to="/routing-and-links" />
+            <NavLink label="Forms" to="/forms" />
+            <NavLink label="Modal Dialogs" to="/modal-dialogs" />
+            <NavLink
+                label="User-defined Components"
+                to="/user-defined-components" />
+            <NavLink
+                label="Refactoring"
+                to="/refactoring" />
+            <NavLink
+                label="Build a HelloWorld Component"
+                to="/build-hello-world-component" />
+            <NavLink label="Hosted Deployment" to="/hosted-deployment" />
+        </NavGroup>
+        <NavGroup label="How To">
+            <NavLink
+                label="Expose a method from a component"
+                to="/howto/expose-a-method-from-a-component" />
+            <NavLink
+                label="Delegate a method"
+                to="/howto/delegate-a-method" />
+            <NavLink
+                label="React to button click not keystrokes"
+                to="/howto/react-to-button-click-not-keystrokes" />
+            <NavLink
+                label="Modify a value reported in a Column"
+                to="/howto/modify-a-value-reported-in-a-column" />
+            <NavLink
+                label="Filter and transform data from an API"
+                to="/howto/filter-and-transform-data-from-an-api" />
+            <NavLink
+                label="Group items in List by a property"
+                to="/howto/group-items-in-list-by-a-property" />
+            <NavLink
+                label="Delay a DataSource until another DataSource is ready"
+                to="/howto/delay-a-datasource-until-another-datasource-is-ready" />
+            <NavLink
+                label="Hide an element until its DataSource is ready"
+                to="/howto/hide-an-element-until-its-datasource-is-ready" />
+            <NavLink
+                label="Use built-in form validation"
+                to="/howto/use-built-in-form-validation" />
+            <NavLink
+                label="Do custom form validation"
+                to="/howto/do-custom-form-validation" />
+            <NavLink
+                label="Assign a complex JSON literal to a component variable"
+                to="/howto/assign-a-complex-json-literal-to-a-component-variable" />
+            <NavLink
+                label="Make a set of equal-width cards"
+                to="/howto/make-a-set-of-equal-width-cards" />
+            <NavLink
+                label="Set the initial value of a Select from fetched data"
+                to="/howto/set-the-initial-value-of-a-select-from-fetched-data" />
+            <NavLink
+                label="Pass data to a Modal Dialog"
+                to="/howto/pass-data-to-a-modal-dialog" />
+            <NavLink
+                label="Debug a component"
+                to="/howto/debug-a-component" />
+            <NavLink
+                label="Share a ModalDialog across components"
+                to="/howto/share-a-modaldialog-across-components" />
+            <NavLink
+                label="Use the same ModalDialog to add or edit"
+                to="/howto/use-the-same-modaldialog-to-add-or-edit" />
+            <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
+            <NavLink
+                label="Chain a DataSource refetch from an APICall.execute"
+                to="/howto/chain-a-refetch" />
+            <NavLink
+                label="Handle background operations"
+                to="/howto/handle-background-operations" />
+            <!--
+                <NavLink label="Update UI optimistically" to="/howto/update-ui-optimistically" />
+                -->
+            <NavLink
+                label="Make a table responsive"
+                to="/howto/make-a-table-responsive" />
+            <NavLink
+                label="Update UI optimistically"
+                to="/howto/update-ui-optimistically" />
+            <NavLink
+                label="Sync selections between table and list views"
+                to="/howto/sync-selections-between-table-and-list-views" />
+            <!-- Add more links as additional files are created -->
+        </NavGroup>
+        <NavGroup label="Reference">
+            <NavGroup label="Components">
+                <!-- GENERATED CONTENT/Component references links -->
+                <NavLink label="Components Overview" to="/components/_overview" />
+                <NavLink label="APICall" to="/components/APICall" />
+                <NavLink label="App" to="/components/App" />
+                <NavLink label="AppHeader" to="/components/AppHeader" />
+                <NavLink label="AppState" to="/components/AppState" />
+                <NavLink label="AutoComplete" to="/components/AutoComplete" />
+                <NavLink label="Avatar" to="/components/Avatar" />
+                <NavLink label="Backdrop" to="/components/Backdrop" />
+                <NavLink label="Badge" to="/components/Badge" />
+                <NavLink label="BarChart" to="/components/BarChart" />
+                <NavLink label="Bookmark" to="/components/Bookmark" />
+                <NavLink label="Breakout" to="/components/Breakout" />
+                <NavLink label="Button" to="/components/Button" />
+                <NavLink label="CHStack" to="/components/CHStack" />
+                <NavLink label="CVStack" to="/components/CVStack" />
+                <NavLink label="Card" to="/components/Card" />
+                <NavLink label="Carousel" to="/components/Carousel" />
+                <NavLink label="ChangeListener" to="/components/ChangeListener" />
+                <NavLink label="Checkbox" to="/components/Checkbox" />
+                <NavLink label="ColorPicker" to="/components/ColorPicker" />
+                <NavLink label="Column" to="/components/Column" />
+                <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
+                <NavLink label="DataSource" to="/components/DataSource" />
+                <NavLink label="DateInput" to="/components/DateInput" />
+                <NavLink label="DatePicker" to="/components/DatePicker" />
+                <NavLink label="DonutChart" to="/components/DonutChart" />
+                <NavLink label="DropdownMenu" to="/components/DropdownMenu" />
+                <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
+                <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
+                <NavLink label="FileInput" to="/components/FileInput" />
+                <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
+                <NavLink label="FlowLayout" to="/components/FlowLayout" />
+                <NavLink label="Footer" to="/components/Footer" />
+                <NavLink label="Form" to="/components/Form" />
+                <NavLink label="FormItem" to="/components/FormItem" />
+                <NavLink label="FormSection" to="/components/FormSection" />
+                <NavLink label="Fragment" to="/components/Fragment" />
+                <NavLink label="H1" to="/components/H1" />
+                <NavLink label="H2" to="/components/H2" />
+                <NavLink label="H3" to="/components/H3" />
+                <NavLink label="H4" to="/components/H4" />
+                <NavLink label="H5" to="/components/H5" />
+                <NavLink label="H6" to="/components/H6" />
+                <NavLink label="HSplitter" to="/components/HSplitter" />
+                <NavLink label="HStack" to="/components/HStack" />
+                <NavLink label="Heading" to="/components/Heading" />
+                <NavLink label="IFrame" to="/components/IFrame" />
+                <NavLink label="Icon" to="/components/Icon" />
+                <NavLink label="Image" to="/components/Image" />
+                <NavLink label="Items" to="/components/Items" />
+                <NavLink label="LabelList" to="/components/LabelList" />
+                <NavLink label="Legend" to="/components/Legend" />
+                <NavLink label="LineChart" to="/components/LineChart" />
+                <NavLink label="Link" to="/components/Link" />
+                <NavLink label="List" to="/components/List" />
+                <NavLink label="Logo" to="/components/Logo" />
+                <NavLink label="Markdown" to="/components/Markdown" />
+                <NavLink label="MenuItem" to="/components/MenuItem" />
+                <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
+                <NavLink label="ModalDialog" to="/components/ModalDialog" />
+                <NavLink label="NavGroup" to="/components/NavGroup" />
+                <NavLink label="NavLink" to="/components/NavLink" />
+                <NavLink label="NavPanel" to="/components/NavPanel" />
+                <NavLink label="NoResult" to="/components/NoResult" />
+                <NavLink label="NumberBox" to="/components/NumberBox" />
+                <NavLink label="Option" to="/components/Option" />
+                <NavLink label="Page" to="/components/Page" />
+                <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
+                <NavLink label="Pages" to="/components/Pages" />
+                <NavLink label="Pagination" to="/components/Pagination" />
+                <NavLink label="PasswordInput" to="/components/PasswordInput" />
+                <NavLink label="PieChart" to="/components/PieChart" />
+                <NavLink label="ProgressBar" to="/components/ProgressBar" />
+                <NavLink label="Queue" to="/components/Queue" />
+                <NavLink label="RadioGroup" to="/components/RadioGroup" />
+                <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
+                <NavLink label="Redirect" to="/components/Redirect" />
+                <NavLink label="Select" to="/components/Select" />
+                <NavLink label="Slider" to="/components/Slider" />
+                <NavLink label="Slot" to="/components/Slot" />
+                <NavLink label="SpaceFiller" to="/components/SpaceFiller" />
+                <NavLink label="Spinner" to="/components/Spinner" />
+                <NavLink label="Splitter" to="/components/Splitter" />
+                <NavLink label="Stack" to="/components/Stack" />
+                <NavLink label="StickyBox" to="/components/StickyBox" />
+                <NavLink label="SubMenuItem" to="/components/SubMenuItem" />
+                <NavLink label="Switch" to="/components/Switch" />
+                <NavLink label="TabItem" to="/components/TabItem" />
+                <NavLink label="Table" to="/components/Table" />
+                <NavLink label="TableOfContents" to="/components/TableOfContents" />
+                <NavLink label="Tabs" to="/components/Tabs" />
+                <NavLink label="Text" to="/components/Text" />
+                <NavLink label="TextArea" to="/components/TextArea" />
+                <NavLink label="TextBox" to="/components/TextBox" />
+                <NavLink label="Theme" to="/components/Theme" />
+                <NavLink label="TimeInput" to="/components/TimeInput" />
+                <NavLink label="Timer" to="/components/Timer" />
+                <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
+                <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
+                <NavLink label="Tooltip" to="/components/Tooltip" />
+                <NavLink label="Tree" to="/components/Tree" />
+                <NavLink label="VSplitter" to="/components/VSplitter" />
+                <NavLink label="VStack" to="/components/VStack" />
+                <!-- END GENERATED CONTENT/Component references links -->
             </NavGroup>
-            <NavGroup label="Tutorial">
-                <NavLink label="XMLUI Invoice HERE WE GO" to="/tutorial-here" />
-                <NavLink label="XMLUI Invoice" to="/tutorial-01" />
-                <NavLink label="Main.xmlui" to="/tutorial-02" />
-                <NavLink label="Navigation" to="/tutorial-03" />
-                <NavLink label="InfoCards" to="/tutorial-04" />
-                <NavLink label="Charts" to="/tutorial-05" />
-                <NavLink label="Slider" to="/tutorial-06" />
-                <NavLink label="Invoices" to="/tutorial-07" />
-                <NavLink label="Create Invoice" to="/tutorial-08" />
-                <NavLink label="Invoice Details" to="/tutorial-09" />
-                <NavLink label="Search" to="/tutorial-10" />
-                <NavLink label="Import" to="/tutorial-11" />
-                <NavLink label="Settings" to="/tutorial-12" />
-            </NavGroup>
-            <NavGroup label="Guides">
-                <NavLink label="App Structure" to="/app-structure" />
-                <NavLink label="Markup" to="/markup" />
-                <NavLink label="Scoping" to="/scoping" />
-                <NavLink label="Scripting" to="/scripting" />
-                <NavLink label="Layout" to="/layout" />
-                <NavLink label="Working with Text" to="/working-with-text" />
-                <NavLink
-                    label="Working with Markdown"
-                    to="/working-with-markdown" />
-                <NavLink label="Routing and Links" to="/routing-and-links" />
-                <NavLink label="Forms" to="/forms" />
-                <NavLink label="Modal Dialogs" to="/modal-dialogs" />
-                <NavLink
-                    label="User-defined Components"
-                    to="/user-defined-components" />
-                <NavLink
-                    label="Refactoring"
-                    to="/refactoring" />
-                <NavLink
-                    label="Build a HelloWorld Component"
-                    to="/build-hello-world-component" />
-                <NavLink label="Hosted Deployment" to="/hosted-deployment" />
-            </NavGroup>
-            <NavGroup label="How To">
-                <NavLink label="Expose a method from a component" to="/howto/expose-a-method-from-a-component" />
-                <NavLink label="React to button click not keystrokes" to="/howto/react-to-button-click-not-keystrokes" />
-                <NavLink label="Modify a value reported in a Column" to="/howto/modify-a-value-reported-in-a-column" />
-                <NavLink label="Filter and transform data from an API" to="/howto/filter-and-transform-data-from-an-api" />
-                <NavLink label="Group items in List by a property" to="/howto/group-items-in-list-by-a-property" />
-                <NavLink label="Delay a DataSource until another DataSource is ready" to="/howto/delay-a-datasource-until-another-datasource-is-ready" />
-                <NavLink label="Hide an element until its DataSource is ready" to="/howto/hide-an-element-until-its-datasource-is-ready" />
-                <NavLink label="Use built-in form validation" to="/howto/use-built-in-form-validation" />
-                <NavLink label="Do custom form validation" to="/howto/do-custom-form-validation" />
-                <NavLink label="Assign a complex JSON literal to a component variable" to="/howto/assign-a-complex-json-literal-to-a-component-variable" />
-                <NavLink label="Make a set of equal-width cards" to="/howto/make-a-set-of-equal-width-cards" />
-                <NavLink label="Set the initial value of a Select from fetched data" to="/howto/set-the-initial-value-of-a-select-from-fetched-data" />
-                <NavLink label="Pass data to a Modal Dialog" to="/howto/pass-data-to-a-modal-dialog" />
-                <NavLink label="Debug a component" to="/howto/debug-a-component" />
-                <NavLink label="Share a ModalDialog across components" to="/howto/share-a-modaldialog-across-components" />
-                <NavLink label="Use the same ModalDialog to add or edit" to="/howto/use-the-same-modaldialog-to-add-or-edit" />
-                <NavLink label="Paginate a List" to="/howto/paginate-a-list" />
-                <!-- Add more links as additional files are created -->
-            </NavGroup>
-            <NavGroup label="Reference">
-                <NavGroup label="Components">
-                    <!-- GENERATED CONTENT/Component references links -->
-                    <NavLink label="Components Overview" to="/components/_overview" />
-                    <NavLink label="APICall" to="/components/APICall" />
-                    <NavLink label="App" to="/components/App" />
-                    <NavLink label="AppHeader" to="/components/AppHeader" />
-                    <NavLink label="AppState" to="/components/AppState" />
-                    <NavLink label="AutoComplete" to="/components/AutoComplete" />
-                    <NavLink label="Avatar" to="/components/Avatar" />
-                    <NavLink label="Backdrop" to="/components/Backdrop" />
-                    <NavLink label="Badge" to="/components/Badge" />
-                    <NavLink label="BarChart" to="/components/BarChart" />
-                    <NavLink label="Bookmark" to="/components/Bookmark" />
-                    <NavLink label="Breakout" to="/components/Breakout" />
-                    <NavLink label="Button" to="/components/Button" />
-                    <NavLink label="CHStack" to="/components/CHStack" />
-                    <NavLink label="CVStack" to="/components/CVStack" />
-                    <NavLink label="Card" to="/components/Card" />
-                    <NavLink label="Carousel" to="/components/Carousel" />
-                    <NavLink label="ChangeListener" to="/components/ChangeListener" />
-                    <NavLink label="Checkbox" to="/components/Checkbox" />
-                    <NavLink label="ColorPicker" to="/components/ColorPicker" />
-                    <NavLink label="Column" to="/components/Column" />
-                    <NavLink label="ContentSeparator" to="/components/ContentSeparator" />
-                    <NavLink label="DataSource" to="/components/DataSource" />
-                    <NavLink label="DateInput" to="/components/DateInput" />
-                    <NavLink label="DatePicker" to="/components/DatePicker" />
-                    <NavLink label="DonutChart" to="/components/DonutChart" />
-                    <NavLink label="DropdownMenu" to="/components/DropdownMenu" />
-                    <NavLink label="EmojiSelector" to="/components/EmojiSelector" />
-                    <NavLink label="ExpandableItem" to="/components/ExpandableItem" />
-                    <NavLink label="FileInput" to="/components/FileInput" />
-                    <NavLink label="FileUploadDropZone" to="/components/FileUploadDropZone" />
-                    <NavLink label="FlowLayout" to="/components/FlowLayout" />
-                    <NavLink label="Footer" to="/components/Footer" />
-                    <NavLink label="Form" to="/components/Form" />
-                    <NavLink label="FormItem" to="/components/FormItem" />
-                    <NavLink label="FormSection" to="/components/FormSection" />
-                    <NavLink label="Fragment" to="/components/Fragment" />
-                    <NavLink label="H1" to="/components/H1" />
-                    <NavLink label="H2" to="/components/H2" />
-                    <NavLink label="H3" to="/components/H3" />
-                    <NavLink label="H4" to="/components/H4" />
-                    <NavLink label="H5" to="/components/H5" />
-                    <NavLink label="H6" to="/components/H6" />
-                    <NavLink label="HSplitter" to="/components/HSplitter" />
-                    <NavLink label="HStack" to="/components/HStack" />
-                    <NavLink label="Heading" to="/components/Heading" />
-                    <NavLink label="IFrame" to="/components/IFrame" />
-                    <NavLink label="Icon" to="/components/Icon" />
-                    <NavLink label="Image" to="/components/Image" />
-                    <NavLink label="Items" to="/components/Items" />
-                    <NavLink label="LabelList" to="/components/LabelList" />
-                    <NavLink label="Legend" to="/components/Legend" />
-                    <NavLink label="LineChart" to="/components/LineChart" />
-                    <NavLink label="Link" to="/components/Link" />
-                    <NavLink label="List" to="/components/List" />
-                    <NavLink label="Logo" to="/components/Logo" />
-                    <NavLink label="Markdown" to="/components/Markdown" />
-                    <NavLink label="MenuItem" to="/components/MenuItem" />
-                    <NavLink label="MenuSeparator" to="/components/MenuSeparator" />
-                    <NavLink label="ModalDialog" to="/components/ModalDialog" />
-                    <NavLink label="NavGroup" to="/components/NavGroup" />
-                    <NavLink label="NavLink" to="/components/NavLink" />
-                    <NavLink label="NavPanel" to="/components/NavPanel" />
-                    <NavLink label="NoResult" to="/components/NoResult" />
-                    <NavLink label="NumberBox" to="/components/NumberBox" />
-                    <NavLink label="Option" to="/components/Option" />
-                    <NavLink label="Page" to="/components/Page" />
-                    <NavLink label="PageMetaTitle" to="/components/PageMetaTitle" />
-                    <NavLink label="Pages" to="/components/Pages" />
-                    <NavLink label="Pagination" to="/components/Pagination" />
-                    <NavLink label="PasswordInput" to="/components/PasswordInput" />
-                    <NavLink label="PieChart" to="/components/PieChart" />
-                    <NavLink label="ProgressBar" to="/components/ProgressBar" />
-                    <NavLink label="Queue" to="/components/Queue" />
-                    <NavLink label="RadioGroup" to="/components/RadioGroup" />
-                    <NavLink label="RealTimeAdapter" to="/components/RealTimeAdapter" />
-                    <NavLink label="Redirect" to="/components/Redirect" />
-                    <NavLink label="Select" to="/components/Select" />
-                    <NavLink label="Slider" to="/components/Slider" />
-                    <NavLink label="Slot" to="/components/Slot" />
-                    <NavLink label="SpaceFiller" to="/components/SpaceFiller" />
-                    <NavLink label="Spinner" to="/components/Spinner" />
-                    <NavLink label="Splitter" to="/components/Splitter" />
-                    <NavLink label="Stack" to="/components/Stack" />
-                    <NavLink label="StickyBox" to="/components/StickyBox" />
-                    <NavLink label="SubMenuItem" to="/components/SubMenuItem" />
-                    <NavLink label="Switch" to="/components/Switch" />
-                    <NavLink label="TabItem" to="/components/TabItem" />
-                    <NavLink label="Table" to="/components/Table" />
-                    <NavLink label="TableOfContents" to="/components/TableOfContents" />
-                    <NavLink label="Tabs" to="/components/Tabs" />
-                    <NavLink label="Text" to="/components/Text" />
-                    <NavLink label="TextArea" to="/components/TextArea" />
-                    <NavLink label="TextBox" to="/components/TextBox" />
-                    <NavLink label="Theme" to="/components/Theme" />
-                    <NavLink label="TimeInput" to="/components/TimeInput" />
-                    <NavLink label="Timer" to="/components/Timer" />
-                    <NavLink label="ToneChangerButton" to="/components/ToneChangerButton" />
-                    <NavLink label="ToneSwitch" to="/components/ToneSwitch" />
-                    <NavLink label="Tooltip" to="/components/Tooltip" />
-                    <NavLink label="VSplitter" to="/components/VSplitter" />
-                    <NavLink label="VStack" to="/components/VStack" />
-                    <!-- END GENERATED CONTENT/Component references links -->
+            <NavGroup label="Extensions">
+                <!-- GENERATED CONTENT/Extension references links -->
+                <NavGroup label="Xmlui Animations">
+                <NavLink label="Extension Overview" to="/extensions/xmlui-animations/_overview" />
+                <NavLink label="Animation" to="/extensions/xmlui-animations/Animation" />
+                <NavLink label="FadeAnimation" to="/extensions/xmlui-animations/FadeAnimation" />
+                <NavLink label="FadeInAnimation" to="/extensions/xmlui-animations/FadeInAnimation" />
+                <NavLink label="FadeOutAnimation" to="/extensions/xmlui-animations/FadeOutAnimation" />
+                <NavLink label="ScaleAnimation" to="/extensions/xmlui-animations/ScaleAnimation" />
+                <NavLink label="SlideInAnimation" to="/extensions/xmlui-animations/SlideInAnimation" />
                 </NavGroup>
-                <NavGroup label="Themes">
-                    <NavLink
-                        label="Layout Properties"
-                        to="/styles-and-themes/layout-props" />
-                    <NavLink
-                        label="Theme Variables"
-                        to="/styles-and-themes/theme-variables" />
-                    <NavLink
-                        label="Theme Variable Defaults"
-                        to="/styles-and-themes/theme-variable-defaults" />
-                    <NavLink
-                        label="Common Units"
-                        to="/styles-and-themes/common-units" />
+                <NavGroup label="Xmlui Website Blocks">
+                <NavLink label="Extension Overview" to="/extensions/xmlui-website-blocks/_overview" />
+                <NavLink label="Carousel" to="/extensions/xmlui-website-blocks/Carousel" />
+                <NavLink label="HelloMd" to="/extensions/xmlui-website-blocks/HelloMd" />
+                <NavLink label="HeroSection" to="/extensions/xmlui-website-blocks/HeroSection" />
+                <NavLink label="ScrollToTop" to="/extensions/xmlui-website-blocks/ScrollToTop" />
                 </NavGroup>
-                <NavLink label="Context Variables" to="/context-variables" />
-                <NavLink label="Globals" to="/globals" />
-                <NavLink label="Helper Tags" to="/helper-tags" />
-                <NavLink
-                    label="Universal Properties"
-                    to="/universal-properties" />
-                <NavLink label="Template Properties" to="/template-properties" />
-                <NavLink label="Palettes" to="/palettes" />
-                <NavLink label="Icons" to="/icons" />
-                <NavLink label="Glossary" to="/glossary" />
+                <!-- END GENERATED CONTENT/Extension references links -->
             </NavGroup>
-            <NavLink label="Model Context Protocol" to="/mcp" />
+            <NavGroup label="Themes">
+                <NavLink
+                    label="Layout Properties"
+                    to="/styles-and-themes/layout-props" />
+                <NavLink
+                    label="Theme Variables"
+                    to="/styles-and-themes/theme-variables" />
+                <NavLink
+                    label="Theme Variable Defaults"
+                    to="/styles-and-themes/theme-variable-defaults" />
+                <NavLink
+                    label="Common Units"
+                    to="/styles-and-themes/common-units" />
+            </NavGroup>
+            <NavLink label="Context Variables" to="/context-variables" />
+            <NavLink label="Globals" to="/globals" />
+            <NavLink label="Helper Tags" to="/helper-tags" />
+            <NavLink
+                label="Universal Properties"
+                to="/universal-properties" />
+            <NavLink label="Template Properties" to="/template-properties" />
+            <NavLink label="Palettes" to="/palettes" />
+            <NavLink label="Icons" to="/icons" />
+            <NavLink label="Glossary" to="/glossary" />
+        </NavGroup>
+        <NavLink label="Model Context Protocol" to="/mcp" />
+        <!--
             <NavLink label="News and reviews" to="/news-and-reviews" />
-            <NavLink label="VSCode extension" to="/vscode" />
-            <NavLink label="Change Log" to="/change-log" />
-        </NavPanel>
-        <Pages fallbackPath="/404">
-            <Page url="/">
-                <DocumentPageNoTOC url="/pages/intro.md" />
-            </Page>
-            <Page url="/reactive-intro">
-                <DocumentPageNoTOC url="/pages/reactive-intro.md" />
-            </Page>
-            <Page url="/components-intro">
-                <DocumentPageNoTOC url="/pages/components-intro.md" />
-            </Page>
-            <Page url="/themes-intro">
-                <ThemesIntro />
-            </Page>
-            <Page url="/tutorial-01">
-                <DocumentPageNoTOC url="/pages/tutorial-01.md" />
-            </Page>
-
-          <Page url="/tutorial-here">
-            <Stack>
-              HEY HERE WE GO
-            </Stack>
-          </Page>
-            <Page url="/tutorial-02">
-                <DocumentPageNoTOC url="/pages/tutorial-02.md" />
-            </Page>
-            <Page url="/tutorial-03">
-                <DocumentPageNoTOC url="/pages/tutorial-03.md" />
-            </Page>
-            <Page url="/tutorial-04">
-                <DocumentPageNoTOC url="/pages/tutorial-04.md" />
-            </Page>
-            <Page url="/tutorial-05">
-                <DocumentPageNoTOC url="/pages/tutorial-05.md" />
-            </Page>
-            <Page url="/tutorial-06">
-                <DocumentPageNoTOC url="/pages/tutorial-06.md" />
-            </Page>
-            <Page url="/tutorial-07">
-                <DocumentPageNoTOC url="/pages/tutorial-07.md" />
-            </Page>
-            <Page url="/tutorial-08">
-                <DocumentPageNoTOC url="/pages/tutorial-08.md" />
-            </Page>
-            <Page url="/tutorial-09">
-                <DocumentPageNoTOC url="/pages/tutorial-09.md" />
-            </Page>
-            <Page url="/tutorial-10">
-                <DocumentPageNoTOC url="/pages/tutorial-10.md" />
-            </Page>
-            <Page url="/tutorial-11">
-                <DocumentPageNoTOC url="/pages/tutorial-11.md" />
-            </Page>
-            <Page url="/tutorial-12">
-                <DocumentPageNoTOC url="/pages/tutorial-12.md" />
-            </Page>
-            <Page url="/app-structure">
-                <DocumentPageNoTOC url="/pages/app-structure.md" />
-            </Page>
-            <Page url="/markup">
-                <DocumentPage url="/pages/markup.md" />
-            </Page>
-            <Page url="/scoping">
-                <DocumentPage url="/pages/scoping.md" />
-            </Page>
-            <Page url="/scripting">
-                <DocumentPage url="/pages/scripting.md" />
-            </Page>
-            <Page url="/layout">
-                <DocumentPage url="/pages/layout.md" />
-            </Page>
-            <Page url="/working-with-text">
-                <DocumentPage url="/pages/working-with-text.md" />
-            </Page>
-            <Page url="/working-with-markdown">
-                <DocumentPage url="/pages/working-with-markdown.md" />
-            </Page>
-            <Page url="/routing-and-links">
-                <DocumentPage url="/pages/routing-and-links.md" />
-            </Page>
-            <Page url="/forms">
-                <DocumentPage url="/pages/forms.md" />
-            </Page>
-            <Page url="/resources">
-                <DocumentPage url="/pages/resources.md" />
-            </Page>
-            <Page url="/modal-dialogs">
-                <DocumentPageNoTOC url="/pages/modal-dialogs.md" />
-            </Page>
-            <Page url="/user-defined-components">
-                <DocumentPageNoTOC url="/pages/user-defined-components.md" />
-            </Page>
-            <Page url="/refactoring">
-                <DocumentPageNoTOC url="/pages/refactoring.md" />
-            </Page>
-            <Page url="/styles-and-themes/layout-props">
-                <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
-            </Page>
-            <Page url="/styles-and-themes/theme-variables">
-                <DocumentPage url="/pages/styles-and-themes/theme-variables.md" />
-            </Page>
-            <Page url="/styles-and-themes/theme-variable-defaults">
-                <DocumentPageNoTOC url="/pages/styles-and-themes/theme-variable-defaults.md" />
-            </Page>
-            <Page url="/styles-and-themes/common-units">
-                <DocumentPage url="/pages/styles-and-themes/common-units.md" />
-            </Page>
-            <Page url="/context-variables">
-                <DocumentPage url="/pages/context-variables.md" />
-            </Page>
-            <Page url="/globals">
-                <DocumentPage url="pages/globals.md" />
-            </Page>
-            <Page url="/helper-tags">
-                <DocumentPage url="pages/helper-tags.md" />
-            </Page>
-            <Page url="/universal-properties">
-                <DocumentPage url="pages/universal-properties.md" />
-            </Page>
-            <Page url="/template-properties">
-                <DocumentPage url="pages/template-properties.md" />
-            </Page>
-            <Page url="/icons">
-                <Icons />
-            </Page>
-            <Page url="/palettes">
-                <Palettes />
-            </Page>
-            <Page url="/glossary">
-                <DocumentPageNoTOC url="/pages/glossary.md" />
-            </Page>
-            <Page url="/build-hello-world-component">
-                <DocumentPage url="/pages/build-hello-world-component.md" />
-            </Page>
-            <Page url="/build-editor-component">
-                <DocumentPage url="/pages/build-editor-component.md" />
-            </Page>
-            <Page url="/howto/expose-a-method-from-a-component">
-                <DocumentPageNoTOC url="/pages/howto/expose-a-method-from-a-component.md" />
-            </Page>
-            <Page url="/howto/react-to-button-click-not-keystrokes">
-                <DocumentPageNoTOC url="/pages/howto/react-to-button-click-not-keystrokes.md" />
-            </Page>
-            <Page url="/howto/modify-a-value-reported-in-a-column">
-                <DocumentPageNoTOC url="/pages/howto/modify-a-value-reported-in-a-column.md" />
-            </Page>
-            <Page url="/howto/filter-and-transform-data-from-an-api">
-                <DocumentPageNoTOC url="/pages/howto/filter-and-transform-data-from-an-api.md" />
-            </Page>
-            <Page url="/howto/group-items-in-list-by-a-property">
-                <DocumentPageNoTOC url="/pages/howto/group-items-in-list-by-a-property.md" />
-            </Page>
-            <Page url="/howto/delay-a-datasource-until-another-datasource-is-ready">
-                <DocumentPageNoTOC url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md" />
-            </Page>
-            <Page url="/howto/hide-an-element-until-its-datasource-is-ready">
-                <DocumentPageNoTOC url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md" />
-            </Page>
-            <Page url="/howto/use-built-in-form-validation">
-                <DocumentPageNoTOC url="/pages/howto/use-built-in-form-validation.md" />
-            </Page>
-            <Page url="/howto/do-custom-form-validation">
-                <DocumentPageNoTOC url="/pages/howto/do-custom-form-validation.md" />
-            </Page>
-            <Page url="/howto/assign-a-complex-json-literal-to-a-component-variable">
-                <DocumentPageNoTOC url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md" />
-            </Page>
-            <Page url="/howto/make-a-set-of-equal-width-cards">
-                <DocumentPageNoTOC url="/pages/howto/make-a-set-of-equal-width-cards.md" />
-            </Page>
-            <Page url="/howto/set-the-initial-value-of-a-select-from-fetched-data">
-                <DocumentPageNoTOC url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md" />
-            </Page>
-            <Page url="/howto/pass-data-to-a-modal-dialog">
-                <DocumentPageNoTOC url="/pages/howto/pass-data-to-a-modal-dialog.md" />
-            </Page>
-            <Page url="/howto/debug-a-component">
-                <DocumentPageNoTOC url="/pages/howto/debug-a-component.md" />
-            </Page>
-            <Page url="/howto/share-a-modaldialog-across-components">
-                <DocumentPageNoTOC url="/pages/howto/share-a-modaldialog-across-components.md" />
-            </Page>
-            <Page url="/howto/use-the-same-modaldialog-to-add-or-edit">
-                <DocumentPageNoTOC url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md" />
-            </Page>
-            <Page url="/howto/paginate-a-list">
-                <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
-            </Page>
-            <!-- Add more pages as additional files are created -->
-            <Page url="/hosted-deployment">
-                <DocumentPage url="/pages/hosted-deployment.md" />
-            </Page>
-            <Page url="/change-log">
-                <ChangeLog />
-            </Page>
-            <Page url="/mcp">
-                <DocumentPageNoTOC url="/pages/mcp.md" />
-            </Page>
-            <Page url="/news-and-reviews">
-                <DocumentPageNoTOC url="/pages/news-and-reviews.md" />
-            </Page>
-            <Page url="/vscode">
-                <DocumentPageNoTOC url="/pages/vscode.md" />
-            </Page>
-            <Page url="/components/*">
-                <script>
-                  var contentKey = 'components/' + $routeParams['*'];
-                  var content = appGlobals.content[contentKey];
-                </script>
-                <DocumentPage when="{content}" content="{content}" />
-                <Redirect when="{!content}" to="/404" />
-            </Page>
-            <Page url="/404">
-                <PageNotFound />
-            </Page>
-        </Pages>
-        <Footer>
-            <CHStack width="*">
-                This site is an XMLUI™ app.
-                <SpaceFiller />
-                <Link
-                    to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
-                    target="_blank">
-                    <Button variant="ghost" icon="github" />
-                </Link>
-            </CHStack>
-        </Footer>
-    </App>
-    <StandalonePlayground when="{window.location.hash.includes('/playground')}" />
-</Fragment>
+-->
+        <NavLink label="VSCode extension" to="/vscode" />
+        <NavLink label="Change Log" to="/change-log" />
+    </NavPanel>
+    <Pages fallbackPath="/404">
+        <Page url="/">
+            <DocumentPageNoTOC url="/pages/intro.md" />
+        </Page>
+        <Page url="/reactive-intro">
+            <DocumentPageNoTOC url="/pages/reactive-intro.md" />
+        </Page>
+        <Page url="/components-intro">
+            <DocumentPageNoTOC url="/pages/components-intro.md" />
+        </Page>
+        <Page url="/themes-intro">
+            <ThemesIntro />
+        </Page>
+        <Page url="/tutorial-01">
+            <DocumentPageNoTOC url="/pages/tutorial-01.md" />
+        </Page>
+        <Page url="/tutorial-02">
+            <DocumentPageNoTOC url="/pages/tutorial-02.md" />
+        </Page>
+        <Page url="/tutorial-03">
+            <DocumentPageNoTOC url="/pages/tutorial-03.md" />
+        </Page>
+        <Page url="/tutorial-04">
+            <DocumentPageNoTOC url="/pages/tutorial-04.md" />
+        </Page>
+        <Page url="/tutorial-05">
+            <DocumentPageNoTOC url="/pages/tutorial-05.md" />
+        </Page>
+        <Page url="/tutorial-06">
+            <DocumentPageNoTOC url="/pages/tutorial-06.md" />
+        </Page>
+        <Page url="/tutorial-07">
+            <DocumentPageNoTOC url="/pages/tutorial-07.md" />
+        </Page>
+        <Page url="/tutorial-08">
+            <DocumentPageNoTOC url="/pages/tutorial-08.md" />
+        </Page>
+        <Page url="/tutorial-09">
+            <DocumentPageNoTOC url="/pages/tutorial-09.md" />
+        </Page>
+        <Page url="/tutorial-10">
+            <DocumentPageNoTOC url="/pages/tutorial-10.md" />
+        </Page>
+        <Page url="/tutorial-11">
+            <DocumentPageNoTOC url="/pages/tutorial-11.md" />
+        </Page>
+        <Page url="/tutorial-12">
+            <DocumentPageNoTOC url="/pages/tutorial-12.md" />
+        </Page>
+        <Page url="/blog">
+            <BlogOverview posts="{posts}" />
+        </Page>
+        <Page url="/blog/{posts[0].slug}">
+            <BlogPage post="{posts[0]}" />
+        </Page>
+        <Page url="/blog/{posts[1].slug}">
+            <BlogPage post="{posts[1]}" />
+        </Page>
+        <Page url="/app-structure">
+            <DocumentPageNoTOC url="/pages/app-structure.md" />
+        </Page>
+        <Page url="/markup">
+            <DocumentPage url="/pages/markup.md" />
+        </Page>
+        <Page url="/scoping">
+            <DocumentPage url="/pages/scoping.md" />
+        </Page>
+        <Page url="/scripting">
+            <DocumentPage url="/pages/scripting.md" />
+        </Page>
+        <Page url="/layout">
+            <DocumentPage url="/pages/layout.md" />
+        </Page>
+        <Page url="/working-with-text">
+            <DocumentPage url="/pages/working-with-text.md" />
+        </Page>
+        <Page url="/working-with-markdown">
+            <DocumentPage url="/pages/working-with-markdown.md" />
+        </Page>
+        <Page url="/routing-and-links">
+            <DocumentPage url="/pages/routing-and-links.md" />
+        </Page>
+        <Page url="/forms">
+            <DocumentPage url="/pages/forms.md" />
+        </Page>
+        <Page url="/resources">
+            <DocumentPage url="/pages/resources.md" />
+        </Page>
+        <Page url="/modal-dialogs">
+            <DocumentPageNoTOC url="/pages/modal-dialogs.md" />
+        </Page>
+        <Page url="/user-defined-components">
+            <DocumentPageNoTOC url="/pages/user-defined-components.md" />
+        </Page>
+        <Page url="/refactoring">
+            <DocumentPageNoTOC url="/pages/refactoring.md" />
+        </Page>
+        <Page url="/styles-and-themes/layout-props">
+            <DocumentPage url="/pages/styles-and-themes/layout-props.md" />
+        </Page>
+        <Page url="/styles-and-themes/theme-variables">
+            <DocumentPage url="/pages/styles-and-themes/theme-variables.md" />
+        </Page>
+        <Page url="/styles-and-themes/theme-variable-defaults">
+            <DocumentPageNoTOC
+                url="/pages/styles-and-themes/theme-variable-defaults.md" />
+        </Page>
+        <Page url="/styles-and-themes/common-units">
+            <DocumentPage url="/pages/styles-and-themes/common-units.md" />
+        </Page>
+        <Page url="/context-variables">
+            <DocumentPage url="/pages/context-variables.md" />
+        </Page>
+        <Page url="/globals">
+            <DocumentPage url="pages/globals.md" />
+        </Page>
+        <Page url="/helper-tags">
+            <DocumentPage url="pages/helper-tags.md" />
+        </Page>
+        <Page url="/universal-properties">
+            <DocumentPage url="pages/universal-properties.md" />
+        </Page>
+        <Page url="/template-properties">
+            <DocumentPage url="pages/template-properties.md" />
+        </Page>
+        <Page url="/icons">
+            <Icons />
+        </Page>
+        <Page url="/palettes">
+            <Palettes />
+        </Page>
+        <Page url="/glossary">
+            <DocumentPageNoTOC url="/pages/glossary.md" />
+        </Page>
+        <Page url="/build-hello-world-component">
+            <DocumentPage url="/pages/build-hello-world-component.md" />
+        </Page>
+        <Page url="/build-editor-component">
+            <DocumentPage url="/pages/build-editor-component.md" />
+        </Page>
+        <Page url="/howto/expose-a-method-from-a-component">
+            <DocumentPageNoTOC
+                url="/pages/howto/expose-a-method-from-a-component.md" />
+        </Page>
+        <Page url="/howto/delegate-a-method">
+            <DocumentPageNoTOC url="/pages/howto/delegate-a-method.md" />
+        </Page>
+        <Page url="/howto/react-to-button-click-not-keystrokes">
+            <DocumentPageNoTOC
+                url="/pages/howto/react-to-button-click-not-keystrokes.md" />
+        </Page>
+        <Page url="/howto/modify-a-value-reported-in-a-column">
+            <DocumentPageNoTOC
+                url="/pages/howto/modify-a-value-reported-in-a-column.md" />
+        </Page>
+        <Page url="/howto/filter-and-transform-data-from-an-api">
+            <DocumentPageNoTOC
+                url="/pages/howto/filter-and-transform-data-from-an-api.md" />
+        </Page>
+        <Page url="/howto/group-items-in-list-by-a-property">
+            <DocumentPageNoTOC
+                url="/pages/howto/group-items-in-list-by-a-property.md" />
+        </Page>
+        <Page
+            url="/howto/delay-a-datasource-until-another-datasource-is-ready">
+            <DocumentPageNoTOC
+                url="/pages/howto/delay-a-datasource-until-another-datasource-is-ready.md" />
+        </Page>
+        <Page url="/howto/hide-an-element-until-its-datasource-is-ready">
+            <DocumentPageNoTOC
+                url="/pages/howto/hide-an-element-until-its-datasource-is-ready.md" />
+        </Page>
+        <Page url="/howto/use-built-in-form-validation">
+            <DocumentPageNoTOC
+                url="/pages/howto/use-built-in-form-validation.md" />
+        </Page>
+        <Page url="/howto/do-custom-form-validation">
+            <DocumentPageNoTOC
+                url="/pages/howto/do-custom-form-validation.md" />
+        </Page>
+        <Page
+            url="/howto/assign-a-complex-json-literal-to-a-component-variable">
+            <DocumentPageNoTOC
+                url="/pages/howto/assign-a-complex-json-literal-to-a-component-variable.md" />
+        </Page>
+        <Page url="/howto/make-a-set-of-equal-width-cards">
+            <DocumentPageNoTOC
+                url="/pages/howto/make-a-set-of-equal-width-cards.md" />
+        </Page>
+        <Page
+            url="/howto/set-the-initial-value-of-a-select-from-fetched-data">
+            <DocumentPageNoTOC
+                url="/pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md" />
+        </Page>
+        <Page url="/howto/pass-data-to-a-modal-dialog">
+            <DocumentPageNoTOC
+                url="/pages/howto/pass-data-to-a-modal-dialog.md" />
+        </Page>
+        <Page url="/howto/debug-a-component">
+            <DocumentPageNoTOC url="/pages/howto/debug-a-component.md" />
+        </Page>
+        <Page url="/howto/share-a-modaldialog-across-components">
+            <DocumentPageNoTOC
+                url="/pages/howto/share-a-modaldialog-across-components.md" />
+        </Page>
+        <Page url="/howto/use-the-same-modaldialog-to-add-or-edit">
+            <DocumentPageNoTOC
+                url="/pages/howto/use-the-same-modaldialog-to-add-or-edit.md" />
+        </Page>
+        <Page url="/howto/paginate-a-list">
+            <DocumentPageNoTOC url="/pages/howto/paginate-a-list.md" />
+        </Page>
+        <Page url="/howto/chain-a-refetch">
+            <DocumentPageNoTOC url="/pages/howto/chain-a-refetch.md" />
+        </Page>
+        <Page url="/howto/handle-background-operations">
+            <DocumentPageNoTOC
+                url="/pages/howto/handle-background-operations.md" />
+        </Page>
+        <Page url="/howto/update-ui-optimistically">
+            <DocumentPageNoTOC
+                url="/pages/howto/update-ui-optimistically.md" />
+        </Page>
+        <Page url="/howto/make-a-table-responsive">
+            <DocumentPageNoTOC
+                url="/pages/howto/make-a-table-responsive.md" />
+        </Page>
+        <Page url="/howto/sync-selections-between-table-and-list-views">
+            <DocumentPageNoTOC
+                url="/pages/howto/sync-selections-between-table-and-list-views.md" />
+        </Page>
+        <!-- Add more pages as additional files are created -->
+        <Page url="/hosted-deployment">
+            <DocumentPage url="/pages/hosted-deployment.md" />
+        </Page>
+        <Page url="/change-log">
+            <ChangeLog />
+        </Page>
+        <Page url="/mcp">
+            <DocumentPageNoTOC url="/pages/mcp.md" />
+        </Page>
+        <Page url="/news-and-reviews">
+            <DocumentPageNoTOC url="/pages/news-and-reviews.md" />
+        </Page>
+        <Page url="/vscode">
+            <DocumentPageNoTOC url="/pages/vscode.md" />
+        </Page>
+        <Page url="/components/*">
+            <script>
+                var contentKey = 'components/' + $routeParams['*'];
+                var content = appGlobals.content[contentKey];
+            </script>
+            <DocumentPage when="{content}" content="{content}" />
+            <Redirect when="{!content}" to="/404" />
+        </Page>
+        <Page url="/extensions/*">
+            <script>
+                var contentKey = 'extensions/' + $routeParams['*'];
+                var content = appGlobals.content[contentKey];
+            </script>
+            <DocumentPage when="{content}" content="{content}" />
+            <Redirect when="{!content}" to="/404" />
+        </Page>
+        <Page url="/404">
+            <PageNotFound />
+        </Page>
+    </Pages>
+    <Footer>
+        <CHStack width="*">
+            This site is an XMLUI™ app.
+            <SpaceFiller />
+            <Link
+                to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
+                target="_blank">
+                <Button variant="ghost" icon="github" />
+            </Link>
+        </CHStack>
+    </Footer>
+</App>

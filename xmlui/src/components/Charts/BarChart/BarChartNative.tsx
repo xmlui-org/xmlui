@@ -97,22 +97,6 @@ export function BarChart({
   const validData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
   const { getThemeVar } = useTheme();
 
-  const safeTooltipRenderer = useCallback(
-    (props: any) => {
-      if (!tooltipRenderer) return <TooltipContent {...props} />;
-
-      // Extract tooltip data from Recharts props
-      const tooltipData = {
-        label: props.label,
-        payload: props.payload,
-        active: props.active,
-      };
-
-      return tooltipRenderer(tooltipData);
-    },
-    [tooltipRenderer],
-  );
-
   const colorValues = useMemo(() => {
     return [
       getThemeVar("color-primary-500"),
@@ -153,6 +137,38 @@ export function BarChart({
       getThemeVar("color-secondary-700"),
     ];
   }, [getThemeVar]);
+
+  const safeTooltipRenderer = useCallback(
+    (props: any) => {
+      if (!tooltipRenderer) return <TooltipContent {...props} />;
+
+      const payloadArray: Array<{ label: string; value: any; color: string }> = [];
+
+      if (props.payload && props.payload.length > 0 && props.payload[0].payload) {
+        const originalPayload = props.payload[0].payload;
+        // Transform dataKeys into array of objects with label, value, and color
+        dataKeys?.forEach((dataKey, index) => {
+          if (dataKey in originalPayload) {
+            payloadArray.push({
+              label: dataKey,
+              value: originalPayload[dataKey],
+              color: colorValues[index] || colorValues[0]
+            });
+          }
+        });
+      }
+
+      // Extract tooltip data from Recharts props
+      const tooltipData = {
+        label: props.label,
+        payload: payloadArray,
+        active: props.active,
+      };
+
+      return tooltipRenderer(tooltipData);
+    },
+    [tooltipRenderer, dataKeys, colorValues],
+  );
 
   const config = useMemo(() => {
     return Object.assign(
@@ -256,56 +272,118 @@ export function BarChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, chartMargin.left, chartMargin.right, layout, validData.length, xAxisHeight]);
 
-  const content = useMemo(() => {
-    // NOTE: Had to place props separately since, for some reason, Recharts cannot handle
-    // if the axes are placed in a React.Fragment. Unsure why, because this worked before.
+  const [tooltipElement, setTooltipElement] = useState<HTMLElement | null>(null);
+  const observer = useRef<ResizeObserver>();
 
-    const xAxisProps: Record<string, any> =
-      layout === "vertical"
-        ? {
-            type: "number",
-            axisLine: false,
-            hide: miniMode || hideX,
-            height: miniMode || hideX ? 0 : xAxisHeight,
-            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-          }
-        : {
-            type: "category",
-            dataKey: nameKey,
-            hide: miniMode || hideX,
-            height: miniMode || hideX ? 0 : xAxisHeight,
-            tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
-            tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-            interval: interval,
-            tickLine: false,
-            angle: tickAngle,
-            textAnchor: tickAnchor,
-          };
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [tooltipWidth, setTooltipWidth] = useState(0);
 
-    const yAxisProps: Record<string, any> =
-      layout === "vertical"
-        ? {
-            type: "category",
-            dataKey: nameKey,
-            hide: miniMode || hideY,
-            interval: "equidistantPreserveStart",
-            tickLine: false,
-            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
-            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
-            width: miniMode || hideY ? 0 : yAxisWidth,
-          }
-        : {
-            type: "number",
-            axisLine: false,
-            tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
-            hide: miniMode || hideY,
-            tickCount: yTickCount,
-            tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
-            width: miniMode || hideY ? 0 : yAxisWidth,
-          };
+  const onMouseEnter = useCallback(
+    (e) => {
 
-    const chart = (
+      setTooltipPosition({ x: e.x - tooltipWidth / 2, y: e.y });
+    },
+    [setTooltipPosition, tooltipWidth],
+  );
+
+  // Observe the size of the reference element
+  useEffect(() => {
+    observer.current?.disconnect();
+
+    if (tooltipElement) {
+      observer.current = new ResizeObserver((entries) => {
+        if (entries[0]) {
+          setTooltipWidth(entries[0].contentRect.width);
+        }
+      });
+      observer.current.observe(tooltipElement);
+    }
+
+    return () => {
+      observer.current?.disconnect();
+    };
+  }, [tooltipElement]);
+
+  // Custom tooltip renderer that captures the DOM element
+  const customTooltipRenderer = useCallback(
+    (props: any) => {
+      const tooltipContent = safeTooltipRenderer(props);
+      
+      return (
+        <div
+          ref={(el) => {
+            if (el && el !== tooltipElement) {
+              setTooltipElement(el);
+            }
+          }}
+        >
+          {tooltipContent}
+        </div>
+      );
+    },
+    [safeTooltipRenderer],
+  );
+
+  const xAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "number",
+          axisLine: false,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+        }
+      : {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideX,
+          height: miniMode || hideX ? 0 : xAxisHeight,
+          tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
+          tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
+          interval: interval,
+          tickLine: false,
+          angle: tickAngle,
+          textAnchor: tickAnchor,
+        };
+
+  const yAxisProps: Record<string, any> =
+    layout === "vertical"
+      ? {
+          type: "category",
+          dataKey: nameKey,
+          hide: miniMode || hideY,
+          interval: "equidistantPreserveStart",
+          tickLine: false,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        }
+      : {
+          type: "number",
+          axisLine: false,
+          tick: miniMode || hideTickY ? false : { fill: "currentColor", fontSize },
+          hide: miniMode || hideY,
+          tickCount: yTickCount,
+          tickFormatter: miniMode || hideTickY ? undefined : tickFormatterY,
+          width: miniMode || hideY ? 0 : yAxisWidth,
+        };
+
+  return (
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <div
+        ref={labelsRef}
+        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
+      >
+        {validData
+          .map((d) => d[nameKey])
+          .map((label, idx) => (
+            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {label}
+            </span>
+          ))}
+      </div>
       <div
         className={classnames(className, styles.wrapper)}
         style={{ flexGrow: 1, ...style }}
@@ -328,7 +406,15 @@ export function BarChart({
             <CartesianGrid vertical={true} strokeDasharray="3 3" />
             <XAxis {...xAxisProps} />
             <YAxis {...yAxisProps} />
-            {!miniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
+            {!miniMode && !hideTooltip && (
+              <Tooltip
+                content={customTooltipRenderer}
+                wrapperStyle={{
+                  pointerEvents: "auto",
+                }}
+                position={tooltipPosition}
+              />
+            )}
             {validData.length > 0 &&
               Object.keys(config).map((key, index) => (
                 <Bar
@@ -338,6 +424,7 @@ export function BarChart({
                   radius={stacked ? 0 : 8}
                   stackId={stacked ? "stacked" : undefined}
                   strokeWidth={1}
+                  onMouseEnter={onMouseEnter}
                 />
               ))}
             {showLegend && (
@@ -355,52 +442,6 @@ export function BarChart({
           </RBarChart>
         </ResponsiveContainer>
       </div>
-    );
-
-    return chart;
-  }, [
-    chartMargin,
-    config,
-    hideTickX,
-    hideTickY,
-    hideX,
-    hideY,
-    interval,
-    layout,
-    miniMode,
-    nameKey,
-    showLegend,
-    stacked,
-    style,
-    className,
-    tickAnchor,
-    tickAngle,
-    tickFormatterX,
-    tickFormatterY,
-    xAxisHeight,
-    yAxisWidth,
-    yTickCount,
-    safeTooltipRenderer,
-    hideTooltip,
-    validData,
-  ]);
-
-  return (
-    <ChartProvider value={chartContextValue}>
-      {children}
-      <div
-        ref={labelsRef}
-        style={{ position: "absolute", visibility: "hidden", height: 0, overflow: "hidden" }}
-      >
-        {validData
-          .map((d) => d[nameKey])
-          .map((label, idx) => (
-            <span key={idx} style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-              {label}
-            </span>
-          ))}
-      </div>
-      {content}
     </ChartProvider>
   );
 }

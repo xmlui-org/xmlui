@@ -1,0 +1,93 @@
+<Component name="HeroBackgroundsPage">
+  <H1>
+    Hero with background image
+  </H1>
+  <HeroSection
+    preamble="pmengine"
+    backgroundColor="lightgreen"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <property name="backgroundTemplate">
+      <Image src="/resources/xmlui-logo.svg" />
+    </property>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  preamble="pmengine"
+  backgroundColor="lightgreen"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+  <property name="backgroundTemplate">
+    <Image src="/resources/xmlui-logo.svg" />
+  </property>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+  <H1>
+    Hero with transformed background image
+  </H1>
+  <HeroSection
+    preamble="pmengine"
+    backgroundColor="lightgreen"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <property name="backgroundTemplate">
+      <Image src="/resources/xmlui-logo.svg" width="2000px" height="600px" fit="contain" transform="rotate(23deg)"/>
+    </property>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  preamble="pmengine"
+  backgroundColor="lightgreen"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+  <property name="backgroundTemplate">
+    <Image src="/resources/xmlui-logo.svg" width="2000px" height="600px" fit="contain" transform="rotate(23deg)"/>
+  </property>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+
+
+  <H1>
+    Hero with transformed background image and no breakout
+  </H1>
+  <HeroSection
+    preamble="pmengine"
+    backgroundColor="lightgreen"
+    fullWidthBackground="false"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+    <property name="backgroundTemplate">
+      <Image src="/resources/xmlui-logo.svg" width="2000px" height="600px" fit="contain" transform="rotate(23deg)"/>
+    </property>
+  </HeroSection>
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  preamble="pmengine"
+  backgroundColor="lightgreen"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows.">
+  <property name="backgroundTemplate">
+    <Image src="/resources/xmlui-logo.svg" width="2000px" height="600px" fit="contain" transform="rotate(23deg)"/>
+  </property>
+</HeroSection>
+```        
+        ]]>
+  </Markdown>
+</Component>

@@ -1,4 +1,5 @@
-import { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { CSSProperties } from "react";
 import classnames from "classnames";
 
 import styles from "./PositionedContainer.module.scss";

@@ -115,7 +115,7 @@ You can observe the effect of using `preserveLinebreaks`:
 > Remember to use the `value` property of `Heading`.
 > Linebreaks are converted to spaces when nesting the text in the `Heading` component.
 
-### `showAnchor` [#showanchor]
+### `showAnchor` (default: false) [#showanchor-default-false]
 
 This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.
 
@@ -138,6 +138,12 @@ This property determines the text displayed in the heading. `Heading` also accep
 This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
+
+### `hasOverflow` [#hasoverflow]
+
+Returns true when the displayed text overflows the bounds of this heading component.
+
+**Signature**: `hasOverflow()`
 
 ### `scrollIntoView` [#scrollintoview]
 

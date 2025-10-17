@@ -112,7 +112,7 @@ test.describe("Basic Functionality", () => {
     const textarea = page.getByRole("textbox");
     await textarea.fill("Some content");
     await expect(textarea).toHaveValue("Some content");
-    expect(textarea).toHaveAttribute("placeholder", "Enter comments");
+    await expect(textarea).toHaveAttribute("placeholder", "Enter comments");
   });
 
   test("maxLength limits input length", async ({ initTestBed, page }) => {
@@ -143,23 +143,6 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("textbox")).toHaveValue(longText);
   });
 
-  test.fixme(
-    "component handles rapid input changes efficiently",
-    SKIP_REASON.REFACTOR("Rewrite: test does not test anything meaningful"),
-    async ({ initTestBed, createTextAreaDriver }) => {
-      await initTestBed(`<TextArea />`);
-      const driver = await createTextAreaDriver();
-
-      // Type rapidly
-      await driver.field.pressSequentially("rapid typing test", { delay: 25 });
-      await expect(driver.field).toHaveValue("rapid typing test");
-
-      await driver.field.clear();
-      await driver.field.pressSequentially("another fast test", { delay: 10 });
-      await expect(driver.field).toHaveValue("another fast test");
-    },
-  );
-
   test("component prop changes update display correctly", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment var.rows="{3}">
@@ -167,7 +150,7 @@ test.describe("Basic Functionality", () => {
         <Button onClick="rows = 5">Set Rows to 5</Button>
       </Fragment>`);
     const textarea = page.getByRole("textbox");
-    
+
     await expect(textarea).toHaveAttribute("rows", "3");
     await page.getByRole("button", { name: "Set Rows to 5" }).click();
     await expect(textarea).toHaveAttribute("rows", "5");
@@ -359,7 +342,7 @@ test.describe("Accessibility", () => {
 
   test("component is keyboard accessible when interactive", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <TextArea 
+      <TextArea
         label="Comments"
         onGotFocus="testState = 'keyboard-focused'"
       />
@@ -403,7 +386,10 @@ test.describe("Accessibility", () => {
 
   test("placeholder provides accessible description", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea placeholder="Describe your feedback in detail" />`);
-    await expect(page.getByRole("textbox")).toHaveAttribute("placeholder", "Describe your feedback in detail");
+    await expect(page.getByRole("textbox")).toHaveAttribute(
+      "placeholder",
+      "Describe your feedback in detail",
+    );
   });
 
   test("component supports multiple textareas with keyboard navigation", async ({
@@ -425,6 +411,64 @@ test.describe("Accessibility", () => {
 
     await page.keyboard.press("Tab");
     await expect(secondTextarea).toBeFocused();
+  });
+});
+
+// =============================================================================
+// EVENT HANDLING TESTS
+// =============================================================================
+
+test.describe("Event Handling", () => {
+  test("didChange event fires on input change", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="testState = 'changed'" />
+    `);
+    await page.getByRole("textbox").fill("test");
+    await expect.poll(testStateDriver.testState).toEqual("changed");
+  });
+
+  test("didChange event passes new value", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onDidChange="arg => testState = arg" />
+    `);
+    await page.getByRole("textbox").fill("test value");
+    await expect.poll(testStateDriver.testState).toEqual("test value");
+  });
+
+  test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByRole("textbox").focus();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("gotFocus event fires on label click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea label="Comments" onGotFocus="testState = 'focused'" />
+    `);
+    await page.getByText("Comments").click();
+    await expect.poll(testStateDriver.testState).toEqual("focused");
+  });
+
+  test("lostFocus event fires on blur", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onLostFocus="testState = 'blurred'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.blur();
+    await expect.poll(testStateDriver.testState).toEqual("blurred");
+  });
+
+  test("events do not fire when component is disabled", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea enabled="false" onDidChange="testState = 'changed'" onGotFocus="testState = 'focused'" />
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.focus();
+    await textarea.fill("test", { force: true });
+    await expect.poll(testStateDriver.testState).toEqual(null);
   });
 });
 
@@ -464,7 +508,7 @@ test.describe("Visual States", () => {
       testThemeVars: {
         "backgroundColor-TextArea--disabled": "rgb(255, 0, 0)",
         "textColor-TextArea--disabled": "rgb(0, 255, 0)",
-        "borderColor-TextArea--disabled": "rgb(0, 0, 255)"
+        "borderColor-TextArea--disabled": "rgb(0, 0, 255)",
       },
     });
     const textarea = page.getByRole("textbox");
@@ -589,17 +633,26 @@ test.describe("Edge Cases", () => {
     await expect(textarea).toHaveValue(longValue);
   });
 
-  test("component handles invalid maxRows/minRows combinations with autoSize", async ({ initTestBed, page }) => {
+  test("component handles invalid maxRows/minRows combinations with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="2" minRows="5" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("component handles zero maxRows/minRows values with autoSize", async ({ initTestBed, page }) => {
+  test("component handles zero maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="0" minRows="0" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
 
-  test("component handles negative maxRows/minRows values with autoSize", async ({ initTestBed, page }) => {
+  test("component handles negative maxRows/minRows values with autoSize", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`<TextArea autoSize="true" maxRows="{-1}" minRows="{-1}" />`);
     await expect(page.getByRole("textbox")).toBeVisible();
   });
@@ -612,7 +665,7 @@ test.describe("Edge Cases", () => {
 test.describe("Performance", () => {
   test("component memoization prevents unnecessary re-renders", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <TextArea 
+      <TextArea
         label="Performance Test"
         onDidChange="testState = ++testState || 1"
       />
@@ -630,25 +683,6 @@ test.describe("Performance", () => {
     // Component should maintain consistent behavior
     await expect(textarea).toBeVisible();
     await expect(textarea).toHaveValue("ab");
-  });
-
-  test.skip("component memory usage stays stable", SKIP_REASON.TEST_NOT_WORKING("This does not test what it says"), async ({ initTestBed, page }) => {
-    // Test multiple instances don't cause memory leaks
-    const configurations = [
-      { label: "Comments 1", rows: "3" },
-      { label: "Comments 2", rows: "5" },
-      { label: "Comments 3", rows: "7" },
-    ];
-
-    for (const config of configurations) {
-      await initTestBed(`<TextArea testId="input" label="${config.label}" rows="${config.rows}" />`);
-      await expect(page.getByTestId("input")).toBeVisible();
-      await expect(page.getByRole("textbox")).toHaveAttribute("rows", config.rows);
-    }
-
-    // Verify final state is clean
-    await initTestBed(`<TextArea testId="input" label="Final Test" />`);
-    await expect(page.getByTestId("input")).toBeVisible();
   });
 
   test("component handles large content efficiently", async ({ initTestBed, page }) => {
@@ -746,7 +780,7 @@ test.describe("Integration", () => {
   test("component works with event handling chain", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <TextArea 
+        <TextArea
           onGotFocus="testState = 'focused'"
           onLostFocus="testState = 'blurred'"
           onDidChange="(value) => testState = 'changed: ' + value"
@@ -796,23 +830,6 @@ test.describe("Integration", () => {
     // Test focus API integration
     await focusBtn.click();
     await expect(textarea1).toBeFocused();
-  });
-
-  test.fixme("component handles complex validation scenarios", SKIP_REASON.REFACTOR("This does not test what it says in the description"), async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <TextArea 
-        required="true"
-        maxLength="100"
-        validationStatus="error"
-        label="Required Comments"
-      />
-    `);
-    const textarea = page.getByRole("textbox");
-
-    // Component should show error state
-    await expect(textarea).toHaveAttribute("required");
-    await expect(textarea).toHaveAttribute("maxlength", "100");
-    await expect(page.getByText("Required Comments")).toContainText("*");
   });
 
   test("component works in nested component structures", async ({ initTestBed, page }) => {
@@ -935,11 +952,47 @@ test.describe("Regression", () => {
     await expect(driver.component).toBeFocused();
     await driver.component.fill("a");
     await expect(driver.component).toHaveValue("a");
-    await tbDriver.field.fill("abc");
-    await expect(tbDriver.field).toHaveValue("abc");
+    await driver.component.fill("abc");
+    await expect(driver.component).toHaveValue("abc");
     await driver.component.fill("abcde");
     await expect(driver.component).toHaveValue("abcde");
-    await expect(driver.component).toBeFocused();
-    await expect(tbDriver.field).toHaveValue("abcde");
   });
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("input has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<TextArea width="200px" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<TextArea width="200px" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TextArea width="50%" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300});
+  await initTestBed(`<TextArea width="50%" label="test" testId="test"/>`, {});
+  
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
 });

@@ -1,4 +1,4 @@
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
@@ -60,6 +60,13 @@ const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
+type RuntimeProps = {
+  default?: any;
+  component?: ComponentDef | CompoundComponentDef;
+  file?: string;
+  src?: string;
+}
+
 // --- The properties of the standalone app
 type StandaloneAppProps = {
   // --- The standalone app description (the engine renders this definition)
@@ -73,7 +80,7 @@ type StandaloneAppProps = {
   debugEnabled?: boolean;
 
   // --- The runtime environment of the standalone app (for pre-compiled apps)
-  runtime?: any;
+  runtime?: RuntimeProps;
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
@@ -100,7 +107,7 @@ function StandaloneApp({
   runtime,
   extensionManager,
   waitForApiInterceptor = false,
-  children
+  children,
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
@@ -123,19 +130,19 @@ function StandaloneApp({
     sources,
   } = standaloneApp || {};
 
-  const globalProps = useMemo(()=>{
+  const globalProps = useMemo(() => {
     return {
       name: name,
       ...(appGlobals || {}),
-      ...(globals || {})
-    }
+      ...(globals || {}),
+    };
   }, [appGlobals, globals, name]);
 
-  let contributes = useMemo(()=>{
+  let contributes = useMemo(() => {
     return {
       compoundComponents: components,
       themes,
-    }
+    };
   }, [components, themes]);
 
   if (!standaloneApp) {
@@ -160,7 +167,11 @@ function StandaloneApp({
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
-    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting} waitForApiInterceptor={waitForApiInterceptor}>
+    <ApiInterceptorProvider
+      interceptor={mockedApi}
+      useHashBasedRouting={useHashBasedRouting}
+      waitForApiInterceptor={waitForApiInterceptor}
+    >
       <AppRoot
         projectCompilation={projectCompilation}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
@@ -176,7 +187,10 @@ function StandaloneApp({
         resourceMap={resourceMap}
         sources={sources}
         extensionManager={extensionManager}
-        contributes={contributes}>{children}</AppRoot>
+        contributes={contributes}
+      >
+        {children}
+      </AppRoot>
     </ApiInterceptorProvider>
   );
 }
@@ -556,7 +570,7 @@ async function loadThemeFile(url: string): Promise<ThemeDefinition> {
  * @param url The URL to fetch the source file from
  * @returns The source file contents response
  */
-async function fetchWithoutCache(url: string): Promise<Response> {
+function fetchWithoutCache(url: string): Promise<Response> {
   return fetch(normalizePath(url), {
     headers: {
       "Cache-Control": "no-cache, no-store",
@@ -601,7 +615,7 @@ function useStandalone(
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
 
   useIsomorphicLayoutEffect(() => {
-    (async function () {
+    void (async function () {
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 

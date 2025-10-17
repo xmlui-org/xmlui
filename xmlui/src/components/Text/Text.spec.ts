@@ -128,6 +128,208 @@ please do not break it!"
 });
 
 // =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("API", () => {
+  test("hasOverflow returns true when text overflows horizontally", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="200px">
+          <Text id="overflowText" maxLines="{1}" 
+            value="This is a very long text that should definitely overflow when constrained to a small width" 
+          />
+          <Button onClick="testState = overflowText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow returns true when text overflows with maxLines constraint", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="200px">
+          <Text id="overflowText" maxLines="{2}" value="This is a very long text that will wrap to multiple lines and should overflow beyond the maxLines constraint when the container is wide enough to allow wrapping" />
+          <Button onClick="testState = overflowText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow returns false when text fits within container", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="300px" height="100px">
+          <Text id="normalText" value="Short text" />
+          <Button onClick="testState = normalText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow returns false for empty text", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px" height="50px">
+          <Text id="emptyText" value="" />
+          <Button onClick="testState = emptyText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow returns false for text with no size constraints", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Text id="unconstrainedText" value="This text has no width or height constraints so it should not overflow" />
+        <Button onClick="testState = unconstrainedText.hasOverflow()" />
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow works with different overflow modes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Text id="ellipsisText" overflowMode="ellipsis" maxLines="{1}" value="This is a very long text that should overflow" />
+          <Button onClick="testState = { ellipsis: ellipsisText.hasOverflow() }" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    const result = await testStateDriver.testState();
+    expect(result.ellipsis).toBe(true);
+  });
+
+  test("hasOverflow works with scroll overflow mode", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Text id="scrollText" overflowMode="scroll" value="This is a very long text that should create horizontal scroll" />
+          <Button onClick="testState = scrollText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow returns correct result after content changes", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.text="short">
+        <Stack width="100px">
+          <Text id="dynamicText" value="{text}" maxLines="{1}" />
+          <Button testId="checkBtn" onClick="testState = dynamicText.hasOverflow()" />
+          <Button testId="changeBtn" onClick="text = 'This is a very long text that will definitely overflow the container'" />
+        </Stack>
+      </Fragment>
+    `);
+
+    // Check initial state (should not overflow)
+    await page.getByTestId("checkBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+
+    // Change content to overflow
+    await page.getByTestId("changeBtn").click();
+    await page.getByTestId("checkBtn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow handles null/undefined values gracefully", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Text id="nullText" value="{null}" />
+          <Button onClick="testState = nullText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("hasOverflow works with unicode characters", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Text id="unicodeText" maxLines="{1}" value="👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦" />
+          <Button onClick="testState = unicodeText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow works with Chinese characters", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="100px">
+          <Text id="chineseText" maxLines="{1}" value="这是一个非常长的中文文本，应该会在小容器中溢出显示区域超出边界限制" />
+          <Button onClick="testState = chineseText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    await page.getByRole("button").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("hasOverflow API can be called multiple times", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Stack width="200px">
+          <Text id="multiCallText" value="Test content" />
+          <Button onClick="testState = testState == null ? 1 : testState + 1; multiCallText.hasOverflow()" />
+        </Stack>
+      </Fragment>
+    `);
+
+    // Call API multiple times
+    await page.getByRole("button").click();
+    await page.getByRole("button").click();
+    await page.getByRole("button").click();
+
+    // Should have been called 3 times without errors
+    await expect.poll(testStateDriver.testState).toBe(3);
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
@@ -283,87 +485,105 @@ test.describe("Visual States", () => {
 // =============================================================================
 
 test.describe("Overflow Mode", () => {
-  test('overflowMode="none" allows wrapping with no overflow indicator', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="none" allows wrapping with no overflow indicator', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowMode="none">
         This is a very long text that should wrap naturally and show no ellipsis.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("white-space", "nowrap");
     await expect(driver.component).toHaveCSS("text-overflow", "clip");
     await expect(driver.component).toHaveCSS("overflow", "hidden");
   });
 
-  test('overflowMode="none" ignores maxLines and clips text cleanly', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="none" ignores maxLines and clips text cleanly', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowMode="none" maxLines="2">
         This is a long-long-long text that should be simply cut at the end without any ellipsis or other overflow indicator.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("white-space", "nowrap");
     await expect(driver.component).toHaveCSS("text-overflow", "clip");
     await expect(driver.component).toHaveCSS("overflow", "hidden");
     // Should NOT use webkit-line-clamp for "none" behavior - it ignores maxLines
     await expect(driver.component).toHaveCSS("-webkit-line-clamp", "none");
     // Should not apply maxLines styles since none mode ignores maxLines
-    const maxHeight = await driver.component.evaluate(el => getComputedStyle(el).maxHeight);
+    const maxHeight = await driver.component.evaluate((el) => getComputedStyle(el).maxHeight);
     expect(maxHeight).toBe("none"); // Should be "none" since maxLines is ignored
-    
+
     // Verify the element is visible and has content
     await expect(driver.component).toBeVisible();
     await expect(driver.component).toContainText("This is a long-long-long text");
   });
 
-  test('overflowMode="ellipsis" shows ellipsis when text overflows (default)', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="ellipsis" shows ellipsis when text overflows (default)', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowMode="ellipsis" maxLines="1">
         This is a very long text that should show ellipsis when it overflows.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("text-overflow", "ellipsis");
     await expect(driver.component).toHaveCSS("overflow", "hidden");
   });
 
-  test('overflowMode="scroll" enables horizontal scrolling', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="scroll" enables horizontal scrolling', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowMode="scroll">
         This is a very long text that should enable horizontal scrolling when it overflows the container width.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("white-space", "nowrap");
     await expect(driver.component).toHaveCSS("overflow-x", "auto");
     await expect(driver.component).toHaveCSS("overflow-y", "hidden");
   });
 
-  test('overflowMode="flow" allows multi-line wrapping with vertical scrolling', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="flow" allows multi-line wrapping with vertical scrolling', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" height="60px" overflowMode="flow">
         This is a very long text that should wrap to multiple lines and show a vertical scrollbar when the content exceeds the container height.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("white-space", "normal");
     await expect(driver.component).toHaveCSS("overflow-x", "hidden");
     await expect(driver.component).toHaveCSS("overflow-y", "auto");
   });
 
-  test('overflowMode="flow" ignores maxLines property', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="flow" ignores maxLines property', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px" overflowMode="flow" maxLines="3">
         This is a very long text that should wrap to multiple lines and completely ignore the maxLines property when using flow mode.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("white-space", "normal");
     await expect(driver.component).toHaveCSS("overflow-y", "auto");
     // Check that line-clamp is NOT applied when flow mode ignores maxLines
@@ -380,10 +600,10 @@ test.describe("Overflow Mode", () => {
       </VStack>
     `);
     const ellipsisDriver = await createTextDriver("ellipsisText");
-    
+
     // Ellipsis should respect maxLines with line-clamp
     await expect(ellipsisDriver.component).toHaveCSS("-webkit-line-clamp", "2");
-    
+
     // Should show ellipsis behavior
     await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
   });
@@ -401,23 +621,26 @@ test.describe("Overflow Mode", () => {
     `);
     const scrollWithMaxLinesDriver = await createTextDriver("scrollWithMaxLines");
     const scrollWithoutMaxLinesDriver = await createTextDriver("scrollWithoutMaxLines");
-    
+
     // Both should have the same behavior - no line-clamp applied
     await expect(scrollWithMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
     await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
-    
+
     // Both should have scroll behavior
     await expect(scrollWithMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
     await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("overflow-x", "auto");
     await expect(scrollWithMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
     await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("white-space", "nowrap");
-    
+
     // Neither should use text-overflow ellipsis
     await expect(scrollWithMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
     await expect(scrollWithoutMaxLinesDriver.component).toHaveCSS("text-overflow", "clip");
   });
 
-  test("overflowMode='flow' ignores maxLines for unrestricted wrapping", async ({ initTestBed, createTextDriver }) => {
+  test("overflowMode='flow' ignores maxLines for unrestricted wrapping", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Text testId="flowWithMaxLines" width="150px" overflowMode="flow" maxLines="2">
@@ -430,11 +653,11 @@ test.describe("Overflow Mode", () => {
     `);
     const flowWithMaxLinesDriver = await createTextDriver("flowWithMaxLines");
     const flowWithoutMaxLinesDriver = await createTextDriver("flowWithoutMaxLines");
-    
+
     // Both should behave identically - flow mode ignores maxLines
     await expect(flowWithMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
     await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("-webkit-line-clamp", "none");
-    
+
     // Both should have flow behavior
     await expect(flowWithMaxLinesDriver.component).toHaveCSS("overflow-y", "auto");
     await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("overflow-y", "auto");
@@ -442,13 +665,16 @@ test.describe("Overflow Mode", () => {
     await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("overflow-x", "hidden");
     await expect(flowWithMaxLinesDriver.component).toHaveCSS("white-space", "normal");
     await expect(flowWithoutMaxLinesDriver.component).toHaveCSS("white-space", "normal");
-    
+
     // Neither should use webkit-box display
     await expect(flowWithMaxLinesDriver.component).not.toHaveCSS("display", "-webkit-box");
     await expect(flowWithoutMaxLinesDriver.component).not.toHaveCSS("display", "-webkit-box");
   });
 
-  test("overflowMode respects ellipses property for ellipsis behavior", async ({ initTestBed, createTextDriver }) => {
+  test("overflowMode respects ellipses property for ellipsis behavior", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Text testId="withEllipses" width="200px" overflowMode="ellipsis" ellipses="true" maxLines="1">
@@ -461,12 +687,15 @@ test.describe("Overflow Mode", () => {
     `);
     const withEllipsesDriver = await createTextDriver("withEllipses");
     const withoutEllipsesDriver = await createTextDriver("withoutEllipses");
-    
+
     await expect(withEllipsesDriver.component).toHaveCSS("text-overflow", "ellipsis");
     await expect(withoutEllipsesDriver.component).toHaveCSS("text-overflow", "clip");
   });
 
-  test('overflowMode="ellipsis" works with multi-line text (maxLines > 1)', async ({ initTestBed, createTextDriver }) => {
+  test('overflowMode="ellipsis" works with multi-line text (maxLines > 1)', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Text testId="singleLine" width="150px" overflowMode="ellipsis" maxLines="1">
@@ -479,21 +708,21 @@ test.describe("Overflow Mode", () => {
     `);
     const singleLineDriver = await createTextDriver("singleLine");
     const multiLineDriver = await createTextDriver("multiLine");
-    
+
     // Both should have ellipsis behavior
     await expect(singleLineDriver.component).toHaveCSS("text-overflow", "ellipsis");
     await expect(multiLineDriver.component).toHaveCSS("text-overflow", "ellipsis");
-    
+
     // Single line should use nowrap
     await expect(singleLineDriver.component).toHaveCSS("white-space", "nowrap");
-    
+
     // Multi-line should have line-clamp applied
     await expect(multiLineDriver.component).toHaveCSS("-webkit-line-clamp", "2");
-    
+
     // Verify heights: multi-line should be approximately 2x single line height
     const { height: heightSingle } = await getBounds(singleLineDriver);
     const { height: heightMulti } = await getBounds(multiLineDriver);
-    
+
     // Multi-line should be taller than single line
     expect(heightMulti).toBeGreaterThan(heightSingle);
     // And should be roughly 2x the height (allowing for some tolerance)
@@ -507,68 +736,86 @@ test.describe("Overflow Mode", () => {
 // =============================================================================
 
 test.describe("Break Mode", () => {
-  test('breakMode="normal" uses standard word boundaries', async ({ initTestBed, createTextDriver }) => {
+  test('breakMode="normal" uses standard word boundaries', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="150px" breakMode="normal">
         This is a verylongwordthatshouldbreakatwordboundaries normally.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("word-break", "normal");
     await expect(driver.component).toHaveCSS("overflow-wrap", "normal");
   });
 
-  test('breakMode="word" breaks long words to prevent overflow', async ({ initTestBed, createTextDriver }) => {
+  test('breakMode="word" breaks long words to prevent overflow', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="150px" breakMode="word">
         This is a verylongwordthatexceedsthecontainerwidthandshouldbreak.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
   });
 
-  test('breakMode="anywhere" breaks at any character', async ({ initTestBed, createTextDriver }) => {
+  test('breakMode="anywhere" breaks at any character', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="100px" breakMode="anywhere">
         Verylongwordwithnobreaks
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     // Should have word-break: break-all or overflow-wrap: anywhere
-    const wordBreak = await driver.component.evaluate(el => getComputedStyle(el).wordBreak);
-    const overflowWrap = await driver.component.evaluate(el => getComputedStyle(el).overflowWrap);
-    
+    const wordBreak = await driver.component.evaluate((el) => getComputedStyle(el).wordBreak);
+    const overflowWrap = await driver.component.evaluate((el) => getComputedStyle(el).overflowWrap);
+
     expect(wordBreak === "break-all" || overflowWrap === "anywhere").toBe(true);
   });
 
-  test('breakMode="keep" prevents breaking within words', async ({ initTestBed, createTextDriver }) => {
+  test('breakMode="keep" prevents breaking within words', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="100px" breakMode="keep">
         This text should keep words intact
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("word-break", "keep-all");
   });
 
-  test('breakMode="hyphenate" uses automatic hyphenation', async ({ initTestBed, createTextDriver }) => {
+  test('breakMode="hyphenate" uses automatic hyphenation', async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="150px" breakMode="hyphenate" lang="en">
         This is a supercalifragilisticexpialidocious word that should be hyphenated.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     await expect(driver.component).toHaveCSS("hyphens", "auto");
     await expect(driver.component).toHaveCSS("overflow-wrap", "break-word");
   });
 
-  test('breakMode works with different overflow modes', async ({ initTestBed, createTextDriver }) => {
+  test("breakMode works with different overflow modes", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <VStack>
         <Text testId="ellipsisWord" width="150px" overflowMode="ellipsis" breakMode="word" maxLines="1">
@@ -581,27 +828,34 @@ test.describe("Break Mode", () => {
     `);
     const ellipsisDriver = await createTextDriver("ellipsisWord");
     const scrollDriver = await createTextDriver("scrollAnywhere");
-    
+
     // Check overflow mode styles
     await expect(ellipsisDriver.component).toHaveCSS("text-overflow", "ellipsis");
     await expect(scrollDriver.component).toHaveCSS("overflow-x", "auto");
-    
+
     // Check break mode styles
     await expect(ellipsisDriver.component).toHaveCSS("overflow-wrap", "break-word");
-    
-    const scrollWordBreak = await scrollDriver.component.evaluate(el => getComputedStyle(el).wordBreak);
-    const scrollOverflowWrap = await scrollDriver.component.evaluate(el => getComputedStyle(el).overflowWrap);
+
+    const scrollWordBreak = await scrollDriver.component.evaluate(
+      (el) => getComputedStyle(el).wordBreak,
+    );
+    const scrollOverflowWrap = await scrollDriver.component.evaluate(
+      (el) => getComputedStyle(el).overflowWrap,
+    );
     expect(scrollWordBreak === "break-all" || scrollOverflowWrap === "anywhere").toBe(true);
   });
 
-  test('default breakMode allows theme variables to work', async ({ initTestBed, createTextDriver }) => {
+  test("default breakMode allows theme variables to work", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
     await initTestBed(`
       <Text testId="text" width="200px">
         This text should use the default browser behavior and allow theme variables to override.
       </Text>
     `);
     const driver = await createTextDriver("text");
-    
+
     // Should not have any break mode classes when no breakMode is specified
     const className = await driver.component.getAttribute("class");
     expect(className).not.toContain("breakWord");
@@ -657,9 +911,9 @@ test.describe("Edge Cases", () => {
 
   test("nested Texts", async ({ initTestBed, page }) => {
     await initTestBed(`<Text>abc<Text>def</Text>ghi</Text>`);
-    
+
     // Check if the page displays the combined text "abcdefghi"
-    await expect(page.locator('body')).toContainText("abcdefghi");
+    await expect(page.locator("body")).toContainText("abcdefghi");
   });
 });
 
@@ -1090,6 +1344,377 @@ test.describe("Theme Variables", () => {
     });
     const component = (await createTextDriver()).component;
     await expect(component).toHaveCSS("line-break", EXPECTED);
+  });
+});
+
+// =============================================================================
+// CUSTOM VARIANT TESTS
+// =============================================================================
+
+test.describe("Custom Variants", () => {
+  test("custom variant textColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0)";
+    await initTestBed(`
+      <App>
+        <Theme textColor-Text-customRed="${EXPECTED}">
+          <Text variant="customRed" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("color", EXPECTED);
+  });
+
+  test("custom variant fontFamily theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "monospace";
+    await initTestBed(`
+      <App>
+        <Theme fontFamily-Text-customMono="${EXPECTED}">
+          <Text variant="customMono" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-family", EXPECTED);
+  });
+
+  test("custom variant fontSize theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "24px";
+    await initTestBed(`
+      <App>
+        <Theme fontSize-Text-customLarge="${EXPECTED}">
+          <Text variant="customLarge" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-size", EXPECTED);
+  });
+
+  test("custom variant fontStyle theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "italic";
+    await initTestBed(`
+      <App>
+        <Theme fontStyle-Text-customItalic="${EXPECTED}">
+          <Text variant="customItalic" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-style", EXPECTED);
+  });
+
+  test("custom variant fontWeight theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "700";
+    await initTestBed(`
+      <App>
+        <Theme fontWeight-Text-customBold="bold">
+          <Text variant="customBold" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-weight", EXPECTED);
+  });
+
+  test("custom variant fontStretch theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "125%";
+    await initTestBed(`
+      <App>
+        <Theme fontStretch-Text-customExpanded="expanded">
+          <Text variant="customExpanded" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("font-stretch", EXPECTED);
+  });
+
+  test("custom variant textDecorationLine theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "underline";
+    await initTestBed(`
+      <App>
+        <Theme textDecorationLine-Text-customUnderline="${EXPECTED}">
+          <Text variant="customUnderline" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-line", EXPECTED);
+  });
+
+  test("custom variant textDecorationColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0)";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customDeco="underline"
+          textDecorationColor-Text-customDeco="${EXPECTED}"
+        >
+          <Text variant="customDeco" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-color", EXPECTED);
+  });
+
+  test("custom variant textDecorationStyle theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "wavy";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customWavy="underline"
+          textDecorationStyle-Text-customWavy="${EXPECTED}"
+        >
+          <Text variant="customWavy" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-style", EXPECTED);
+  });
+
+  test("custom variant textDecorationThickness theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "3px";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customThick="underline"
+          textDecorationThickness-Text-customThick="${EXPECTED}"
+        >
+          <Text variant="customThick" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-decoration-thickness", EXPECTED);
+  });
+
+  test("custom variant textUnderlineOffset theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "5px";
+    await initTestBed(`
+      <App>
+        <Theme 
+          textDecorationLine-Text-customOffset="underline"
+          textUnderlineOffset-Text-customOffset="${EXPECTED}"
+        >
+          <Text variant="customOffset" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-underline-offset", EXPECTED);
+  });
+
+  test("custom variant lineHeight theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "32px";
+    await initTestBed(`
+      <App>
+        <Theme lineHeight-Text-customLineHeight="${EXPECTED}">
+          <Text variant="customLineHeight" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("line-height", EXPECTED);
+  });
+
+  test("custom variant backgroundColor theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 255, 0)";
+    await initTestBed(`
+      <App>
+        <Theme backgroundColor-Text-customBg="${EXPECTED}">
+          <Text variant="customBg" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("background-color", EXPECTED);
+  });
+
+  test("custom variant textTransform theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "uppercase";
+    await initTestBed(`
+      <App>
+        <Theme textTransform-Text-customUpper="${EXPECTED}">
+          <Text variant="customUpper" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-transform", EXPECTED);
+  });
+
+  test("custom variant letterSpacing theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "5px";
+    await initTestBed(`
+      <App>
+        <Theme letterSpacing-Text-customSpaced="${EXPECTED}">
+          <Text variant="customSpaced" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("letter-spacing", EXPECTED);
+  });
+
+  test("custom variant wordSpacing theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "10px";
+    await initTestBed(`
+      <App>
+        <Theme wordSpacing-Text-customWordSpace="${EXPECTED}">
+          <Text variant="customWordSpace" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-spacing", EXPECTED);
+  });
+
+  test("custom variant textShadow theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rgb(255, 0, 0) 2px 2px 4px";
+    await initTestBed(`
+      <App>
+        <Theme textShadow-Text-customShadow="${EXPECTED}">
+          <Text variant="customShadow" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-shadow", EXPECTED);
+  });
+
+  test("custom variant textIndent theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "20px";
+    await initTestBed(`
+      <App>
+        <Theme textIndent-Text-customIndent="${EXPECTED}">
+          <Text variant="customIndent" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-indent", EXPECTED);
+  });
+
+  test("custom variant textAlign theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "center";
+    await initTestBed(`
+      <App>
+        <Theme textAlign-Text-customCenter="${EXPECTED}">
+          <Text variant="customCenter" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-align", EXPECTED);
+  });
+
+  test("custom variant textAlignLast theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "right";
+    await initTestBed(`
+      <App>
+        <Theme textAlignLast-Text-customAlignLast="${EXPECTED}">
+          <Text variant="customAlignLast" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("text-align-last", EXPECTED);
+  });
+
+  test("custom variant wordBreak theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "break-all";
+    await initTestBed(`
+      <App>
+        <Theme wordBreak-Text-customBreak="${EXPECTED}">
+          <Text variant="customBreak" breakMode="'{undefined}'" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-break", EXPECTED);
+  });
+
+  test("custom variant wordWrap theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "break-word";
+    await initTestBed(`
+      <App>
+        <Theme wordWrap-Text-customWrap="${EXPECTED}">
+          <Text variant="customWrap" breakMode="'{undefined}'" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("word-wrap", EXPECTED);
+  });
+
+  test("custom variant direction theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "rtl";
+    await initTestBed(`
+      <App>
+        <Theme direction-Text-customRtl="${EXPECTED}">
+          <Text variant="customRtl" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("direction", EXPECTED);
+  });
+
+  test("custom variant writingMode theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "vertical-rl";
+    await initTestBed(`
+      <App>
+        <Theme writingMode-Text-customVertical="${EXPECTED}">
+          <Text variant="customVertical" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("writing-mode", EXPECTED);
+  });
+
+  test("custom variant lineBreak theme variable", async ({ initTestBed, page }) => {
+    const EXPECTED = "strict";
+    await initTestBed(`
+      <App>
+        <Theme lineBreak-Text-customLineBreak="${EXPECTED}">
+          <Text variant="customLineBreak" testId="text">Hello Custom!</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveCSS("line-break", EXPECTED);
+  });
+
+  test("custom variant with multiple theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Theme 
+          textColor-Text-pinkElephant="rgb(255, 192, 203)" 
+          fontWeight-Text-pinkElephant="bold"
+          textColor-Text-greenDog="rgb(0, 128, 0)" 
+          fontStyle-Text-greenDog="italic"
+        >
+          <Text variant="pinkElephant" testId="pink">
+            Hello Pink Elephant!
+          </Text>
+          <Text variant="greenDog" testId="green">
+            Hello Green Dog!
+          </Text>
+        </Theme>
+      </App>
+    `);
+
+    const pinkText = page.getByTestId("pink");
+    const greenText = page.getByTestId("green");
+
+    await expect(pinkText).toHaveCSS("color", "rgb(255, 192, 203)");
+    await expect(pinkText).toHaveCSS("font-weight", "700");
+    await expect(greenText).toHaveCSS("color", "rgb(0, 128, 0)");
+    await expect(greenText).toHaveCSS("font-style", "italic");
   });
 });
 

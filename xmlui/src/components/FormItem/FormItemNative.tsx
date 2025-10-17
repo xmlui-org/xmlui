@@ -20,7 +20,7 @@ import type {
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { useFormContextPart } from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
@@ -48,7 +48,6 @@ import { useValidation, useValidationDisplay } from "./Validations";
 import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
-import { NumberBox2 } from "../NumberBox/NumberBox2Native";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
@@ -200,24 +199,24 @@ export const FormItem = memo(function FormItem({
     }
   }, [bindTo, defaultId, itemIndex, parentFormItemId]);
 
-  const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
+  const labelWidthValue = useFormContextPart((value) => labelWidth || value?.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
-    labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
+    labelBreak !== undefined ? labelBreak : value?.itemLabelBreak,
   );
   const labelPositionValue = useFormContextPart<any>(
-    (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
+    (value) => labelPosition || value?.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
   const initialValueFromSubject = useFormContextPart<any>((value) =>
-    getByPath(value.originalSubject, formItemId),
+    getByPath(value?.originalSubject, formItemId),
   );
   const initialValue =
     initialValueFromSubject === undefined ? initialValueFromProps : initialValueFromSubject;
 
-  const value = useFormContextPart<any>((value) => getByPath(value.subject, formItemId));
+  const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
 
-  const validationResult = useFormContextPart((value) => value.validationResults[formItemId]);
-  const dispatch = useFormContextPart((value) => value.dispatch);
-  const formEnabled = useFormContextPart((value) => value.enabled);
+  const validationResult = useFormContextPart((value) => value?.validationResults[formItemId]);
+  const dispatch = useFormContextPart((value) => value?.dispatch);
+  const formEnabled = useFormContextPart((value) => value?.enabled);
 
   const isEnabled = enabled && formEnabled;
 
@@ -252,6 +251,14 @@ export const FormItem = memo(function FormItem({
     validationMode,
   );
 
+  const onFocus = useEvent(() => {
+    dispatch(fieldFocused(formItemId));
+  });
+
+  const onBlur = useEvent(() => {
+    dispatch(fieldLostFocus(formItemId));
+  });
+
   let formControl = null;
 
   switch (type) {
@@ -262,6 +269,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
         >
@@ -277,6 +286,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
         >
@@ -291,7 +302,9 @@ export const FormItem = memo(function FormItem({
           {...rest}
           value={value}
           updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
+          //registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
         />
@@ -304,7 +317,9 @@ export const FormItem = memo(function FormItem({
           {...rest}
           value={value}
           updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
+          //registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
         >
@@ -322,6 +337,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           integersOnly={type === "integer"}
           validationStatus={validationStatus}
@@ -333,26 +350,6 @@ export const FormItem = memo(function FormItem({
       );
       break;
     }
-    // NOTE: This is a prototype for the new number field
-    // works as good as the regular number field but untested
-    // in production.
-    case "integer2":
-    case "number2": {
-      formControl = (
-        <NumberBox2
-          {...rest}
-          initialValue={initialValue}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          min={validations.minValue}
-          max={validations.maxValue}
-          integersOnly={type === "integer2"}
-        />
-      );
-      break;
-    }
     case "switch":
     case "checkbox": {
       formControl = (
@@ -360,7 +357,9 @@ export const FormItem = memo(function FormItem({
           {...rest}
           value={value}
           updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           variant={type}
@@ -376,6 +375,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           multiple={asOptionalBoolean((rest as any).multiple, false)} //TODO come up with something for this
@@ -390,6 +391,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? validations?.maxLength}
@@ -406,6 +409,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? validations?.maxLength}
@@ -420,6 +425,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? validations?.maxLength}
@@ -434,6 +441,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
           min={validations.minValue}
@@ -449,6 +458,8 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
           enabled={isEnabled}
           validationStatus={validationStatus}
         />
@@ -479,15 +490,12 @@ export const FormItem = memo(function FormItem({
     }
   }
 
-  const onFocus = useEvent(() => {
-    dispatch(fieldFocused(formItemId));
-  });
-
-  const onBlur = useEvent(() => {
-    dispatch(fieldLostFocus(formItemId));
-  });
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
+  const isInsideForm = useIsInsideForm();
+  if (!isInsideForm) {
+    throw new Error("FormItem must be used inside a Form");
+  }
   return (
     <ItemWithLabel
       labelPosition={labelPositionValue}

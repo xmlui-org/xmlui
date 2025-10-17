@@ -1,4 +1,4 @@
-import type { MarkupContent, CompletionItem } from "vscode-languageserver";
+import type { MarkupContent, CompletionItem, Position } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
@@ -8,8 +8,9 @@ import * as docGen from "./common/docs-generation";
 import {
   compNameForTagNameNode,
   findTagNameNodeInStack,
+  getFirstNodeFromAncestorChain,
   insideClosingTag,
-  pathToNodeInAscendands,
+  visitAncestorsInChain,
 } from "./common/syntax-node-utilities";
 import {
   addOnPrefix,
@@ -73,17 +74,18 @@ type CompletionContext = {
   parseResult: ParseResult;
   getText: GetText;
   metaByComp: MetadataProvider;
+  offsetToPos: (offset: number) => Position;
 };
 
 export function handleCompletion(
-  { parseResult: { node }, getText, metaByComp }: CompletionContext,
+  { parseResult: { node }, getText, metaByComp, offsetToPos }: CompletionContext,
   position: number,
 ): XmluiCompletionItem[] | null {
   const findRes = findTokenAtPos(node, position);
   if (!findRes) {
     return null;
   }
-  const { chainAtPos, chainBeforePos, sharedParents } = findRes;
+  const { chainAtPos, chainBeforePos } = findRes;
 
   if (findRes.chainBeforePos === undefined) {
     return handleCompletionInsideToken(chainAtPos, position, metaByComp, getText);
@@ -92,17 +94,37 @@ export function handleCompletion(
   const nodeBefore = chainBeforePos.at(-1);
   switch (nodeBefore.kind) {
     case SyntaxKind.OpenNodeStart:
-      return allComponentNames(metaByComp);
-    case SyntaxKind.CloseNodeStart:
-      //TODO: this can be substituted for an function that finds the first ElementNode up the tree
-      const closestElementNodeSuspect = chainBeforePos.at(-2) ?? chainAtPos.at(sharedParents - 1);
+      const defaultCompNames = allComponentNames(metaByComp);
+      const closestElementNodeSuspect = chainBeforePos.at(-2);
+
       if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
-        return matchingTagName(closestElementNodeSuspect, metaByComp, getText);
+        const matchingNode = getFirstNodeFromAncestorChain(
+          chainBeforePos.slice(0, -3),
+          SyntaxKind.ElementNode,
+        );
+        if (!matchingNode) return defaultCompNames;
+
+        const compName = getNameFromElement(matchingNode, getText);
+        if (!compName) return defaultCompNames;
+
+        const compNameSuggestion = closingComponentCompletionItem(compName, offsetToPos, position);
+        return [compNameSuggestion, ...defaultCompNames.map((c) => ({ ...c, sortText: "1" }))];
+      }
+      return defaultCompNames;
+
+    case SyntaxKind.CloseNodeStart: {
+      //TODO: this can be substituted for an function that finds the first ElementNode up the tree
+      const closestElementNodeSuspect = chainBeforePos.at(-2);
+      if (closestElementNodeSuspect && closestElementNodeSuspect.kind === SyntaxKind.ElementNode) {
+        const compName = getNameFromElement(closestElementNodeSuspect, getText);
+        if (!compName) return allComponentNames(metaByComp);
+        return [componentCompletionItem(compName)];
       } else {
         return allComponentNames(metaByComp);
       }
+    }
     case SyntaxKind.Identifier:
-      const pathToElementNode = pathToNodeInAscendands(
+      const pathToElementNode = visitAncestorsInChain(
         chainBeforePos,
         (n) => n.kind === SyntaxKind.ElementNode,
       );
@@ -111,8 +133,9 @@ export function handleCompletion(
         parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end;
       if (completeCompName) {
         if (pathToElementNode && insideClosingTag(pathToElementNode)) {
-          const elementNode = pathToElementNode.at(-1);
-          return matchingTagName(elementNode, metaByComp, getText);
+          const compName = getNameFromElement(pathToElementNode.at(-1), getText);
+          if (!compName) return allComponentNames(metaByComp);
+          return [componentCompletionItem(compName)];
         }
         return allComponentNames(metaByComp);
       }
@@ -144,19 +167,16 @@ function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {
 }
 
 /**
- *
+ * Retrieves the name from an ElementNode
  * @param elementNode has to point to a ElementNode
  * @returns
  */
-function matchingTagName(
-  elementNode: Node,
-  metaByComp: MetadataProvider,
-  getText: GetText,
-): CompletionItem[] | null {
+function getNameFromElement(elementNode: Node, getText: GetText): string | null {
   const nameNode = elementNode.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
   if (nameNode === undefined) {
-    return allComponentNames(metaByComp);
+    return null;
   }
+  // --- Handle namespaces
   const colonIdx = nameNode.children!.findIndex((c) => c.kind === SyntaxKind.Colon);
   let nameSpace: string | undefined = undefined;
   let nameIdentSearchSpace = nameNode.children!;
@@ -170,11 +190,11 @@ function matchingTagName(
   }
   const nameIdent = nameIdentSearchSpace.find((c) => c.kind === SyntaxKind.Identifier);
   if (nameIdent === undefined) {
-    return allComponentNames(metaByComp);
+    return null;
   }
   name = getText(nameIdent);
   const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-  return [componentCompletionItem(value)];
+  return value;
 }
 
 function handleCompletionInsideToken(
@@ -199,7 +219,9 @@ function handleCompletionInsideToken(
         previousNode.kind === SyntaxKind.CloseNodeStart &&
         tagNameNodeParent.kind === SyntaxKind.ElementNode
       ) {
-        return matchingTagName(tagNameNodeParent, metaByComp, getText);
+        const compName = getNameFromElement(tagNameNodeParent, getText);
+        if (!compName) return allComponentNames(metaByComp);
+        return [componentCompletionItem(compName)];
       }
       return allComponentNames(metaByComp);
     }
@@ -260,10 +282,44 @@ function attributeCompletionItem(
   };
 }
 
-function componentCompletionItem(componentName: string): XmluiCompletionItem {
+function componentCompletionItem(
+  componentName: string,
+  sortingOrder?: number,
+): XmluiCompletionItem {
+  const sortText =
+    sortingOrder !== undefined &&
+    sortingOrder !== 0 &&
+    sortingOrder !== null &&
+    !isNaN(sortingOrder)
+      ? sortingOrder.toString()
+      : "";
   return {
     label: componentName,
     kind: CompletionItemKind.Constructor,
+    sortText,
+    data: {
+      metadataAccessInfo: {
+        componentName,
+      },
+    },
+  };
+}
+
+function closingComponentCompletionItem(
+  componentName: string,
+  offsetToPos: (offset: number) => Position,
+  cursorOffset: number,
+): XmluiCompletionItem {
+  const cursorPos = offsetToPos(cursorOffset);
+  const updatedText = /* TODO globals.clientSupports.insertReplaceEdit ? Handle this case : */ {
+    newText: `/${componentName}>`,
+    range: { start: cursorPos, end: cursorPos },
+  };
+  return {
+    label: `/${componentName}`,
+    kind: CompletionItemKind.Constructor,
+    sortText: "0",
+    textEdit: updatedText,
     data: {
       metadataAccessInfo: {
         componentName,

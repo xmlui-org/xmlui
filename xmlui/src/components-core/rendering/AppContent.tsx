@@ -430,11 +430,6 @@ export function AppContent({
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
-  const registerAppState = useCallback((bucket: string, initialValue: any) => {
-    setAppState((prev) => {
-      return { ...prev, [bucket]: initialValue };
-    });
-  }, []);
 
   const update = useCallback((bucket: string, patch: any) => {
     setAppState((prev) => {
@@ -450,11 +445,10 @@ export function AppContent({
 
   const appStateContextValue: IAppStateContext = useMemo(() => {
     return {
-      registerAppState,
       appState,
       update,
     };
-  }, [appState, registerAppState, update]);
+  }, [appState, update]);
 
   return (
     <AppContext.Provider value={appContextValue}>

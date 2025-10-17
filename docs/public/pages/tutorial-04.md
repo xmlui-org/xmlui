@@ -2,7 +2,7 @@
 
 The `Dashboard` page opens with a set of infocards. Here is a simplified version of two of them.
 
-```xmlui-pg display  noHeader
+```xmlui-pg display name="infocards"
 <App>
   <variable name="dashboardStats" value="{
     {
@@ -39,7 +39,7 @@ It returns a structure like the variable we've defined above: an object with a `
 There are five infocards on the XMLUI Invoice dashboard. To style them all in a consistent way, the app defines an `InfoCard` that wraps `Card` and `Text`.
 
 
-```xmlui /InfoCard/ /width/ /title/ /currency/ /value/
+```xmlui
 <Component name="InfoCard">
 
     <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">

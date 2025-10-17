@@ -1,5 +1,8 @@
-import { CSSProperties, useEffect, useState } from "react";
+import type { CSSProperties} from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 const TOASTER_CONTAINER_STYLE: CSSProperties = {
   top: 40,
@@ -18,6 +21,7 @@ let toasterMounted = false;
 
 export const NotificationToast = ({ toastDuration }: NotificationToastProps) => {
   const [shouldRender, setShouldRender] = useState(false);
+  const { root } = useTheme();
 
   useEffect(() => {
     if (!toasterMounted) {
@@ -27,7 +31,7 @@ export const NotificationToast = ({ toastDuration }: NotificationToastProps) => 
   }, []);
 
   if (!shouldRender) return null;
-  return (
+  return createPortal(
     <Toaster
       position={"top-right"}
       containerStyle={TOASTER_CONTAINER_STYLE}
@@ -45,6 +49,7 @@ export const NotificationToast = ({ toastDuration }: NotificationToastProps) => 
           </ToastBar>
         </div>
       )}
-    </Toaster>
+    </Toaster>,
+    root,
   );
 };

@@ -2,11 +2,11 @@ import type { PlaygroundState } from "../state/store";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import {
-  ComponentDef,
-  CompoundComponentDef,
-  ThemeDefinition,
+  type ComponentDef,
+  type CompoundComponentDef,
+  type ThemeDefinition,
   XmlUiHelper,
-  XmlUiNode
+  type XmlUiNode,
 } from "xmlui";
 import { decompress } from "../playground/utils";
 
@@ -91,12 +91,13 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
     components: [],
     app: "",
   },
+  error: null,
 };
 
 function removeWhitespace(obj: any) {
   if (typeof obj === "string") {
     return obj.replace(/\s+/g, " ").trim(); // Remove extra whitespaces and newlines
-  } else if (typeof obj === "object" && obj !== null) {
+  } else if (obj !== null && typeof obj === "object") {
     const newObj: any = Array.isArray(obj) ? [] : {};
     for (const key in obj) {
       newObj[key] = removeWhitespace(obj[key]);
@@ -176,7 +177,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       type: "blob",
       platform: operatingSystem === "Windows" ? "DOS" : "UNIX",
     });
-    saveAs(content, `${(appDescription.config.name || 'xmlui-playground-app').trim()}.zip`);
+    saveAs(content, `${(appDescription.config.name || "xmlui-playground-app").trim()}.zip`);
   } catch (error) {
     console.error("An error occurred while generating the ZIP:", error);
   }
@@ -203,7 +204,7 @@ export function preprocessCode(code: string): string {
   const minIndent = Math.min(
     ...trimmedLines
       .filter((line) => line.trim() !== "") // Ignore empty lines for indentation
-      .map((line) => line.match(/^\s*/)[0].length), // Count leading spaces
+      .map((line) => line.match(/^\s*/)?.[0].length || 0), // Count leading spaces
   );
 
   // Remove minIndent spaces from the beginning of each line

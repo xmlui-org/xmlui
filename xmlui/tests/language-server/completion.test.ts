@@ -3,12 +3,13 @@ import {
   handleCompletion,
   handleCompletionResolve,
 } from "../../src/language-server/services/completion";
-import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
 import type { CompletionItem, MarkupContent } from "vscode-languageserver";
 import { CompletionItemKind } from "vscode-languageserver";
 import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
 import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
+import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
+import { createDocumentCursor } from "../../src/components-core/xmlui-parser";
 
 describe("Completion", () => {
   it("lists all component names after '<'", () => {
@@ -71,6 +72,16 @@ describe("Completion", () => {
     expect(docs).toContain(mockMetadata.Button.props.label.description);
   });
 
+  it("resolves closing component name", () => {
+    const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+
+    expect(docs).toContain(mockMetadata.Button.description);
+    expect(docs).toContain(mockMetadata.Button.events.click.description);
+    expect(docs).toContain(mockMetadata.Button.props.label.description);
+  });
+
   it("resolves prop", () => {
     const item = completeAtPoundSign("<Button labe#l />").find(({ label }) => label === "label");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
@@ -120,6 +131,57 @@ describe("Completion", () => {
     expect(resolvedItem).toMatchObject(expected);
     expect(docs).toContain(widthDescription);
   });
+
+  it("closing element 1st after opening tag & element creation", () => {
+    const suggestions = completeAtPoundSign("<Button><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, cursor not at end", () => {
+    const suggestions = completeAtPoundSign("<Button><#A").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr", () => {
+    const suggestions = completeAtPoundSign("<Button attr=><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("closing element 1st after opening tag & element creation, malformed attr list", () => {
+    const suggestions = completeAtPoundSign("<Button attr=' :><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(["/Button", ...Object.keys(mockMetadata)]);
+  });
+
+  it("suggest all components if no identifier provided", () => {
+    const suggestions = completeAtPoundSign("<><#").map(({ label }) => label);
+    expect(suggestions).toStrictEqual(Object.keys(mockMetadata));
+  });
+
+  it("places closing tag after accepting code completion of opened component", () => {
+    const item = completeAtPoundSign("<Button><#").find(({ label }) => label === "/Button");
+
+    const expected: CompletionItem = {
+      kind: CompletionItemKind.Constructor,
+      data: { metadataAccessInfo: { componentName: "Button" } },
+      label: "/Button",
+      textEdit: {
+        newText: "/Button>",
+        range: {
+          start: { line: 0, character: "<Button><".length },
+          end: { line: 0, character: "<Button><".length },
+        },
+      },
+    };
+
+    expect(item).toMatchObject(expected);
+  });
+
+  it("don't suggest closing tag if completion item is not the one that has an opened tag", () => {
+    const items = completeAtPoundSign("<Button><#").filter(({ label }) => label !== "/Button");
+    for (const item of items) {
+      expect(item.textEdit).toBeUndefined();
+    }
+  });
 });
 
 function completeAtPoundSign(source: string) {
@@ -133,10 +195,13 @@ function completeAtPoundSign(source: string) {
   source = source.replace(cursorIndicator, "");
   const parser = createXmlUiParser(source);
 
-  const parseResult = parser.parse();
-
   return handleCompletion(
-    { getText: parser.getText, parseResult, metaByComp: mockMetadataProvider },
+    {
+      getText: parser.getText,
+      parseResult: parser.parse(),
+      metaByComp: mockMetadataProvider,
+      offsetToPos: createDocumentCursor(source).offsetToPos,
+    },
     position,
   );
 }

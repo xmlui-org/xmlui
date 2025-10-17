@@ -13,6 +13,8 @@ import {
   type IconPosition,
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
+import { sizeValues } from "../abstractions";
+import { defaultProps } from "./ButtonNative";
 
 // --- Smoke
 
@@ -151,16 +153,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
     });
   });
-
-  /*
-  ["disabled", "hover", "active", "focused"].forEach((state) => {
-    test.skip(
-      `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
-      SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-      async ({ initTestBed, createButtonDriver }) => {},
-    );
-  });
-  */
 
   // fonts
   const EXPECTED_FONT_FAMILY = "Arial, sans-serif";
@@ -493,14 +485,66 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createButton
 
 // --- size
 
-// TODO: add size tests
 // Relative testing is acceptable for now - basis of the test is the default size
-["xs", "sm", "md", "lg"].forEach((size) => {
-  test.skip(
-    `compare size "${size}" with default size`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed, createButtonDriver }) => {},
+test("relative size test", async ({ initTestBed, page }) => {
+  const components = sizeValues
+    .map((size) => {
+      return `<Button testId="${size}" size="${size}" />`;
+    })
+    .join("\n");
+
+  await initTestBed(`<Fragment>${components}</Fragment>`);
+  const { width: widthXs, height: heightXs } = await getBounds(page.getByTestId("xs"));
+  const { width: widthSm, height: heightSm } = await getBounds(page.getByTestId("sm"));
+  const { width: widthMd, height: heightMd } = await getBounds(page.getByTestId("md"));
+  const { width: widthLg, height: heightLg } = await getBounds(page.getByTestId("lg"));
+
+  expect(widthXs).toBeLessThanOrEqual(widthSm);
+  expect(widthSm).toBeLessThanOrEqual(widthMd);
+  expect(widthMd).toBeLessThanOrEqual(widthLg);
+  expect(heightXs).toBeLessThanOrEqual(heightSm);
+  expect(heightSm).toBeLessThanOrEqual(heightMd);
+  expect(heightMd).toBeLessThanOrEqual(heightLg);
+});
+
+test(`invalid size falls back to default ${defaultProps.size}`, async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <Button testId="reference" size="${defaultProps.size}" />
+      <Button testId="invalid" size="invalid"/>
+    </Fragment>
+  `);
+  const reference = page.getByTestId("reference");
+  const invalid = page.getByTestId("invalid");
+  const { width: widthRef, height: heightRef } = await getBounds(reference);
+  const { width: widthInvalid, height: heightInvalid } = await getBounds(invalid);
+
+  await expect(invalid).toBeVisible();
+  expect(widthInvalid).toBe(widthRef);
+  expect(heightInvalid).toBe(heightRef);
+});
+
+test(`no size prop defaults to ${defaultProps.size}`, async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(
+    `<Fragment>
+      <Button testId="reference" size="${defaultProps.size}" />
+      <Button testId="default" />
+    </Fragment>`,
   );
+  const reference = page.getByTestId("reference");
+  const defaultButton = page.getByTestId("default");
+  const { width: widthRef, height: heightRef } = await getBounds(reference);
+  const { width: widthDefault, height: heightDefault } = await getBounds(defaultButton);
+
+  await expect(defaultButton).toBeVisible();
+  expect(widthDefault).toBe(widthRef);
+  expect(heightDefault).toBe(heightRef);
 });
 
 test("testState initializes to default value", async ({ initTestBed }) => {
@@ -568,26 +612,3 @@ test("lostFocus event does not fire if disabled", async ({ initTestBed, createBu
   await expect(driver.component).not.toBeFocused();
   await expect.poll(testStateDriver.testState).toEqual(null);
 });
-
-// --- Should be added to tests regarding the framework loading mechanism:
-/*
-test("can render correct icon", async ({ createDriver }) => {
-  // 1. Define the icon resource we wish to load
-  // 2. Provide the XLMUI app ecosystem with the resource
-  // 3. Fetch the icon ourselves
-  // 4. Compare both icons
-
-  const testIcon = `
-  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bell"
-       width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-       stroke-linecap="round" stroke-linejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-    <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-    <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-  </svg>
-  `;
-
-  const driver = await createDriver(`<Button icon="test" />`,{esources: { "icon.test": "resources/bell.svg" } });
-  await expect(driver.buttonIcon).toBeVisible();
-});
-*/

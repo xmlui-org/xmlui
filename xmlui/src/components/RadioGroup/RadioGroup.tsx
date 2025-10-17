@@ -10,10 +10,6 @@ import {
   dGotFocus,
   dInitialValue,
   dInternal,
-  dLabel,
-  dLabelBreak,
-  dLabelPosition,
-  dLabelWidth,
   dLostFocus,
   dReadonly,
   dRequired,
@@ -30,7 +26,11 @@ export const RadioGroupMd = createMetadata({
     "`RadioGroup` creates a mutually exclusive selection interface where users can " +
     "choose only one option from a group of radio buttons. It manages the selection " +
     "state and ensures that selecting one option automatically deselects all others in " +
-    "the group.",
+    "the group." +
+    "\n\n" +
+    "Radio options store their values as strings. Numbers and booleans are converted to strings " +
+    "when assigned, while objects, functions and arrays default to an empty string unless resolved " +
+    "via binding expressions.",
   props: {
     initialValue: {
       ...dInitialValue(),
@@ -54,10 +54,6 @@ export const RadioGroupMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
         `options within the radio group.`,
     ),
-    label: dLabel(),
-    labelPosition: dLabelPosition("top"),
-    labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -82,7 +78,7 @@ export const RadioGroupMd = createMetadata({
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
     [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
     
-    [`fontSize-${RGOption}`]: "$fontSize-small",
+    [`fontSize-${RGOption}`]: "$fontSize-sm",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
   },
 });
@@ -102,6 +98,7 @@ export const radioGroupRenderer = createComponentRenderer(
   }) => {
     return (
       <RadioGroup
+        autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         className={className}
         initialValue={extractValue(node.props.initialValue)}
@@ -112,11 +109,8 @@ export const radioGroupRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
-        label={extractValue.asOptionalString(node.props.label)}
-        labelPosition={extractValue(node.props.labelPosition)}
-        labelWidth={extractValue(node.props.labelWidth)}
-        labelBreak={extractValue(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       >
         {renderChild(node.children)}
       </RadioGroup>

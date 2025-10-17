@@ -1,6 +1,6 @@
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   T_ASSIGNMENT_EXPRESSION,
@@ -35,15 +35,16 @@ import {
 } from "./ScriptingSourceTree";
 import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import { reportEngineError } from "../reportEngineError";
-import {
+import type {
   QueueInfo,
-  StatementQueue,
-  mapStatementsToQueueItems,
   StatementQueueItem,
   ProcessOutcome,
-  mapToItem,
   StatementRunTimeInfo,
-  StatementWithInfo,
+  StatementWithInfo} from "./statement-queue";
+import {
+  StatementQueue,
+  mapStatementsToQueueItems,
+  mapToItem
 } from "./statement-queue";
 import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";

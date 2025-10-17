@@ -1,4 +1,4 @@
-import { SingleValidationResult, ValidationResult } from "../Form/FormContext";
+import type { SingleValidationResult, ValidationResult } from "../Form/FormContext";
 
 export const UNBOUND_FIELD_SUFFIX = "__UNBOUND_FIELD__";
 

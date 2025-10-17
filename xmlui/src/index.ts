@@ -9,9 +9,13 @@ import type {
   ComponentLike,
   ComponentMetadata,
   CompoundComponentDef,
+  PropertyValueDescription,
 } from "./abstractions/ComponentDefs";
 import { AppRoot } from "./components-core/rendering/AppRoot";
-import { createComponentRenderer } from "./components-core/renderers";
+import {
+  createComponentRenderer,
+  createUserDefinedComponentRenderer,
+} from "./components-core/renderers";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
@@ -45,8 +49,10 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
+import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
+import { Theme } from "./components/Theme/ThemeNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
@@ -56,8 +62,41 @@ import {
   createMetadata,
   d,
   dComponent,
+  dAutoFocus,
+  dClick,
+  dCollapse,
+  dDidChange,
+  dDidClose,
+  dDidOpen,
+  dEnabled,
+  dFocus,
+  dEndIcon,
+  dEndText,
+  dExpanded,
+  dExpand,
+  dGotFocus,
+  dIndeterminate,
+  dInitialValue,
+  dInternal,
+  dLabel,
+  dLabelBreak,
+  dLabelPosition,
+  dLabelWidth,
+  dLostFocus,
+  dMaxLength,
+  dMulti,
+  dOrientation,
+  dPlaceholder,
+  dReadonly,
+  dRequired,
+  dStartIcon,
+  dStartText,
+  dSetValueApi,
+  dTriggerTemplate,
+  dValidationStatus,
+  dValue,
+  dValueApi,
 } from "./components/metadata-helpers";
-import { partClassName } from "./components-core/parts";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 
 export type {
@@ -65,6 +104,7 @@ export type {
   ComponentDef,
   ComponentRendererDef,
   CompoundComponentDef,
+  PropertyValueDescription,
   ComponentLike,
   StandaloneAppDescription,
   StandaloneJsonConfig,
@@ -81,9 +121,44 @@ export {
   StandaloneApp,
   StandaloneExtensionManager,
   createComponentRenderer,
+  createUserDefinedComponentRenderer,
   createMetadata,
   d,
   dComponent,
+  dAutoFocus,
+  dClick,
+  dCollapse,
+  dDidChange,
+  dDidClose,
+  dDidOpen,
+  dEnabled,
+  dFocus,
+  dEndIcon,
+  dEndText,
+  dExpanded,
+  dExpand,
+  dGotFocus,
+  dIndeterminate,
+  dInitialValue,
+  dInternal,
+  dLabel,
+  dLabelBreak,
+  dLabelPosition,
+  dLabelWidth,
+  dLostFocus,
+  dMaxLength,
+  dMulti,
+  dOrientation,
+  dPlaceholder,
+  dReadonly,
+  dRequired,
+  dStartIcon,
+  dStartText,
+  dSetValueApi,
+  dTriggerTemplate,
+  dValidationStatus,
+  dValue,
+  dValueApi,
   parseScssVar,
   startApp,
   useTheme,
@@ -114,11 +189,12 @@ export {
   LinkNative,
   ToneChangerButton,
   Logo,
+  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
   StyleProvider,
   StyleRegistry,
   useEvent,
-  partClassName,
   StandaloneComponent,
+  Theme,
 };

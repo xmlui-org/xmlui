@@ -19,7 +19,7 @@ export const RadioItemMd = createMetadata({
   },
   events: {
     didChange: dDidChange(COMP),
-  }
+  },
 });
 
 export const radioItemComponentRenderer = createComponentRenderer(

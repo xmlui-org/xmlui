@@ -66,3 +66,24 @@
 ```
 
 %-PROP-END
+
+%-EVENT-START itemCreated
+
+Add a few new items not in the options list. The following markup will display them:
+
+```xmlui-pg copy display height="300px" name="Example: itemCreated"
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
+</App>
+```
+
+%-EVENT-END

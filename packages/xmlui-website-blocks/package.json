@@ -1,6 +1,6 @@
 {
   "name": "xmlui-website-blocks",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "sideEffects": false,
   "type": "module",
   "scripts": {

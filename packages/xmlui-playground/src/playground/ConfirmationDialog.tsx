@@ -1,4 +1,3 @@
-import React from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import styles from "./ConfirmationDialog.module.scss";
 import classnames from "classnames";
@@ -21,7 +20,7 @@ const ConfirmationDialog = ({
   confirmText?: string;
   cancelText?: string;
 }) => {
-  const {root} = useTheme();
+  const { root } = useTheme();
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal container={root}>

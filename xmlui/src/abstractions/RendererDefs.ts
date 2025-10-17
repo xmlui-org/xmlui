@@ -94,7 +94,8 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
   layoutContext?: LayoutContext<L>,
   parentRenderContext?: ParentRenderContext,
   uidInfoRef?: RefObject<Record<string, any>>,
-  ref?: ForwardedRef<any>
+  ref?: ForwardedRef<any>,
+  rest?: Record<string, any>
 ) => ReactNode | ReactNode[];
 
 // Each component is rendered in a particular layout context (for example, within a

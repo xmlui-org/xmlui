@@ -11,12 +11,11 @@ import { App, defaultProps } from "./AppNative";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
-import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { IndexerContext } from "./IndexerContext";
 import { createPortal } from "react-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
-import { extractPaddings } from "../../components-core/utils/css-utils";
 
 // --- Define a structure to represent navigation hierarchy
 interface NavHierarchyNode {
@@ -92,6 +91,15 @@ export const AppMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.defaultTheme,
     },
+    autoDetectTone: {
+      description: 
+        'This boolean property enables automatic detection of the system theme preference. ' +
+        'When set to true and no defaultTone is specified, the app will automatically use ' +
+        '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
+        'also respond to changes in the system theme preference.',
+      valueType: "boolean",
+      defaultValue: defaultProps.autoDetectTone,
+    },
   },
   events: {
     ready: {
@@ -134,7 +142,7 @@ export const AppMd = createMetadata({
 });
 
 
-function AppNode({ node, extractValue, renderChild, className, lookupEventHandler }) {
+function AppNode({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -360,6 +368,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       logoLight: extractValue(node.props["logo-light"]),
       defaultTone: extractValue(node.props.defaultTone),
       defaultTheme: extractValue(node.props.defaultTheme),
+      autoDetectTone: extractValue.asOptionalBoolean(node.props.autoDetectTone, false),
       applyDefaultContentPadding
     }),
     [
@@ -375,6 +384,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       node.props["logo-light"],
       node.props.defaultTone,
       node.props.defaultTheme,
+      node.props.autoDetectTone,
       className,
       applyDefaultContentPadding
     ],
@@ -395,6 +405,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
     >
       {renderedContent}
       <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
@@ -572,7 +583,7 @@ function PageIndexer({
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     return (
       <AppNode
         node={node}
@@ -580,6 +591,7 @@ export const appRenderer = createComponentRenderer(
         extractValue={extractValue}
         className={className}
         lookupEventHandler={lookupEventHandler}
+        registerComponentApi={registerComponentApi}
       />
     );
   },

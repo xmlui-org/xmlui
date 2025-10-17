@@ -1,4 +1,5 @@
-import Dexie, { Table } from "dexie";
+import type { Table } from "dexie";
+import Dexie from "dexie";
 
 import { ReadOnlyCollection } from "../interception/ReadonlyCollection";
 import type { IDatabase, TableDescriptor } from "./abstractions";
@@ -110,8 +111,8 @@ export class IndexedDb implements IDatabase {
   };
 
   public getItemById = async (resourceId: string, id: any) => {
-    return await this.getItem(resourceId, async (item) => {
-      return item.id + "" === id + "";
+    return await this.getItem(resourceId, (item) => {
+      return Promise.resolve(item.id + "" === id + "");
     });
   };
 
@@ -139,14 +140,14 @@ export class IndexedDb implements IDatabase {
 }
 
 // Wraps an indexDb Table into an object that provides helpful methods
-async function createTableWrapper(table: Table): Promise<any> {
+function createTableWrapper(table: Table): any {
   // --- Function to retrieve the current table data
   const getDataFn = () => table.db.table(table.name);
 
   // --- Helper method to filter the table data
   const filteredData = async (predicate?: (item: any) => Promise<boolean>) => {
     const dataSnapshot = await table.toArray();
-    const results = await Promise.all(dataSnapshot.map(predicate ?? (async () => true)));
+    const results = await Promise.all(dataSnapshot.map(predicate ?? (() => Promise.resolve(true))));
     return dataSnapshot.filter((_v, index) => results[index]);
   };
 
@@ -176,7 +177,7 @@ async function createTableWrapper(table: Table): Promise<any> {
         //it's an auto incremented id, must be a number
         safeId = Number(id);
       }
-      return table.get(safeId);
+      return await table.get(safeId);
     },
     toArray: async () => await table.toArray(),
     single: async (predicate: (item: any) => Promise<boolean>) =>

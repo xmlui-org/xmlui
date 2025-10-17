@@ -330,7 +330,7 @@ export function useValidation(
       if (!ignore) {
         dispatch(fieldValidated(bindTo, partialResult));
         if (partialResult.partial) {
-          (async () => {
+          void (async () => {
             const result = await throttledAsyncValidate(validations, onValidate, deferredValue);
             if (!ignore) {
               // console.log(`async validation result for ${bindTo}`, result);
@@ -357,9 +357,10 @@ export function useValidationDisplay(
   validationStatus: ValidationSeverity;
 } {
   const interactionFlags: any =
-    useFormContextPart((value) => value.interactionFlags[bindTo]) || EMPTY_OBJECT;
+    useFormContextPart((value) => value?.interactionFlags[bindTo]) || EMPTY_OBJECT;
   const forceShowValidationResult = interactionFlags.forceShowValidationResult;
   const focused = interactionFlags.focused;
+  const afterFirstDirtyBlur = interactionFlags.afterFirstDirtyBlur;
   const isValidLostFocus = interactionFlags.isValidLostFocus;
   const isValidOnFocus = interactionFlags.isValidOnFocus;
   const invalidToValid = interactionFlags.invalidToValid;
@@ -386,15 +387,33 @@ export function useValidationDisplay(
 
   let isHelperTextShown = false;
   switch (validationMode) {
-    case "errorLate":
-      isHelperTextShown =
-        isDirty && (focused ? !invalidToValid && !isValidOnFocus : !isValidLostFocus);
+    // This validation model was inspired by https://medium.com/wdstack/inline-validation-in-forms-designing-the-experience-123fb34088ce
+    // The idea is to show validation errors as late as possible (on blur)
+    case "errorLate": {
+      // --- Don't fire if not dirty
+      if (!isDirty) {
+        isHelperTextShown = false;
+        break;
+      }
+      // --- Show if losing focus and invalid
+      if (!focused && !isValidLostFocus) {
+        isHelperTextShown = true;
+        break;
+      }
+      // --- Show if focused, after first meaningful blur, was not valid on last focus and not changed to valid while typing
+      if (focused && afterFirstDirtyBlur && !isValidOnFocus && !invalidToValid) {
+        isHelperTextShown = true;
+        break;
+      }
       break;
-    case "onChanged":
+    }
+    case "onChanged": {
       isHelperTextShown = isDirty;
       break;
-    case "onLostFocus":
-      isHelperTextShown = isDirty && ((!focused && !isValid) || (!isValidLostFocus && !isValid));
+    }
+    case "onLostFocus": {
+      isHelperTextShown = isDirty && !focused && !isValidLostFocus;
+    }
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;
 

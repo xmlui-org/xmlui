@@ -25,6 +25,7 @@ $themeVars: t.composePaddingVars($themeVars, "cell-#{$component}");
 $paddingHorizontal-cell-first-Table: createThemeVar("paddingHorizontal-cell-first-#{$component}");
 $paddingHorizontal-cell-last-Table: createThemeVar("paddingHorizontal-cell-last-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-pagination-Table: createThemeVar("backgroundColor-pagination-#{$component}");
 $textColor-heading-Table: createThemeVar("textColor-heading-#{$component}");
 $fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
@@ -32,6 +33,7 @@ $fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
 $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
 $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
+$borderRadius-Table: createThemeVar("borderRadius-#{$component}");
 
 
 @layer components {
@@ -40,6 +42,8 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     outline: none;
     overflow: auto;
     isolation: isolate;
+    border-radius: $borderRadius-Table;
+    @include t.borderVars($themeVars, $component);
 
     &.noScroll {
       overflow-y: initial;
@@ -245,6 +249,10 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
         opacity: 0.6;
       }
 
+      &:last-child{
+        border-bottom: createThemeVar("borderBottom-last-row-Table");
+      }
+
       &.noBottomBorder:last-child {
         border-bottom: none;
       }
@@ -296,7 +304,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
   .paginationLabel {
     color: $textColor-pagination-Table;
-    font-size: t.$fontSize-small;
+    font-size: t.$fontSize-sm;
   }
 
   .paginationSelect {
@@ -329,6 +337,11 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     opacity: 0.5;
 
     &:hover {
+      opacity: 1;
+    }
+
+    // Force hover state for extended interaction zone
+    &.forceHoverWrapper {
       opacity: 1;
     }
   }

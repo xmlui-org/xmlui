@@ -28,7 +28,11 @@ export const TextMd = createMetadata({
       description:
         "An optional string value that provides named presets for text variants with a " +
         "unique combination of font style, weight, size, color, and other parameters. " +
-        "If not defined, the text uses the current style of its context.",
+        "If not defined, the text uses the current style of its context. " +
+        "In addition to predefined variants, you can specify custom variant names and style them " +
+        "using theme variables with the pattern `{cssProperty}-Text-{variantName}` " +
+        "(e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). " +
+        "See the documentation for a complete list of supported CSS properties.",
       availableValues: variantOptionsMd,
     },
     maxLines: d(
@@ -92,25 +96,31 @@ export const TextMd = createMetadata({
       ],
     },
   },
+  apis: {
+    hasOverflow: {
+      description: "Returns true when the displayed text overflows its container boundaries.",
+      signature: "hasOverflow(): boolean",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`borderStyle-${COMP}`]: "solid",
-    [`fontSize-${COMP}`]: "$fontSize-small",
+    [`fontSize-${COMP}`]: "$fontSize-sm",
     [`borderWidth-${COMP}`]: "$space-0",
 
     [`lineHeight-${COMP}-codefence`]: "1.5",
 
     [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
     [`textTransform-${COMP}-abbr`]: "uppercase",
-    [`fontSize-${COMP}-secondary`]: "$fontSize-small",
+    [`fontSize-${COMP}-secondary`]: "$fontSize-sm",
     [`fontStyle-${COMP}-cite`]: "italic",
     [`textColor-${COMP}`]: "$textColor-primary",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontSize-${COMP}-codefence`]: "$fontSize-code",
     [`fontFamily-${COMP}-code`]: "$fontFamily-monospace",
-    [`fontSize-${COMP}-code`]: "$fontSize-small",
+    [`fontSize-${COMP}-code`]: "$fontSize-sm",
     [`borderWidth-${COMP}-code`]: "1px",
     [`borderStyle-${COMP}-code`]: "solid",
     [`borderRadius-${COMP}-code`]: "4px",
@@ -119,25 +129,24 @@ export const TextMd = createMetadata({
     [`textDecorationLine-${COMP}-deleted`]: "line-through",
     [`textDecorationLine-${COMP}-inserted`]: "underline",
     [`fontFamily-${COMP}-keyboard`]: "$fontFamily-monospace",
-    [`fontSize-${COMP}-keyboard`]: "$fontSize-small",
+    [`fontSize-${COMP}-keyboard`]: "$fontSize-sm",
     [`fontWeight-${COMP}-keyboard`]: "$fontWeight-bold",
     [`borderWidth-${COMP}-keyboard`]: "1px",
     [`paddingHorizontal-${COMP}-keyboard`]: "$space-1",
     [`fontFamily-${COMP}-sample`]: "$fontFamily-monospace",
-    [`fontSize-${COMP}-sample`]: "$fontSize-small",
-    [`fontSize-${COMP}-sup`]: "$fontSize-smaller",
+    [`fontSize-${COMP}-sample`]: "$fontSize-sm",
+    [`fontSize-${COMP}-sup`]: "$fontSize-xs",
     [`verticalAlignment-${COMP}-sup`]: "super",
-    [`fontSize-${COMP}-sub`]: "$fontSize-smaller",
+    [`fontSize-${COMP}-sub`]: "$fontSize-xs",
     [`verticalAlignment-${COMP}-sub`]: "sub",
     [`fontStyle-${COMP}-var`]: "italic",
     [`fontStyle-${COMP}-em`]: "italic",
     [`fontFamily-${COMP}-mono`]: "$fontFamily-monospace",
-    [`fontSize-${COMP}-title`]: "$fontSize-large",
-    [`fontSize-${COMP}-subtitle`]: "$fontSize-medium",
-    [`fontSize-${COMP}-small`]: "$fontSize-small",
-    [`lineHeight-${COMP}-small`]: "$lineHeight-tight",
+    [`fontSize-${COMP}-title`]: "$fontSize-2xl",
+    [`fontSize-${COMP}-subtitle`]: "$fontSize-xl",
+    [`fontSize-${COMP}-small`]: "$fontSize-sm",
     [`letterSpacing-${COMP}-caption`]: "0.05rem",
-    [`fontSize-${COMP}-placeholder`]: "$fontSize-smaller",
+    [`fontSize-${COMP}-placeholder`]: "$fontSize-xs",
     [`fontFamily-${COMP}-codefence`]: "$fontFamily-monospace",
     [`paddingHorizontal-${COMP}-codefence`]: "$space-4",
     [`paddingVertical-${COMP}-codefence`]: "$space-3",
@@ -171,7 +180,7 @@ export const TextMd = createMetadata({
 export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     const {
       variant,
       maxLines,
@@ -201,6 +210,7 @@ export const textComponentRenderer = createComponentRenderer(
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(breakMode) as BreakMode | undefined}
+        registerComponentApi={registerComponentApi}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

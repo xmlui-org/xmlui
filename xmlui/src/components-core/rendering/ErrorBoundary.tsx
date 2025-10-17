@@ -1,4 +1,4 @@
-import React, { ErrorInfo, ReactNode } from "react";
+import React, { type ErrorInfo, type ReactNode } from "react";
 
 import styles from "./ErrorBoundary.module.scss";
 
@@ -37,8 +37,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
    * This method implements the Error Boundaries for the React application.
    * It is invoked if errors occur during the rendering phase of any lifecycle
    * methods or children components.
-   * 
-   * DO NOT DELETE this method! Though it is not referenced directly from the code, 
+   *
+   * DO NOT DELETE this method! Though it is not referenced directly from the code,
    * it is a required part of the React component lifecycle.
    */
   static getDerivedStateFromError(error: Error): State {
@@ -75,7 +75,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
    */
   render() {
     return this.state.hasError ? (
-      <div className={styles.errorOverlay}>
+      <div data-error-boundary className={styles.errorOverlay}>
         <div className={styles.title}>There was an error!</div>
         <div className={styles.errorItem}>{this.state.error?.message}</div>
       </div>

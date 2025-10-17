@@ -16,6 +16,14 @@ export const ModalDialogMd = createMetadata({
     "ideal for forms, confirmations, detailed views, or any content that requires " +
     "focused user attention. Dialogs are programmatically opened using the `open()` " +
     "method and can receive parameters for dynamic content.",
+  parts: {
+    content: {
+      description: "The main content area of the modal dialog.",
+    },
+    title: {
+      description: "The title area of the modal dialog.",
+    },
+  },
   props: {
     fullScreen: {
       description:
@@ -43,12 +51,14 @@ export const ModalDialogMd = createMetadata({
   },
   apis: {
     close: {
-      description: `This method is used to close the \`${COMP}\`. Invoke it using \`modalId.close()\` ` +
+      description:
+        `This method is used to close the \`${COMP}\`. Invoke it using \`modalId.close()\` ` +
         `where \`modalId\` refers to a \`ModalDialog\` component.`,
       signature: "close(): void",
     },
     open: {
-      description: "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
+      description:
+        "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
         "of parameters to the method. In the `ModalDialog` instance, you can access those " +
         "with the `\$param` and `\$params` context values.",
       signature: "open(...params: any[]): void",
@@ -95,7 +105,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
     if (!layoutContext?._insideModalFrame) {
       return (
         <ModalDialogFrame
-          isInitiallyOpen={node.when !== undefined}
+          isInitiallyOpen={extractValue(node.when) !== undefined}
           registerComponentApi={registerComponentApi}
           onClose={lookupEventHandler("close")}
           onOpen={lookupEventHandler("open")}
@@ -119,6 +129,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
         fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
         title={extractValue(node.props?.title)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
+        externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
       >
         {renderChild(node.children, { type: "Stack" })}
       </ModalDialog>

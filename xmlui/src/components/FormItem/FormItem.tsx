@@ -40,7 +40,9 @@ export const FormItemMd = createMetadata({
     "`FormItem` wraps individual input controls within a `Form`, providing data " +
     "binding, validation, labeling, and layout functionality. It connects form " +
     "controls to the parent form's data model and handles validation feedback " +
-    "automatically.",
+    "automatically." +
+    "\n\n" +
+    "> **Note:** `FormItem` must be used inside a `Form` component.",
   props: {
     bindTo: {
       description:
@@ -218,7 +220,7 @@ export const FormItemMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "textColor-FormItemLabel": "$textColor-primary",
-    "fontSize-FormItemLabel": "$fontSize-small",
+    "fontSize-FormItemLabel": "$fontSize-sm",
     "fontWeight-FormItemLabel": "$fontWeight-medium",
     "fontStyle-FormItemLabel": "normal",
     "textTransform-FormItemLabel": "none",

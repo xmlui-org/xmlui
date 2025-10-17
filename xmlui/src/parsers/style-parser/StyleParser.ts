@@ -179,7 +179,105 @@ export class StyleParser {
     const themeIdNode = this.tryThemeId<ColorNode>();
     if (themeIdNode) return themeIdNode;
 
-    const parser = this;
+    /**
+     * Parses color function parameters
+     */
+    const parseColorParameters = (pars: string[]): boolean => {
+      // --- Skip the color function name token
+      this._lexer.get();
+
+      // --- Expect "("
+      this.expectToken(StyleTokenType.LParent, "S007");
+
+      // --- Iterate through pars
+      for (let i = 0; i < pars.length; i++) {
+        // --- Get the parameter value
+        const value = this.getNumber();
+        if (value === null) return false;
+
+        // --- Get optional parameter unit
+        const unit = this._lexer.peek(true);
+
+        // --- Process the value & unit
+        switch (pars[i]) {
+          // 0-255 or 0%-100%
+          case "V%":
+            if (unit.type === StyleTokenType.Percentage) {
+              if (value < 0 || value > 100) {
+                this.reportError("S008");
+                return false;
+              }
+              this._lexer.get();
+            } else {
+              if (value < 0 || value > 255) {
+                this.reportError("S009");
+                return false;
+              }
+            }
+            break;
+          // 0%-100%
+          case "%":
+            if (unit.type !== StyleTokenType.Percentage || value < 0 || value > 100) {
+              this.reportError("S008");
+              return false;
+            }
+            this._lexer.get();
+            break;
+
+          case "angle":
+            if (unit.type === StyleTokenType.Angle) {
+              this._lexer.get();
+            }
+            break;
+
+          // alpha with units
+          case "alpha":
+            if (unit.type === StyleTokenType.Percentage) {
+              if (value < 0 || value > 100) {
+                this.reportError("S008");
+                return false;
+              }
+              this._lexer.get();
+            } else {
+              if (value < 0 || value > 1) {
+                this.reportError("S011");
+                return false;
+              }
+            }
+            break;
+        }
+
+        // --- No separator expected after the last parameter
+        if (i === pars.length - 1) continue;
+
+        // --- Process the separator
+        let sepToken = this._lexer.peek(true);
+        if (sepToken.type === StyleTokenType.Ws) {
+          this._lexer.get();
+          sepToken = this._lexer.peek(true);
+          if (sepToken.type === StyleTokenType.Comma) {
+            this._lexer.get();
+          }
+        } else {
+          this.expectToken(StyleTokenType.Comma);
+        }
+        sepToken = this._lexer.peek();
+        if (sepToken.type === StyleTokenType.Ws) {
+          this._lexer.get();
+        }
+      }
+
+      // --- Process the optional separator
+      let aSepToken = this._lexer.peek();
+      if (aSepToken.type === StyleTokenType.Ws) {
+        this._lexer.get();
+      }
+
+      // --- Expect ")"
+      this.expectToken(StyleTokenType.RParent, "S010");
+      return true;
+    };
+
     switch (startToken.type) {
       case StyleTokenType.ColorName:
         this._lexer.get();
@@ -233,102 +331,6 @@ export class StyleParser {
       default:
         this.reportError("S005", startToken);
         return null;
-    }
-
-    function parseColorParameters(pars: string[]): boolean {
-      // --- Skip the color function name token
-      parser._lexer.get();
-
-      // --- Expect "("
-      parser.expectToken(StyleTokenType.LParent, "S007");
-
-      // --- Iterate through pars
-      for (let i = 0; i < pars.length; i++) {
-        // --- Get the parameter value
-        const value = parser.getNumber();
-        if (value === null) return false;
-
-        // --- Get optional parameter unit
-        const unit = parser._lexer.peek(true);
-
-        // --- Process the value & unit
-        switch (pars[i]) {
-          // 0-255 or 0%-100%
-          case "V%":
-            if (unit.type === StyleTokenType.Percentage) {
-              if (value < 0 || value > 100) {
-                parser.reportError("S008");
-                return false;
-              }
-              parser._lexer.get();
-            } else {
-              if (value < 0 || value > 255) {
-                parser.reportError("S009");
-                return false;
-              }
-            }
-            break;
-          // 0%-100%
-          case "%":
-            if (unit.type !== StyleTokenType.Percentage || value < 0 || value > 100) {
-              parser.reportError("S008");
-              return false;
-            }
-            parser._lexer.get();
-            break;
-
-          case "angle":
-            if (unit.type === StyleTokenType.Angle) {
-              parser._lexer.get();
-            }
-            break;
-
-          // alpha with units
-          case "alpha":
-            if (unit.type === StyleTokenType.Percentage) {
-              if (value < 0 || value > 100) {
-                parser.reportError("S008");
-                return false;
-              }
-              parser._lexer.get();
-            } else {
-              if (value < 0 || value > 1) {
-                parser.reportError("S011");
-                return false;
-              }
-            }
-            break;
-        }
-
-        // --- No separator expected after the last parameter
-        if (i === pars.length - 1) continue;
-
-        // --- Process the separator
-        let sepToken = parser._lexer.peek(true);
-        if (sepToken.type === StyleTokenType.Ws) {
-          parser._lexer.get();
-          sepToken = parser._lexer.peek(true);
-          if (sepToken.type === StyleTokenType.Comma) {
-            parser._lexer.get();
-          }
-        } else {
-          parser.expectToken(StyleTokenType.Comma);
-        }
-        sepToken = parser._lexer.peek();
-        if (sepToken.type === StyleTokenType.Ws) {
-          parser._lexer.get();
-        }
-      }
-
-      // --- Process the optional separator
-      let aSepToken = parser._lexer.peek();
-      if (aSepToken.type === StyleTokenType.Ws) {
-        parser._lexer.get();
-      }
-
-      // --- Expect ")"
-      parser.expectToken(StyleTokenType.RParent, "S010");
-      return true;
     }
   }
 

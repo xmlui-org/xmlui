@@ -1,5 +1,160 @@
 # xmlui-vscode
 
+## 0.10.22
+
+### Patch Changes
+
+- Updated dependencies [501f60a]
+- Updated dependencies [1020f1c]
+  - xmlui@0.10.22
+
+## 0.10.21
+
+### Patch Changes
+
+- Updated dependencies [6fd4d62]
+  - xmlui@0.10.21
+
+## 0.10.20
+
+### Patch Changes
+
+- Updated dependencies [26eac90]
+- Updated dependencies [f53edff]
+- Updated dependencies [1840916]
+- Updated dependencies [c6be7a3]
+- Updated dependencies [6aaefaf]
+- Updated dependencies [28d2585]
+- Updated dependencies [e29a231]
+- Updated dependencies [22162c0]
+- Updated dependencies [e90232b]
+  - xmlui@0.10.20
+
+## 0.10.19
+
+### Patch Changes
+
+- Updated dependencies [facb257]
+- Updated dependencies [6084c14]
+- Updated dependencies [e1fa9d7]
+  - xmlui@0.10.19
+
+## 0.10.18
+
+### Patch Changes
+
+- Updated dependencies [202f2b2]
+- Updated dependencies [6650ee8]
+- Updated dependencies [da98994]
+- Updated dependencies [8394663]
+  - xmlui@0.10.18
+
+## 0.10.17
+
+### Patch Changes
+
+- Updated dependencies [07dae0b]
+  - xmlui@0.10.17
+
+## 0.10.16
+
+### Patch Changes
+
+- Updated dependencies [0ba6612]
+- Updated dependencies [7b78052]
+- Updated dependencies [314b429]
+- Updated dependencies [a1dea8f]
+- Updated dependencies [cff754c]
+  - xmlui@0.10.16
+
+## 0.10.15
+
+### Patch Changes
+
+- Updated dependencies [3c8ad14]
+- Updated dependencies [5502fea]
+- Updated dependencies [e08f0ba]
+- Updated dependencies [5502fea]
+- Updated dependencies [db618b5]
+- Updated dependencies [a795b3d]
+- Updated dependencies [5851c02]
+  - xmlui@0.10.15
+
+## 0.10.14
+
+### Patch Changes
+
+- Updated dependencies [618049b]
+- Updated dependencies [215a142]
+- Updated dependencies [65b52e1]
+- Updated dependencies [0cc2178]
+- Updated dependencies [53d4ed9]
+  - xmlui@0.10.14
+
+## 0.10.13
+
+### Patch Changes
+
+- Updated dependencies [9401ee0]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [eb62858]
+- Updated dependencies [243b7fa]
+- Updated dependencies [eb62858]
+  - xmlui@0.10.13
+
+## 0.10.12
+
+### Patch Changes
+
+- Updated dependencies [f12a042]
+- Updated dependencies [8731eb8]
+- Updated dependencies [eb6454f]
+- Updated dependencies [1210852]
+  - xmlui@0.10.12
+
+## 0.10.11
+
+### Patch Changes
+
+- Updated dependencies [8c76c8d]
+- Updated dependencies [d56c3e5]
+- Updated dependencies [e42d367]
+- Updated dependencies [f539526]
+- Updated dependencies [19ce234]
+- Updated dependencies [455b6c0]
+- Updated dependencies [e90dc73]
+- Updated dependencies [819b563]
+- Updated dependencies [b57dfa2]
+- Updated dependencies [9dd0f97]
+- Updated dependencies [19ce234]
+- Updated dependencies [898346d]
+- Updated dependencies [705dd04]
+  - xmlui@0.10.11
+
+## 0.10.10
+
+### Patch Changes
+
+- Updated dependencies [fff80c5]
+  - xmlui@0.10.10
+
+## 0.10.9
+
+### Patch Changes
+
+- Updated dependencies [879c09d]
+- Updated dependencies [3ad8514]
+- Updated dependencies [0c69245]
+- Updated dependencies [4ad31fc]
+- Updated dependencies [c99f184]
+- Updated dependencies [5032e4a]
+- Updated dependencies [2394f36]
+  - xmlui@0.10.9
+
 ## 0.10.8
 
 ### Patch Changes

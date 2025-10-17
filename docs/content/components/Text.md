@@ -7,6 +7,29 @@ You can learn more about this component in the [Working with Text](/working-with
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
 
+## Custom Variants [#custom-variants]
+
+In addition to the predefined variants, the `Text` component supports **custom variant names** that can be styled using theme variables. This allows you to create application-specific text styles without modifying the component itself.
+
+When you use a custom variant name (one not in the predefined list), the component automatically applies theme variables following the naming pattern: `{cssProperty}-Text-{variantName}`.
+
+```xmlui-pg display name="Example: custom variants"
+<App>
+  <Theme 
+    textColor-Text-brandTitle="rgb(41, 128, 185)"
+    fontSize-Text-brandTitle="28px"
+    fontWeight-Text-brandTitle="bold"
+    letterSpacing-Text-brandTitle="2px"
+  >
+    <Text variant="brandTitle">
+      Welcome to Our Application
+    </Text>
+  </Theme>
+</App>
+```
+
+In this example, the custom variant `brandTitle` is styled using theme variables. Any CSS text property can be configured, including `textColor`, `fontSize`, `fontWeight`, `fontFamily`, `textDecoration*`, `lineHeight`, `backgroundColor`, `textTransform`, `letterSpacing`, `wordSpacing`, `textShadow`, and more.
+
 ## Properties [#properties]
 
 ### `breakMode` (default: "normal") [#breakmode-default-normal]
@@ -263,7 +286,7 @@ The text to be displayed. This value can also be set via nesting the text into t
 
 ### `variant` [#variant]
 
-An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context.
+An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context. In addition to predefined variants, you can specify custom variant names and style them using theme variables with the pattern `{cssProperty}-Text-{variantName}` (e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). See the documentation for a complete list of supported CSS properties.
 
 Available values:
 
@@ -468,9 +491,60 @@ This component does not have any events.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `hasOverflow` [#hasoverflow]
+
+Returns true when the displayed text overflows its container boundaries.
+
+**Signature**: `hasOverflow(): boolean`
 
 ## Styling [#styling]
+
+### Custom Variant Theme Variables [#custom-variant-theme-variables]
+
+When using custom variants, you can style them using theme variables with the naming pattern `{propertyName}-Text-{variantName}`. The following CSS properties are supported:
+
+| Theme Variable Name | Description | Example Value |
+|---------------------|-------------|---------------|
+| `textColor-Text-{variant}` | Text color | `rgb(255, 0, 0)`, `#ff0000`, `red` |
+| `fontFamily-Text-{variant}` | Font family | `"Arial, sans-serif"`, `monospace` |
+| `fontSize-Text-{variant}` | Font size | `16px`, `1.5rem`, `large` |
+| `fontStyle-Text-{variant}` | Font style | `normal`, `italic`, `oblique` |
+| `fontWeight-Text-{variant}` | Font weight | `normal`, `bold`, `700` |
+| `fontStretch-Text-{variant}` | Font stretch | `normal`, `expanded`, `condensed` |
+| `textDecorationLine-Text-{variant}` | Decoration line type | `none`, `underline`, `overline`, `line-through` |
+| `textDecorationColor-Text-{variant}` | Decoration color | `rgb(255, 0, 0)`, `currentColor` |
+| `textDecorationStyle-Text-{variant}` | Decoration style | `solid`, `dashed`, `dotted`, `wavy` |
+| `textDecorationThickness-Text-{variant}` | Decoration thickness | `2px`, `from-font`, `auto` |
+| `textUnderlineOffset-Text-{variant}` | Underline offset | `5px`, `0.2em`, `auto` |
+| `lineHeight-Text-{variant}` | Line height | `1.5`, `24px`, `normal` |
+| `backgroundColor-Text-{variant}` | Background color | `rgb(255, 255, 0)`, `transparent` |
+| `textTransform-Text-{variant}` | Text transformation | `none`, `uppercase`, `lowercase`, `capitalize` |
+| `letterSpacing-Text-{variant}` | Space between letters | `1px`, `0.1em`, `normal` |
+| `wordSpacing-Text-{variant}` | Space between words | `5px`, `0.2em`, `normal` |
+| `textShadow-Text-{variant}` | Text shadow | `2px 2px 4px rgba(0,0,0,0.5)` |
+| `textIndent-Text-{variant}` | First line indentation | `20px`, `2em`, `0` |
+| `textAlign-Text-{variant}` | Horizontal alignment | `left`, `center`, `right`, `justify` |
+| `textAlignLast-Text-{variant}` | Last line alignment | `left`, `center`, `right`, `justify` |
+| `wordBreak-Text-{variant}` | Word breaking behavior | `normal`, `break-all`, `keep-all` |
+| `wordWrap-Text-{variant}` | Word wrapping | `normal`, `break-word` |
+| `direction-Text-{variant}` | Text direction | `ltr`, `rtl` |
+| `writingMode-Text-{variant}` | Writing mode | `horizontal-tb`, `vertical-rl`, `vertical-lr` |
+| `lineBreak-Text-{variant}` | Line breaking rules | `auto`, `normal`, `strict`, `loose` |
+
+```xmlui-pg  display name="Example: custom variant styles" /highlight/
+<App>
+  <Theme 
+    textColor-Text-highlight="rgb(255, 193, 7)"
+    fontWeight-Text-highlight="bold"
+    backgroundColor-Text-highlight="rgba(0, 0, 0, 0.8)"
+    padding-Text-highlight="4px 8px"
+    textShadow-Text-highlight="0 2px 4px rgba(0,0,0,0.5)"
+  >
+    <Text variant="highlight">Important Notice</Text>
+    <Text variant="highlight">This is Important Too</Text>
+  </Theme>
+</App>
+```
 
 ### Theme Variables [#theme-variables]
 
@@ -501,21 +575,21 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-keyboard | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-mono | $fontFamily-monospace | $fontFamily-monospace |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
-| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-smaller | $fontSize-smaller |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-small | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-sub | $fontSize-smaller | $fontSize-smaller |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-xs | $fontSize-xs |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-small | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-sub | $fontSize-xs | $fontSize-xs |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-subheading | $fontSize-H6 | $fontSize-H6 |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-subtitle | $fontSize-medium | $fontSize-medium |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-sup | $fontSize-smaller | $fontSize-smaller |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-subtitle | $fontSize-xl | $fontSize-xl |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-sup | $fontSize-xs | $fontSize-xs |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-tableheading | $fontSize-H6 | $fontSize-H6 |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-title | $fontSize-large | $fontSize-large |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-title | $fontSize-2xl | $fontSize-2xl |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-cite | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-em | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-marked | *none* | *none* |
@@ -533,15 +607,18 @@ This component does not expose any methods.
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-subheading | 0.04em | 0.04em |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-codefence | 1.5 | 1.5 |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
-| [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
+| [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
@@ -563,6 +640,7 @@ This component does not expose any methods.
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
 | [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |

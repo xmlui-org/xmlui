@@ -67,7 +67,7 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: t.$fontSize-normal;
+    font-size: t.$fontSize-base;
     line-height: 1;
     user-select: none;
     //border-color: transparent;
@@ -126,6 +126,22 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
     &[data-orientation="horizontal"] {
       flex-direction: row;
     }
+
+    &.alignStart {
+      justify-content: flex-start;
+    }
+
+    &.alignEnd {
+      justify-content: flex-end;
+    }
+
+    &.alignCenter {
+      justify-content: center;
+    }
+
+    &.alignStretch {
+      justify-content: stretch;
+    }
   }
 
   .tabsList:hover {
@@ -135,6 +151,60 @@ $border-list-Tabs: createThemeVar("border-list-Tabs");
   .tabsContent {
     flex-grow: 1;
     outline: none;
+  }
+
+  // Accordion view styles
+  .accordionView {
+    width: 100%;
+  }
+
+  .accordionRoot {
+    display: flex;
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .accordionInterleaved {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .accordionList {
+    display: contents; // Makes children act as direct children of parent
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .accordionItem {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .accordionTrigger {
+    width: 100%;
+    justify-content: flex-start;
+    border-bottom-width: $borderWidth-Tabs;
+    border-bottom-style: solid;
+    border-bottom-color: $borderColor-Tabs;
+    border-right: none !important;
+
+    &[data-state="active"] {
+      border-bottom-width: $borderWidth-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $borderColor-active-Tabs;
+      background-color: $backgroundColor-trigger-Tabs--active;
+      border-right: none !important;
+    }
+  }
+
+  // Style for accordion content to appear inline with headers
+  .accordionInterleaved .tabsContent {
+    width: 100%;
+    order: inherit;
   }
 }
 

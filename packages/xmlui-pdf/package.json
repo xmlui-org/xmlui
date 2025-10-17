@@ -1,6 +1,6 @@
 {
   "name": "xmlui-pdf",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
     "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
-    "pdfjs-dist": "^4.4.168",
-    "react-pdf": "^9.1.1"
+    "pdfjs-dist": "5.3.93",
+    "react-pdf": "^10.1.0"
   },
   "devDependencies": {
     "xmlui": "*"

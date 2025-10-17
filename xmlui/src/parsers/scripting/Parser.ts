@@ -1062,9 +1062,17 @@ export class Parser {
    *   : "finally" blockStatement
    */
   private parseTryStatement(): TryStatement | null {
+    const getBlock: () => BlockStatement | null = () => {
+      const nextToken = this._lexer.peek();
+      if (nextToken.type !== TokenType.LBrace) {
+        this.reportError("W012", nextToken);
+        return null;
+      }
+      return this.parseBlockStatement();
+    };
+
     const startToken = this._lexer.peek();
     let endToken: Token | undefined = this._lexer.get();
-    const parser = this;
 
     // --- Get "try" block
     const tryB = getBlock()!;
@@ -1125,15 +1133,6 @@ export class Parser {
       startToken,
       endToken,
     );
-
-    function getBlock(): BlockStatement | null {
-      const nextToken = parser._lexer.peek();
-      if (nextToken.type !== TokenType.LBrace) {
-        parser.reportError("W012", nextToken);
-        return null;
-      }
-      return parser.parseBlockStatement();
-    }
   }
 
   /**

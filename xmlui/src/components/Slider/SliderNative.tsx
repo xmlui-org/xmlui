@@ -6,10 +6,11 @@ import styles from "./Slider.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 import { Tooltip } from "../Tooltip/TooltipNative";
+import { isNaN } from "lodash-es";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export type Props = {
   id?: string;
@@ -31,10 +32,6 @@ export type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
   required?: boolean;
   enabled?: boolean;
   rangeStyle?: CSSProperties;
@@ -43,7 +40,18 @@ export type Props = {
   valueFormat?: (value: number) => string;
 };
 
-export const defaultProps: Pick<Props, "step" | "min" | "max" | "enabled" | "validationStatus" | "tabIndex" | "showValues" | "valueFormat" | "minStepsBetweenThumbs"> = {
+export const defaultProps: Pick<
+  Props,
+  | "step"
+  | "min"
+  | "max"
+  | "enabled"
+  | "validationStatus"
+  | "tabIndex"
+  | "showValues"
+  | "valueFormat"
+  | "minStepsBetweenThumbs"
+> = {
   step: 1,
   min: 0,
   max: 10,
@@ -55,18 +63,41 @@ export const defaultProps: Pick<Props, "step" | "min" | "max" | "enabled" | "val
   minStepsBetweenThumbs: 1,
 };
 
+const parseValue = (val: string | number | undefined, defaultVal: number): number => {
+  if (typeof val === "number") {
+    return val;
+  } else if (typeof val === "string") {
+    const parsed = parseFloat(val);
+    if (!isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return defaultVal;
+};
+
 // Helper function to ensure value is properly formatted
-const formatValue = (val: number | number[] | undefined, defaultVal: number = 0): number[] => {
+const formatValue = (
+  val: number | number[] | undefined,
+  defaultVal: number = 0,
+  minVal?: number,
+  maxVal?: number,
+): number[] => {
+  const clampValue = (value: number): number => {
+    if (minVal !== undefined && value < minVal) return minVal;
+    if (maxVal !== undefined && value > maxVal) return maxVal;
+    return value;
+  };
+
   if (val === undefined) {
-    return [defaultVal];
+    return [clampValue(defaultVal)];
   }
   if (typeof val === "number") {
-    return [val];
+    return [clampValue(val)];
   }
   if (Array.isArray(val) && val.length > 0) {
-    return val;
+    return val.map(clampValue);
   }
-  return [defaultVal];
+  return [clampValue(defaultVal)];
 };
 
 export const Slider = forwardRef(
@@ -89,10 +120,6 @@ export const Slider = forwardRef(
       autoFocus,
       readOnly,
       tabIndex = defaultProps.tabIndex,
-      label,
-      labelPosition,
-      labelWidth,
-      labelBreak,
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue,
@@ -105,14 +132,17 @@ export const Slider = forwardRef(
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
-    const _id = useId();
-    id = id || _id;
     const inputRef = useRef(null);
+    const ref = forwardedRef ? composeRefs(inputRef, forwardedRef) : inputRef;
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const thumbRef = useRef(null);
+    const thumbsRef = useRef<(HTMLSpanElement | null)[]>([]);
+    min = parseValue(min, defaultProps.min);
+    max = parseValue(max, defaultProps.max);
 
     // Initialize localValue properly
-    const [localValue, setLocalValue] = React.useState<number[]>([]);
+    const [localValue, setLocalValue] = React.useState<number[]>(() =>
+      formatValue(value || initialValue, min, min, max),
+    );
     const [showTooltip, setShowTooltip] = React.useState(false);
     const onShowTooltip = useCallback(() => setShowTooltip(true), []);
     const onHideTooltip = useCallback(() => setShowTooltip(false), []);
@@ -124,7 +154,8 @@ export const Slider = forwardRef(
       if (typeof initialValue === "string") {
         try {
           // Try to parse as JSON first (for arrays)
-          initialVal = JSON.parse(initialValue);
+          const parsed = JSON.parse(initialValue);
+          initialVal = parsed;
         } catch (e) {
           // If not JSON, try to parse as number
           const num = parseFloat(initialValue);
@@ -133,15 +164,13 @@ export const Slider = forwardRef(
           }
         }
       } else if (typeof initialValue === "number") {
-        if (initialValue >= min && initialValue <= max) {
-          initialVal = initialValue;
-        }
-      } else {
-        initialVal = formatValue(initialValue, min);
+        initialVal = initialValue;
+      } else if (initialValue !== undefined) {
+        initialVal = initialValue;
       }
 
-      // Format the value properly
-      const formattedValue = formatValue(initialVal, min);
+      // Format the value properly - single call to formatValue with bounds checking
+      const formattedValue = formatValue(initialVal, min, min, max);
       setLocalValue(formattedValue);
 
       // Notify parent component
@@ -158,10 +187,10 @@ export const Slider = forwardRef(
     // Sync with external value changes
     useEffect(() => {
       if (value !== undefined) {
-        const formattedValue = formatValue(value, min);
+        const formattedValue = formatValue(value, min, min, max);
         setLocalValue(formattedValue);
       }
-    }, [value, min]);
+    }, [value, min, max]);
 
     const updateValue = useCallback(
       (value: number | number[]) => {
@@ -176,6 +205,9 @@ export const Slider = forwardRef(
 
     const onInputChange = useCallback(
       (value: number[]) => {
+        if (readOnly) {
+          return;
+        }
         setLocalValue(value);
 
         // 👇 Force the DOM element to reflect the latest value synchronously
@@ -189,26 +221,41 @@ export const Slider = forwardRef(
           updateValue(value[0]);
         }
       },
-      [updateValue],
+      [updateValue, readOnly],
     );
 
     // Component APIs
     const handleOnFocus = useCallback(
-      (ev) => onFocus?.(ev),
-      [onFocus],
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        onShowTooltip();
+        onFocus?.(ev);
+      },
+      [onFocus, onShowTooltip],
     );
-
     const handleOnBlur = useCallback(
-      (ev) => onBlur?.(ev),
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        onBlur?.(ev);
+      },
       [onBlur],
     );
 
     const focus = useCallback(() => {
-      inputRef.current?.focus();
+      // Focus the first available thumb
+      const firstThumb = thumbsRef.current.find(thumb => thumb !== null);
+      if (firstThumb) {
+        firstThumb.focus();
+      } else {
+        inputRef.current?.focus();
+      }
     }, []);
 
     const setValue = useEvent((newValue) => {
-      updateValue(newValue);
+      if (readOnly || !enabled) {
+        return;
+      }
+      const formattedValue = formatValue(newValue, min, min, max);
+      const valueToUpdate = formattedValue.length === 1 ? formattedValue[0] : formattedValue;
+      updateValue(valueToUpdate);
     });
 
     useEffect(() => {
@@ -219,51 +266,39 @@ export const Slider = forwardRef(
     }, [focus, registerComponentApi, setValue]);
 
     // Ensure we always have at least one thumb
-    const displayValue = localValue.length > 0 ? localValue : [min];
-    return (
-      <ItemWithLabel
-        {...rest}
-        labelPosition={labelPosition as any}
-        label={label}
-        labelWidth={labelWidth}
-        labelBreak={labelBreak}
-        required={required}
-        enabled={enabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-        className={className}
-        ref={forwardedRef}
-        id={id}
-        isInputTemplateUsed={true}
-      >
-        <div className={styles.sliderContainer} data-slider-container>
-          <Root
-            minStepsBetweenThumbs={minStepsBetweenThumbs}
-            ref={inputRef}
-            tabIndex={tabIndex}
-            aria-readonly={readOnly}
-            className={classnames(className, styles.sliderRoot, {
-              [styles.disabled]: !enabled,
-              [styles.readOnly]: readOnly,
-            })}
-            style={style}
-            max={max}
-            min={min}
-            inverted={inverted}
-            step={step}
-            disabled={!enabled}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-            onValueChange={onInputChange}
-            onMouseOver={onShowTooltip}
-            onMouseLeave={onHideTooltip}
-            onPointerDown={onShowTooltip}
-            aria-required={required}
-            value={displayValue}
-            autoFocus={autoFocus}
-          >
+    const displayValue = localValue.length > 0 ? localValue : formatValue(undefined, min, min, max);
+
+    // Clean up thumbs ref array when number of thumbs changes
+    useEffect(() => {
+      thumbsRef.current = thumbsRef.current.slice(0, displayValue.length);
+    }, [displayValue.length]);
+
+      return (
+          <div {...rest} ref={ref} style={style} className={classnames(styles.sliderContainer, className)} data-slider-container>
+            <Root
+              ref={inputRef}
+              minStepsBetweenThumbs={minStepsBetweenThumbs}
+              tabIndex={tabIndex}
+              aria-readonly={readOnly}
+              className={classnames(styles.sliderRoot, {
+                [styles.disabled]: !enabled,
+                [styles.readOnly]: readOnly,
+              })}
+              max={max}
+              min={min}
+              inverted={inverted}
+              step={step}
+              disabled={!enabled}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              onValueChange={onInputChange}
+              onMouseOver={onShowTooltip}
+              onMouseLeave={onHideTooltip}
+              onPointerDown={onShowTooltip}
+              value={displayValue}
+            >
             <Track
+              data-track
               className={classnames(styles.sliderTrack, {
                 [styles.disabled]: !enabled,
                 [styles.readOnly]: readOnly,
@@ -274,6 +309,7 @@ export const Slider = forwardRef(
               style={rangeStyle ? { ...rangeStyle } : undefined}
             >
               <Range
+                data-range
                 className={classnames(styles.sliderRange, {
                   [styles.disabled]: !enabled,
                 })}
@@ -288,19 +324,22 @@ export const Slider = forwardRef(
                 open={showValues && showTooltip}
               >
                 <Thumb
-                  ref={index === 0 ? thumbRef : null}
+                  id={id}
+                  aria-required={required}
+                  ref={(el) => {
+                    thumbsRef.current[index] = el;
+                  }}
                   className={classnames(styles.sliderThumb, {
                     [styles.disabled]: !enabled,
                   })}
                   style={thumbStyle ? { ...thumbStyle } : undefined}
-                  id={id}
                   data-thumb-index={index}
+                  autoFocus={autoFocus && index === 0}
                 />
               </Tooltip>
             ))}
           </Root>
         </div>
-      </ItemWithLabel>
     );
   },
 );

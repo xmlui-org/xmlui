@@ -31,9 +31,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders with basic props", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -46,9 +46,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("renders correct number of line series", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -65,9 +65,9 @@ test.describe("data handling", () => {
   test("renders with empty data array", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${emptyData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -80,9 +80,9 @@ test.describe("data handling", () => {
   test("renders with single data point", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${singlePointData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -95,9 +95,9 @@ test.describe("data handling", () => {
   test("handles non-array data gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{null}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -114,9 +114,9 @@ test.describe("legend", () => {
   test("legend is hidden by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -129,9 +129,9 @@ test.describe("legend", () => {
   test("legend is shown when showLegend is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         showLegend
         width="600px"
         height="400px"
@@ -149,9 +149,9 @@ test.describe("tooltip", () => {
   test("tooltip appears on hover by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -169,9 +169,9 @@ test.describe("tooltip", () => {
   test("tooltip is hidden when hideTooltip is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideTooltip
         width="600px"
         height="400px"
@@ -193,9 +193,9 @@ test.describe("x-axis", () => {
   test("x-axis is shown by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -211,9 +211,9 @@ test.describe("x-axis", () => {
   test("x-axis is hidden when hideX is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideX
         width="600px"
         height="400px"
@@ -227,9 +227,9 @@ test.describe("x-axis", () => {
   test("x-axis ticks are hidden when hideTickX is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideTickX
         width="600px"
         height="400px"
@@ -248,9 +248,9 @@ test.describe("y-axis", () => {
   test("y-axis is shown by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       />
@@ -266,9 +266,9 @@ test.describe("y-axis", () => {
   test("y-axis is hidden when hideY is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideY
         width="600px"
         height="400px"
@@ -282,9 +282,9 @@ test.describe("y-axis", () => {
   test("y-axis ticks are hidden when hideTickY is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideTickY
         width="600px"
         height="400px"
@@ -305,9 +305,9 @@ test.describe("formatters", () => {
   test("applies tickFormatterX when provided", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-          yKey="name"
+          xKey="name"
           data="{${sampleData}}"
-          xKeys="{['sales', 'profit']}"
+          yKeys="{['sales', 'profit']}"
           tickFormatterX="{(value) => value + ' (X)'}"
           width="600px"
           height="400px"
@@ -322,9 +322,9 @@ test.describe("formatters", () => {
   test("applies tickFormatterY when provided", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-          yKey="name"
+          xKey="name"
           data="{${sampleData}}"
-          xKeys="{['sales', 'profit']}"
+          yKeys="{['sales', 'profit']}"
           tickFormatterY="{(value) => '$' + value}"
           width="600px"
           height="400px"
@@ -343,9 +343,9 @@ test.describe("margins", () => {
   test("applies custom margins", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         marginTop="{20}"
         marginRight="{30}"
         marginBottom="{40}"
@@ -367,9 +367,9 @@ test.describe("responsive behavior", () => {
   test("enters mini mode with very small container height", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="50px"
       />
@@ -387,9 +387,9 @@ test.describe("responsive behavior", () => {
   test("renders normally with adequate height", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="200px"
       />
@@ -406,9 +406,9 @@ test.describe("responsive behavior", () => {
   test("adjusts tick intervals for narrow containers", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="150px"
         height="400px"
       />
@@ -427,9 +427,9 @@ test.describe("tooltipTemplate", () => {
   test("renders custom tooltip template", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         width="600px"
         height="400px"
       >
@@ -460,9 +460,9 @@ test.describe("tooltipTemplate", () => {
   test("tooltip template is not rendered when hideTooltip is true", async ({ initTestBed, page }) => {
     await initTestBed(`
       <LineChart
-        yKey="name"
+        xKey="name"
         data="{${sampleData}}"
-        xKeys="{['sales', 'profit']}"
+        yKeys="{['sales', 'profit']}"
         hideTooltip
         width="600px"
         height="400px"
@@ -485,9 +485,9 @@ test.describe("tooltipTemplate", () => {
   test("falls back to default tooltip when tooltipTemplate is not provided", async ({ initTestBed, page }) => {
       await initTestBed(`
         <LineChart
-          yKey="name"
+          xKey="name"
           data="{${sampleData}}"
-          xKeys="{['sales', 'profit']}"
+          yKeys="{['sales', 'profit']}"
           width="600px"
           height="400px"
         />

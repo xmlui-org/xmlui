@@ -64,31 +64,6 @@ This property determines whether the dropdown list is open when the component is
 
 This property sets the component's initial value.
 
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` [#labelposition]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space.
-
 ### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
@@ -160,6 +135,27 @@ This event is triggered when value of AutoComplete has changed.
 
 This event is triggered when the AutoComplete has received the focus.
 
+### `itemCreated` [#itemcreated]
+
+This event is triggered when a new item is created by the user (if `creatable` is enabled).
+
+Add a few new items not in the options list. The following markup will display them:
+
+```xmlui-pg copy display height="300px" name="Example: itemCreated"
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
+</App>
+```
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the AutoComplete has lost the focus.
@@ -209,16 +205,17 @@ This API allows you to get or set the value of the component. If no value is set
 | [backgroundColor](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-item-AutoComplete | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
 | [backgroundColor](../styles-and-themes/common-units/#color)-item-AutoComplete--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
-| [backgroundColor](../styles-and-themes/common-units/#color)-item-AutoComplete--hover | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
-| [backgroundColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-AutoComplete--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
 | [border](../styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | initial | initial |
+| [borderColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | initial | initial |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-default | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-default--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-error | *none* | *none* |
@@ -227,6 +224,7 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-success--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
 | [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
@@ -270,6 +268,7 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderWidth](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-AutoComplete-warning | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-menu-AutoComplete | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-menu-AutoComplete | 1px | 1px |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-default | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-default--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-error | *none* | *none* |
@@ -280,8 +279,8 @@ This API allows you to get or set the value of the component. If no value is set
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-AutoComplete-warning--hover | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-AutoComplete-success | *none* | *none* |
@@ -290,20 +289,28 @@ This API allows you to get or set the value of the component. If no value is set
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-placeholder-AutoComplete-warning | *none* | *none* |
-| [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
+| [opacity](../styles-and-themes/common-units/#opacity)-AutoComplete--disabled | 0.5 | 0.5 |
+| [opacity](../styles-and-themes/common-units/#opacity)-text-item-AutoComplete--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [padding](../styles-and-themes/common-units/#size)-item-AutoComplete | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete | $space-1 | $space-1 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-2 | $space-2 |
+| [paddingBottom](../styles-and-themes/common-units/#size)-item-AutoComplete | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete | $space-2 | $space-2 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-2_5 | $space-2_5 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-item-AutoComplete | $space-2 | $space-2 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-item-AutoComplete | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-item-AutoComplete | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-item-AutoComplete | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete | $space-2 | $space-2 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-0_5 | $space-0_5 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-item-AutoComplete | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |

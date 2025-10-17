@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
+import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from 'rollup-plugin-copy';
@@ -21,8 +22,8 @@ export default ({ mode = "lib" }) => {
       lib = {
         entry: [path.resolve("src", "index-standalone.ts")],
         name: "xmlui",
-        formats: ["umd"],
-        fileName: (format) => `xmlui-standalone.${format}.js`,
+        formats: ["umd"] as any,
+        fileName: (format: any) => `xmlui-standalone.${format}.js`,
       };
       define = {
         "process.env": {
@@ -68,13 +69,13 @@ export default ({ mode = "lib" }) => {
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
         },
-        formats: ["es"],
+        formats: ["es"] as any,
       };
     }
   }
   let plugins = mode === "metadata"
-    ? []
-    : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })];
+    ? [ViteXmlui({})]
+    : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if(mode === "lib"){
     plugins.push(copy({
@@ -117,10 +118,10 @@ export default ({ mode = "lib" }) => {
       },
     },
     build: {
-      //minify:false,
+      minify: "terser",
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
-      lib: lib,
+      lib,
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:

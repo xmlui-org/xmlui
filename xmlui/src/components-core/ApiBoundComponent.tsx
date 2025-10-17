@@ -3,9 +3,6 @@ import React, { useMemo } from "react";
 
 import type { ComponentDef, ParentRenderContext } from "../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
-import type { UploadActionComponent } from "./action/FileUploadAction";
-import type { DownloadActionComponent } from "./action/FileDownloadAction";
-import type { ApiActionComponent } from "../components/APICall/APICall";
 import { parseAttributeValue } from "./script-runner/AttributeValueParser";
 
 type ApiBoundComponentProps = {
@@ -32,18 +29,30 @@ export function ApiBoundComponent({
       return `${node.uid}_data_${key}`;
     }
 
-    const loaders: Array<ComponentDef> = [...(node.loaders || [])];
-    const events = { ...(node.events || {}) } as any;
-    const props = { ...(node.props || {}) } as any;
-    const vars = { ...(node.vars || {}) };
-    const api = { ...(node.api || {}) };
+    // Generates a string representation of an event handler function that calls 
+    // the appropriate action. This function is used recursively for nested actions.
+    function generateEventHandler(actionComponent: any): string {
+      const { type } = actionComponent;
 
-    apiBoundEvents.forEach((key) => {
-      const { type } = node.events![key];
+      // Prepares an event handler, which can be several types of data
+      // (string for inline JS functions, parsed objects, or nested action components)
+      const prepareEvent = (eventData: any) => {
+        if (!eventData) {
+          return "undefined";
+        }
+        if (typeof eventData === "string") {
+          return `"${eventData}"`;
+        }
+        if (typeof eventData.type === "string") {
+          return generateEventHandler(eventData);
+        }
+        return JSON.stringify(eventData);
+      };
 
+      // --- Prepare event handlers
+      const { success, error, progress, beforeRequest } = actionComponent.events || {};
       switch (type) {
         case "FileUpload": {
-          const actionComponent = node.events![key] as UploadActionComponent;
           const {
             invalidates,
             asForm,
@@ -56,8 +65,7 @@ export function ApiBoundComponent({
             method,
             file,
           } = actionComponent.props;
-          const { success, error } = actionComponent.events || {};
-          events[key] = `(eventArgs) => {
+          return `(eventArgs) => {
             return Actions.upload({
               asForm: ${JSON.stringify(asForm)}, 
               formParams: ${JSON.stringify(formParams)}, 
@@ -69,20 +77,18 @@ export function ApiBoundComponent({
               method: ${JSON.stringify(method)}, 
               file: ${JSON.stringify(file)}, 
               params: { '$param': eventArgs }, 
-              onError: ${JSON.stringify(error)}, 
-              onSuccess: ${JSON.stringify(success)}, 
+              onError: ${prepareEvent(error)}, 
+              onSuccess: ${prepareEvent(success)}, 
               onProgress: eventArgs.onProgress, 
               invalidates: ${
                 invalidates === undefined ? undefined : JSON.stringify(invalidates)
               }  }, { resolveBindingExpressions: true });
           }`;
-          break;
         }
         case "FileDownload": {
-          const actionComponent = node.events![key] as DownloadActionComponent;
           const { url, queryParams, rawBody, body, headers, method, fileName } =
             actionComponent.props;
-          events[key] = `(eventArgs) => {
+          return `(eventArgs) => {
             return Actions.download({
               queryParams: ${JSON.stringify(queryParams)}, 
               rawBody: ${JSON.stringify(rawBody)}, 
@@ -94,10 +100,8 @@ export function ApiBoundComponent({
               params: { '$param': eventArgs },
             }, { resolveBindingExpressions: true });
           }`;
-          break;
         }
         case "APICall": {
-          const actionComponent = node.events![key] as ApiActionComponent;
           const { when, uid } = actionComponent;
 
           const {
@@ -119,9 +123,8 @@ export function ApiBoundComponent({
             rawBody,
             body,
           } = actionComponent.props;
-          const { success, error, progress, beforeRequest } = actionComponent.events || {};
 
-          events[key] = `(eventArgs, options) => {
+          return `(eventArgs, options) => {
             return Actions.callApi({
               uid: ${JSON.stringify(uid)},
               headers: ${JSON.stringify(headers)}, 
@@ -137,10 +140,10 @@ export function ApiBoundComponent({
               completedNotificationMessage: ${JSON.stringify(completedNotificationMessage)}, 
               errorNotificationMessage: ${JSON.stringify(errorNotificationMessage)}, 
               params: { '$param': eventArgs }, 
-              onError: ${JSON.stringify(error)}, 
-              onProgress: ${JSON.stringify(progress)}, 
-              onBeforeRequest: ${JSON.stringify(beforeRequest)}, 
-              onSuccess: ${JSON.stringify(success)}, 
+              onError: ${prepareEvent(error)}, 
+              onProgress: ${prepareEvent(progress)}, 
+              onBeforeRequest: ${prepareEvent(beforeRequest)}, 
+              onSuccess: ${prepareEvent(success)}, 
               updates: ${JSON.stringify(updates)}, 
               optimisticValue: ${JSON.stringify(optimisticValue)}, 
               payloadType: ${JSON.stringify(payloadType)}, 
@@ -148,12 +151,22 @@ export function ApiBoundComponent({
               invalidates: ${invalidates === undefined ? undefined : JSON.stringify(invalidates)}, 
               when: ${when === undefined ? undefined : JSON.stringify(when)} }, { resolveBindingExpressions: true });
           }`;
-          break;
         }
         default: {
           throw new Error("Unknown event handler component type: ", type);
         }
       }
+    }
+
+    const loaders: Array<ComponentDef> = [...(node.loaders || [])];
+    const events = { ...(node.events || {}) } as any;
+    const props = { ...(node.props || {}) } as any;
+    const vars = { ...(node.vars || {}) };
+    const api = { ...(node.api || {}) };
+
+    apiBoundEvents.forEach((key) => {
+      const actionComponent = node.events![key];
+      events[key] = generateEventHandler(actionComponent);
     });
 
     apiBoundProps.forEach((key) => {

@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash-es";
 
 import { RootThemeDefinition } from "../theming/themes/root";
-import { DefaultThemeVars, ThemeDefinition, ThemeDefinitionDetails, ThemeTone } from "../../abstractions/ThemingDefs";
+import type { DefaultThemeVars, ThemeDefinition, ThemeDefinitionDetails, ThemeTone } from "../../abstractions/ThemingDefs";
 
 function collectExtends(cTheme: ThemeDefinition | undefined, allThemes: Array<ThemeDefinition>) {
   if (!cTheme) {

@@ -8,7 +8,6 @@ import { existsSync } from "fs";
 import { join, resolve, dirname, isAbsolute } from "path";
 import { fileURLToPath } from "url";
 import { ErrorWithSeverity, LOGGER_LEVELS } from "./logger.mjs";
-import { ERROR_MESSAGES, ERROR_HANDLING } from "./constants.mjs";
 import { validateRequiredProperties } from "./pattern-utilities.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
 
@@ -40,21 +39,27 @@ export const CONFIG_SCHEMAS = {
   },
   
   EXTENSIONS: {
-    required: ["packageNames"],
-    optional: ["excludePackages", "includeDevPackages", "customMetadata"],
+    required: [],
+    optional: ["excludeComponentStatuses", "cleanFolder", "includeByName", "excludeByName"],
     properties: {
-      packageNames: {
-        type: "array",
-        itemType: "string"
-      },
-      excludePackages: {
+      excludeComponentStatuses: {
         type: "array",
         itemType: "string",
         default: []
       },
-      includeDevPackages: {
+      cleanFolder: {
         type: "boolean",
         default: false
+      },
+      includeByName: {
+        type: "array",
+        itemType: "string",
+        default: []
+      },
+      excludeByName: {
+        type: "array",
+        itemType: "string",
+        default: []
       }
     }
   },

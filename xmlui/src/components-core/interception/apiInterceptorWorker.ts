@@ -30,13 +30,13 @@ function createHandlers(api: ApiInterceptor) {
 }
 
 // Create the worker for the ApiInterceptorProvider
-export const createApiInterceptorWorker = async (
+export const createApiInterceptorWorker = (
   apiInstance: ApiInterceptor,
   parentWorker?: SetupWorker,
 ) => {
   const handlers = createHandlers(apiInstance);
   let worker = parentWorker;
-  if(!parentWorker){
+  if (!parentWorker) {
     worker = setupWorker();
   }
   // https://github.com/mswjs/msw/issues/2495

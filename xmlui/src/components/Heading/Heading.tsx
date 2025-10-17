@@ -44,6 +44,23 @@ const OMIT_FROM_TOC_DESC = {
   type: "boolean",
   defaultValue: defaultProps.omitFromToc,
 };
+const SHOW_ANCHOR_DESC = {
+  description:
+    "This property indicates whether an anchor link should be displayed next to the heading. " +
+    "If set to `true`, an anchor link will be displayed on hover next to the heading.",
+  type: "boolean",
+  defaultValue: defaultProps.showAnchor,
+};
+const APIS_DESC = {
+  scrollIntoView: {
+    signature: "scrollIntoView()",
+    description: "Scrolls the heading into view.",
+  },
+  hasOverflow: {
+    signature: "hasOverflow()",
+    description: "Returns true when the displayed text overflows the bounds of this heading component.",
+  },
+};
 
 export const HeadingMd = createMetadata({
   status: "stable",
@@ -63,19 +80,9 @@ export const HeadingMd = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
-    showAnchor: {
-      description:
-        "This property indicates whether an anchor link should be displayed next to the heading. " +
-        "If set to `true`, an anchor link will be displayed on hover next to the heading.",
-      type: "boolean",
-    },
+    showAnchor: SHOW_ANCHOR_DESC,
   },
-  apis: {
-    scrollIntoView: {
-      signature: "scrollIntoView()",
-      description: "Scrolls the heading into view.",
-    },
-  },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
@@ -104,14 +111,18 @@ export const H1Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H1}`]: "$fontSize-large",
+    [`fontSize-${H1}`]: "$fontSize-2xl",
     [`marginTop-${H1}`]: "0",
     [`marginBottom-${H1}`]: "0",
-    [`fontSize-${H1}-markdown`]: "$fontSize-large",
+    [`fontSize-${H1}-markdown`]: "$fontSize-2xl",
     [`marginTop-${H1}-markdown`]: "0",
     [`marginBottom-${H1}-markdown`]: "$space-6",
     light: {
@@ -131,13 +142,18 @@ export const H2Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H2}`]: "$fontSize-medium",
+    [`fontSize-${H2}`]: "$fontSize-xl",
     [`marginTop-${H2}`]: "0",
     [`marginBottom-${H2}`]: "0",
+    [`fontSize-${H2}-markdown`]: "$fontSize-xl",
     [`marginTop-${H2}-markdown`]: "$space-10",
     [`marginBottom-${H2}-markdown`]: "$space-3",
     light: {
@@ -157,13 +173,18 @@ export const H3Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H3}`]: "$fontSize-normal",
+    [`fontSize-${H3}`]: "$fontSize-lg",
     [`marginTop-${H3}`]: "0",
     [`marginBottom-${H3}`]: "0",
+    [`fontSize-${H3}-markdown`]: "$fontSize-lg",
     [`marginTop-${H3}-markdown`]: "$space-6",
     [`marginBottom-${H3}-markdown`]: "$space-2",
     light: {
@@ -184,12 +205,17 @@ export const H4Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H4}`]: "$fontSize-small",
+    [`fontSize-${H4}`]: "$fontSize-base",
     [`marginTop-${H4}`]: "0",
     [`marginBottom-${H4}`]: "0",
+    [`fontSize-${H4}-markdown`]: "$fontSize-base",
     [`marginTop-${H4}-markdown`]: "$space-5",
     [`marginBottom-${H4}-markdown`]: "$space-1",
     light: {
@@ -210,12 +236,17 @@ export const H5Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H5}`]: "$fontSize-smaller",
+    [`fontSize-${H5}`]: "$fontSize-sm",
     [`marginTop-${H5}`]: "0",
     [`marginBottom-${H5}`]: "0",
+    [`fontSize-${H5}-markdown`]: "$fontSize-sm",
     [`marginTop-${H5}-markdown`]: "0",
     [`marginBottom-${H5}-markdown`]: "$space-0",
     light: {
@@ -236,12 +267,17 @@ export const H6Md = createMetadata({
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
   },
+  apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`fontSize-${H6}`]: "$fontSize-tiny",
+    [`fontSize-${H6}`]: "$fontSize-xs",
     [`marginTop-${H6}`]: "0",
     [`marginBottom-${H6}`]: "0",
+    [`fontSize-${H6}-markdown`]: "$fontSize-xs",
     [`marginTop-${H6}-markdown`]: "0",
     [`marginBottom-${H6}-markdown`]: "$space-0",
     light: {
@@ -262,6 +298,7 @@ type RenderHeadingProps = {
   level: string;
   showAnchor?: boolean;
   renderChild: RenderChildFn;
+  registerComponentApi?: (api: any) => void;
 };
 
 function renderHeading({
@@ -271,6 +308,7 @@ function renderHeading({
   level,
   showAnchor,
   renderChild,
+  registerComponentApi,
 }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
@@ -284,6 +322,7 @@ function renderHeading({
       showAnchor={extractValue.asOptionalBoolean(showAnchor)}
       className={className}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
+      registerComponentApi={registerComponentApi}
       {...resolveAndCleanProps(restProps, extractValue)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
@@ -294,13 +333,14 @@ function renderHeading({
 export const headingComponentRenderer = createComponentRenderer(
   COMP,
   HeadingMd,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
-      node,
+      node: node as HeadingComponentDef,
       extractValue,
       className,
       level: node.props.level,
       renderChild,
+      registerComponentApi,
     });
   },
 );
@@ -308,13 +348,14 @@ export const headingComponentRenderer = createComponentRenderer(
 export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h1",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -322,13 +363,14 @@ export const h1ComponentRenderer = createComponentRenderer(
 export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h2",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -336,13 +378,14 @@ export const h2ComponentRenderer = createComponentRenderer(
 export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h3",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -350,13 +393,14 @@ export const h3ComponentRenderer = createComponentRenderer(
 export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h4",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -364,13 +408,14 @@ export const h4ComponentRenderer = createComponentRenderer(
 export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h5",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );
@@ -378,13 +423,14 @@ export const h5ComponentRenderer = createComponentRenderer(
 export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
-  ({ node, extractValue, className, renderChild }) => {
+  ({ node, extractValue, className, renderChild, registerComponentApi }) => {
     return renderHeading({
       node,
       extractValue,
       className,
       level: "h6",
       renderChild,
+      registerComponentApi,
     } as any);
   },
 );

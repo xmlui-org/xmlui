@@ -349,7 +349,7 @@ onBlur={lookupEventHandler("lostFocus")}
 
 // Custom events with specific payloads
 onDidChange={lookupEventHandler("didChange")}
-onSelectionChanged={lookupEventHandler("selectionChanged")}
+onSelectionChanged={lookupEventHandler("selectionDidChange")}
 ```
 
 ### Renderer Examples
@@ -460,7 +460,7 @@ Follow this implementation flow for creating new XMLUI components:
 Native components must follow these patterns:
 
 ```typescript
-import React, { forwardRef, useRef, useImperativeHandle, useEffect } from "react";
+import React, { forwardRef, useRef, useEffect } from "react";
 import classnames from "classnames";
 import styles from "./ComponentName.module.scss";
 
@@ -644,7 +644,8 @@ export const componentRenderer = createComponentRenderer(
 
 **React API Overview**:
 - **`forwardRef`**: A React function that enables a component to receive a `ref` from its parent and forward it to a child element or expose custom APIs
-- **`useImperativeHandle`**: A React hook that customizes the instance value exposed when using `ref`, allowing components to expose specific methods instead of raw DOM elements
+
+> **⚠️ Important - useImperativeHandle Antipattern**: The XMLUI team has determined that `useImperativeHandle` is an antipattern and **should NOT be used** in XMLUI components. All instances have been removed from the codebase. Instead, imperative APIs should be exposed through the XMLUI `registerComponentApi` mechanism, which provides better framework integration and more predictable behavior.
 
 **Implementation Pattern**:
 
@@ -693,34 +694,51 @@ export const ComponentNative = forwardRef<HTMLDivElement, Props>(
 );
 ```
 
-3. **ForwardRef with imperative API using useImperativeHandle**:
+3. **ForwardRef with imperative API exposure via registerComponentApi** (recommended pattern):
 ```typescript
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import React, { forwardRef, useRef, useState, useEffect } from "react";
 
-interface ComponentAPI {
-  focus: () => void;
-  blur: () => void;
-  scrollIntoView: () => void;
-  getValue: () => string;
+interface Props {
+  initialValue?: string;
+  registerComponentApi?: (api: any) => void;
+  updateState?: (state: any) => void;
+  onDidChange?: () => void;
 }
 
-export const ComponentNative = forwardRef<ComponentAPI, Props>(
-  function ComponentNative({ initialValue, ...rest }, ref) {
+export const ComponentNative = forwardRef<HTMLInputElement, Props>(
+  function ComponentNative({ initialValue, registerComponentApi, updateState, onDidChange, ...rest }, ref) {
     const elementRef = useRef<HTMLInputElement>(null);
     const [value, setValue] = useState(initialValue || "");
     
-    useImperativeHandle(ref, () => ({
-      focus: () => elementRef.current?.focus(),
-      blur: () => elementRef.current?.blur(),
-      scrollIntoView: () => elementRef.current?.scrollIntoView(),
-      getValue: () => value,
-    }), [value]);
+    // Compose refs to expose both DOM element and internal ref
+    const composedRef = composeRefs(ref, elementRef);
+    
+    // Register imperative API using XMLUI's registerComponentApi pattern
+    useEffect(() => {
+      if (registerComponentApi) {
+        registerComponentApi({
+          focus: () => elementRef.current?.focus(),
+          blur: () => elementRef.current?.blur(),
+          scrollIntoView: () => elementRef.current?.scrollIntoView(),
+          getValue: () => value,
+          setValue: (newValue: string) => {
+            setValue(newValue);
+            updateState?.({ value: newValue });
+            onDidChange?.();
+          },
+        });
+      }
+    }, [registerComponentApi, value, updateState, onDidChange]);
     
     return (
       <input
-        ref={elementRef}
+        ref={composedRef}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          updateState?.({ value: e.target.value });
+          onDidChange?.();
+        }}
         {...rest}
       />
     );
@@ -733,19 +751,13 @@ export const ComponentNative = forwardRef<ComponentAPI, Props>(
 export const componentRenderer = createComponentRenderer(
   COMP,
   ComponentMd,
-  ({ node, extractValue, registerComponentApi }) => {
+  ({ node, extractValue, registerComponentApi, updateState, lookupEventHandler }) => {
     return (
       <ComponentNative
-        ref={(instance) => {
-          if (instance) {
-            registerComponentApi({
-              focus: () => instance.focus(),
-              blur: () => instance.blur(),
-              getValue: () => instance.getValue(),
-            });
-          }
-        }}
         initialValue={extractValue(node.props.initialValue)}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
+        onDidChange={lookupEventHandler("didChange")}
       />
     );
   },
@@ -754,11 +766,12 @@ export const componentRenderer = createComponentRenderer(
 
 **Key Benefits**:
 - Enables parent components to access child DOM elements directly
-- Supports imperative APIs for programmatic component control
+- Supports imperative APIs for programmatic component control through `registerComponentApi`
 - Maintains clean separation between declarative props and imperative methods
 - Allows XMLUI components to expose methods callable from event handlers
 - Facilitates complex component interactions (focus management, animations, measurements)
 - Essential for form components that need validation and value access
+- Provides better framework integration compared to `useImperativeHandle` antipattern
 
 ## State Management Patterns
 

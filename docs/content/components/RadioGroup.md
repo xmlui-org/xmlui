@@ -2,6 +2,8 @@
 
 `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.
 
+Radio options store their values as strings. Numbers and booleans are converted to strings when assigned, while objects, functions and arrays default to an empty string unless resolved via binding expressions.
+
 **Key features:**
 - **Exclusive selection**: Only one option can be selected at a time within the group
 - **Form integration**: Built-in validation states and seamless form compatibility
@@ -53,31 +55,6 @@ This property defines the initial value of the selected option within the group.
   </RadioGroup>
 </App>
 ```
-
-### `label` [#label]
-
-This property sets the label of the component.  If not set, the component will not display a label.
-
-### `labelBreak` (default: true) [#labelbreak-default-true]
-
-This boolean value indicates whether the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.
-
-### `labelPosition` (default: "top") [#labelposition-default-top]
-
-Places the label at the given position of the component.
-
-Available values:
-
-| Value | Description |
-| --- | --- |
-| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
-| `bottom` | The bottom of the input |
-
-### `labelWidth` [#labelwidth]
-
-This property sets the width of the `RadioGroup` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `readOnly` (default: false) [#readonly-default-false]
 
@@ -191,8 +168,8 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption-validation | 2px | 2px |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
+| [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | $space-1_5 | $space-1_5 |

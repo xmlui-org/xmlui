@@ -9,7 +9,7 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { LoaderDirections } from "../loader/PageableLoader";
 import { createLoaderRenderer } from "../renderers";
@@ -83,11 +83,10 @@ function DataLoader({
 
   const hasPaging = pagingDirection !== null;
 
-  const {apiInstance} = useApiInterceptorContext();
+  const { apiInstance } = useApiInterceptorContext();
   const api = useMemo(() => {
     return new RestApiProxy(appContext, apiInstance);
   }, [apiInstance, appContext]);
-
 
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
@@ -148,9 +147,9 @@ function DataLoader({
           // Extract SQL query from the body or rawBody
           let sqlQuery: string = "";
           let sqlParams: any[] = [];
-          
+
           // Try to extract SQL query and parameters from body or rawBody
-          if (body && typeof body === 'object') {
+          if (body && typeof body === "object") {
             //console.log("[SQL DataLoader] Using body object:", body);
             sqlQuery = body.sql || "";
             sqlParams = body.params || [];
@@ -209,18 +208,24 @@ function DataLoader({
           //console.log("[SQL DataLoader] Response status:", response.status, response.statusText);
 
           if (!response.ok) {
-            console.error("[SQL DataLoader] Failed response:", response.status, response.statusText);
-            throw new Error(`Failed to execute SQL query: ${response.status} ${response.statusText}`);
+            console.error(
+              "[SQL DataLoader] Failed response:",
+              response.status,
+              response.statusText,
+            );
+            throw new Error(
+              `Failed to execute SQL query: ${response.status} ${response.statusText}`,
+            );
           }
 
           // Parse response as JSON
           const jsonResult = await response.json();
           //console.log("[SQL DataLoader] Response data:", jsonResult);
-          
+
           // Check the structure of the response
-          if (jsonResult && typeof jsonResult === 'object') {
+          if (jsonResult && typeof jsonResult === "object") {
             //console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
-            
+
             // If response has rows property, check if it's in expected format
             if (jsonResult.rows) {
               //console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
@@ -228,18 +233,18 @@ function DataLoader({
               // if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
               //   console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
               // }
-              
+
               // Return rows directly for easier table rendering
               return jsonResult.rows;
             }
-            
+
             // Check for other common SQL result formats
             if (jsonResult.results) {
               //console.log("[SQL DataLoader] Response has 'results' property");
               return jsonResult.results;
             }
           }
-          
+
           return jsonResult;
         } catch (error) {
           console.error("Error executing SQL query:", error);
@@ -257,15 +262,7 @@ function DataLoader({
         });
       }
     },
-    [
-      api,
-      loader.props,
-      state,
-      url,
-      body,
-      rawBody,
-      appContext
-    ],
+    [api, loader.props, state, url, body, rawBody, appContext],
   );
 
   const queryId = useMemo(() => {
@@ -274,7 +271,7 @@ function DataLoader({
       queryParams,
       appContext?.appGlobals.apiUrl,
       body,
-      rawBody
+      rawBody,
     ).asKey();
   }, [appContext?.appGlobals.apiUrl, queryParams, url, body, rawBody]);
 
@@ -286,10 +283,10 @@ function DataLoader({
     (isInProgress) => {
       //console.log("[DataLoader] inProgress() called with isInProgress:", isInProgress);
       //console.log("[DataLoader] dataType:", loader.props.dataType);
-      
+
       loaderInProgressChanged(isInProgress);
       //console.log("[DataLoader] After loaderInProgressChanged() call");
-      
+
       const inProgressMessage = extractParam(
         stateRef.current.state,
         loader.props.inProgressNotificationMessage,
@@ -307,7 +304,7 @@ function DataLoader({
       }
       //console.log("[DataLoader] inProgress() completed");
     },
-    [loader.props.inProgressNotificationMessage, loaderInProgressChanged, loader.props.dataType],
+    [loader.props.inProgressNotificationMessage, loaderInProgressChanged],
   );
 
   const loaded: LoaderLoadedFn = useCallback(
@@ -315,7 +312,7 @@ function DataLoader({
       // console.log("[DataLoader] loaded() called with data:", data);
       // console.log("[DataLoader] loaded() pageInfo:", pageInfo);
       // console.log("[DataLoader] loader.props.dataType:", loader.props.dataType);
-      
+
       // if (loader.props.dataType === "sql") {
       //   console.log("[SQL DataLoader] Processing SQL result data in loaded()");
       //   console.log("[SQL DataLoader] Data type:", typeof data);
@@ -324,10 +321,10 @@ function DataLoader({
       //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
       //   }
       // }
-      
+
       loaderLoaded(data, pageInfo);
       // console.log("[DataLoader] After loaderLoaded() call");
-      
+
       const completedMessage = extractParam(
         {
           ...stateRef.current.state,
@@ -347,7 +344,7 @@ function DataLoader({
       }
       //console.log("[DataLoader] loaded() completed");
     },
-    [loader.props.completedNotificationMessage, loaderLoaded, loader.props.dataType],
+    [loader.props.completedNotificationMessage, loaderLoaded],
   );
 
   const error: LoaderErrorFn = useCallback(
@@ -453,12 +450,12 @@ export const DataLoaderMd = createMetadata({
 
 type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
-function IndexAwareDataLoader(props){
-  const {indexing} = useIndexerContext();
-  if(indexing){
+function IndexAwareDataLoader(props) {
+  const { indexing } = useIndexerContext();
+  if (indexing) {
     return null;
   }
-  return <DataLoader {...props}/>
+  return <DataLoader {...props} />;
 }
 
 export const dataLoaderRenderer = createLoaderRenderer(
@@ -473,11 +470,13 @@ export const dataLoaderRenderer = createLoaderRenderer(
     registerComponentApi,
     lookupAction,
     lookupSyncCallback,
-    extractValue
+    extractValue,
   }) => {
     // --- Check for required properties
     if (!loader.props?.url || !loader.props.url.trim()) {
-      throw new Error("You must specify a non-empty (not whitespace-only) 'url' property for DataSource");
+      throw new Error(
+        "You must specify a non-empty (not whitespace-only) 'url' property for DataSource",
+      );
     }
 
     return (

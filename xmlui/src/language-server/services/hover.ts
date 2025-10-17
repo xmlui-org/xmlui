@@ -5,10 +5,9 @@ import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
 import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
-import type { Hover,  Position } from "vscode-languageserver";
+import type { Hover, Position } from "vscode-languageserver";
 import { MarkupKind } from "vscode-languageserver";
-import { offsetToPosRange } from "./common/lsp-utils";
-
+import { offsetRangeToPosRange } from "./common/lsp-utils";
 
 type SimpleHover = null | {
   value: string;
@@ -29,7 +28,7 @@ type HoverContex = {
  * @returns The hover content string
  */
 export function handleHoverCore(
-  { node , getText, metaByComp }: Omit<HoverContex, 'offsetToPosition'>,
+  { node, getText, metaByComp }: Omit<HoverContex, "offsetToPosition">,
   position: number,
 ): SimpleHover {
   const findRes = findTokenAtPos(node, position);
@@ -49,7 +48,7 @@ export function handleHoverCore(
             metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
-            getText
+            getText,
           });
         }
         case SyntaxKind.AttributeKeyNode: {
@@ -66,9 +65,9 @@ export function handleHoverCore(
   return null;
 }
 
-export function handleHover(ctx: HoverContex, position: number,): Hover {
+export function handleHover(ctx: HoverContex, position: number): Hover {
   const hoverRes = handleHoverCore(ctx, position);
-  if (hoverRes === null){
+  if (hoverRes === null) {
     return null;
   }
   const { value, range } = hoverRes;
@@ -77,7 +76,7 @@ export function handleHover(ctx: HoverContex, position: number,): Hover {
       kind: MarkupKind.Markdown,
       value,
     },
-    range: offsetToPosRange(ctx.offsetToPosition, range)
+    range: offsetRangeToPosRange(ctx.offsetToPosition, range),
   };
 }
 

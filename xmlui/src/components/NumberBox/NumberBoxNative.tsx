@@ -30,13 +30,10 @@ import { type ValidationStatus } from "../abstractions";
 import { Icon } from "../Icon/IconNative";
 import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import {
-  PART_END_ADORNMENT,
-  PART_INPUT,
-  PART_START_ADORNMENT,
-  partClassName,
-} from "../../components-core/parts";
+import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+
+const PART_SPINNER_UP = "spinnerUp";
+const PART_SPINNER_DOWN = "spinnerDown";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -88,10 +85,7 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string;
-  labelBreak?: boolean;
+  direction?: "ltr" | "rtl";
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -126,10 +120,7 @@ export const NumberBox = forwardRef(function NumberBox(
     autoFocus,
     readOnly,
     required,
-    label,
-    labelPosition,
-    labelWidth,
-    labelBreak,
+    direction,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -142,6 +133,8 @@ export const NumberBox = forwardRef(function NumberBox(
   min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
 
   // Step must be an integer since floating point arithmetic needs a deeper dive.
+  // probably some way to integrate with https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
+  // since there are footguns, like 0.1 + 0.2 = 0.0000...04
   const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -211,159 +204,291 @@ export const NumberBox = forwardRef(function NumberBox(
   useLongPress(upButton.current, handleIncStep);
   useLongPress(downButton.current, handleDecStep);
 
-  // --- This logic prevenst the user from typing invalid characters (in the current typing context)
-  const handleOnBeforeInput = (event: any) => {
-    // --- Prevent the default behavior for some characters
-    let shouldPreventDefault = false;
-    const currentValue: string = event.target.value ?? "";
-    const currentPos = event.target.selectionStart;
+  // --- Shared character validation logic
+  const processCharacterInput = useCallback(
+    (
+      char: string,
+      currentValue: string,
+      currentPos: number,
+      predictedValue: string,
+      isForPaste: boolean = false,
+    ): {
+      shouldAccept: boolean;
+      newValue?: string;
+      newPos?: number;
+      shouldPreventDefault?: boolean;
+    } => {
+      // --- Are the caret after the exponential separator?
+      const beforeCaret = currentValue.substring(0, currentPos);
+      const expPos = beforeCaret.indexOf(EXPONENTIAL_SEPARATOR);
 
-    // --- Are the caret after the exponential separator?
-    const beforeCaret = currentValue.substring(0, event.target.selectionStart);
+      let shouldAccept = true;
+      let shouldPreventDefault = false;
+      let newValue = currentValue;
+      let newPos = currentPos;
 
-    // --- If "expPos" is -1, the caret is not after the exponential separator
-    const expPos = beforeCaret.indexOf(EXPONENTIAL_SEPARATOR);
-
-    switch (event.data) {
-      case "-":
-        shouldPreventDefault = true;
-        if (expPos === -1) {
-          // --- Change the first char to "-" if we are before the exponential separator and it's not already there
-          if (!currentValue.startsWith("-")) {
-            setNewValue("-" + currentValue, currentPos + 1);
-          }
-        } else {
-          // --- Change the char after the exponential separator to "-" if it's not already there
-          if (currentValue[expPos + 1] !== "-") {
-            setNewValue(
-              currentValue.substring(0, expPos + 1) + "-" + currentValue.substring(expPos + 1),
-              currentPos + 1,
-            );
-          }
-        }
-        break;
-      case "+":
-        shouldPreventDefault = true;
-        if (expPos === -1) {
-          // --- Remove the first char if it's "-" and we are before the exponential separator
-          if (currentValue.startsWith("-")) {
-            setNewValue(currentValue.substring(1), currentPos - 1);
-          }
-        } else {
-          // --- Remove the char after the exponential separator if it's "-"
-          if (currentValue[expPos + 1] === "-") {
-            setNewValue(
-              currentValue.substring(0, expPos + 1) + currentValue.substring(expPos + 2),
-              currentPos - 1,
-            );
-          }
-        }
-        break;
-      case DECIMAL_SEPARATOR:
-        // --- Prevent multiple decimal separators (integers only),
-        // --- or decimal separator after the exponential separator
-        if (integersOnly || currentValue.includes(DECIMAL_SEPARATOR) || expPos !== -1) {
+      switch (char) {
+        case "-":
+          shouldAccept = false;
           shouldPreventDefault = true;
-        }
-        break;
-      case EXPONENTIAL_SEPARATOR:
-        // --- Prevent exponential notation for integers
-        if (integersOnly) {
-          shouldPreventDefault = true;
-          break;
-        }
-
-        // --- Prevent multiple exponential separators (and too many digits after it)
-        if (
-          currentValue.includes(EXPONENTIAL_SEPARATOR) ||
-          tooManyDigitsAfterExponentialSeparator(currentPos, 2)
-        ) {
-          shouldPreventDefault = true;
-        }
-        break;
-
-      default:
-        let newInput = event.data;
-        const selectionStart = event.target.selectionStart;
-
-        // --- Test for multi-character input (perhaps paste)
-        if (event.data?.length > 0) {
-          // --- Decide whether to accept the optional sign character
-          if (newInput.startsWith("-")) {
-            if (selectionStart > 0) {
-              shouldPreventDefault = true;
-              break;
+          if (zeroOrPositive) {
+            // --- No minus sign allowed
+            break;
+          }
+          if (expPos === -1) {
+            // --- Change the first char to "-" if we are before the exponential separator and it's not already there
+            if (!currentValue.startsWith("-")) {
+              newValue = "-" + currentValue;
+              newPos = currentPos + 1;
             }
-          } else if (newInput.startsWith("+")) {
+          } else {
+            // --- Change the char after the exponential separator to "-" if it's not already there
+            if (currentValue[expPos + 1] !== "-") {
+              newValue =
+                currentValue.substring(0, expPos + 1) + "-" + currentValue.substring(expPos + 1);
+              newPos = currentPos + 1;
+            }
+          }
+          break;
+        case "+":
+          shouldAccept = false;
+          shouldPreventDefault = true;
+          if (expPos === -1) {
+            // --- Remove the first char if it's "-" and we are before the exponential separator
+            if (currentValue.startsWith("-")) {
+              newValue = currentValue.substring(1);
+              newPos = Math.max(0, currentPos - 1);
+            }
+          } else {
+            // --- Remove the char after the exponential separator if it's "-"
+            if (currentValue[expPos + 1] === "-") {
+              newValue = currentValue.substring(0, expPos + 1) + currentValue.substring(expPos + 2);
+              newPos = Math.max(expPos + 1, currentPos - 1);
+            }
+          }
+          break;
+        case "0":
+          // --- Prevent leading zeros (before decimal or exponential separator)
+          if (currentValue === "0") {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          }
+          break;
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+          // --- Replace leading zero with this digit
+          if (currentValue === "0" && currentPos === 1) {
+            if (isForPaste) {
+              newValue = char;
+              shouldAccept = false; // Don't add it again for paste
+            } else {
+              newValue = char;
+              newPos = 1;
+              shouldPreventDefault = true;
+            }
+          }
+          break;
+        case DECIMAL_SEPARATOR:
+          // --- Prevent multiple decimal separators (integers only),
+          // --- or decimal separator after the exponential separator
+          if (integersOnly || currentValue.includes(DECIMAL_SEPARATOR) || expPos !== -1) {
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          } else if (predictedValue.startsWith(DECIMAL_SEPARATOR) && currentPos === 0) {
+            newValue = "0" + predictedValue;
+            newPos = currentPos + 2;
+            shouldPreventDefault = true;
+          }
+          break;
+        case EXPONENTIAL_SEPARATOR:
+          // --- Prevent exponential notation for integers
+          if (integersOnly) {
+            shouldAccept = false;
             shouldPreventDefault = true;
             break;
           }
-
-          // --- Replace the selection with the new input
-          const newValue =
-            currentValue.substring(0, selectionStart) +
-            newInput +
-            currentValue.substring(event.target.selectionEnd);
-
-          // --- Check for integers
-          if (integersOnly && !INT_REGEXP.test(newValue)) {
-            // --- The result is not an integer, drop the pasted input
-            shouldPreventDefault = true;
-          } else if (!FLOAT_REGEXP.test(newValue)) {
-            // --- The result is not a loat, drop the pasted input
+          // --- Prevent multiple exponential separators
+          if (currentValue.includes(EXPONENTIAL_SEPARATOR)) {
+            shouldAccept = false;
             shouldPreventDefault = true;
           }
           break;
-        }
+        default:
+          // --- Only allow digits for single characters
+          if (char >= "0" && char <= "9") {
+            // --- Prevent digits before minus sign
+            if (currentValue.startsWith("-") && currentPos === 0) {
+              shouldAccept = false;
+              shouldPreventDefault = true;
+              break;
+            }
 
-        // --- Single character input
-        // --- Prevent non-digit characters
-        if (event.data < "0" || event.data > "9") {
-          shouldPreventDefault = true;
+            // --- For beforeInput, check for too many digits after exponential separator
+            if (!isForPaste && expPos !== -1) {
+              const tooManyDigitsAfterExponentialSeparator = (
+                pos: number,
+                maxDigits: number,
+              ): boolean => {
+                let numDigitsAfter = 0;
+                while (pos < currentValue.length) {
+                  if (/\d/.test(currentValue[pos++])) {
+                    numDigitsAfter++;
+                  } else {
+                    numDigitsAfter = maxDigits + 1;
+                    break;
+                  }
+                }
+                return numDigitsAfter > maxDigits;
+              };
+
+              if (tooManyDigitsAfterExponentialSeparator(expPos + 1, 1)) {
+                shouldAccept = false;
+                shouldPreventDefault = true;
+              }
+            }
+          } else {
+            // --- Reject non-digit characters
+            shouldAccept = false;
+            shouldPreventDefault = true;
+          }
           break;
-        }
+      }
 
-        // --- Prevent digits before minus sign
-        if (currentValue.startsWith("-") && selectionStart === 0) {
+      return { shouldAccept, newValue, newPos, shouldPreventDefault };
+    },
+    [integersOnly, zeroOrPositive],
+  );
+
+  // --- This logic prevents the user from typing invalid characters (in the current typing context)
+  const handleOnBeforeInput = (event: any) => {
+    const currentValue: string = event.target.value ?? "";
+    const currentPos = event.target.selectionStart;
+    const expectedNewValue =
+      currentValue.substring(0, currentPos) +
+      event.data +
+      currentValue.substring(event.target.selectionEnd);
+
+    // --- Handle multi-character input (paste) through the legacy path
+    if (event.data?.length > 1) {
+      let shouldPreventDefault = false;
+      const selectionStart = event.target.selectionStart;
+      let newInput = event.data;
+
+      // --- Decide whether to accept the optional sign character
+      if (newInput.startsWith("-")) {
+        if (selectionStart > 0) {
           shouldPreventDefault = true;
-          break;
         }
+      } else if (newInput.startsWith("+")) {
+        shouldPreventDefault = true;
+      }
 
-        // --- Prevent too many digits after the exponential separator
-        if (expPos !== -1 && tooManyDigitsAfterExponentialSeparator(expPos + 1, 1)) {
-          // --- Caret after the exponential separator
-          // --- Prevent typing a digi if more than 2 digits after the exponential separator
+      if (!shouldPreventDefault) {
+        // --- Check for integers
+        if (integersOnly && !INT_REGEXP.test(expectedNewValue)) {
+          // --- The result is not an integer, drop the pasted input
           shouldPreventDefault = true;
-        }
-        break;
-    }
-
-    // --- Done.
-    if (shouldPreventDefault) {
-      event.preventDefault();
-    }
-    return;
-
-    // --- Helpers
-    function tooManyDigitsAfterExponentialSeparator(pos: number, maxDigits: number): boolean {
-      let numDigitsAfter = 0;
-      while (pos < currentValue.length) {
-        if (/\d/.test(currentValue[pos++])) {
-          numDigitsAfter++;
-        } else {
-          numDigitsAfter = maxDigits + 1;
-          break;
+        } else if (!FLOAT_REGEXP.test(expectedNewValue)) {
+          // --- The result is not a float, drop the pasted input
+          shouldPreventDefault = true;
         }
       }
-      return numDigitsAfter > maxDigits;
+
+      if (shouldPreventDefault) {
+        event.preventDefault();
+      }
+      return;
     }
 
-    function setNewValue(newValue: string, pos: number) {
-      event.target.value = newValue;
-      updateValue(newValue, newValue);
-      inputRef.current?.setSelectionRange(pos, pos);
+    // --- Single character processing
+    const result = processCharacterInput(
+      event.data,
+      currentValue,
+      currentPos,
+      expectedNewValue,
+      false,
+    );
+
+    if (result.shouldPreventDefault) {
+      event.preventDefault();
+    }
+
+    // --- Apply value changes if needed
+    if (result.newValue !== currentValue) {
+      const setNewValue = (newValue: string, pos: number) => {
+        event.target.value = newValue;
+        updateValue(newValue, newValue);
+        inputRef.current?.setSelectionRange(pos, pos);
+      };
+      setNewValue(result.newValue!, result.newPos!);
     }
   };
+
+  // --- Handle paste events by applying the same character validation logic
+  const handleOnPaste = useCallback(
+    (event: React.ClipboardEvent<HTMLInputElement>) => {
+      event.preventDefault();
+
+      const pastedText = event.clipboardData.getData("text/plain");
+      if (!pastedText) return;
+
+      const inputElement = event.currentTarget;
+      const currentValue = inputElement.value ?? "";
+      const selectionStart = inputElement.selectionStart ?? 0;
+      const selectionEnd = inputElement.selectionEnd ?? 0;
+      const expectedNewValue =
+        currentValue.substring(0, selectionStart) +
+        pastedText +
+        currentValue.substring(selectionEnd);
+
+      // --- Start with the value before the selection
+      let resultValue = currentValue.substring(0, selectionStart);
+      let currentPos = selectionStart;
+
+      // --- Process each character from the pasted text
+      for (let i = 0; i < pastedText.length; i++) {
+        const char = pastedText[i];
+
+        const result = processCharacterInput(char, resultValue, currentPos, expectedNewValue, true);
+
+        if (result.shouldAccept) {
+          resultValue =
+            resultValue.substring(0, currentPos) + char + resultValue.substring(currentPos);
+          currentPos++;
+        } else if (result.newValue !== resultValue) {
+          // --- Handle special cases like sign changes or zero replacement
+          resultValue = result.newValue!;
+          currentPos = result.newPos!;
+        }
+      }
+
+      // --- Add the rest of the original value after the selection
+      resultValue += currentValue.substring(selectionEnd);
+
+      // --- Final validation - ensure the result is a valid number format
+      let isValidFinal = false;
+      if (integersOnly) {
+        isValidFinal = INT_REGEXP.test(resultValue) || resultValue === "" || resultValue === "-";
+      } else {
+        isValidFinal = FLOAT_REGEXP.test(resultValue) || resultValue === "" || resultValue === "-";
+      }
+
+      // --- Apply the result if valid
+      if (isValidFinal) {
+        inputElement.value = resultValue;
+        updateValue(resultValue, resultValue);
+        inputElement.setSelectionRange(currentPos, currentPos);
+      }
+    },
+    [processCharacterInput, updateValue, integersOnly],
+  );
 
   // --- Setting steppers with keyboard
   const handleOnKey = useCallback(
@@ -386,9 +511,41 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [onFocus]);
 
   const handleOnBlur = useCallback(() => {
-    setValueStrRep(mapToRepresentation(value));
+    // --- Get the current input value
+    const currentInputValue = inputRef.current?.value ?? "";
+
+    // --- Check if we need to add a trailing zero
+    let finalValue = currentInputValue;
+    if (!integersOnly && currentInputValue.endsWith(DECIMAL_SEPARATOR)) {
+      // --- Add trailing zero if the value ends with decimal separator
+      finalValue = currentInputValue + "0";
+    }
+
+    // --- Convert to number and clamp to min/max bounds
+    const numericValue = toUsableNumber(finalValue, integersOnly);
+    if (!isEmptyLike(numericValue)) {
+      const clampedValue = clamp(numericValue, min, max);
+      if (clampedValue !== numericValue) {
+        const clampedString = clampedValue.toString();
+        finalValue = clampedString;
+
+        // --- Update the input field immediately
+        if (inputRef.current) {
+          inputRef.current.value = clampedString;
+        }
+      }
+    }
+
+    // --- Update the state if the final value is different from current input
+    if (finalValue !== currentInputValue) {
+      updateValue(finalValue, finalValue);
+    } else {
+      // --- Use the standard representation mapping
+      setValueStrRep(mapToRepresentation(value));
+    }
+
     onBlur?.();
-  }, [value, onBlur]);
+  }, [value, onBlur, integersOnly, updateValue, min, max]);
 
   const focus = useCallback(() => {
     inputRef.current?.focus();
@@ -406,48 +563,37 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <ItemWithLabel
-      {...rest}
-      id={id}
-      ref={forwardedRef}
-      labelPosition={labelPosition as any}
-      label={label}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-      // NOTE: This is a band-aid solution to handle the multiple IDs issue - remove after resolving focus bug
-      isInputTemplateUsed={true}
-    >
       <div
-        className={classnames(styles.inputRoot, {
+        {...rest}
+        className={classnames(className, styles.inputRoot,{
           [styles.readOnly]: readOnly,
           [styles.disabled]: !enabled,
           [styles.noSpinBox]: !hasSpinBox,
           [styles.error]: validationStatus === "error",
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
+          [styles.rtl]: direction === "rtl",
         })}
+        id={id}
+        ref={forwardedRef}
         tabIndex={-1}
         onFocus={() => {
           inputRef.current?.focus();
         }}
-        style={{ gap }}
+        style={{ ...style, gap }}
       >
         <Adornment
+          data-part-id={PART_START_ADORNMENT}
           text={startText}
           iconName={startIcon}
-          className={classnames(partClassName(PART_START_ADORNMENT), styles.adornment)}
+          className={classnames(styles.adornment)}
         />
         <input
           id={id}
+          data-part-id={PART_INPUT}
           type="text"
           inputMode="numeric"
-          className={classnames(partClassName(PART_INPUT), styles.input, {
+          className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
           disabled={!enabled}
@@ -458,6 +604,7 @@ export const NumberBox = forwardRef(function NumberBox(
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
           onBeforeInput={handleOnBeforeInput}
+          onPaste={handleOnPaste}
           onKeyDown={handleOnKey}
           readOnly={readOnly}
           ref={inputRef}
@@ -466,13 +613,15 @@ export const NumberBox = forwardRef(function NumberBox(
           required={required}
         />
         <Adornment
+          data-part-id={PART_END_ADORNMENT}
           text={endText}
           iconName={endIcon}
-          className={classnames(partClassName(PART_END_ADORNMENT), styles.adornment)}
+          className={classnames(styles.adornment)}
         />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
+              data-part-id={PART_SPINNER_UP}
               data-spinner="up"
               type="button"
               role="spinbutton"
@@ -486,6 +635,7 @@ export const NumberBox = forwardRef(function NumberBox(
               <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
             <Button
+              data-part-id={PART_SPINNER_DOWN}
               data-spinner="down"
               type="button"
               role="spinbutton"
@@ -505,7 +655,6 @@ export const NumberBox = forwardRef(function NumberBox(
           </div>
         )}
       </div>
-    </ItemWithLabel>
   );
 });
 

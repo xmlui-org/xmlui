@@ -107,7 +107,7 @@ async function uploadFile(
       throw e;
     }
   }
-  invalidateQueries(invalidates, appContext, state);
+  void invalidateQueries(invalidates, appContext, state);
   return result;
 }
 

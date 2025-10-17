@@ -1,5 +1,6 @@
 import { SKIP_REASON } from "../src/testing/component-test-helpers";
 import { expect, test } from "../src/testing/fixtures";
+import { initApp } from "../src/testing/themed-app-test-helpers";
 
 test("static coumpound component renders", async ({ page, initTestBed }) => {
   const EXPECTED_TEXT = "Test content text";
@@ -73,7 +74,7 @@ test("ChildSlot rendered in compound components", async ({ page, initTestBed }) 
 
 test("Default slot rendered in compound components", async ({ page, initTestBed }) => {
   const EXPECTED_DEFAULT_SLOT = "Default slot content";
-  await initTestBed(`<Custom />`, {
+  await initTestBed(`<Custom></Custom>`, {
     components: [
       `
       <Component name="Custom">
@@ -330,14 +331,24 @@ ${EXPECTED_VALUE2}
   await expect(page.getByText(EXPECTED_VALUE2)).toBeVisible();
 });
 
-test.fixme(
-  "Markdown with multiple slots",
-  SKIP_REASON.TEST_NOT_WORKING("Second EXPECTED_VALUE2 has a null at the end"),
-  async ({ page, initTestBed }) => {
-    const EXPECTED_VALUE1 = "Hello, world!";
-    const EXPECTED_VALUE2 = "Here I am";
-    await initTestBed(
-      `
+test("Markdown with multiple slots", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Hello, world!";
+  const EXPECTED_VALUE2 = "Here I am";
+
+  await initApp(page, {
+    // NOTE: This test runs, but TS is unhappy about the components property
+    //@ts-ignore
+    components: `
+        <Component name="Custom">
+          <VStack>
+            <Markdown>
+              <Slot />
+              <Slot />
+            </Markdown>
+          </VStack>
+        </Component>
+        `,
+    entryPoint: `
       <Custom>
         <![CDATA[
 ## ${EXPECTED_VALUE1}
@@ -346,26 +357,13 @@ ${EXPECTED_VALUE2}
         ]]>
       </Custom>
     `,
-      {
-        components: [
-          `
-      <Component name="Custom">
-        <VStack>
-          <Markdown>
-            <Slot />
-            <Slot />
-          </Markdown>
-        </VStack>
-      </Component>
-    `,
-        ],
-      },
-    );
-    expect(page.locator("body")).toHaveText(
-      `${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`,
-    );
-  },
-);
+  });
+
+  const bodyText = await page.locator("body").innerText();
+  expect(bodyText).toBe(
+    `${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`,
+  );
+});
 
 test("Markdown with a single+default slot", async ({ page, initTestBed }) => {
   const EXPECTED_VALUE1 = "Howdy!";
@@ -609,26 +607,23 @@ test("$this works in compound components", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
 });
 
-test.fixme(
-  "call api with id works in compound components",
-  SKIP_REASON.TEST_NOT_WORKING("Event does not fire"),
-  async ({ page, initTestBed }) => {
-    await initTestBed(
-      `<TestButton testId="buttonComponent" onClick="buttonComponent.incrementInside()"/>`,
-      {
-        components: [
-          `
-      <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
-        <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
-      </Component>
+test("call api with id works in compound components", async ({ page }) => {
+  await initApp(page, {
+    // NOTE: This test runs, but TS is unhappy about the components property
+    //@ts-ignore
+    components: `
+        <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
+        </Component>
     `,
-        ],
-      },
-    );
-    await page.getByTestId("buttonComponent").click();
-    await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
-  },
-);
+    entryPoint: `
+        <TestButton id="buttonComponent" onClick="buttonComponent.incrementInside()"/>
+    `,
+  });
+
+  await page.getByTestId("buttonComponent").click();
+  await expect(page.getByTestId("buttonComponent")).toHaveText("Increment counter: 1");
+});
 
 test("$self works in compound components", async ({ page, initTestBed }) => {
   await initTestBed(`<TestButton testId="buttonComponent"/>`, {
@@ -706,4 +701,33 @@ test("$this works in Queue event handler", async ({ page, initTestBed }) => {
   await page.getByTestId("button").click();
   await expect(page.getByTestId("processed")).toHaveText("2");
   await expect(page.getByTestId("queueLength")).toHaveText("0");
+});
+
+test("method works with script", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `
+    <Fragment var.msg="">
+      <MyComp id="myComp"/>
+      <Button testId="trigger" onClick="() => msg = myComp.greet()">Greet</Button>
+      <H2 testId="greeting">{msg}</H2>
+    </Fragment>
+  `,
+    {
+      components: [
+        `
+        <Component name="MyComp">
+          <script>
+            var hello="Hello from MyComp!"
+          </script>
+          <Text>{hello}</Text>
+          <method name="greet">() => hello</method>
+        </Component>
+      `,
+      ],
+    },
+  );
+
+  const button = page.getByTestId("trigger");
+  await button.click();
+  await expect(page.getByTestId("greeting")).toHaveText("Hello from MyComp!");
 });

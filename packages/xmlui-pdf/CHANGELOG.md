@@ -1,5 +1,11 @@
 # xmlui-pdf
 
+## 0.1.11
+
+### Patch Changes
+
+- 3c8ad14: Add the data property to the Pdf component
+
 ## 0.1.10
 
 ### Patch Changes

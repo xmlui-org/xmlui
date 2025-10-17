@@ -70,10 +70,9 @@ export function AppWithCodeViewNative({
   const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
 
   const safePopOutUrl = withoutTrailingSlash(
-    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://docs.xmlui.org/#/playground",
+    popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
-
     const data = {
       standalone: {
         app,
@@ -141,7 +140,7 @@ export function AppWithCodeViewNative({
                       <button
                         className={styles.headerButton}
                         onClick={() => {
-                          openPlayground();
+                          void openPlayground();
                         }}
                       >
                         <RxOpenInNewWindow />
