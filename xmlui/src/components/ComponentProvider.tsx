@@ -294,6 +294,11 @@ export type ContributesDefinition = {
    * Themes that come with the app.
    */
   themes?: ThemeDefinition[];
+
+  /**
+   * Custom behaviors that come with the app.
+   */
+  behaviors?: Behavior[];
 };
 
 type ComponentName = {
@@ -807,6 +812,11 @@ export class ComponentRegistry {
     this.registerBehavior(animationBehavior);
     this.registerBehavior(labelBehavior);
 
+    // Register external behaviors from contributes
+    contributes.behaviors?.forEach((behavior) => {
+      this.registerBehavior(behavior);
+    });
+
     this.extensionManager?.subscribeToRegistrations(this.extensionRegistered);
   }
 
@@ -1008,7 +1018,22 @@ export class ComponentRegistry {
   }
 
   // --- Registers a behavior
-  private registerBehavior(behavior: Behavior) {
+  private registerBehavior(
+    behavior: Behavior,
+    location: "before" | "after" = "after",
+    position?: string
+  ) {
+    // If position is specified, insert relative to that behavior
+    if (position) {
+      const targetIndex = this.behaviors.findIndex(b => b.name === position);
+      if (targetIndex !== -1) {
+        const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
+        this.behaviors.splice(insertIndex, 0, behavior);
+        return;
+      }
+    }
+    
+    // Default: append to the end
     this.behaviors.push(behavior);
   }
 

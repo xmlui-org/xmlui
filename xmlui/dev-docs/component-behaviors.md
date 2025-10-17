@@ -46,8 +46,8 @@ Behaviors apply in `ComponentAdapter` immediately after the component renderer p
 // 1. Component renderer executes
 renderedNode = renderer(rendererContext);
 
-// 2. Retrieve registered behaviors
-const behaviors = getCoreBehaviors();
+// 2. Retrieve registered behaviors from component registry
+const behaviors = componentRegistry.getBehaviors();
 
 // 3. Apply behaviors sequentially (skip compound components)
 if (!isCompoundComponent) {
@@ -64,7 +64,7 @@ if (!isCompoundComponent) {
 **Application Logic:**
 
 1. **Renderer Execution** - Component's renderer function produces the initial React node from the component definition
-2. **Behavior Retrieval** - `getCoreBehaviors()` returns the array of registered framework behaviors (currently `[tooltipBehavior, animationBehavior, labelBehavior]`)
+2. **Behavior Retrieval** - `componentRegistry.getBehaviors()` returns all registered behaviors from the central registry (framework behaviors plus any contributed by external packages)
 3. **Compound Check** - If the component is a compound (XMLUI-defined) component, skip all behaviors to avoid wrapping internal structure
 4. **Sequential Evaluation** - For each behavior in order:
    - Call `canAttach(node, metadata)` with the component definition and its metadata descriptor
@@ -73,6 +73,109 @@ if (!isCompoundComponent) {
 5. **Result** - Multiple behaviors create nested wrappers in application order (tooltip innermost, label outermost)
 
 This placement ensures behaviors wrap the core component but remain inside decorations (test IDs), API bindings, and layout wrappers.
+
+### Behavior Registration Architecture
+
+Behaviors are registered centrally in the `ComponentRegistry` class within `ComponentProvider`, following the same pattern used for components, actions, and loaders. This centralized registry enables both framework behaviors and external package behaviors to coexist.
+
+**Registration in ComponentRegistry:**
+
+```typescript
+class ComponentRegistry {
+  private behaviors: Behavior[] = [];
+
+  constructor(contributes: ContributesDefinition = {}, ...) {
+    // ... component and action registration ...
+
+    // Register framework-implemented behaviors
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(labelBehavior);
+
+    // Register external behaviors from contributes
+    contributes.behaviors?.forEach((behavior) => {
+      this.registerBehavior(behavior);
+    });
+  }
+
+  private registerBehavior(
+    behavior: Behavior,
+    location: "before" | "after" = "after",
+    position?: string
+  ) {
+    if (position) {
+      const targetIndex = this.behaviors.findIndex(b => b.name === position);
+      if (targetIndex !== -1) {
+        const insertIndex = location === "before" ? targetIndex : targetIndex + 1;
+        this.behaviors.splice(insertIndex, 0, behavior);
+        return;
+      }
+    }
+    this.behaviors.push(behavior);
+  }
+
+  getBehaviors(): Behavior[] {
+    return this.behaviors;
+  }
+}
+```
+
+**ComponentAdapter Retrieval:**
+
+The `ComponentAdapter` retrieves registered behaviors from the component registry:
+
+```typescript
+// In ComponentAdapter.tsx
+const componentRegistry = useComponentRegistry();
+const behaviors = componentRegistry.getBehaviors();
+
+// Apply behaviors to rendered node
+for (const behavior of behaviors) {
+  if (behavior.canAttach(rendererContext.node, descriptor)) {
+    renderedNode = behavior.attach(rendererContext, renderedNode);
+  }
+}
+```
+
+**External Package Registration:**
+
+External component packages can contribute custom behaviors through the `ContributesDefinition`:
+
+```typescript
+// In an external package (e.g., packages/my-package/src/index.tsx)
+import { myCustomBehavior } from "./behaviors/MyCustomBehavior";
+
+export default {
+  namespace: "MyPackage",
+  components: [myComponentRenderer],
+  behaviors: [myCustomBehavior],  // Custom behaviors register here
+};
+```
+
+**Positioned Registration:**
+
+The `registerBehavior` method supports precise control over behavior execution order through optional `location` and `position` parameters:
+
+- **location**: `"before" | "after"` - Specifies placement relative to the target behavior
+- **position**: `string` - The name of the target behavior for positioning
+
+This allows external packages to insert behaviors at specific points in the execution sequence:
+
+```typescript
+// Insert a custom behavior before the animation behavior
+registerBehavior(myBehavior, "before", "animation");
+
+// Insert a custom behavior after the tooltip behavior
+registerBehavior(myBehavior, "after", "tooltip");
+```
+
+**Benefits of Registry Architecture:**
+
+- **Extensibility** - Third-party packages can register custom behaviors without modifying framework code
+- **Consistency** - Follows the same pattern as components, actions, and loaders
+- **Order Control** - Positioned registration enables fine-grained control over behavior application sequence
+- **Centralized Management** - All behaviors accessible through single `getBehaviors()` method
+- **Type Safety** - Full TypeScript type checking for behavior implementations
 
 ## Framework-Implemented Behaviors
 
@@ -185,19 +288,25 @@ The label behavior checks `metadata?.props?.label` to determine if a component h
 
 Components like TextBox or Select do not define `label` in their metadata because they expect the label behavior to handle labeling. The presence of a `label` prop in the component instance (but absence in metadata) signals that the behavior should attach.
 
-### The getCoreBehaviors Function
+### Behavior Execution Order
 
-The `getCoreBehaviors()` function returns the array of framework-implemented behaviors available for application:
+Behaviors are registered in the `ComponentRegistry` during construction. The framework registers its three core behaviors first, followed by any behaviors contributed by external packages:
 
 ```typescript
-export const getCoreBehaviors = () => {
-  return [tooltipBehavior, animationBehavior, labelBehavior];
-};
+// Framework behaviors registered in ComponentRegistry constructor
+this.registerBehavior(tooltipBehavior);
+this.registerBehavior(animationBehavior);
+this.registerBehavior(labelBehavior);
+
+// External behaviors registered after
+contributes.behaviors?.forEach((behavior) => {
+  this.registerBehavior(behavior);
+});
 ```
 
-**Behavior Order Significance:**
+**Order Significance:**
 
-The order matters because behaviors wrap sequentially. The current order (tooltip, animation, label) produces this nesting:
+The registration order matters because behaviors wrap sequentially. The current order (tooltip, animation, label) produces this nesting:
 
 ```
 <ItemWithLabel>          ← Label behavior (outermost)
@@ -293,9 +402,9 @@ try {
   }
 
   /**
-   * Apply any core behaviors to the component.
+   * Apply behaviors to the component.
    */
-  const behaviors = getCoreBehaviors();
+  const behaviors = componentRegistry.getBehaviors();
   if (!isCompoundComponent) {
     for (const behavior of behaviors) {
       if (behavior.canAttach(rendererContext.node, descriptor)) {
@@ -454,7 +563,7 @@ graph TD
     B --> C[ComponentAdapter prepares renderer context]
     C --> D[ComponentAdapter calls component renderer]
     D --> E[Initial React node created]
-    E --> F[ComponentAdapter retrieves behaviors via getCoreBehaviors]
+    E --> F[ComponentAdapter retrieves behaviors from registry via componentRegistry.getBehaviors]
     F --> G[FOR EACH behavior: Evaluate canAttach]
     G --> H{canAttach returns true?}
     H -->|Yes| I[behavior.attach wraps node]
@@ -501,6 +610,8 @@ flowchart TD
 
 Component behaviors provide a powerful mechanism for applying cross-cutting concerns to XMLUI components declaratively. Behaviors integrate seamlessly into the rendering pipeline, transforming components after initial rendering but before decoration. They leverage the full renderer context for value extraction, event handling, and state management.
 
-The behavior system reduces code duplication, ensures consistency, and enables framework-level enhancements without component-level changes. Behaviors are retrieved via the `getCoreBehaviors()` function and applied directly in `ComponentAdapter`.
+The behavior system reduces code duplication, ensures consistency, and enables framework-level enhancements without component-level changes. Behaviors are registered in the central `ComponentRegistry` and retrieved via `componentRegistry.getBehaviors()`, then applied sequentially in `ComponentAdapter`.
+
+The registry-based architecture enables extensibility - both framework behaviors and external package behaviors coexist through the `ContributesDefinition` mechanism. External packages can register custom behaviors that execute alongside framework behaviors, with optional positioning control for precise execution order.
 
 For framework developers working on XMLUI core, behaviors represent a critical architectural pattern for implementing features that span multiple components uniformly and maintainably.
