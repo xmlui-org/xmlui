@@ -278,7 +278,7 @@ function buildTreeFromPathsAndMeta(
 
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
 const App: StandaloneAppDescription = {
-  name: "XMLUI Docs",
+  name: "XMLUI Blog",
   defaultTheme: "docs-theme",
   resources: {
     logo: "/resources/logo.svg",
@@ -301,7 +301,7 @@ const App: StandaloneAppDescription = {
     },
     prefetchedContent,
     lintSeverity: "skip", // Turn off xmlui linting
-    popOutUrl: "/#/playground",
+    popOutUrl: "https://playground.xmlui.org/#/playground",
   },
 };
 

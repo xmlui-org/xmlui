@@ -73,6 +73,13 @@
       ],
       "outputs": ["dist/**"]
     },
+    "build:blog": {
+      "dependsOn": [
+        "^build:extension",
+        "^build:xmlui"
+      ],
+      "outputs": ["dist/**"]
+    },
     "build:xmlui-test-bed": {
       "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
