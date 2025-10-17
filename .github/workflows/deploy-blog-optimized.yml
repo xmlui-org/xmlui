@@ -53,14 +53,14 @@ jobs:
         # This step will give a clear error if authentication is the problem
         run: npm install ./xmlui-optimizer
 
-      - run: cd blog && npm run release-ci-optimized
+      - run: npm run build-blog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: ./blog/xmlui-optimized-output
+          publish-dir: ./blog/dist
           production-deploy: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
