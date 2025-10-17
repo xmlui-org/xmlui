@@ -40,19 +40,6 @@ jobs:
 
       - run: npm ci --prefer-offline
 
-      - name: 4. Configure Git to use the App's token 🔑
-        # The token generated in the first step is used here for authentication.
-        run: git config --global url."https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/".insteadOf "https://github.com/"
-      - name: 5. DEBUG - Attempt to clone the private repo
-        # This step will give a clear error if authentication is the problem
-        run: git clone https://github.com/xmlui-org/xmlui-optimizer.git
-      - name: 5. Install optimizer's dependencies
-        run: npm install
-        working-directory: ./xmlui-optimizer
-      - name: DEBUG - install xmlui-optimizer
-        # This step will give a clear error if authentication is the problem
-        run: npm install ./xmlui-optimizer
-
       - run: npm run build-blog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
