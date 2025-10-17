@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.10.22
+
+### Patch Changes
+
+- 501f60a: The behavior infrastructure now uses ComponentProvider and allows adding custom behaviors
+- 1020f1c: Extend Tab with the tabAlignment and accordionView properties
+
 ## 0.10.21
 
 ### Patch Changes

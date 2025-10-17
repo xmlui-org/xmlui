@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.10.21",
+  "version": "0.10.22",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
