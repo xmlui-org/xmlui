@@ -280,7 +280,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     if (!isCompoundComponent) {
       for (const behavior of behaviors) {
         if (behavior.canAttach(rendererContext.node, descriptor)) {
-          renderedNode = behavior.attach(rendererContext, renderedNode);
+          renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
         }
       }
     }

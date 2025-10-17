@@ -166,10 +166,10 @@ export const TextMd = createMetadata({
     [`backgroundColor-${COMP}-keyboard`]: "rgb(from $color-surface-100 r g b / 0.4)",
     [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
     [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-200 r g b / 0.4)",
-    [`color-${COMP}-placeholder`]: "$color-surface-500",
-    [`color-${COMP}-codefence`]: "$color-surface-900",
-    [`color-${COMP}-subheading`]: "$textColor-secondary",
-    [`color-${COMP}-secondary`]: "$textColor-secondary",
+    [`textColor-${COMP}-placeholder`]: "$color-surface-500",
+    [`textColor-${COMP}-codefence`]: "$color-surface-900",
+    [`textColor-${COMP}-subheading`]: "$textColor-secondary",
+    [`textColor-${COMP}-secondary`]: "$textColor-secondary",
 
     dark: {
       [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-400 r g b / 0.4)",

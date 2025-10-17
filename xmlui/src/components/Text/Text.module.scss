@@ -7,6 +7,7 @@ $themeVars: ();
 }
 
 $component: "Text";
+$themeVars: t.composeTextVars($themeVars, $component);
 
 @mixin textVariant($variant) {
   $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
@@ -21,6 +22,10 @@ $component: "Text";
   margin-left: createThemeVar("marginLeft-#{$variantName}");
   margin-right: createThemeVar("marginRight-#{$variantName}");
   vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
+
+  &:hover {
+    color: createThemeVar("textColor-#{$variantName}--hover");
+  }
 }
 
 @layer components {
@@ -121,7 +126,7 @@ $component: "Text";
 
     &.marked {
       background-color: createThemeVar("backgroundColor-#{$component}-marked");
-      color: createThemeVar("color-#{$component}-marked");
+      color: createThemeVar("textColor-#{$component}-marked");
       font-weight: createThemeVar("fontWeight-#{$component}-marked");
       font-style: createThemeVar("fontStyle-#{$component}-marked");
       line-height: createThemeVar("lineHeight-#{$component}-marked");
@@ -190,7 +195,7 @@ $component: "Text";
     }
 
     &.placeholder {
-      color: createThemeVar("color-#{$component}-placeholder");
+      color: createThemeVar("textColor-#{$component}-placeholder");
       font-style: createThemeVar("fontStyle-#{$component}-placeholder");
       font-weight: createThemeVar("fontWeight-#{$component}-placeholder");
       font-size: createThemeVar("fontSize-#{$component}-placeholder");
@@ -208,7 +213,7 @@ $component: "Text";
       font-style: createThemeVar("fontStyle-#{$component}-subheading");
       letter-spacing: createThemeVar("letterSpacing-#{$component}-subheading");
       text-transform: createThemeVar("textTransform-#{$component}-subheading");
-      color: createThemeVar("color-#{$component}-subheading");
+      color: createThemeVar("textColor-#{$component}-subheading");
     }
 
     &.tableheading {
@@ -222,7 +227,7 @@ $component: "Text";
 
     &.secondary {
       font-size: createThemeVar("fontSize-#{$component}-secondary");
-      color: createThemeVar("color-#{$component}-secondary");
+      color: createThemeVar("textColor-#{$component}-secondary");
     }
 
     &.strong{

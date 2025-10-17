@@ -285,7 +285,7 @@ export type ComponentMetadata<
   opaque?: boolean;
 
   // List of theme variables available for the component
-  themeVars?: Array<string>;
+  themeVars?: Record<string, string>;
 
   // Optional description of theme variables available for the component
   themeVarDescriptions?: Record<string, string>;
