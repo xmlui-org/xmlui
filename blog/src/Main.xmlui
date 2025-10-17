@@ -13,16 +13,21 @@
     <AppState
         id="navState"
         initialValue="{{
-            showNavPanel: posts.length > showNavPanelThreshold && mediaSize.sizeIndex > 2,
+            showNavPanel: showNav(),
             showNavPanelThreshold: showNavPanelThreshold,
             posts: posts.length
         }}" />
-       <CHStack>
-           <Logo when="{! (posts.length > showNavPanelThreshold && mediaSize.sizeIndex > 2)}" height="$space-8" />
+       <CHStack width="100%">
+        <Logo when="{! showNav()}" height="$space-6"/>
+        <SpaceFiller when="{! showNav()}" />
+        <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
+            <Button
+                label="Home"
+            >
+            </Button>
+        </Link>
         <SpaceFiller />
-        <Search
-            data="{appGlobals.plainTextContent}"
-            when="{mediaSize.sizeIndex > 2}" />
+        <Search data="{appGlobals.plainTextContent}" />
         </CHStack>
     <!--
     <AppHeader>
