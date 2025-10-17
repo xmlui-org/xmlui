@@ -161,7 +161,7 @@ describe("XML Formatter", () => {
 <A />`);
       expect(result).toEqual(`<A />
 
-  <!--c-->
+<!--c-->
 
 <A />`);
     });

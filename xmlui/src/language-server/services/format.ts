@@ -40,6 +40,7 @@ export function handleDocumentFormatting({
 }
 
 class XmluiFormatter {
+  private readonly maxConsecutiveNewlines: number = 2;
   private readonly getText: GetText;
   private readonly startingNode: Node;
   private readonly maxLineLength: number;
@@ -90,6 +91,7 @@ class XmluiFormatter {
         case SyntaxKind.CData:
         case SyntaxKind.Script:
         case SyntaxKind.ElementNode: {
+          const childIsLast = i === node.children.length - 1;
           acc += this.printTagLikeTriviaInContent(prevChild, c);
 
           acc += this.printTagLike(c);
@@ -100,9 +102,9 @@ class XmluiFormatter {
         case SyntaxKind.TextNode: {
           const formattedContent = this.printContentString(c);
           if (formattedContent !== "") {
+            acc += this.newlineToken;
             acc += this.indent(this.indentationLvl);
             acc += formattedContent;
-            acc += this.newlineToken;
           } else {
             acc.trimEnd();
           }
@@ -127,101 +129,177 @@ class XmluiFormatter {
   }
 
   printTagLikeTriviaInContent(prevSibling: Node | null, node: Node) {
-    if (prevSibling?.isTagLike()) {
-      return this.printTriviaBetweenTagLikes(node);
+    if (!prevSibling) {
+      return this.printTriviaBeforeFirstTaglikeInContent(node);
+    } else if (prevSibling.isTagLike()) {
+      return this.printTriviaBetweenSiblingTaglikes(node);
+    } else if (
+      prevSibling.kind === SyntaxKind.TextNode ||
+      prevSibling.kind === SyntaxKind.StringLiteral
+    ) {
+      return this.printTriviaBetweenTextAndTaglike(prevSibling, node);
+    } else {
+      // prevSibling is an error node, treat is as any taglike
+      return this.printTriviaBetweenSiblingTaglikes(node);
     }
+  }
 
-    console.log(
-      "todo: code below also handles printTriviaBetweenTagLikes, but it should be handled by now",
-    );
+  printTriviaBetweenTextAndTaglike(textNode: Node, node: Node) {
+    // const comment = this.getCommentsSpaceJoined(node);
+
+    // if (comment) {
+    //   let commentInline: boolean = true;
+
+    //   if (this.hasNewlineTriviaBeforeComment(node)) {
+    //     commentInline = false;
+    //   } else {
+    //     const prevText = this.getText(prevSibling);
+    // commentInline = !hasNewlineInTrailingWhitespace(prevText);
+    //   }
+
+    //   if (commentInline) {
+    //     if (acc.at(-1) === this.newlineToken) {
+    //       acc = acc.substring(0, acc.length - this.newlineToken.length);
+    //     }
+    //     acc += ` ${comment}${this.newlineToken}`;
+    //   } else {
+    //     acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
+    //   }
+    // }
+
     let acc = "";
-    const comment = this.getCommentsSpaceJoined(node);
-    const prevIsText = prevSibling?.kind === SyntaxKind.TextNode;
+    const trivias = node.getTriviaNodes();
+    const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(textNode));
 
-    if (comment) {
-      let commentInline: boolean = true;
+    if (trivias) {
+      const newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
 
-      if (this.hasNewlineTriviaBeforeComment(node)) {
-        commentInline = false;
-      } else if (prevIsText) {
-        const prevText = this.getText(prevSibling);
-        commentInline = !hasNewlineInTrailingWhitespace(prevText);
+      acc += this.newlineToken.repeat(newlinesAfterText);
+      if (newlinesAfterText > 0) {
+        acc += this.indent(this.indentationLvl);
       }
 
-      if (commentInline) {
-        if (acc.at(-1) === this.newlineToken) {
-          acc = acc.substring(0, acc.length - this.newlineToken.length);
-        }
-        acc += ` ${comment}${this.newlineToken}`;
-      } else {
-        acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
-      }
+      const collapsedTrivias = this.collapseBlankLines(trivias);
+      const formattedTrivia = this.addWsToCollapsedTriviaAfterText(collapsedTrivias);
+
+      acc += formattedTrivia + this.indent(this.indentationLvl);
+    } else {
+      const usableNewlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
+      const newlinesAfterText = usableNewlinesAfterText === 0 ? 1 : usableNewlinesAfterText;
+
+      acc += this.newlineToken.repeat(newlinesAfterText) + this.indent(this.indentationLvl);
+    }
+    return acc;
+  }
+
+  printTriviaBeforeFirstTaglikeInContent(node: Node): string {
+    const triviaBetweenTaglikes = node.getTriviaNodes();
+    if (!triviaBetweenTaglikes) {
+      if (node.start === 0) return "";
+      return this.newlineToken + this.indent(this.indentationLvl);
     }
 
+    const collapsedTrivias = this.collapseBlankLines(triviaBetweenTaglikes);
+    let acc = this.addWsToCollapsedTrivia(collapsedTrivias);
     acc += this.indent(this.indentationLvl);
     return acc;
   }
 
-  printTriviaBetweenTagLikes(node: Node): string {
-    /* returns newline and comment nodes so that at most 1 blank line is permitted */
-    function collapseBlankLines(trivias: Node[]) {
-      let consecutiveNewlines = 0;
-      const accTrivias: Node[] = [];
-
-      for (let t of trivias) {
-        if (t.kind === SyntaxKind.NewLineTrivia) {
-          consecutiveNewlines++;
-          if (consecutiveNewlines <= 2) {
-            accTrivias.push(t);
-          }
-        } else if (t.kind === SyntaxKind.CommentTrivia) {
-          consecutiveNewlines = 0;
-          accTrivias.push(t);
-        }
-      }
-
-      return accTrivias;
-    }
-
-    const addWsToCollapsedTrivia = (trivias: Node[]) => {
-      let acc = "";
-      for (let i = 0; i < trivias.length; i++) {
-        const t = trivias[i];
-        switch (t.kind) {
-          case SyntaxKind.CommentTrivia: {
-            if (i === 0) {
-              acc += " ";
-              acc += this.getText(t);
-            } else if (i === trivias.length - 1) {
-              acc += this.indent(this.indentationLvl) + this.getText(t) + this.newlineToken;
-            } else {
-              acc += this.indent(this.indentationLvl) + this.getText(t);
-            }
-            if (trivias[i + 1]?.kind === SyntaxKind.CommentTrivia) {
-              acc += this.newlineToken;
-            }
-            break;
-          }
-          case SyntaxKind.NewLineTrivia: {
-            acc += this.newlineToken;
-            break;
-          }
-        }
-      }
-      return acc;
-    };
-
+  printTriviaBetweenSiblingTaglikes(node: Node): string {
     const triviaBetweenTaglikes = node.getTriviaNodes();
     if (!triviaBetweenTaglikes) {
       return this.newlineToken + this.indent(this.indentationLvl);
     }
 
-    const collapsedTrivias = collapseBlankLines(triviaBetweenTaglikes);
-    let acc = addWsToCollapsedTrivia(collapsedTrivias);
+    const collapsedTrivias = this.collapseBlankLines(triviaBetweenTaglikes);
+    let acc = this.addWsToCollapsedTrivia(collapsedTrivias);
     acc += this.indent(this.indentationLvl);
     return acc;
   }
 
+  /* returns newline and comment nodes so that at most 1 blank line is permitted */
+  collapseBlankLines(trivias: Node[]) {
+    let consecutiveNewlines = 0;
+    const accTrivias: Node[] = [];
+
+    for (let t of trivias) {
+      if (t.kind === SyntaxKind.NewLineTrivia) {
+        consecutiveNewlines++;
+        if (consecutiveNewlines <= this.maxConsecutiveNewlines) {
+          accTrivias.push(t);
+        }
+      } else if (t.kind === SyntaxKind.CommentTrivia) {
+        consecutiveNewlines = 0;
+        accTrivias.push(t);
+      }
+    }
+
+    return accTrivias;
+  }
+
+  // todo refactor this
+  addWsToCollapsedTriviaAfterText(trivias: Node[]) {
+    let acc = "";
+    let lastKeptTriviaIsComment = false;
+    for (let i = 0; i < trivias.length; i++) {
+      const t = trivias[i];
+      switch (t.kind) {
+        case SyntaxKind.CommentTrivia: {
+          if (i === 0) {
+            acc += this.getText(t);
+          } else {
+            acc += this.indent(this.indentationLvl) + this.getText(t);
+          }
+          if (trivias[i + 1]?.kind === SyntaxKind.CommentTrivia) {
+            acc += this.newlineToken;
+          }
+          lastKeptTriviaIsComment = true;
+          break;
+        }
+        case SyntaxKind.NewLineTrivia: {
+          acc += this.newlineToken;
+          lastKeptTriviaIsComment = false;
+          break;
+        }
+      }
+    }
+    if (lastKeptTriviaIsComment) {
+      acc += this.newlineToken;
+    }
+    return acc;
+  }
+
+  addWsToCollapsedTrivia(trivias: Node[]) {
+    let acc = "";
+    let lastKeptTriviaIsComment = false;
+    for (let i = 0; i < trivias.length; i++) {
+      const t = trivias[i];
+      switch (t.kind) {
+        case SyntaxKind.CommentTrivia: {
+          if (i === 0) {
+            acc += " ";
+            acc += this.getText(t);
+          } else {
+            acc += this.indent(this.indentationLvl) + this.getText(t);
+          }
+          if (trivias[i + 1]?.kind === SyntaxKind.CommentTrivia) {
+            acc += this.newlineToken;
+          }
+          lastKeptTriviaIsComment = true;
+          break;
+        }
+        case SyntaxKind.NewLineTrivia: {
+          acc += this.newlineToken;
+          lastKeptTriviaIsComment = false;
+          break;
+        }
+      }
+    }
+    if (lastKeptTriviaIsComment) {
+      acc += this.newlineToken;
+    }
+    return acc;
+  }
   printTagLike(node: Node): string {
     switch (node.kind) {
       case SyntaxKind.Script:
@@ -255,7 +333,6 @@ class XmluiFormatter {
       const contentListNode = node.children[contentListIdx];
 
       ++this.indentationLvl;
-      acc += this.newlineToken;
       acc += this.printContentListNode(contentListNode);
       --this.indentationLvl;
     }
@@ -314,7 +391,7 @@ class XmluiFormatter {
             acc += comment + this.newlineToken;
           }
 
-          acc += this.indent(this.indentationLvl) + "</";
+          acc += this.newlineToken + this.indent(this.indentationLvl) + "</";
           break;
         case SyntaxKind.TagNameNode:
           acc += this.printTagName(c);
@@ -563,9 +640,14 @@ export function format(node: Node, getText: GetText, options: FormatOptions): st
   return formatter.format();
 }
 
-function hasNewlineInTrailingWhitespace(text: string): boolean {
-  const lastNewlineIdx = text.lastIndexOf("\n");
+function newlinesInTrailingWhitespace(text: string): number {
   const trimmedPrevText = text.trimEnd();
-  const textEndedInNewline = lastNewlineIdx >= trimmedPrevText.length;
-  return textEndedInNewline;
+  const trailingWhitespace = text.substring(trimmedPrevText.length);
+  let newlineCount = 0;
+  for (const c of trailingWhitespace) {
+    if (c === "\n") {
+      newlineCount++;
+    }
+  }
+  return newlineCount;
 }
