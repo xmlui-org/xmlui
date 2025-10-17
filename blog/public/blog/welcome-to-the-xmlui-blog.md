@@ -1,4 +1,4 @@
-In this inaugural post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. The whole site, of which the blog is now a part, is an XMLUI app built with components including [NavPanel](/components/NavPanel), [NavLink](/components/NavLink), [Pages](/components/Pages), [Page](/components/Page), and [Markdown](/components/Markdown).
+In this inaugural post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. The whole site, of which the blog is now a part, is an XMLUI app built with components including [NavPanel](https://docs.xmlui.org/components/NavPanel), [NavLink](https://docs.xmlui.org/components/NavLink), [Pages](https://docs.xmlui.org/components/Pages), [Page](https://docs.xmlui.org/components/Page), and [Markdown](https://docs.xmlui.org/components/Markdown).
 
 Let's see how it evolved.
 
