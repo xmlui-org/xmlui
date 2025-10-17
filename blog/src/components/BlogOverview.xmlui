@@ -1,15 +1,9 @@
 <Component name="BlogOverview">
-  <Debug />
   <CVStack>
     <VStack width="100%">
-      <H1>
-        XMLUI Blog
-      </H1>
-      <Text>
-        Latest updates, tutorials, and insights for building with XMLUI
-      </Text>
-      <List
-        data="{
+      <H1>XMLUI Blog</H1>
+      <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
+      <List  data="{
       $props.posts.sort(function(a, b) {
         return new Date(b.date) - new Date(a.date);
       })
@@ -26,7 +20,7 @@
           <Link to="/blog/{$item.slug}">
             <Image src="/blog/images/{$item.image}" />
           </Link>
-          <Stack height="3rem" />
+          <Stack height="$space-8" />
         </VStack>
       </List>
     </VStack>
