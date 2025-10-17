@@ -2,6 +2,7 @@
   "name": "xmlui",
   "version": "0.10.26",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
