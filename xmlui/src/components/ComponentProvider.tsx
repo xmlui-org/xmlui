@@ -6,6 +6,7 @@ import type {
   ComponentRendererFn,
   CompoundComponentRendererInfo,
 } from "../abstractions/RendererDefs";
+import type { Behavior } from "../components-core/behaviors/Behavior";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
@@ -106,6 +107,7 @@ import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
 import { timedAction } from "../components-core/action/TimedAction";
+import { tooltipBehavior, animationBehavior, labelBehavior } from "../components-core/behaviors/CoreBehaviors";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -325,6 +327,9 @@ export class ComponentRegistry {
 
   // --- The pool of available loader renderers
   private loaders = new Map<string, LoaderRenderer<any>>();
+
+  // --- The pool of available behaviors
+  private behaviors: Behavior[] = [];
 
   /**
    * The component constructor registers all xmlui core components, so each
@@ -798,6 +803,10 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
+    this.registerBehavior(tooltipBehavior);
+    this.registerBehavior(animationBehavior);
+    this.registerBehavior(labelBehavior);
+
     this.extensionManager?.subscribeToRegistrations(this.extensionRegistered);
   }
 
@@ -996,6 +1005,16 @@ export class ComponentRegistry {
   // --- Registers an action function using its definition
   private registerActionFn({ actionName: functionName, actionFn }: ActionRendererDef) {
     this.actionFns.set(functionName, actionFn);
+  }
+
+  // --- Registers a behavior
+  private registerBehavior(behavior: Behavior) {
+    this.behaviors.push(behavior);
+  }
+
+  // --- Returns all registered behaviors
+  getBehaviors(): Behavior[] {
+    return this.behaviors;
   }
 }
 
