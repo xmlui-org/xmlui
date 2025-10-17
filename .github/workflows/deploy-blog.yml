@@ -6,7 +6,8 @@ on:
   push:
     branches:
       - main
-
+    paths:
+      - 'blog/**'
 
 permissions:
   contents: write
