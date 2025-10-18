@@ -1,38 +1,41 @@
 <App
-    layout="vertical-full-header"
-    noScrollbarGutters="false"
-    var.posts = `{[
+    layout="vertical"
+    var.showNavPanelThreshold="{6}"
+    var.posts=`{[
       {
         title: "Welcome to the XMLUI blog!",
         slug: "welcome-to-the-xmlui-blog",
         author: "Jon Udell",
-        date: "2025-09-10",
+        date: "2025-10-20",
         image: "blog-scrabble.png"
       }
-    ]}`
-    >
+    ]}`>
+    <AppState
+        id="navState"
+        initialValue="{{
+            showNavPanel: showNav(),
+            showNavPanelThreshold: showNavPanelThreshold,
+            posts: posts.length
+        }}" />
     <AppHeader>
         <property name="logoTemplate">
-            <Link to="https://xmlui.org/">
-                <Logo height="$space-8" />
+          <CHStack height="$space-6">
+            <Logo />
+            <Text variant="em">Tutorials, tips, best practices</Text>
+          </CHStack>
+        </property>
+        <property name="profileMenuTemplate">
+            <SpaceFiller />
+            <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
+                <Button height="$space-6" padding="$space-2" label="All Posts" />
             </Link>
         </property>
-        <SpaceFiller />
-        <Search
-            data="{appGlobals.plainTextContent}"
-            when="{mediaSize.sizeIndex > 2}" />
-        <ToneSwitch />
     </AppHeader>
-    <NavPanel
-        when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
-        <Stack
-            paddingHorizontal="$space-4"
-            paddingBottom="$space-4"
-            when="{mediaSize.sizeIndex <= 2}">
-            <Search data="{appGlobals.plainTextContent}" />
-        </Stack>
-        <NavGroup label="Recent posts" to="/blog" >
-          <NavLink label="Welcome to the XMLUI blog!" to="/blog/{posts[0].slug}" />
+    <NavPanel>
+       <NavGroup label="Recent posts" to="/blog">
+            <NavLink
+                label="Welcome to the XMLUI blog!"
+                to="/blog/{posts[0].slug}" />
         </NavGroup>
     </NavPanel>
     <Pages fallbackPath="/404">
@@ -50,14 +53,10 @@
         </Page>
     </Pages>
     <Footer>
-        <CHStack width="*">
+        <CHStack width="100%">
             This site is an XMLUI™ app.
             <SpaceFiller />
-            <Link
-                to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
-                target="_blank">
-                <Button variant="ghost" icon="github" />
-            </Link>
+            <ToneSwitch />
         </CHStack>
     </Footer>
 </App>
