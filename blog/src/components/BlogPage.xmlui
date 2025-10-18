@@ -1,4 +1,5 @@
 <Component name="BlogPage">
+    <Debug />
     <VStack gap="0">
       <H1>{$props.post.title}</H1>
       <Text>{$props.post.date} • {$props.post.author}</Text>
