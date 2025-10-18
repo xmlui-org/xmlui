@@ -1,4 +1,5 @@
 <Component name="BlogOverview">
+  <Debug />
   <CVStack>
     <VStack width="100%">
       <List  data="{

@@ -10,6 +10,7 @@
         image: "blog-scrabble.png"
       }
     ]}`>
+    <Button variant="ghost" label="toggle threshold" padding="$space-1" onClick="toggleThreshold()" />
     <AppState
         id="navState"
         initialValue="{{
@@ -21,17 +22,17 @@
         <property name="logoTemplate">
           <CHStack height="$space-6">
             <Logo />
-            <Text variant="em">Tutorials, tips, best practices</Text>
           </CHStack>
         </property>
         <property name="profileMenuTemplate">
+            <Text variant="em">Tutorials, tips, best practices</Text>
             <SpaceFiller />
             <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
                 <Button height="$space-6" padding="$space-2" label="All Posts" />
             </Link>
         </property>
     </AppHeader>
-    <NavPanel>
+    <NavPanel when="{showNav()}" >
        <NavGroup label="Recent posts" to="/blog">
             <NavLink
                 label="Welcome to the XMLUI blog!"
