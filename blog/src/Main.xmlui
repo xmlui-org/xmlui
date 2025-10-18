@@ -1,6 +1,6 @@
 <App
     layout="vertical"
-    var.showNavPanelThreshold="{0}"
+    var.showNavPanelThreshold="{6}"
     var.posts=`{[
       {
         title: "Welcome to the XMLUI blog!",
@@ -18,14 +18,20 @@
             posts: posts.length
         }}" />
     <AppHeader>
+        <property name="logoTemplate">
+          <CHStack height="$space-6">
+            <Logo />
+            <Text variant="em">Tutorials, tips, best practices</Text>
+          </CHStack>
+        </property>
         <property name="profileMenuTemplate">
+            <SpaceFiller />
             <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
-                <Button label="Home" />
+                <Button height="$space-6" padding="$space-2" label="All Posts" />
             </Link>
-            <Search data="{appGlobals.plainTextContent}" />
         </property>
     </AppHeader>
-    <NavPanel when="{showNav()}">
+    <NavPanel>
        <NavGroup label="Recent posts" to="/blog">
             <NavLink
                 label="Welcome to the XMLUI blog!"

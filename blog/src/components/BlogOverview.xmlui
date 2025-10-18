@@ -1,8 +1,6 @@
 <Component name="BlogOverview">
   <CVStack>
     <VStack width="100%">
-      <H1>XMLUI Blog</H1>
-      <Text>Latest updates, tutorials, and insights for building with XMLUI</Text>
       <List  data="{
       $props.posts.sort(function(a, b) {
         return new Date(b.date) - new Date(a.date);

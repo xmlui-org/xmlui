@@ -1,0 +1,6 @@
+<Component name="Debug">
+  <AppState id="navState" />
+  <Text>
+    navState: {JSON.stringify(navState.value)},  sizeIndex {JSON.stringify(mediaSize.sizeIndex)}, path {$pathname}
+  </Text>
+</Component>
