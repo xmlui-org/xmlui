@@ -10,7 +10,12 @@
         image: "blog-scrabble.png"
       }
     ]}`>
-    <Button variant="ghost" label="toggle threshold" padding="$space-1" onClick="toggleThreshold()" />
+    <!--
+    <HStack verticalAlignment="center">
+        <Button variant="ghost" label="toggle showNav" onClick="toggleThreshold()" />
+        <Text>{showNav()}</Text>
+    </HStack>
+    -->
     <AppState
         id="navState"
         initialValue="{{
@@ -32,7 +37,7 @@
             </Link>
         </property>
     </AppHeader>
-    <NavPanel when="{showNav()}" >
+    <NavPanel when="{showNav()}">
        <NavGroup label="Recent posts" to="/blog">
             <NavLink
                 label="Welcome to the XMLUI blog!"

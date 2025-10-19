@@ -1,5 +1,5 @@
 function showNav() {
-    return posts.length > showNavPanelThreshold && mediaSize.sizeIndex > 2;
+    return posts.length > showNavPanelThreshold;
 }
 
 function toggleThreshold() {
