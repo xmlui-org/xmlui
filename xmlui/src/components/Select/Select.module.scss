@@ -49,6 +49,15 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   }
 }
 
+$outlineWidth: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+
+$backgroundColor-Select-disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-Select-disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-Select-disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
 @layer components {
   // =============================================================================
   // SHARED COMPONENTS (used by both SimpleSelect and MultiSelect)

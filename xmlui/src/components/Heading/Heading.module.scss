@@ -29,6 +29,15 @@ $color-anchor-Heading: createThemeVar("color-anchor-Heading");
 $gap-anchor-Heading: createThemeVar("gap-anchor-Heading");
 $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-Heading");
 
+$textColor-Heading: createThemeVar("textColor-Heading");
+$textColor-H1: createThemeVar("textColor-H1");
+$textColor-H2: createThemeVar("textColor-H2");
+$textColor-H3: createThemeVar("textColor-H3");
+$textColor-H4: createThemeVar("textColor-H4");
+$textColor-H5: createThemeVar("textColor-H5");
+$textColor-H6: createThemeVar("textColor-H6");
+// ... TODO for all other theme variables used in this module
+
 @mixin heading($level) {
   @include t.paddingVars($themeVars, $level);
   @include t.borderVars($themeVars, $level);
@@ -36,6 +45,7 @@ $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-He
   color: createThemeVar("Heading:textColor-#{$level}");
   letter-spacing: createThemeVar("Heading:letterSpacing-#{$level}");
   font-family: createThemeVar("Heading:fontFamily-#{$level}");
+  font-size: createThemeVar("Heading:fontSize-#{$level}");
   font-weight: createThemeVar("Heading:fontWeight-#{$level}");
   margin-top: createThemeVar("marginTop-#{$level}"); // Intentionally omitting "Heading" inheritance
   margin-bottom: createThemeVar(

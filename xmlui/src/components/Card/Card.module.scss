@@ -17,7 +17,7 @@ $gap-Card: createThemeVar("gap-Card");
 $gap-title-Card: createThemeVar("gap-title-Card");
 $gap-avatar-Card: createThemeVar("gap-avatar-Card");
 $horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-Card");
-$verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
+$verticalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
 
 
 @layer components {
@@ -33,7 +33,7 @@ $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
     .avatarWrapper {
       display: flex;
       flex-direction: row;
-      align-items: $verticalalAlignment-title-Card;
+      align-items: $verticalAlignment-title-Card;
       gap: $gap-avatar-Card;
       min-width: 0;
     }

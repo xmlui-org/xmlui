@@ -12,6 +12,11 @@ $themeVars: (
 $componentName: "TextBox";
 $themeVars: t.composePaddingVars($themeVars, $componentName);
 
+$gapAdornmentSize: createThemeVar("Input:gap-adornment-#{$componentName}");
+$backgroundColorDisabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColorDisabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColorDisabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
 // --- CSS properties of a particular TextBox variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
@@ -78,7 +83,7 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
   .inputRoot {
     display: flex;
     align-items: center;
-    gap: createThemeVar("Input:gap-adornment-#{$componentName}");
+    gap: $gapAdornmentSize;
     width: 100%;
     border-style: solid;
     border-width: 1px;
@@ -101,9 +106,9 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
 
     &:has(.input:is(:disabled)) {
       cursor: not-allowed;
-      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-      color: createThemeVar("Input:textColor-#{$componentName}--disabled");
-      border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+      background-color: $backgroundColorDisabled;
+      color: $textColorDisabled;
+      border-color: $borderColorDisabled;
     }
 
     .input {

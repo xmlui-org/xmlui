@@ -25,6 +25,11 @@ $textDecorationColor-Link--active: createThemeVar("textDecorationColor-#{$compon
 $textDecorationStyle-Link: createThemeVar("textDecorationStyle-#{$component}");
 $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
 
+$outlineWidth-Link--focus: createThemeVar("outlineWidth-#{$component}--focus");
+$outlineColor-Link--focus: createThemeVar("outlineColor-#{$component}--focus");
+$outlineStyle-Link--focus: createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus");
+
 @layer components {
   .container {
     @include t.borderVars($themeVars, $component);
@@ -55,10 +60,10 @@ $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$compon
       }
 
       &:focus-visible {
-        outline-width: createThemeVar("outlineWidth-#{$component}--focus");
-        outline-color: createThemeVar("outlineColor-#{$component}--focus");
-        outline-style: createThemeVar("outlineStyle-#{$component}--focus");
-        outline-offset: createThemeVar("outlineOffset-#{$component}--focus");
+        outline-width: $outlineWidth-Link--focus;
+        outline-color: $outlineColor-Link--focus;
+        outline-style: $outlineStyle-Link--focus;
+        outline-offset: $outlineOffset-Link--focus;
       }
 
       &.active {
