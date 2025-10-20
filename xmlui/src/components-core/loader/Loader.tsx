@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
-import type { QueryFunction } from "@tanstack/query-core/src/types";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
@@ -74,7 +73,7 @@ export function Loader({
     structuralSharing,
     //we pause the loaders if the apiInterceptor is not initialized (true when the app is not using mockApi)
     enabled: initialized,
-    queryFn: useCallback<QueryFunction>(
+    queryFn: useCallback<any>(
       async ({ signal }) => {
         // console.log("[Loader queryFn] Starting to fetch data...");
         try {

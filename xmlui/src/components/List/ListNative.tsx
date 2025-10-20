@@ -41,7 +41,6 @@ import { Spinner } from "../Spinner/SpinnerNative";
 import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { CustomItemComponent } from "virtua/lib/react/types";
 
 // Default props for List component
 export const defaultProps = {
@@ -523,7 +522,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 shift={shift}
                 onScroll={onScroll}
                 startMargin={startMargin}
-                item={Item as CustomItemComponent}
+                item={Item as any}
                 count={rowCount}
               >
                 {(rowIndex) => {

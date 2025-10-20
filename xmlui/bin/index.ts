@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S vite-node --script
 
 import { build } from "./build";
 import { start } from "./start";
@@ -177,6 +177,10 @@ switch (command) {
   }
   case "start": {
     const { port, withMock, proxy } = argv as StartArgs;
+    console.log("hi\n\n\n");
+    console.log(process.argv);
+    console.log(__dirname);
+    console.log("hi\n\n\n");
     start({ port, withMock: getBoolArg(withMock), proxy });
     break;
   }
