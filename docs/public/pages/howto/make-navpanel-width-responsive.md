@@ -4,7 +4,7 @@ You can use `width-navPanel-App` to control the width of `NavPanel` according to
 
 You can use the same `mediaSize` global variable to hide labels and show only icons.
 
-```xmlui-pg
+```xmlui-pg name="Shrink the window to see the NavPanel respond"
 ---app display
 <Theme width-navPanel-App="{mediaSize.sizeIndex <= 1 ? '4rem' : '10rem'}" >
   <App
