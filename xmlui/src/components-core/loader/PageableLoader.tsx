@@ -2,7 +2,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
-import type { QueryFunction } from "@tanstack/query-core/src/types";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -115,7 +114,7 @@ export function PageableLoader({
     isRefetching,
   } = useInfiniteQuery({
     queryKey,
-    queryFn: useCallback<QueryFunction>(
+    queryFn: useCallback<any>(
       async ({ signal, pageParam }) => {
         return await loaderFn(signal, pageParam);
       },
