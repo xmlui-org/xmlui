@@ -2,12 +2,6 @@ name: Deploy blog
 
 on:
   workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - main
-    paths:
-      - 'blog/**'
 
 permissions:
   contents: write
