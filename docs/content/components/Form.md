@@ -154,6 +154,32 @@ The form infrastructure fires this event when the form is submitted. The event a
 
 The form infrastructure fires this event when the form is submitted successfully.
 
+### `willSubmit` [#willsubmit]
+
+The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. You can cancel the submission by returning `false` from the event handler.
+
+The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
+
+```xmlui-pg display copy {4-9} name="Example: willSubmit"
+<App>
+  <Form padding="0.5rem"
+    data="{{ name: 'Joe', age: 43 }}"
+    onWillSubmit="(toSubmit) => {
+      if (toSubmit.age % 2) {
+        toast.error('Age must be an even number');
+        return false;
+      }
+    }"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FlowLayout columnGap="12px" paddingBottom="6px">
+      <FormItem bindTo="name" label="Customer name" width="50%" />
+      <FormItem bindTo="age" label="Age" type="integer" width="50%"
+        zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>  
+```
+
 ## Exposed Methods [#exposed-methods]
 
 ### `reset` [#reset]

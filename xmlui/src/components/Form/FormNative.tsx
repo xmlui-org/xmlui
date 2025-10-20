@@ -218,6 +218,8 @@ type OnSubmit = (
   params: Record<string, any> | undefined,
   options: { passAsDefaultBody: boolean },
 ) => Promise<void>;
+type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void>;
+type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
 type Props = {
@@ -234,10 +236,11 @@ type Props = {
   saveInProgressLabel?: string;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
+  onWillSubmit?: OnWillSubmit;
   onSubmit?: OnSubmit;
   onCancel?: OnCancel;
   onReset?: OnReset;
-  onSuccess?: (result: any) => void;
+  onSuccess?: OnSuccess;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -294,6 +297,7 @@ const Form = forwardRef(function (
     saveLabel = defaultProps.saveLabel,
     saveInProgressLabel = defaultProps.saveInProgressLabel,
     swapCancelAndSave,
+    onWillSubmit,
     onSubmit,
     onCancel,
     onReset,
@@ -382,6 +386,14 @@ const Form = forwardRef(function (
     dispatch(formSubmitting());
     try {
       const filteredSubject = cleanUpSubject(formState.subject);
+      const canSubmit = await onWillSubmit?.(filteredSubject);
+      if (canSubmit === false) {
+        // --- We do not reset the form but allow the next submit.
+        dispatch(
+          backendValidationArrived({ generalValidationResults: [], fieldValidationResults: {} }),
+        );
+        return;
+      }
 
       const result = await onSubmit?.(filteredSubject, {
         passAsDefaultBody: true,
@@ -638,6 +650,11 @@ export const FormWithContextVar = forwardRef(function (
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
         swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
+        onWillSubmit={lookupEventHandler("willSubmit", {
+          context: {
+            $data,
+          },
+        })}
         onSubmit={lookupEventHandler("submit", {
           defaultHandler: submitUrl
             ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`

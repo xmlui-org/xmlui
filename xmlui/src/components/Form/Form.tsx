@@ -97,6 +97,11 @@ export const FormMd = createMetadata({
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
   events: {
+    willSubmit: d(
+      `The form infrastructure fires this event just before the form is submitted. The event argument ` +
+        `is the current \`data\` value to be submitted. You can cancel the submission by returning ` +
+        `\`false\` from the event handler.`,
+    ),
     submit: d(
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
