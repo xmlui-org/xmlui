@@ -8,6 +8,8 @@ This document explains XMLUI's user-defined component infrastructure - the rende
 
 A user-defined component is declared with the `<Component>` tag and must have a unique name starting with an uppercase letter. The component name must match the filename (e.g., `ActionBar.xmlui` contains `<Component name="ActionBar">`). Components support properties, events, methods, variables, and slots for template composition.
 
+> **Note**: In built mode, xmlui can work with components where their name does not match the file name. However, those components won't work with buildless mode.
+
 **Key Characteristics:**
 
 - **Declarative Definition** - Components defined entirely in XMLUI markup without requiring JavaScript/TypeScript code
@@ -19,32 +21,6 @@ A user-defined component is declared with the `<Component>` tag and must have a 
 
 ## Architectural Overview
 
-### Component Rendering Flow
-
-User-defined components follow a distinct rendering path compared to framework-provided components. The key architectural difference is that user-defined components are **compound components** - they have both a component definition (what the parent sees) and an internal implementation (what renders).
-
-**High-Level Flow:**
-
-```mermaid
-%%{init: {"block": {"padding": 8}}}%%
-block-beta
-  columns 3
-
-  A["Parent Component Uses &lt;MyComponent&gt;"]
-  B["ComponentAdapter receives<br/>component definition"]
-  C["ComponentRegistry identifies<br/>as compound component"]
-
-  D["CompoundComponent wraps<br/>internal implementation"]
-  E["Container provides scope<br/>for $props, vars, methods"]
-  F["Slot components transpose<br/>parent content"]
-
-  block:Final:3
-    G["SlotItem renders content<br/>with context variables"]
-  end
-```
-
-This architecture enables template composition - parent components provide markup fragments that render within the compound component's layout, with access to data pushed from the compound component through slot properties.
-
 ### The Compound Component Pattern
 
 User-defined components are implemented as **compound components** - they consist of two interconnected parts:
@@ -54,37 +30,44 @@ User-defined components are implemented as **compound components** - they consis
 
 **Example Component Definition:**
 
-```xmlui
-<Component name="ActionBar">
-  <variable name="isExpanded" value="{false}" />
-  
-  <Card>
-    <HStack>
-      <H3>{$props.header}</H3>
-      <Button 
-        label="{isExpanded ? 'Collapse' : 'Expand'}"
-        onClick="isExpanded = !isExpanded" />
-    </HStack>
-    <If condition="{isExpanded}">
-      <VStack>
-        <Slot />
-      </VStack>
-    </If>
+```xml
+<Component name="ContactCard">
+  <Card width="20%">
+    <Text>Name: { $props.name} </Text>
+    <Text>Phone: { $props.value} </Text>
+    <Slot />
   </Card>
 </Component>
 ```
 
 **Parent Usage:**
 
-```xmlui
-<ActionBar header="Actions Menu">
-  <Button label="Create" onClick="handleCreate()" />
-  <Button label="Edit" onClick="handleEdit()" />
-  <Button label="Delete" onClick="handleDelete()" />
-</ActionBar>
+```xml
+<App>
+  <ContactCard name="Mary" value="123">
+    <Button icon="phone" label="Click Me to Call" />
+  </ContactCard>
+</App>
 ```
 
-The component interface receives `header` property and button children from the parent. The component implementation defines internal state (`isExpanded`), accesses the property via `$props.header`, and uses `<Slot />` to transpose the children into its layout.
+This example defines a reusable ContactCard component that reads properties passed by its parent (available inside the component as `$props.name` and `$props.value`) and renders them inside a Card. The `<Slot />` is a default slot: any children provided by the parent (the Button in this case) are transposed into that location when the component is rendered.
+
+### Component Rendering Flow
+
+User-defined components follow a distinct rendering path compared to framework-provided components. The key architectural difference is that user-defined components are **compound components** - they have both a component definition (what the parent sees) and an internal implementation (what renders).
+
+**High-Level Flow:**
+
+1. Parent component uses a user-defined component (e.g., `<ContactCard>`)
+2. ComponentAdapter receives the component definition
+3. ComponentRegistry identifies it as a compound component
+4. CompoundComponent wraps the internal implementation
+5. Container provides scope for `$props`, vars, and methods
+6. Slot components transpose parent content
+7. SlotItem renders content with context variables
+
+This architecture enables template composition - parent components provide markup fragments that render within the compound component's layout, with access to data pushed from the compound component through slot properties.
+
 
 ### Slot-Based Template Composition
 
@@ -92,7 +75,7 @@ Slots are placeholder components within user-defined components that mark where 
 
 **Default (Unnamed) Slots** receive all children passed to the component:
 
-```xmlui
+```xml
 <Component name="Panel">
   <Card>
     <Slot />
@@ -107,7 +90,7 @@ Slots are placeholder components within user-defined components that mark where 
 
 **Named Slots** receive specific template fragments from the parent using the `<property>` syntax:
 
-```xmlui
+```xml
 <Component name="Dialog">
   <Card>
     <Slot name="headerTemplate">
@@ -148,21 +131,21 @@ Slots enable bidirectional data flow - not only can parents inject content into 
 
 **Example - List Component Passing Item Data:**
 
-```xmlui
+```xml
 <Component name="ItemList">
   <variable name="items" value="{['Apple', 'Banana', 'Cherry']}" />
   
   <VStack>
-    <For items="{items}">
+    <Items data="{items}">
       <Slot 
         name="itemTemplate" 
         item="{$item}" 
         index="{$index}"
-        isLast="{$index === items.length - 1}">
+        isLast="{$isLast}">
         <!-- Default template if parent doesn't provide one -->
         <Text>{$item}</Text>
       </Slot>
-    </For>
+    </Items>
   </VStack>
 </Component>
 
@@ -171,19 +154,17 @@ Slots enable bidirectional data flow - not only can parents inject content into 
   <property name="itemTemplate">
     <Card padding="sm">
       <Text variant="strong">#{$index + 1}: {$item}</Text>
-      <If condition="{!$isLast}">
-        <Divider />
-      </If>
+      <ContentSeparator when="{!$isLast}" />
     </Card>
   </property>
 </ItemList>
 ```
 
 In this example:
-- The `ItemList` component iterates over `items` array
+- The `ItemList` component uses the `<Items>` component to iterate over the `items` array
 - For each item, it renders a `<Slot>` with properties: `item`, `index`, and `isLast`
 - These properties become context variables `$item`, `$index`, and `$isLast` in the parent's template
-- The parent's `itemTemplate` can use these variables to render custom markup for each item
+- The parent's `itemTemplate` uses these variables to render custom markup, with `ContentSeparator` conditionally displayed based on `$isLast`
 
 **Scope Behavior:**
 
@@ -199,14 +180,14 @@ This pattern enables powerful composition scenarios like data tables with custom
 
 ### ComponentAdapter: The Routing Layer
 
-`ComponentAdapter` is the central component in XMLUI's rendering pipeline that transforms component definitions into React elements. For user-defined components, ComponentAdapter handles special routing and slot transposition.
+`ComponentAdapter` is the central component in XMLUI's rendering pipeline that transforms component definitions into React elements. It handles special routing and slot transposition for user-defined components.
 
 **Key Responsibilities:**
 
-1. **Component Registry Lookup** - Queries `ComponentRegistry` to determine if a component is compound (user-defined) vs primitive (framework)
-2. **Slot Detection and Routing** - Detects `type === "Slot"` and routes to `slotRenderer()` function
-3. **Renderer Context Assembly** - Prepares full renderer context with state, value extraction, event handlers, and layout information
-4. **Behavior Application** - Applies component behaviors (tooltip, animation, label) but skips them for compound components
+1. **Component Registry Lookup** - Determines if a component is compound (user-defined) or primitive (framework)
+2. **Slot Detection and Routing** - Detects `type === "Slot"` and routes to `slotRenderer()`
+3. **Renderer Context Assembly** - Prepares renderer context with state, value extraction, event handlers, and layout
+4. **Behavior Application** - Applies behaviors (tooltip, animation, label) but skips them for compound components
 5. **Test Decoration** - Adds test IDs and inspection attributes for development tooling
 
 **Compound Component Detection:**
@@ -216,10 +197,10 @@ const { renderer, descriptor, isCompoundComponent } =
   componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 ```
 
-The `lookupComponentRenderer()` method returns:
-- `renderer` - The rendering function (for compound components, this is `CompoundComponentHolder`)
-- `descriptor` - Metadata about the component (props, events, visual/nonvisual, etc.)
-- `isCompoundComponent` - Boolean flag indicating whether this is a user-defined component
+Returns:
+- `renderer` - Rendering function (for compound components: `CompoundComponentHolder`)
+- `descriptor` - Component metadata (props, events, visual/nonvisual, etc.)
+- `isCompoundComponent` - Boolean flag for user-defined components
 
 **Critical Behavioral Difference:**
 
@@ -236,11 +217,11 @@ if (!isCompoundComponent) {
 }
 ```
 
-This prevents behaviors (tooltip, animation, label) from wrapping the compound component's internal structure. Behaviors should only attach to the outermost visual element, which the compound component's internal implementation controls.
+This prevents behaviors from wrapping the compound component's internal structure. Behaviors attach only to the outermost visual element controlled by the component's internal implementation.
 
 ### slotRenderer(): The Transposition Function
 
-The `slotRenderer()` function is a specialized renderer within ComponentAdapter that handles all Slot component rendering logic. It implements the core transposition mechanism - taking content from the parent component and rendering it in the compound component's location.
+`slotRenderer()` is a specialized renderer within ComponentAdapter that handles Slot component rendering. It implements the core transposition mechanism - taking content from the parent and rendering it in the compound component's location.
 
 **Function Signature:**
 
@@ -253,12 +234,12 @@ function slotRenderer(
 
 **Parameters:**
 
-- `node` - The Slot component definition containing the slot name and properties
-- `extractValue` - Function to evaluate property expressions (for slot properties)
-- `renderChild` - Function to render child components (for default slot content)
-- `lookupAction` - Function to resolve action expressions (for arrow function slot props)
+- `node` - Slot component definition with slot name and properties
+- `extractValue` - Evaluates property expressions for slot properties
+- `renderChild` - Renders child components for default slot content
+- `lookupAction` - Resolves action expressions for arrow function slot props
 - `layoutContext` - Current layout context (horizontal/vertical stack, etc.)
-- `parentRenderContext` - Context from the parent component containing children and templates
+- `parentRenderContext` - Parent component context with children and templates
 
 **Processing Logic:**
 
@@ -272,6 +253,8 @@ if (templateName && !templateName.endsWith("Template")) {
 }
 
 // 3. Extract slot properties (all props except "name")
+// Note: The "name" property identifies which parent template to use for transposition
+// and is not passed as a slot property to the rendered content
 let slotProps: any = null;
 if (!isEmpty(node.props)) {
   slotProps = {};
@@ -341,7 +324,7 @@ The function follows this logic to determine what to render:
 
 All properties on the Slot element (except `name`) become slot properties:
 
-```xmlui
+```xml
 <Slot name="itemTemplate" item="{$item}" index="{$index}" color="red" />
 ```
 
@@ -361,7 +344,7 @@ These props are passed to `SlotItem` which transforms them into context variable
 
 Slot properties can be arrow functions that execute in the component's scope:
 
-```xmlui
+```xml
 <Slot 
   name="itemTemplate" 
   item="{$item}"
@@ -433,17 +416,16 @@ return <>{renderChild(nodeWithItem, layoutContext)}</>;
 
 **Memoization Strategy:**
 
-SlotItem uses two levels of memoization to optimize performance:
-
+SlotItem uses multiple memoization levels to optimize performance:
 - `React.memo` - Prevents re-rendering when props haven't changed
-- `useShallowCompareMemoize` - Creates stable references for slot props using shallow equality
+- `useShallowCompareMemoize` - Creates stable references using shallow equality
 - `useMemo` - Recomputes containerized node only when slot props or content changes
 
-This prevents unnecessary re-renders when compound components re-render but slot properties haven't changed.
+This prevents unnecessary re-renders when compound components re-render but slot properties remain unchanged.
 
 **Example Data Flow:**
 
-```xmlui
+```xml
 <!-- Compound Component -->
 <Slot name="itemTemplate" item="{currentItem}" index="{i}" />
 
@@ -538,10 +520,10 @@ const containerNode: ContainerWrapperDef = useMemo(() => {
 
 The internal component implementation is wrapped in a Container that provides:
 - `loaders` - DataSource and other loader components defined at component level
-- `vars` - Variables declared with `<variable>` tags
-- `functions` - Methods declared with `<method>` tags
+- `vars` - Variables declared with `<variable>` tags or in `<script>` tags
+- `functions` - Methods declared with `<script>` tags
 - `scriptCollected` - Collected script declarations from `.xmlui.xs` code-behind files
-- `api` - Component API method mappings for external access
+- `api` - Component API method mappings for external access (declared with `<method>` tags)
 
 **Implicit Variables Injection:**
 
@@ -578,7 +560,7 @@ const emitEvent = useEvent((eventName, ...args) => {
 
 The `emitEvent()` function allows component implementations to notify parents of state changes:
 
-```xmlui
+```xml
 <Component name="Counter">
   <variable name="count" value="{0}" />
   <Button 
@@ -591,6 +573,8 @@ The `emitEvent()` function allows component implementations to notify parents of
 ```
 
 When the button is clicked, `emitEvent('valueChanged', count)` looks up the parent's `onValueChanged` handler and calls it with the current count value.
+
+> **Note**: The `emitEvent` function signature is `emitEvent(eventName: string, ...args: any[])`. The event name is automatically prefixed with "on" and converted to camelCase when looking up the parent's handler. For example, `emitEvent('valueChanged', data)` looks for the `onValueChanged` property in the parent.
 
 **Parent Render Context Assembly:**
 
@@ -620,12 +604,11 @@ const memoedParentRenderContext = useMemo(() => {
 CompoundComponent analyzes the parent's usage to determine if it needs to create a parent render context:
 
 **Parent render context is created when:**
-- The parent provides template properties (properties ending with "Template")
-- The parent provides children (for default slot transposition)
+- The parent provides template properties (ending with "Template")
+- The parent provides children for default slot transposition
 
-**Parent render context is undefined when:**
-- No template properties are passed
-- No children are provided
+**Parent render context is not created when:**
+- No template properties are passed and no children are provided
 
 The parent render context is passed down through `renderChild()` and becomes available in `slotRenderer()` for slot transposition.
 
@@ -684,42 +667,44 @@ export type ParentRenderContext = {
 
 **Flow Through Rendering Pipeline:**
 
-```
-Parent Component
-  <MyComponent header="Title">
-    <property name="headerTemplate">
-      <H2>{$processedHeader}</H2>
-    </property>
-    <Button label="Click me" />
-  </MyComponent>
-    ↓
-CompoundComponent assembles parent render context:
-  {
-    renderChild: parentRenderChild,
-    props: {
-      header: "Title",
-      headerTemplate: [{ type: "H2", children: [...] }]
-    },
-    children: [{ type: "Button", props: { label: "Click me" } }]
-  }
-    ↓
-Passed to renderChild as third parameter
-    ↓
-Flows through ComponentWrapper → ComponentAdapter
-    ↓
-Available in slotRenderer when Slot is encountered
-    ↓
-slotRenderer uses:
-  - parentRenderContext.props[templateName] for named slots
-  - parentRenderContext.children for default slot
-  - parentRenderContext.renderChild to render content
-```
+1. **Parent Component Usage**
+   ```xml
+   <MyComponent header="Title">
+     <property name="headerTemplate">
+       <H2>{$processedHeader}</H2>
+     </property>
+     <Button label="Click me" />
+   </MyComponent>
+   ```
+
+2. **Parent Render Context Assembly** - CompoundComponent assembles:
+   ```ts
+   {
+     renderChild: parentRenderChild,
+     props: {
+       header: "Title",
+       headerTemplate: [{ type: "H2", children: [...] }]
+     },
+     children: [{ type: "Button", props: { label: "Click me" } }]
+   }
+   ```
+
+3. **Context Propagation** - Passed to `renderChild` as third parameter
+
+4. **Rendering Flow** - Flows through ComponentWrapper → ComponentAdapter
+
+5. **Slot Detection** - Available in slotRenderer when Slot is encountered
+
+6. **Content Resolution** - slotRenderer uses:
+   - `parentRenderContext.props[templateName]` for named slots
+   - `parentRenderContext.children` for default slot
+   - `parentRenderContext.renderChild` to render content
 
 **Scope Preservation:**
 
 The parent render context preserves the parent's rendering scope, which is critical for correct slot behavior:
 
-```xmlui
+```xml
 <!-- Parent Component -->
 <App var.userName="Alice">
   <MyDialog>
@@ -748,70 +733,47 @@ Without parent render context preservation, the template would render in MyDialo
 
 **Complete Flow:**
 
-```
-1. Parent Component References User-Defined Component
+1. **Parent Component References User-Defined Component**
+   ```xml
    <ActionBar header="Menu">
      <Button label="Save" />
      <Button label="Cancel" />
    </ActionBar>
-       ↓
-2. ComponentWrapper receives component definition
-       ↓
-3. ComponentWrapper routes to ComponentAdapter
-       ↓
-4. ComponentAdapter queries ComponentRegistry
+   ```
+
+2. **ComponentWrapper** receives component definition
+3. **ComponentWrapper** routes to ComponentAdapter
+4. **ComponentAdapter** queries ComponentRegistry
    - Receives: renderer, descriptor, isCompoundComponent=true
    - Renderer is CompoundComponentHolder
-       ↓
-5. ComponentAdapter prepares RendererContext
+5. **ComponentAdapter** prepares RendererContext
    - Assembles state, extractValue, lookupEventHandler, etc.
    - Skips behavior application (isCompoundComponent=true)
-       ↓
-6. ComponentAdapter calls CompoundComponentHolder(rendererContext)
-       ↓
-7. CompoundComponentHolder wraps in CompoundComponent
-       ↓
-8. CompoundComponent resolves properties
+6. **ComponentAdapter** calls CompoundComponentHolder(rendererContext)
+7. **CompoundComponentHolder** wraps in CompoundComponent
+8. **CompoundComponent** resolves properties
    - Extracts "Menu" from header property
    - Creates resolvedProps: { header: "Menu" }
-       ↓
-9. CompoundComponent assembles Container for implementation
+9. **CompoundComponent** assembles Container for implementation
    - Injects $props, emitEvent, hasEventHandler, vars, methods
-       ↓
-10. CompoundComponent creates parent render context
+10. **CompoundComponent** creates parent render context
     - props: { header: "Menu" }
     - children: [Button, Button]
     - renderChild: parent's renderChild function
-       ↓
-11. CompoundComponent calls renderChild(containerNode, layoutContext, parentRenderContext)
-       ↓
-12. renderChild routes through ComponentWrapper → ContainerWrapper → ComponentAdapter
-       ↓
-13. ComponentAdapter renders component's internal Card, HStack, H3, Slot
-       ↓
-14. ComponentAdapter encounters Slot component (type === "Slot")
-       ↓
-15. ComponentAdapter calls slotRenderer(rendererContext, parentRenderContext)
-       ↓
-16. slotRenderer determines slot type (default, unnamed)
-       ↓
-17. slotRenderer extracts slot properties (if any)
-       ↓
-18. slotRenderer retrieves content from parentRenderContext.children
-       ↓
-19. slotRenderer delegates to SlotItem
-       ↓
-20. SlotItem transforms slot props to context variables
-    - Creates Container with contextVars
-       ↓
-21. SlotItem calls parentRenderContext.renderChild(containerizedNode)
-       ↓
-22. Parent's renderChild renders Button components in parent's scope
-       ↓
-23. Buttons render with access to parent's variables, IDs, event handlers
-       ↓
-24. Full component tree assembled and returned to parent
-```
+11. **CompoundComponent** calls renderChild(containerNode, layoutContext, parentRenderContext)
+12. **renderChild** routes through ComponentWrapper → ContainerWrapper → ComponentAdapter
+13. **ComponentAdapter** renders component's internal Card, HStack, H3, Slot
+14. **ComponentAdapter** encounters Slot component (type === "Slot")
+15. **ComponentAdapter** calls slotRenderer(rendererContext, parentRenderContext)
+16. **slotRenderer** determines slot type (default, unnamed)
+17. **slotRenderer** extracts slot properties (if any)
+18. **slotRenderer** retrieves content from parentRenderContext.children
+19. **slotRenderer** delegates to SlotItem
+20. **SlotItem** transforms slot props to context variables and creates Container with contextVars
+21. **SlotItem** calls parentRenderContext.renderChild(containerizedNode)
+22. **Parent's renderChild** renders Button components in parent's scope
+23. **Buttons** render with access to parent's variables, IDs, event handlers
+24. **Full component tree** assembled and returned to parent
 
 **Key Transition Points:**
 
@@ -852,7 +814,7 @@ This scope management ensures that:
 
 Slots can be conditionally rendered based on component state or properties:
 
-```xmlui
+```xml
 <Component name="CollapsiblePanel">
   <variable name="isExpanded" value="{$props.defaultExpanded ?? false}" />
   
@@ -866,108 +828,18 @@ Slots can be conditionally rendered based on component state or properties:
         onClick="isExpanded = !isExpanded" />
     </HStack>
     
-    <If condition="{isExpanded}">
-      <Slot />
-    </If>
+    <Slot when="{isExpanded}"/>
   </Card>
 </Component>
 ```
 
-The default slot only renders when `isExpanded` is true. The `<If>` component controls slot rendering based on component state.
-
-### Nested Slots
-
-Slots can contain other slots, enabling multi-level template composition:
-
-```xmlui
-<Component name="MasterDetail">
-  <FlowLayout>
-    <VStack width="30%">
-      <Slot name="masterTemplate">
-        <Text>Master list goes here</Text>
-      </Slot>
-    </VStack>
-    <VStack width="70%">
-      <Slot name="detailTemplate">
-        <Card>
-          <Slot name="detailHeaderTemplate">
-            <H3>Detail Header</H3>
-          </Slot>
-          <Slot name="detailContentTemplate">
-            <Text>Detail content goes here</Text>
-          </Slot>
-        </Card>
-      </Slot>
-    </VStack>
-  </FlowLayout>
-</Component>
-```
-
-Parent components can provide templates at each level:
-
-```xmlui
-<MasterDetail>
-  <property name="masterTemplate">
-    <ItemList items="{users}" />
-  </property>
-  <property name="detailTemplate">
-    <UserDetail user="{selectedUser}">
-      <property name="detailHeaderTemplate">
-        <HStack>
-          <Avatar src="{selectedUser.avatar}" />
-          <H2>{selectedUser.name}</H2>
-        </HStack>
-      </property>
-      <property name="detailContentTemplate">
-        <UserProfile user="{selectedUser}" />
-      </property>
-    </UserDetail>
-  </property>
-</MasterDetail>
-```
-
-Each nested component can define its own slots, creating hierarchical template composition.
-
-### Slot Properties with Arrow Functions
-
-Slot properties can be arrow functions that execute in the component's scope:
-
-```xmlui
-<Component name="DataTable">
-  <variable name="sortedData" value="{sortData($props.data, $props.sortBy)}" />
-  
-  <For items="{sortedData}">
-    <Slot 
-      name="rowTemplate"
-      row="{$item}"
-      index="{$index}"
-      isEven="{$index % 2 === 0}"
-      formatCurrency="(value) => '$' + value.toFixed(2)"
-      formatDate="(dateStr) => new Date(dateStr).toLocaleDateString()">
-      <Text>{$row.name}</Text>
-    </Slot>
-  </For>
-</Component>
-
-<!-- Parent Usage -->
-<DataTable data="{salesData}" sortBy="date">
-  <property name="rowTemplate">
-    <Card backgroundColor="{$isEven ? 'gray.50' : 'white'}">
-      <Text>{$index + 1}. {$row.product}</Text>
-      <Text>Amount: {$formatCurrency($row.amount)}</Text>
-      <Text>Date: {$formatDate($row.date)}</Text>
-    </Card>
-  </property>
-</DataTable>
-```
-
-Arrow function slot properties provide utility functions that execute in the component's scope but are callable from the parent's template. This pattern enables components to provide formatting, validation, or data transformation functions to parent templates.
+The default slot only renders when `isExpanded` is true. The `when` attribute of `Slot` controls slot rendering based on component state.
 
 ### Default Content with Slot Properties
 
 Slots can provide both default content and slot properties:
 
-```xmlui
+```xml
 <Component name="StatusBadge">
   <variable name="statusColor" value="{getColorForStatus($props.status)}" />
   <variable name="statusIcon" value="{getIconForStatus($props.status)}" />
@@ -1017,33 +889,11 @@ This pattern allows components to provide sensible defaults while enabling paren
 - Prefix event properties with `on` (e.g., `onValueChanged`, `onSubmit`)
 - Keep names concise but descriptive
 
-### Property Validation
-
-Use default values and type checking in component implementation:
-
-```xmlui
-<Component name="Avatar">
-  <variable name="validSize" value="{['sm', 'md', 'lg'].includes($props.size) ? $props.size : 'md'}" />
-  <variable name="initials" value="{$props.name ? $props.name.substring(0, 2).toUpperCase() : '??'}" />
-  
-  <If condition="{$props.src}">
-    <Image src="{$props.src}" width="{validSize}" height="{validSize}" />
-  </If>
-  <If condition="{!$props.src}">
-    <Card width="{validSize}" height="{validSize}">
-      <Text>{initials}</Text>
-    </Card>
-  </If>
-</Component>
-```
-
-This pattern provides fallbacks for missing or invalid properties.
-
 ### State Management
 
 Keep component state internal and communicate changes through events:
 
-```xmlui
+```xml
 <Component name="SearchBox">
   <variable name="query" value="{$props.initialQuery ?? ''}" />
   <variable name="results" value="{[]}" />
@@ -1059,11 +909,11 @@ Keep component state internal and communicate changes through events:
       emitEvent('searchCompleted', { query, results: newResults });
     </method>
     
-    <For items="{results}">
+    <Items data="{results}">
       <Slot name="resultTemplate" result="{$item}" index="{$index}">
         <Text>{$result.title}</Text>
       </Slot>
-    </For>
+    </Items>
   </VStack>
 </Component>
 ```
@@ -1074,7 +924,7 @@ The component manages internal state (`query`, `results`) and notifies parent of
 
 Always provide meaningful default content for slots:
 
-```xmlui
+```xml
 <Component name="Card">
   <Card>
     <Slot name="headerTemplate">
@@ -1093,42 +943,6 @@ Always provide meaningful default content for slots:
 ```
 
 Default content provides fallback rendering when parents don't provide custom templates, making components more robust and self-documenting.
-
-### Composition Over Inheritance
-
-Use slot composition to build specialized components from generic ones:
-
-```xmlui
-<!-- Generic Dialog Component -->
-<Component name="Dialog">
-  <ModalDialog>
-    <Slot name="headerTemplate" />
-    <Slot />
-    <Slot name="actionsTemplate" />
-  </ModalDialog>
-</Component>
-
-<!-- Specialized Confirmation Dialog -->
-<Component name="ConfirmDialog">
-  <Dialog>
-    <property name="headerTemplate">
-      <HStack>
-        <Icon name="alert-triangle" color="warn" />
-        <H3>{$props.title}</H3>
-      </HStack>
-    </property>
-    
-    <Text>{$props.message}</Text>
-    
-    <property name="actionsTemplate">
-      <Button label="Cancel" onClick="emitEvent('cancel')" />
-      <Button label="Confirm" onClick="emitEvent('confirm')" variant="primary" />
-    </property>
-  </Dialog>
-</Component>
-```
-
-This pattern creates component hierarchies through composition rather than requiring inheritance mechanisms.
 
 ## Implementation Notes for Framework Developers
 
@@ -1152,8 +966,6 @@ This pattern creates component hierarchies through composition rather than requi
 - Container wrapping ensures component state doesn't pollute parent or global state
 - Slot content renders in isolated Container scope with context variables
 
-### Error Handling
-
 **Slot Name Validation:**
 
 Named slots must end with "Template" suffix. The `slotRenderer` function validates this and renders an `InvalidComponent` with error message if violated:
@@ -1174,45 +986,6 @@ if (templateName && !templateName.endsWith("Template")) {
 
 This validation prevents common mistakes and provides clear error messages during development.
 
-**Component Registry Failures:**
-
-When ComponentAdapter can't find a renderer for a component type, it renders `UnknownComponent`:
-
-```typescript
-if (!renderer) {
-  console.error(
-    `Component '${safeNode.type}' is not available. Did you forget to register it?`,
-  );
-  return <UnknownComponent message={`${safeNode.type}`} />;
-}
-```
-
-This provides graceful degradation and clear feedback when components are referenced but not defined.
-
-**Rendering Exceptions:**
-
-ComponentAdapter wraps rendering in try-catch and renders `InvalidComponent` with error details when exceptions occur:
-
-```typescript
-try {
-  renderedNode = renderer(rendererContext);
-  // ... behavior application, decoration ...
-} catch (e) {
-  renderingError = (e as Error)?.message || "Internal error";
-  console.error(e);
-}
-
-if (renderingError) {
-  return (
-    <InvalidComponent errors={[renderingError]} node={safeNode}>
-      {renderedNode}
-    </InvalidComponent>
-  );
-}
-```
-
-This ensures rendering errors don't crash the entire application.
-
 ### Extensibility Points
 
 **Custom Component Registration:**
@@ -1230,83 +1003,6 @@ export default {
     }
   ],
 };
-```
-
-**Slot Renderer Extension:**
-
-The `slotRenderer` function is internal to ComponentAdapter but could be extended to support additional slot features:
-- Conditional slots based on media queries
-- Slot content caching for performance
-- Slot content validation against schemas
-
-**Parent Render Context Extension:**
-
-The parent render context structure could be extended to include additional information:
-- Parent component metadata
-- Parent state snapshots
-- Parent event handler registry
-
-### Testing Strategies
-
-**Component Testing:**
-
-Test user-defined components by providing test implementations:
-
-```typescript
-await initTestBed(`<MyComponent testProp="value" />`, {
-  components: [
-    `
-    <Component name="MyComponent">
-      <Text>{$props.testProp}</Text>
-    </Component>
-    `,
-  ],
-});
-```
-
-**Slot Testing:**
-
-Test slot transposition by providing parent children and templates:
-
-```typescript
-await initTestBed(
-  `
-  <MyComponent>
-    <property name="headerTemplate">
-      <Text>Custom Header</Text>
-    </property>
-    <Text>Default content</Text>
-  </MyComponent>
-  `,
-  {
-    components: [`<Component name="MyComponent">...</Component>`],
-  }
-);
-```
-
-**Slot Properties Testing:**
-
-Test slot properties by verifying context variables are available:
-
-```typescript
-await initTestBed(
-  `
-  <MyComponent>
-    <property name="itemTemplate">
-      <Text>{$item} at {$index}</Text>
-    </property>
-  </MyComponent>
-  `,
-  {
-    components: [
-      `
-      <Component name="MyComponent">
-        <Slot name="itemTemplate" item="Apple" index="{0}" />
-      </Component>
-      `,
-    ],
-  }
-);
 ```
 
 ## Summary
