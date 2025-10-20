@@ -26,7 +26,14 @@ All behaviors implement a simple contract with three members:
 export interface Behavior {
   name: string;
   canAttach: (node: ComponentDef, metadata: ComponentMetadata) => boolean;
-  attach: (context: RendererContext<any>, node: ReactNode) => ReactNode;
+  // The attach method now receives an optional metadata argument so
+  // behaviors can make use of component descriptor information when
+  // transforming the rendered node.
+  attach: (
+    context: RendererContext<any>,
+    node: ReactNode,
+    metadata?: ComponentMetadata
+  ) => ReactNode;
 }
 ```
 
@@ -51,11 +58,14 @@ const behaviors = componentRegistry.getBehaviors();
 
 // 3. Apply behaviors sequentially (skip compound components)
 if (!isCompoundComponent) {
-  for (const behavior of behaviors) {
-    if (behavior.canAttach(rendererContext.node, descriptor)) {
-      renderedNode = behavior.attach(rendererContext, renderedNode);
+    for (const behavior of behaviors) {
+      if (behavior.canAttach(rendererContext.node, descriptor)) {
+        // Pass the component metadata into attach so behaviors that need
+        // descriptor-level information (for example, to avoid wrapping
+        // components marked `opaque` or `nonVisual`) can use it.
+        renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
+      }
     }
-  }
 }
 
 // 4. Continue with decoration, API binding, layout wrapping...
@@ -67,9 +77,9 @@ if (!isCompoundComponent) {
 2. **Behavior Retrieval** - `componentRegistry.getBehaviors()` returns all registered behaviors from the central registry (framework behaviors plus any contributed by external packages)
 3. **Compound Check** - If the component is a compound (XMLUI-defined) component, skip all behaviors to avoid wrapping internal structure
 4. **Sequential Evaluation** - For each behavior in order:
-   - Call `canAttach(node, metadata)` with the component definition and its metadata descriptor
-   - If true, call `attach(context, renderedNode)` to wrap the node
-   - The wrapped node becomes the input for the next behavior
+  - Call `canAttach(node, metadata)` with the component definition and its metadata descriptor
+  - If true, call `attach(context, renderedNode, metadata)` to wrap the node; the metadata is passed so behaviors can consult descriptor-level information during attachment
+  - The wrapped node becomes the input for the next behavior
 5. **Result** - Multiple behaviors create nested wrappers in application order (tooltip innermost, label outermost)
 
 This placement ensures behaviors wrap the core component but remain inside decorations (test IDs), API bindings, and layout wrappers.
@@ -360,13 +370,15 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 **Example - Tooltip Behavior Using Context:**
 
 ```typescript
-attach: (context, node) => {
+attach: (context, node, metadata) => {
   const { extractValue } = context;
   const tooltipText = extractValue(context.node.props?.tooltip, true);
   const tooltipMarkdown = extractValue(context.node.props?.tooltipMarkdown, true);
   const tooltipOptions = extractValue(context.node.props?.tooltipOptions, true);
   const parsedOptions = parseTooltipOptions(tooltipOptions);
 
+  // metadata may be used to alter behavior for components marked nonVisual
+  // or opaque; it's passed in for richer decision-making.
   return (
     <Tooltip text={tooltipText} markdown={tooltipMarkdown} {...parsedOptions}>
       {node}
@@ -408,7 +420,7 @@ try {
   if (!isCompoundComponent) {
     for (const behavior of behaviors) {
       if (behavior.canAttach(rendererContext.node, descriptor)) {
-        renderedNode = behavior.attach(rendererContext, renderedNode);
+        renderedNode = behavior.attach(rendererContext, renderedNode, descriptor);
       }
     }
   }

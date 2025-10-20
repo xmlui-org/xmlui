@@ -65,7 +65,7 @@ type RuntimeProps = {
   component?: ComponentDef | CompoundComponentDef;
   file?: string;
   src?: string;
-};
+}
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -743,19 +743,26 @@ function useStandalone(
         errorComponents.push(loadedEntryPoint!.component as ComponentDef);
       }
 
-      // -- Load the main component's code-behind file if any
-      const mainCodeBehind = loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE;
-      let loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
-        try {
-          const resp = await fetchWithoutCache(resolvePath(MAIN_FILE, mainCodeBehind));
-          const codeBehind = await parseCodeBehindResponse(resp);
-          resolve(codeBehind?.hasError ? codeBehind : codeBehind.codeBehind);
-        } catch (e) {
-          resolve(null);
+      let loadedEntryPointCodeBehind = null;
+      if (loadedEntryPoint.component.props?.codeBehind !== undefined) {
+        // --- We have a code-behind file for the main component
+        loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
+          try {
+            const resp = await fetchWithoutCache(
+              resolvePath(
+                MAIN_FILE,
+                loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE,
+              ),
+            );
+            const codeBehind = await parseCodeBehindResponse(resp);
+            resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
+          } catch (e) {
+            resolve(null);
+          }
+        })) as any;
+        if (loadedEntryPointCodeBehind.hasError) {
+          errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
         }
-      })) as any;
-      if (loadedEntryPointCodeBehind?.hasError) {
-        errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
       }
 
       // --- Check if any of the components have markup errors
@@ -790,6 +797,9 @@ function useStandalone(
         } else {
           if (compWrapper.file) {
             sources[compWrapper.file] = compWrapper.src;
+            // resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
+            // resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint.component;
+            // resolvedRuntime.projectCompilation.entrypoint.markupSource = loadedEntryPoint.src;
           }
         }
       });
@@ -875,30 +885,38 @@ function useStandalone(
               definition: compWrapper.component as CompoundComponentDef,
             };
 
-            const componentCodeBehindFile =
-              (compWrapper.component as CompoundComponentDef)?.codeBehind ||
-              `${componentPath}.${codeBehindFileExtension}`;
-            let componentCodeBehind = (await new Promise(async (resolve) => {
-              try {
-                const codeBehind = await fetchWithoutCache(
-                  resolvePath(`components/${componentPath}`, componentCodeBehindFile),
-                );
-                const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
-                if (codeBehindWrapper.hasError) {
-                  errorComponents.push(codeBehindWrapper.component as ComponentDef);
+            let componentCodeBehind = null;
+            if (
+              "codeBehind" in compWrapper.component &&
+              compWrapper.component?.codeBehind !== undefined
+            ) {
+              // --- Promises for the component code-behind files
+              componentCodeBehind = (await new Promise(async (resolve) => {
+                try {
+                  const codeBehind = await fetchWithoutCache(
+                    resolvePath(
+                      `components/${componentPath}`,
+                      (compWrapper.component as CompoundComponentDef)?.codeBehind ||
+                        `${componentPath}.${codeBehindFileExtension}`,
+                    ),
+                  );
+                  const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
+                  if (codeBehindWrapper.hasError) {
+                    errorComponents.push(codeBehindWrapper.component as ComponentDef);
+                  }
+                  resolve(
+                    codeBehindWrapper.hasError
+                      ? (codeBehindWrapper.component as CompoundComponentDef)
+                      : codeBehindWrapper,
+                  );
+                } catch {
+                  resolve(null);
                 }
-                resolve(
-                  codeBehindWrapper.hasError
-                    ? (codeBehindWrapper.component as CompoundComponentDef)
-                    : codeBehindWrapper,
-                );
-              } catch {
-                resolve(null);
-              }
-            })) as any;
+              })) as Promise<CompoundComponentDef | ParsedResponse>;
 
-            if (componentCodeBehind && "src" in componentCodeBehind) {
-              compCompilation.codeBehindSource = (componentCodeBehind as any).src;
+              if (componentCodeBehind && "src" in componentCodeBehind) {
+                compCompilation.codeBehindSource = componentCodeBehind.src;
+              }
             }
 
             resolvedRuntime.projectCompilation.components.push(compCompilation);
