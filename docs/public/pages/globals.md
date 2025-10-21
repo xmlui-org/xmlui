@@ -198,6 +198,8 @@ formatDateTime(new Date(), "yyyy-MM-dd'T'HH:mm:ss")  // "2025-10-20T14:30:45"
 formatDateTime(new Date(), "EEEE, MMMM d 'at' h:mm a") // "Monday, October 20 at 2:30 PM"
 ```
 
+See [common format patterns](#formatdate) in the `formatDate` documentation.
+
 ### `formatDateWithoutYear`
 
 ```ts
@@ -231,6 +233,8 @@ formatTime(new Date(), "h:mm a")          // "2:30 PM"
 formatTime(new Date(), "HH:mm")           // "14:30"
 formatTime(new Date(), "hh:mm:ss a")      // "02:30:45 PM"
 ```
+
+See [common format patterns](#formatdate) in the `formatDate` documentation.
 
 ### `formatTimeWithoutSeconds`
 
