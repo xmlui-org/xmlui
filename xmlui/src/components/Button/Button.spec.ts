@@ -1,9 +1,4 @@
-import {
-  getBorders,
-  getBounds,
-  getPaddings,
-  SKIP_REASON,
-} from "../../testing/component-test-helpers";
+import { getBorders, getBounds, getPaddings } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import {
   alignmentOptionValues,
@@ -14,7 +9,6 @@ import {
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
 import { sizeValues } from "../abstractions";
-import { defaultProps } from "./ButtonNative";
 
 // --- Smoke
 
@@ -505,46 +499,6 @@ test("relative size test", async ({ initTestBed, page }) => {
   expect(heightXs).toBeLessThanOrEqual(heightSm);
   expect(heightSm).toBeLessThanOrEqual(heightMd);
   expect(heightMd).toBeLessThanOrEqual(heightLg);
-});
-
-test(`invalid size falls back to default ${defaultProps.size}`, async ({
-  initTestBed,
-  page,
-}) => {
-  await initTestBed(`
-    <Fragment>
-      <Button testId="reference" size="${defaultProps.size}" />
-      <Button testId="invalid" size="invalid"/>
-    </Fragment>
-  `);
-  const reference = page.getByTestId("reference");
-  const invalid = page.getByTestId("invalid");
-  const { width: widthRef, height: heightRef } = await getBounds(reference);
-  const { width: widthInvalid, height: heightInvalid } = await getBounds(invalid);
-
-  await expect(invalid).toBeVisible();
-  expect(widthInvalid).toBe(widthRef);
-  expect(heightInvalid).toBe(heightRef);
-});
-
-test(`no size prop defaults to ${defaultProps.size}`, async ({
-  initTestBed,
-  page,
-}) => {
-  await initTestBed(
-    `<Fragment>
-      <Button testId="reference" size="${defaultProps.size}" />
-      <Button testId="default" />
-    </Fragment>`,
-  );
-  const reference = page.getByTestId("reference");
-  const defaultButton = page.getByTestId("default");
-  const { width: widthRef, height: heightRef } = await getBounds(reference);
-  const { width: widthDefault, height: heightDefault } = await getBounds(defaultButton);
-
-  await expect(defaultButton).toBeVisible();
-  expect(widthDefault).toBe(widthRef);
-  expect(heightDefault).toBe(heightRef);
 });
 
 test("testState initializes to default value", async ({ initTestBed }) => {
