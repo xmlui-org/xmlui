@@ -10,8 +10,29 @@ $themeVars: ();
 $component: "Accordion";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
-$borderRadius: createThemeVar("borderRadius-#{$component}");
 
+// Generic Accordion variables
+$borderRadius-Accordion: createThemeVar("borderRadius-Accordion");
+
+// Header variables
+$verticalAlignment-header-Accordion: createThemeVar("verticalAlignment-header-Accordion");
+$fontSize-header-Accordion: createThemeVar("fontSize-header-Accordion");
+$fontWeight-header-Accordion: createThemeVar("fontWeight-header-Accordion");
+$fontStyle-header-Accordion: createThemeVar("fontStyle-header-Accordion");
+$paddingVertical-header-Accordion: createThemeVar("paddingVertical-header-Accordion");
+$paddingHorizontal-header-Accordion: createThemeVar("paddingHorizontal-header-Accordion");
+$backgroundColor-header-Accordion: createThemeVar("backgroundColor-header-Accordion");
+$color-header-Accordion: createThemeVar("color-header-Accordion");
+$backgroundColor-header-Accordion-hover: createThemeVar("backgroundColor-header-Accordion--hover");
+
+// Content variables
+$color-content-Accordion: createThemeVar("color-content-Accordion");
+$backgroundColor-content-Accordion: createThemeVar("backgroundColor-content-Accordion");
+
+// Icon variables
+$width-icon-Accordion: createThemeVar("width-icon-Accordion");
+$height-icon-Accordion: createThemeVar("height-icon-Accordion");
+$color-icon-Accordion: createThemeVar("color-icon-Accordion");
 
 @layer components {
   .root {
@@ -29,13 +50,13 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
 
     &:first-child {
       margin-top: 0;
-      border-top-left-radius: $borderRadius;
-      border-top-right-radius: $borderRadius;
+      border-top-left-radius: $borderRadius-Accordion;
+      border-top-right-radius: $borderRadius-Accordion;
     }
 
     &:last-child {
-      border-bottom-left-radius: $borderRadius;
-      border-bottom-right-radius: $borderRadius;
+      border-bottom-left-radius: $borderRadius-Accordion;
+      border-bottom-right-radius: $borderRadius-Accordion;
     }
 
     &:focus-within {
@@ -53,19 +74,19 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
     font-family: inherit;
     flex: 1;
     display: inline-flex;
-    align-items: createThemeVar("verticalAlignment-header-#{$component}");
+    align-items: $verticalAlignment-header-Accordion;
     justify-content: space-between;
     line-height: 1;
     box-sizing: border-box;
-    font-size: createThemeVar("fontSize-header-#{$component}");
-    font-weight: createThemeVar("fontWeight-header-#{$component}");
-    font-style: createThemeVar("fontStyle-header-#{$component}");
-    padding: createThemeVar("paddingVertical-header-#{$component}") createThemeVar("paddingHorizontal-header-#{$component}");
-    background-color: createThemeVar("backgroundColor-header-#{$component}");
-    color: createThemeVar("color-header-#{$component}");
+    font-size: $fontSize-header-Accordion;
+    font-weight: $fontWeight-header-Accordion;
+    font-style: $fontStyle-header-Accordion;
+    padding: $paddingVertical-header-Accordion $paddingHorizontal-header-Accordion;
+    background-color: $backgroundColor-header-Accordion;
+    color: $color-header-Accordion;
 
     &:hover {
-      background-color: createThemeVar("backgroundColor-header-#{$component}-hover");
+      background-color: $backgroundColor-header-Accordion-hover;
     }
 
     &.triggerStart {
@@ -75,8 +96,8 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
 
   .contentWrapper {
     overflow: hidden;
-    color: createThemeVar("color-content-#{$component}");
-    background-color: createThemeVar("backgroundColor-content-#{$component}");
+    color: $color-content-Accordion;
+    background-color: $backgroundColor-content-Accordion;
 
     &[data-state='open'] {
       animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
@@ -92,9 +113,9 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
   }
 
   .chevron {
-    width: createThemeVar("width-icon-#{$component}");
-    height: createThemeVar("height-icon-#{$component}");
-    color: createThemeVar("color-icon-#{$component}");
+    width: $width-icon-Accordion;
+    height: $height-icon-Accordion;
+    color: $color-icon-Accordion;
   }
 
   @keyframes slideDown {
