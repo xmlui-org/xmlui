@@ -6,7 +6,7 @@
     "start": "echo '====================================================================\nExecuting \"npm run watch-docs-content\" in the project root,\nyou get automatic content generation based on xmlui metadata!\n====================================================================\n' && xmlui start",
     "preview": "xmlui preview",
     "gen:rss": "node scripts/generate-rss.js",
-    "build:blog": "npm run gen:rss && xmlui build --buildMode=INLINE_ALL --withMock",
+    "build:blog": "npm run gen:rss && xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --source=xmlui-optimized-output --target=ui.zip",
     "build-optimized": "npx xmlui-optimizer",
     "release-ci-optimized": "npm run gen:rss && npm run build-optimized",
     "preview-optimized": "npx serve@latest ./xmlui-optimized-output"
