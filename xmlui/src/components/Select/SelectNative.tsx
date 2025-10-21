@@ -453,7 +453,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   );
 
   const onOptionAdd = useCallback((option: Option) => {
-    setOptions((prev) => new Set(prev).add(option));
+    setOptions((prev) => {
+      // Check if option with same value already exists
+      const exists = Array.from(prev).some((opt) => opt.value === option.value);
+      if (exists) {
+        return prev;
+      }
+      const newSet = new Set(prev);
+      newSet.add(option);
+      return newSet;
+    });
   }, []);
 
   const onOptionRemove = useCallback((option: Option) => {
@@ -488,10 +497,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        {/* Hidden render to collect options on mount */}
-        <div style={{ display: "none" }}>
-          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-        </div>
+        {/* Hidden render to collect options when dropdown is closed */}
+        {!open && (
+          <div style={{ display: "none" }}>
+            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+          </div>
+        )}
 
         <OptionTypeProvider Component={VisibleSelectOption}>
           <Popover
