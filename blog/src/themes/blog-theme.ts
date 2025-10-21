@@ -13,7 +13,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-content-App": "$color-surface-0",
 
     // --- App layout
-    "maxWidth-App": "840px",
+    //"maxWidth-App": "840px",
     "boxShadow-navPanel-App": "none",
 
     // --- We intentionally use different theming to amplify the "documentation" feel
@@ -46,7 +46,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
       "backgroundColor-separator-DocumentLinks": "#e2e5ea",
     },
     dark: {
-      // --- These colors match better with the dark tone 
+      // --- These colors match better with the dark tone
       "backgroundColor-content-App": "$color-surface-100",
       backgroundColor: "$color-surface-100",
       "backgroundColor-NavPanel": "$color-surface-50",

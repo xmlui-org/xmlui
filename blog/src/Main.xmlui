@@ -1,31 +1,27 @@
 <App
     layout="vertical-full-header"
     noScrollbarGutters
-    var.showNavPanelThreshold="{2}"
     var.posts=`{[
       {
         title: "Welcome to the XMLUI blog!",
         slug: "welcome-to-the-xmlui-blog",
+        description: "In our inaugural blog post we show how to build a simple blog engine with XMLUI.",
         author: "Jon Udell",
-        date: "2025-10-20",
+        date: "2025-10-22",
         image: "blog-scrabble.png"
       }
     ]}`>
-    <AppHeader showNavPanelIf="{posts.length > showNavPanelThreshold}">
+    <AppHeader>
         <property name="logoTemplate">
             <Link to="https://xmlui.org/">
                 <Logo height="$space-8"/>
             </Link>
         </property>
         <property name="profileMenuTemplate">
-            <Text variant="em">Tutorials, tips, best practices</Text>
-            <SpaceFiller />
-            <Link when="{!['/', '/blog'].includes($pathname)}" to="/">
-                <Button height="$space-6" padding="$space-2" label="All Posts" />
-            </Link>
+            <Text variant="em">XMLUI Blog: Tutorials, tips, best practices</Text>
         </property>
     </AppHeader>
-    <NavPanel when="{showNav()}">
+    <NavPanel>
        <NavGroup label="Recent posts" to="/blog">
             <NavLink
                 label="Welcome to the XMLUI blog!"
@@ -34,7 +30,6 @@
     </NavPanel>
     <Pages fallbackPath="/404">
         <Page url="/">
-            <Headlines />
             <BlogOverview posts="{posts}" />
         </Page>
         <Page url="/blog">
@@ -43,15 +38,17 @@
         <Page url="/blog/{posts[0].slug}">
             <BlogPage post="{posts[0]}" />
         </Page>
-        <Page url="/404">
-            <PageNotFound />
-        </Page>
     </Pages>
     <Footer>
-        <CHStack width="100%">
-            This site is an XMLUI™ app.
+        <HStack width="100%">
+            <Text>This site is an XMLUI™ app.</Text>
             <SpaceFiller />
             <ToneSwitch />
-        </CHStack>
+            <Image
+              width="$space-6"
+              height="$space-6"
+              onClick="window.location.href = '/feed.rss'"
+              src="/resources/rss.svg" />
+        </HStack>
     </Footer>
 </App>
