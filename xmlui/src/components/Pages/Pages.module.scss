@@ -1,14 +1,30 @@
 @use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$paddingVertical-Pages: createThemeVar("paddingVertical-Pages");
+$paddingHorizontal-Pages: createThemeVar("paddingHorizontal-Pages");
+$gap-Pages: createThemeVar("gap-Pages");
+
 @layer components {
   .wrapper{
-    padding-top: t.$space-5;
-    padding-bottom: t.$space-5;
-    padding-right: t.$space-4;
-    padding-left: t.$space-4;
-    gap: t.$space-5;
+    padding-top: $paddingVertical-Pages;
+    padding-bottom: $paddingVertical-Pages;
+    padding-right: $paddingHorizontal-Pages;
+    padding-left: $paddingHorizontal-Pages;
+    gap: $gap-Pages;
     display: flex;
     flex-direction: column;
     min-height: 100%;
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

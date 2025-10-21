@@ -1,6 +1,7 @@
 <App
-    layout="vertical"
-    var.showNavPanelThreshold="{6}"
+    layout="vertical-full-header"
+    noScrollbarGutters
+    var.showNavPanelThreshold="{2}"
     var.posts=`{[
       {
         title: "Welcome to the XMLUI blog!",
@@ -10,24 +11,11 @@
         image: "blog-scrabble.png"
       }
     ]}`>
-    <!--
-    <HStack verticalAlignment="center">
-        <Button variant="ghost" label="toggle showNav" onClick="toggleThreshold()" />
-        <Text>{showNav()}</Text>
-    </HStack>
-    -->
-    <AppState
-        id="navState"
-        initialValue="{{
-            showNavPanel: showNav(),
-            showNavPanelThreshold: showNavPanelThreshold,
-            posts: posts.length
-        }}" />
-    <AppHeader>
+    <AppHeader showNavPanelIf="{posts.length > showNavPanelThreshold}">
         <property name="logoTemplate">
-          <CHStack height="$space-6">
-            <Logo />
-          </CHStack>
+            <Link to="https://xmlui.org/">
+                <Logo height="$space-8"/>
+            </Link>
         </property>
         <property name="profileMenuTemplate">
             <Text variant="em">Tutorials, tips, best practices</Text>
@@ -46,6 +34,7 @@
     </NavPanel>
     <Pages fallbackPath="/404">
         <Page url="/">
+            <Headlines />
             <BlogOverview posts="{posts}" />
         </Page>
         <Page url="/blog">
