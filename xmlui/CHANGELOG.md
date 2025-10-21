@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.10.24
+
+### Patch Changes
+
+- 3e361c4: The xmlui-pg codefence now accepts emojies
+- 3e361c4: Exend the formatDate, formatDateTime, and formatTime functions with optional format strings
+
 ## 0.10.23
 
 ### Patch Changes

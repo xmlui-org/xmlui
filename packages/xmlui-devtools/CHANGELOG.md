@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.21
+
+### Patch Changes
+
+- 3e361c4: The xmlui-pg codefence now accepts emojies
+
 ## 0.1.20
 
 ### Patch Changes
