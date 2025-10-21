@@ -87,9 +87,23 @@ export const StateContainer = memo(
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
+    
+    // Debug ID to track different StateContainer instances
+    const instanceId = useRef(Math.random().toString(36).substring(7));
 
     const stateFromOutside = useShallowCompareMemoize(
-      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
+      useMemo(() => {
+        const extracted = extractScopedState(parentState, node.uses);
+        console.log(`[StateContainer ${instanceId.current}] extractScopedState:`, {
+          uses: node.uses,
+          parentStateKeys: Object.keys(parentState),
+          extractedKeys: Object.keys(extracted || {}),
+          hasTestCall: 'testCall' in (parentState || {}),
+          testCallValue: parentState?.['testCall'],
+          testCallHasExecute: parentState?.['testCall']?.execute !== undefined,
+        });
+        return extracted;
+      }, [node.uses, parentState]),
     );
 
     // --- All state manipulation happens through the container reducer, which is created here.
@@ -102,8 +116,17 @@ export const StateContainer = memo(
     // --- The exposed APIs of components are also the part of the state.
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
 
+    console.log(`[StateContainer ${instanceId.current}] Render - componentApis has`, Object.getOwnPropertySymbols(componentApis).length, "APIs", Object.getOwnPropertySymbols(componentApis).map(s => s.description));
+    console.log(`[StateContainer ${instanceId.current}] Render - componentState keys:`, Object.keys(componentState));
+    console.log(`[StateContainer ${instanceId.current}] Render - componentState symbols:`, Object.getOwnPropertySymbols(componentState).map(s => s.description));
+    console.log(`[StateContainer ${instanceId.current}] Render - componentState testCall:`, {
+      hasTestCall: 'testCall' in componentState,
+      testCallValue: componentState['testCall'],
+    });
+
     const componentStateWithApis = useShallowCompareMemoize(
       useMemo(() => {
+        console.log(`[StateContainer ${instanceId.current}] componentStateWithApis useMemo RUNNING`);
         const ret = { ...componentState };
         for (const stateKey of Object.getOwnPropertySymbols(componentState)) {
           const value = componentState[stateKey];
@@ -113,13 +136,22 @@ export const StateContainer = memo(
         }
         if (Reflect.ownKeys(componentApis).length === 0) {
           //skip containers with no registered apis
+          console.log(`[StateContainer ${instanceId.current}] Early return - no componentApis`);
           return ret;
         }
+        console.log(`[StateContainer ${instanceId.current}] Merging componentApis into componentState`);
+        console.log(`[StateContainer ${instanceId.current}] componentState keys:`, Object.keys(componentState));
+        console.log(`[StateContainer ${instanceId.current}] componentApis symbols:`, Object.getOwnPropertySymbols(componentApis).map(s => s.description));
         for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
           const value = componentApis[componentApiKey];
           if (componentApiKey.description) {
             const key = componentApiKey.description;
+            console.log(`[StateContainer ${instanceId.current}] Merging API for key "${key}":`, {
+              retBefore: ret[key],
+              apiValue: value,
+            });
             ret[key] = { ...(ret[key] || {}), ...value };
+            console.log(`[StateContainer ${instanceId.current}] Merged result for "${key}":`, ret[key]);
           }
           ret[componentApiKey] = { ...ret[componentApiKey], ...value };
         }
@@ -181,12 +213,27 @@ export const StateContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars,
     );
+    console.log(`[StateContainer ${instanceId.current}] resolvedLocalVars testCall:`, {
+      hasTestCall: 'testCall' in resolvedLocalVars,
+      testCallValue: resolvedLocalVars['testCall'],
+      testCallHasExecute: resolvedLocalVars['testCall']?.execute !== undefined,
+    });
+    console.log(`[StateContainer ${instanceId.current}] componentStateWithApis testCall:`, {
+      hasTestCall: 'testCall' in componentStateWithApis,
+      testCallValue: componentStateWithApis['testCall'],
+      testCallHasExecute: componentStateWithApis['testCall']?.execute !== undefined,
+    });
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
+    console.log(`[StateContainer ${instanceId.current}] mergedWithVars testCall:`, {
+      hasTestCall: 'testCall' in mergedWithVars,
+      testCallValue: mergedWithVars['testCall'],
+      testCallHasExecute: mergedWithVars['testCall']?.execute !== undefined,
+    });
     const combinedState = useCombinedState(
-      stateFromOutside,
-      node.contextVars,
-      mergedWithVars,
+      mergedWithVars,           // Local vars and component state (lower priority)
+      node.contextVars,         // Context vars like $item
+      stateFromOutside,         // Parent state (higher priority) - should override local vars
       routingParams,
     );
 

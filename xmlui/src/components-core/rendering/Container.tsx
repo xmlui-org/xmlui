@@ -156,12 +156,17 @@ export const Container = memo(
         options: LookupActionOptions | undefined,
         ...eventArgs: any[]
       ) => {
+        console.log("[Container] runCodeAsync called, componentUid:", componentUid.description, "eventName:", options?.eventName, "eventArgs:", eventArgs);
         // --- Check if the event handler can sign its lifecycle state
-        const canSignEventLifecycle = () =>
-          componentUid.description !== undefined && options?.eventName !== undefined;
+        const canSignEventLifecycle = () => {
+          const canSign = componentUid.description !== undefined && options?.eventName !== undefined;
+          console.log("[Container] canSignEventLifecycle:", canSign, "componentUid.description:", componentUid.description, "eventName:", options?.eventName);
+          return canSign;
+        };
 
         let changes: Array<any> = [];
         const getComponentStateClone = () => {
+          console.log("[Container] getComponentStateClone called");
           changes.length = 0;
           const poj = cloneDeep({ ...stateRef.current, ...(options?.context || {}) });
           poj["$this"] = stateRef.current[componentUid];
@@ -208,9 +213,11 @@ export const Container = memo(
         };
 
         try {
+          console.log("[Container] Entering try block, about to prepare statements");
           // --- Prepare the event handler to an arrow expression statement
           let statements: Statement[];
           if (typeof source === "string") {
+            console.log("[Container] Source is string:", source);
             if (!parsedStatementsRef.current[source]) {
               parsedStatementsRef.current[source] = prepareHandlerStatements(
                 parseHandlerCode(source),
@@ -236,10 +243,16 @@ export const Container = memo(
             ];
           }
 
+          console.log("[Container] Statements prepared, length:", statements?.length);
+          if (statements && statements.length > 0) {
+            console.log("[Container] First statement:", JSON.stringify(statements[0], null, 2).substring(0, 500));
+          }
           if (!statements?.length) {
+            console.log("[Container] No statements to execute, returning early");
             return;
           }
 
+          console.log("[Container] About to sign event lifecycle if needed");
           if (canSignEventLifecycle()) {
             // --- Sign the event handler has been started
             dispatch({
@@ -416,11 +429,15 @@ export const Container = memo(
 
         //if we have a context or ephemeral event handler, we don't cache it (otherwise we would have stale reference for the context)
         if (options?.ephemeral || options?.context) {
+          console.log("[Container] Returning ephemeral/context handler for:", options?.eventName);
           return handler;
         }
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
+          console.log("[Container] Creating new cached handler for:", fnCacheKey, "uid:", uid.description);
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = handler;
+        } else {
+          console.log("[Container] Reusing cached handler for:", fnCacheKey, "uid:", uid.description);
         }
         return fnsRef.current[uid][fnCacheKey];
       },
