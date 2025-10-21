@@ -1,5 +1,41 @@
 [
   {
+    "tag_name": "xmlui@0.10.22",
+    "published_at": "2025-10-17T06:33:28Z",
+    "changes": [
+      {
+        "description": "The behavior infrastructure now uses ComponentProvider and allows adding custom behaviors",
+        "commit_sha": "501f60a"
+      },
+      {
+        "description": "Extend Tab with the tabAlignment and accordionView properties",
+        "commit_sha": "1020f1c"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.22.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.22/xmlui-0.10.22.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.10.21",
+    "published_at": "2025-10-16T11:53:23Z",
+    "changes": [
+      {
+        "description": "Add custom Text variant styling",
+        "commit_sha": "6fd4d62"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.21.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.21/xmlui-0.10.21.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.20",
     "published_at": "2025-10-15T12:46:33Z",
     "changes": [
@@ -248,98 +284,6 @@
       {
         "name": "xmlui-0.10.13.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.13/xmlui-0.10.13.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.12",
-    "published_at": "2025-09-19T13:53:31Z",
-    "changes": [
-      {
-        "description": "fix: report errors in script tag",
-        "commit_sha": "f12a042"
-      },
-      {
-        "description": "Avatar does not issue a resource URL warning when \"url\" is not specified",
-        "commit_sha": "8731eb8"
-      },
-      {
-        "description": "refactor: change LineChart/BarChart property names",
-        "commit_sha": "eb6454f"
-      },
-      {
-        "description": "Fix the layout property usage of ModalDialog",
-        "commit_sha": "1210852"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.12.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.12/xmlui-0.10.12.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.11",
-    "published_at": "2025-09-18T05:57:44Z",
-    "changes": [
-      {
-        "description": "feat: style the error report colors and spaces in the browser for xmlui syntax errors",
-        "commit_sha": "8c76c8d"
-      },
-      {
-        "description": "RadioGroup now correctly handles different types of initialValue property values, applies readOnly property, and places necessary ARIA tags if the required property is set. Clarified component reference description on how RadioGroup and Option handles value types.",
-        "commit_sha": "d56c3e5"
-      },
-      {
-        "description": "Add FancyButton to xmlui-website-blocks",
-        "commit_sha": "e42d367"
-      },
-      {
-        "description": "feat: BarChart - add tooltip position tracking",
-        "commit_sha": "f539526"
-      },
-      {
-        "description": "Review Option handling in Select and RadioGroup",
-        "commit_sha": "19ce234"
-      },
-      {
-        "description": "feat: add animation support to all relevant components via animation and animationOptions props",
-        "commit_sha": "455b6c0"
-      },
-      {
-        "description": "feat: add support for 'uses' property",
-        "commit_sha": "e90dc73"
-      },
-      {
-        "description": "Update fontSize and lineHeight themes and style (may break existing xmlui code)",
-        "commit_sha": "819b563"
-      },
-      {
-        "description": "Add the autoDetectTone property to App",
-        "commit_sha": "b57dfa2"
-      },
-      {
-        "description": "Update Checkbox and Switch with click event metadata",
-        "commit_sha": "9dd0f97"
-      },
-      {
-        "description": "Select accepts null as an option value; it converts a value to a string no longer",
-        "commit_sha": "19ce234"
-      },
-      {
-        "description": "Extend Text and Heading APIs with hasOverflow",
-        "commit_sha": "898346d"
-      },
-      {
-        "description": "Fix RestApiProxy to deliver response status when no error body specified",
-        "commit_sha": "705dd04"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.11.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.11/xmlui-0.10.11.js"
       }
     ]
   }
