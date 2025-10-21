@@ -8,11 +8,9 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
 import { FocusScope } from "@radix-ui/react-focus-scope";
-import { SelectOption } from "./SelectOption";
 import styles from "./Select.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -21,13 +19,10 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import Icon from "../Icon/IconNative";
-import { SelectContext } from "./SelectContext";
+import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { OptionContext } from "./OptionContext";
+import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
-import { useIsInsideForm } from "../Form/FormContext";
-import { SimpleSelect } from "./SimpleSelect";
-import { MultiSelectOption } from "./MultiSelectOption";
 
 export const defaultProps = {
   enabled: true,
@@ -258,7 +253,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState(new Set<Option>());
-  const isInForm = useIsInsideForm();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
@@ -494,22 +488,38 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        {searchable || multiSelect ? (
-          <OptionTypeProvider Component={HiddenOption}>
-            <Popover open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger
-                {...rest}
-                ref={composeRefs(setReferenceElement, forwardedRef)}
+        {/* Hidden render to collect options on mount */}
+        <div style={{ display: "none" }}>
+          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+        </div>
+
+        <OptionTypeProvider Component={VisibleSelectOption}>
+          <Popover
+            open={open}
+            onOpenChange={(isOpen) => {
+              if (readOnly) return;
+              setOpen(isOpen);
+            }}
+            modal={false}
+          >
+            <PopoverTrigger {...rest} asChild>
+              <div
+                ref={(el) => {
+                  setReferenceElement(el);
+                  if (typeof forwardedRef === "function") {
+                    forwardedRef(el);
+                  } else if (forwardedRef) {
+                    forwardedRef.current = el;
+                  }
+                }}
                 id={id}
                 aria-haspopup="listbox"
                 style={style}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                disabled={!enabled}
                 aria-expanded={open}
                 onClick={(event) => {
-                  // Prevent event propagation to parent elements (e.g., DropdownMenu)
-                  // This ensures that clicking the Select trigger doesn't close the containing DropdownMenu
+                  if (!enabled || readOnly) return;
                   event.stopPropagation();
                   setOpen((prev) => !prev);
                 }}
@@ -522,6 +532,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   },
                   className,
                 )}
+                tabIndex={enabled ? 0 : -1}
                 autoFocus={autoFocus}
               >
                 <SelectTriggerValue
@@ -540,87 +551,200 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   readOnly={readOnly}
                   clearValue={clearValue}
                 />
-              </PopoverTrigger>
-              {open && (
-                <Portal container={root}>
-                  <FocusScope asChild loop trapped>
-                    <PopoverContent
-                      style={{ minWidth: width, height: dropdownHeight }}
-                      className={styles.selectContent}
-                      onKeyDown={handleKeyDown}
-                    >
-                      <div className={styles.command}>
-                        {searchable ? (
-                          <div className={styles.commandInputContainer}>
-                            <Icon name="search" />
-                            <input
-                              role="combobox"
-                              className={classnames(styles.commandInput)}
-                              placeholder="Search..."
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              autoFocus
-                            />
-                          </div>
-                        ) : (
-                          <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                        )}
-                        <div role="listbox" className={styles.commandList}>
-                          {inProgress && (
-                            <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                          )}
-                          {filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                            <MultiSelectOption
-                              key={value}
-                              readOnly={readOnly}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                              isHighlighted={selectedIndex === index}
-                              itemIndex={index}
-                            />
-                          ))}
-                          {!inProgress && filteredOptions.length === 0 && (
-                            <div>{emptyListNode}</div>
-                          )}
+              </div>
+            </PopoverTrigger>
+            {open && (
+              <Portal container={root}>
+                <FocusScope asChild loop trapped>
+                  <PopoverContent
+                    style={{ minWidth: width, height: dropdownHeight }}
+                    className={styles.selectContent}
+                    onKeyDown={handleKeyDown}
+                  >
+                    <div className={styles.command}>
+                      {searchable ? (
+                        <div className={styles.commandInputContainer}>
+                          <Icon name="search" />
+                          <input
+                            role="combobox"
+                            className={classnames(styles.commandInput)}
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                          />
                         </div>
+                      ) : (
+                        <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                      )}
+                      <div role="listbox" className={styles.commandList}>
+                        {inProgress ? (
+                          <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                        ) : searchable && searchTerm ? (
+                          // When searching, show only filtered options
+                          filteredOptions.length === 0 ? (
+                            <div>{emptyListNode}</div>
+                          ) : (
+                            filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                              <SelectOptionItem
+                                key={value}
+                                readOnly={readOnly}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                                isHighlighted={selectedIndex === index}
+                                itemIndex={index}
+                              />
+                            ))
+                          )
+                        ) : (
+                          // When not searching, show all children (includes Options and other components like Button)
+                          <>
+                            {children}
+                            {options.size === 0 && <div>{emptyListNode}</div>}
+                          </>
+                        )}
                       </div>
-                    </PopoverContent>
-                  </FocusScope>
-                </Portal>
-              )}
-            </Popover>
-            {children}
-          </OptionTypeProvider>
-        ) : (
-          <OptionTypeProvider Component={SelectOption}>
-            <SimpleSelect
-              {...rest}
-              readOnly={!!readOnly}
-              ref={forwardedRef}
-              key={isInForm ? (value ? `status-${value}` : "status-initial") : undefined} //workaround for https://github.com/radix-ui/primitives/issues/3135
-              value={value as SingleValueType}
-              onValueChange={toggleOption}
-              id={id}
-              style={style}
-              className={className}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              enabled={enabled}
-              validationStatus={validationStatus}
-              triggerRef={setReferenceElement}
-              autoFocus={autoFocus}
-              placeholder={placeholder}
-              height={dropdownHeight}
-              width={width}
-              emptyListNode={emptyListNode}
-            >
-              {children}
-            </SimpleSelect>
-          </OptionTypeProvider>
-        )}
+                    </div>
+                  </PopoverContent>
+                </FocusScope>
+              </Portal>
+            )}
+          </Popover>
+        </OptionTypeProvider>
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
 });
+
+// Visible option component for rendering items in the dropdown (used by OptionTypeProvider)
+function VisibleSelectOption(option: Option) {
+  const { value, label, enabled = true, children } = option;
+  const { onOptionAdd } = useOption();
+  const { value: selectedValue, onChange, multiSelect, setOpen, optionRenderer } = useSelect();
+
+  const opt: Option = useMemo(() => {
+    return {
+      ...option,
+      label: label ?? "",
+      keywords: option.keywords || [label ?? ""],
+    };
+  }, [option, label]);
+
+  useEffect(() => {
+    onOptionAdd(opt);
+    // Don't remove options when component unmounts - they should persist
+  }, [opt, onOptionAdd]);
+
+  const selected = useMemo(() => {
+    return Array.isArray(selectedValue) && multiSelect
+      ? selectedValue.map((v) => String(v)).includes(value)
+      : String(selectedValue) === String(value);
+  }, [selectedValue, value, multiSelect]);
+
+  const handleClick = () => {
+    if (enabled) {
+      onChange(value);
+    }
+  };
+
+  return (
+    <div
+      role="option"
+      aria-disabled={!enabled}
+      aria-selected={selected}
+      className={classnames(styles.multiSelectOption, {
+        [styles.disabledOption]: !enabled,
+      })}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onClick={handleClick}
+      data-state={selected ? "checked" : undefined}
+    >
+      <div className={styles.multiSelectOptionContent}>
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+        ) : (
+          <>
+            {children || label}
+            {selected && <Icon name="checkmark" />}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Internal option component for rendering items in the dropdown
+function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {
+  const {
+    value,
+    label,
+    enabled = true,
+    readOnly,
+    children,
+    isHighlighted = false,
+    itemIndex,
+  } = option;
+  const {
+    value: selectedValue,
+    onChange,
+    multiSelect,
+    setOpen,
+    setSelectedIndex,
+    optionRenderer,
+  } = useSelect();
+
+  const selected = useMemo(() => {
+    return Array.isArray(selectedValue) && multiSelect
+      ? selectedValue.map((v) => String(v)).includes(value)
+      : String(selectedValue) === String(value);
+  }, [selectedValue, value, multiSelect]);
+
+  const handleClick = () => {
+    if (readOnly) {
+      setOpen(false);
+      return;
+    }
+    if (enabled) {
+      onChange(value);
+    }
+  };
+
+  return (
+    <div
+      role="option"
+      aria-disabled={!enabled}
+      aria-selected={selected}
+      className={classnames(styles.multiSelectOption, {
+        [styles.disabledOption]: !enabled,
+        [styles.highlighted]: isHighlighted,
+      })}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseEnter={() => {
+        if (itemIndex !== undefined && setSelectedIndex && enabled) {
+          setSelectedIndex(itemIndex);
+        }
+      }}
+      onClick={handleClick}
+      data-state={selected ? "checked" : undefined}
+    >
+      <div className={styles.multiSelectOptionContent}>
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+        ) : (
+          <>
+            {children || label}
+            {selected && <Icon name="checkmark" />}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

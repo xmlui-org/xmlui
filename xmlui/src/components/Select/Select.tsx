@@ -20,7 +20,6 @@ import {
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectNative";
-import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "Select";
 
@@ -224,13 +223,7 @@ export const selectComponentRenderer = createComponentRenderer(
                       $selectedValue: val,
                       $inTrigger: inTrigger,
                     }}
-                    renderChild={(...args) =>
-                      multiSelect || searchable ? (
-                        renderChild(...args)
-                      ) : (
-                        <SelectItemText>{renderChild(...args)}</SelectItemText>
-                      )
-                    }
+                    renderChild={renderChild}
                   />
                 );
               }
