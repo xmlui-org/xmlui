@@ -26,6 +26,7 @@ import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
+import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -357,9 +358,9 @@ export const Markdown = memo(
             },
             samp({ ...props }) {
               const markdownContentBase64 = props?.["data-pg-markdown"];
-              const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
+              const markdownContent = markdownContentBase64 ? decodeFromBase64(markdownContentBase64) : "";
               const dataContentBase64 = props?.["data-pg-content"];
-              const jsonContent = atob(dataContentBase64);
+              const jsonContent = decodeFromBase64(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
               return (
                 <NestedAppAndCodeViewNative
@@ -386,7 +387,7 @@ export const Markdown = memo(
             section({ children, ...props }) {
               const treeContentBase64 = props?.["data-tree-content"];
               if (treeContentBase64 !== undefined) {
-                const content = atob(treeContentBase64);
+                const content = decodeFromBase64(treeContentBase64);
                 return <TreeDisplay content={content} />;
               }
               return null;

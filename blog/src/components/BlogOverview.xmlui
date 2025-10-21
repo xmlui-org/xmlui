@@ -1,27 +1,27 @@
 <Component name="BlogOverview">
   <Debug />
-  <CVStack>
-    <VStack width="100%">
-      <List  data="{
-      $props.posts.sort(function(a, b) {
-        return new Date(b.date) - new Date(a.date);
-      })
-    }">
-        <VStack gap="$space-2">
-          <Link to="/blog/{$item.slug}">
-            <Text fontSize="larger">
-              {$item.title}
-            </Text>
-          </Link>
-          <Text>
-            {$item.date} • {$item.author}
-          </Text>
-          <Link to="/blog/{$item.slug}">
-            <Image src="/blog/images/{$item.image}" />
-          </Link>
-          <Stack height="$space-8" />
-        </VStack>
-      </List>
+  <List
+    data="{
+    $props.posts.sort(function(a, b) {
+      return new Date(b.date) - new Date(a.date);
+    })
+  }">
+    <VStack 
+      var.blogLink="/blog/{$item.slug}"
+      gap="$space-2" 
+      onClick="Actions.navigate(blogLink)">
+      <Link to="{blogLink}">
+        <Text fontSize="larger">
+          {$item.title}
+        </Text>
+      </Link>
+      <Text>
+        {formatDate($item.date, "MMM dd, yyyy")} • {$item.author}
+      </Text>
+      <Link to="/blog/{$item.slug}">
+        <Image src="/blog/images/{$item.image}" />
+      </Link>
+      <Stack height="$space-8" />
     </VStack>
-  </CVStack>
+  </List>
 </Component>

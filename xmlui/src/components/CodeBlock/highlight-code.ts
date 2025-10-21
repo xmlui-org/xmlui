@@ -1,44 +1,12 @@
 import { type ReactNode, isValidElement } from "react";
+import { encodeToBase64, decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
 const highlightRowsClass = "codeBlockHighlightRow";
 const highlightSubstringsClass = "codeBlockHighlightString";
 const highlightSubstringsEmphasisClass = "codeBlockHighlightStringEmphasis";
 
-/**
- * Encode string to ASCII base64 value
- */
-export function encodeToBase64(value: string | number | boolean | object | null) {
-  if (!value) {
-    return null;
-  }
-
-  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
-
-  if (typeof window !== 'undefined') {
-    return window.btoa(valueToString);
-  }
-
-  const buff = Buffer.from(valueToString, 'ascii');
-  return buff.toString('base64');
-}
-
-/**
- * Decode base64 value to string
- */
-export function decodeFromBase64(value: string | number | boolean | object | null) {
-  if (!value) {
-    return null;
-  }
-
-  const valueToString = typeof value === "object" ? JSON.stringify(value) : value.toString();
-
-  if (typeof window !== "undefined") {
-    return window.atob(valueToString);
-  }
-
-  const buff = Buffer.from(valueToString, "base64");
-  return buff.toString("ascii");
-}
+// Re-export for backward compatibility
+export { encodeToBase64, decodeFromBase64 };
 
 /**
  * This function handles two things:

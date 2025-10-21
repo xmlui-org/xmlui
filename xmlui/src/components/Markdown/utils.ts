@@ -1,3 +1,5 @@
+import { encodeToBase64 } from "../../components-core/utils/base64-utils";
+
 export type SegmentProps = {
   display?: boolean;
   copy?: boolean;
@@ -399,8 +401,8 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Convert the JSON representation of pgContent to a base64 string
   const jsonString = JSON.stringify(pgContent);
-  const base64ContentString = btoa(jsonString);
-  const base64MarkdownString = btoa(markdownContent);
+  const base64ContentString = encodeToBase64(jsonString);
+  const base64MarkdownString = encodeToBase64(markdownContent);
   return (
     '<samp data-pg-content="' +
     base64ContentString +
@@ -450,6 +452,6 @@ export function convertTreeDisplayToMarkdown(content: string): string {
     const treeContent = content
       .slice("```xmlui-tree".length, content.indexOf("```", "```xmlui-tree".length))
       .trim();
-    return `<section data-tree-content="${btoa(treeContent)}"></section>\n\n`;
+    return `<section data-tree-content="${encodeToBase64(treeContent)}"></section>\n\n`;
   }
 }
