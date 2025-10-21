@@ -65,4 +65,10 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [gap](../styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Pages | $space-4 | $space-4 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
