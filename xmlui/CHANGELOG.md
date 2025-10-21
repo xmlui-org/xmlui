@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.10.23
+
+### Patch Changes
+
+- bf18444: Experiment with the "variant" behavior
+- 6d3bb89: Form now has a willSubmit event (it can cancel the submit event)
+- 89c69af: Fix the boolean conversion issue with showAnchor in Heading
+- 4cfebf0: Fix loading code-behind files in standalone mode
+- 145cd68: fix: pointer-events:none when using sibling Dialog
+
 ## 0.10.22
 
 ### Patch Changes

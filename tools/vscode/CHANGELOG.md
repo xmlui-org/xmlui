@@ -1,5 +1,16 @@
 # xmlui-vscode
 
+## 0.10.23
+
+### Patch Changes
+
+- Updated dependencies [bf18444]
+- Updated dependencies [6d3bb89]
+- Updated dependencies [89c69af]
+- Updated dependencies [4cfebf0]
+- Updated dependencies [145cd68]
+  - xmlui@0.10.23
+
 ## 0.10.22
 
 ### Patch Changes
