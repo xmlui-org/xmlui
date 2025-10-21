@@ -1,5 +1,37 @@
 [
   {
+    "tag_name": "xmlui@0.10.23",
+    "published_at": "2025-10-21T07:04:42Z",
+    "changes": [
+      {
+        "description": "Experiment with the \"variant\" behavior",
+        "commit_sha": "bf18444"
+      },
+      {
+        "description": "Form now has a willSubmit event (it can cancel the submit event)",
+        "commit_sha": "6d3bb89"
+      },
+      {
+        "description": "Fix the boolean conversion issue with showAnchor in Heading",
+        "commit_sha": "89c69af"
+      },
+      {
+        "description": "Fix loading code-behind files in standalone mode",
+        "commit_sha": "4cfebf0"
+      },
+      {
+        "description": "fix: pointer-events:none when using sibling Dialog",
+        "commit_sha": "145cd68"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.10.23.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.23/xmlui-0.10.23.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.10.22",
     "published_at": "2025-10-17T06:33:28Z",
     "changes": [
@@ -236,54 +268,6 @@
       {
         "name": "xmlui-0.10.14.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.14/xmlui-0.10.14.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.10.13",
-    "published_at": "2025-09-22T08:53:46Z",
-    "changes": [
-      {
-        "description": "Added short debounce to ColorPicker to make changing color values with slider a bit smoother.",
-        "commit_sha": "9401ee0"
-      },
-      {
-        "description": "fix: assigning new properties to objects in xmlui script",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: stricter empty body detection in RestApiProxy",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: TextArea autofocus",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: dropdownMenu overflow",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: ability to use user defined components in triggerTemplate (dropdownMenu)",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "select: use focus-visible instead of focus for outline",
-        "commit_sha": "eb62858"
-      },
-      {
-        "description": "fix: modal dialog/toast issue",
-        "commit_sha": "243b7fa"
-      },
-      {
-        "description": "form: hideButtonRowUntilDirty",
-        "commit_sha": "eb62858"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.10.13.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.10.13/xmlui-0.10.13.js"
       }
     ]
   }
