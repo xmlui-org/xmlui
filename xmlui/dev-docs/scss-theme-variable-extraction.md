@@ -27,13 +27,13 @@ $property-Component
 $property-element-Component
 
 // State-specific variable
-$property-element-Component-state
+$property-element-Component--state
 
 // Variant-specific variable
 $property-Component-variant
 
 // Variant with state
-$property-Component-variant-state
+$property-Component-variant--state
 ```
 
 ### 2. Organization
@@ -48,7 +48,7 @@ Group variables logically by:
 
 Use double-dash `--` for state modifiers in the `createThemeVar()` call:
 ```scss
-$backgroundColor-control-Carousel-hover: createThemeVar("backgroundColor-control-Carousel--hover");
+$backgroundColor-control-Carousel--hover: createThemeVar("backgroundColor-control-Carousel--hover");
 ```
 
 ## Examples
@@ -64,8 +64,8 @@ $height-Carousel: createThemeVar("height-Carousel");
 
 // Element variables with states
 $backgroundColor-control-Carousel: createThemeVar("backgroundColor-control-Carousel");
-$backgroundColor-control-Carousel-hover: createThemeVar("backgroundColor-control-Carousel--hover");
-$backgroundColor-control-Carousel-active: createThemeVar("backgroundColor-control-Carousel--active");
+$backgroundColor-control-Carousel--hover: createThemeVar("backgroundColor-control-Carousel--hover");
+$backgroundColor-control-Carousel--active: createThemeVar("backgroundColor-control-Carousel--active");
 ```
 
 ### Component with Variants (TextBox)
@@ -73,15 +73,15 @@ $backgroundColor-control-Carousel-active: createThemeVar("backgroundColor-contro
 ```scss
 // Generic Input variables
 $borderColor-Input-TextBox: createThemeVar("Input:borderColor-TextBox");
-$borderColor-Input-TextBox-hover: createThemeVar("Input:borderColor-TextBox--hover");
+$borderColor-Input-TextBox--hover: createThemeVar("Input:borderColor-TextBox--hover");
 
 // Default variant variables
 $borderColor-Input-TextBox-default: createThemeVar("Input:borderColor-TextBox-default");
-$borderColor-Input-TextBox-default-hover: createThemeVar("Input:borderColor-TextBox-default--hover");
+$borderColor-Input-TextBox-default--hover: createThemeVar("Input:borderColor-TextBox-default--hover");
 
 // Error variant variables
 $borderColor-Input-TextBox-error: createThemeVar("Input:borderColor-TextBox-error");
-$borderColor-Input-TextBox-error-hover: createThemeVar("Input:borderColor-TextBox-error--hover");
+$borderColor-Input-TextBox-error--hover: createThemeVar("Input:borderColor-TextBox-error--hover");
 ```
 
 ### Component with Multiple Levels (Heading)
@@ -130,14 +130,14 @@ $textColor-H2: createThemeVar("textColor-H2");
 ```scss
 // Variable declarations
 $backgroundColor-Input-TextBox-default: createThemeVar("Input:backgroundColor-TextBox-default");
-$backgroundColor-Input-TextBox-default-hover: createThemeVar("Input:backgroundColor-TextBox-default--hover");
+$backgroundColor-Input-TextBox-default--hover: createThemeVar("Input:backgroundColor-TextBox-default--hover");
 
 // Mixin with conditionals
 @mixin variant($variantName) {
   @if $variantName == "default" {
     background-color: $backgroundColor-Input-TextBox-default;
     &:hover {
-      background-color: $backgroundColor-Input-TextBox-default-hover;
+      background-color: $backgroundColor-Input-TextBox-default--hover;
     }
   }
 }

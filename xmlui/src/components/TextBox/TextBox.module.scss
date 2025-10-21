@@ -26,26 +26,26 @@ $fontSize-Input-TextBox: createThemeVar("Input:fontSize-TextBox");
 $backgroundColor-Input-TextBox: createThemeVar("Input:backgroundColor-TextBox");
 $boxShadow-Input-TextBox: createThemeVar("Input:boxShadow-TextBox");
 $textColor-Input-TextBox: createThemeVar("Input:textColor-TextBox");
-$borderColor-Input-TextBox-hover: createThemeVar("Input:borderColor-TextBox--hover");
-$backgroundColor-Input-TextBox-hover: createThemeVar("Input:backgroundColor-TextBox--hover");
-$boxShadow-Input-TextBox-hover: createThemeVar("Input:boxShadow-TextBox--hover");
-$textColor-Input-TextBox-hover: createThemeVar("Input:textColor-TextBox--hover");
-$borderColor-Input-TextBox-focus: createThemeVar("Input:borderColor-TextBox--focus");
-$backgroundColor-Input-TextBox-focus: createThemeVar("Input:backgroundColor-TextBox--focus");
-$boxShadow-Input-TextBox-focus: createThemeVar("Input:boxShadow-TextBox--focus");
-$textColor-Input-TextBox-focus: createThemeVar("Input:textColor-TextBox--focus");
-$outlineWidth-Input-TextBox-focus: createThemeVar("Input:outlineWidth-TextBox--focus");
-$outlineColor-Input-TextBox-focus: createThemeVar("Input:outlineColor-TextBox--focus");
-$outlineStyle-Input-TextBox-focus: createThemeVar("Input:outlineStyle-TextBox--focus");
-$outlineOffset-Input-TextBox-focus: createThemeVar("Input:outlineOffset-TextBox--focus");
+$borderColor-Input-TextBox--hover: createThemeVar("Input:borderColor-TextBox--hover");
+$backgroundColor-Input-TextBox--hover: createThemeVar("Input:backgroundColor-TextBox--hover");
+$boxShadow-Input-TextBox--hover: createThemeVar("Input:boxShadow-TextBox--hover");
+$textColor-Input-TextBox--hover: createThemeVar("Input:textColor-TextBox--hover");
+$borderColor-Input-TextBox--focus: createThemeVar("Input:borderColor-TextBox--focus");
+$backgroundColor-Input-TextBox--focus: createThemeVar("Input:backgroundColor-TextBox--focus");
+$boxShadow-Input-TextBox--focus: createThemeVar("Input:boxShadow-TextBox--focus");
+$textColor-Input-TextBox--focus: createThemeVar("Input:textColor-TextBox--focus");
+$outlineWidth-Input-TextBox--focus: createThemeVar("Input:outlineWidth-TextBox--focus");
+$outlineColor-Input-TextBox--focus: createThemeVar("Input:outlineColor-TextBox--focus");
+$outlineStyle-Input-TextBox--focus: createThemeVar("Input:outlineStyle-TextBox--focus");
+$outlineOffset-Input-TextBox--focus: createThemeVar("Input:outlineOffset-TextBox--focus");
 $textColor-placeholder-Input-TextBox: createThemeVar("Input:textColor-placeholder-TextBox");
 $fontSize-placeholder-Input-TextBox: createThemeVar("Input:fontSize-placeholder-TextBox");
 $color-adornment-Input-TextBox: createThemeVar("Input:color-adornment-TextBox");
 $color-passwordToggle-Input-TextBox: createThemeVar("Input:color-passwordToggle-TextBox");
 $paddingLeft-passwordToggle-Input-TextBox: createThemeVar("Input:paddingLeft-passwordToggle-TextBox");
 $paddingRight-passwordToggle-Input-TextBox: createThemeVar("Input:paddingRight-passwordToggle-TextBox");
-$color-passwordToggle-Input-TextBox-hover: createThemeVar("Input:color-passwordToggle-TextBox--hover");
-$color-passwordToggle-Input-TextBox-focus: createThemeVar("Input:color-passwordToggle-TextBox--focus");
+$color-passwordToggle-Input-TextBox--hover: createThemeVar("Input:color-passwordToggle-TextBox--hover");
+$color-passwordToggle-Input-TextBox--focus: createThemeVar("Input:color-passwordToggle-TextBox--focus");
 
 // Default variant variables
 $borderRadius-Input-TextBox-default: createThemeVar("Input:borderRadius-TextBox-default");
@@ -56,18 +56,18 @@ $fontSize-Input-TextBox-default: createThemeVar("Input:fontSize-TextBox-default"
 $backgroundColor-Input-TextBox-default: createThemeVar("Input:backgroundColor-TextBox-default");
 $boxShadow-Input-TextBox-default: createThemeVar("Input:boxShadow-TextBox-default");
 $textColor-Input-TextBox-default: createThemeVar("Input:textColor-TextBox-default");
-$borderColor-Input-TextBox-default-hover: createThemeVar("Input:borderColor-TextBox-default--hover");
-$backgroundColor-Input-TextBox-default-hover: createThemeVar("Input:backgroundColor-TextBox-default--hover");
-$boxShadow-Input-TextBox-default-hover: createThemeVar("Input:boxShadow-TextBox-default--hover");
-$textColor-Input-TextBox-default-hover: createThemeVar("Input:textColor-TextBox-default--hover");
-$borderColor-Input-TextBox-default-focus: createThemeVar("Input:borderColor-TextBox-default--focus");
-$backgroundColor-Input-TextBox-default-focus: createThemeVar("Input:backgroundColor-TextBox-default--focus");
-$boxShadow-Input-TextBox-default-focus: createThemeVar("Input:boxShadow-TextBox-default--focus");
-$textColor-Input-TextBox-default-focus: createThemeVar("Input:textColor-TextBox-default--focus");
-$outlineWidth-Input-TextBox-default-focus: createThemeVar("Input:outlineWidth-TextBox-default--focus");
-$outlineColor-Input-TextBox-default-focus: createThemeVar("Input:outlineColor-TextBox-default--focus");
-$outlineStyle-Input-TextBox-default-focus: createThemeVar("Input:outlineStyle-TextBox-default--focus");
-$outlineOffset-Input-TextBox-default-focus: createThemeVar("Input:outlineOffset-TextBox-default--focus");
+$borderColor-Input-TextBox-default--hover: createThemeVar("Input:borderColor-TextBox-default--hover");
+$backgroundColor-Input-TextBox-default--hover: createThemeVar("Input:backgroundColor-TextBox-default--hover");
+$boxShadow-Input-TextBox-default--hover: createThemeVar("Input:boxShadow-TextBox-default--hover");
+$textColor-Input-TextBox-default--hover: createThemeVar("Input:textColor-TextBox-default--hover");
+$borderColor-Input-TextBox-default--focus: createThemeVar("Input:borderColor-TextBox-default--focus");
+$backgroundColor-Input-TextBox-default--focus: createThemeVar("Input:backgroundColor-TextBox-default--focus");
+$boxShadow-Input-TextBox-default--focus: createThemeVar("Input:boxShadow-TextBox-default--focus");
+$textColor-Input-TextBox-default--focus: createThemeVar("Input:textColor-TextBox-default--focus");
+$outlineWidth-Input-TextBox-default--focus: createThemeVar("Input:outlineWidth-TextBox-default--focus");
+$outlineColor-Input-TextBox-default--focus: createThemeVar("Input:outlineColor-TextBox-default--focus");
+$outlineStyle-Input-TextBox-default--focus: createThemeVar("Input:outlineStyle-TextBox-default--focus");
+$outlineOffset-Input-TextBox-default--focus: createThemeVar("Input:outlineOffset-TextBox-default--focus");
 $textColor-placeholder-Input-TextBox-default: createThemeVar("Input:textColor-placeholder-TextBox-default");
 $fontSize-placeholder-Input-TextBox-default: createThemeVar("Input:fontSize-placeholder-TextBox-default");
 $color-adornment-Input-TextBox-default: createThemeVar("Input:color-adornment-TextBox-default");
@@ -81,18 +81,18 @@ $fontSize-Input-TextBox-error: createThemeVar("Input:fontSize-TextBox-error");
 $backgroundColor-Input-TextBox-error: createThemeVar("Input:backgroundColor-TextBox-error");
 $boxShadow-Input-TextBox-error: createThemeVar("Input:boxShadow-TextBox-error");
 $textColor-Input-TextBox-error: createThemeVar("Input:textColor-TextBox-error");
-$borderColor-Input-TextBox-error-hover: createThemeVar("Input:borderColor-TextBox-error--hover");
-$backgroundColor-Input-TextBox-error-hover: createThemeVar("Input:backgroundColor-TextBox-error--hover");
-$boxShadow-Input-TextBox-error-hover: createThemeVar("Input:boxShadow-TextBox-error--hover");
-$textColor-Input-TextBox-error-hover: createThemeVar("Input:textColor-TextBox-error--hover");
-$borderColor-Input-TextBox-error-focus: createThemeVar("Input:borderColor-TextBox-error--focus");
-$backgroundColor-Input-TextBox-error-focus: createThemeVar("Input:backgroundColor-TextBox-error--focus");
-$boxShadow-Input-TextBox-error-focus: createThemeVar("Input:boxShadow-TextBox-error--focus");
-$textColor-Input-TextBox-error-focus: createThemeVar("Input:textColor-TextBox-error--focus");
-$outlineWidth-Input-TextBox-error-focus: createThemeVar("Input:outlineWidth-TextBox-error--focus");
-$outlineColor-Input-TextBox-error-focus: createThemeVar("Input:outlineColor-TextBox-error--focus");
-$outlineStyle-Input-TextBox-error-focus: createThemeVar("Input:outlineStyle-TextBox-error--focus");
-$outlineOffset-Input-TextBox-error-focus: createThemeVar("Input:outlineOffset-TextBox-error--focus");
+$borderColor-Input-TextBox-error--hover: createThemeVar("Input:borderColor-TextBox-error--hover");
+$backgroundColor-Input-TextBox-error--hover: createThemeVar("Input:backgroundColor-TextBox-error--hover");
+$boxShadow-Input-TextBox-error--hover: createThemeVar("Input:boxShadow-TextBox-error--hover");
+$textColor-Input-TextBox-error--hover: createThemeVar("Input:textColor-TextBox-error--hover");
+$borderColor-Input-TextBox-error--focus: createThemeVar("Input:borderColor-TextBox-error--focus");
+$backgroundColor-Input-TextBox-error--focus: createThemeVar("Input:backgroundColor-TextBox-error--focus");
+$boxShadow-Input-TextBox-error--focus: createThemeVar("Input:boxShadow-TextBox-error--focus");
+$textColor-Input-TextBox-error--focus: createThemeVar("Input:textColor-TextBox-error--focus");
+$outlineWidth-Input-TextBox-error--focus: createThemeVar("Input:outlineWidth-TextBox-error--focus");
+$outlineColor-Input-TextBox-error--focus: createThemeVar("Input:outlineColor-TextBox-error--focus");
+$outlineStyle-Input-TextBox-error--focus: createThemeVar("Input:outlineStyle-TextBox-error--focus");
+$outlineOffset-Input-TextBox-error--focus: createThemeVar("Input:outlineOffset-TextBox-error--focus");
 $textColor-placeholder-Input-TextBox-error: createThemeVar("Input:textColor-placeholder-TextBox-error");
 $fontSize-placeholder-Input-TextBox-error: createThemeVar("Input:fontSize-placeholder-TextBox-error");
 $color-adornment-Input-TextBox-error: createThemeVar("Input:color-adornment-TextBox-error");
@@ -106,18 +106,18 @@ $fontSize-Input-TextBox-warning: createThemeVar("Input:fontSize-TextBox-warning"
 $backgroundColor-Input-TextBox-warning: createThemeVar("Input:backgroundColor-TextBox-warning");
 $boxShadow-Input-TextBox-warning: createThemeVar("Input:boxShadow-TextBox-warning");
 $textColor-Input-TextBox-warning: createThemeVar("Input:textColor-TextBox-warning");
-$borderColor-Input-TextBox-warning-hover: createThemeVar("Input:borderColor-TextBox-warning--hover");
-$backgroundColor-Input-TextBox-warning-hover: createThemeVar("Input:backgroundColor-TextBox-warning--hover");
-$boxShadow-Input-TextBox-warning-hover: createThemeVar("Input:boxShadow-TextBox-warning--hover");
-$textColor-Input-TextBox-warning-hover: createThemeVar("Input:textColor-TextBox-warning--hover");
-$borderColor-Input-TextBox-warning-focus: createThemeVar("Input:borderColor-TextBox-warning--focus");
-$backgroundColor-Input-TextBox-warning-focus: createThemeVar("Input:backgroundColor-TextBox-warning--focus");
-$boxShadow-Input-TextBox-warning-focus: createThemeVar("Input:boxShadow-TextBox-warning--focus");
-$textColor-Input-TextBox-warning-focus: createThemeVar("Input:textColor-TextBox-warning--focus");
-$outlineWidth-Input-TextBox-warning-focus: createThemeVar("Input:outlineWidth-TextBox-warning--focus");
-$outlineColor-Input-TextBox-warning-focus: createThemeVar("Input:outlineColor-TextBox-warning--focus");
-$outlineStyle-Input-TextBox-warning-focus: createThemeVar("Input:outlineStyle-TextBox-warning--focus");
-$outlineOffset-Input-TextBox-warning-focus: createThemeVar("Input:outlineOffset-TextBox-warning--focus");
+$borderColor-Input-TextBox-warning--hover: createThemeVar("Input:borderColor-TextBox-warning--hover");
+$backgroundColor-Input-TextBox-warning--hover: createThemeVar("Input:backgroundColor-TextBox-warning--hover");
+$boxShadow-Input-TextBox-warning--hover: createThemeVar("Input:boxShadow-TextBox-warning--hover");
+$textColor-Input-TextBox-warning--hover: createThemeVar("Input:textColor-TextBox-warning--hover");
+$borderColor-Input-TextBox-warning--focus: createThemeVar("Input:borderColor-TextBox-warning--focus");
+$backgroundColor-Input-TextBox-warning--focus: createThemeVar("Input:backgroundColor-TextBox-warning--focus");
+$boxShadow-Input-TextBox-warning--focus: createThemeVar("Input:boxShadow-TextBox-warning--focus");
+$textColor-Input-TextBox-warning--focus: createThemeVar("Input:textColor-TextBox-warning--focus");
+$outlineWidth-Input-TextBox-warning--focus: createThemeVar("Input:outlineWidth-TextBox-warning--focus");
+$outlineColor-Input-TextBox-warning--focus: createThemeVar("Input:outlineColor-TextBox-warning--focus");
+$outlineStyle-Input-TextBox-warning--focus: createThemeVar("Input:outlineStyle-TextBox-warning--focus");
+$outlineOffset-Input-TextBox-warning--focus: createThemeVar("Input:outlineOffset-TextBox-warning--focus");
 $textColor-placeholder-Input-TextBox-warning: createThemeVar("Input:textColor-placeholder-TextBox-warning");
 $fontSize-placeholder-Input-TextBox-warning: createThemeVar("Input:fontSize-placeholder-TextBox-warning");
 $color-adornment-Input-TextBox-warning: createThemeVar("Input:color-adornment-TextBox-warning");
@@ -131,18 +131,18 @@ $fontSize-Input-TextBox-success: createThemeVar("Input:fontSize-TextBox-success"
 $backgroundColor-Input-TextBox-success: createThemeVar("Input:backgroundColor-TextBox-success");
 $boxShadow-Input-TextBox-success: createThemeVar("Input:boxShadow-TextBox-success");
 $textColor-Input-TextBox-success: createThemeVar("Input:textColor-TextBox-success");
-$borderColor-Input-TextBox-success-hover: createThemeVar("Input:borderColor-TextBox-success--hover");
-$backgroundColor-Input-TextBox-success-hover: createThemeVar("Input:backgroundColor-TextBox-success--hover");
-$boxShadow-Input-TextBox-success-hover: createThemeVar("Input:boxShadow-TextBox-success--hover");
-$textColor-Input-TextBox-success-hover: createThemeVar("Input:textColor-TextBox-success--hover");
-$borderColor-Input-TextBox-success-focus: createThemeVar("Input:borderColor-TextBox-success--focus");
-$backgroundColor-Input-TextBox-success-focus: createThemeVar("Input:backgroundColor-TextBox-success--focus");
-$boxShadow-Input-TextBox-success-focus: createThemeVar("Input:boxShadow-TextBox-success--focus");
-$textColor-Input-TextBox-success-focus: createThemeVar("Input:textColor-TextBox-success--focus");
-$outlineWidth-Input-TextBox-success-focus: createThemeVar("Input:outlineWidth-TextBox-success--focus");
-$outlineColor-Input-TextBox-success-focus: createThemeVar("Input:outlineColor-TextBox-success--focus");
-$outlineStyle-Input-TextBox-success-focus: createThemeVar("Input:outlineStyle-TextBox-success--focus");
-$outlineOffset-Input-TextBox-success-focus: createThemeVar("Input:outlineOffset-TextBox-success--focus");
+$borderColor-Input-TextBox-success--hover: createThemeVar("Input:borderColor-TextBox-success--hover");
+$backgroundColor-Input-TextBox-success--hover: createThemeVar("Input:backgroundColor-TextBox-success--hover");
+$boxShadow-Input-TextBox-success--hover: createThemeVar("Input:boxShadow-TextBox-success--hover");
+$textColor-Input-TextBox-success--hover: createThemeVar("Input:textColor-TextBox-success--hover");
+$borderColor-Input-TextBox-success--focus: createThemeVar("Input:borderColor-TextBox-success--focus");
+$backgroundColor-Input-TextBox-success--focus: createThemeVar("Input:backgroundColor-TextBox-success--focus");
+$boxShadow-Input-TextBox-success--focus: createThemeVar("Input:boxShadow-TextBox-success--focus");
+$textColor-Input-TextBox-success--focus: createThemeVar("Input:textColor-TextBox-success--focus");
+$outlineWidth-Input-TextBox-success--focus: createThemeVar("Input:outlineWidth-TextBox-success--focus");
+$outlineColor-Input-TextBox-success--focus: createThemeVar("Input:outlineColor-TextBox-success--focus");
+$outlineStyle-Input-TextBox-success--focus: createThemeVar("Input:outlineStyle-TextBox-success--focus");
+$outlineOffset-Input-TextBox-success--focus: createThemeVar("Input:outlineOffset-TextBox-success--focus");
 $textColor-placeholder-Input-TextBox-success: createThemeVar("Input:textColor-placeholder-TextBox-success");
 $fontSize-placeholder-Input-TextBox-success: createThemeVar("Input:fontSize-placeholder-TextBox-success");
 $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-TextBox-success");
@@ -160,24 +160,24 @@ $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-Te
     color: $textColor-Input-TextBox-default;
 
     &:hover {
-      border-color: $borderColor-Input-TextBox-default-hover;
-      background-color: $backgroundColor-Input-TextBox-default-hover;
-      box-shadow: $boxShadow-Input-TextBox-default-hover;
-      color: $textColor-Input-TextBox-default-hover;
+      border-color: $borderColor-Input-TextBox-default--hover;
+      background-color: $backgroundColor-Input-TextBox-default--hover;
+      box-shadow: $boxShadow-Input-TextBox-default--hover;
+      color: $textColor-Input-TextBox-default--hover;
     }
 
     &:focus-within {
-      border-color: $borderColor-Input-TextBox-default-focus;
-      background-color: $backgroundColor-Input-TextBox-default-focus;
-      box-shadow: $boxShadow-Input-TextBox-default-focus;
-      color: $textColor-Input-TextBox-default-focus;
+      border-color: $borderColor-Input-TextBox-default--focus;
+      background-color: $backgroundColor-Input-TextBox-default--focus;
+      box-shadow: $boxShadow-Input-TextBox-default--focus;
+      color: $textColor-Input-TextBox-default--focus;
     }
 
     &:has(.input:focus-visible) {
-      outline-width: $outlineWidth-Input-TextBox-default-focus;
-      outline-color: $outlineColor-Input-TextBox-default-focus;
-      outline-style: $outlineStyle-Input-TextBox-default-focus;
-      outline-offset: $outlineOffset-Input-TextBox-default-focus;
+      outline-width: $outlineWidth-Input-TextBox-default--focus;
+      outline-color: $outlineColor-Input-TextBox-default--focus;
+      outline-style: $outlineStyle-Input-TextBox-default--focus;
+      outline-offset: $outlineOffset-Input-TextBox-default--focus;
     }
 
     .input {
@@ -201,24 +201,24 @@ $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-Te
     color: $textColor-Input-TextBox-error;
 
     &:hover {
-      border-color: $borderColor-Input-TextBox-error-hover;
-      background-color: $backgroundColor-Input-TextBox-error-hover;
-      box-shadow: $boxShadow-Input-TextBox-error-hover;
-      color: $textColor-Input-TextBox-error-hover;
+      border-color: $borderColor-Input-TextBox-error--hover;
+      background-color: $backgroundColor-Input-TextBox-error--hover;
+      box-shadow: $boxShadow-Input-TextBox-error--hover;
+      color: $textColor-Input-TextBox-error--hover;
     }
 
     &:focus-within {
-      border-color: $borderColor-Input-TextBox-error-focus;
-      background-color: $backgroundColor-Input-TextBox-error-focus;
-      box-shadow: $boxShadow-Input-TextBox-error-focus;
-      color: $textColor-Input-TextBox-error-focus;
+      border-color: $borderColor-Input-TextBox-error--focus;
+      background-color: $backgroundColor-Input-TextBox-error--focus;
+      box-shadow: $boxShadow-Input-TextBox-error--focus;
+      color: $textColor-Input-TextBox-error--focus;
     }
 
     &:has(.input:focus-visible) {
-      outline-width: $outlineWidth-Input-TextBox-error-focus;
-      outline-color: $outlineColor-Input-TextBox-error-focus;
-      outline-style: $outlineStyle-Input-TextBox-error-focus;
-      outline-offset: $outlineOffset-Input-TextBox-error-focus;
+      outline-width: $outlineWidth-Input-TextBox-error--focus;
+      outline-color: $outlineColor-Input-TextBox-error--focus;
+      outline-style: $outlineStyle-Input-TextBox-error--focus;
+      outline-offset: $outlineOffset-Input-TextBox-error--focus;
     }
 
     .input {
@@ -242,24 +242,24 @@ $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-Te
     color: $textColor-Input-TextBox-warning;
 
     &:hover {
-      border-color: $borderColor-Input-TextBox-warning-hover;
-      background-color: $backgroundColor-Input-TextBox-warning-hover;
-      box-shadow: $boxShadow-Input-TextBox-warning-hover;
-      color: $textColor-Input-TextBox-warning-hover;
+      border-color: $borderColor-Input-TextBox-warning--hover;
+      background-color: $backgroundColor-Input-TextBox-warning--hover;
+      box-shadow: $boxShadow-Input-TextBox-warning--hover;
+      color: $textColor-Input-TextBox-warning--hover;
     }
 
     &:focus-within {
-      border-color: $borderColor-Input-TextBox-warning-focus;
-      background-color: $backgroundColor-Input-TextBox-warning-focus;
-      box-shadow: $boxShadow-Input-TextBox-warning-focus;
-      color: $textColor-Input-TextBox-warning-focus;
+      border-color: $borderColor-Input-TextBox-warning--focus;
+      background-color: $backgroundColor-Input-TextBox-warning--focus;
+      box-shadow: $boxShadow-Input-TextBox-warning--focus;
+      color: $textColor-Input-TextBox-warning--focus;
     }
 
     &:has(.input:focus-visible) {
-      outline-width: $outlineWidth-Input-TextBox-warning-focus;
-      outline-color: $outlineColor-Input-TextBox-warning-focus;
-      outline-style: $outlineStyle-Input-TextBox-warning-focus;
-      outline-offset: $outlineOffset-Input-TextBox-warning-focus;
+      outline-width: $outlineWidth-Input-TextBox-warning--focus;
+      outline-color: $outlineColor-Input-TextBox-warning--focus;
+      outline-style: $outlineStyle-Input-TextBox-warning--focus;
+      outline-offset: $outlineOffset-Input-TextBox-warning--focus;
     }
 
     .input {
@@ -283,24 +283,24 @@ $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-Te
     color: $textColor-Input-TextBox-success;
 
     &:hover {
-      border-color: $borderColor-Input-TextBox-success-hover;
-      background-color: $backgroundColor-Input-TextBox-success-hover;
-      box-shadow: $boxShadow-Input-TextBox-success-hover;
-      color: $textColor-Input-TextBox-success-hover;
+      border-color: $borderColor-Input-TextBox-success--hover;
+      background-color: $backgroundColor-Input-TextBox-success--hover;
+      box-shadow: $boxShadow-Input-TextBox-success--hover;
+      color: $textColor-Input-TextBox-success--hover;
     }
 
     &:focus-within {
-      border-color: $borderColor-Input-TextBox-success-focus;
-      background-color: $backgroundColor-Input-TextBox-success-focus;
-      box-shadow: $boxShadow-Input-TextBox-success-focus;
-      color: $textColor-Input-TextBox-success-focus;
+      border-color: $borderColor-Input-TextBox-success--focus;
+      background-color: $backgroundColor-Input-TextBox-success--focus;
+      box-shadow: $boxShadow-Input-TextBox-success--focus;
+      color: $textColor-Input-TextBox-success--focus;
     }
 
     &:has(.input:focus-visible) {
-      outline-width: $outlineWidth-Input-TextBox-success-focus;
-      outline-color: $outlineColor-Input-TextBox-success-focus;
-      outline-style: $outlineStyle-Input-TextBox-success-focus;
-      outline-offset: $outlineOffset-Input-TextBox-success-focus;
+      outline-width: $outlineWidth-Input-TextBox-success--focus;
+      outline-color: $outlineColor-Input-TextBox-success--focus;
+      outline-style: $outlineStyle-Input-TextBox-success--focus;
+      outline-offset: $outlineOffset-Input-TextBox-success--focus;
     }
 
     .input {
@@ -322,11 +322,11 @@ $color-adornment-Input-TextBox-success: createThemeVar("Input:color-adornment-Te
     padding-right: $paddingRight-passwordToggle-Input-TextBox;
 
     &:hover {
-      color: $color-passwordToggle-Input-TextBox-hover;
+      color: $color-passwordToggle-Input-TextBox--hover;
     }
 
     &:focus {
-      color: $color-passwordToggle-Input-TextBox-focus;
+      color: $color-passwordToggle-Input-TextBox--focus;
     }
   }
 }

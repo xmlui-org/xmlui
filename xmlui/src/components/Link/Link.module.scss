@@ -15,6 +15,7 @@ $themeVars: t.composeTextVars($themeVars, $component);
 $textColor-Link--active: createThemeVar("textColor-#{$component}--active");
 $textColor-Link--hover: createThemeVar("textColor-#{$component}--hover");
 $textColor-Link--hover--active: createThemeVar("textColor-#{$component}--hover--active");
+$textColor-Link--disabled: createThemeVar("textColor-#{$component}--disabled");
 $fontWeight-Link--active: createThemeVar("fontWeight-#{$component}--active");
 $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
@@ -52,6 +53,8 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
 
     &.disabled {
       pointer-events: none;
+      color: $textColor-Link--disabled;
+      cursor: default;
     }
 
     &:not(.disabled) {

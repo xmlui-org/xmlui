@@ -19,22 +19,22 @@ $width-control-Carousel: createThemeVar("width-control-Carousel");
 $textColor-control-Carousel: createThemeVar("textColor-control-Carousel");
 $backgroundColor-control-Carousel: createThemeVar("backgroundColor-control-Carousel");
 $borderRadius-control-Carousel: createThemeVar("borderRadius-control-Carousel");
-$backgroundColor-control-Carousel-hover: createThemeVar("backgroundColor-control-Carousel--hover");
-$textColor-control-Carousel-hover: createThemeVar("textColor-control-Carousel--hover");
-$backgroundColor-control-Carousel-active: createThemeVar("backgroundColor-control-Carousel--active");
-$textColor-control-Carousel-active: createThemeVar("textColor-control-Carousel--active");
-$textColor-control-Carousel-disabled: createThemeVar("textColor-control-Carousel--disabled");
-$backgroundColor-control-Carousel-disabled: createThemeVar("backgroundColor-control-Carousel--disabled");
+$backgroundColor-control-Carousel--hover: createThemeVar("backgroundColor-control-Carousel--hover");
+$textColor-control-Carousel--hover: createThemeVar("textColor-control-Carousel--hover");
+$backgroundColor-control-Carousel--active: createThemeVar("backgroundColor-control-Carousel--active");
+$textColor-control-Carousel--active: createThemeVar("textColor-control-Carousel--active");
+$textColor-control-Carousel--disabled: createThemeVar("textColor-control-Carousel--disabled");
+$backgroundColor-control-Carousel--disabled: createThemeVar("backgroundColor-control-Carousel--disabled");
 
 // Indicator variables
 $width-indicator-Carousel: createThemeVar("width-indicator-Carousel");
 $height-indicator-Carousel: createThemeVar("height-indicator-Carousel");
 $textColor-indicator-Carousel: createThemeVar("textColor-indicator-Carousel");
 $backgroundColor-indicator-Carousel: createThemeVar("backgroundColor-indicator-Carousel");
-$backgroundColor-indicator-Carousel-hover: createThemeVar("backgroundColor-indicator-Carousel--hover");
-$textColor-indicator-Carousel-hover: createThemeVar("textColor-indicator-Carousel--hover");
-$backgroundColor-indicator-Carousel-active: createThemeVar("backgroundColor-indicator-Carousel--active");
-$textColor-indicator-Carousel-active: createThemeVar("textColor-indicator-Carousel--active");
+$backgroundColor-indicator-Carousel--hover: createThemeVar("backgroundColor-indicator-Carousel--hover");
+$textColor-indicator-Carousel--hover: createThemeVar("textColor-indicator-Carousel--hover");
+$backgroundColor-indicator-Carousel--active: createThemeVar("backgroundColor-indicator-Carousel--active");
+$textColor-indicator-Carousel--active: createThemeVar("textColor-indicator-Carousel--active");
 
 @layer components {
   .carousel {
@@ -98,18 +98,18 @@ $textColor-indicator-Carousel-active: createThemeVar("textColor-indicator-Carous
   }
 
   .controlButton:hover {
-    background-color: $backgroundColor-control-Carousel-hover;
-    color: $textColor-control-Carousel-hover;
+    background-color: $backgroundColor-control-Carousel--hover;
+    color: $textColor-control-Carousel--hover;
   }
 
   .controlButton:active {
-    background-color: $backgroundColor-control-Carousel-active;
-    color: $textColor-control-Carousel-active;
+    background-color: $backgroundColor-control-Carousel--active;
+    color: $textColor-control-Carousel--active;
   }
 
   .controlButton:disabled {
-    color: $textColor-control-Carousel-disabled;
-    background-color: $backgroundColor-control-Carousel-disabled;
+    color: $textColor-control-Carousel--disabled;
+    background-color: $backgroundColor-control-Carousel--disabled;
   }
 
   .indicators {
@@ -129,13 +129,13 @@ $textColor-indicator-Carousel-active: createThemeVar("textColor-indicator-Carous
     background-color: $backgroundColor-indicator-Carousel;
 
     &:hover {
-      background-color: $backgroundColor-indicator-Carousel-hover;
-      color: $textColor-indicator-Carousel-hover;
+      background-color: $backgroundColor-indicator-Carousel--hover;
+      color: $textColor-indicator-Carousel--hover;
     }
 
     &.active {
-      background-color: $backgroundColor-indicator-Carousel-active;
-      color: $textColor-indicator-Carousel-active;
+      background-color: $backgroundColor-indicator-Carousel--active;
+      color: $textColor-indicator-Carousel--active;
     }
   }
 }

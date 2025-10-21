@@ -23,7 +23,7 @@ $paddingVertical-header-Accordion: createThemeVar("paddingVertical-header-Accord
 $paddingHorizontal-header-Accordion: createThemeVar("paddingHorizontal-header-Accordion");
 $backgroundColor-header-Accordion: createThemeVar("backgroundColor-header-Accordion");
 $color-header-Accordion: createThemeVar("color-header-Accordion");
-$backgroundColor-header-Accordion-hover: createThemeVar("backgroundColor-header-Accordion--hover");
+$backgroundColor-header-Accordion--hover: createThemeVar("backgroundColor-header-Accordion--hover");
 
 // Content variables
 $color-content-Accordion: createThemeVar("color-content-Accordion");
@@ -86,7 +86,7 @@ $color-icon-Accordion: createThemeVar("color-icon-Accordion");
     color: $color-header-Accordion;
 
     &:hover {
-      background-color: $backgroundColor-header-Accordion-hover;
+      background-color: $backgroundColor-header-Accordion--hover;
     }
 
     &.triggerStart {
