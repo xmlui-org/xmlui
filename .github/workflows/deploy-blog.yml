@@ -2,12 +2,6 @@ name: Deploy blog
 
 on:
   workflow_dispatch:
-    inputs:
-      max_releases:
-        description: "Maximum number of releases to include in docs"
-        type: number
-        required: false
-        default: 10
 
 jobs:
   build-and-deploy:
