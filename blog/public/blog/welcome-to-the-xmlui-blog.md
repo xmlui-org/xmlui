@@ -4,9 +4,9 @@ In this inaugural post we'll explore the development of the blog engine we're us
 
 We started with the simplest possible approach: post metadata and data as literal strings.
 
-```xmlui-pg name="XMLUI blog v1"
+```xmlui-pg name="XMLUI blog v1" height="200px"
 ---app
-<App layout="vertical">
+<App layout="vertical-full-header">
   <NavPanel>
     <NavGroup label="Blog">
       <NavLink label="Newest post" to="/newest-post" />
@@ -48,7 +48,7 @@ We started with the simplest possible approach: post metadata and data as litera
 
 You can use it right here or you can click the ![](/resources/pg-popout.svg) icon to open a playground where you can make live changes.
 
-This is a pretty good start! We can write posts, arrange them in reverse chronological order, and hey, it's the essence of a blog. The live playground is a nice bonus that any XMLUI app might put to good use. The user interfaces that you build with XMLUI will require some explaining, it's handy to explain with working examples as well as images, text, and video.
+This is a pretty good start! We can write posts, arrange them in reverse chronological order, and hey, it's the essence of a blog. The live playground is a nice bonus that any XMLUI app might put to good use. When you build user interfaces with XMLUI you'll want to document them, it's useful to do that with working examples as well as images, text, and video.
 
 Let's unpack how this works, there isn't much to it. The `App` declared in `Main.xmlui` sets up navigation.
 
@@ -95,7 +95,7 @@ Here's how `BlogPage` assembles data and metadata to create a post.
 
 So far the post content exists only as the `content` property passed to the `BlogPage` component. For the real blog we'll want to manage it as a set of Markdown files. This version enables that.
 
-```xmlui-pg name="XMLUI blog v2"
+```xmlui-pg name="XMLUI blog v2"  height="200px"
 ---app
 <App
   layout="vertical"
@@ -155,7 +155,7 @@ Now we write post metadata as an App-level variable, and create Markdown files c
       slug: "welcome-to-the-xmlui-blog",
       author: "Jon Udell",
       date: "2025-09-01",
-      image: "blog-page-component.png"
+      image: "blog-scrabble.png"
     },
     {
       title: "Lorem Ipsum!",
@@ -205,7 +205,7 @@ And the `Page` passes the complete post object to `BlogPage`. In v1 we used the 
 
 ## Create the overview page
 
-Although it's feasible to use a `NavGroup` to list the posts, a blog should really have an overview page. Let's add another user-defined component for that.
+Although we have a `NavGroup` to list the posts, a blog should really have an overview page. Let's add another user-defined component for that.
 
 ```xmlui copy
 <Component name="BlogOverview">
@@ -257,11 +257,7 @@ We refer to the overview in `Pages` along with the same `Page` used for the intr
 
 ## Create an RSS feed
 
-We can't call it a blog unless it provides an RSS feed. For that we've added a simple feed generator that reads the metadata and writes `/feed.rss` which is then served statically by the webserver that hosts the site. And we've added feed autodiscovery to the site's `index.html`.
-
-```xmlui copy
-<link rel="alternate" type="application/rss+xml" title="XMLUI Blog" href="/feed.rss" />
-```
+We can't call it a blog unless it provides an RSS feed. For that we've added a simple feed generator that reads the metadata and writes `/feed.rss` which is then served statically by the webserver that hosts the site. So we've added a RSS icon to the template and feed autodiscovery to the site's `index.html`.
 
 ## Deploy standalone
 
@@ -283,8 +279,7 @@ But it can exist standalone, you only need a folder with a handful of files.
 │   ├── BlogPage.xmlui
 ├── index.html
 └── xmlui
-    ├── xmlui-playground.js
-    └── xmlui-0.10.8.js
+    └── 0.10.24.js
 ```
 
 Here's the `index.html`.
@@ -296,8 +291,7 @@ Here's the `index.html`.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XMLUI blog test</title>
-  <script src="xmlui/xmlui-0.10.8.js"></script>
-  <script src="xmlui/xmlui-playground.js"></script>
+  <script src="xmlui/0.10.24.js"></script>
 </head>
 <body>
 </body>
@@ -311,6 +305,4 @@ I dragged the folder containing the standalone app onto Netlify's drop target. C
 ## XMLUI for publishing
 
 We get it, blog engines are a dime a dozen. We made this one because XMLUI was already a strong publishing system that we use for the [docs](https://docs.xmlui.org), [demo](https://demo.xmlui.org), and [landing page](https://xmlui.org). The `Markdown` component, with its support for playgrounds, works really well and it made sense to leverage that for our blog. We're not saying that you *should* build a blog engine with XMLUI but it's clearly something you *could* do. We think it's pretty easy to create a competent engine that makes life easy for authors and readers.
-
-
 
