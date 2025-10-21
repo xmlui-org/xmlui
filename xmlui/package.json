@@ -147,6 +147,7 @@
     "rollup-plugin-visualizer": "5.8.3",
     "serve": "14.2.0",
     "terser": "^5.44.0",
+    "tsx": "4.20.6",
     "typescript": "5.7.3",
     "vite": "5.4.19",
     "vite-plugin-dts": "4.5.0",
@@ -166,7 +167,7 @@
     "src/syntax"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "./bin/bootstrap.mjs"
   },
   "clean-package": {
     "replace": {
