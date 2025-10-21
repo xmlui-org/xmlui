@@ -12,7 +12,9 @@ See [this guide](/forms) for details.
 
 %-CONTEXT_VAR-START $data
 
-The following sample demonstrates enabling a field according to another's current value.
+The following sample demonstrates enabling a field based on another field's current value.
+
+`$data` is also available in these event handlers: `willSubmit`, `submit`, `cancel`, `reset`, and `success`.
 
 ```xmlui-pg copy {5} display name="Example: referencing field values"
 <App>
