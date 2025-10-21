@@ -765,3 +765,63 @@ test.describe("Visual State", () => {
     expect(width).toBe(200);
   });
 });
+
+// =============================================================================
+// Z-INDEX AND MODAL LAYERING TESTS
+// =============================================================================
+
+test.describe("Z-Index and Modal Layering", () => {
+  test("Select dropdown in modal is visible and not covered by modal overlay", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select testId="select">
+          <Option value="stuff1">option 1</Option>
+          <Option value="stuff2">option 2</Option>
+          <Button onClick="modal.open()">BLOW UP</Button>
+        </Select>
+        <ModalDialog id="modal" title="Example Dialog">
+          <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
+            <FormItem bindTo="firstName" required="true" />
+            <FormItem bindTo="lastName" required="true" />
+            <FormItem
+              label="Field to Update"
+              type="select"
+              width="200px"
+              bindTo="fieldToUpdate"
+              required
+              initialValue="rate"
+              testId="modal-select"
+            >
+              <Option value="rate">Price</Option>
+              <Option value="description">Item Description</Option>
+              <Option value="account_id">Account</Option>
+            </FormItem>
+          </Form>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    const selectDriver = await createSelectDriver("select");
+    await selectDriver.click();
+
+    // Click button to open modal
+    const blowUpButton = page.getByText("BLOW UP");
+    await blowUpButton.click();
+
+    // Wait for modal to be visible
+    await expect(page.getByRole("dialog", { name: "Example Dialog" })).toBeVisible();
+
+    // Open the select in the modal
+    const modalSelectDriver = await createSelectDriver("modal-select");
+    await modalSelectDriver.click();
+
+    // Check that all options are visible
+    await expect(page.getByRole("option", { name: "Price" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Item Description" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Account" })).toBeVisible();
+  });
+});
