@@ -1,8 +1,8 @@
 import type { ThemeDefinition } from "xmlui";
 
 export const DefaultDocsTheme: ThemeDefinition = {
-  name: "XMLUI Documentation Theme",
-  id: "docs-theme",
+  name: "XMLUI Blog Theme",
+  id: "blog-theme",
   extends: ["xmlui"],
   themeVars: {
 
@@ -13,7 +13,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-content-App": "$color-surface-0",
 
     // --- App layout
-    "maxWidth-App": "1320px",
+    "maxWidth-App": "820px",
     "boxShadow-navPanel-App": "none",
 
     // --- We intentionally use different theming to amplify the "documentation" feel
@@ -22,7 +22,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
-    "maxWidth-Drawer": "100%",
+    "maxWidth-Drawer": "300px",
     "textColor-NavLink": "$color-secondary-600",
     "color-indicator-NavLink--active": "transparent",
     "color-indicator-NavLink--hover": "transparent",

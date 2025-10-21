@@ -296,7 +296,6 @@ type RenderHeadingProps = {
   extractValue: ValueExtractor;
   className?: string;
   level: string;
-  showAnchor?: boolean;
   renderChild: RenderChildFn;
   registerComponentApi?: (api: any) => void;
 };
@@ -306,12 +305,12 @@ function renderHeading({
   extractValue,
   className,
   level,
-  showAnchor,
   renderChild,
   registerComponentApi,
 }: RenderHeadingProps) {
-  const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
+  const { maxLines, preserveLinebreaks, ellipses, showAnchor, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
+  const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
   return (
     <Heading
       uid={node.uid}
@@ -319,7 +318,7 @@ function renderHeading({
       maxLines={extractValue.asOptionalNumber(maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(ellipses, true)}
-      showAnchor={extractValue.asOptionalBoolean(showAnchor)}
+      showAnchor={showAnchorValue}
       className={className}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
       registerComponentApi={registerComponentApi}
