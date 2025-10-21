@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 ui-optimized.zip
+ui.zip
 
 # Generated files
 public/feed.rss

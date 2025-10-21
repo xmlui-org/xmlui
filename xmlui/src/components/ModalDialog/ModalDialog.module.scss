@@ -50,7 +50,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   .overlayBg {
     background-color: $backgroundColor-overlay-ModalDialog;
     inset: 0;
-    z-index: 999;
+    z-index: 1000;
     animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
     position: fixed;
 
