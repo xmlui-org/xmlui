@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import type { InfiniteData } from "@tanstack/react-query";
+import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
 
@@ -114,7 +114,7 @@ export function PageableLoader({
     isRefetching,
   } = useInfiniteQuery({
     queryKey,
-    queryFn: useCallback<any>(
+    queryFn: useCallback<QueryFunction>(
       async ({ signal, pageParam }) => {
         return await loaderFn(signal, pageParam);
       },

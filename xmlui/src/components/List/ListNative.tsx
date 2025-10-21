@@ -17,7 +17,6 @@ import {
   noop,
   omit,
   orderBy as lodashOrderBy,
-  rest,
   sortBy,
   uniq,
 } from "lodash-es";
@@ -25,7 +24,7 @@ import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/R
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
-import type { CustomItemComponentProps, VListHandle } from "virtua";
+import type { CustomItemComponent, CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {
   useHasExplicitHeight,
@@ -522,7 +521,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 shift={shift}
                 onScroll={onScroll}
                 startMargin={startMargin}
-                item={Item as any}
+                item={Item as CustomItemComponent}
                 count={rowCount}
               >
                 {(rowIndex) => {
