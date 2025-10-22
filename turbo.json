@@ -14,12 +14,12 @@
       "outputs": ["dist/standalone/**"]
     },
     "build:xmlui-metadata": {
-      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.mjs"],
+      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.js"],
       "outputs": ["dist/metadata/**"]
     },
     "gen:langserver-metadata": {
       "dependsOn": ["build:xmlui-metadata"],
-      "outputs": ["src/language-server/xmlui-metadata-generated.mjs"]
+      "outputs": ["src/language-server/xmlui-metadata-generated.js"]
     },
     "build:extension": {
       "dependsOn": ["^build:extension"],

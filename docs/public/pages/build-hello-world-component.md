@@ -197,13 +197,13 @@ This creates the core React component with:
 ```
 
 This SCSS module defines the basic visual styling for our HelloWorld component:
+
 - `.container` - Main wrapper with background, padding, and layout
 - `.message` - Styling for the greeting text
 - `.button` - Interactive button with hover effects
 - `.counter` - Display for the click count
 
 At this stage, we use hardcoded colors. In Step 9, we'll replace these theme variables.
-
 
 ## Step 5: Create component metadata and renderer
 
@@ -258,7 +258,6 @@ It:
 - Passes them to the native React component
 - Handles optional props gracefully (undefined becomes default values)
 
-
 This pattern enables XMLUI to:
 
 - Validate markup against metadata
@@ -284,7 +283,6 @@ EOF
 This creates the main entry point that exports your HelloWorld component under the XMLUIExtensions namespace.
 
 ## Step 7: Build the extension
-
 
 ```xmlui copy
 npm run build:extension
@@ -404,6 +402,7 @@ So far, our HelloWorld component uses hardcoded colors. Let's integrate it with 
 **Understanding XMLUI's theme system**
 
 XMLUI provides a sophisticated theming system that:
+
 - Uses semantic design tokens (like `$color-surface-50`, `$color-content-primary`)
 - Automatically supports light and dark modes
 - Maintains consistency across all components
@@ -471,6 +470,7 @@ $textColor: createThemeVar("textColor-#{$component}");
 **What changed**
 
 Instead of hardcoded colors like `#f5f5f5` and `#333`, we now use:
+
 - `$backgroundColor` - Uses XMLUI's surface color tokens
 - `$textColor` - Uses XMLUI's content color tokens
 
@@ -626,10 +626,12 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 ```
 
 **New props**
+
 - `onClick?: (event: React.MouseEvent) => void` - Called when the click button is pressed
 - `onReset?: (event: React.MouseEvent) => void` - Called when the reset button is pressed
 
 **Event handler changes:**
+
 - `handleClick` now calls `onClick?.(event)` after updating internal state
 - `handleReset` now calls `onReset?.(event)` after resetting the counter
 - Both pass the DOM event object (not custom data) to match XMLUI's event system
@@ -706,15 +708,18 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 ```
 
 **Metadata changes:**
+
 - Added `events` section defining `onClick` and `onReset` event handlers
 - Each event includes description and type information for documentation
 
 **Renderer changes:**
+
 - Added `lookupEventHandler` to the renderer context
 - `lookupEventHandler("onClick")` and `lookupEventHandler("onReset")` convert XMLUI event bindings to function references
 - These function references are passed to the native React component
 
 **The event flow:**
+
 1. XMLUI markup: `<HelloWorld onClick="handleHelloClick" />`
 2. Renderer: `lookupEventHandler("onClick")` finds the `handleHelloClick` function
 3. Native component: Receives the function as `onClick` prop
@@ -763,7 +768,6 @@ Now you can use the component with event handling.
 ## Step 11: Add component APIs (external methods)
 
 Update `src/HelloWorldNative.tsx`.
-
 
 ```xmlui copy
 import React, { useState, useEffect } from "react";
@@ -849,13 +853,16 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 ```
 
 **New props**
+
 - `registerComponentApi?: RegisterComponentApiFn` - Function to register component APIs with XMLUI
 
 **New imports:**
+
 - `useEffect` from React - For API registration and state synchronization
 - `RegisterComponentApiFn` type from "xmlui" - Type for the API registration function
 
 **API registration:**
+
 - `setValue` method - Allows external code to set the click count
 - `useEffect` hook registers the API with XMLUI, exposing both `setValue` and `value`
 - API updates whenever `clickCount` changes, ensuring `value` is always current
@@ -936,13 +943,16 @@ EOF
 ```
 
 **Metadata**
+
 - Added `apis` section defining `value` (number) and `setValue` (function) APIs
 
 **Renderer Changes**
+
 - Added `registerComponentApi` to the renderer context
 - Passes `registerComponentApi` to the native component for API registration
 
 **The API flow:**
+
 1. XMLUI markup: `<HelloWorld id="demo" />` creates component with ID
 2. Renderer: Registers component APIs via `registerComponentApi`
 3. External access: `demo.setValue(5)` calls the component's setValue method
@@ -967,4 +977,4 @@ Copy the new `xmlui-hello-world.js` into your standalone app's `xmlui` folder, a
     </CHStack>
 
 </App>
-  ```
+```

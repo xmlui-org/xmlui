@@ -17,7 +17,7 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";
+import collectedComponentMetadata from "./xmlui-metadata-generated.js";
 import type { XmluiCompletionItem } from "./services/completion";
 import { handleCompletion, handleCompletionResolve } from "./services/completion";
 import { handleHover } from "./services/hover";

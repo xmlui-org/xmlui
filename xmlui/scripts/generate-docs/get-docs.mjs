@@ -4,7 +4,7 @@ import { unlink, readdir, mkdir, writeFile, rm, readFile } from "fs/promises";
 import { ErrorWithSeverity, LOGGER_LEVELS, logger } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
-import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
+import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
 import { configManager, pathResolver } from "./configuration-management.mjs";
@@ -272,7 +272,11 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
   const { indentationDepth } = await findAndDisplayGeneratedContent();
 
   // Replace the generated content with the in-memory NavLinks content
-  await replaceGeneratedContentInMainXmlui(navLinksContent, indentationDepth, EXTENSIONS_NAVIGATION);
+  await replaceGeneratedContentInMainXmlui(
+    navLinksContent,
+    indentationDepth,
+    EXTENSIONS_NAVIGATION,
+  );
 
   // generate a _meta.json for the folder names
   await withErrorHandling(
@@ -561,7 +565,11 @@ function calculateIndentationDepth(content) {
  * @param {string} navLinksContent - The NavLink content to insert
  * @param {number} indentationDepth - Number of spaces to indent each line
  */
-async function replaceGeneratedContentInMainXmlui(navLinksContent, indentationDepth, NavConfigObj = COMPONENT_NAVIGATION) {
+async function replaceGeneratedContentInMainXmlui(
+  navLinksContent,
+  indentationDepth,
+  NavConfigObj = COMPONENT_NAVIGATION,
+) {
   try {
     const mainXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.MAIN_XMLUI);
 
