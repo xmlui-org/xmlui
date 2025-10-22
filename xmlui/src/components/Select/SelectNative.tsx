@@ -667,6 +667,8 @@ function VisibleSelectOption(option: Option) {
     optionRenderer,
   } = useSelect();
 
+  const optionRef = useRef<HTMLDivElement>(null);
+
   const opt: Option = useMemo(() => {
     return {
       ...option,
@@ -690,6 +692,13 @@ function VisibleSelectOption(option: Option) {
     return highlightedValue !== undefined && String(highlightedValue) === String(value);
   }, [highlightedValue, value]);
 
+  // Scroll into view when highlighted
+  useEffect(() => {
+    if (isHighlighted && optionRef.current) {
+      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [isHighlighted]);
+
   const handleClick = () => {
     if (readOnly) {
       setOpen(false);
@@ -702,6 +711,7 @@ function VisibleSelectOption(option: Option) {
 
   return (
     <div
+      ref={optionRef}
       role="option"
       aria-disabled={!enabled}
       aria-selected={selected}
@@ -750,11 +760,20 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
     optionRenderer,
   } = useSelect();
 
+  const optionRef = useRef<HTMLDivElement>(null);
+
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.map((v) => String(v)).includes(value)
       : String(selectedValue) === String(value);
   }, [selectedValue, value, multiSelect]);
+
+  // Scroll into view when highlighted
+  useEffect(() => {
+    if (isHighlighted && optionRef.current) {
+      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [isHighlighted]);
 
   const handleClick = () => {
     if (readOnly) {
@@ -768,6 +787,7 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
 
   return (
     <div
+      ref={optionRef}
       role="option"
       aria-disabled={!enabled}
       aria-selected={selected}
