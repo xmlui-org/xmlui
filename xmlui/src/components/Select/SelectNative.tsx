@@ -512,12 +512,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     [
       multiSelect,
       readOnly,
-      toggleOption,
       value,
+      toggleOption,
       options,
-      optionRenderer,
       selectedIndex,
       filteredOptions,
+      optionRenderer,
     ],
   );
 
