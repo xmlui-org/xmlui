@@ -87,22 +87,10 @@ export const StateContainer = memo(
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
-    
-    // Debug ID to track different StateContainer instances
-    const instanceId = useRef(Math.random().toString(36).substring(7));
 
     const stateFromOutside = useShallowCompareMemoize(
       useMemo(() => {
-        const extracted = extractScopedState(parentState, node.uses);
-        console.log(`[StateContainer ${instanceId.current}] extractScopedState:`, {
-          uses: node.uses,
-          parentStateKeys: Object.keys(parentState),
-          extractedKeys: Object.keys(extracted || {}),
-          hasTestCall: 'testCall' in (parentState || {}),
-          testCallValue: parentState?.['testCall'],
-          testCallHasExecute: parentState?.['testCall']?.execute !== undefined,
-        });
-        return extracted;
+        return extractScopedState(parentState, node.uses);
       }, [node.uses, parentState]),
     );
 
@@ -116,20 +104,8 @@ export const StateContainer = memo(
     // --- The exposed APIs of components are also the part of the state.
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
 
-    console.log(`[StateContainer ${instanceId.current}] Render - componentApis has`, Object.getOwnPropertySymbols(componentApis).length, "APIs", Object.getOwnPropertySymbols(componentApis).map(s => s.description));
-    console.log(`[StateContainer ${instanceId.current}] Render - componentState keys:`, Object.keys(componentState));
-    console.log(`[StateContainer ${instanceId.current}] Render - componentState symbols:`, Object.getOwnPropertySymbols(componentState).map(s => s.description));
-    console.log(`[StateContainer ${instanceId.current}] Render - componentState testCall:`, {
-      hasTestCall: 'testCall' in componentState,
-      testCallValue: componentState['testCall'],
-      testCallSymbolValue: Object.getOwnPropertySymbols(componentState).find(s => s.description === 'testCall') 
-        ? componentState[Object.getOwnPropertySymbols(componentState).find(s => s.description === 'testCall')!]
-        : undefined,
-    });
-
     const componentStateWithApis = useShallowCompareMemoize(
       useMemo(() => {
-        console.log(`[StateContainer ${instanceId.current}] componentStateWithApis useMemo RUNNING`);
         const ret = { ...componentState };
         
         // Get set of registered API keys - only these should have reducer state exposed as string keys
@@ -151,22 +127,13 @@ export const StateContainer = memo(
         }
         if (Reflect.ownKeys(componentApis).length === 0) {
           //skip containers with no registered apis
-          console.log(`[StateContainer ${instanceId.current}] Early return - no componentApis`);
           return ret;
         }
-        console.log(`[StateContainer ${instanceId.current}] Merging componentApis into componentState`);
-        console.log(`[StateContainer ${instanceId.current}] componentState keys:`, Object.keys(componentState));
-        console.log(`[StateContainer ${instanceId.current}] componentApis symbols:`, Object.getOwnPropertySymbols(componentApis).map(s => s.description));
         for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
           const value = componentApis[componentApiKey];
           if (componentApiKey.description) {
             const key = componentApiKey.description;
-            console.log(`[StateContainer ${instanceId.current}] Merging API for key "${key}":`, {
-              retBefore: ret[key],
-              apiValue: value,
-            });
             ret[key] = { ...(ret[key] || {}), ...value };
-            console.log(`[StateContainer ${instanceId.current}] Merged result for "${key}":`, ret[key]);
           }
           ret[componentApiKey] = { ...ret[componentApiKey], ...value };
         }
@@ -228,45 +195,23 @@ export const StateContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars,
     );
-    console.log(`[StateContainer ${instanceId.current}] resolvedLocalVars testCall:`, {
-      hasTestCall: 'testCall' in resolvedLocalVars,
-      testCallValue: resolvedLocalVars['testCall'],
-      testCallHasExecute: resolvedLocalVars['testCall']?.execute !== undefined,
-    });
-    console.log(`[StateContainer ${instanceId.current}] componentStateWithApis testCall:`, {
-      hasTestCall: 'testCall' in componentStateWithApis,
-      testCallValue: componentStateWithApis['testCall'],
-      testCallHasExecute: componentStateWithApis['testCall']?.execute !== undefined,
-    });
 
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
-    console.log(`[StateContainer ${instanceId.current}] mergedWithVars testCall:`, {
-      hasTestCall: 'testCall' in mergedWithVars,
-      testCallValue: mergedWithVars['testCall'],
-      testCallHasExecute: mergedWithVars['testCall']?.execute !== undefined,
-    });
-    console.log(`[StateContainer ${instanceId.current}] stateFromOutside testCall:`, {
-      hasTestCall: 'testCall' in stateFromOutside,
-      testCallValue: stateFromOutside['testCall'],
-      testCallHasExecute: stateFromOutside['testCall']?.execute !== undefined,
-    });
     const combinedState = useCombinedState(
-      mergedWithVars,           // Local vars and component state (lower priority)
+      stateFromOutside,         // Parent state (lower priority) - allows local vars to shadow
       node.contextVars,         // Context vars like $item
-      stateFromOutside,         // Parent state (higher priority) - should override local vars
+      mergedWithVars,           // Local vars and component state (higher priority) - enables shadowing
       routingParams,
     );
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
         produce((draft) => {
-          // console.log("-----BUST----setComponentApis");
           if (!draft[uid]) {
             draft[uid] = {};
           }
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
-              // console.log(`-----BUST------new api for ${uid}`, draft[uid][key], value)
               draft[uid][key] = value;
             }
           });
@@ -376,11 +321,9 @@ function useCombinedState(...states: (ContainerState | undefined)[]) {
   const combined: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
     states.forEach((state = EMPTY_OBJECT) => {
-      // console.log("st", state);
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
-      // console.log("ret", ret);
     });
     return ret;
   }, [states]);
@@ -443,7 +386,6 @@ function useVars(
                 if (isParsedValue(value)) {
                   return collectVariableDependencies(value.tree, referenceTrackedApi);
                 }
-                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
                 const params = parseParameterString(value);
                 let ret = new Set<string>();
                 params.forEach((param) => {
@@ -458,15 +400,6 @@ function useVars(
               }),
               obtainValue: memoizeOne(
                 (value, state, appContext, strict, deps, appContextDeps) => {
-                  // console.log(
-                  //   "VARS, BUST, obtain value called with",
-                  //   value,
-                  //   { state, appContext },
-                  //   {
-                  //     deps,
-                  //     appContextDeps,
-                  //   }
-                  // );
                   try {
                     return isParsedValue(value)
                       ? evalBinding(value.tree, {
@@ -528,7 +461,6 @@ function useVars(
           }
           const stateDepValues = pickFromObject(stateContext, dependencies);
           const appContextDepValues = pickFromObject(appContext, dependencies);
-          // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
 
           ret[key] = memoedVars.current
             .get(value)!
