@@ -758,7 +758,7 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async searchFor(value: string) {
-    await this.page.getByRole("combobox").fill(value);
+    await this.page.getByRole("searchbox").fill(value);
   }
 
   async chooseIndex(index: number) {

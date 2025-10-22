@@ -21,7 +21,10 @@ export type ValidationSummaryProps = {
   generalValidationResults: Array<SingleValidationResult>;
 };
 
-export const defaultProps: Pick<ValidationSummaryProps, "fieldValidationResults" | "generalValidationResults"> = {
+export const defaultProps: Pick<
+  ValidationSummaryProps,
+  "fieldValidationResults" | "generalValidationResults"
+> = {
   fieldValidationResults: EMPTY_OBJECT,
   generalValidationResults: EMPTY_ARRAY,
 };
@@ -63,11 +66,7 @@ export function ValidationSummary({
   }, [fieldValidationResults, generalValidationResults]);
 
   return (
-    <div
-      ref={animateContainerRef}
-      className={styles.summaryContainer}
-      data-validation-summary
-    >
+    <div ref={animateContainerRef} className={styles.summaryContainer} data-validation-summary>
       <ValidationDisplay
         issues={groupedInvalidResults.warning}
         severity={"warning"}

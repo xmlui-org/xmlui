@@ -6,11 +6,13 @@ import type { Option } from "../abstractions";
 
 type SelectContextValue = {
   multiSelect?: boolean;
+  readOnly?: boolean;
   value: ValueType | null;
   onChange?: (selectedValue: SingleValueType) => void;
   setOpen: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
   options: Set<Option>;
+  highlightedValue?: string;
   optionRenderer?: (
     option: Option,
     selectedValue: SingleValueType,

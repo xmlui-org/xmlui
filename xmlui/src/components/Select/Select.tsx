@@ -20,7 +20,6 @@ import {
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectNative";
-import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "Select";
 
@@ -185,7 +184,7 @@ export const selectComponentRenderer = createComponentRenderer(
         updateState={isControlled ? undefined : updateState}
         searchable={searchable}
         initialValue={extractValue(node.props.initialValue)}
-        value={isControlled ? extractValue(node.props.value) : state?.value}
+        value={state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
@@ -224,13 +223,7 @@ export const selectComponentRenderer = createComponentRenderer(
                       $selectedValue: val,
                       $inTrigger: inTrigger,
                     }}
-                    renderChild={(...args) =>
-                      multiSelect || searchable ? (
-                        renderChild(...args)
-                      ) : (
-                        <SelectItemText>{renderChild(...args)}</SelectItemText>
-                      )
-                    }
+                    renderChild={renderChild}
                   />
                 );
               }

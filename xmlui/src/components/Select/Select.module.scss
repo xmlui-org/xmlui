@@ -88,7 +88,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
       border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
     }
 
-    &.focused {
+    &:focus {
       outline-width: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
       outline-color: createThemeVar("Input:outlineColor-#{$componentName}--focus");
       outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
@@ -204,6 +204,7 @@ $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
   .selectContent {
     z-index: 1000;
     outline: none;
+    overflow: auto;
     background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
     border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
     box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");

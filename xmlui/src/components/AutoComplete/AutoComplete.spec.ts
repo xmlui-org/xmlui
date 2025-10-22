@@ -140,11 +140,12 @@ test("multi mode allows selecting multiple options", async ({
   await expect(page.getByTestId("text")).toHaveText("Selected values: 1");
 
   // Click another option
-  await driver.click();
   await driver.selectLabel("Diana Prince");
 
   // Both options should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected values: 1,3");
+
+  await driver.click();
 
   // Both selected options should be visible as badges
   await expect(page.getByText("Bruce Wayne")).toBeVisible();
