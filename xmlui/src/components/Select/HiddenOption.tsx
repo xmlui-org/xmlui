@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 export function HiddenOption(option: Option) {
   const { label } = option;
-  const { onOptionRemove, onOptionAdd } = useOption();
+  const { onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
 
   const opt: Option = useMemo(() => {

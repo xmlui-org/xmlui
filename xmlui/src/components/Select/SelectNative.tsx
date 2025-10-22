@@ -423,7 +423,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    console.log("focus");
     referenceElement?.focus();
   }, [referenceElement]);
 
@@ -536,10 +535,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               id={id}
               aria-haspopup="listbox"
               style={style}
-              onFocus={() => {
-                onFocus();
-                console.log("onFocus");
-              }}
+              onFocus={onFocus}
               onBlur={onBlur}
               disabled={!enabled}
               aria-expanded={open}
@@ -672,7 +668,6 @@ function VisibleSelectOption(option: Option) {
     multiSelect,
     readOnly,
     setOpen,
-    setSelectedIndex,
     highlightedValue,
     optionRenderer,
   } = useSelect();
