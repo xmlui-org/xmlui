@@ -1,7 +1,6 @@
 <App
-    layout="vertical-full-header"
-    noScrollbarGutters
-    var.posts=`{[
+  layout="vertical-full-header"
+  var.posts=`{[
       {
         title: "Welcome to the XMLUI blog!",
         slug: "welcome-to-the-xmlui-blog",
@@ -17,6 +16,7 @@
                 <Logo height="$space-8"/>
             </Link>
         </property>
+        <Search data="{appGlobals.plainTextContent}" />
         <property name="profileMenuTemplate">
             <Text variant="em">XMLUI Blog: Tutorials, tips, best practices</Text>
         </property>
@@ -40,15 +40,17 @@
         </Page>
     </Pages>
     <Footer>
-        <HStack width="100%">
-            <Text>This site is an XMLUI™ app.</Text>
-            <SpaceFiller />
-            <ToneSwitch />
-            <Image
-              width="$space-6"
-              height="$space-6"
-              onClick="window.location.href = '/feed.rss'"
-              src="/resources/rss.svg" />
-        </HStack>
+        <Text variant="em">
+            This site is an XMLUI™ app.
+        </Text>
+        <SpaceFiller />
+        <FooterLinks />
+        <SpaceFiller />
+          <Image
+            width="$space-6"
+            height="$space-6"
+            onClick="window.location.href = '/feed.rss'"
+            src="/resources/rss.svg" />
+        <ToneSwitch />
     </Footer>
 </App>

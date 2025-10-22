@@ -1,17 +1,18 @@
-<App
-    layout="vertical-full-header"
-    noScrollbarGutters="false">
+    <App layout="vertical-full-header">
     <AppHeader>
         <property name="logoTemplate">
             <Link to="https://xmlui.org/">
                 <Logo height="$space-8" />
             </Link>
         </property>
+        <Search data="{appGlobals.plainTextContent}" />
+        <property name="profileMenuTemplate">
+            <Text variant="em">XMLUI Docs: For humans and AIs</Text>
+        </property>
         <SpaceFiller />
         <Search
             data="{appGlobals.plainTextContent}"
             when="{mediaSize.sizeIndex > 2}" />
-        <ToneSwitch />
     </AppHeader>
     <NavPanel
         when="{!window.location.hash.includes('/404') || mediaSize.sizeIndex <= 2}">
@@ -574,14 +575,12 @@
         </Page>
     </Pages>
     <Footer>
-        <CHStack width="*">
+        <Text variant="em">
             This site is an XMLUI™ app.
-            <SpaceFiller />
-            <Link
-                to="https://github.com/xmlui-org/xmlui/tree/main/docs/src"
-                target="_blank">
-                <Button variant="ghost" icon="github" />
-            </Link>
-        </CHStack>
+        </Text>
+        <SpaceFiller />
+        <FooterLinks />
+        <SpaceFiller />
+        <ToneSwitch />
     </Footer>
 </App>
