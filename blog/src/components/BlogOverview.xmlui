@@ -6,8 +6,6 @@
     })
   }">
     <VStack
-       width="85%"
-       marginHorizontal="auto"
        var.blogLink="/blog/{$item.slug}"
        gap="$space-2"
        onClick="Actions.navigate(blogLink)">
