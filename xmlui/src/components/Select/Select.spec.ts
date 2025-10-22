@@ -37,10 +37,10 @@ test.describe("Basic Functionality", () => {
     </Form>`);
     const driver = await createSelectDriver("mySelect");
 
-    await expect(driver.component.locator("select")).toHaveValue("opt1");
+    await expect(driver.component).toHaveText("first");
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("second");
-    await expect(driver.component.locator("select")).toHaveValue("opt2");
+    await expect(driver.component).toHaveText("second");
   });
 
   // --- initialValue prop
@@ -157,12 +157,10 @@ test.describe("Basic Functionality", () => {
     </Select>
     `);
     const driver = await createSelectDriver();
-    await expect(page.getByText("Two")).not.toBeVisible();
-    await expect(page.getByText("One")).toBeVisible();
+    await expect(driver.component).toHaveText("One");
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("Two");
-    await expect(page.getByText("Two")).not.toBeVisible();
-    await expect(page.getByText("One")).toBeVisible();
+    await expect(driver.component).toHaveText("One");
 
     // verify dropdown is not visible but value is shown
   });

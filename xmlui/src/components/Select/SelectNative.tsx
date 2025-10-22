@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import classnames from "classnames";
 import { FocusScope } from "@radix-ui/react-focus-scope";
 import styles from "./Select.module.scss";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -23,6 +24,8 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { HiddenOption } from "./HiddenOption";
+
+const PART_LIST_WRAPPER = "listWrapper";
 
 export const defaultProps = {
   enabled: true,
@@ -484,6 +487,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const selectContextValue = useMemo(
     () => ({
       multiSelect,
+      readOnly,
       value,
       onChange: toggleOption,
       setOpen,
@@ -491,7 +495,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       options,
       optionRenderer,
     }),
-    [multiSelect, toggleOption, value, options, optionRenderer],
+    [multiSelect, readOnly, toggleOption, value, options, optionRenderer],
   );
 
   return (
@@ -501,61 +505,51 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           <Popover
             open={open}
             onOpenChange={(isOpen) => {
-              if (readOnly) return;
+              if (!enabled) return;
               setOpen(isOpen);
+              // Reset highlighted option when dropdown closes
+              setSelectedIndex(-1);
             }}
             modal={false}
           >
-            <PopoverTrigger {...rest} asChild>
-              <div
-                ref={(el) => {
-                  setReferenceElement(el);
-                  if (typeof forwardedRef === "function") {
-                    forwardedRef(el);
-                  } else if (forwardedRef) {
-                    forwardedRef.current = el;
-                  }
-                }}
-                id={id}
-                aria-haspopup="listbox"
-                style={style}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                aria-expanded={open}
-                onClick={(event) => {
-                  if (!enabled || readOnly) return;
-                  event.stopPropagation();
-                  setOpen((prev) => !prev);
-                }}
-                className={classnames(
-                  styles.selectTrigger,
-                  styles[validationStatus],
-                  {
-                    [styles.disabled]: !enabled,
-                    [styles.multi]: multiSelect,
-                  },
-                  className,
-                )}
-                tabIndex={enabled ? 0 : -1}
-                autoFocus={autoFocus}
-              >
-                <SelectTriggerValue
-                  value={value}
-                  placeholder={placeholder}
-                  readOnly={readOnly}
-                  multiSelect={multiSelect}
-                  options={options}
-                  valueRenderer={valueRenderer}
-                  toggleOption={toggleOption}
-                />
-                <SelectTriggerActions
-                  value={value}
-                  multiSelect={multiSelect}
-                  enabled={enabled}
-                  readOnly={readOnly}
-                  clearValue={clearValue}
-                />
-              </div>
+            <PopoverTrigger
+              {...rest}
+              ref={composeRefs(setReferenceElement, forwardedRef)}
+              id={id}
+              aria-haspopup="listbox"
+              style={style}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              disabled={!enabled}
+              aria-expanded={open}
+              data-part-id={PART_LIST_WRAPPER}
+              className={classnames(className, styles.selectTrigger, styles[validationStatus], {
+                [styles.disabled]: !enabled,
+                [styles.multi]: multiSelect,
+              })}
+              onClick={(event) => {
+                if (!enabled) return;
+                event.stopPropagation();
+                setOpen((prev) => !prev);
+              }}
+              autoFocus={autoFocus}
+            >
+              <SelectTriggerValue
+                value={value}
+                placeholder={placeholder}
+                readOnly={readOnly}
+                multiSelect={multiSelect}
+                options={options}
+                valueRenderer={valueRenderer}
+                toggleOption={toggleOption}
+              />
+              <SelectTriggerActions
+                value={value}
+                multiSelect={multiSelect}
+                enabled={enabled}
+                readOnly={readOnly}
+                clearValue={clearValue}
+              />
             </PopoverTrigger>
             {open && (
               <Portal container={root}>
@@ -632,7 +626,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 function VisibleSelectOption(option: Option) {
   const { value, label, enabled = true, children } = option;
   const { onOptionAdd } = useOption();
-  const { value: selectedValue, onChange, multiSelect, setOpen, optionRenderer } = useSelect();
+  const {
+    value: selectedValue,
+    onChange,
+    multiSelect,
+    readOnly,
+    setOpen,
+    optionRenderer,
+  } = useSelect();
 
   const opt: Option = useMemo(() => {
     return {
@@ -654,6 +655,10 @@ function VisibleSelectOption(option: Option) {
   }, [selectedValue, value, multiSelect]);
 
   const handleClick = () => {
+    if (readOnly) {
+      setOpen(false);
+      return;
+    }
     if (enabled) {
       onChange(value);
     }
