@@ -349,7 +349,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "backgroundColor-control-Carousel--hover": "rgb(255, 165, 0)",
+          "backgroundColor-control-hover-Carousel": "rgb(255, 165, 0)",
         },
       },
     );
@@ -366,7 +366,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "textColor-control-Carousel--hover": "rgb(255, 255, 255)",
+          "textColor-control-hover-Carousel": "rgb(255, 255, 255)",
         },
       },
     );
@@ -383,7 +383,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "backgroundColor-control-Carousel--active": "rgb(0, 128, 0)",
+          "backgroundColor-control-active-Carousel": "rgb(0, 128, 0)",
         },
       },
     );
@@ -401,7 +401,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "textColor-control-Carousel--active": "rgb(255, 255, 0)",
+          "textColor-control-active-Carousel": "rgb(255, 255, 0)",
         },
       },
     );
@@ -418,7 +418,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "backgroundColor-control-Carousel--disabled": "rgb(200, 200, 200)",
+          "backgroundColor-control-disabled-Carousel": "rgb(200, 200, 200)",
         },
       },
     );
@@ -433,7 +433,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "textColor-control-Carousel--disabled": "rgb(150, 150, 150)",
+          "textColor-control-disabled-Carousel": "rgb(150, 150, 150)",
         },
       },
     );
@@ -497,7 +497,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "backgroundColor-indicator-Carousel--hover": "rgb(150, 150, 255)",
+          "backgroundColor-indicator-hover-Carousel": "rgb(150, 150, 255)",
         },
       },
     );
@@ -514,7 +514,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "textColor-indicator-Carousel--hover": "rgb(255, 100, 100)",
+          "textColor-indicator-hover-Carousel": "rgb(255, 100, 100)",
         },
       },
     );
@@ -531,7 +531,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "backgroundColor-indicator-Carousel--active": "rgb(0, 0, 255)",
+          "backgroundColor-indicator-active-Carousel": "rgb(0, 0, 255)",
         },
       },
     );
@@ -547,7 +547,7 @@ test.describe("Visual States", () => {
       </Carousel>`,
       {
         testThemeVars: {
-          "textColor-indicator-Carousel--active": "rgb(255, 255, 255)",
+          "textColor-indicator-active-Carousel": "rgb(255, 255, 255)",
         },
       },
     );
