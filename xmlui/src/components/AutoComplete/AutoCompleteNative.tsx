@@ -237,7 +237,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }, [multi, updateState, onDidChange]);
 
   const onOptionAdd = useCallback((option: Option) => {
-    setOptions((prev) => new Set(prev).add(option));
+    setOptions((prev) => {
+      const newSet = new Set(prev);
+      // Remove old version if exists, then add the new one to ensure updates
+      const existing = Array.from(prev).find((opt) => opt.value === option.value);
+      if (existing) {
+        newSet.delete(existing);
+      }
+      newSet.add(option);
+      return newSet;
+    });
   }, []);
 
   const onOptionRemove = useCallback((option: Option) => {
@@ -485,6 +494,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   },
                 )}
                 aria-expanded={open}
+                onClick={(event) => {
+                  if (readOnly) return;
+                  // In multi mode, only open the dropdown, don't toggle
+                  // In single mode, toggle as usual
+                  if (multi && open) {
+                    return; // Already open, don't close
+                  }
+                  event.stopPropagation();
+                  setOpen((prev) => !prev);
+                }}
               >
                 {Array.isArray(selectedValue) && selectedValue.length > 0 && (
                   <div className={styles.badgeList}>
@@ -642,7 +661,8 @@ type CreatableItemProps = {
 };
 
 function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps) {
-  const { value, options, searchTerm, onChange, setOpen, setSelectedIndex } = useAutoComplete();
+  const { value, options, searchTerm, onChange, setOpen, setSelectedIndex, multi } =
+    useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
     isOptionsExist(options, [{ value: searchTerm, label: searchTerm }]) ||
@@ -657,7 +677,10 @@ function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps)
     onOptionAdd(newOption);
     onNewItem?.(searchTerm);
     onChange(searchTerm);
-    setOpen(false);
+    // Only close dropdown for single select mode
+    if (!multi) {
+      setOpen(false);
+    }
   };
 
   const Item = (
@@ -714,7 +737,10 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
   const handleClick = () => {
     if (!readOnly && enabled) {
       onChange(value);
-      setOpen(false);
+      // Only close dropdown for single select mode
+      if (!multi) {
+        setOpen(false);
+      }
     }
   };
 
