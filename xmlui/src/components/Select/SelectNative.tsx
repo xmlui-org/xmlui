@@ -497,13 +497,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        {/* Hidden render to collect options when dropdown is closed */}
-        {!open && (
-          <div style={{ display: "none" }}>
-            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
-          </div>
-        )}
-
         <OptionTypeProvider Component={VisibleSelectOption}>
           <Popover
             open={open}
@@ -624,6 +617,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             )}
           </Popover>
         </OptionTypeProvider>
+        {/* Hidden render to collect options when dropdown is closed */}
+        {!open && (
+          <div style={{ display: "none" }}>
+            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+          </div>
+        )}
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
