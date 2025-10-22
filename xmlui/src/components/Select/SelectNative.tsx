@@ -527,6 +527,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 [styles.disabled]: !enabled,
                 [styles.multi]: multiSelect,
               })}
+              role="combobox"
               onClick={(event) => {
                 if (!enabled) return;
                 event.stopPropagation();
@@ -564,7 +565,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                         <div className={styles.commandInputContainer}>
                           <Icon name="search" />
                           <input
-                            role="combobox"
+                            role="searchbox"
                             className={classnames(styles.commandInput)}
                             placeholder="Search..."
                             value={searchTerm}
