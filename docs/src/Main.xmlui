@@ -575,7 +575,7 @@
         </Page>
     </Pages>
     <Footer>
-        <Text variant="em">
+        <Text>
             This site is an XMLUI™ app.
         </Text>
         <SpaceFiller />
