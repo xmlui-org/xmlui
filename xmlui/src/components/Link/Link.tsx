@@ -56,7 +56,6 @@ export const LinkMd = createMetadata({
     [`textColor-${COMP}--active`]: "$color-primary-400",
     [`textDecorationColor-${COMP}--active`]: `textColor-${COMP}--active`,
     [`textColor-${COMP}--hover--active`]: `$textColor-${COMP}--active`,
-    [`textColor-${COMP}--disabled`]: `$textColor--disabled`,
     [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`textDecorationLine-${COMP}`]: "underline",
     [`textDecorationStyle-${COMP}`]: "solid",
