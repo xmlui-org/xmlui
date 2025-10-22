@@ -398,6 +398,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             const selectedItem = filteredOptions[selectedIndex];
             if (selectedItem.enabled !== false) {
               toggleOption(selectedItem.value);
+              // Close dropdown after selecting in single-select mode
+              if (!multiSelect) {
+                setOpen(false);
+              }
             }
           }
           break;
@@ -412,6 +416,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       selectedIndex,
       filteredOptions,
       toggleOption,
+      multiSelect,
       findNextEnabledIndex,
       findPreviousEnabledIndex,
     ],
@@ -532,6 +537,21 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 if (!enabled) return;
                 event.stopPropagation();
                 setOpen((prev) => !prev);
+              }}
+              onKeyDown={(event) => {
+                if (!enabled || readOnly) return;
+
+                // Handle opening dropdown with keyboard
+                if (!open && (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === " " || event.key === "Enter")) {
+                  event.preventDefault();
+                  setOpen(true);
+                  return;
+                }
+
+                // Handle keyboard navigation when dropdown is open
+                if (open) {
+                  handleKeyDown(event);
+                }
               }}
               autoFocus={autoFocus}
             >
