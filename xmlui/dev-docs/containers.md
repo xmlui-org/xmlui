@@ -396,8 +396,21 @@ const stateFromOutside = extractScopedState(parentState, node.uses);
 const componentStateWithApis = mergeComponentApis(componentState, componentApis);
 const localVarsStateContext = useCombinedState(stateFromOutside, componentStateWithApis, node.contextVars);
 const resolvedLocalVars = useVars(varDefinitions, functionDeps, localVarsStateContext, memoedVars);
-const combinedState = useCombinedState(stateFromOutside, node.contextVars, mergedWithVars, routingParams);
+const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
+
+// State priority order (later overrides earlier):
+// 1. stateFromOutside (parent state - lowest priority)
+// 2. node.contextVars (context variables like $item)
+// 3. mergedWithVars (local vars + component APIs - highest priority)
+const combinedState = useCombinedState(
+  stateFromOutside,      // Parent state (lowest priority) - allows shadowing
+  node.contextVars,      // Context vars
+  mergedWithVars,        // Local vars and component APIs (highest priority) - enables shadowing
+  routingParams          // Routing parameters
+);
 ```
+
+**State Shadowing**: The priority order allows local variables to shadow (override) parent state variables with the same name. This enables child containers to define their own versions of variables without being forced to use the parent's state, supporting better component encapsulation.
 
 ### Variable Resolution and Memoization
 
@@ -437,6 +450,21 @@ export const enum ContainerActionKind {
   STATE_PART_CHANGED = "ContainerActionKind:STATE_PART_CHANGED",
 }
 ```
+
+#### Event Handler State Preservation
+
+The event handler lifecycle actions (`EVENT_HANDLER_STARTED`, `EVENT_HANDLER_COMPLETED`, `EVENT_HANDLER_ERROR`) implement a critical state preservation pattern. When setting lifecycle flags like `inProgress` or `error`, the reducer checks if state already exists for the component's `uid`:
+
+```typescript
+// From reducer.ts - state preservation pattern
+case ContainerActionKind.EVENT_HANDLER_STARTED:
+  state[uid] = state[uid] 
+    ? { ...state[uid], [inProgressFlagName]: true }
+    : { [inProgressFlagName]: true };
+  break;
+```
+
+**Why This Matters**: Components with reducer state (like `DataSource` or `APICall`) maintain their `data`, `error`, and other properties throughout the event handler lifecycle. Without this preservation, setting the `inProgress` flag would replace the entire state object, losing critical data like loaded results or previous errors. This fix resolved issues where APIs would become non-functional after their first error because the state was being wiped out instead of updated.
 
 ### Partial State Changes
 
@@ -643,6 +671,31 @@ APIs are merged into the component state so they're accessible via the component
 // API access pattern
 componentStateWithApis[componentId] = { ...componentState, ...exposedApi };
 ```
+
+#### API State Scoping
+
+Component API state (particularly reducer state from loaders like `DataSource` or `APICall`) is carefully scoped to prevent state leakage between containers. When component APIs are exposed as string keys in the container state (using the component's `id` as the key), the StateContainer only includes reducer state for APIs that are actually registered within that specific container.
+
+**Implementation**: The StateContainer maintains a Set of registered API keys and filters which reducer state properties are copied to string keys:
+
+```typescript
+// From StateContainer.tsx - API state scoping
+const registeredApiKeys = new Set<string>();
+for (const sym of Object.getOwnPropertySymbols(componentApis)) {
+  if (sym.description) {
+    registeredApiKeys.add(sym.description);
+  }
+}
+
+// Only copy reducer state if the API is registered in this container
+for (const key of Object.keys(componentState)) {
+  if (registeredApiKeys.has(key)) {
+    ret[key] = { ...(ret[key] || {}), ...componentState[key] };
+  }
+}
+```
+
+**Benefit**: This prevents child containers from inheriting parent API reducer state. For example, if a parent has a `DataSource` with `id="users"`, child containers won't see `users.inProgress`, `users.error`, or other reducer properties unless they register their own API with that ID. This ensures clean separation and prevents confusing state interactions.
 
 ## Asynchronous Event Handler Execution
 
