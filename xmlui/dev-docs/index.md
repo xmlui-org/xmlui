@@ -15,57 +15,11 @@ This article helps you understand the implementation details of xmlui so that yo
 
 **Rendering Techniques**
 - [Component Behaviors](./component-behaviors.md)
+- [User-Defined Components](./ud-components.md)
+- [Components with Options](./components-with-options.md)
 - ...
 
 Topics to elaborate on:
-
-- **How deployment and build systems work** ✓ _[standalone-app.md, build-system.md, build-xmlui.md, xmlui-repo.md]_
-  - File structure requirements for each deployment mode ✓
-  - Buildless mode: runtime source file fetching, on-demand parsing, and zero-config deployment ✓
-  - Built mode: compile-time transformation, Vite plugins, HMR, and production optimization ✓
-  - How `StandaloneApp` and `useStandalone` handle both modes ✓
-  - Performance trade-offs and choosing the right deployment mode ✓
-  - CLI commands: xmlui start, build, preview, build-lib, zip-dist ✓
-  - Build modes: CONFIG_ONLY, INLINE_ALL, ALL for component bundling ✓
-  - Vite plugin system: .xmlui/.xmlui.xs transformation pipeline ✓
-  - Core package builds: library (npm), standalone (UMD), metadata (docs/LSP) ✓
-  - Extension builds: development workflow, distribution, package structure ✓
-  - Monorepo architecture: workspaces, Turborepo orchestration, task dependencies ✓
-  - CI/CD integration: caching, parallel execution, changesets version management ✓
-  - Migration path from buildless to built mode
-
-- **How the rendering pipeline works** ✓ _[standalone-app.md]_
-  - Parsing .xmlui markup and .xmlui.xs code-behind files into ComponentDef structures ✓
-  - Component registry: mapping component names to renderer functions (core → user → extensions) ✓
-  - The renderChild() "jolly-joker" function: recursive component tree traversal and rendering ✓
-  - ComponentWrapper → ContainerWrapper → ComponentAdapter collaboration chain ✓
-  - RendererContext creation and propagation to component renderers ✓
-  - Expression evaluation and data binding resolution ✓
-  - Error handling, fallback rendering, and ErrorBoundary integration ✓
-
-- **How user-defined components work** ✓ _[containers.md]_
-  - Component definition with `<Component name="...">` syntax ✓
-  - Automatic instance container creation for each usage and instance isolation ✓
-  - Props passing and property binding to instances ✓
-  - Slot mechanism: named slots, default slots, template transposition, and content projection ✓
-  - Component reusability and composition patterns
-  - Communication between component instances via APIs ✓
-
-- **How container-based state management works** ✓ _[containers.md]_
-  - Automatic container wrapping: isContainerLike() detection logic ✓
-  - Container hierarchy mirroring component structure ✓
-  - Five layers of state composition: parent state, component APIs, local variables, context variables, routing ✓
-  - Component identification with Symbols and API registration ✓
-  - State inheritance and the uses property for explicit scoping ✓
-  - ContainerState structure and useCombinedState() merging ✓
-
-- **How reactive state changes are detected and propagated** ✓ _[containers.md]_
-  - Proxy-based change detection: buildProxy() intercepting get/set operations ✓
-  - Path tracking and dispatching STATE_PART_CHANGED actions ✓
-  - Reducer-based state updates: ContainerActionKind enum and Immer integration ✓
-  - Deep object/array mutation handling with Lodash setWith() ✓
-  - Variable dependency tracking and memoization with useVars() ✓
-  - Performance optimization: selective recalculation and preventing unnecessary re-renders ✓
 
 - **How data loading and API operations work** ✓ _[standalone-app.md, containers.md]_
   - ApiBoundComponent detection of DataSource, APICall, FileUpload, FileDownload ✓
