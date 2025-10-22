@@ -62,6 +62,27 @@ test.describe("Open/Close", () => {
     await expect(page.getByTestId("modal").getByRole("heading")).toHaveText("PARAM_VALUE");
   });
 
+  test("Preserves $item context variable from Table Column", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Table data='{[
+        {id: 1, company: "Acme Corp", order: 1},
+      ]}'>
+        <Column>
+          <ModalDialog id="dialog" testId="dialog" title="{$item.company}">
+            <Text testId="modal-text">{JSON.stringify($item)}</Text>
+          </ModalDialog>
+          <Button testId="btn-{$itemIndex}" onClick="dialog.open()">{$item.company}</Button>
+        </Column>
+      </Table>
+    `);
+
+    // Test first row
+    await page.getByTestId("btn-0").click();
+    const modal = page.getByTestId("dialog");
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText("Acme Corp");
+  });
+
   test("Declarative open/close", async ({ page, initTestBed }) => {
     await initTestBed(`
     <Fragment var.isOpen="{false}">
