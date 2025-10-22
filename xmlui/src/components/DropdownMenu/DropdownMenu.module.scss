@@ -15,7 +15,7 @@ $borderWidth-DropdownMenu-content: createThemeVar("borderWidth-DropdownMenu-cont
 $borderStyle-DropdownMenu-content: createThemeVar("borderStyle-DropdownMenu-content");
 $minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
 $backgroundColor-MenuItem: createThemeVar("backgroundColor-MenuItem");
-$color-MenuItem: createThemeVar("color-MenuItem");
+$textColor-MenuItem: createThemeVar("textColor-MenuItem");
 $fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
 $gap-MenuItem: createThemeVar("gap-MenuItem");
 $fontSize-MenuItem: createThemeVar("fontSize-MenuItem");
@@ -24,10 +24,10 @@ $paddingHorizontal-MenuItem: createThemeVar("paddingHorizontal-MenuItem");
 $backgroundColor-MenuItem--hover: createThemeVar("backgroundColor-MenuItem--hover");
 $backgroundColor-MenuItem--active: createThemeVar("backgroundColor-MenuItem--active");
 $backgroundColor-MenuItem--active--hover: createThemeVar("backgroundColor-MenuItem--active--hover");
-$color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
-$color-MenuItem--active: createThemeVar("color-MenuItem--active");
-$color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
-$color-MenuItem--disabled: createThemeVar("color-MenuItem--disabled");
+$textColor-MenuItem--hover: createThemeVar("textColor-MenuItem--hover");
+$textColor-MenuItem--active: createThemeVar("textColor-MenuItem--active");
+$textColor-MenuItem--active--hover: createThemeVar("textColor-MenuItem--active--hover");
+$textColor-MenuItem--disabled: createThemeVar("textColor-MenuItem--disabled");
 $marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
 $marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
 $width-MenuSeparator: createThemeVar("width-MenuSeparator");
@@ -57,7 +57,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   .DropdownMenuItem,
   .DropdownMenuSubTrigger {
     background-color: $backgroundColor-MenuItem;
-    color: $color-MenuItem;
+    color: $textColor-MenuItem;
     font-family: $fontFamily-MenuItem;
     display: flex;
     border: 0;
@@ -65,7 +65,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     gap: $gap-MenuItem;
     font-size: $fontSize-MenuItem;
     padding: $paddingVertical-MenuItem 0;
-    padding-inline: $paddingHorizontal-MenuItem; //t.$space-3;
+    padding-inline: $paddingHorizontal-MenuItem;
     cursor: pointer;
     align-items: center;
     justify-content: space-between;
@@ -75,27 +75,27 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     &:hover,
     &[data-highlighted] {
       background-color: $backgroundColor-MenuItem--hover;
-      color: $color-MenuItem--hover;
+      color: $textColor-MenuItem--hover;
     }
 
     &.active {
       background-color: $backgroundColor-MenuItem--active;
-      color: $color-MenuItem--active;
+      color: $textColor-MenuItem--active;
 
       &:hover {
         background-color: $backgroundColor-MenuItem--active--hover;
-        color: $color-MenuItem--active--hover;
+        color: $textColor-MenuItem--active--hover;
       }
     }
 
     &.disabled {
       background-color: $backgroundColor-MenuItem;
-      color: $color-MenuItem--disabled;
+      color: $textColor-MenuItem--disabled;
       cursor: not-allowed;
 
       &:hover {
         background-color: $backgroundColor-MenuItem;
-        color: $color-MenuItem--disabled;
+        color: $textColor-MenuItem--disabled;
       }
     }
 
