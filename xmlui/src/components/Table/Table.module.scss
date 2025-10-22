@@ -1,7 +1,8 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$themeVars: ();
+$themeVars: (
+);
 
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
@@ -33,15 +34,6 @@ $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
 $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 $borderRadius-Table: createThemeVar("borderRadius-#{$component}");
-
-$outlineWidth-heading-Table--focus: createThemeVar('outlineWidth-heading-#{$component}--focus');
-$outlineColor-heading-Table--focus: createThemeVar('outlineColor-heading-#{$component}--focus');
-$outlineStyle-heading-Table--focus: createThemeVar('outlineStyle-heading-#{$component}--focus');
-$outlineOffset-heading-Table--focus: createThemeVar('outlineOffset-heading-#{$component}--focus');
-
-$borderColor-cell-Table: createThemeVar("borderColor-cell-#{$component}");
-$borderBottom-cell-Table: createThemeVar("borderBottom-cell-#{$component}");
-$borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component}");
 
 
 @layer components {
@@ -90,10 +82,10 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
       }
 
       &:focus-visible {
-        outline-width: $outlineWidth-heading-Table--focus;
-        outline-color: $outlineColor-heading-Table--focus;
-        outline-style: $outlineStyle-heading-Table--focus;
-        outline-offset: $outlineOffset-heading-Table--focus;
+        outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
 
       }
     }
@@ -148,8 +140,9 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
     .headerRow {
       display: flex;
       flex-direction: row;
-      border-bottom: $borderBottom-cell-Table;
+      border-bottom: createThemeVar("borderBottom-cell-Table");
       user-select: none;
+      //background-color: inherit;
 
       .checkBoxWrapper {
         font-size: 1rem;
@@ -223,6 +216,7 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
 
         .cell {
           background-color: $backgroundColor-selected-Table;
+
         }
       }
 
@@ -256,7 +250,7 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
       }
 
       &:last-child{
-        border-bottom: $borderBottom-last-row-Table;
+        border-bottom: createThemeVar("borderBottom-last-row-Table");
       }
 
       &.noBottomBorder:last-child {
@@ -290,6 +284,38 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
     width: 100%;
     text-align: center;
     margin-top: t.$space-16;
+  }
+
+  .pagination {
+    position: sticky;
+    left: 0;
+    padding-top: t.$space-4;
+    padding-bottom: t.$space-4;
+    padding-inline: t.$space-4;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: t.$space-8;
+    width: 100%;
+    margin: 0 auto;
+    background-color: $backgroundColor-pagination-Table;
+  }
+
+  .paginationLabel {
+    color: $textColor-pagination-Table;
+    font-size: t.$fontSize-sm;
+  }
+
+  .paginationSelect {
+    color: inherit;
+    background-color: transparent;
+    margin-left: t.$space-4;
+  }
+
+  .paginationButtons {
+    display: flex;
+    flex-direction: row;
   }
 
   .searchIconWrapper {
@@ -339,7 +365,7 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-#{$component
       content: '';
       width: 1px;
       height: 100%;
-      background: $borderColor-cell-Table;
+      background: createThemeVar("borderColor-cell-Table");
     }
   }
 

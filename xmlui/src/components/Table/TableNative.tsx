@@ -511,6 +511,7 @@ export const Table = forwardRef(
     ]);
 
     // --- Set up page information (using the first page size option)
+    // const [pagination, setPagination] = useState<PaginationState>();
     const [pagination, setPagination] = useState<PaginationState>({
       pageSize: isPaginated ? pageSize : Number.MAX_VALUE,
       pageIndex: currentPageIndex,

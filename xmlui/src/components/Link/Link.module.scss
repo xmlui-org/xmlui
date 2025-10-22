@@ -15,7 +15,6 @@ $themeVars: t.composeTextVars($themeVars, $component);
 $textColor-Link--active: createThemeVar("textColor-#{$component}--active");
 $textColor-Link--hover: createThemeVar("textColor-#{$component}--hover");
 $textColor-Link--hover--active: createThemeVar("textColor-#{$component}--hover--active");
-$textColor-Link--disabled: createThemeVar("textColor-#{$component}--disabled");
 $fontWeight-Link--active: createThemeVar("fontWeight-#{$component}--active");
 $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
@@ -25,11 +24,6 @@ $textDecorationColor-Link--hover: createThemeVar("textDecorationColor-#{$compone
 $textDecorationColor-Link--active: createThemeVar("textDecorationColor-#{$component}--active");
 $textDecorationStyle-Link: createThemeVar("textDecorationStyle-#{$component}");
 $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
-
-$outlineWidth-Link--focus: createThemeVar("outlineWidth-#{$component}--focus");
-$outlineColor-Link--focus: createThemeVar("outlineColor-#{$component}--focus");
-$outlineStyle-Link--focus: createThemeVar("outlineStyle-#{$component}--focus");
-$outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus");
 
 @layer components {
   .container {
@@ -53,8 +47,6 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
 
     &.disabled {
       pointer-events: none;
-      color: $textColor-Link--disabled;
-      cursor: default;
     }
 
     &:not(.disabled) {
@@ -63,10 +55,10 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
       }
 
       &:focus-visible {
-        outline-width: $outlineWidth-Link--focus;
-        outline-color: $outlineColor-Link--focus;
-        outline-style: $outlineStyle-Link--focus;
-        outline-offset: $outlineOffset-Link--focus;
+        outline-width: createThemeVar("outlineWidth-#{$component}--focus");
+        outline-color: createThemeVar("outlineColor-#{$component}--focus");
+        outline-style: createThemeVar("outlineStyle-#{$component}--focus");
+        outline-offset: createThemeVar("outlineOffset-#{$component}--focus");
       }
 
       &.active {
