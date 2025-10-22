@@ -2258,6 +2258,11 @@ export default {
   "AppState": {
     "status": "stable",
     "description": "`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.",
+    "events": {
+      "didUpdate": {
+        "description": "This event is fired when the AppState value is updated. The event provides the new state value as its parameter."
+      }
+    },
     "props": {
       "bucket": {
         "description": "This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.",
@@ -2265,7 +2270,7 @@ export default {
         "defaultValue": "default"
       },
       "initialValue": {
-        "description": "This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization. By default, the bucked's initial state is undefined."
+        "description": "This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately merged with the existing state. The issue may come from the behavior that `initialValue` is set (merged) only when a component mounts. By default, the bucket's initial state is undefined."
       }
     },
     "apis": {
@@ -2274,6 +2279,30 @@ export default {
         "description": "This method updates the application state object bound to the `AppState` instance.",
         "parameters": {
           "newState": "An object that specifies the new state value."
+        }
+      },
+      "appendToList": {
+        "signature": "appendToList(key: string, id: any)",
+        "description": "This method appends an item to an array in the application state object bound to the `AppState` instance.",
+        "parameters": {
+          "key": "The key of the array in the state object.",
+          "id": "The item to append to the array."
+        }
+      },
+      "removeFromList": {
+        "signature": "removeFromList(key: string, id: any)",
+        "description": "This method removes an item from an array in the application state object bound to the `AppState` instance.",
+        "parameters": {
+          "key": "The key of the array in the state object.",
+          "id": "The item to remove from the array."
+        }
+      },
+      "listIncludes": {
+        "signature": "listIncludes(key: string, id: any)",
+        "description": "This method checks if an array in the application state object contains a specific item.",
+        "parameters": {
+          "key": "The key of the array in the state object.",
+          "id": "The item to check for in the array."
         }
       }
     },
@@ -2343,39 +2372,6 @@ export default {
           }
         ],
         "defaultValue": "none"
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ]
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "dropdownHeight": {
         "description": "This property sets the height of the dropdown list."
@@ -2470,6 +2466,13 @@ export default {
       "paddingRight-AutoComplete": "var(--xmlui-paddingRight-AutoComplete, var(--xmlui-paddingHorizontal-AutoComplete, var(--xmlui-padding-AutoComplete)))",
       "paddingTop-AutoComplete": "var(--xmlui-paddingTop-AutoComplete, var(--xmlui-paddingVertical-AutoComplete, var(--xmlui-padding-AutoComplete)))",
       "paddingBottom-AutoComplete": "var(--xmlui-paddingBottom-AutoComplete, var(--xmlui-paddingVertical-AutoComplete, var(--xmlui-padding-AutoComplete)))",
+      "padding-item-AutoComplete": "var(--xmlui-padding-item-AutoComplete)",
+      "paddingHorizontal-item-AutoComplete": "var(--xmlui-paddingHorizontal-item-AutoComplete, var(--xmlui-padding-item-AutoComplete))",
+      "paddingVertical-item-AutoComplete": "var(--xmlui-paddingVertical-item-AutoComplete, var(--xmlui-padding-item-AutoComplete))",
+      "paddingLeft-item-AutoComplete": "var(--xmlui-paddingLeft-item-AutoComplete, var(--xmlui-paddingHorizontal-item-AutoComplete, var(--xmlui-padding-item-AutoComplete)))",
+      "paddingRight-item-AutoComplete": "var(--xmlui-paddingRight-item-AutoComplete, var(--xmlui-paddingHorizontal-item-AutoComplete, var(--xmlui-padding-item-AutoComplete)))",
+      "paddingTop-item-AutoComplete": "var(--xmlui-paddingTop-item-AutoComplete, var(--xmlui-paddingVertical-item-AutoComplete, var(--xmlui-padding-item-AutoComplete)))",
+      "paddingBottom-item-AutoComplete": "var(--xmlui-paddingBottom-item-AutoComplete, var(--xmlui-paddingVertical-item-AutoComplete, var(--xmlui-padding-item-AutoComplete)))",
       "Input:borderRadius-AutoComplete-default": "var(--xmlui-borderRadius-AutoComplete-default)",
       "Input:borderColor-AutoComplete-default": "var(--xmlui-borderColor-AutoComplete-default)",
       "Input:borderWidth-AutoComplete-default": "var(--xmlui-borderWidth-AutoComplete-default)",
@@ -2544,34 +2547,41 @@ export default {
       "Input:backgroundColor-AutoComplete-badge--active": "var(--xmlui-backgroundColor-AutoComplete-badge--active)",
       "Input:textColor-AutoComplete-badge--active": "var(--xmlui-textColor-AutoComplete-badge--active)",
       "Input:textColor-placeholder-AutoComplete": "var(--xmlui-textColor-placeholder-AutoComplete)",
-      "Input:backgroundColor-menu-AutoComplete": "var(--xmlui-backgroundColor-menu-AutoComplete)",
       "Input:borderRadius-menu-AutoComplete": "var(--xmlui-borderRadius-menu-AutoComplete)",
+      "Input:borderWidth-menu-AutoComplete": "var(--xmlui-borderWidth-menu-AutoComplete)",
+      "Input:borderColor-menu-AutoComplete": "var(--xmlui-borderColor-menu-AutoComplete)",
+      "Input:backgroundColor-menu-AutoComplete": "var(--xmlui-backgroundColor-menu-AutoComplete)",
       "Input:boxShadow-menu-AutoComplete": "var(--xmlui-boxShadow-menu-AutoComplete)",
       "backgroundColor-item-AutoComplete": "var(--xmlui-backgroundColor-item-AutoComplete)",
+      "backgroundColor-item-AutoComplete--active": "var(--xmlui-backgroundColor-item-AutoComplete--active)",
       "backgroundColor-item-AutoComplete--hover": "var(--xmlui-backgroundColor-item-AutoComplete--hover)",
       "textColor-item-AutoComplete--disabled": "var(--xmlui-textColor-item-AutoComplete--disabled)"
     },
     "defaultThemeVars": {
-      "backgroundColor-menu-AutoComplete": "$backgroundColor-primary",
+      "backgroundColor-menu-AutoComplete": "$color-surface-raised",
       "boxShadow-menu-AutoComplete": "$boxShadow-md",
       "borderRadius-menu-AutoComplete": "$borderRadius",
       "borderWidth-menu-AutoComplete": "1px",
       "borderColor-menu-AutoComplete": "$borderColor",
-      "backgroundColor-item-AutoComplete": "$backgroundColor-dropdown-item",
-      "backgroundColor-item-AutoComplete--hover": "$backgroundColor-dropdown-item--active",
-      "backgroundColor-item-AutoComplete--active": "$backgroundColor-dropdown-item--active",
-      "minHeight-Input": "39px",
       "backgroundColor-AutoComplete-badge": "$color-primary-500",
       "fontSize-AutoComplete-badge": "$fontSize-sm",
+      "paddingHorizontal-AutoComplete-badge": "$space-2_5",
+      "paddingVertical-AutoComplete-badge": "$space-0_5",
       "borderRadius-AutoComplete-badge": "$borderRadius",
-      "paddingHorizontal-AutoComplete-badge": "$space-2",
-      "paddingVertical-AutoComplete-badge": "$space-1",
-      "paddingHorizontal-AutoComplete": "$space-1",
+      "paddingHorizontal-item-AutoComplete": "$space-2",
+      "paddingVertical-item-AutoComplete": "$space-2",
+      "paddingHorizontal-AutoComplete": "$space-2",
       "paddingVertical-AutoComplete": "$space-2",
+      "opacity-text-item-AutoComplete--disabled": "0.5",
+      "opacity-AutoComplete--disabled": "0.5",
       "backgroundColor-AutoComplete-badge--hover": "$color-primary-400",
       "backgroundColor-AutoComplete-badge--active": "$color-primary-500",
       "textColor-item-AutoComplete--disabled": "$color-surface-200",
-      "textColor-AutoComplete-badge": "$const-color-surface-50"
+      "textColor-AutoComplete-badge": "$const-color-surface-50",
+      "backgroundColor-item-AutoComplete": "$backgroundColor-dropdown-item",
+      "backgroundColor-item-AutoComplete--hover": "$backgroundColor-dropdown-item--hover",
+      "backgroundColor-item-AutoComplete--active": "$backgroundColor-dropdown-item--active",
+      "borderColor-AutoComplete--disabled": "initial"
     }
   },
   "Avatar": {
@@ -3654,40 +3664,6 @@ export default {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
         "defaultValue": false
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "end"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `Checkbox` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
         "valueType": "boolean",
@@ -3858,40 +3834,6 @@ export default {
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `ColorPicker` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -4090,11 +4032,19 @@ export default {
     },
     "themeVars": {
       "backgroundColor-ContentSeparator": "var(--xmlui-backgroundColor-ContentSeparator)",
-      "size-ContentSeparator": "var(--xmlui-size-ContentSeparator)"
+      "size-ContentSeparator": "var(--xmlui-size-ContentSeparator)",
+      "marginTop-ContentSeparator": "var(--xmlui-marginTop-ContentSeparator)",
+      "marginBottom-ContentSeparator": "var(--xmlui-marginBottom-ContentSeparator)",
+      "marginVertical-ContentSeparator": "var(--xmlui-marginVertical-ContentSeparator)",
+      "marginLeft-ContentSeparator": "var(--xmlui-marginLeft-ContentSeparator)",
+      "marginRight-ContentSeparator": "var(--xmlui-marginRight-ContentSeparator)",
+      "marginHorizontal-ContentSeparator": "var(--xmlui-marginHorizontal-ContentSeparator)"
     },
     "defaultThemeVars": {
       "backgroundColor-ContentSeparator": "$color-surface-200",
       "size-ContentSeparator": "1px",
+      "marginVertical-ContentSeparator": "0",
+      "marginHorizontal-ContentSeparator": "0",
       "light": {},
       "dark": {}
     }
@@ -4253,40 +4203,6 @@ export default {
         ],
         "defaultValue": "none"
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `DatePicker` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `DatePicker` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "mode": {
         "description": "The mode of the datepicker (single or range)",
         "valueType": "string",
@@ -4351,20 +4267,20 @@ export default {
           }
         ]
       },
-      "minValue": {
-        "description": "The optional start date of the selectable date range. If not defined, the range allows any dates in the past.",
+      "startDate": {
+        "description": "The earliest month to start the month navigation from (inclusive). If not defined, the component allows any dates in the past. Accepts the same date format as the `initialValue`.Example: '2023-01-01' ensures the first month to select a date from is January 2023.",
         "valueType": "string"
       },
-      "maxValue": {
-        "description": "The optional end date of the selectable date range. If not defined, the range allows any future dates.",
+      "endDate": {
+        "description": "The latest month to start the month navigation from (inclusive). If not defined, the component allows any future dates. Accepts the same date format as the `initialValue`.Example: '2023-12-31' ensures the last month to select a date from is December 2023.",
         "valueType": "string"
       },
       "disabledDates": {
-        "description": "An optional array of dates that are disabled",
+        "description": "An optional array of dates that are to be disabled.",
         "valueType": "any"
       },
       "inline": {
-        "description": "Whether to display the datepicker inline",
+        "description": "If set to true, the calendar is always visible and its panel is rendered as part of the layout. If false, the calendar is shown in a popup when the input is focused or clicked.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -4571,40 +4487,6 @@ export default {
           }
         ],
         "defaultValue": "none"
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `DateInput` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `DateInput` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "mode": {
         "description": "The mode of the date input (single or range)",
@@ -5416,40 +5298,6 @@ export default {
         ],
         "defaultValue": "none"
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `FileInput` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `FileInput` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "buttonVariant": {
         "description": "The button variant to use",
         "availableValues": [
@@ -5779,6 +5627,11 @@ export default {
         "type": "boolean",
         "defaultValue": false
       },
+      "hideButtonRowUntilDirty": {
+        "description": "This property hides the button row until the form data is modified (dirty).",
+        "type": "boolean",
+        "defaultValue": false
+      },
       "submitUrl": {
         "description": "URL to submit the form data."
       },
@@ -5838,7 +5691,8 @@ export default {
     },
     "themeVars": {
       "gap-Form": "var(--xmlui-gap-Form)",
-      "gap-buttonRow-Form": "var(--xmlui-gap-buttonRow-Form)"
+      "gap-buttonRow-Form": "var(--xmlui-gap-buttonRow-Form)",
+      "marginTop-buttonRow-Form": "var(--xmlui-marginTop-buttonRow-Form)"
     },
     "defaultThemeVars": {
       "gap-Form": "$space-4",
@@ -5854,13 +5708,14 @@ export default {
       "textColor-ValidationDisplay-error": "$color-error",
       "textColor-ValidationDisplay-warning": "$color-warning",
       "textColor-ValidationDisplay-info": "$color-info",
-      "textColor-ValidationDisplay-valid": "$color-valid"
+      "textColor-ValidationDisplay-valid": "$color-valid",
+      "marginTop-buttonRow-Form": "$space-4"
     }
   },
   "FormItem": {
     "status": "stable",
     "allowArbitraryProps": true,
-    "description": "`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.",
+    "description": "`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.\n\n> **Note:** `FormItem` must be used inside a `Form` component.",
     "props": {
       "bindTo": {
         "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name. If the property is not set, the input will be bound to an internal data field but not submitted."
@@ -7247,11 +7102,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H1": "$fontSize-2xl",
-      "lineHeight-H1": "$lineHeight-2xl",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
       "fontSize-H1-markdown": "$fontSize-2xl",
-      "lineHeight-H1-markdown": "$lineHeight-2xl",
       "marginTop-H1-markdown": "0",
       "marginBottom-H1-markdown": "$space-6",
       "light": {},
@@ -7763,11 +7616,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H2": "$fontSize-xl",
-      "lineHeight-H2": "$lineHeight-xl",
       "marginTop-H2": "0",
       "marginBottom-H2": "0",
       "fontSize-H2-markdown": "$fontSize-xl",
-      "lineHeight-H2-markdown": "$lineHeight-xl",
       "marginTop-H2-markdown": "$space-10",
       "marginBottom-H2-markdown": "$space-3",
       "light": {},
@@ -8279,11 +8130,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H3": "$fontSize-lg",
-      "lineHeight-H3": "$lineHeight-lg",
       "marginTop-H3": "0",
       "marginBottom-H3": "0",
       "fontSize-H3-markdown": "$fontSize-lg",
-      "lineHeight-H3-markdown": "$lineHeight-lg",
       "marginTop-H3-markdown": "$space-6",
       "marginBottom-H3-markdown": "$space-2",
       "light": {},
@@ -8795,11 +8644,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H4": "$fontSize-base",
-      "lineHeight-H4": "$lineHeight-base",
       "marginTop-H4": "0",
       "marginBottom-H4": "0",
       "fontSize-H4-markdown": "$fontSize-base",
-      "lineHeight-H4-markdown": "$lineHeight-base",
       "marginTop-H4-markdown": "$space-5",
       "marginBottom-H4-markdown": "$space-1",
       "light": {},
@@ -9311,11 +9158,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H5": "$fontSize-sm",
-      "lineHeight-H5": "$lineHeight-sm",
       "marginTop-H5": "0",
       "marginBottom-H5": "0",
       "fontSize-H5-markdown": "$fontSize-sm",
-      "lineHeight-H5-markdown": "$lineHeight-sm",
       "marginTop-H5-markdown": "0",
       "marginBottom-H5-markdown": "$space-0",
       "light": {},
@@ -9827,11 +9672,9 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-H6": "$fontSize-xs",
-      "lineHeight-H6": "$lineHeight-xs",
       "marginTop-H6": "0",
       "marginBottom-H6": "0",
       "fontSize-H6-markdown": "$fontSize-xs",
-      "lineHeight-H6-markdown": "$lineHeight-xs",
       "marginTop-H6-markdown": "0",
       "marginBottom-H6-markdown": "$space-0",
       "light": {},
@@ -9877,7 +9720,7 @@ export default {
       "size-Icon": "var(--xmlui-size-Icon)"
     },
     "defaultThemeVars": {
-      "size-Icon": "1.25em"
+      "size-Icon": "1.2em"
     }
   },
   "IFrame": {
@@ -10010,6 +9853,9 @@ export default {
     "props": {
       "src": {
         "description": "This property is used to indicate the source (path) of the image to display. When not defined, no image is displayed."
+      },
+      "data": {
+        "description": "This property contains the binary data that represents the image."
       },
       "alt": {
         "description": "This optional property specifies an alternate text for the image."
@@ -11156,40 +11002,6 @@ export default {
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `NumberBox` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `NumberBox` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
         "valueType": "number"
@@ -11435,6 +11247,9 @@ export default {
         "description": "This boolean property indicates whether the option is enabled or disabled.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "keywords": {
+        "description": "An array of keywords that can be used for searching and filtering the option. These keywords are not displayed but help users find the option through search."
       }
     }
   },
@@ -11791,40 +11606,6 @@ export default {
       "orientation": {
         "description": "(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group.",
         "isInternal": true
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `RadioGroup` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       }
     },
     "events": {
@@ -11966,40 +11747,6 @@ export default {
         ],
         "defaultValue": "none"
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `Select` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": false
-      },
       "optionLabelTemplate": {
         "description": "This property allows replacing the default template to display an option in the dropdown list.",
         "valueType": "ComponentDef"
@@ -12078,13 +11825,38 @@ export default {
       }
     },
     "themeVars": {
-      "padding-item-Select": "var(--xmlui-padding-item-Select)",
-      "paddingHorizontal-item-Select": "var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select))",
-      "paddingVertical-item-Select": "var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select))",
-      "paddingLeft-item-Select": "var(--xmlui-paddingLeft-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
-      "paddingRight-item-Select": "var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
-      "paddingTop-item-Select": "var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
-      "paddingBottom-item-Select": "var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
+      "border-Select": "var(--xmlui-border-Select)",
+      "borderHorizontal-Select": "var(--xmlui-borderHorizontal-Select, var(--xmlui-border-Select))",
+      "borderVertical-Select": "var(--xmlui-borderVertical-Select, var(--xmlui-border-Select))",
+      "borderLeft-Select": "var(--xmlui-borderLeft-Select, var(--xmlui-borderHorizontal-Select, var(--xmlui-border-Select)))",
+      "borderRight-Select": "var(--xmlui-borderRight-Select, var(--xmlui-borderHorizontal-Select, var(--xmlui-border-Select)))",
+      "borderTop-Select": "var(--xmlui-borderTop-Select, var(--xmlui-borderVertical-Select, var(--xmlui-border-Select)))",
+      "borderBottom-Select": "var(--xmlui-borderBottom-Select, var(--xmlui-borderVertical-Select, var(--xmlui-border-Select)))",
+      "borderWidth-Select": "var(--xmlui-borderWidth-Select)",
+      "borderHorizontalWidth-Select": "var(--xmlui-borderHorizontalWidth-Select, var(--xmlui-borderWidth-Select))",
+      "borderLeftWidth-Select": "var(--xmlui-borderLeftWidth-Select, var(--xmlui-borderHorizontalWidth-Select, var(--xmlui-borderWidth-Select)))",
+      "borderRightWidth-Select": "var(--xmlui-borderRightWidth-Select, var(--xmlui-borderHorizontalWidth-Select, var(--xmlui-borderWidth-Select)))",
+      "borderVerticalWidth-Select": "var(--xmlui-borderVerticalWidth-Select, var(--xmlui-borderWidth-Select))",
+      "borderTopWidth-Select": "var(--xmlui-borderTopWidth-Select, var(--xmlui-borderVerticalWidth-Select, var(--xmlui-borderWidth-Select)))",
+      "borderBottomWidth-Select": "var(--xmlui-borderBottomWidth-Select, var(--xmlui-borderVerticalWidth-Select, var(--xmlui-borderWidth-Select)))",
+      "borderStyle-Select": "var(--xmlui-borderStyle-Select)",
+      "borderHorizontalStyle-Select": "var(--xmlui-borderHorizontalStyle-Select, var(--xmlui-borderStyle-Select))",
+      "borderLeftStyle-Select": "var(--xmlui-borderLeftStyle-Select, var(--xmlui-borderHorizontalStyle-Select, var(--xmlui-borderStyle-Select)))",
+      "borderRightStyle-Select": "var(--xmlui-borderRightStyle-Select, var(--xmlui-borderHorizontalStyle-Select, var(--xmlui-borderStyle-Select)))",
+      "borderVerticalStyle-Select": "var(--xmlui-borderVerticalStyle-Select, var(--xmlui-borderStyle-Select))",
+      "borderTopStyle-Select": "var(--xmlui-borderTopStyle-Select, var(--xmlui-borderVerticalStyle-Select, var(--xmlui-borderStyle-Select)))",
+      "borderBottomStyle-Select": "var(--xmlui-borderBottomStyle-Select, var(--xmlui-borderVerticalStyle-Select, var(--xmlui-borderStyle-Select)))",
+      "borderColor-Select": "var(--xmlui-borderColor-Select)",
+      "borderHorizontalColor-Select": "var(--xmlui-borderHorizontalColor-Select, var(--xmlui-borderColor-Select))",
+      "borderLeftColor-Select": "var(--xmlui-borderLeftColor-Select, var(--xmlui-borderHorizontalColor-Select, var(--xmlui-borderColor-Select)))",
+      "borderRightColor-Select": "var(--xmlui-borderRightColor-Select, var(--xmlui-borderHorizontalColor-Select, var(--xmlui-borderColor-Select)))",
+      "borderVerticalColor-Select": "var(--xmlui-borderVerticalColor-Select, var(--xmlui-borderColor-Select))",
+      "borderTopColor-Select": "var(--xmlui-borderTopColor-Select, var(--xmlui-borderVerticalColor-Select, var(--xmlui-borderColor-Select)))",
+      "borderBottomColor-Select": "var(--xmlui-borderBottomColor-Select, var(--xmlui-borderVerticalColor-Select, var(--xmlui-borderColor-Select)))",
+      "borderStartStartRadius-Select": "var(--xmlui-borderStartStartRadius-Select, var(--xmlui-borderRadius-Select))",
+      "borderStartEndRadius-Select": "var(--xmlui-borderStartEndRadius-Select, var(--xmlui-borderRadius-Select))",
+      "borderEndStartRadius-Select": "var(--xmlui-borderEndStartRadius-Select, var(--xmlui-borderRadius-Select))",
+      "borderEndEndRadius-Select": "var(--xmlui-borderEndEndRadius-Select, var(--xmlui-borderRadius-Select))",
       "padding-Select": "var(--xmlui-padding-Select)",
       "paddingHorizontal-Select": "var(--xmlui-paddingHorizontal-Select, var(--xmlui-padding-Select))",
       "paddingVertical-Select": "var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select))",
@@ -12092,24 +11864,21 @@ export default {
       "paddingRight-Select": "var(--xmlui-paddingRight-Select, var(--xmlui-paddingHorizontal-Select, var(--xmlui-padding-Select)))",
       "paddingTop-Select": "var(--xmlui-paddingTop-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select)))",
       "paddingBottom-Select": "var(--xmlui-paddingBottom-Select, var(--xmlui-paddingVertical-Select, var(--xmlui-padding-Select)))",
-      "Input:fontSize-Select-default": "var(--xmlui-fontSize-Select-default)",
-      "Input:textColor-placeholder-Select-default": "var(--xmlui-textColor-placeholder-Select-default)",
-      "Input:textColor-Select-default": "var(--xmlui-textColor-Select-default)",
-      "Input:fontSize-Select-error": "var(--xmlui-fontSize-Select-error)",
-      "Input:textColor-placeholder-Select-error": "var(--xmlui-textColor-placeholder-Select-error)",
-      "Input:textColor-Select-error": "var(--xmlui-textColor-Select-error)",
-      "Input:fontSize-Select-warning": "var(--xmlui-fontSize-Select-warning)",
-      "Input:textColor-placeholder-Select-warning": "var(--xmlui-textColor-placeholder-Select-warning)",
-      "Input:textColor-Select-warning": "var(--xmlui-textColor-Select-warning)",
-      "Input:fontSize-Select-success": "var(--xmlui-fontSize-Select-success)",
-      "Input:textColor-placeholder-Select-success": "var(--xmlui-textColor-placeholder-Select-success)",
-      "Input:textColor-Select-success": "var(--xmlui-textColor-Select-success)",
+      "padding-item-Select": "var(--xmlui-padding-item-Select)",
+      "paddingHorizontal-item-Select": "var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select))",
+      "paddingVertical-item-Select": "var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select))",
+      "paddingLeft-item-Select": "var(--xmlui-paddingLeft-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingRight-item-Select": "var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingTop-item-Select": "var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingBottom-item-Select": "var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
       "Input:borderRadius-Select-default": "var(--xmlui-borderRadius-Select-default)",
       "Input:borderColor-Select-default": "var(--xmlui-borderColor-Select-default)",
       "Input:borderWidth-Select-default": "var(--xmlui-borderWidth-Select-default)",
       "Input:borderStyle-Select-default": "var(--xmlui-borderStyle-Select-default)",
+      "Input:fontSize-Select-default": "var(--xmlui-fontSize-Select-default)",
       "Input:backgroundColor-Select-default": "var(--xmlui-backgroundColor-Select-default)",
       "Input:boxShadow-Select-default": "var(--xmlui-boxShadow-Select-default)",
+      "Input:textColor-Select-default": "var(--xmlui-textColor-Select-default)",
       "Input:borderColor-Select-default--hover": "var(--xmlui-borderColor-Select-default--hover)",
       "Input:backgroundColor-Select-default--hover": "var(--xmlui-backgroundColor-Select-default--hover)",
       "Input:boxShadow-Select-default--hover": "var(--xmlui-boxShadow-Select-default--hover)",
@@ -12118,13 +11887,16 @@ export default {
       "Input:outlineColor-Select-default--focus": "var(--xmlui-outlineColor-Select-default--focus)",
       "Input:outlineStyle-Select-default--focus": "var(--xmlui-outlineStyle-Select-default--focus)",
       "Input:outlineOffset-Select-default--focus": "var(--xmlui-outlineOffset-Select-default--focus)",
+      "Input:textColor-placeholder-Select-default": "var(--xmlui-textColor-placeholder-Select-default)",
       "Input:fontSize-placeholder-Select-default": "var(--xmlui-fontSize-placeholder-Select-default)",
       "Input:borderRadius-Select-error": "var(--xmlui-borderRadius-Select-error)",
       "Input:borderColor-Select-error": "var(--xmlui-borderColor-Select-error)",
       "Input:borderWidth-Select-error": "var(--xmlui-borderWidth-Select-error)",
       "Input:borderStyle-Select-error": "var(--xmlui-borderStyle-Select-error)",
+      "Input:fontSize-Select-error": "var(--xmlui-fontSize-Select-error)",
       "Input:backgroundColor-Select-error": "var(--xmlui-backgroundColor-Select-error)",
       "Input:boxShadow-Select-error": "var(--xmlui-boxShadow-Select-error)",
+      "Input:textColor-Select-error": "var(--xmlui-textColor-Select-error)",
       "Input:borderColor-Select-error--hover": "var(--xmlui-borderColor-Select-error--hover)",
       "Input:backgroundColor-Select-error--hover": "var(--xmlui-backgroundColor-Select-error--hover)",
       "Input:boxShadow-Select-error--hover": "var(--xmlui-boxShadow-Select-error--hover)",
@@ -12133,13 +11905,16 @@ export default {
       "Input:outlineColor-Select-error--focus": "var(--xmlui-outlineColor-Select-error--focus)",
       "Input:outlineStyle-Select-error--focus": "var(--xmlui-outlineStyle-Select-error--focus)",
       "Input:outlineOffset-Select-error--focus": "var(--xmlui-outlineOffset-Select-error--focus)",
+      "Input:textColor-placeholder-Select-error": "var(--xmlui-textColor-placeholder-Select-error)",
       "Input:fontSize-placeholder-Select-error": "var(--xmlui-fontSize-placeholder-Select-error)",
       "Input:borderRadius-Select-warning": "var(--xmlui-borderRadius-Select-warning)",
       "Input:borderColor-Select-warning": "var(--xmlui-borderColor-Select-warning)",
       "Input:borderWidth-Select-warning": "var(--xmlui-borderWidth-Select-warning)",
       "Input:borderStyle-Select-warning": "var(--xmlui-borderStyle-Select-warning)",
+      "Input:fontSize-Select-warning": "var(--xmlui-fontSize-Select-warning)",
       "Input:backgroundColor-Select-warning": "var(--xmlui-backgroundColor-Select-warning)",
       "Input:boxShadow-Select-warning": "var(--xmlui-boxShadow-Select-warning)",
+      "Input:textColor-Select-warning": "var(--xmlui-textColor-Select-warning)",
       "Input:borderColor-Select-warning--hover": "var(--xmlui-borderColor-Select-warning--hover)",
       "Input:backgroundColor-Select-warning--hover": "var(--xmlui-backgroundColor-Select-warning--hover)",
       "Input:boxShadow-Select-warning--hover": "var(--xmlui-boxShadow-Select-warning--hover)",
@@ -12148,13 +11923,16 @@ export default {
       "Input:outlineColor-Select-warning--focus": "var(--xmlui-outlineColor-Select-warning--focus)",
       "Input:outlineStyle-Select-warning--focus": "var(--xmlui-outlineStyle-Select-warning--focus)",
       "Input:outlineOffset-Select-warning--focus": "var(--xmlui-outlineOffset-Select-warning--focus)",
+      "Input:textColor-placeholder-Select-warning": "var(--xmlui-textColor-placeholder-Select-warning)",
       "Input:fontSize-placeholder-Select-warning": "var(--xmlui-fontSize-placeholder-Select-warning)",
       "Input:borderRadius-Select-success": "var(--xmlui-borderRadius-Select-success)",
       "Input:borderColor-Select-success": "var(--xmlui-borderColor-Select-success)",
       "Input:borderWidth-Select-success": "var(--xmlui-borderWidth-Select-success)",
       "Input:borderStyle-Select-success": "var(--xmlui-borderStyle-Select-success)",
+      "Input:fontSize-Select-success": "var(--xmlui-fontSize-Select-success)",
       "Input:backgroundColor-Select-success": "var(--xmlui-backgroundColor-Select-success)",
       "Input:boxShadow-Select-success": "var(--xmlui-boxShadow-Select-success)",
+      "Input:textColor-Select-success": "var(--xmlui-textColor-Select-success)",
       "Input:borderColor-Select-success--hover": "var(--xmlui-borderColor-Select-success--hover)",
       "Input:backgroundColor-Select-success--hover": "var(--xmlui-backgroundColor-Select-success--hover)",
       "Input:boxShadow-Select-success--hover": "var(--xmlui-boxShadow-Select-success--hover)",
@@ -12163,11 +11941,16 @@ export default {
       "Input:outlineColor-Select-success--focus": "var(--xmlui-outlineColor-Select-success--focus)",
       "Input:outlineStyle-Select-success--focus": "var(--xmlui-outlineStyle-Select-success--focus)",
       "Input:outlineOffset-Select-success--focus": "var(--xmlui-outlineOffset-Select-success--focus)",
+      "Input:textColor-placeholder-Select-success": "var(--xmlui-textColor-placeholder-Select-success)",
       "Input:fontSize-placeholder-Select-success": "var(--xmlui-fontSize-placeholder-Select-success)",
-      "opacity-Select--disabled": "var(--xmlui-opacity-Select--disabled)",
       "Input:backgroundColor-Select--disabled": "var(--xmlui-backgroundColor-Select--disabled)",
       "Input:textColor-Select--disabled": "var(--xmlui-textColor-Select--disabled)",
       "Input:borderColor-Select--disabled": "var(--xmlui-borderColor-Select--disabled)",
+      "Input:outlineWidth-Select--focus": "var(--xmlui-outlineWidth-Select--focus)",
+      "Input:outlineColor-Select--focus": "var(--xmlui-outlineColor-Select--focus)",
+      "Input:outlineStyle-Select--focus": "var(--xmlui-outlineStyle-Select--focus)",
+      "Input:outlineOffset-Select--focus": "var(--xmlui-outlineOffset-Select--focus)",
+      "Input:textColor-placeholder-Select": "var(--xmlui-textColor-placeholder-Select)",
       "paddingVertical-Select-badge": "var(--xmlui-paddingVertical-Select-badge)",
       "paddingHorizontal-Select-badge": "var(--xmlui-paddingHorizontal-Select-badge)",
       "borderRadius-Select-badge": "var(--xmlui-borderRadius-Select-badge)",
@@ -12178,17 +11961,16 @@ export default {
       "Input:textColor-Select-badge--hover": "var(--xmlui-textColor-Select-badge--hover)",
       "Input:backgroundColor-Select-badge--active": "var(--xmlui-backgroundColor-Select-badge--active)",
       "Input:textColor-Select-badge--active": "var(--xmlui-textColor-Select-badge--active)",
-      "Input:textColor-placeholder-Select": "var(--xmlui-textColor-placeholder-Select)",
       "Input:backgroundColor-menu-Select": "var(--xmlui-backgroundColor-menu-Select)",
       "Input:borderRadius-menu-Select": "var(--xmlui-borderRadius-menu-Select)",
       "Input:boxShadow-menu-Select": "var(--xmlui-boxShadow-menu-Select)",
       "Input:borderWidth-menu-Select": "var(--xmlui-borderWidth-menu-Select)",
       "Input:borderColor-menu-Select": "var(--xmlui-borderColor-menu-Select)",
       "backgroundColor-item-Select": "var(--xmlui-backgroundColor-item-Select)",
-      "backgroundColor-item-Select--hover": "var(--xmlui-backgroundColor-item-Select--hover)",
-      "opacity-text-item-Select--disabled": "var(--xmlui-opacity-text-item-Select--disabled)",
-      "fontSize-Select": "var(--xmlui-fontSize-Select)",
       "backgroundColor-item-Select--active": "var(--xmlui-backgroundColor-item-Select--active)",
+      "backgroundColor-item-Select--hover": "var(--xmlui-backgroundColor-item-Select--hover)",
+      "textColor-item-Select--disabled": "var(--xmlui-textColor-item-Select--disabled)",
+      "opacity-text-item-Select--disabled": "var(--xmlui-opacity-text-item-Select--disabled)",
       "textColor-indicator-Select": "var(--xmlui-textColor-indicator-Select)"
     },
     "defaultThemeVars": {
@@ -12211,7 +11993,7 @@ export default {
       "backgroundColor-Select-badge--hover": "$color-primary-400",
       "backgroundColor-Select-badge--active": "$color-primary-500",
       "textColor-item-Select--disabled": "$color-surface-200",
-      "textColor-Select-badge": "$color-surface-50",
+      "textColor-Select-badge": "$const-color-surface-50",
       "backgroundColor-item-Select": "$backgroundColor-dropdown-item",
       "backgroundColor-item-Select--hover": "$backgroundColor-dropdown-item--hover",
       "backgroundColor-item-Select--active": "$backgroundColor-dropdown-item--active",
@@ -12234,40 +12016,6 @@ export default {
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `Slider` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "minValue": {
         "description": "This property specifies the minimum value of the allowed input range.",
@@ -12417,6 +12165,8 @@ export default {
       "Input:borderColor-thumb-Slider": "var(--xmlui-borderColor-thumb-Slider)",
       "Input:backgroundColor-thumb-Slider": "var(--xmlui-backgroundColor-thumb-Slider)",
       "Input:boxShadow-thumb-Slider": "var(--xmlui-boxShadow-thumb-Slider)",
+      "Input:backgroundColor-thumb-Slider--focus": "var(--xmlui-backgroundColor-thumb-Slider--focus)",
+      "Input:boxShadow-thumb-Slider--focus": "var(--xmlui-boxShadow-thumb-Slider--focus)",
       "Input:backgroundColor-thumb-Slider--hover": "var(--xmlui-backgroundColor-thumb-Slider--hover)",
       "Input:boxShadow-thumb-Slider--hover": "var(--xmlui-boxShadow-thumb-Slider--hover)",
       "Input:backgroundColor-thumb-Slider--active": "var(--xmlui-backgroundColor-thumb-Slider--active)",
@@ -12429,6 +12179,8 @@ export default {
       "borderStyle-thumb-Slider": "solid",
       "borderColor-thumb-Slider": "$color-surface-50",
       "backgroundColor-thumb-Slider": "$color-primary",
+      "backgroundColor-thumb-Slider--focus": "$color-primary",
+      "boxShadow-thumb-Slider--focus": "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
       "backgroundColor-thumb-Slider--hover": "$color-primary",
       "boxShadow-thumb-Slider--hover": "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
       "backgroundColor-thumb-Slider--active": "$color-primary-400",
@@ -13238,40 +12990,6 @@ export default {
       }
     },
     "props": {
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "end"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `Switch` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
         "valueType": "boolean",
@@ -13459,6 +13177,12 @@ export default {
       "rowsSelectable": {
         "description": "Indicates whether the rows are selectable (`true`) or not (`false`)."
       },
+      "initiallySelected": {
+        "description": "An array of IDs that should be initially selected when the table is rendered. This property only has an effect when the rowsSelectable property is set to `true`."
+      },
+      "syncWithAppState": {
+        "description": "An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes."
+      },
       "pageSize": {
         "description": "This property defines the number of rows to display per page when pagination is enabled."
       },
@@ -13576,6 +13300,17 @@ export default {
           "bottom"
         ],
         "defaultValue": "center"
+      },
+      "checkboxTolerance": {
+        "description": "This property controls the tolerance area around checkboxes for easier interaction. This property only has an effect when the rowsSelectable property is set to `true`. `none` provides no tolerance (0px), `compact` provides minimal tolerance (8px), `comfortable` provides medium tolerance (12px), and `spacious` provides generous tolerance (16px) for improved accessibility.",
+        "valueType": "string",
+        "availableValues": [
+          "none",
+          "compact",
+          "comfortable",
+          "spacious"
+        ],
+        "defaultValue": "compact"
       }
     },
     "events": {
@@ -13673,6 +13408,38 @@ export default {
       "borderStartEndRadius-cell-Table": "var(--xmlui-borderStartEndRadius-cell-Table, var(--xmlui-borderRadius-cell-Table))",
       "borderEndStartRadius-cell-Table": "var(--xmlui-borderEndStartRadius-cell-Table, var(--xmlui-borderRadius-cell-Table))",
       "borderEndEndRadius-cell-Table": "var(--xmlui-borderEndEndRadius-cell-Table, var(--xmlui-borderRadius-cell-Table))",
+      "border-Table": "var(--xmlui-border-Table)",
+      "borderHorizontal-Table": "var(--xmlui-borderHorizontal-Table, var(--xmlui-border-Table))",
+      "borderVertical-Table": "var(--xmlui-borderVertical-Table, var(--xmlui-border-Table))",
+      "borderLeft-Table": "var(--xmlui-borderLeft-Table, var(--xmlui-borderHorizontal-Table, var(--xmlui-border-Table)))",
+      "borderRight-Table": "var(--xmlui-borderRight-Table, var(--xmlui-borderHorizontal-Table, var(--xmlui-border-Table)))",
+      "borderTop-Table": "var(--xmlui-borderTop-Table, var(--xmlui-borderVertical-Table, var(--xmlui-border-Table)))",
+      "borderBottom-Table": "var(--xmlui-borderBottom-Table, var(--xmlui-borderVertical-Table, var(--xmlui-border-Table)))",
+      "borderWidth-Table": "var(--xmlui-borderWidth-Table)",
+      "borderHorizontalWidth-Table": "var(--xmlui-borderHorizontalWidth-Table, var(--xmlui-borderWidth-Table))",
+      "borderLeftWidth-Table": "var(--xmlui-borderLeftWidth-Table, var(--xmlui-borderHorizontalWidth-Table, var(--xmlui-borderWidth-Table)))",
+      "borderRightWidth-Table": "var(--xmlui-borderRightWidth-Table, var(--xmlui-borderHorizontalWidth-Table, var(--xmlui-borderWidth-Table)))",
+      "borderVerticalWidth-Table": "var(--xmlui-borderVerticalWidth-Table, var(--xmlui-borderWidth-Table))",
+      "borderTopWidth-Table": "var(--xmlui-borderTopWidth-Table, var(--xmlui-borderVerticalWidth-Table, var(--xmlui-borderWidth-Table)))",
+      "borderBottomWidth-Table": "var(--xmlui-borderBottomWidth-Table, var(--xmlui-borderVerticalWidth-Table, var(--xmlui-borderWidth-Table)))",
+      "borderStyle-Table": "var(--xmlui-borderStyle-Table)",
+      "borderHorizontalStyle-Table": "var(--xmlui-borderHorizontalStyle-Table, var(--xmlui-borderStyle-Table))",
+      "borderLeftStyle-Table": "var(--xmlui-borderLeftStyle-Table, var(--xmlui-borderHorizontalStyle-Table, var(--xmlui-borderStyle-Table)))",
+      "borderRightStyle-Table": "var(--xmlui-borderRightStyle-Table, var(--xmlui-borderHorizontalStyle-Table, var(--xmlui-borderStyle-Table)))",
+      "borderVerticalStyle-Table": "var(--xmlui-borderVerticalStyle-Table, var(--xmlui-borderStyle-Table))",
+      "borderTopStyle-Table": "var(--xmlui-borderTopStyle-Table, var(--xmlui-borderVerticalStyle-Table, var(--xmlui-borderStyle-Table)))",
+      "borderBottomStyle-Table": "var(--xmlui-borderBottomStyle-Table, var(--xmlui-borderVerticalStyle-Table, var(--xmlui-borderStyle-Table)))",
+      "borderColor-Table": "var(--xmlui-borderColor-Table)",
+      "borderHorizontalColor-Table": "var(--xmlui-borderHorizontalColor-Table, var(--xmlui-borderColor-Table))",
+      "borderLeftColor-Table": "var(--xmlui-borderLeftColor-Table, var(--xmlui-borderHorizontalColor-Table, var(--xmlui-borderColor-Table)))",
+      "borderRightColor-Table": "var(--xmlui-borderRightColor-Table, var(--xmlui-borderHorizontalColor-Table, var(--xmlui-borderColor-Table)))",
+      "borderVerticalColor-Table": "var(--xmlui-borderVerticalColor-Table, var(--xmlui-borderColor-Table))",
+      "borderTopColor-Table": "var(--xmlui-borderTopColor-Table, var(--xmlui-borderVerticalColor-Table, var(--xmlui-borderColor-Table)))",
+      "borderBottomColor-Table": "var(--xmlui-borderBottomColor-Table, var(--xmlui-borderVerticalColor-Table, var(--xmlui-borderColor-Table)))",
+      "borderStartStartRadius-Table": "var(--xmlui-borderStartStartRadius-Table, var(--xmlui-borderRadius-Table))",
+      "borderStartEndRadius-Table": "var(--xmlui-borderStartEndRadius-Table, var(--xmlui-borderRadius-Table))",
+      "borderEndStartRadius-Table": "var(--xmlui-borderEndStartRadius-Table, var(--xmlui-borderRadius-Table))",
+      "borderEndEndRadius-Table": "var(--xmlui-borderEndEndRadius-Table, var(--xmlui-borderRadius-Table))",
       "backgroundColor-pagination-Table": "var(--xmlui-backgroundColor-pagination-Table)",
       "textColor-heading-Table": "var(--xmlui-textColor-heading-Table)",
       "fontWeight-row-Table": "var(--xmlui-fontWeight-row-Table)",
@@ -13680,16 +13447,18 @@ export default {
       "fontWeight-heading-Table": "var(--xmlui-fontWeight-heading-Table)",
       "fontSize-heading-Table": "var(--xmlui-fontSize-heading-Table)",
       "textTransform-heading-Table": "var(--xmlui-textTransform-heading-Table)",
+      "borderRadius-Table": "var(--xmlui-borderRadius-Table)",
       "outlineWidth-heading-Table--focus": "var(--xmlui-outlineWidth-heading-Table--focus)",
       "outlineColor-heading-Table--focus": "var(--xmlui-outlineColor-heading-Table--focus)",
       "outlineStyle-heading-Table--focus": "var(--xmlui-outlineStyle-heading-Table--focus)",
-      "outlineOffset-heading-Table--focus": "var(--xmlui-outlineOffset-heading-Table--focus)"
+      "outlineOffset-heading-Table--focus": "var(--xmlui-outlineOffset-heading-Table--focus)",
+      "borderBottom-last-row-Table": "var(--xmlui-borderBottom-last-row-Table)"
     },
     "defaultThemeVars": {
-      "padding-heading-Table": "$space-2 $space-0 $space-2 $space-2",
-      "padding-cell-Table": "$space-2 $space-0 $space-2 $space-2",
+      "padding-heading-Table": "$space-2 $space-1 $space-2 $space-2",
+      "padding-cell-Table": "$space-2 $space-1 $space-2 $space-2",
       "paddingHorizontal-cell-first-Table": "$space-5",
-      "paddingHorizontal-cell-last-Table": "$space-0",
+      "paddingHorizontal-cell-last-Table": "$space-1",
       "border-cell-Table": "1px solid $borderColor",
       "outlineWidth-heading-Table--focus": "$outlineWidth--focus",
       "outlineStyle-heading-Table--focus": "$outlineStyle--focus",
@@ -13707,7 +13476,10 @@ export default {
       "backgroundColor-heading-Table--hover": "$color-surface-200",
       "backgroundColor-heading-Table--active": "$color-surface-300",
       "backgroundColor-heading-Table": "$color-surface-100",
-      "textColor-heading-Table": "$color-surface-500"
+      "textColor-heading-Table": "$color-surface-500",
+      "border-Table": "0px solid transparent",
+      "borderBottom-last-row-Table": "$borderBottom-cell-Table",
+      "borderRadius-Table": "$borderRadius"
     }
   },
   "TableOfContents": {
@@ -14176,13 +13948,29 @@ export default {
         "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default."
       },
       "orientation": {
-        "description": "This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.",
+        "description": "This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top. Note: This property is ignored when accordionView is set to true.",
         "availableValues": [
           "horizontal",
           "vertical"
         ],
         "defaultValue": "horizontal",
         "valueType": "string"
+      },
+      "tabAlignment": {
+        "description": "This property controls how tabs are aligned within the tab header container in horizontal orientation. Use 'start' to align tabs to the left, 'end' to align to the right, 'center' to center the tabs, and 'stretch' to make tabs fill the full width of the header. Note: This property is ignored when orientation is set to 'vertical' or when accordionView is enabled.",
+        "availableValues": [
+          "start",
+          "end",
+          "center",
+          "stretch"
+        ],
+        "defaultValue": "start",
+        "valueType": "string"
+      },
+      "accordionView": {
+        "description": "When enabled, displays tabs in an accordion-like view where tab headers are stacked vertically and only the active tab's content is visible. Each tab header remains visible and clicking a header opens its content while closing others. When enabled, the orientation property is ignored.",
+        "defaultValue": false,
+        "valueType": "boolean"
       },
       "headerTemplate": {
         "description": "This property declares the template for the clickable tab area.",
@@ -14251,7 +14039,7 @@ export default {
         "description": "The text to be displayed. This value can also be set via nesting the text into the `Text` component."
       },
       "variant": {
-        "description": "An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context.",
+        "description": "An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context. In addition to predefined variants, you can specify custom variant names and style them using theme variables with the pattern `{cssProperty}-Text-{variantName}` (e.g., `textColor-Text-brandTitle`, `fontSize-Text-highlight`). See the documentation for a complete list of supported CSS properties.",
         "availableValues": [
           {
             "value": "abbr",
@@ -14468,6 +14256,11 @@ export default {
       "marginLeft-Text-small": "var(--xmlui-marginLeft-Text-small)",
       "marginRight-Text-small": "var(--xmlui-marginRight-Text-small)",
       "verticalAlignment-Text-small": "var(--xmlui-verticalAlignment-Text-small)",
+      "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
+      "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
+      "marginLeft-Text-code": "var(--xmlui-marginLeft-Text-code)",
+      "marginRight-Text-code": "var(--xmlui-marginRight-Text-code)",
+      "verticalAlignment-Text-code": "var(--xmlui-verticalAlignment-Text-code)",
       "letterSpacing-Text-caption": "var(--xmlui-letterSpacing-Text-caption)",
       "color-Text-placeholder": "var(--xmlui-color-Text-placeholder)",
       "fontStyle-Text-placeholder": "var(--xmlui-fontStyle-Text-placeholder)",
@@ -14493,13 +14286,11 @@ export default {
       "borderRadius-Text": "$borderRadius",
       "borderStyle-Text": "solid",
       "fontSize-Text": "$fontSize-sm",
-      "lineHeight-Text": "$lineHeight-sm",
       "borderWidth-Text": "$space-0",
       "lineHeight-Text-codefence": "1.5",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
       "fontSize-Text-secondary": "$fontSize-sm",
-      "lineHeight-Text-secondary": "$lineHeight-sm",
       "fontStyle-Text-cite": "italic",
       "textColor-Text": "$textColor-primary",
       "fontFamily-Text": "$fontFamily",
@@ -14507,7 +14298,6 @@ export default {
       "fontSize-Text-codefence": "$fontSize-code",
       "fontFamily-Text-code": "$fontFamily-monospace",
       "fontSize-Text-code": "$fontSize-sm",
-      "lineHeight-Text-code": "$lineHeight-xs",
       "borderWidth-Text-code": "1px",
       "borderStyle-Text-code": "solid",
       "borderRadius-Text-code": "4px",
@@ -14517,37 +14307,28 @@ export default {
       "textDecorationLine-Text-inserted": "underline",
       "fontFamily-Text-keyboard": "$fontFamily-monospace",
       "fontSize-Text-keyboard": "$fontSize-sm",
-      "lineHeight-Text-keyboard": "$lineHeight-sm",
       "fontWeight-Text-keyboard": "$fontWeight-bold",
       "borderWidth-Text-keyboard": "1px",
       "paddingHorizontal-Text-keyboard": "$space-1",
       "fontFamily-Text-sample": "$fontFamily-monospace",
       "fontSize-Text-sample": "$fontSize-sm",
-      "lineHeight-Text-sample": "$lineHeight-sm",
       "fontSize-Text-sup": "$fontSize-xs",
-      "lineHeight-Text-sup": "$lineHeight-xs",
       "verticalAlignment-Text-sup": "super",
       "fontSize-Text-sub": "$fontSize-xs",
-      "lineHeight-Text-sub": "$lineHeight-xs",
       "verticalAlignment-Text-sub": "sub",
       "fontStyle-Text-var": "italic",
       "fontStyle-Text-em": "italic",
       "fontFamily-Text-mono": "$fontFamily-monospace",
       "fontSize-Text-title": "$fontSize-2xl",
-      "lineHeight-Text-title": "$lineHeight-2xl",
       "fontSize-Text-subtitle": "$fontSize-xl",
-      "lineHeight-Text-subtitle": "$lineHeight-xl",
       "fontSize-Text-small": "$fontSize-sm",
-      "lineHeight-Text-small": "$lineHeight-sm",
       "letterSpacing-Text-caption": "0.05rem",
       "fontSize-Text-placeholder": "$fontSize-xs",
-      "lineHeight-Text-placeholder": "$lineHeight-xs",
       "fontFamily-Text-codefence": "$fontFamily-monospace",
       "paddingHorizontal-Text-codefence": "$space-4",
       "paddingVertical-Text-codefence": "$space-3",
       "paddingVertical-Text-paragraph": "$space-1",
       "fontSize-Text-subheading": "$fontSize-H6",
-      "lineHeight-Text-subheading": "$lineHeight-sm",
       "fontWeight-Text-subheading": "$fontWeight-bold",
       "letterSpacing-Text-subheading": "0.04em",
       "textTransform-Text-subheading": "uppercase",
@@ -14555,7 +14336,6 @@ export default {
       "marginBottom-Text-tableheading": "$space-4",
       "paddingHorizontal-Text-tableheading": "$space-1",
       "fontSize-Text-tableheading": "$fontSize-H6",
-      "lineHeight-Text-tableheading": "$lineHeight-sm",
       "fontWeight-Text-tableheading": "$fontWeight-bold",
       "backgroundColor-Text-code": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-code": "$color-surface-100",
@@ -14621,40 +14401,6 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `TextArea` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `TextArea` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -14875,40 +14621,6 @@ export default {
       "initialValue": {
         "description": "This property sets the component's initial value.",
         "defaultValue": ""
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
@@ -15177,40 +14889,6 @@ export default {
         "description": "This property sets the component's initial value.",
         "defaultValue": ""
       },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
       "maxLength": {
         "description": "This property sets the maximum length of the input it accepts.",
         "valueType": "number"
@@ -15472,6 +15150,11 @@ export default {
         "description": "This property indicates whether the component is at the root of the application.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "applyIf": {
+        "description": "This property controls whether the theme wrapper is applied. When true (default), the theme wraps the children. When false, children are rendered unwrapped.",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "opaque": true
@@ -15532,40 +15215,6 @@ export default {
           }
         ],
         "defaultValue": "none"
-      },
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "labelPosition": {
-        "description": "Places the label at the given position of the component.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the input"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the input"
-          }
-        ],
-        "defaultValue": "top"
-      },
-      "labelWidth": {
-        "description": "This property sets the width of the `TimeInput` component's label. If not defined, the label's width will be determined by its content and the available space."
-      },
-      "labelBreak": {
-        "description": "This boolean value indicates whether the `TimeInput` label can be split into multiple lines if it would overflow the available label width.",
-        "valueType": "boolean",
-        "defaultValue": true
       },
       "hour24": {
         "description": "Whether to use 24-hour format (true) or 12-hour format with AM/PM (false)",
@@ -15923,20 +15572,288 @@ export default {
     }
   },
   "Tree": {
-    "status": "in progress",
-    "description": "The `Tree` component is a virtualized tree component that displays hierarchical data.",
+    "status": "stable",
+    "description": "The `Tree` component is a virtualized tree component that displays hierarchical data with support for flat and hierarchy data formats.",
     "props": {
       "data": {
-        "description": "The data source of the tree.",
-        "required": true
+        "description": "The data source of the tree. Format depends on the dataFormat property.",
+        "isRequired": true
       },
-      "selectedUid": {
-        "description": "The ID (optional) of the selected tree row."
+      "dataFormat": {
+        "description": "The input data structure format: \"flat\" (array with parent relationships) or \"hierarchy\" (nested objects).",
+        "valueType": "string",
+        "defaultValue": "flat"
+      },
+      "idField": {
+        "description": "The property name in source data for unique identifiers.",
+        "valueType": "string",
+        "defaultValue": "id"
+      },
+      "nameField": {
+        "description": "The property name in source data for display text.",
+        "valueType": "string",
+        "defaultValue": "name"
+      },
+      "iconField": {
+        "description": "The property name in source data for icon identifiers.",
+        "valueType": "string",
+        "defaultValue": "icon"
+      },
+      "iconExpandedField": {
+        "description": "The property name in source data for expanded state icons.",
+        "valueType": "string",
+        "defaultValue": "iconExpanded"
+      },
+      "iconCollapsedField": {
+        "description": "The property name in source data for collapsed state icons.",
+        "valueType": "string",
+        "defaultValue": "iconCollapsed"
+      },
+      "parentIdField": {
+        "description": "The property name in source data for parent relationships (used in flat format).",
+        "valueType": "string",
+        "defaultValue": "parentId"
+      },
+      "childrenField": {
+        "description": "The property name in source data for child arrays (used in hierarchy format).",
+        "valueType": "string",
+        "defaultValue": "children"
+      },
+      "selectableField": {
+        "description": "The property name in source data for selectable state (default: \"selectable\").",
+        "valueType": "string",
+        "defaultValue": "selectable"
+      },
+      "selectedValue": {
+        "description": "The selected item ID in source data format."
+      },
+      "defaultExpanded": {
+        "description": "Initial expansion state: \"none\", \"all\", \"first-level\", or array of specific IDs.",
+        "valueType": "string",
+        "defaultValue": "none"
+      },
+      "autoExpandToSelection": {
+        "description": "Automatically expand the path to the selected item.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "itemClickExpands": {
+        "description": "Whether clicking anywhere on a tree item should expand/collapse the node, not just the expand/collapse icon.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "iconCollapsed": {
+        "description": "The icon name to use for collapsed nodes (default: \"chevronright\").",
+        "valueType": "string",
+        "defaultValue": "chevronright"
+      },
+      "iconExpanded": {
+        "description": "The icon name to use for expanded nodes (default: \"chevrondown\").",
+        "valueType": "string",
+        "defaultValue": "chevrondown"
+      },
+      "iconSize": {
+        "description": "The size of the expand/collapse icons (default: \"16\").",
+        "valueType": "string",
+        "defaultValue": "16"
+      },
+      "itemHeight": {
+        "description": "The height of each tree row in pixels (default: 35).",
+        "valueType": "number",
+        "defaultValue": 32
+      },
+      "animateExpand": {
+        "description": "When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "expandRotation": {
+        "description": "The number of degrees to rotate the collapsed icon when expanded in animate mode (default: 90).",
+        "valueType": "number",
+        "defaultValue": 90
+      },
+      "dynamicField": {
+        "description": "The property name in source data for dynamic loading state (default: \"dynamic\").",
+        "valueType": "string",
+        "defaultValue": "dynamic"
       },
       "itemTemplate": {
         "description": "The template for each item in the tree.",
         "valueType": "ComponentDef"
       }
+    },
+    "events": {
+      "selectionDidChange": {
+        "description": "Fired when the tree selection changes.",
+        "signature": "(event: TreeSelectionEvent) => void"
+      },
+      "nodeDidExpand": {
+        "description": "Fired when a tree node is expanded.",
+        "signature": "(node: FlatTreeNode) => void"
+      },
+      "nodeDidCollapse": {
+        "description": "Fired when a tree node is collapsed.",
+        "signature": "(node: FlatTreeNode) => void"
+      },
+      "loadChildren": {
+        "description": "Fired when a tree node needs to load children dynamically. Should return an array of child data.",
+        "signature": "(node: FlatTreeNode) => any[]"
+      }
+    },
+    "apis": {
+      "expandAll": {
+        "description": "Expand all nodes in the tree.",
+        "signature": "expandAll(): void"
+      },
+      "collapseAll": {
+        "description": "Collapse all nodes in the tree.",
+        "signature": "collapseAll(): void"
+      },
+      "expandToLevel": {
+        "description": "Expand nodes up to the specified depth level (0-based).",
+        "signature": "expandToLevel(level: number): void",
+        "parameters": {
+          "level": "The maximum depth level to expand (0 = root level only)"
+        }
+      },
+      "expandNode": {
+        "description": "Expand a specific node by its source data ID.",
+        "signature": "expandNode(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to expand (source data format)"
+        }
+      },
+      "collapseNode": {
+        "description": "Collapse a specific node by its source data ID.",
+        "signature": "collapseNode(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to collapse (source data format)"
+        }
+      },
+      "selectNode": {
+        "description": "Programmatically select a node by its source data ID.",
+        "signature": "selectNode(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to select (source data format)"
+        }
+      },
+      "clearSelection": {
+        "description": "Clear the current selection.",
+        "signature": "clearSelection(): void"
+      },
+      "getNodeById": {
+        "description": "Get a tree node by its source data ID.",
+        "signature": "getNodeById(nodeId: string | number): TreeNode | null",
+        "parameters": {
+          "nodeId": "The ID of the node to retrieve (source data format)"
+        }
+      },
+      "getExpandedNodes": {
+        "description": "Get an array of currently expanded node IDs in source data format.",
+        "signature": "getExpandedNodes(): (string | number)[]"
+      },
+      "getSelectedNode": {
+        "description": "Get the currently selected tree node.",
+        "signature": "getSelectedNode(): TreeNode | null"
+      },
+      "scrollIntoView": {
+        "description": "Scroll to a specific node and expand parent nodes as needed to make it visible.",
+        "signature": "scrollIntoView(nodeId: string | number, options?: ScrollIntoViewOptions): void",
+        "parameters": {
+          "nodeId": "The ID of the node to scroll to (source data format)",
+          "options": "Optional scroll options"
+        }
+      },
+      "scrollToItem": {
+        "description": "Scroll to a specific node if it's currently visible in the tree.",
+        "signature": "scrollToItem(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to scroll to (source data format)"
+        }
+      },
+      "appendNode": {
+        "description": "Add a new node to the tree as a child of the specified parent node.",
+        "signature": "appendNode(parentNodeId: string | number | null, nodeData: any): void",
+        "parameters": {
+          "parentNodeId": "The ID of the parent node, or null/undefined to add to root level",
+          "nodeData": "The node data object using the format specified in dataFormat and field properties"
+        }
+      },
+      "removeNode": {
+        "description": "Remove a node and all its descendants from the tree.",
+        "signature": "removeNode(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to remove (along with all its descendants)"
+        }
+      },
+      "removeChildren": {
+        "description": "Remove all children (descendants) of a node while keeping the node itself.",
+        "signature": "removeChildren(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the parent node whose children should be removed"
+        }
+      },
+      "insertNodeBefore": {
+        "description": "Insert a new node before an existing node at the same level.",
+        "signature": "insertNodeBefore(beforeNodeId: string | number, nodeData: any): void",
+        "parameters": {
+          "beforeNodeId": "The ID of the existing node before which the new node should be inserted",
+          "nodeData": "The node data object using the format specified in dataFormat and field properties"
+        }
+      },
+      "insertNodeAfter": {
+        "description": "Insert a new node after an existing node at the same level.",
+        "signature": "insertNodeAfter(afterNodeId: string | number, nodeData: any): void",
+        "parameters": {
+          "afterNodeId": "The ID of the existing node after which the new node should be inserted",
+          "nodeData": "The node data object using the format specified in dataFormat and field properties"
+        }
+      },
+      "getNodeLoadingState": {
+        "description": "Get the loading state of a dynamic node.",
+        "signature": "getNodeLoadingState(nodeId: string | number): NodeLoadingState",
+        "parameters": {
+          "nodeId": "The ID of the node to check loading state for"
+        }
+      },
+      "markNodeLoaded": {
+        "description": "Mark a dynamic node as loaded.",
+        "signature": "markNodeLoaded(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to mark as loaded"
+        }
+      },
+      "markNodeUnloaded": {
+        "description": "Mark a dynamic node as unloaded and collapse it.",
+        "signature": "markNodeUnloaded(nodeId: string | number): void",
+        "parameters": {
+          "nodeId": "The ID of the node to mark as unloaded"
+        }
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Tree-row--selected": "var(--xmlui-backgroundColor-Tree-row--selected)",
+      "backgroundColor-Tree-row--hover": "var(--xmlui-backgroundColor-Tree-row--hover)",
+      "textColor-Tree": "var(--xmlui-textColor-Tree)",
+      "textColor-Tree--selected": "var(--xmlui-textColor-Tree--selected)",
+      "textColor-Tree--hover": "var(--xmlui-textColor-Tree--hover)",
+      "borderColor-Tree-row--focus": "var(--xmlui-borderColor-Tree-row--focus)",
+      "outlineColor-Tree--focus": "var(--xmlui-outlineColor-Tree--focus)",
+      "outlineWidth-Tree--focus": "var(--xmlui-outlineWidth-Tree--focus)",
+      "outlineStyle-Tree--focus": "var(--xmlui-outlineStyle-Tree--focus)",
+      "outlineOffset-Tree--focus": "var(--xmlui-outlineOffset-Tree--focus)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-Tree-row--selected": "$color-primary-50",
+      "backgroundColor-Tree-row--hover": "$color-surface-100",
+      "textColor-Tree": "$textColor-primary",
+      "textColor-Tree--selected": "$color-primary-900",
+      "textColor-Tree--hover": "$textColor-primary",
+      "borderColor-Tree-row--focus": "$color-primary-500",
+      "outlineColor-Tree--focus": "$outlineColor--focus",
+      "outlineWidth-Tree--focus": "$outlineWidth--focus",
+      "outlineStyle-Tree--focus": "$outlineStyle--focus",
+      "outlineOffset-Tree--focus": "$outlineOffset--focus"
     }
   },
   "BarChart": {
@@ -15947,8 +15864,8 @@ export default {
       "data": {
         "description": "This property is used to provide the component with data to display.The data needs to be an array of objects."
       },
-      "xKeys": {
-        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.",
+      "yKeys": {
+        "description": "Specifies the key in the data objects that will be used to label the different data series.",
         "valueType": "string"
       },
       "stacked": {
@@ -15965,8 +15882,8 @@ export default {
         ],
         "defaultValue": "vertical"
       },
-      "yKey": {
-        "description": "Specifies the key in the data objects that will be used to label the different data series.",
+      "xKey": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.",
         "valueType": "string"
       },
       "hideX": {
@@ -16129,12 +16046,12 @@ export default {
       "data": {
         "description": "The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point."
       },
-      "xKeys": {
-        "description": "This property specifies the keys in the data objects that should be used for rendering the lines.",
+      "xKey": {
+        "description": "The key in the data objects used for labeling different data series.",
         "valueType": "string"
       },
-      "yKey": {
-        "description": "The key in the data objects used for labeling different data series.",
+      "yKeys": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the lines.",
         "valueType": "string"
       },
       "hideX": {
