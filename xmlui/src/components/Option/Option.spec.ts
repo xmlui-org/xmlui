@@ -442,6 +442,8 @@ test.describe("Accessibility", () => {
     await page.waitForTimeout(200);
     await page.keyboard.press("ArrowDown");
     await page.waitForTimeout(200);
+    await page.keyboard.press("ArrowDown");
+    await page.waitForTimeout(200);
 
     // Select with Enter
     await page.keyboard.press("Enter");
@@ -582,11 +584,7 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByRole("option")).toHaveCount(2);
   });
 
-  test("null values are handled gracefully", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
+  test("null values are handled gracefully", async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
       <Select>
         <Option label="{null}" value="null_label" />

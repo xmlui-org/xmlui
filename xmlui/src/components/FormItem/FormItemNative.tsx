@@ -51,6 +51,7 @@ import { HelperText } from "./HelperText";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
+import styles from "./FormItem.module.scss";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -510,7 +511,7 @@ export const FormItem = memo(function FormItem({
       style={style}
       className={className}
       validationResult={
-        <div ref={animateContainerRef}>
+        <div ref={animateContainerRef} className={styles.helperTextContainer}>
           {isHelperTextShown &&
             validationResult?.validations.map((singleValidation, i) => (
               <Fragment key={i}>

@@ -872,7 +872,7 @@ test.describe("Edge Cases", () => {
     const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
     await selectDriver.component.click();
-    await page.getByLabel("Public Key").click();
+    await page.getByText("Public Key").click();
     await textfieldDriver.field.fill("John");
     await formDriver.submitForm();
 
@@ -1656,7 +1656,7 @@ test("can submit with invisible required field", async ({
   const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
   await selectDriver.component.click();
-  await page.getByLabel("Public Key").click();
+  await page.getByText("Public Key").click();
   await textfieldDriver.field.fill("John");
   await formDriver.submitForm();
 
