@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.10.25
+
+### Patch Changes
+
+- e7c503e: refactor: Select - remove radix select
+- 5fe3052: Fix the NavGroup click behavior in responsive view
+- 5fe3052: Fix the $item access issue within a ModalDialog inside a Column
+- 250647b: Fix the APICall becomes non-functional after first error when used with DataSource + Items + $item context issue
+
 ## 0.10.24
 
 ### Patch Changes
