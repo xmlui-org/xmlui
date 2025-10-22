@@ -91,6 +91,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
   ModalDialogMd,
   ({
     node,
+    contextVars,
     extractValue,
     className,
     renderChild,
@@ -98,11 +99,9 @@ export const modalViewComponentRenderer = createComponentRenderer(
     registerComponentApi,
     layoutContext,
   }) => {
-    // gigantic hack: If the ModalDialog is not inside a ModalDialogFrame, wrap it in one
-    //   we do this through the layout context, render it through another render loop with the extra $param context var
-    //   (note the layoutContext and node on the MemoizedItem)
-    // one solution would be to have a renderChild that can take a contextVars argument
+    // --- If the ModalDialog is not inside a ModalDialogFrame, wrap it in one.
     if (!layoutContext?._insideModalFrame) {
+      // --- Context variables are now directly available via contextVars parameter
       return (
         <ModalDialogFrame
           isInitiallyOpen={extractValue(node.when) !== undefined}
@@ -115,7 +114,11 @@ export const modalViewComponentRenderer = createComponentRenderer(
                 node={node}
                 renderChild={renderChild}
                 layoutContext={{ _insideModalFrame: true }}
-                contextVars={{ $param: openParams?.[0], $params: openParams }}
+                contextVars={{ 
+                  ...contextVars, 
+                  $param: openParams?.[0], 
+                  $params: openParams 
+                }}
               />
             );
           }}

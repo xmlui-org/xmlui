@@ -234,10 +234,22 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
+  // --- Extract context variables (keys starting with "$") from state
+  const contextVars = useMemo(() => {
+    const vars: Record<string, any> = {};
+    for (const key of Object.keys(state)) {
+      if (key.startsWith("$")) {
+        vars[key] = state[key];
+      }
+    }
+    return vars;
+  }, [state]);
+
   // --- Assemble the renderer context we pass down the rendering chain
   const rendererContext: RendererContext<any> = {
     node: safeNode,
     state: state[uid] || EMPTY_OBJECT,
+    contextVars,
     updateState: memoedUpdateState,
     appContext,
     extractValue: valueExtractor,
