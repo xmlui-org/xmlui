@@ -7,7 +7,7 @@
         </property>
         <Search data="{appGlobals.plainTextContent}" />
         <property name="profileMenuTemplate">
-            <Text variant="em">XMLUI Docs: For humans and AIs</Text>
+            <Text>XMLUI Docs: For people and AIs</Text>
         </property>
         <SpaceFiller />
         <Search

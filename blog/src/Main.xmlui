@@ -18,7 +18,7 @@
         </property>
         <Search data="{appGlobals.plainTextContent}" />
         <property name="profileMenuTemplate">
-            <Text variant="em">XMLUI Blog: Tutorials, tips, best practices</Text>
+            <Text>XMLUI Blog: Tutorials, tips, best practices</Text>
         </property>
     </AppHeader>
     <NavPanel>
