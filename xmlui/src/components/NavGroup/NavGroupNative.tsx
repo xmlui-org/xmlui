@@ -200,12 +200,18 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     "--nav-link-level": layoutIsVertical ? level : 0,
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpanded((prev) => !prev);
+  };
+
   return (
     <>
       <NavLink
         {...rest}
         style={toggleStyle}
-        onClick={() => setExpanded((prev) => !prev)}
+        onClick={handleClick}
         icon={icon}
         to={to}
         disabled={disabled}

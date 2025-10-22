@@ -1,5 +1,5 @@
-import type { ReactNode} from "react";
-import { useLayoutEffect, useRef } from "react";
+import type { ReactNode } from "react";
+import { useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -14,6 +14,8 @@ import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { Button } from "../../components/Button/ButtonNative";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+
+const PART_HAMBURGER = "hamburger";
 
 type Props = {
   children?: ReactNode;
@@ -96,6 +98,7 @@ export const AppHeader = ({
       >
         {hasRegisteredNavPanel && showNavPanelIf && (
           <Button
+            data-part-id={PART_HAMBURGER}
             onClick={toggleDrawer}
             icon={<Icon name={"hamburger"} />}
             variant={"ghost"}
