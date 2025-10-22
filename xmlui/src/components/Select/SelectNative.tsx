@@ -498,9 +498,13 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       setOpen,
       setSelectedIndex,
       options,
+      highlightedValue:
+        selectedIndex >= 0 && selectedIndex < filteredOptions.length
+          ? filteredOptions[selectedIndex].value
+          : undefined,
       optionRenderer,
     }),
-    [multiSelect, readOnly, toggleOption, value, options, optionRenderer],
+    [multiSelect, readOnly, toggleOption, value, options, optionRenderer, selectedIndex, filteredOptions],
   );
 
   return (
@@ -542,7 +546,13 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                 if (!enabled || readOnly) return;
 
                 // Handle opening dropdown with keyboard
-                if (!open && (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === " " || event.key === "Enter")) {
+                if (
+                  !open &&
+                  (event.key === "ArrowDown" ||
+                    event.key === "ArrowUp" ||
+                    event.key === " " ||
+                    event.key === "Enter")
+                ) {
                   event.preventDefault();
                   setOpen(true);
                   return;
@@ -652,6 +662,8 @@ function VisibleSelectOption(option: Option) {
     multiSelect,
     readOnly,
     setOpen,
+    setSelectedIndex,
+    highlightedValue,
     optionRenderer,
   } = useSelect();
 
@@ -674,6 +686,10 @@ function VisibleSelectOption(option: Option) {
       : String(selectedValue) === String(value);
   }, [selectedValue, value, multiSelect]);
 
+  const isHighlighted = useMemo(() => {
+    return highlightedValue !== undefined && String(highlightedValue) === String(value);
+  }, [highlightedValue, value]);
+
   const handleClick = () => {
     if (readOnly) {
       setOpen(false);
@@ -691,6 +707,7 @@ function VisibleSelectOption(option: Option) {
       aria-selected={selected}
       className={classnames(styles.multiSelectOption, {
         [styles.disabledOption]: !enabled,
+        [styles.highlighted]: isHighlighted,
       })}
       onMouseDown={(e) => {
         e.preventDefault();

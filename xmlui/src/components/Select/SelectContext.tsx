@@ -12,6 +12,7 @@ type SelectContextValue = {
   setOpen: (open: boolean) => void;
   setSelectedIndex?: (index: number) => void;
   options: Set<Option>;
+  highlightedValue?: string;
   optionRenderer?: (
     option: Option,
     selectedValue: SingleValueType,
