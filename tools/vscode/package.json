@@ -82,8 +82,7 @@
     "type-check": "tsc --noEmit",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "format-test": "node ./dist/extension.js --test ./test-samples/complex-sample.xmlui"
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1",
