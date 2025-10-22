@@ -3,7 +3,7 @@ generateLangServerMetadata(collectedComponentMetadata);
 
 /**
  * @typedef {import('../src/language-server/services/common').ComponentMetadataCollection} ComponentMetadataCollection
- * @typedef {import('../src/abstractions/ComponentDefs').ComponentMetadata} ComponentMetadata
+ * @typedef {import('../src/abstractions/ComponentDefs.js').ComponentMetadata} ComponentMetadata
  */
 
 /**
