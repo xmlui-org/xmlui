@@ -10,7 +10,6 @@ import {
 } from "react";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
-import { FocusScope } from "@radix-ui/react-focus-scope";
 import styles from "./Select.module.scss";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -424,6 +423,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
+    console.log("focus");
     referenceElement?.focus();
   }, [referenceElement]);
 
@@ -536,7 +536,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               id={id}
               aria-haspopup="listbox"
               style={style}
-              onFocus={onFocus}
+              onFocus={() => {
+                onFocus();
+                console.log("onFocus");
+              }}
               onBlur={onBlur}
               disabled={!enabled}
               aria-expanded={open}
@@ -593,59 +596,57 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             </PopoverTrigger>
             {open && (
               <Portal container={root}>
-                <FocusScope asChild loop trapped>
-                  <PopoverContent
-                    style={{ minWidth: width, height: dropdownHeight }}
-                    className={styles.selectContent}
-                    onKeyDown={handleKeyDown}
-                  >
-                    <div className={styles.command}>
-                      {searchable ? (
-                        <div className={styles.commandInputContainer}>
-                          <Icon name="search" />
-                          <input
-                            role="searchbox"
-                            className={classnames(styles.commandInput)}
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                          />
-                        </div>
-                      ) : (
-                        <button aria-hidden="true" className={styles.srOnly} />
-                      )}
-                      <div role="listbox" className={styles.commandList}>
-                        {inProgress ? (
-                          <div className={styles.loading}>{inProgressNotificationMessage}</div>
-                        ) : searchable && searchTerm ? (
-                          // When searching, show only filtered options
-                          filteredOptions.length === 0 ? (
-                            <div>{emptyListNode}</div>
-                          ) : (
-                            filteredOptions.map(({ value, label, enabled, keywords }, index) => (
-                              <SelectOptionItem
-                                key={value}
-                                readOnly={readOnly}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                                isHighlighted={selectedIndex === index}
-                                itemIndex={index}
-                              />
-                            ))
-                          )
-                        ) : (
-                          // When not searching, show all children (includes Options and other components like Button)
-                          <>
-                            {children}
-                            {options.size === 0 && <div>{emptyListNode}</div>}
-                          </>
-                        )}
+                <PopoverContent
+                  style={{ minWidth: width, height: dropdownHeight }}
+                  className={styles.selectContent}
+                  onKeyDown={handleKeyDown}
+                >
+                  <div className={styles.command}>
+                    {searchable ? (
+                      <div className={styles.commandInputContainer}>
+                        <Icon name="search" />
+                        <input
+                          role="searchbox"
+                          className={classnames(styles.commandInput)}
+                          placeholder="Search..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                       </div>
+                    ) : (
+                      <button aria-hidden="true" className={styles.srOnly} />
+                    )}
+                    <div role="listbox" className={styles.commandList}>
+                      {inProgress ? (
+                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                      ) : searchable && searchTerm ? (
+                        // When searching, show only filtered options
+                        filteredOptions.length === 0 ? (
+                          <div>{emptyListNode}</div>
+                        ) : (
+                          filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                            <SelectOptionItem
+                              key={value}
+                              readOnly={readOnly}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                              isHighlighted={selectedIndex === index}
+                              itemIndex={index}
+                            />
+                          ))
+                        )
+                      ) : (
+                        // When not searching, show all children (includes Options and other components like Button)
+                        <>
+                          {children}
+                          {options.size === 0 && <div>{emptyListNode}</div>}
+                        </>
+                      )}
                     </div>
-                  </PopoverContent>
-                </FocusScope>
+                  </div>
+                </PopoverContent>
               </Portal>
             )}
           </Popover>
