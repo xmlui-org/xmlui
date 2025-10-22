@@ -72,21 +72,24 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       case ContainerActionKind.EVENT_HANDLER_STARTED: {
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
-        state[uid] = { ...state[uid], [inProgressFlagName]: true };
+        // Preserve existing state or use empty object
+        state[uid] = state[uid] ? { ...state[uid], [inProgressFlagName]: true } : { [inProgressFlagName]: true };
         storeNextValue(state[uid]);
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_COMPLETED: {
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
-        state[uid] = { ...state[uid], [inProgressFlagName]: false };
+        // Preserve existing state or use empty object
+        state[uid] = state[uid] ? { ...state[uid], [inProgressFlagName]: false } : { [inProgressFlagName]: false };
         storeNextValue(state[uid]);
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_ERROR: {
         const { eventName } = action.payload;
         const inProgressFlagName = `${eventName}InProgress`;
-        state[uid] = { ...state[uid], [inProgressFlagName]: false };
+        // Preserve existing state or use empty object
+        state[uid] = state[uid] ? { ...state[uid], [inProgressFlagName]: false } : { [inProgressFlagName]: false };
         storeNextValue(state[uid]);
         break;
       }
